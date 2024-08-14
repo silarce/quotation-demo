@@ -6,7 +6,6 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 //  gear
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
@@ -107,7 +106,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     return (dataArr ?? []).map((contract, index) => {
       const { id: contractId, content, isSignedBack, contractNumber } = contract;
 
-      const { managerReviewedAt } = content;
+      const { managerReviewedAt, averageDiscount } = content;
 
       const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
 
@@ -117,7 +116,8 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         quotationId: contract.contractNumber ?? '---',
         clientName: content.customer?.name ?? '---',
         quotationName: content.projectName,
-        discount: contract.discount,
+        // discount: contract.discount,
+        averageDiscount: averageDiscount ?? '',
         priceTotal: String(contract.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,

@@ -60,7 +60,7 @@
 
 .head_head1 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -109,7 +109,7 @@
     grid-template-columns: 600px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
-    margin-top: 5px;
+    // margin-top: 5px;
     margin-left: 20px;
     margin-right: 20px;
 
@@ -282,7 +282,7 @@ div.panelHeader11 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 30px 150px 300px 300px 50px 50px 40px 60px 80px 30px 200px;
+        grid-template-columns: 30px 150px 415px 415px 50px 50px 40px 60px 80px 30px 200px;
         gap: 5px;
     }
 }
@@ -566,27 +566,89 @@ div.panelHeader13 {
 }
 
 .squarebtn {
-    height: 39px;
-    width: 39px;
+    height: 50px;
+    width: 50px;
     // padding: 0px 40px;
     border: solid 1px #c1c1c1;
-    ;
     background-color: $bgc01;
     padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
     font-weight: 500;
-    font-size: 16px;
+    font-size: 1rem;
     color: #14256a;
     transform: translateY(2px);
-
+  
     &:hover {
-        border: solid 1px #c1c1c1;
-        background-color: #c1c1c17c
+      border: solid 1px #c1c1c1;
+      background-color: #c1c1c17c
     }
-
+  
     &:focus {
-        background-color: $bgc01;
-        border: solid 1px #c1c1c1;
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
     }
-}
+  }
+  
+  .redsquarebtn {
+    height: 50px;
+    width: 50px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #14256a;
+    transform: translateY(2px);
+  
+    &:hover {
+      border: solid 1px #c1c1c1;
+      background-color: #c1c1c17c
+    }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
+    }
+  }
+  
+  .disablesquarebtn {
+    height: 50px;
+    width: 50px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #5b5a5ad6;
+    transform: translateY(2px);
+  
+    &:hover {
+      background-repeat: no-repeat;
+      background-position: center right 10px;
+      /* 調整圖標位置 */
+      cursor: not-allowed;
+      /* 添加這行使滑鼠顯示禁止符號 */
+  }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
+    }
+  }
+
+//判斷字串是否過長
+.truncate {
+    display: inline-block;
+    max-width: 200px; /* 設定你希望的最大寬度 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle; /* 可選，根據需要對齊文本 */
+  }

@@ -1,8 +1,8 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
-import _ from 'lodash';
+import moment, { Moment } from 'moment';
+import _, { filter } from 'lodash';
 
 import scss from './purchaseRequisitionList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -37,6 +37,14 @@ import icon_disable from 'public/image/icon/fc_disable.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { color } from 'html2canvas/dist/types/css/types/color';
 import { orange } from '@mui/material/colors';
+import icon_remove from 'public/image/icon/fc_remove.svg';
+import icon_fc_arrow_up from 'public/image/icon/fc_arrow_up.svg';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_approved from 'public/image/icon/fc_approved.svg';
+import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
+import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -76,6 +84,7 @@ export default function PurchaseRequisitionList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -98,7 +107,13 @@ export default function PurchaseRequisitionList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
 
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -246,8 +261,16 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: '尚無單據'
+                })
+            }
+
             setData(data);
             setData1Restore(data);
+            setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0]);
@@ -270,9 +293,15 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
+
     useEffect(() => {
-        getPurchaseRequisition();
+        if (!hasFetchedData.current) {
+            getPurchaseRequisition();
+            hasFetchedData.current = true;
+        }
     }, []);
+
 
     //取對應的請購明細
     const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
@@ -843,13 +872,118 @@ export default function PurchaseRequisitionList() {
 
     //#endregion
 
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
 
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.purchaserequisitionid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+
+
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        // setSearchdata(data);
+    }
+
+
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // 空依賴陣列確保只在掛載和卸載時運行
+
+
+    const Print = async (purchaserequisitionuuid: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel= {
+                
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/Print1?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData2(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={panelList} />
-            <div className={scss.container}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === false ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
                         <div style={{
@@ -925,18 +1059,52 @@ export default function PurchaseRequisitionList() {
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { Print("test") }} title="列印">
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
                                 </button>
                             </div>
+                            <div>
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("核准") }} title="單據核准">
+                                    <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    核准
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("駁回") }} title="單據核准">
+                                    <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    駁回
+                                </button>
+
+                            </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+                            </div>
                         </div>
                         <div className={scss.head_content1}>
 
@@ -947,7 +1115,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                             // value: checkfirstin
                                         },
                                     }}
@@ -958,7 +1126,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid,
+                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
                                         },
                                     }}
                                 />
@@ -968,7 +1136,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -982,7 +1150,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '',
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
                                         },
                                     }}
                                 />
@@ -996,7 +1164,7 @@ export default function PurchaseRequisitionList() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red' },
-                                            value: statusin,
+                                            value: statusin || ' ',
                                         },
                                     }}
                                 />
@@ -1050,11 +1218,8 @@ export default function PurchaseRequisitionList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                {/* {statusin} */}
-                                {/* {transpoprogress} */}
-                                {/* {parseInt(totalreqprogress)} */}
-                                {/* {quotereqprogress}/{totalreqprogress} */}
-                                <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
+
+                                {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
                                     <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
@@ -1072,7 +1237,7 @@ export default function PurchaseRequisitionList() {
                                 </span>
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -1135,7 +1300,7 @@ export default function PurchaseRequisitionList() {
                                             <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span style={{ backgroundColor: '#e9eff5' }}>{_item.suppliername}</span>
+                                            <span>{_item.suppliername}</span>
                                             <span>
                                                 <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
@@ -1144,13 +1309,13 @@ export default function PurchaseRequisitionList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
                             )}
                         </div>
-
+                        
                         <div className={scss.body_foot1}>
                             <div>
                                 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
@@ -1167,39 +1332,31 @@ export default function PurchaseRequisitionList() {
                                         <td>小計</td>
                                         <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
                                     </tr>
-                                    {/* <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>營業稅</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
-                                </tr> */}
-                                    {/* <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>應付金額</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
-                                </tr> */}
                                 </table>
                             </div>
                         </div>
                         <br />
                         <div className={scss.foot_head1}>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                {/* <span>
-                                    <button className={scss.redbtn} onClick={() => { handlePO() }}>轉採購單</button>
-                                </span> */}
-                                <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
+
+                                {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handlePO() }}>新增採購</button>
                                 </span>
                                 <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增採購</button>
-                                    {/* <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="新增採購" /> */}
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.foot_content1}>
@@ -1285,7 +1442,7 @@ export default function PurchaseRequisitionList() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
@@ -1473,52 +1630,48 @@ export default function PurchaseRequisitionList() {
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                         </div>
                         <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
                         </div>
                     </div>
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordstartdate || null,
+                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
                                             }
                                         }}
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                <div>
                                     <InputSel
                                         caption="截止日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div> */}
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="請購日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordenddate || null,
+                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
                                             }
                                         }}
                                     />
@@ -1531,8 +1684,8 @@ export default function PurchaseRequisitionList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                                value: keyword2 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1545,22 +1698,8 @@ export default function PurchaseRequisitionList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="廠商名稱"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                                value: keyword3 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1580,7 +1719,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1594,7 +1733,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1608,7 +1747,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1621,32 +1760,18 @@ export default function PurchaseRequisitionList() {
                                         }}
                                     />
                                 </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                     <span>
-                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    <span>
+                                    {/* <span>
                                         <button className={scss.minibtn} type="submit">查找</button>
-                                    </span>
+                                    </span> */}
                                 </div>
                             </form>
                         </div>
                         <div style={{
-                            maxHeight: '500px',
+                            maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
                             // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
@@ -1654,7 +1779,7 @@ export default function PurchaseRequisitionList() {
                             // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
-                            <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
 
                     </div>

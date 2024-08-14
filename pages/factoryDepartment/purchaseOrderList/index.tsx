@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import _ from 'lodash';
 import scss from './purchaseOrderList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -32,6 +32,10 @@ import icon_fc_collapse_right from 'public/image/icon/fc_collapse_right.svg';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { Modal } from 'antd';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -78,6 +82,8 @@ export default function PurchaseOrderList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
+
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -102,6 +108,14 @@ export default function PurchaseOrderList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -247,6 +261,7 @@ export default function PurchaseOrderList() {
             const data = await response.json();
             setData(data);
             setData1Restore(data);
+            setSearchdata(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -277,9 +292,16 @@ export default function PurchaseOrderList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
+
     useEffect(() => {
-        getPurchaseOrder();
+        if (!hasFetchedData.current) {
+            getPurchaseOrder();
+            hasFetchedData.current = true;
+        }
     }, []);
+
+
 
     //取對應的採購明細
     const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
@@ -753,6 +775,68 @@ export default function PurchaseOrderList() {
         setSearchmodalopen(false);
     }
 
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
+        const suppliername = keyword4.trim();
+
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status &&
+            !suppliername) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.purchaseorderid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+        if (suppliername) {
+            filteredData = filteredData.filter(item =>
+                item.suppliername.toString().includes(suppliername)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        setKeyword4('');
+        // setSearchdata(data);
+    }
 
 
     return (
@@ -834,22 +918,38 @@ export default function PurchaseOrderList() {
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
                                 </button>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
+                            <div>
+                                <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} title="單據已結">
+                                    <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
                             <div>
-
                                 <InputSel
                                     {...inputSelProps}
                                     caption="採購日期"
@@ -1120,7 +1220,7 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
+                                {/* <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
                                     <button className={scss.redbtn} onClick={() => { handleClosePO("結案") }}>結案</button>
                                 </span>
                                 <span style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} onClick={() => { myAlert.warning({ title: '尚未達到需求數量' }) }}>
@@ -1128,7 +1228,7 @@ export default function PurchaseOrderList() {
                                 </span>
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -1179,7 +1279,7 @@ export default function PurchaseOrderList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1357,52 +1457,48 @@ export default function PurchaseOrderList() {
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                         </div>
                         <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
                         </div>
                     </div>
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordstartdate || null,
+                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
                                             }
                                         }}
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                <div>
                                     <InputSel
                                         caption="截止日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div> */}
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="採購日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordenddate || null,
+                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
                                             }
                                         }}
                                     />
@@ -1415,8 +1511,8 @@ export default function PurchaseOrderList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                                value: keyword2 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1429,8 +1525,8 @@ export default function PurchaseOrderList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                                value: keyword3 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1443,22 +1539,8 @@ export default function PurchaseOrderList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
+                                                value: keyword4 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1505,37 +1587,23 @@ export default function PurchaseOrderList() {
                                         }}
                                     />
                                 </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                     <span>
-                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    <span>
+                                    {/* <span>
                                         <button className={scss.minibtn} type="submit">查找</button>
-                                    </span>
+                                    </span> */}
                                 </div>
                             </form>
                         </div>
                         <div style={{
-                            maxHeight: '500px',
+                            maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'PurchaseOrder'} />
-                            <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Tbody01 type={'PurchaseOrder'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
 
                     </div>

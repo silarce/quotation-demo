@@ -17,7 +17,7 @@ type Tcontract = {
   quotationId: string;
   clientName: string;
   quotationName: string;
-  discount: string;
+  averageDiscount: string;
   priceTotal: string;
   contactPerson: string;
   contactPhone: string;
@@ -44,7 +44,7 @@ export default function ListHeader01({
     quotationId,
     clientName,
     quotationName,
-    discount,
+    averageDiscount,
     priceTotal,
     contactPerson,
     contactPhone,
@@ -65,7 +65,7 @@ export default function ListHeader01({
         <span>{clientName}</span>
         <span>{quotationName}</span>
       </div>
-      <span>{discount}%</span>
+      <span>{averageDiscount}%</span>
       <span>{parsedPriceTotal}</span>
       <span>{contactPerson}</span>
       <span>{contactPhone}</span>

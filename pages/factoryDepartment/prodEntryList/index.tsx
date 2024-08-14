@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
 import scss from './prodEntryList.module.scss';
@@ -37,6 +37,11 @@ import EditWHPosition from '../editWHPosition';
 import { color } from 'html2canvas/dist/types/css/types/color';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_wh from 'public/image/icon/fc_wh.svg';
+import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
+
+
 
 
 type Tquery = {
@@ -87,9 +92,13 @@ export default function ProdEntryList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
     const [data11, setData11] = useState<any[]>([]);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
 
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [hoverInfo, setHoverInfo] = useState<string | null>(null);
+    const [mouseX, setMouseX] = useState('0px');
+    const [mouseY, setMouseY] = useState('0px');
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -121,6 +130,14 @@ export default function ProdEntryList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -152,6 +169,10 @@ export default function ProdEntryList() {
     const [traynamecalled, setTraynamecalled] = useState<string>("");
     const [whpnamecalled, setWhpnamecalled] = useState<string>("");
 
+
+    const [selectedOption, setSelectedOption] = useState(''); // 預設選項
+    const [selectWhnamedata, setSelectwhnamedata] = useState<any[]>([]);
+    const [selecttraynamedata, setSelecttraynamedata] = useState<any[]>([]);
 
     const [nowname, setNowname] = useState<string>("");
     const [nowproductid, setNowproductid] = useState<string>("");
@@ -297,6 +318,7 @@ export default function ProdEntryList() {
             const data = await response.json();
             setData(data);
             setDatarestore(data);
+            setSearchdata(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -327,8 +349,13 @@ export default function ProdEntryList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
+
     useEffect(() => {
-        getProdEntry();
+        if (!hasFetchedData.current) {
+            getProdEntry();
+            hasFetchedData.current = true;
+        }
     }, []);
 
     //取對應的進貨明細
@@ -418,8 +445,10 @@ export default function ProdEntryList() {
             setIsLoading(true);
             const conditionModel: {
                 productid: string | undefined
+                type: string | undefined
             } = {
                 productid: productid as string | undefined,
+                type: "entry"
             };
 
 
@@ -449,6 +478,7 @@ export default function ProdEntryList() {
 
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
 
+
             console.log(data);
             if (modalcheckfirstin === 0) {
                 setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
@@ -461,6 +491,22 @@ export default function ProdEntryList() {
                 setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
             }
             console.log(data);
+
+
+
+            const distinctWhnames = data
+                .map((item: { whname: any; }) => item.whname)  // 提取所有 whname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+            setSelectwhnamedata(distinctWhnames);
+
+            const distincttraynames = data
+                .map((item: { trayname: any; }) => item.trayname)  // 提取所有 trayname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+
+            setSelecttraynamedata(distincttraynames);
+
 
 
         } catch (error: any) {
@@ -822,11 +868,15 @@ export default function ProdEntryList() {
                 prodentrydetailuuid: string | undefined,
                 quantity: string | undefined,
                 batchid: string | undefined,
+                type: string | undefined,
+                productid: string | undefined
             } = {
                 whpositionuuid: nowwhpositionuuid,
                 prodentrydetailuuid: nowprodentrydetailuuid,
                 quantity: inboxquantity.toString() as string | undefined,
-                batchid: batchidin
+                batchid: batchidin,
+                type: whpproductid != nowproductid ? 'false' : 'true',
+                productid: nowproductid
             };
 
 
@@ -848,6 +898,7 @@ export default function ProdEntryList() {
             setNowentryqty((parseInt(nowentryqty) + 1).toString());
             getProdEntryDetail(prodentryuuidin);
             setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
+            setInboxquantity(0);
 
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
@@ -1110,7 +1161,13 @@ export default function ProdEntryList() {
     };
 
     function handleinbox(item: any) {
-        console.log(item);
+        setWhpnumber('');
+        setWhpproductid('');
+        setWhpname('');
+        setWhpspec('');
+        setWhpquantity('');
+        setData3([]);
+        setData11([]);
         getWhpositionDetailByProductId(item.productid);
         setWhpositionqmodalopen(!whpositionqmodalopen);
         // setMaxinboxquantity(item.quantity);
@@ -1146,23 +1203,27 @@ export default function ProdEntryList() {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // let value = e.target.value;
-        // // 檢查輸入是否為數字
-        // if (!isNaN(Number(value))) {
-        //     let numericValue = Number(value);
-        //     if (numericValue > maxinboxquantity) {
-        //         numericValue = maxinboxquantity;
-        //     }
-        //     setInboxquantity(numericValue);
-        // }
         let value = e.target.value;
+
         // 檢查輸入是否為數字
-        if (!isNaN(Number(value))) {
+        if (!isNaN(Number(value)) && value !== "") {
             let numericValue = Number(value);
-            if (numericValue > (parseInt(nowquantity) - parseInt(nowentryqty))) {
-                numericValue = (parseInt(nowquantity) - parseInt(nowentryqty));
+
+            // 獲取最大允許值
+            const maxValue = parseInt(nowquantity) - parseInt(nowentryqty);
+
+            // 比較輸入值和最大值
+            if (numericValue > maxValue) {
+                numericValue = maxValue;
+            } else if (numericValue < 0) {
+                numericValue = 0; // 確保最小值為0
             }
+
+            // 更新狀態
             setInboxquantity(numericValue);
+        } else {
+            // 處理非數字輸入
+            setInboxquantity(0); // 或者保留先前的狀態，具體看你的需求
         }
     };
 
@@ -1297,12 +1358,113 @@ export default function ProdEntryList() {
         setSelectedItemId(itemId);
     };
 
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
+        const suppliername = keyword4.trim();
+
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status &&
+            !suppliername) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.prodentryid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+        if (suppliername) {
+            filteredData = filteredData.filter(item =>
+                item.suppliername.toString().includes(suppliername)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        setKeyword4('');
+        // setSearchdata(data);
+    }
+
+    useEffect(() => {
+        // 明確指定參數類型為 Window 的 MouseEvent
+        const handleMouseMove = (event: globalThis.MouseEvent) => {
+            setMouseX(`${event.pageX}px`);
+            setMouseY(`${event.pageY}px`);
+        };
+
+        // 當組件加載時添加事件監聽器
+        window.addEventListener('mousemove', handleMouseMove);
+
+        // 返回一個清理函數，在組件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []); // 空依賴數組，確保只在組件加載和卸載時運行
+
+
+
+
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // 空依賴陣列確保只在掛載和卸載時運行
+
+
+
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'入庫單'} panelList={panelList} />
-            <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
                     <div className={scss.content}>
                         <div style={{
                             display: 'flex',
@@ -1311,15 +1473,14 @@ export default function ProdEntryList() {
                             position: 'sticky',
                             top: 0,
                             backgroundColor: '#fff',
-                            zIndex: 1000
+                            zIndex: 1002
                         }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                            {/*    <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
                                 <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
                                     <InputSel
                                         caption="入庫日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
                                                 value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
@@ -1356,13 +1517,13 @@ export default function ProdEntryList() {
                                     <button className={scss.minibtn} type="submit">搜尋</button>
                                 </div>
                                 <div>
-                                    <Thead01 type={'ProdEntry'} />
                                 </div>
-                            </form>
+                            </form>*/}
                         </div>
-                        {/* <hr /> */}
+
                         <div>
-                            <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Thead01 type={'ProdEntry'} />
+                            <Tbody01 type={'ProdEntry'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
                 </div>
@@ -1370,10 +1531,10 @@ export default function ProdEntryList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button> */}
-                                {/* &nbsp; */}
+                                <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    <img src={icon_sidebar.src} alt="sidebar" style={{ height: '30px', width: '30px' }} title="側欄" />
+                                </button>
+                                &nbsp;
                                 {/* <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
                                     儲位管理
                                 </button> */}
@@ -1390,8 +1551,14 @@ export default function ProdEntryList() {
                                 </button>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
+                            <div>
+                                {/* <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                </button> */}
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
@@ -1474,7 +1641,7 @@ export default function ProdEntryList() {
                                         },
                                     }}
                                 />
-                                 <InputSel
+                                <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
                                     disabled={true}
@@ -1485,7 +1652,7 @@ export default function ProdEntryList() {
                                         },
                                     }}
                                 />
-                                 <InputSel
+                                <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
                                     disabled={true}
@@ -1657,20 +1824,18 @@ export default function ProdEntryList() {
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
+                                            {/* <span>{_item.spec}</span> */}
                                             <span>{_item.spec}</span>
                                             <span style={{ color: '#ea1833' }}>{_item.entry_qty}</span>
                                             <span>{_item.quantity}</span>
                                             <span>{_item.unit}</span>
-                                            <span>{_item.total_quantity}</span>
-                                            {/* <span>{_item.totalprice.toLocaleString()}</span> */}
                                             <span>
-
-                                                {/* <IconDetail onClick={() => { setWhpositionqmodalopen(!whpositionqmodalopen); getWhpositionDetailByProductId(_item.productid) }}></IconDetail> */}
                                                 <button onClick={() => { handleinbox(_item) }}>
-                                                    <img src={icon_fc_tray.src} alt="tray" style={{ width: '30px', height: '20px' }} />
+                                                    <img src={icon_tray_in.src} alt="tray" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span>{_item.total_quantity}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1814,9 +1979,10 @@ export default function ProdEntryList() {
                 visible={whpositionqmodalopen}
                 footer={null}
                 onCancel={whpositionqModalClose}
-                width="1500px"
+                // width="2000px"
+                width="100%"
                 maskClosable={false}
-                style={{ top: 100 }}
+                style={{ top: 70 }}
             >
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
                     <span style={{ fontSize: '16px', color: '#14256a' }}>
@@ -1876,6 +2042,31 @@ export default function ProdEntryList() {
                     <div className={scss.modal_left}>
                         <div className={scss.modal_content}>
                             <div>
+                                {/* <span style={{ fontSize: '18px', }}>倉庫：</span>
+                                <select
+                                    value={selectedOption}
+                                    style={{ fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                    onChange={(e) => setSelectedOption(e.target.value)}
+                                >
+                                    {selectWhnamedata.map((whname, index) => (
+                                        <option key={index} value={whname}>
+                                            {whname}
+                                        </option>
+                                    ))}
+                                </select>
+                                &nbsp;
+                                <span style={{ fontSize: '18px', }}>托盤：</span>
+                                <select
+                                    value={selectedOption}
+                                    style={{ fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                    onChange={(e) => setSelectedOption(e.target.value)}
+                                >
+                                    {selecttraynamedata.map((trayname, index) => (
+                                        <option key={index} value={trayname}>
+                                            {trayname}
+                                        </option>
+                                    ))}
+                                </select> */}
                                 <Thead01 type={'ProdEntryWhpositionList'} />
                                 {data3 && (
                                     data3.map((_item: any, index: number) => (
@@ -1885,10 +2076,12 @@ export default function ProdEntryList() {
                                                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                                 onClick={() => handleGetLayOut(_item)}
                                             >
+                                                <span>{index + 1}</span>
                                                 <span>{_item.whname}</span>
                                                 <span>{_item.trayname}</span>
                                                 <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
-                                                <span>{_item.quantity}</span>
+                                                <span style={{ color: `${_item.productid != nowproductid ? 'red' : 'black'}` }}>{_item.productid}</span>
+                                                <span style={{ color: `${_item.quantity === 0 ? 'red' : 'black'}` }}>{_item.quantity}</span>
                                                 <span>
                                                     {/* <button onClick={() => {  }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
@@ -1950,11 +2143,13 @@ export default function ProdEntryList() {
                                                                 <tr className={scss.childtraytabletr}>
                                                                     {childitem.childwidthdata.map((childDataItem: any) => (
                                                                         <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
-                                                                            <span className={scss.childtraytabletdButton}
+                                                                            <button className={scss.childtraytabletdButton}
                                                                                 style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
+                                                                                onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
+                                                                                onMouseLeave={() => setHoverInfo(null)}
                                                                             >
                                                                                 {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                            </span>
+                                                                            </button>
                                                                         </td>
                                                                     ))}
                                                                 </tr>
@@ -1967,6 +2162,25 @@ export default function ProdEntryList() {
                                     </tbody>
                                 </table>
                             ))}
+                            {hoverInfo && (
+                                <div
+                                    style={{
+                                        backgroundColor: '#dfdcdc',
+                                        position: 'fixed',
+                                        top: mouseY,
+                                        left: mouseX,
+                                        transform: 'translate(10%, 60%)',
+                                        padding: '5px',
+                                        borderRadius: '5px',
+                                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                                        zIndex: '1002',
+                                        whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
+                                        fontSize: '16px'
+                                    }}
+                                >
+                                    {hoverInfo}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -2005,7 +2219,7 @@ export default function ProdEntryList() {
                                 <div style={{ paddingTop: '5px' }}>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="入庫狀態"
+                                        caption="入庫進度"
                                         className='align-bottom'
                                         disabled={true}
                                         inputProps={{
@@ -2107,10 +2321,11 @@ export default function ProdEntryList() {
                                         disabled={(traycalled === true && nowentryqty < nowquantity) ? false : true}
                                         inputProps={{
                                             props: {
+                                                type: "number",
+                                                min: 0, // 設置最小值為0
+                                                step: 1, // 設置步進值，默認為1
+                                                max: parseInt(nowquantity) - parseInt(nowentryqty), // 設置最大值
                                                 style: { color: 'red' },
-                                                max: maxinboxquantity,
-                                                // max: (parseInt(nowquantity)-parseInt(nowentryqty)),
-                                                // nowentryqty} / ${nowquantity
                                                 value: inboxquantity ? inboxquantity : 0,
                                                 onChange: handleInputChange
                                             },
@@ -2165,7 +2380,7 @@ export default function ProdEntryList() {
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                         </div>
                         <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
                         </div>
                     </div>
                 }
@@ -2174,47 +2389,43 @@ export default function ProdEntryList() {
             >
                 <div className={scss.modal_head_content1}>
                     <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                            {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="起始日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="截止日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div> */}
+                        <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    caption="起始日期"
+                                    disabled={false}
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                    datePickerProps={{
+                                        props: {
+                                            value: keywordstartdate || null,
+                                            onChange: (e: Moment | null) => { setKeywordstartdate(e) }
+                                        }
+                                    }}
+                                />
+                            </div>
                             <br />
                             <div>
                                 <InputSel
-                                    caption="入庫日期"
+                                    caption="截止日期"
                                     disabled={false}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                     datePickerProps={{
                                         props: {
-                                            value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                            onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            value: keywordenddate || null,
+                                            onChange: (e: Moment | null) => { setKeywordenddate(e) }
                                         }
                                     }}
                                 />
@@ -2223,12 +2434,12 @@ export default function ProdEntryList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="入庫單號"
+                                    caption="進貨單號"
                                     disabled={false}
                                     inputProps={{
                                         props: {
-                                            value: keyword2 ? keyword2 : ' ',
-                                            onChange: (e) => { setKeyword2(e.target.value) }
+                                            value: keyword2 || ' ',
+                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                         },
                                     }}
                                 />
@@ -2241,8 +2452,8 @@ export default function ProdEntryList() {
                                     disabled={false}
                                     inputProps={{
                                         props: {
-                                            value: keyword3 ? keyword3 : ' ',
-                                            onChange: (e) => { setKeyword3(e.target.value) }
+                                            value: keyword3 || ' ',
+                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                         },
                                     }}
                                 />
@@ -2255,14 +2466,14 @@ export default function ProdEntryList() {
                                     disabled={false}
                                     inputProps={{
                                         props: {
-                                            value: keyword3 ? keyword3 : ' ',
-                                            onChange: (e) => { setKeyword3(e.target.value) }
+                                            value: keyword4 || ' ',
+                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
                                         },
                                     }}
                                 />
                             </div>
                             <br />
-                            <div>
+                            <div >
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -2276,7 +2487,7 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <br />
-                            <div>
+                            <div >
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -2290,7 +2501,7 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <br />
-                            <div>
+                            <div >
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -2303,46 +2514,18 @@ export default function ProdEntryList() {
                                     }}
                                 />
                             </div>
-                            <br />
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <br />
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                 <span>
-                                    <button className={scss.minibtn} type="submit">清除條件</button>
+                                    <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                 </span>
-                                <span>
-                                    <button className={scss.minibtn} type="submit">查找</button>
-                                </span>
+                                {/* <span>
+                                        <button className={scss.minibtn} type="submit">查找</button>
+                                    </span> */}
                             </div>
                         </form>
                     </div>
                     <div style={{
-                        maxHeight: '500px',
+                        maxHeight: '465.81px',
                         overflowY: 'auto',
                         border: '1px solid #c1c1c1',
                         // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
@@ -2350,7 +2533,7 @@ export default function ProdEntryList() {
                         // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                     }}>
                         <Thead01 type={'ProdEntry'} />
-                        <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Tbody01 type={'ProdEntry'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
 
                 </div>
