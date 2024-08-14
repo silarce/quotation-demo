@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // component
 import { ExportToIncomeBill } from './exportToIncomeBill';
@@ -27,6 +28,8 @@ import { TpaymentType, Tstate_accountant, TreqPost, TreqPatch, TreqPostPatchIsIm
 // type
 import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
+
+import { calcQuota } from './function';
 
 // ============================================================================
 const Cell_span = ({
@@ -117,41 +120,25 @@ const Row = ({
         month: postProps.month - 1,
       }));
 
+  // 匯入發票匯入紙本時的額度
+  const quota = data_accountant ? calcQuota(data_accountant) : 0;
+  // const quota = (() => {
+  //   const { price, splitPayment } = data_accountant ?? {};
+
+  //   const paymentTotal_d = (splitPayment ?? []).reduce((total, payment) => {
+  //     return total.add(payment);
+  //   }, new Decimal(0));
+
+  //   return new Decimal(price || 0).minus(paymentTotal_d).toNumber();
+  // })();
+
   // ---------------------------------------------------
 
-  const isAllowToEdit = !isWorksDepartment;
-
-  const {
-    // billSerialNumber,
-    // isImported, exchangeFromId,
-    isAlreadyImportIncomeBill,
-  } = data_accountant ?? {};
-  // const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
-
-  let isAllowToEditIsImported = false;
-
-  if (
-    !isNew &&
-    isWorksDepartment &&
-    // && !state_accountant.billSerialNumber.length
-    !isAlreadyImportIncomeBill
-  ) {
-    isAllowToEditIsImported = true;
-  }
-
-  let fonbiddenText: string | null = null;
-
-  if (isAlreadyImportIncomeBill) {
-    fonbiddenText = '已匯入/已兌現';
-  }
-
-  // if ((isImported || isBillSerialNumberValid) && exchangeFromId) {
-  //   fonbiddenText = '已匯入/已兌現';
-  // } else if (isImported || isBillSerialNumberValid) {
-  //   fonbiddenText = '已匯入';
-  // } else if (exchangeFromId) {
-  //   fonbiddenText = '已兌現';
-  // }
+  const { condition, fonbiddenText } = determineCondition({
+    isWorksDepartment,
+    data_accountant,
+    state_accountant,
+  });
 
   // ---------------------------------------------------
 
@@ -194,7 +181,8 @@ const Row = ({
               reqPatchIsImported(data_accountant.id, isoString, separatePayment)
             }
             onCancel={modal.destroy}
-            defaultPayment={Number(state_accountant.price)}
+            // defaultPayment={Number(state_accountant.price)}
+            quota={quota}
           />
         ),
       });
@@ -282,31 +270,28 @@ const Row = ({
         )}
         style={rowCellPropsList?.btn?.style}
       >
-        {
-          //
-          fonbiddenText ? (
-            <span className="text-center">{fonbiddenText}</span>
-          ) : isAllowToEdit ? (
-            <>
-              <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
-              <IconEdit
-                //
-                className={classNames(!disabled && scss.active, scss.foo, isNew && 'invisible')}
-                onClick={() => setDisabled((state) => !state)}
-              />
-              <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
-            </>
-          ) : (
-            <div className={scss.subBtnBar}>
-              <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant)}>
-                匯入發票
-              </MyButton_v2>
-              <MyButton_v2 px="px22" py="py4" onClick={handle_checkIsImported}>
-                匯入紙本
-              </MyButton_v2>
-            </div>
-          )
-        }
+        {condition === 'notAllow' && <span className="text-center">{fonbiddenText}</span>}
+        {condition === 'allowEdit' && (
+          <>
+            <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
+            <IconEdit
+              //
+              className={classNames(!disabled && scss.active, isNew && 'invisible')}
+              onClick={() => setDisabled((state) => !state)}
+            />
+            <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
+          </>
+        )}
+        {condition === 'allowExport' && (
+          <div className={scss.subBtnBar}>
+            <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant)}>
+              匯入發票
+            </MyButton_v2>
+            <MyButton_v2 px="px22" py="py4" onClick={handle_checkIsImported}>
+              匯入紙本
+            </MyButton_v2>
+          </div>
+        )}
       </div>
 
       {theKeyArr.map((key) => {
@@ -322,7 +307,7 @@ const Row = ({
             state_accountant,
             setState_accountant,
             handle_checkIsImported,
-            isAllowToEditIsImported,
+            // isAllowToEditIsImported,
           }) ?? {};
 
         const theDiasbled = isbillSerialNumber || disabled;
@@ -372,6 +357,83 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
 
   splitPayment: [],
 });
+
+const determineCondition = ({
+  isWorksDepartment,
+  data_accountant,
+  state_accountant,
+}: // isNew,
+{
+  isWorksDepartment: boolean;
+  data_accountant: TaccountantDto | undefined;
+  state_accountant: Tstate_accountant;
+  // isNew: boolean;
+}): {
+  condition: 'allowEdit' | 'allowExport' | 'notAllow' | null;
+  fonbiddenText: string | null;
+} => {
+  const isAlreadyImportIncomeBill = data_accountant?.isAlreadyImportIncomeBill;
+  const isIncomeBillExist = !!state_accountant.billSerialNumber.length;
+
+  let condition: 'allowEdit' | 'allowExport' | 'notAllow' | null = null;
+  let fonbiddenText: string | null = null;
+
+  if (isAlreadyImportIncomeBill) {
+    condition = 'notAllow';
+    fonbiddenText = '匯入額度已滿';
+  } else if (!isWorksDepartment && isIncomeBillExist) {
+    condition = 'notAllow';
+    fonbiddenText = '已匯入不可編輯';
+  } else if (!isWorksDepartment && !isIncomeBillExist) {
+    condition = 'allowEdit';
+  } else if (isWorksDepartment && !isAlreadyImportIncomeBill) {
+    condition = 'allowExport';
+  }
+
+  return {
+    condition,
+    fonbiddenText,
+  };
+
+  // 原本的判斷，留作參考 // 20240821後還沒有回頭看這個的話就可以刪掉了
+  // const isAllowToEdit = !isWorksDepartment;
+
+  // const {
+  //   // billSerialNumber,
+  //   // isImported, exchangeFromId,
+  //   isAlreadyImportIncomeBill,
+  // } = data_accountant ?? {};
+  // // const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
+
+  // let isAllowToEditIsImported = false;
+
+  // const isIncomeBillExist = !!state_accountant.billSerialNumber.length;
+
+  // if (
+  //   !isNew &&
+  //   isWorksDepartment &&
+  //   // && !state_accountant.billSerialNumber.length
+  //   !isAlreadyImportIncomeBill
+  // ) {
+  //   isAllowToEditIsImported = true;
+  // }
+
+  // let fonbiddenText: string | null = null;
+
+  // if (isAlreadyImportIncomeBill) {
+  //   fonbiddenText = '已匯入/已兌現';
+  // } else if (isIncomeBillExist) {
+  // }
+
+  // 更舊的判斷，留作參考 // 20240821後還沒有回頭看這個的話就可以刪掉了
+  // // if ((isImported || isBillSerialNumberValid) && exchangeFromId) {
+  // //   fonbiddenText = '已匯入/已兌現';
+  // // } else if (isImported || isBillSerialNumberValid) {
+  // //   fonbiddenText = '已匯入';
+  // // } else if (exchangeFromId) {
+  // //   fonbiddenText = '已兌現';
+  // // }
+};
 
 // =============================================================================
 

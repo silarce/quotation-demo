@@ -56,6 +56,7 @@ import { Tcurrency } from 'js/api/dtoTypes';
 // ______________________________________________________________
 
 import { Thead, Row } from './row';
+import { calcQuota } from './function';
 
 // =============================================================================
 
@@ -147,7 +148,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   // ------------------------------------------------------------------------------
 
-  const [disabled = isWorksDepartment, setDisabled] = useState(true);
+  // const [disabled = isWorksDepartment, setDisabled] = useState(true);
   const [showNewRow, setShowNewRow] = useState(false);
 
   // const [accountantId, setAccountantId] = useState<string>();
@@ -325,7 +326,15 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   // region FUNCTION
 
-  const handle_import = (accountReceivableId: string, accountantWillImport: TaccountantDto) => {
+  const handle_import = ({
+    accountReceivableId,
+    accountantWillImport,
+  }: {
+    accountReceivableId: string;
+    accountantWillImport: TaccountantDto;
+  }) => {
+    const quota = calcQuota(accountantWillImport);
+
     const modal = myAlert.btnBar({});
     modal.update({
       title: '匯入發票',
@@ -335,7 +344,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)
           }
           onCancel={modal.destroy}
-          defaultPayment={accountantWillImport.price}
+          // defaultPayment={accountantWillImport.price}
+          quota={quota}
         />
       ),
     });
@@ -449,7 +459,10 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             }
 
             if (accountReceivableId) {
-              handle_import(accountReceivableId, accountantWillImport!);
+              handle_import({
+                accountReceivableId,
+                accountantWillImport: accountantWillImport!,
+              });
             }
           }}
           onCancel={() => {

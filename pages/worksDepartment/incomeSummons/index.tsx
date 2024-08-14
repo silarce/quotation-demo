@@ -212,7 +212,7 @@ export default function IncomeSummons() {
 
   const reqApiPostIncomeBillSerialSettlementForm = async () => {
     return await apiPostIncomeBillSerialSettlementForm({
-      temp_date: isoDate,
+      settlementDate: isoDate,
     });
   };
 

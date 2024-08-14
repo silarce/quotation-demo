@@ -479,7 +479,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: '開立發票管理',
-              path: path01 + '/invoiceIssuanceManagement',
+              path: path01 + '/invoiceManagement',
               erpFeature: [
                 worksDepartment,
                 accountsReceivable,
@@ -676,16 +676,16 @@ const sidePathList: TsidePathList = {
               label: '請購管理',
               path: path01 + '/purchaseRequisitionList',
               activeChecker: ({ router }) => {
-
-                const { pathname, query } = router
+                const { pathname, query } = router;
                 console.log(router);
-                if (pathname === "/factoryDepartment/purchaseRequisitionList") {
+
+                if (pathname === '/factoryDepartment/purchaseRequisitionList') {
                   return true;
-                } else if (pathname === "/factoryDepartment/quotereqDetailList") {
+                } else if (pathname === '/factoryDepartment/quotereqDetailList') {
                   return true;
                 }
-                return false;
 
+                return false;
               },
               query: {
                 type: 'purchaseRequisitionList',
@@ -696,16 +696,16 @@ const sidePathList: TsidePathList = {
               label: '採購管理',
               path: path01 + '/purchaseOrderList',
               activeChecker: ({ router }) => {
-
-                const { pathname, query } = router
+                const { pathname, query } = router;
                 console.log(router);
-                if (pathname === "/factoryDepartment/purchaseOrderList") {
+
+                if (pathname === '/factoryDepartment/purchaseOrderList') {
                   return true;
-                } else if (pathname === "/factoryDepartment/addPurchaseOrder") {
+                } else if (pathname === '/factoryDepartment/addPurchaseOrder') {
                   return true;
                 }
-                return false;
 
+                return false;
               },
               query: {
                 type: 'purchaseOrderList',
@@ -716,14 +716,14 @@ const sidePathList: TsidePathList = {
               label: '進貨管理',
               path: path01 + '/prodReceiptList',
               activeChecker: ({ router }) => {
-
-                const { pathname, query } = router
+                const { pathname, query } = router;
                 console.log(router);
-                if (pathname === "/factoryDepartment/prodReceiptList") {
+
+                if (pathname === '/factoryDepartment/prodReceiptList') {
                   return true;
                 }
-                return false;
 
+                return false;
               },
               query: {
                 type: 'prodReceiptList',
@@ -734,14 +734,14 @@ const sidePathList: TsidePathList = {
               label: '領料管理',
               path: path01 + '/pickingList',
               activeChecker: ({ router }) => {
-
-                const { pathname, query } = router
+                const { pathname, query } = router;
                 console.log(router);
-                if (pathname === "/factoryDepartment/pickingList") {
+
+                if (pathname === '/factoryDepartment/pickingList') {
                   return true;
                 }
-                return false;
 
+                return false;
               },
               query: {
                 type: 'prodReceiptList',
@@ -758,18 +758,19 @@ const sidePathList: TsidePathList = {
               label: '儲位管理',
               path: path01 + '/wareHouseList',
               activeChecker: ({ router }) => {
-                const { pathname, query } = router
-                if (pathname === "/factoryDepartment/trayList") {
-                  return true;
-                } else if (pathname === "/factoryDepartment/addTray") {
-                  return true;
-                } else if (pathname === "/factoryDepartment/wareHouseList") {
-                  return true
-                } else if (pathname === "/factoryDepartment/editWHPosition") {
-                  return true
-                }
-                return false;
+                const { pathname, query } = router;
 
+                if (pathname === '/factoryDepartment/trayList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/addTray') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/wareHouseList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/editWHPosition') {
+                  return true;
+                }
+
+                return false;
               },
               query: {
                 type: 'WareHouse',
@@ -781,14 +782,14 @@ const sidePathList: TsidePathList = {
               label: '入庫管理',
               path: path01 + '/prodEntryList',
               activeChecker: ({ router }) => {
-
-                const { pathname, query } = router
+                const { pathname, query } = router;
                 console.log(router);
-                if (pathname === "/factoryDepartment/prodEntryList") {
+
+                if (pathname === '/factoryDepartment/prodEntryList') {
                   return true;
                 }
-                return false;
 
+                return false;
               },
               query: {
                 type: 'prodEntryList',
@@ -826,7 +827,6 @@ const sidePathList: TsidePathList = {
         //     // },
         //   ],
         // },
-
       ],
     };
   })(),
