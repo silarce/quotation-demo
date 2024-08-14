@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect, forwardRef } from 'react';
+import { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // antd
 import { Badge } from 'antd';
@@ -28,6 +29,10 @@ import scss from './summon.module.scss';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
 
+// global state
+import { useVipInfo } from 'hooks/globalState/useVipInfo';
+// context
+import { AppContext } from 'pages/_app';
 // ============================================================================
 
 type Tstate_incomeBillSerial = {
@@ -55,6 +60,11 @@ type Tstate_incomeBillSerial = {
   //
   // readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
   state_deduction: Tstate_deduction[];
+  //
+  //
+  isCashierSeen: boolean | null;
+  isWorkSupervisorSeen: boolean | null;
+  isManagerSeen: boolean | null;
 };
 
 type Tstate_deduction = {
@@ -152,6 +162,28 @@ const Summons_pre = (
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
+  const { userInfo } = useContext(AppContext);
+  const userId = userInfo?.employee?.id;
+
+  const {
+    manager,
+    worksDepartment_cashier: cashier,
+    worksDepartment_workSupervisor: workSupervisor,
+  } = useVipInfo((state) => ({
+    manager: state.manager,
+    worksDepartment_cashier: state.worksDepartment_cashier,
+    worksDepartment_workSupervisor: state.worksDepartment_workSupervisor,
+  }));
+
+  const identity =
+    userId === manager.id
+      ? 'manager'
+      : userId === cashier.id
+      ? 'cashier'
+      : userId === workSupervisor.id
+      ? 'workSupervisor'
+      : '';
+
   const accountantId = incomeBillSerial.accountant.id;
   const defaultState = useDefaultState(incomeBillSerial);
 
@@ -169,6 +201,20 @@ const Summons_pre = (
     });
   };
 
+  const handle_review = async () => {
+    if (!identity) {
+      return;
+    }
+
+    const body = _.cloneDeep(state_incomeBillSerial);
+
+    identity === 'cashier' && (body.isCashierSeen = !body.isCashierSeen);
+    identity === 'workSupervisor' && (body.isWorkSupervisorSeen = !body.isWorkSupervisorSeen);
+    identity === 'manager' && (body.isManagerSeen = !body.isManagerSeen);
+
+    await reqPatch(incomeBillSerial.id, body).then(() => {});
+  };
+
   // ---------------------------------------------------------------------
 
   useEffect(() => {
@@ -183,17 +229,20 @@ const Summons_pre = (
     <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled, className)}>
       <div className={scss.btnPanel} style={cellPropsList_summon.btnPanel.style}>
         <div className={scss.reviewerBox}>
-          <div className={scss.reviewer}>
-            <Badge status="default" />
-            <span>名字</span>
+          <div onClick={handle_review} className={classNames(scss.reviewer, identity === 'cashier' && scss.isReviewer)}>
+            <Badge status={checkStatus(state_incomeBillSerial.isCashierSeen)} />
+            <span>{cashier.name}</span>
           </div>
-          <div className={scss.reviewer}>
-            <Badge status="success" />
-            <span>名字</span>
+          <div
+            onClick={handle_review}
+            className={classNames(scss.reviewer, identity === 'workSupervisor' && scss.isReviewer)}
+          >
+            <Badge status={checkStatus(state_incomeBillSerial.isWorkSupervisorSeen)} />
+            <span>{workSupervisor.name}</span>
           </div>
-          <div className={scss.reviewer}>
-            <Badge status="error" />
-            <span>名字</span>
+          <div onClick={handle_review} className={classNames(scss.reviewer, identity === 'manager' && scss.isReviewer)}>
+            <Badge status={checkStatus(state_incomeBillSerial.isManagerSeen)} />
+            <span>{manager.title}</span>
           </div>
         </div>
         {/* <UpDownArrow className="h-[20px]" onClick={changeActive} /> */}
@@ -661,8 +710,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
         accountantId: accountantId,
         incomeBillId: state_incomeBillSerial.id,
         // defaultStateArr: undefined,
-        // onConfirm: update_incomeBill,
-        forbidden: true,
+        onConfirm: update_incomeBill,
+        // forbidden: true,
       };
 
       const editDefunctionBtnProps = disabled ? editDefunctionBtnProps_disable : editDefunctionBtnProps_able;
@@ -918,6 +967,12 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
 
       accountsReceivableDeduction,
       fee,
+      //
+      //
+      //
+      isCashierSeen,
+      isWorkSupervisorSeen,
+      isManagerSeen,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -953,10 +1008,19 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       vendorName: accountant.vendorName ?? '',
 
       state_deduction: state_deduction,
+      //
+      //
+      isManagerSeen,
+      isCashierSeen,
+      isWorkSupervisorSeen,
     };
 
     return defaultState;
   }, [incomeBillSerial]);
+};
+
+const checkStatus = (bool: boolean | null | undefined) => {
+  return bool ? 'success' : 'error';
 };
 
 // =============================================================================

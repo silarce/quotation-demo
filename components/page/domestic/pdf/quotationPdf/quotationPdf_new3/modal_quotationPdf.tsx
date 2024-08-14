@@ -1259,7 +1259,11 @@ const useModalQuotationPdf = ({
     });
 
     setPdfData({ top, prodArr, bottom });
-  }, [quotationContent]);
+  }, [
+    quotationContent,
+    emptySomeProperty,
+    // attachedProdArr
+  ]);
 
   return {
     visible,

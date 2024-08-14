@@ -3730,6 +3730,15 @@ export type TincomeBillSerialDto = {
   // 沒意外的話invoices裡應該最多只會有一筆資料
   invoiceNumber: string | null;
   invoices?: TaccountsReceivableInvoiceDto[];
+
+  //
+  //
+  // '應收是否已閱'
+  isCashierSeen: boolean | null;
+  // '應收是否已閱'
+  isWorkSupervisorSeen: boolean | null;
+  // '總經理是否已閱'
+  isManagerSeen: boolean | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3755,6 +3764,9 @@ export type TupdateIncomeBillSerialDto = Pick<
 } & {
   order?: number | null;
   isImported?: boolean;
+  isCashierSeen?: boolean | null;
+  isWorkSupervisorSeen?: boolean | null;
+  isManagerSeen?: boolean | null;
 };
 
 type TupdateIncomeBillDeductionDto = {
