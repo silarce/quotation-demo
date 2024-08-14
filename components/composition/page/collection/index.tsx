@@ -79,6 +79,7 @@ type Tstate_accountant = {
   billSerialNumber: string[];
   notes: string;
 
+  // isImported: boolean;
   isImported: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 

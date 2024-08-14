@@ -93,6 +93,15 @@ $height_thead: 44px;
   .active {
     color: red;
   }
+  .subBtnBar {
+    display: grid;
+    gap: 10px;
+    button {
+      span {
+        font-size: 14px;
+      }
+    }
+  }
 }
 
 .totalPriceWrapper {
