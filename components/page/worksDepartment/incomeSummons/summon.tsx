@@ -661,8 +661,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
         accountantId: accountantId,
         incomeBillId: state_incomeBillSerial.id,
         // defaultStateArr: undefined,
-        // onConfirm: update_incomeBill,
-        forbidden: true,
+        onConfirm: update_incomeBill,
+        // forbidden: true,
       };
 
       const editDefunctionBtnProps = disabled ? editDefunctionBtnProps_disable : editDefunctionBtnProps_able;
