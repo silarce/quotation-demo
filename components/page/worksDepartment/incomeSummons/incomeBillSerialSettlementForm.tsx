@@ -164,8 +164,8 @@ const IncomeBillSerialSettlementForm = ({
     };
 
     const defaultState_internalReceivablePayment = {
-      foreign: internalReceivablePayment,
-      domestic: foreignReceivablePayment,
+      foreign: foreignReceivablePayment,
+      domestic: internalReceivablePayment,
       total: new Decimal(internalReceivablePayment).add(foreignReceivablePayment).toNumber(),
     };
 
