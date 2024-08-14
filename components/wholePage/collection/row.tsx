@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // component
 import { ExportToIncomeBill } from './exportToIncomeBill';
@@ -27,6 +28,8 @@ import { TpaymentType, Tstate_accountant, TreqPost, TreqPatch, TreqPostPatchIsIm
 // type
 import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
+
+import { calcQuota } from './function';
 
 // ============================================================================
 const Cell_span = ({
@@ -117,6 +120,18 @@ const Row = ({
         month: postProps.month - 1,
       }));
 
+  // 匯入發票匯入紙本時的額度
+  const quota = data_accountant ? calcQuota(data_accountant) : 0;
+  // const quota = (() => {
+  //   const { price, splitPayment } = data_accountant ?? {};
+
+  //   const paymentTotal_d = (splitPayment ?? []).reduce((total, payment) => {
+  //     return total.add(payment);
+  //   }, new Decimal(0));
+
+  //   return new Decimal(price || 0).minus(paymentTotal_d).toNumber();
+  // })();
+
   // ---------------------------------------------------
 
   const { condition, fonbiddenText } = determineCondition({
@@ -166,7 +181,8 @@ const Row = ({
               reqPatchIsImported(data_accountant.id, isoString, separatePayment)
             }
             onCancel={modal.destroy}
-            defaultPayment={Number(state_accountant.price)}
+            // defaultPayment={Number(state_accountant.price)}
+            quota={quota}
           />
         ),
       });

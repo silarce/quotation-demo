@@ -18,25 +18,35 @@ const ExportToIncomeBill = ({
   //
   onConfirm,
   onCancel,
-  defaultPayment,
+  // defaultPayment,
+  quota,
 }: {
   onConfirm: TonConfirm;
   onCancel: () => void;
-  defaultPayment: number;
+  // defaultPayment: number;
+  quota: number;
 }) => {
   const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
-  const [state_splitPayment, setState_splitPayment] = useState<number | null>(defaultPayment);
+  const [state_splitPayment, setState_splitPayment] = useState<number>(quota);
 
   const handle_onConfirm = async () => {
-    if (state_incomeBillDate) {
-      await onConfirm({
-        isoString: state_incomeBillDate.toISOString(),
-        splitPayment: state_splitPayment || 0,
-      });
-      onCancel();
-    } else {
+    if (!state_incomeBillDate) {
       myAlert.info({ title: '請選擇日期' });
+
+      return;
     }
+
+    if (state_splitPayment > quota) {
+      myAlert.info({ title: '分出金額不可大於可分配金額' });
+
+      return;
+    }
+
+    await onConfirm({
+      isoString: state_incomeBillDate.toISOString(),
+      splitPayment: state_splitPayment,
+    });
+    onCancel();
   };
 
   return (
