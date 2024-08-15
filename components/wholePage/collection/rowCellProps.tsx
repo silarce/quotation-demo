@@ -226,6 +226,8 @@ const rowCellPropsList: TconfigList = {
         props: {
           value: value_moment,
           onChange: (date) => {
+            date && (date = date.startOf('day'));
+
             setState_accountant((state) => ({ ...state, insertDate: date }));
           },
           disabledDate: (date) => {
