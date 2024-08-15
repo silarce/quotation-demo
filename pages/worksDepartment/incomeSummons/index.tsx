@@ -175,6 +175,17 @@ export default function IncomeSummons() {
       isCashierSeen,
       isWorkSupervisorSeen,
       isManagerSeen,
+      //
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationPayment,
+      declarationCurrencyPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      currencyFee,
+      exchangeBenefits,
     } = state_incomeBillSerial;
 
     const incomeBillDeduction = state_deduction.map((item) => {
@@ -205,6 +216,16 @@ export default function IncomeSummons() {
       isCashierSeen,
       isWorkSupervisorSeen,
       isManagerSeen,
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationPayment,
+      declarationCurrencyPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      currencyFee,
+      exchangeBenefits,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
