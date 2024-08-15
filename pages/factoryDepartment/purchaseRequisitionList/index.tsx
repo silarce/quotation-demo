@@ -948,7 +948,7 @@ export default function PurchaseRequisitionList() {
     }, []); // 空依賴陣列確保只在掛載和卸載時運行
 
 
-    const Print = async (purchaserequisitionuuid: any) => {
+    const Print = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -1008,10 +1008,6 @@ export default function PurchaseRequisitionList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-
-            // const responseData = await response.json();
-            // console.log("Transfer response:", responseData);
-            // getQuotereqDetail(prquotereqadddata.quoterequuid);
 
         } catch (error: any) {
             // setError(error.message);
@@ -1112,7 +1108,7 @@ export default function PurchaseRequisitionList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Print("test") }} title="列印">
+                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>

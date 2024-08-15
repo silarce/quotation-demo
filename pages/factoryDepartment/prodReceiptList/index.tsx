@@ -866,6 +866,78 @@ export default function ProdReceiptList() {
     }
 
 
+    const Print = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+            if (!response.ok) {
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+            }
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
+
+        } catch (error: any) {
+            setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    const sentToPrint = async (ip: any) => {
+        try {
+            const conditionModel = {
+                id: prodreceiptidin,
+                type: "prodreceipt",
+                clientip: ip,
+                data: []
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}Print`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -945,7 +1017,7 @@ export default function ProdReceiptList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>
