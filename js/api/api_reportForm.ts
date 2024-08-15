@@ -69,6 +69,10 @@ const useGetReportForm_bonus = (
       });
   }, [params]);
 
+  const clear = () => {
+    setRes(undefined);
+  };
+
   useEffect(() => {
     isAutoUpdate && update();
   }, [isAutoUpdate, update]);
@@ -78,6 +82,7 @@ const useGetReportForm_bonus = (
     meta: res?.meta,
     isFetching,
     update,
+    clear,
   };
 };
 

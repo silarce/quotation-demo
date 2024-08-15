@@ -1383,6 +1383,8 @@ export const useQuotationAccounting_personalContract = (
 
   const update = async () => {
     if (!params.employeeId || !params.year) {
+      setRes(undefined);
+
       return;
     }
 
