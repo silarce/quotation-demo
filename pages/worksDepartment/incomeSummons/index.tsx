@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import Decimal from 'decimal.js';
 
 // layout
@@ -9,10 +9,9 @@ import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHe
 
 // component
 import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/incomeSummons/incomeBillSerialSettlementForm';
-import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
+
 import Summons, {
   SummonsRow,
-  keyArr_ori,
   getKeyArr,
   cellPropsList_summon,
   Tstate_incomeBillSerial,
@@ -27,7 +26,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './index.module.scss';
 
 // type
-import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tparams } from 'js/api/dtoTypes';
 
 // api
 import {
@@ -47,32 +46,6 @@ type Tquery = {
   year: string;
   month: string;
 };
-
-// type Tstate_incomeBillSerial = {
-//   id: string;
-//   billSerialNumber: string;
-//   receiveDate: Moment | null;
-//   contractNumber: string;
-//   projectName: string;
-//   contractPayment: string;
-//   periodPayment: string;
-//   priorPeriodPayment: string;
-//   importAccountingNumber: string;
-//   noteNumber: string;
-//   noteMaturityDate: Moment | null;
-//   receivablePayment: string;
-//   deductionPayment: string;
-//   unpaidPayment: string;
-//   difference: string;
-//   //
-//   readonly fee: number; // 現在是從accountant裡面拿
-//   //
-//   note: string;
-//   vendorName: string;
-
-//   //
-//   readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
-// };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
@@ -384,26 +357,6 @@ export default function IncomeSummons() {
                 />
               );
             })}
-
-            {/* <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
-              {data_incomeBill.map((data, index) => {
-                return (
-                  <Panel
-                    key={data.id}
-                    header={
-                      <Summons
-                        incomeBillSerial={data}
-                        reqPatch={reqPatch}
-                        update_incomeBill={update_incomeBill}
-                        changeActive={() => changeActive(data.id)}
-                      />
-                    }
-                  >
-                    <OtherInfo incomeBillSerial={data} />
-                  </Panel>
-                );
-              })}
-            </Collapse> */}
           </div>
         </div>
         {/*  */}
