@@ -2300,7 +2300,7 @@ export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 export type TcopyQuotationDto = {
   quotationId: string;
   customerId: string;
-  isRelationQuotation?: boolean;
+  isRelationQuotation: boolean;
 };
 
 // export type TcreateModifyQuotationDto = {
