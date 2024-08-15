@@ -13,7 +13,9 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import scss from '../inputSel.module.scss';
 
 export type TdatePickerProps = {
-  props?: DatePickerProps;
+  props?: DatePickerProps & {
+    onChange_raw?: DatePickerProps['onChange'];
+  };
   wrapperClassName?: string;
   wrapperStyle?: React.CSSProperties;
   showSuffixIcon?: 'always' | 'never' | 'auto';
@@ -61,6 +63,15 @@ export default function MyDatePicker({
         // @ts-ignore // 明明就有showToday，但是ts表示沒有
         showToday={false}
         {...props}
+        onChange={(date_m, dateString) => {
+          if (props?.onChange_raw) {
+            props.onChange_raw(date_m, dateString);
+          } else {
+            date_m = date_m?.startOf('day') ?? null;
+            dateString = date_m?.format('YYYY-MM-DD') ?? '';
+            props?.onChange?.(date_m, dateString);
+          }
+        }}
         className={classNames(scss.timePicker, props?.className, !isShowSuffixIcon && scss.notShowSuffixIcon)}
       />
     </div>
