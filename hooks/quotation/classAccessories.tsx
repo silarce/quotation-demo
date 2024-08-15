@@ -165,6 +165,10 @@ class Class_accessories {
     this.reRender();
   }
 
+  get referenceSpec() {
+    return this._acceData.referenceSpec;
+  }
+
   get name() {
     return this._acceData.name;
   }
@@ -198,12 +202,18 @@ class Class_accessories {
   get price() {
     return String(this._acceData.price);
   }
+
   set price(str) {
     const num = Number(str);
     this._acceData.price = num;
     this.calcAllPrice();
     this.reRender();
   }
+
+  get price_num() {
+    return this._acceData.price;
+  }
+
   get price_locale() {
     return String(this._acceData.price || 0);
     // return this._acceData.price.toLocaleString();

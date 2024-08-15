@@ -53,7 +53,7 @@ export default function WdContractList() {
       },
       $or: {
         'content.projectName': { $contains: keyWord },
-        contractNumber: { $eq: keyWord },
+        contractNumber: { $contains: keyWord },
       },
       engineeringContactId: { $notNull: true },
     },

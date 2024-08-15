@@ -1,19 +1,26 @@
-import { useState, useMemo, useEffect, forwardRef } from 'react';
-import classNames from 'classnames';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// component
+import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/incomeSummons/incomeBillSerialSettlementForm';
+import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
+import Summons, {
+  SummonsRow,
+  keyArr,
+  cellPropsList_summon,
+  Tstate_incomeBillSerial,
+} from 'components/page/worksDepartment/incomeSummons/summon';
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
-// icon
-import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './index.module.scss';
@@ -24,12 +31,11 @@ import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
 // api
 import {
   TupdateIncomeBillSerialDto,
-  useGetAccountReceivableIncomeBills,
   apiPatchIncomeBill,
+  useGetAccountReceivableIncomeBills,
+  //
+  apiPostIncomeBillSerialSettlementForm,
 } from 'js/api/api_engineering';
-
-// untils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ==============================================================================
 
@@ -41,26 +47,37 @@ type Tquery = {
   month: string;
 };
 
-type Tstate_incomeBillSerial = {
-  billSerialNumber: string;
-  receiveDate: Moment | null;
-  contractNumber: string;
-  projectName: string;
-  contractPayment: string;
-  periodPayment: string;
-  priorPeriodPayment: string;
-  importAccountingNumber: string;
-  noteNumber: string;
-  noteMaturityDate: Moment | null;
-  receivablePayment: string;
-  deductionPayment: string;
-  unpaidPayment: string;
-  difference: string;
-  //
-  fee: string;
-};
+// type Tstate_incomeBillSerial = {
+//   id: string;
+//   billSerialNumber: string;
+//   receiveDate: Moment | null;
+//   contractNumber: string;
+//   projectName: string;
+//   contractPayment: string;
+//   periodPayment: string;
+//   priorPeriodPayment: string;
+//   importAccountingNumber: string;
+//   noteNumber: string;
+//   noteMaturityDate: Moment | null;
+//   receivablePayment: string;
+//   deductionPayment: string;
+//   unpaidPayment: string;
+//   difference: string;
+//   //
+//   readonly fee: number; // 現在是從accountant裡面拿
+//   //
+//   note: string;
+//   vendorName: string;
+
+//   //
+//   readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
+// };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
+
+export type { TreqPatch };
+
+// ==============================================================================
 
 // ==============================================================================
 
@@ -78,24 +95,33 @@ export default function IncomeSummons() {
     month = String(thisMonth),
   } = query;
 
+  const month_whole = month.padStart(2, '0');
+  const isoDate = moment(`${year}-${month_whole}`).toISOString();
+
+  // -----------------------------------------------------------------------------
+
+  const [showTable, setShowTable] = useState(false);
+  // const { activePanelKeyArr, changeActive } = useActiveKey(); // 棄用
+
   // -----------------------------------------------------------------------------
 
   const params: Tparams = useMemo(() => {
     return {
-      sort: 'receiveDate',
+      sort: 'billSerialNumber',
       pageSize: 999999,
-      populate: ['accountant'],
+      // populate: ['accountant'],
+      populate: ['accountant', 'accountsReceivableDeduction'],
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
         },
         incomeBillDate: {
-          $gte: moment(`${year}-${month}`).startOf('month').toISOString(),
-          $lte: moment(`${year}-${month}`).endOf('month').toISOString(),
+          $gte: moment(`${year}-${month_whole}`).startOf('month').toISOString(),
+          $lte: moment(`${year}-${month_whole}`).endOf('month').toISOString(),
         },
       },
     };
-  }, [isForeign, month, year]);
+  }, [isForeign, month_whole, year]);
 
   const {
     data: data_incomeBill = [],
@@ -104,6 +130,19 @@ export default function IncomeSummons() {
   } = useGetAccountReceivableIncomeBills({
     params,
   });
+
+  const totals = useMemo(() => {
+    let total_receivablePayment = new Decimal(0);
+
+    data_incomeBill.forEach((data) => {
+      const receivablePayment = new Decimal(data.receivablePayment || 0);
+      total_receivablePayment = total_receivablePayment.add(receivablePayment);
+    });
+
+    return {
+      receivablePayment: total_receivablePayment.toNumber(),
+    };
+  }, [data_incomeBill]);
 
   // -----------------------------------------------------------------------------
 
@@ -128,7 +167,22 @@ export default function IncomeSummons() {
       deductionPayment,
       unpaidPayment,
       difference,
+      //
+      note,
+      state_deduction,
+      fee,
+      //
+      isCashierSeen,
+      isWorkSupervisorSeen,
+      isManagerSeen,
     } = state_incomeBillSerial;
+
+    const incomeBillDeduction = state_deduction.map((item) => {
+      return {
+        ...item,
+        detailedAmount: Number(item.detailedAmount || 0),
+      };
+    });
 
     const body: TupdateIncomeBillSerialDto = {
       receiveDate: receiveDate ? receiveDate.toISOString() : null,
@@ -144,9 +198,36 @@ export default function IncomeSummons() {
       deductionPayment: deductionPayment ? Number(deductionPayment) : null,
       unpaidPayment: unpaidPayment ? Number(unpaidPayment) : null,
       difference: difference ? difference : null,
+      note: note,
+
+      fee,
+      incomeBillDeduction: incomeBillDeduction,
+      isCashierSeen,
+      isWorkSupervisorSeen,
+      isManagerSeen,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
+  };
+
+  const reqApiPostIncomeBillSerialSettlementForm = async () => {
+    return await apiPostIncomeBillSerialSettlementForm({
+      settlementDate: isoDate,
+    });
+  };
+
+  // -----------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_reqApiPostIncomeBillSerialSettlementForm = () => {
+    myAlert.confirm({
+      title: `確定要結算${month}月份收款統計明細表嗎`,
+      content: '結算後無法回朔，且同一個月份不可以結算第二次',
+      props: {
+        onOk: reqApiPostIncomeBillSerialSettlementForm,
+      },
+    });
   };
 
   // -----------------------------------------------------------------------------
@@ -221,6 +302,21 @@ export default function IncomeSummons() {
     ] as TselectPropsArr;
   }, [year, month, yearOptionArr, monthOptionArr]);
 
+  const panelList: TpanelList = [
+    {
+      type: 'redButton',
+      label: '結算收款統計明細表',
+      onClick: handle_reqApiPostIncomeBillSerialSettlementForm,
+    },
+    {
+      type: 'myButton',
+      label: '收款統計明細表',
+      onClick: () => {
+        setShowTable(true);
+      },
+    },
+  ];
+
   // -----------------------------------------------------------------------------
   // MARK: RENDER
   return (
@@ -228,14 +324,20 @@ export default function IncomeSummons() {
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
+        panelList={panelList}
       />
       <div className={scss.main}>
+        {/*  */}
+
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
-            <Row className={scss.thead}>
-              <div style={config.btnPanel.style} className={config.btnPanel.className}></div>
+            <SummonsRow className={scss.thead}>
+              <div
+                style={cellPropsList_summon.btnPanel.style}
+                className={cellPropsList_summon.btnPanel.className}
+              ></div>
               {keyArr.map((key) => {
-                const { label, style, className } = config[key];
+                const { label, style, className } = cellPropsList_summon[key];
 
                 return (
                   <div key={key} style={style} className={className}>
@@ -243,15 +345,72 @@ export default function IncomeSummons() {
                   </div>
                 );
               })}
-            </Row>
+            </SummonsRow>
 
             {data_incomeBill.map((data, index) => {
-              return <Summons key={data.id} incomeBillSerial={data} reqPatch={reqPatch} />;
+              return (
+                <Summons
+                  key={data.id}
+                  incomeBillSerial={data}
+                  reqPatch={reqPatch}
+                  update_incomeBill={update_incomeBill}
+                  // changeActive={() => changeActive(data.id)}
+                  changeActive={() => {}} // 棄用 待串接上審核api時再拿掉
+                />
+              );
             })}
+
+            {/* <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
+              {data_incomeBill.map((data, index) => {
+                return (
+                  <Panel
+                    key={data.id}
+                    header={
+                      <Summons
+                        incomeBillSerial={data}
+                        reqPatch={reqPatch}
+                        update_incomeBill={update_incomeBill}
+                        changeActive={() => changeActive(data.id)}
+                      />
+                    }
+                  >
+                    <OtherInfo incomeBillSerial={data} />
+                  </Panel>
+                );
+              })}
+            </Collapse> */}
           </div>
         </div>
         {/*  */}
+
+        <div className={scss.totalBar}>
+          <SummonsRow className={scss.thead}>
+            <div style={cellPropsList_summon.btnPanel.style} className={cellPropsList_summon.btnPanel.className}></div>
+            {keyArr.map((key) => {
+              const { label, style, className } = cellPropsList_summon[key];
+
+              let node: React.ReactNode = null;
+
+              if (key === 'receivablePayment') {
+                node = <div className={scss.total_receivablePayment}>{totals.receivablePayment.toLocaleString()}</div>;
+              }
+
+              return (
+                <div key={key} style={style} className={className}>
+                  {node}
+                </div>
+              );
+            })}
+          </SummonsRow>
+        </div>
       </div>
+      {/*  */}
+      <IncomeBillSerialSettlementForm
+        //
+        showTable={showTable}
+        date={`${year}-${month.padStart(2, '0')}`}
+        onCrossClick={() => setShowTable(false)}
+      />
     </SubLayer>
   );
 }
@@ -262,139 +421,6 @@ export default function IncomeSummons() {
 // ==============================================================================
 // ==============================================================================
 // ==============================================================================
-// MARK: COMPONENT
-
-const Row_pre = (
-  {
-    //
-    className,
-    children,
-  }: {
-    className?: string;
-    children: React.ReactNode;
-  },
-  ref: React.Ref<HTMLDivElement>
-) => {
-  return (
-    <div ref={ref} className={classNames(scss.row, className)}>
-      {children}
-    </div>
-  );
-};
-
-const Row = forwardRef(Row_pre);
-
-const Summons_pre = (
-  {
-    //
-    incomeBillSerial,
-    reqPatch,
-  }: {
-    incomeBillSerial: TincomeBillSerialDto;
-    reqPatch: TreqPatch;
-  },
-  ref: React.Ref<HTMLDivElement>
-) => {
-  const defaultState = useMemo(() => {
-    const {
-      billSerialNumber,
-      receiveDate,
-      contractNumber,
-      projectName,
-      contractPayment,
-      periodPayment,
-      priorPeriodPayment,
-      importAccountingNumber,
-      noteNumber,
-      noteMaturityDate,
-      receivablePayment,
-      deductionPayment,
-      unpaidPayment,
-      //
-      accountant,
-    } = incomeBillSerial;
-
-    let { difference } = incomeBillSerial;
-    difference = (difference ?? '').trimEnd();
-
-    const defaultState: Tstate_incomeBillSerial = {
-      billSerialNumber: billSerialNumber,
-      receiveDate: receiveDate ? moment(receiveDate) : null,
-      contractNumber: contractNumber || '',
-      projectName: projectName || '',
-      contractPayment: String(contractPayment || ''),
-      periodPayment: String(periodPayment || ''),
-      priorPeriodPayment: String(priorPeriodPayment || ''),
-      importAccountingNumber: importAccountingNumber || '',
-      noteNumber: noteNumber || '',
-      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
-      receivablePayment: String(receivablePayment || ''),
-      deductionPayment: String(deductionPayment || ''),
-      unpaidPayment: String(unpaidPayment || ''),
-      difference: difference || '',
-      fee: String(accountant?.fee || '0'),
-    };
-
-    return defaultState;
-  }, [incomeBillSerial]);
-
-  const [state_incomeBillSerial, setState_incomeBillSerial] = useState<Tstate_incomeBillSerial>(defaultState);
-
-  const [disabled, setDisabled] = useState(true);
-
-  // isPaperImported 已匯入紙本應收帳款(舊的收款紀錄)，若為true，則可以編輯所有欄位
-  const isPaperImported = incomeBillSerial.isPaperImported;
-
-  // ---------------------------------------------------------------------
-
-  const handle_onConfirm = async () => {
-    await reqPatch(incomeBillSerial.id, state_incomeBillSerial).then(() => {
-      setDisabled(true);
-    });
-  };
-
-  // ---------------------------------------------------------------------
-
-  useEffect(() => {
-    setState_incomeBillSerial(defaultState);
-  }, [defaultState, disabled]);
-
-  // ---------------------------------------------------------------------
-
-  return (
-    <Row ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
-      <div className={scss.btnPanel} style={config.btnPanel.style}>
-        <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
-        <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
-      </div>
-
-      {keyArr.map((key) => {
-        const { style, className, createInputSelProps: createInputAttr } = config[key];
-
-        const inputSelProps = createInputAttr({
-          disabled: disabled,
-          isPaperImported,
-          state_incomeBillSerial,
-          setState_incomeBillSerial,
-        });
-
-        return (
-          <div key={key} style={style} className={classNames(className)}>
-            <InputSel
-              //
-              disabled={disabled || !isPaperImported}
-              showBaseline="auto"
-              {...inputSelProps}
-            />
-          </div>
-        );
-      })}
-    </Row>
-  );
-};
-
-// forwardRef
-const Summons = forwardRef(Summons_pre);
 
 // ==============================================================================
 
@@ -435,578 +461,3 @@ const useYearMonth = () => {
 };
 
 // ==============================================================================
-
-// MARK: FUNCTION
-
-const reducer_input = ({ disabled, value }: { disabled: boolean; value: string | number }) => {
-  const type = disabled ? 'text' : 'number';
-  const value_num = Number(value);
-
-  const theValue = (disabled ? value_num?.toLocaleString() : value) || '';
-
-  return {
-    type,
-    value: theValue,
-  };
-};
-
-const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
-  // 餘額=承攬價/本期計價-上期已計價-扣款-匯費
-
-  const {
-    //
-    contractPayment,
-    periodPayment,
-    priorPeriodPayment,
-    deductionPayment,
-    fee,
-  } = state_incomeBillSerial;
-
-  const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
-    .minus(priorPeriodPayment || 0)
-    .minus(deductionPayment || 0)
-    .minus(fee || 0)
-    .toNumber();
-
-  return unpaidPayment;
-};
-
-// ==============================================================================
-
-// MARK: config
-
-type TconfigKey =
-  | keyof Pick<
-      TincomeBillSerialDto,
-      | 'billSerialNumber'
-      | 'receiveDate'
-      | 'contractNumber'
-      | 'projectName'
-      | 'contractPayment'
-      | 'periodPayment'
-      | 'priorPeriodPayment'
-      | 'importAccountingNumber'
-      | 'noteNumber'
-      | 'noteMaturityDate'
-      | 'receivablePayment'
-      | 'deductionPayment'
-      | 'unpaidPayment'
-      | 'difference'
-    >
-  | 'fee';
-
-type TconfigItem = {
-  label: string;
-  style?: React.CSSProperties;
-  className?: string;
-  createInputSelProps: (props: {
-    disabled: boolean;
-    isPaperImported: boolean;
-    state_incomeBillSerial: Tstate_incomeBillSerial;
-    setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
-  }) => TinputSelProps;
-};
-
-type Tconfig = {
-  [key in TconfigKey]: TconfigItem;
-} & {
-  btnPanel: TconfigItem;
-};
-
-const keyArr: TconfigKey[] = [
-  'billSerialNumber',
-  // 'invoiceType',
-  'receiveDate',
-  'contractNumber',
-  'projectName',
-  'contractPayment',
-  'periodPayment',
-  'priorPeriodPayment',
-  'importAccountingNumber',
-  'noteNumber',
-  'noteMaturityDate',
-  'receivablePayment',
-  'deductionPayment',
-  'fee',
-  'unpaidPayment',
-  'difference',
-];
-
-const config: Tconfig = {
-  btnPanel: {
-    label: '',
-    style: { width: 70 },
-    className: scss.btnPanel,
-    createInputSelProps: () => ({}),
-  },
-
-  billSerialNumber: {
-    label: '收入傳票序號',
-    style: { width: 150 },
-    className: scss.billSerialNumber,
-    createInputSelProps: ({ state_incomeBillSerial }) => ({
-      disabled: true,
-      showBaseline: 'invisible',
-      inputProps: {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.billSerialNumber,
-          onChange: () => {},
-        },
-      },
-    }),
-  },
-
-  receiveDate: {
-    label: '日期',
-    style: { width: 130 },
-    className: 'text-center',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const datePickerProps: TinputSelProps['datePickerProps'] = {
-        props: {
-          value: state_incomeBillSerial.receiveDate,
-          onChange: (date) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                receiveDate: date,
-              };
-            });
-          },
-        },
-      };
-
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.receiveDate
-            ? getTaiwanDateStr(state_incomeBillSerial.receiveDate.toISOString()) ?? ''
-            : '',
-          onChange: () => {},
-        },
-      };
-
-      const inputSelProps = disabled || !isPaperImported ? { inputProps } : { datePickerProps };
-
-      return inputSelProps;
-    },
-  },
-  contractNumber: {
-    label: '合約編號',
-    style: { width: 100 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.contractNumber,
-          onChange: (e) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                contractNumber: e.target.value,
-              };
-            });
-          },
-        },
-      },
-    }),
-  },
-  projectName: {
-    label: '工程名稱',
-    style: {
-      // flex: '1',
-      width: 200,
-    },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
-        props: {
-          // className: 'text-center',
-          value: state_incomeBillSerial.projectName,
-          onChange: (e) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                projectName: e.target.value,
-              };
-            });
-          },
-        },
-      },
-    }),
-  },
-  contractPayment: {
-    label: '承攬價',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.contractPayment,
-      });
-
-      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setState_incomeBillSerial((prev) => {
-          const copy = { ...prev };
-          copy.contractPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
-          copy.periodPayment = '';
-
-          return copy;
-        });
-      };
-
-      const inputSelProps = {
-        disabled,
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            readOnly: disabled,
-            onChange,
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-  periodPayment: {
-    label: '本期計價',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.periodPayment,
-      });
-
-      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setState_incomeBillSerial((prev) => {
-          const copy = { ...prev };
-          copy.periodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
-          copy.contractPayment = '';
-
-          return copy;
-        });
-      };
-
-      const inputSelProps = {
-        disabled,
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            readOnly: disabled,
-            onChange: onChange,
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-  priorPeriodPayment: {
-    label: '前期已收',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.priorPeriodPayment,
-      });
-
-      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setState_incomeBillSerial((prev) => {
-          const copy = { ...prev };
-          copy.priorPeriodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
-
-          return copy;
-        });
-      };
-
-      const inputSelProps = {
-        disabled,
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            readOnly: disabled,
-            onChange: onChange,
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-  importAccountingNumber: {
-    label: '票據/匯入帳號',
-    className: 'text-center',
-    style: { width: 250 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.importAccountingNumber,
-          onChange: (e) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                importAccountingNumber: e.target.value,
-              };
-            });
-          },
-        },
-      },
-    }),
-  },
-  noteNumber: {
-    label: '票據號碼',
-    style: { width: 150 },
-    className: 'text-center',
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.noteNumber,
-          onChange: (e) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                noteNumber: e.target.value,
-              };
-            });
-          },
-        },
-      },
-    }),
-  },
-  noteMaturityDate: {
-    label: '票據日期', // (到期日)
-    style: { width: 130 },
-    className: 'text-center',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const datePickerProps: TinputSelProps['datePickerProps'] = {
-        props: {
-          placeholder: '',
-          value: state_incomeBillSerial.noteMaturityDate,
-          className: 'text-center',
-          onChange: (date) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                noteMaturityDate: date,
-              };
-            });
-          },
-        },
-      };
-
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-center',
-          placeholder: '',
-          value: state_incomeBillSerial.noteMaturityDate
-            ? getTaiwanDateStr(state_incomeBillSerial.noteMaturityDate.toISOString()) ?? ''
-            : '',
-          onChange: () => {},
-        },
-      };
-
-      const inputSelProps = disabled || !isPaperImported ? { inputProps } : { datePickerProps };
-
-      return inputSelProps;
-    },
-  },
-  receivablePayment: {
-    label: '收款金額',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.receivablePayment,
-      });
-
-      return {
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value: value,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  receivablePayment: e.target.value,
-                };
-              });
-            },
-          },
-        },
-      };
-    },
-  },
-  deductionPayment: {
-    label: '扣款金額',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled: disabled || !isPaperImported,
-        value: state_incomeBillSerial.deductionPayment,
-      });
-
-      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setState_incomeBillSerial((prev) => {
-          const copy = { ...prev };
-          copy.deductionPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
-
-          return copy;
-        });
-      };
-
-      const inputSelProps = {
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: onChange,
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-  unpaidPayment: {
-    label: '餘額',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      isPaperImported,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      const { type, value } = reducer_input({
-        disabled: disabled || !isPaperImported,
-        value: state_incomeBillSerial.unpaidPayment,
-      });
-
-      return {
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  unpaidPayment: e.target.value,
-                };
-              });
-            },
-          },
-        },
-      };
-    },
-  },
-
-  difference: {
-    label: '差額',
-    style: { width: 200 },
-    className: 'text-right',
-    createInputSelProps: ({
-      disabled,
-      state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
-    }) => {
-      // const { type, value } = reducer_input({
-      //   disabled,
-      //   value: state_incomeBillSerial.difference,
-      // });
-
-      return {
-        textareaProps: {
-          allowNewLineByUser: true,
-          props: {
-            className: 'text-right',
-            placeholder: '',
-            // type,
-            value: state_incomeBillSerial.difference,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  difference: e.target.value,
-                };
-              });
-            },
-          },
-        },
-      };
-    },
-  },
-
-  fee: {
-    label: '匯費',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
-      const inputSelProps: TinputSelProps = {
-        disabled: true,
-        inputProps: {
-          props: {
-            className: 'text-right',
-            defaultValue: state_incomeBillSerial.fee,
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-} as const;

@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Link, { LinkProps } from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
-// global gear
+//  gear
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
@@ -30,7 +29,7 @@ import { TuserDto } from 'js/api/dtoTypes';
 type Tquery = {
   county: string | undefined;
   customerName: string | undefined;
-  projectName: string | undefined;
+  keyWord: string | undefined;
   source: 'all' | 'pendingReview' | undefined;
 };
 
@@ -49,8 +48,13 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 export default function Contract({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  query.source = query.source || 'all';
-  const { county, customerName, projectName, source } = query;
+  const {
+    //
+    county,
+    customerName,
+    keyWord,
+    source = 'all',
+  } = query;
 
   const userId = userInfo.employee?.id;
 
@@ -67,10 +71,13 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         version: { $eq: 1 },
         'content.county': { $eq: county },
         'content.customer.name': { $contains: customerName },
-        'content.projectName': { $contains: projectName },
+        $or: {
+          'content.projectName': { $contains: keyWord },
+          contractNumber: { $contains: keyWord },
+        },
       },
     };
-  }, [county, customerName, projectName]);
+  }, [county, customerName, keyWord]);
 
   const {
     //
@@ -78,6 +85,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     viewRef_bottom,
     isLoadingPage1,
     reset,
+    reqSignedBack, // 簽回
   } = useContract_infinite({ customParams: params });
 
   const {
@@ -96,9 +104,9 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
 
   const contractList = useMemo(() => {
     return (dataArr ?? []).map((contract, index) => {
-      const { id: contractId, content } = contract;
+      const { id: contractId, content, isSignedBack, contractNumber } = contract;
 
-      const { managerReviewedAt } = content;
+      const { managerReviewedAt, averageDiscount } = content;
 
       const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
 
@@ -108,7 +116,8 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         quotationId: contract.contractNumber ?? '---',
         clientName: content.customer?.name ?? '---',
         quotationName: content.projectName,
-        discount: contract.discount,
+        // discount: contract.discount,
+        averageDiscount: averageDiscount ?? '',
         priceTotal: String(contract.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
@@ -130,6 +139,20 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
           pathname: `/domestic/contract/quotation`,
           query: { id: contractId, version: 1 },
         },
+        isSignedBack: isSignedBack,
+        onSignedBackClick: async () => {
+          await reqSignedBack(contractId, !isSignedBack);
+
+          // myAlert.confirm({
+          //   // title: `確認簽回${contractNumber || content.projectName}?`,
+          //   title: !isSignedBack
+          //     ? `確認簽回${contractNumber || content.projectName}?`
+          //     : `確認取消簽回${contractNumber || content.projectName}?`,
+          //   props: {
+          //     onOk: async () => await reqSignedBack(contractId, !isSignedBack),
+          //   },
+          // });
+        },
       };
     });
   }, [dataArr]);
@@ -148,32 +171,30 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
       options: optionsCounty,
       placeholder: '選擇地區',
       width: '80px',
-      defaultValue: router.query.county as string,
+      defaultValue: query.county,
     },
     {
       placeholder: '請輸入客戶名稱',
-      defaultValue: router.query.clientName as string,
+      defaultValue: query.customerName,
     },
     {
-      placeholder: '請輸入專案名稱',
-      defaultValue: router.query.projectName as string,
+      placeholder: '請輸入專案名稱或合約編號',
+      defaultValue: query.keyWord,
     },
   ];
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    // const doorModel = (valueArr[0] as Toption).value;
     const county = (valueArr[0] as Toption).value;
     const customerName = valueArr[1] as string;
-    const projectName = valueArr[2] as string;
+    const keyWord = valueArr[2] as string;
 
     router.push({
       href: '',
       query: {
         ...router.query,
-        // doorModel,
         county,
         customerName,
-        projectName,
+        keyWord,
       },
     });
   };
@@ -195,7 +216,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
 
   useEffect(() => {
     source === 'all' ? reset() : update_contractArr_employee();
-  }, [county, customerName, projectName, source]);
+  }, [county, customerName, keyWord, source]);
 
   // -----------------------------------------------------------------------
   // MARK: RENDER

@@ -1,0 +1,102 @@
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  // align-items: flex-end;
+  // gap: 10px;
+
+  border-bottom: solid 1px theme("colors.border");
+  padding: 10px 0;
+  padding-right: 50px;
+
+  width: fit-content;
+  // background-color: inherit;
+  background-color: #fff;
+  font-size: 16px;
+
+  > div {
+    // text-align: center;
+    background-color: inherit;
+    // background-color: #fff;
+    padding: 0 10px;
+
+    > input {
+      width: 100%;
+      border-bottom: solid 1px transparent;
+    }
+    > span {
+      display: inline-block;
+      border-bottom: solid 1px transparent;
+      white-space: pre-wrap;
+    }
+  }
+
+  &.enabled {
+    input:not(.readOnly) {
+      border-color: theme("colors.sub");
+    }
+  }
+  &:nth-last-of-type(1) {
+    border-bottom: 0;
+  }
+}
+
+.thead {
+  position: sticky;
+  // top: $topBlockHeight;
+  top: 0;
+  z-index: 2;
+  background-color: theme("colors.bgc01");
+  // border-top: solid 1px theme("colors.border");
+  font-weight: 500;
+}
+
+.btnPanel {
+  display: flex;
+  justify-content: center;
+  // align-items: center;
+  align-content: flex-start;
+  > * {
+    position: relative;
+    top: 3px;
+  }
+  .enable {
+    color: red;
+  }
+}
+
+.btnPanel {
+  display: flex;
+  // justify-content: space-between;
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  gap: 10px;
+  background-color: inherit;
+  // > * {
+  //   flex: none;
+  // }
+  .reviewerBox {
+    display: grid;
+    gap: 5px;
+    height: fit-content;
+    flex: 1;
+    user-select: none;
+    > .reviewer {
+      &.isReviewer {
+        cursor: pointer;
+        &:hover {
+          background-color: theme("colors.hoverBgc");
+        }
+      }
+      width: fit-content;
+    }
+  }
+}
+
+.billSerialNumber {
+  position: sticky;
+  left: 170px;
+  z-index: 1;
+  background-color: inherit;
+  text-align: center;
+}

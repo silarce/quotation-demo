@@ -13,6 +13,7 @@ import { AxiosError } from 'axios';
 import type {
   Tparams,
   TpageMetaDto,
+  TapiError,
   TquotationContentDto,
   TquotationDto,
   TcreateQuotationContentDto,
@@ -31,6 +32,7 @@ import type {
   TquotationAccounting_modifyContract,
   TquotationStatus,
   TbonusDto,
+  TcopyQuotationDto,
 } from './dtoTypes';
 
 export type {
@@ -73,6 +75,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewCahierEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewSalesManagerEmployee',
       'latestContent.reviewManagerEmployee',
       'latestContent.managerReviewedAt',
       'latestContent.products.quantity',
@@ -178,6 +181,7 @@ export const apiGetQuotation_Id = async (id: string, params?: Tparams) => {
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewCashierEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewSalesManagerEmployee',
       'latestContent.reviewManagerEmployee',
 
       'latestContent.products.items.accessories',
@@ -323,8 +327,8 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'managerEmployee',
 
       'reviewSalesEmployee',
-      'reviewSupervisorEmployee',
       'reviewCashierEmployee',
+      'reviewSalesManagerEmployee',
       'reviewWorkDirectorEmployee',
       'reviewCashierEmployee',
       'reviewManagerEmployee',
@@ -450,6 +454,7 @@ export const apiGetContract = async (params?: Tparams) => {
   //     'content.reviewSalesEmployee',
   //     'content.reviewWorkDirectorEmployee',
   //     'content.reviewSupervisorEmployee',
+  //     'content.reviewSalesManagerEmployee',
   //     'content.products.quantity',
   //     'content.products.options',
   //   ],
@@ -472,6 +477,8 @@ export const useGetContract = (customParams?: Tparams) => {
       'content.reviewWorkDirectorEmployee',
       'content.reviewCashierEmployee',
       'content.reviewSupervisorEmployee',
+      'content.reviewSalesManagerEmployee',
+      'content.reviewSalesManagerEmployee',
       'content.products.quantity',
       'content.products.options',
     ],
@@ -513,7 +520,8 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   const [viewRef_top, inView_top] = useInView();
   const [viewRef_bottom, inView_bottom] = useInView();
   // ----------------------------------------------------------------
-  const [dataList, setDataList] = useState<{ [key: `${number}`]: TquotationContractDto[] }>({});
+  const [dataList_raw, setDataList_raw] = useState<{ [id: string]: TquotationContractDto }>({});
+  const [dataList, setDataList] = useState<{ [page: `${number}`]: TquotationContractDto[] }>({});
 
   const [page, setPage] = useState<number>();
   const [meta, setMeta] = useState<TpageMetaDto>();
@@ -529,6 +537,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
       'content.reviewWorkDirectorEmployee',
       'content.reviewCashierEmployee',
       'content.reviewSupervisorEmployee',
+      'content.reviewSalesManagerEmployee',
       'content.products.quantity',
       'content.products.options',
     ],
@@ -552,8 +561,20 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
       const res = await apiGetContract(params);
 
       if (res) {
+        const arr = res.data;
+
+        setDataList_raw((list) => {
+          const copy = { ...list };
+
+          arr.forEach((item) => {
+            copy[item.id] = item;
+          });
+
+          return copy;
+        });
+
         setDataList((list) => {
-          list[`${res.meta.page}`] = res.data;
+          list[`${res.meta.page}`] = arr;
 
           return { ...list };
         });
@@ -617,6 +638,23 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   }, [inView_bottom, isLoading]);
   // -----------------------------------------------
 
+  // 簽回
+  const reqSignedBack = async (contractId: string, signedBack = true) => {
+    await apiPatchContractStatus(contractId, { isSignedBack: signedBack })
+      .then(() => {
+        // const id = res.id;
+        setDataList_raw((list) => {
+          const copy = { ...list };
+          list[contractId].isSignedBack = signedBack;
+
+          return copy;
+        });
+      })
+      .catch(() => true);
+  };
+
+  // -----------------------------------------------
+
   return {
     dataList,
     dataArr: _.flatten(Object.values(dataList)),
@@ -627,6 +665,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     meta,
     init,
     reset,
+    reqSignedBack,
   };
 };
 
@@ -971,7 +1010,7 @@ export const useGetContract_id_finalProductItem = (contractId: string | undefine
   };
 };
 
-/**取得主產品資料 */
+// 取得主產品資料
 export const apiGetQuotationProducts = async (productId: string) => {
   const api = `/quotation/products/${productId}`;
 
@@ -979,6 +1018,20 @@ export const apiGetQuotationProducts = async (productId: string) => {
     .get<TquotationProductDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// 合約簽回
+export const apiPatchContractStatus = async (contractId: string, body: { isSignedBack: boolean }) => {
+  const api = `/quotation/quotation-contract/${contractId}/status`;
+
+  return axi
+    .patch<TquotationContractDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError<TapiError>) => {
+      myAlert.err({ title: '合約簽回失敗', content: err.response?.data.message || err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 // ==================================================================
@@ -1325,6 +1378,7 @@ export const useQuotationAccounting_personalContract = (
     year: number | undefined;
   }
 ) => {
+  const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TcontractAccountingReportFormDto[]>();
 
   const update = async () => {
@@ -1338,18 +1392,23 @@ export const useQuotationAccounting_personalContract = (
       employeeId: params.employeeId,
     };
 
-    const newRes = await apiQuotationAccounting_personalContract(theParams);
-
-    if (newRes) {
-      setRes(newRes);
-    }
-
-    return newRes;
+    setIsFetching(true);
+    await apiQuotationAccounting_personalContract(theParams)
+      .then((res) => {
+        setRes(res);
+      })
+      .catch((err: AxiosError<TapiError>) => {
+        myAlert.err({ title: '取得個人業績統計表失敗', content: err.response?.data.message || err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
   };
 
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
@@ -1385,7 +1444,7 @@ export const apiPatchQuotationToPending = ({ contentId }: { contentId: string })
 // };
 
 // 複製報價單
-export const apiPostCopyQuotation = (body: { quotationId: string; customerId: string }) => {
+export const apiPostCopyQuotation = (body: TcopyQuotationDto) => {
   const api = '/quotation/copy-quotation';
 
   return axi
@@ -1442,6 +1501,7 @@ const lookpu_contractPopulate = {
   //   'content.reviewSalesEmployee',
   //   'content.reviewWorkDirectorEmployee',
   //   'content.reviewSupervisorEmployee',
+  //   'content.reviewSalesManagerEmployee',
   //   'content.reviewManagerEmployee',
 
   //   'content.products',
@@ -1458,6 +1518,7 @@ const lookpu_contractPopulate = {
   //   // 'rootContract.content.reviewSalesEmployee',
   //   // 'rootContract.content.reviewWorkDirectorEmployee',
   //   // 'rootContract.content.reviewSupervisorEmployee',
+  //   // 'rootContract.content.reviewSalesManagerEmployee',
   //   // 'rootContract.content.others',
   //   // 'rootContract.content.products.items.accessories',
   //   // 'rootContract.content.products.items.components',
@@ -1479,6 +1540,7 @@ const lookpu_contractPopulate = {
     'content.reviewWorkDirectorEmployee',
     'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
+    'content.reviewSalesManagerEmployee',
     'content.reviewManagerEmployee',
     'content.products',
     'content.others',
@@ -1497,6 +1559,7 @@ const lookpu_contractPopulate = {
     'content.reviewWorkDirectorEmployee',
     'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
+    'content.reviewSalesManagerEmployee',
     'content.products.items.accessories',
     'content.products.items.components',
     'content.others',
@@ -1527,6 +1590,7 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 
     'latestContent.reviewSalesEmployee',
     'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewSalesManagerEmployee',
     'latestContent.reviewWorkDirectorEmployee',
     'latestContent.reviewCashierEmployee',
     'latestContent.reviewManagerEmployee',

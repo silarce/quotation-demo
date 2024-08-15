@@ -23,7 +23,7 @@ import {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
+
   //
   useGetAccountant,
   useGetAccountantPreset,
@@ -228,6 +228,8 @@ export default function CollectionDetailList() {
 
           const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
 
+          const billSerialNumber_str = billSerialNumber?.join('\n') ?? '';
+
           const list = {
             insertDate: getTaiwanDateStr(insertDate),
             vendorName,
@@ -237,7 +239,8 @@ export default function CollectionDetailList() {
             noteNumber,
             noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
             invoiceNumber,
-            billSerialNumber,
+            // billSerialNumber,
+            billSerialNumber: billSerialNumber_str,
           } as const;
 
           return (

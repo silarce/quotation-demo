@@ -104,6 +104,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
+import { init_variable } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -167,41 +168,48 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
 
-  let reviewSalesEmployeeId: string | undefined = undefined;
-  let reviewWorkDirectorEmployeeId: string | undefined = undefined;
-  let reviewCashierEmployeeId: string | undefined = undefined;
-  let reviewSupervisorEmployeeId: string | undefined = undefined;
-  let reviewManagerEmployeeId: string | undefined = undefined;
+  let {
+    reviewSalesEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewSupervisorEmployeeId,
+    //
+    reviewSalesManagerEmployeeId,
+    //
+    reviewManagerEmployeeId,
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+    //
+    isSalesManagerEmployee,
+    //
+    isManager,
+    salesReviewedAt,
+    supervisorReviewedAt,
+    //
+    salesManagerReviewedAt,
+    //
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+    toSalesAt,
+    toSupervisorAt,
+    toSalesManagerAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+    isSendToReview,
+    isSendToReview_pending,
+    isAttach,
+    isAllReviewedBeforePending,
+    version,
+    editNotes,
+  } = init_variable();
 
-  let isReviewer = false;
-  let isSales = false;
-  let isWorkDirector = false;
-  let isCashier = false;
-  let isSupervisor = false;
-  let isManager = false;
-
-  let salesReviewedAt: string | null | undefined = undefined;
-  let supervisorReviewedAt: string | null | undefined = undefined;
-  let workDirectorReviewedAt: string | null | undefined = undefined;
-  let cashierReviewedAt: string | null | undefined = undefined;
-  let managerReviewedAt: string | null | undefined = undefined;
-
-  let toSalesAt: string | null | undefined = undefined;
-  let toSupervisorAt: string | null | undefined = undefined;
-  let toWorkDirectorAt: string | null | undefined = undefined;
-  let toCashierAt: string | null | undefined = undefined;
-  let toManagerAt: string | null | undefined = undefined;
-
-  let isSendToReview = false;
-  let isSendToReview_pending = false;
-
-  let version: number | undefined = undefined;
-  let editNotes: string | undefined = undefined;
-
-  //
-  const isAttach = true;
-  //
-  let isAllReviewedBeforePending = false;
+  isAttach = true;
+  isAllReviewedBeforePending = false;
 
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
@@ -270,16 +278,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
   reviewWorkDirectorEmployeeId = theContent?.reviewWorkDirectorEmployee?.id;
   reviewCashierEmployeeId = theContent?.reviewCashierEmployee?.id;
   reviewSupervisorEmployeeId = theContent?.reviewSupervisorEmployee?.id;
+  reviewSalesManagerEmployeeId = theContent?.reviewSalesManagerEmployee?.id;
   reviewManagerEmployeeId = theContent?.reviewManagerEmployee?.id;
 
   salesReviewedAt = theContent?.salesReviewedAt;
   supervisorReviewedAt = theContent?.supervisorReviewedAt;
+  salesManagerReviewedAt = theContent?.salesManagerReviewedAt;
   workDirectorReviewedAt = theContent?.workDirectorReviewedAt;
   cashierReviewedAt = theContent?.cashierReviewedAt;
   managerReviewedAt = theContent?.managerReviewedAt;
 
   toSalesAt = theContent?.toSalesAt;
   toSupervisorAt = theContent?.toSupervisorAt;
+  toSalesManagerAt = theContent?.toSalesManagerAt;
   toWorkDirectorAt = theContent?.toWorkDirectorAt;
   toCashierAt = theContent?.toCashierAt;
   toManagerAt = theContent?.toManagerAt;
@@ -294,16 +305,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
     agentEmployee = theContent?.agentEmployee;
   }
 
-  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
-  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview = !!(
+    toSalesAt ||
+    toSupervisorAt ||
+    toSalesManagerAt ||
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
+  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
-      isAllReviewedBeforePending = true;
-    }
+    // if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && managerReviewedAt) {
+    //   isAllReviewedBeforePending = true;
+    // }
+
+    managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
   if (userId) {
@@ -315,13 +335,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
+    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
       if (salesReviewedAt && supervisorReviewedAt) {
+        isSalesManagerEmployee = true;
+        isReviewer = true;
+      }
+    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
+      if (
+        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
+        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
+        // 代表這個content是在SalesManager這個property被加進來之前的content
+        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
+      ) {
         isWorkDirector = true;
         isReviewer = true;
       }
     } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
+      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
         isCashier = true;
         isReviewer = true;
       }
@@ -333,7 +363,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
-      } else if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+      } else if (
+        //
+        salesReviewedAt &&
+        supervisorReviewedAt &&
+        salesManagerReviewedAt &&
+        workDirectorReviewedAt &&
+        cashierReviewedAt
+      ) {
         isManager = true;
         isReviewer = true;
       }
@@ -724,16 +761,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       body.deliveryDate = null;
     }
 
-    let hasSurface = true;
-    body.products.forEach((item) => {
-      if (!item.materialSurface) {
-        hasSurface = false;
-      }
-    });
+    // let hasSurface = true;
+    // body.products.forEach((item) => {
+    //   if (!item.materialSurface) {
+    //     hasSurface = false;
+    //   }
+    // });
 
-    if (!hasSurface) {
-      return myAlert.warning({ title: '所有主產品必須選擇表面' });
-    }
+    // if (!hasSurface) {
+    //   return myAlert.warning({ title: '所有主產品必須選擇表面' });
+    // }
 
     try {
       setIsLoading(true);
@@ -778,6 +815,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -795,7 +833,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         !reviewSalesEmployeeId ||
         !reviewWorkDirectorEmployeeId ||
         !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId
+        !reviewSupervisorEmployeeId ||
+        !reviewSalesManagerEmployeeId
       ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
@@ -806,6 +845,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     if (isSales && salesReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });

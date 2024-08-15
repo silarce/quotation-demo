@@ -1,3 +1,8 @@
+// MARK: 說明
+
+// 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
+
+// ---------------------------------------------------------------------------
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
 
 // 表面處理
@@ -31,6 +36,18 @@ export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
 export type TinvoiceType = '三聯式' | '二聯式';
 export type TelectronicSuppliesAction = '領取' | '退回';
 export type TfinalPaymentType = '尾款' | '保留款';
+
+export type TincomeBillSettlementReviewStatus =
+  | 'notSubmitted' //未審核
+  | 'audited' //審核通過
+  | 'fail'; //審核不通過
+
+export type TincomeBillSerialSettlementFormStatus =
+  | 'notSubmitted' //未審核
+  | 'submitted' //已送審
+  | 'supervisorReviewed' //主管已審核
+  | 'managerReviewed' //經理已審核
+  | 'generalReviewed'; //總經理已審核
 
 //_______________________________________________________
 
@@ -900,7 +917,14 @@ export type TquotationContentOtherDto = {
   spec: string | null;
 };
 
-export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
+// export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationContentOtherDto = Pick<
+  TquotationContentOtherDto,
+  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec'
+> & {
+  quantity: `${number}`;
+  totalPrice: `${number}`;
+};
 
 /**選配設定 */
 export type TquotationProductAccessoryDto = {
@@ -1781,23 +1805,30 @@ export type TquotationContentDto = {
   supervisorEmployee: TemployeeDto | null;
   agentEmployee?: TemployeeDto;
 
-  //審核相關
+  // 審核相關
+  // 業務 選擇
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
   toSalesAt: string | null; // date
-
+  // 業務主管 選擇
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
   toSupervisorAt: string | null; // date
 
+  // 業務經理 固定
+  toSalesManagerAt?: string | null;
+  reviewSalesManagerEmployee?: TemployeeDto | null;
+  salesManagerReviewedAt?: string | null;
+
+  // 應收帳款 固定 慧銀
   reviewWorkDirectorEmployee: TemployeeDto | null;
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
-
+  // 應收帳款 固定 雅芬
   reviewCashierEmployee: TemployeeDto | null;
   toCashierAt: string | null;
   cashierReviewedAt: string | null;
-
+  // 總經理 固定
   reviewManagerEmployee: TemployeeDto | null;
   managerReviewedAt: string | null;
   toManagerAt: string | null; // date
@@ -2259,9 +2290,18 @@ export type TquotationContractDto = {
   certificatedDoc?: TcertificatedDocDto[];
   electronicSuppliesId: string | null;
   electronicSupplies?: TelectronicSuppliesDto;
+  //
+  // 是否已簽回
+  isSignedBack: boolean;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
+
+export type TcopyQuotationDto = {
+  quotationId: string;
+  customerId: string;
+  isRelationQuotation?: boolean;
+};
 
 // export type TcreateModifyQuotationDto = {
 //   // 報價日期
@@ -2340,6 +2380,8 @@ export type TquotationAccouting_years = {
 
 // 全區業績統計表
 export type TquotationAccouting_area = {
+  area: '北部' | '中部' | '南部' | '外銷';
+  contractnumber: string | null;
   quotetype: string;
   year: number;
   month: number;
@@ -2744,6 +2786,9 @@ export type TquotationVerifyFormDto = {
   testDriveNote: string | null;
   // 扣款項目、比例、金額
   debitItem: string;
+  //
+  secondAskForPaymentDate: string; // 第二註明請款日 單純的字串
+  secondDisbursementDate: string; // 第二放款日 單純的字串
 };
 
 export type TcreateQuotationVerifyFormDto = Pick<
@@ -2751,6 +2796,8 @@ export type TcreateQuotationVerifyFormDto = Pick<
   | 'askForPaymentDate'
   | 'disbursementDate'
   | 'paymentDateNote'
+  | 'secondAskForPaymentDate'
+  | 'secondDisbursementDate'
   //
   | 'paymentRatio'
   | 'paymentTenor'
@@ -2788,6 +2835,7 @@ export type TcreateQuotationVerifyFormDto = Pick<
 export type TreviewQuotationContentDto = {
   reviewSalesEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
+  reviewSalesManagerEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
   reviewCashierEmployeeId?: string | null;
   reviewManagerEmployeeId?: string | null;
@@ -3669,6 +3717,28 @@ export type TincomeBillSerialDto = {
   //
   accountantId: string;
   accountant: TaccountantDto;
+  //
+  note: string | null;
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: number | null;
+  //
+  accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
+  order: number | null;
+  fee: number | null;
+
+  // 沒意外的話invoices裡應該最多只會有一筆資料
+  invoiceNumber: string | null;
+  invoices?: TaccountsReceivableInvoiceDto[];
+
+  //
+  //
+  // '應收是否已閱'
+  isCashierSeen: boolean | null;
+  // '應收是否已閱'
+  isWorkSupervisorSeen: boolean | null;
+  // '總經理是否已閱'
+  isManagerSeen: boolean | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3683,21 +3753,120 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'noteNumber'
   | 'noteMaturityDate'
   | 'receivablePayment'
+  // 20240813 發現patch deductionPayment無效，還未知後端有沒有修正
   | 'deductionPayment'
   | 'unpaidPayment'
   | 'difference'
->;
+  | 'note'
+> & {
+  incomeBillDeduction: TupdateIncomeBillDeductionDto[];
+  fee: number | null;
+} & {
+  order?: number | null;
+  isImported?: boolean;
+  isCashierSeen?: boolean | null;
+  isWorkSupervisorSeen?: boolean | null;
+  isManagerSeen?: boolean | null;
+};
+
+type TupdateIncomeBillDeductionDto = {
+  id?: string; // 不提供則將此筆視為新資料
+  itemName: string; // 項目
+  detailedAmount: number; // 明細金額
+};
 
 export type TcreateAccountReceivableAccountsDto = {
   // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
+  splitPayment: number;
 };
 
+// apiPatchAccountReceivableAccountant用的
+// 更新指定ReceivableAccountant下指定發票與incomeBill的關聯
 export type TupdateAccountReceivableAccountantDto = {
   invoiceId: string;
-  accountantId: string[];
+  // accountantId: string[];
+  incomeBillId: string[];
+  // temporary_separatePayment: number;
 }[];
+
+export type TincomeBillSerialSettlementFormDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 年份月份
+  date: string;
+  // 本月實際收款額(國內)
+  internalActualReceivablePayment: number;
+  // 本月預估收款額(國內)
+  internalEstimatePayment: number;
+  // 下月預估收款額(國內)
+  internalNextMonthEstimatePayment: number;
+  // 年度至今累積收款額(國內)
+  internalAccumulatePayment: number;
+  // 應收帳款總額(國內)
+  internalReceivablePayment: number;
+  // 本月實際收款額(外銷)
+  foreignActualReceivablePayment: number;
+  // 本月預估收款額(外銷)
+  foreignEstimatePayment: number;
+  // 下月預估收款額(外銷)
+  foreignNextMonthEstimatePayment: number;
+  // 年度至今累積收款額(外銷)
+  foreignAccumulatePayment: number;
+  // 應收帳款總額(外銷)
+  foreignReceivablePayment: number;
+
+  // 應收帳款狀態
+  reviewStatus: TincomeBillSerialSettlementFormStatus;
+  // 審核狀態
+  reviewRecord?: TincomeBillSerialSettlementFormReviewRecordDto[];
+
+  // 經辦(製表)
+  agentEmployeeId: string | null;
+  // 經辦(製表)
+  agentEmployee?: TemployeeDto;
+  // 包含的所有收入傳票
+  incomeBills?: TincomeBillSerialDto[];
+};
+
+export type TincomeBillSerialSettlementFormReviewRecordDto = {
+  // 審核人員id
+  reviewerEmployeeId: string;
+  // 審核人員職稱
+  reviewerTitle: string;
+  // 審核人員姓名
+  reviewerName: string;
+  // 審核狀態
+  status: TincomeBillSettlementReviewStatus;
+  // 審核層級 // 數字越大越後面審核
+  level: number;
+  // 所屬收入傳票統計表id
+  settlementFormId: string | null;
+  //  所屬收入傳票統計表
+  settlementForm: TincomeBillSerialSettlementFormDto;
+};
+
+export type TcreateIncomeBillSettlementFormDto = {
+  // 需結算之收入傳票 @IsUUID() // 不送這個property就是結算當月
+  // 已被結算過的incomeBillId不可以再次結算，應該會失敗
+  incomeBillIds?: string[];
+  settlementDate?: string; // 預接api，不知道property
+};
+
+export type TupdateIncomeBillSettlementFormDto = {
+  // 下月預估收款額
+  internalNextMonthEstimatePayment: number;
+  // 下月預估收款額(外銷)
+  foreignNextMonthEstimatePayment: number;
+
+  // 應收帳款總額
+  internalReceivablePayment: number;
+  // 應收帳款總額(外銷)
+  foreignReceivablePayment: number;
+};
 
 // MARK: /engineering
 
@@ -3760,7 +3929,7 @@ export type TaccountsReceivableDto = {
   // 所屬舊合約
   legacyContract: TlegacyContractDto | null;
   // 扣款明細 // 棄用?
-  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
+  // accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 收款期
   periods: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
@@ -3795,7 +3964,9 @@ export type TaccountsReceivableDto = {
   // 保留款是否含稅
   isFinalPaymentWithTax: boolean | null;
   //
-  accountantList?: TaccountantDto[];
+  // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
+  // accountantList?: TaccountantDto[];
+  incomeBillList?: TincomeBillSerialDto[];
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -3934,8 +4105,12 @@ export type TaccountsReceivableInvoiceDto = {
   invoiceStatus: TinvoiceStatus;
   // 發票備註
   note: string | null;
+
   // 關聯收款紀錄
-  accountantList?: TaccountantDto[];
+  // accountantList?: TaccountantDto[];
+
+  incomeBillSerialList?: TincomeBillSerialDto[];
+
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
@@ -3992,15 +4167,21 @@ export type TaccountantDto = {
   // 發票
   invoices?: TaccountsReceivableInvoiceDto[];
   // 收入傳票序號
-  billSerialNumber?: string | null;
+  // billSerialNumber?: string | null;
+  billSerialNumber?: string[] | null;
   // 收入傳票
-  incomeBill: TincomeBillSerialDto;
+  incomeBill: TincomeBillSerialDto[];
   // 票據到期日
   noteMaturityDate: string | null;
   // 排序
   order: number;
-  // 扣款明細
-  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // ! accountant下的accountsReceivableDeduction將不會再更新
+  // ! 要取得 accountsReceivableDeduction 要從 TincomeBillSerialDto取得
+  // ! 也就是上面幾行的那個incomeBill
+  // 扣款明細 // 後端還會用到，但前端不再使用，前端就當作沒有這個property
+  // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   // 已匯入紙本應收帳款(舊的收款紀錄)
   isImported: boolean;
   // 票據狀態
@@ -4020,6 +4201,10 @@ export type TaccountantDto = {
 
   exchangeRate: `${number}`; // 匯率
   currencyValue: `${number}`; // 幣值
+
+  // 已分出金額
+  splitPayment: number[] | null;
+  isAlreadyImportIncomeBill: boolean;
 };
 
 export type TcreateAccountantDto = Pick<

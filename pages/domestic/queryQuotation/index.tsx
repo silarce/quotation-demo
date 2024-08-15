@@ -105,6 +105,7 @@ export default function Budget() {
       // 'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSalesManagerEmployee',
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewCashierEmployee',
       'latestContent.reviewSupervisorEmployee',
@@ -129,7 +130,7 @@ export default function Budget() {
       // 工程名稱
       'latestContent.projectName': { $contains: projectName },
       // 報價編號
-      'latestContent.quotationNumber': { $eq: projectNumber },
+      'latestContent.quotationNumber': { $contains: projectNumber },
       // 失件
       'latestContent.isLost': { $eq: isLost },
 

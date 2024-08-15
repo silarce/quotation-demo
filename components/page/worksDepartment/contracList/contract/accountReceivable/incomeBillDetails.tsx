@@ -1,24 +1,19 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import Image from 'next/image';
 import Decimal from 'decimal.js';
 
 // component
-import EditDeduction from './editDeduction';
+import EditDefunctionBtn from './accountantDeductionEditor';
 
 // gear
 import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
-import scss from './accountantDetails.module.scss';
+import scss from './incomeBillDetails.module.scss';
 
 // type
-import type { TaccountantDto } from 'js/api/dtoTypes';
-
-// icon
-import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
+import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -30,46 +25,51 @@ type Tstate_deduction = {
   detailedAmount: string; // 扣款金額
 };
 
-type Tstate_accountant = {
+type Tstate_incomeBill = {
   id: string;
-  insertDate: string | null;
+  receiveDate: string | null;
   paymentType: string;
-  accountingNumber: string;
-  price: number;
+  importAccountingNumber: string;
+  receivablePayment: number;
+
+  // 票據編號
   noteNumber: string;
+  // 票據到期日
   noteMaturityDate: string | null;
+
   fee: string;
   billSerialNumber: string;
   //
-
+  //
   state_deduction: Tstate_deduction[];
   deductionTotal: number; // 後端沒有 accountsReceivableDeduction金額的總和
+  //
+  raw: TincomeBillSerialDto; // 原本的資料
 };
 
-export type { Tstate_accountant, Tstate_deduction };
+export type { Tstate_incomeBill, Tstate_deduction };
 
 // ============================================================================
 // region START
 // 收款明細
-export default function AccountantDetails({
+export default function IncomeBillDetails({
   className,
-  accountantArr,
-  reqPatchAccountant,
+  incomeBillList,
+  reqPatchIncomeBill_feeAndDeduction,
 }: {
   className?: string;
-  accountantArr: TaccountantDto[];
-  reqPatchAccountant: (data: Tstate_accountant[]) => void;
+  incomeBillList: TincomeBillSerialDto[];
+  reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
 }) {
   const [disabled, setDisabled] = useState(true);
-
-  const [state_accountantArr, setState_accountantArr] = useState<Tstate_accountant[]>([]);
+  const [state_incomeBillArr, setState_incomeBillArr] = useState<Tstate_incomeBill[]>([]);
 
   // ---------------------------------------------------------------------------
 
   // region function
 
   const editFee = (index: number, value: string) => {
-    setState_accountantArr((arr) => {
+    setState_incomeBillArr((arr) => {
       const copy = [...arr];
       copy[index].fee = value;
 
@@ -77,43 +77,27 @@ export default function AccountantDetails({
     });
   };
 
-  const handle_editDeduction = (index: number, state_deduction: Tstate_deduction[]) => {
-    const modal = myAlert.btnBar({});
+  const handle_editDeduction = (index: number, state_deductionArr: Tstate_deduction[]) => {
+    const deductionTotal = state_deductionArr.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
 
-    const onConfirm = (state_deduction: Tstate_deduction[]) => {
-      const deductionTotal = state_deduction.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
+    setState_incomeBillArr((arr) => {
+      const copy = [...arr];
+      copy[index].state_deduction = state_deductionArr;
+      copy[index].deductionTotal = deductionTotal;
 
-      setState_accountantArr((arr) => {
-        const copy = [...arr];
-        copy[index].state_deduction = state_deduction;
-        copy[index].deductionTotal = deductionTotal;
-
-        return copy;
-      });
-      modal.destroy();
-    };
-
-    modal.update({
-      content: (
-        <EditDeduction
-          //
-          state_deduction={state_deduction}
-          onCancel={modal.destroy}
-          onConfirm={onConfirm}
-        />
-      ),
+      return copy;
     });
   };
 
   // ---------------------------------------------------------------------------
 
   const totals = useMemo(() => {
-    const total = state_accountantArr.reduce(
+    const total = state_incomeBillArr.reduce(
       (acc, cur) => {
-        const { price, fee, deductionTotal } = cur;
+        const { receivablePayment: price, fee, deductionTotal } = cur;
 
-        const acc_priceNum = new Decimal(price).add(acc.price).toNumber();
-        const acc_feeNum = new Decimal(fee).add(acc.fee).toNumber();
+        const acc_priceNum = new Decimal(price || 0).add(acc.price).toNumber();
+        const acc_feeNum = new Decimal(fee || 0).add(acc.fee).toNumber();
         const acc_deductionTotalNum = new Decimal(deductionTotal).add(acc.deductionTotal).toNumber();
 
         return {
@@ -130,10 +114,10 @@ export default function AccountantDetails({
     );
 
     return total;
-  }, [state_accountantArr]);
+  }, [state_incomeBillArr]);
 
   const handle_confirm = async () => {
-    await reqPatchAccountant(state_accountantArr);
+    await reqPatchIncomeBill_feeAndDeduction(state_incomeBillArr);
     setDisabled(true);
   };
 
@@ -143,24 +127,25 @@ export default function AccountantDetails({
 
   useEffect(() => {
     setDisabled(true);
-  }, [accountantArr]);
+  }, [incomeBillList]);
 
   useEffect(() => {
-    const stateArr: Tstate_accountant[] = accountantArr.map((accountant) => {
+    const stateArr: Tstate_incomeBill[] = incomeBillList.map((incomeBill) => {
       const {
         id,
-        insertDate = '',
-        paymentType = '',
-        accountingNumber,
-        price = 0,
+        receiveDate: insertDate = '',
+        accountant: { paymentType = '' },
+        importAccountingNumber,
+        receivablePayment = 0,
         noteNumber = '',
         noteMaturityDate = '',
         fee,
-        billSerialNumber = '',
+        billSerialNumber,
         accountsReceivableDeduction = [],
-      } = accountant;
+      } = incomeBill;
 
       const deductionTotal = accountsReceivableDeduction.reduce((acc, cur) => acc + cur.detailedAmount, 0);
+
       const state_deduction = accountsReceivableDeduction.map((deduction) => {
         const { id, itemName, detailedAmount } = deduction;
 
@@ -173,25 +158,26 @@ export default function AccountantDetails({
         return state;
       });
 
-      const state: Tstate_accountant = {
+      const state: Tstate_incomeBill = {
         id,
-        insertDate,
+        receiveDate: insertDate,
         paymentType,
-        accountingNumber: accountingNumber ?? '',
-        price,
+        importAccountingNumber: importAccountingNumber ?? '',
+        receivablePayment: receivablePayment || 0,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        fee: String(fee),
-        billSerialNumber: billSerialNumber ?? '',
+        fee: String(fee || 0),
+        billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
+        raw: incomeBill,
       };
 
       return state;
     });
 
-    setState_accountantArr(stateArr);
-  }, [accountantArr, disabled]);
+    setState_incomeBillArr(stateArr);
+  }, [incomeBillList, disabled]);
 
   // ---------------------------------------------------------------------------
   //  region RENDER
@@ -233,33 +219,33 @@ export default function AccountantDetails({
         }}
       >
         <Thead />
-        {state_accountantArr.map((accountant, index_state) => {
+        {state_incomeBillArr.map((incomeBill, index_state) => {
           const {
             id,
-            insertDate,
+            receiveDate,
             paymentType,
-            accountingNumber,
-            price,
+            importAccountingNumber,
+            receivablePayment,
             noteNumber,
             noteMaturityDate,
             fee,
             billSerialNumber,
             state_deduction,
             deductionTotal,
-          } = accountant;
+          } = incomeBill;
 
           return (
             <Row key={id}>
-              <div className={scss.cell} style={configList['insertDate'].style}>
-                {getTaiwanDateStr(insertDate)}
+              <div className={scss.cell} style={configList['receiveDate'].style}>
+                {getTaiwanDateStr(receiveDate)}
               </div>
 
               <div className={scss.cell} style={configList['paymentType'].style}>
                 {paymentType}
               </div>
 
-              <div className={scss.cell} style={configList['accountingNumber'].style}>
-                {accountingNumber}
+              <div className={scss.cell} style={configList['importAccountingNumber'].style}>
+                {importAccountingNumber}
               </div>
 
               <div className={scss.cell} style={configList['noteNumber'].style}>
@@ -270,8 +256,8 @@ export default function AccountantDetails({
                 {getTaiwanDateStr(noteMaturityDate)}
               </div>
 
-              <div className={classNames(scss.cell, scss.price)} style={configList['price'].style}>
-                {price.toLocaleString()}
+              <div className={classNames(scss.cell, scss.price)} style={configList['receivablePayment'].style}>
+                {receivablePayment.toLocaleString()}
               </div>
 
               <div className={scss.cell} style={configList['fee'].style}>
@@ -284,7 +270,10 @@ export default function AccountantDetails({
                 />
               </div>
 
-              <div className={scss.cell} style={configList['billSerialNumber'].style}>
+              <div
+                className={classNames(scss.cell, configList['billSerialNumber'].className)}
+                style={configList['billSerialNumber'].style}
+              >
                 {billSerialNumber}
               </div>
               <div className={scss.cell} style={configList['deductionTotal'].style}>
@@ -293,11 +282,11 @@ export default function AccountantDetails({
 
               <div className={scss.cell} style={configList['btn'].style}>
                 {!disabled && (
-                  <Image
-                    className="cursor-pointer"
-                    src={iconEyeOpen}
-                    alt="編輯扣款"
-                    onClick={() => handle_editDeduction(index_state, state_deduction)}
+                  <EditDefunctionBtn
+                    defaultStateArr={state_deduction}
+                    onConfirm={({ state_deductionArr }) => {
+                      handle_editDeduction(index_state, state_deductionArr);
+                    }}
                   />
                 )}
               </div>
@@ -350,14 +339,14 @@ const Tfoot = ({
 }) => {
   return (
     <Row className={classNames(scss.tfoot, className)}>
-      <div className={scss.cell} style={configList['insertDate'].style} />
+      <div className={scss.cell} style={configList['receiveDate'].style} />
       <div className={scss.cell} style={configList['paymentType'].style} />
-      <div className={scss.cell} style={configList['accountingNumber'].style} />
+      <div className={scss.cell} style={configList['importAccountingNumber'].style} />
       <div className={scss.cell} style={configList['noteNumber'].style} />
       <div className={scss.cell} style={configList['noteMaturityDate'].style}>
         合計
       </div>
-      <div className={classNames(scss.cell, scss.price)} style={configList['price'].style}>
+      <div className={classNames(scss.cell, scss.price)} style={configList['receivablePayment'].style}>
         {price.toLocaleString()}
       </div>
       <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
@@ -379,11 +368,10 @@ const Tfoot = ({
 
 type Tkey =
   | keyof Pick<
-      TaccountantDto,
-      | 'insertDate' // 日期
-      | 'paymentType' // 收款方式
-      | 'accountingNumber' // 票據/匯入帳號
-      | 'price' // 金額
+      TincomeBillSerialDto,
+      | 'receiveDate' // 日期
+      | 'importAccountingNumber' // 票據/匯入帳號
+      | 'receivablePayment' // 金額
       | 'noteNumber' // 票據編號
       | 'noteMaturityDate' // 票據到期日
       //
@@ -391,6 +379,7 @@ type Tkey =
       //
       | 'billSerialNumber' // 收入傳票序號
     >
+  | 'paymentType' // 收款方式
   | 'deductionTotal' // 扣款總額
   | 'btn';
 
@@ -407,15 +396,15 @@ type TconfigList = {
 const keyArr_half = [
   //
   'paymentType',
-  'accountingNumber',
+  'importAccountingNumber',
   'noteNumber',
   'noteMaturityDate',
-  'price',
+  'receivablePayment',
 ] as const;
 
 const keyArr_thead: Tkey[] = [
   //
-  'insertDate',
+  'receiveDate',
   ...keyArr_half,
   'fee',
   'billSerialNumber',
@@ -424,7 +413,7 @@ const keyArr_thead: Tkey[] = [
 ];
 
 const configList: TconfigList = {
-  insertDate: {
+  receiveDate: {
     label: '日期',
     style: { width: '120px' },
   },
@@ -432,11 +421,11 @@ const configList: TconfigList = {
     label: '收款方式',
     style: { width: '100px' },
   },
-  accountingNumber: {
+  importAccountingNumber: {
     label: '票據/匯入帳號',
     style: { width: '165px' },
   },
-  price: {
+  receivablePayment: {
     label: '金額',
     style: { width: '100px' },
   },
@@ -457,6 +446,7 @@ const configList: TconfigList = {
   billSerialNumber: {
     label: '收入傳票序號',
     style: { width: '165px' },
+    className: 'whitespace-pre-wrap break-words',
   },
   deductionTotal: {
     label: '扣款總額',

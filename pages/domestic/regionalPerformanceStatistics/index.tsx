@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
-
 import { useRouter } from 'next/router';
+
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // gaer
@@ -16,7 +16,11 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 import scss from './regionalPerformanceStatistics.module.scss';
 
 // api
-import { useQuotationAccounting_area, TquotationAccouting_area } from 'js/api/api_quotation';
+import {
+  //
+  TquotationAccouting_area,
+  useQuotationAccounting_area,
+} from 'js/api/api_quotation';
 
 // ==================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -27,28 +31,43 @@ type Tquery = {
   keyWord: string | undefined;
 };
 
+type Tdata = {
+  /**地區 */
+  [area: string]: {
+    /**門型 追加 合計 */
+    [quotetype: string]: {
+      totalsum: string; // 牌價複價
+      pricesum: string; // 單價複價
+      percentage: string; // 百分比
+    };
+  };
+};
+
+type TcountList = {
+  /**地區 */
+  [key: string]: {
+    /**門型 追加  */
+    [key: string]: {
+      count: number;
+    };
+  };
+};
+
 // ==================================================================
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
 // ==================================================================
-// 全區業績統計表
+// MARK: 全區業績統計表
+//
+//
+//
+//
+//
+// MARK: START
 export default function RegionalPerformanceStatistics() {
   const router = useRouter();
   const { year, month } = router.query as Tquery;
-
-  useEffect(() => {
-    const now = new Date();
-    const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month;
-
-    router.push({
-      query: {
-        year: theYear,
-        month: theMonth,
-      },
-    });
-  }, []);
 
   // ------------------------------------------------------------------
 
@@ -58,10 +77,6 @@ export default function RegionalPerformanceStatistics() {
   };
 
   const { data, update } = useQuotationAccounting_area(params);
-
-  useEffect(() => {
-    update();
-  }, [year, month]);
 
   // ------------------------------------------------------------------
 
@@ -75,47 +90,57 @@ export default function RegionalPerformanceStatistics() {
     const quotetypeList: { [key: string]: string } = {};
 
     data.forEach((item) => {
-      const { year, month, totalsum, pricesum } = item;
-      let { percentage, quotetype, county } = item;
+      const {
+        //  year, month,
+        totalsum,
+        pricesum,
+      } = item;
+      let {
+        //
+        percentage,
+        quotetype,
+        // county,
+        // area,
+      } = item;
+      let area: TquotationAccouting_area['area'] | '---' = item.area;
 
       if (percentage === null) {
         percentage = 0;
       }
 
       if (!quotetype) {
-        quotetype = '無資料';
+        quotetype = '---';
       }
 
-      if (!county) {
-        county = '無城市資料';
+      if (!area) {
+        area = '---';
       }
 
       quotetypeList[quotetype] = quotetype;
 
-      if (!list[county]) {
-        list[county] = {};
-        countList[county] = {};
+      if (!list[area]) {
+        list[area] = {};
+        countList[area] = {};
       }
 
-      if (!list[county][quotetype]) {
-        list[county][quotetype] = {
+      if (!list[area][quotetype]) {
+        list[area][quotetype] = {
           totalsum: totalsum,
           pricesum: pricesum,
           percentage: String(percentage),
         };
-        countList[county][quotetype] = {
+        countList[area][quotetype] = {
           count: 1,
         };
       } else {
-        list[county][quotetype].totalsum = new Decimal(list[county][quotetype].totalsum).add(totalsum).toString();
-        list[county][quotetype].pricesum = new Decimal(list[county][quotetype].pricesum).add(pricesum).toString();
-        list[county][quotetype].percentage = new Decimal(list[county][quotetype].percentage).add(percentage).toString();
-        countList[county][quotetype].count += 1;
+        list[area][quotetype].totalsum = new Decimal(list[area][quotetype].totalsum).add(totalsum).toString();
+        list[area][quotetype].pricesum = new Decimal(list[area][quotetype].pricesum).add(pricesum).toString();
+        list[area][quotetype].percentage = new Decimal(list[area][quotetype].percentage).add(percentage).toString();
+        countList[area][quotetype].count += 1;
       }
     });
     //
     //
-    // Object.values(list).forEach((item_c) => {
     Object.keys(list).forEach((key_c) => {
       const item_c = list[key_c];
 
@@ -165,10 +190,9 @@ export default function RegionalPerformanceStatistics() {
     return { formatedList: list, quotetypeArr };
   }, [data]);
 
-  console.log('formatedList', formatedList);
-  console.log('quotetypeArr', quotetypeArr);
+  // -----------------------------------------------------------------------------
 
-  // ------------------------------------------------------------------
+  // region PROPS
 
   const selectPropsArr: TselectPropsArr = [
     {
@@ -211,24 +235,33 @@ export default function RegionalPerformanceStatistics() {
 
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
-  const panelList: TpanelList = [
-    // {
-    //   searchGroup: {
-    //     searchTargetList: [
-    //       {
-    //         placeholder: '輸入搜尋內容',
-    //       },
-    //     ],
-    //     doSearch: (v) => {
-    //       console.log(v);
-    //     },
-    //   },
-    // },
-  ];
+  // -----------------------------------------------------------------------------
+  // region useEffect
+
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    update();
+  }, [year, month]);
+
+  // --------------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer>
-      <PageHeader02 tag="全區業績統計表" customeLeft={customeLeft} panelList={panelList} />
+      <PageHeader02 tag="全區業績統計表" customeLeft={customeLeft} />
 
       <div className={scss.wrapper}>
         <div className={scss.table}>
@@ -309,27 +342,6 @@ export default function RegionalPerformanceStatistics() {
     </SubLayer>
   );
 }
+// MARK:END
 
 // ==================================================================
-
-type Tdata = {
-  /**地區 */
-  [key: string]: {
-    /**門型 追加 合計 */
-    [key: string]: {
-      totalsum: string; // 牌價複價
-      pricesum: string; // 單價複價
-      percentage: string; // 百分比
-    };
-  };
-};
-
-type TcountList = {
-  /**地區 */
-  [key: string]: {
-    /**門型 追加  */
-    [key: string]: {
-      count: number;
-    };
-  };
-};

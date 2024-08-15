@@ -7,7 +7,7 @@
   grid-template-columns: $columnsWidth01;
   gap: $gap01;
   padding: 18px 0 18px $gridPaddingLeft01;
-  padding-right: 12px;
+  padding-right: $gridPaddingRight01;
   border-bottom: solid 1px $colorBorder01;
   &:nth-last-of-type(1) {
     border-bottom: none;
@@ -54,4 +54,11 @@
       margin-top: 16px;
     }
   }
+}
+
+.btnCell {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
