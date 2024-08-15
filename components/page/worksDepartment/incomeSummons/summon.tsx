@@ -185,12 +185,14 @@ const Summons_pre = (
     reqPatch,
     update_incomeBill,
     changeActive,
+    isForeign,
   }: {
     className?: string;
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
     update_incomeBill: () => void;
     changeActive?: () => void;
+    isForeign: boolean;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
@@ -246,6 +248,10 @@ const Summons_pre = (
 
     await reqPatch(incomeBillSerial.id, body).then(() => {});
   };
+
+  // ---------------------------------------------------------------------
+
+  const keyArr = getKeyArr({ isForeign });
 
   // ---------------------------------------------------------------------
 
@@ -324,7 +330,7 @@ const Summons = forwardRef(Summons_pre);
 
 // region PROPSLIST
 
-const keyArr: TconfigKey[] = [
+const keyArr_ori: TconfigKey[] = [
   'billSerialNumber',
   // 'invoiceType',
   'receiveDate',
@@ -343,22 +349,20 @@ const keyArr: TconfigKey[] = [
   'unpaidPayment',
   // 'difference',
 
+  //
+  'declarationCurrency', // 外銷
+  'declarationExchangeRate', // 外銷
+  'declarationPayment', // 外銷
+  'declarationCurrencyPayment', // 外銷
+
+  'receivableCurrency', // 外銷
+  'receivableExchangeRate', // 外銷
+  'receivableCurrencyPayment', // 外銷
+
+  'currencyFee', // 外銷
+  'exchangeBenefits', // 外銷
+  //
   'note',
-
-  //
-  //
-  //
-  'declarationCurrency',
-  'declarationExchangeRate',
-  'declarationPayment',
-  'declarationCurrencyPayment',
-
-  'receivableCurrency',
-  'receivableExchangeRate',
-  'receivableCurrencyPayment',
-
-  'currencyFee',
-  'exchangeBenefits',
 ];
 
 const cellPropsList_summon: TcellPropsList_summon = {
@@ -1383,6 +1387,34 @@ const calc_foreignToTw = ({
 //   return new Decimal(foreignPayment).div(twPayment).toNumber();
 // };
 
+const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
+  let theKeyArr = _.cloneDeep(keyArr_ori);
+
+  if (!isForeign) {
+    theKeyArr = theKeyArr.filter((key) => {
+      let pass = true;
+
+      if (
+        key === 'declarationCurrency' ||
+        key === 'declarationExchangeRate' ||
+        key === 'declarationPayment' ||
+        key === 'declarationCurrencyPayment' ||
+        key === 'receivableCurrency' ||
+        key === 'receivableExchangeRate' ||
+        key === 'receivableCurrencyPayment' ||
+        key === 'currencyFee' ||
+        key === 'exchangeBenefits'
+      ) {
+        pass = false;
+      }
+
+      return pass;
+    });
+  }
+
+  return theKeyArr;
+};
+
 // =============================================================================
 
 const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
@@ -1491,4 +1523,10 @@ const checkStatus = (bool: boolean | null | undefined) => {
 // =============================================================================
 
 export default Summons;
-export { SummonsRow, keyArr, cellPropsList_summon };
+export {
+  //
+  getKeyArr,
+  keyArr_ori,
+  SummonsRow,
+  cellPropsList_summon,
+};

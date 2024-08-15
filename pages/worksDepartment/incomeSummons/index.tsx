@@ -12,7 +12,8 @@ import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/inco
 import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
 import Summons, {
   SummonsRow,
-  keyArr,
+  keyArr_ori,
+  getKeyArr,
   cellPropsList_summon,
   Tstate_incomeBillSerial,
 } from 'components/page/worksDepartment/incomeSummons/summon';
@@ -255,6 +256,8 @@ export default function IncomeSummons() {
 
   // MARK: PROPS
 
+  const keyArr = getKeyArr({ isForeign: isForeign === 'true' });
+
   const tagList: TtagList = [
     {
       label: '收入傳票(內銷)',
@@ -377,6 +380,7 @@ export default function IncomeSummons() {
                   update_incomeBill={update_incomeBill}
                   // changeActive={() => changeActive(data.id)}
                   changeActive={() => {}} // 棄用 待串接上審核api時再拿掉
+                  isForeign={isForeign === 'true'}
                 />
               );
             })}
