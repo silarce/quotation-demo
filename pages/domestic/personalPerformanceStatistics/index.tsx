@@ -101,8 +101,9 @@ export default function PersonalPerformanceStatistics() {
     //
     data: data_bonus,
     update: update_bonus,
+    clear: clear_bonus,
     isFetching: isFetching_bonus,
-  } = useGetReportForm_bonus(params_bouus);
+  } = useGetReportForm_bonus(params_bouus, { isAutoUpdate: false });
 
   // ------------------------------------------------------------------
 
@@ -274,6 +275,14 @@ export default function PersonalPerformanceStatistics() {
   useEffect(() => {
     update_emp();
   }, []);
+
+  useEffect(() => {
+    if (emp) {
+      update_bonus();
+    } else {
+      clear_bonus();
+    }
+  }, [params_bouus]);
 
   // ------------------------------------------------------------------
 

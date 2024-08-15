@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 import Decimal from 'decimal.js';
 
 // layout
@@ -9,10 +9,10 @@ import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHe
 
 // component
 import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/incomeSummons/incomeBillSerialSettlementForm';
-import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
+
 import Summons, {
   SummonsRow,
-  keyArr,
+  getKeyArr,
   cellPropsList_summon,
   Tstate_incomeBillSerial,
 } from 'components/page/worksDepartment/incomeSummons/summon';
@@ -26,7 +26,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './index.module.scss';
 
 // type
-import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tparams } from 'js/api/dtoTypes';
 
 // api
 import {
@@ -46,32 +46,6 @@ type Tquery = {
   year: string;
   month: string;
 };
-
-// type Tstate_incomeBillSerial = {
-//   id: string;
-//   billSerialNumber: string;
-//   receiveDate: Moment | null;
-//   contractNumber: string;
-//   projectName: string;
-//   contractPayment: string;
-//   periodPayment: string;
-//   priorPeriodPayment: string;
-//   importAccountingNumber: string;
-//   noteNumber: string;
-//   noteMaturityDate: Moment | null;
-//   receivablePayment: string;
-//   deductionPayment: string;
-//   unpaidPayment: string;
-//   difference: string;
-//   //
-//   readonly fee: number; // 現在是從accountant裡面拿
-//   //
-//   note: string;
-//   vendorName: string;
-
-//   //
-//   readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
-// };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
@@ -175,6 +149,17 @@ export default function IncomeSummons() {
       isCashierSeen,
       isWorkSupervisorSeen,
       isManagerSeen,
+      //
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationPayment,
+      declarationCurrencyPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      currencyFee,
+      exchangeBenefits,
     } = state_incomeBillSerial;
 
     const incomeBillDeduction = state_deduction.map((item) => {
@@ -205,6 +190,16 @@ export default function IncomeSummons() {
       isCashierSeen,
       isWorkSupervisorSeen,
       isManagerSeen,
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationPayment,
+      declarationCurrencyPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      currencyFee,
+      exchangeBenefits,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
@@ -233,6 +228,8 @@ export default function IncomeSummons() {
   // -----------------------------------------------------------------------------
 
   // MARK: PROPS
+
+  const keyArr = getKeyArr({ isForeign: isForeign === 'true' });
 
   const tagList: TtagList = [
     {
@@ -356,29 +353,10 @@ export default function IncomeSummons() {
                   update_incomeBill={update_incomeBill}
                   // changeActive={() => changeActive(data.id)}
                   changeActive={() => {}} // 棄用 待串接上審核api時再拿掉
+                  isForeign={isForeign === 'true'}
                 />
               );
             })}
-
-            {/* <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
-              {data_incomeBill.map((data, index) => {
-                return (
-                  <Panel
-                    key={data.id}
-                    header={
-                      <Summons
-                        incomeBillSerial={data}
-                        reqPatch={reqPatch}
-                        update_incomeBill={update_incomeBill}
-                        changeActive={() => changeActive(data.id)}
-                      />
-                    }
-                  >
-                    <OtherInfo incomeBillSerial={data} />
-                  </Panel>
-                );
-              })}
-            </Collapse> */}
           </div>
         </div>
         {/*  */}

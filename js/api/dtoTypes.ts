@@ -2300,7 +2300,7 @@ export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 export type TcopyQuotationDto = {
   quotationId: string;
   customerId: string;
-  isRelationQuotation?: boolean;
+  isRelationQuotation: boolean;
 };
 
 // export type TcreateModifyQuotationDto = {
@@ -3739,6 +3739,28 @@ export type TincomeBillSerialDto = {
   isWorkSupervisorSeen: boolean | null;
   // '總經理是否已閱'
   isManagerSeen: boolean | null;
+  //
+  //
+  //
+  // 外銷相關
+  // '出口報單幣別'
+  declarationCurrency: Tcurrency | null;
+  // '出口報單匯率'
+  declarationExchangeRate: string | null;
+  // '出口報單外幣金額'
+  declarationCurrencyPayment: string | null;
+  // '出口報單台幣金額'
+  declarationPayment: string | null;
+  // '收款幣別'
+  receivableCurrency: Tcurrency | null;
+  // '收款匯率'
+  receivableExchangeRate: string | null;
+  // '收款外幣金額'
+  receivableCurrencyPayment: string | null;
+  // '國外匯費'
+  currencyFee: string | null;
+  // '兌換利益'
+  exchangeBenefits: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3767,6 +3789,16 @@ export type TupdateIncomeBillSerialDto = Pick<
   isCashierSeen?: boolean | null;
   isWorkSupervisorSeen?: boolean | null;
   isManagerSeen?: boolean | null;
+} & {
+  declarationCurrency: string | null;
+  declarationExchangeRate: string | null;
+  declarationPayment: string | null;
+  declarationCurrencyPayment: string | null;
+  receivableCurrency: string | null;
+  receivableExchangeRate: string | null;
+  receivableCurrencyPayment: string | null;
+  currencyFee: string | null;
+  exchangeBenefits: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {

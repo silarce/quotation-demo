@@ -965,7 +965,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const res = await apiPostCopyQuotation({
         quotationId,
         customerId,
-        isRelationQuotation: customerSelectorShow.isRelationQuotation,
+        isRelationQuotation: customerSelectorShow.isRelationQuotation || false,
       });
 
       if (res) {
