@@ -1,12 +1,9 @@
 import { useEffect, useMemo, Fragment } from 'react';
-
 import classNames from 'classnames';
 import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-
-// component
 
 // gaer
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -16,16 +13,88 @@ import scss from './annualPerformanceStatistics.module.scss';
 // api
 import { useQuotationAccounting_years } from 'js/api/api_quotation';
 
-export default function AnnualPerformanceStatistics() {
-  // const fakeData: Tfoo = {};
-  // const companyKeyArr = Object.keys(fakeData);
+// --------------------------------------------------------------------
 
+type Tlist = {
+  // 這一層是company_location
+  [key: string]: {
+    // 這一層是year
+    [key: string]: {
+      companyName: string;
+      year: string; // totalSum
+      '1': string; // totalSum
+      '2': string; // totalSum
+      '3': string; // totalSum
+      '4': string; // totalSum
+      '5': string; // totalSum
+      '6': string; // totalSum
+      '7': string; // totalSum
+      '8': string; // totalSum
+      '9': string; // totalSum
+      '10': string; // totalSum
+      '11': string; // totalSum
+      '12': string; // totalSum
+      noMonth: string; // totalSum
+      inTotal: string; // 總合計
+      成長率: string;
+    };
+  };
+};
+
+type TcompanyNameLookup = {
+  [key: string]: string | undefined;
+};
+
+// --------------------------------------------------------------------
+
+// 會收到的資料結構
+
+const leftStrArr = [
+  '1月',
+  '2月',
+  '3月',
+  '4月',
+  '5月',
+  '6月',
+  '7月',
+  '8月',
+  '9月',
+  '10月',
+  '11月',
+  '12月',
+  // '舊合約',
+  '總計',
+  '成長率',
+];
+
+const monthArr = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  // 'noMonth'
+] as const;
+
+const companyNameLookup: TcompanyNameLookup = {
+  Taichung: '台中分公司',
+  Taipei: '台北分公司',
+};
+
+// --------------------------------------------------------------------
+// MARK: START
+
+export default function AnnualPerformanceStatistics() {
   const { data, update } = useQuotationAccounting_years();
 
-  useEffect(() => {
-    update();
-  }, []);
-
+  // --------------------------------------------------------------------
   const list = useMemo(() => {
     if (!data) {
       return [];
@@ -96,6 +165,11 @@ export default function AnnualPerformanceStatistics() {
 
   // --------------------------------------------------------------------
   const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出excel',
+      onClick: () => {},
+    },
     // {
     //   searchGroup: {
     //     searchTargetList: [
@@ -109,6 +183,20 @@ export default function AnnualPerformanceStatistics() {
     //   },
     // },
   ];
+
+  // -----------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, []);
+
+  // -----------------------------------------------------------------------
+
+  // MARK: RENDER
+
+  console.log(list);
 
   return (
     <SubLayer>
@@ -188,77 +276,8 @@ export default function AnnualPerformanceStatistics() {
   );
 }
 
+// MARK: EDN
+
 // ===============================================================
-
-// 會收到的資料結構
-
-type Tlist = {
-  // 這一層是company_location
-  [key: string]: {
-    // 這一層是year
-    [key: string]: {
-      companyName: string;
-      year: string; // totalSum
-      '1': string; // totalSum
-      '2': string; // totalSum
-      '3': string; // totalSum
-      '4': string; // totalSum
-      '5': string; // totalSum
-      '6': string; // totalSum
-      '7': string; // totalSum
-      '8': string; // totalSum
-      '9': string; // totalSum
-      '10': string; // totalSum
-      '11': string; // totalSum
-      '12': string; // totalSum
-      noMonth: string; // totalSum
-      inTotal: string; // 總合計
-      成長率: string;
-    };
-  };
-};
-
-const leftStrArr = [
-  '1月',
-  '2月',
-  '3月',
-  '4月',
-  '5月',
-  '6月',
-  '7月',
-  '8月',
-  '9月',
-  '10月',
-  '11月',
-  '12月',
-  // '舊合約',
-  '總計',
-  '成長率',
-];
-
-const monthArr = [
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  '11',
-  '12',
-  // 'noMonth'
-] as const;
-
-type TcompanyNameLookup = {
-  [key: string]: string | undefined;
-};
-
-const companyNameLookup: TcompanyNameLookup = {
-  Taichung: '台中分公司',
-  Taipei: '台北分公司',
-};
 
 // ===============================================================
