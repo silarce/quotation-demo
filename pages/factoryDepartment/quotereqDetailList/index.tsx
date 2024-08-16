@@ -620,6 +620,7 @@ export default function QuotereqDetailList() {
 
 
     function handlechangeQuotereqDetail(item: any): void {
+        handleRowClick(item.quoterequuid);
         setCheckFirstIn(1);
         setSelectedsupplier("");
         setPurchaserequisitionidin(item.purchaserequisitionid);
@@ -653,12 +654,18 @@ export default function QuotereqDetailList() {
                             {data1 && (
                                 data1.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader18}>
-                                        <div className={scss.row01}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.quoterequuid === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => handlechangeQuotereqDetail(_item)}
+                                        >
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
                                             <span>{_item.alreadyquotereq}</span>
-                                            <span><IconDetail onClick={() => handlechangeQuotereqDetail(_item)} /></span>
+                                            <span>
+                                                {/* <IconDetail onClick={() => handlechangeQuotereqDetail(_item)} /> */}
+                                            </span>
                                             {/* <span><IconDetail onClick={() => {alert(_item.quoterequuid)}} /></span> */}
                                         </div>
                                     </CellWithBar>
@@ -1100,7 +1107,7 @@ export default function QuotereqDetailList() {
                 </div>
             </Modal>
 
-         
+
 
 
 

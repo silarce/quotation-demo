@@ -299,11 +299,11 @@ div.panelHeader19 {
 
 //新增請購單明細
 div.panelHeader20 {
-  padding-left: 15px;
   border-bottom: solid 1px $colorBorder01;
-
+  
   .row01,
   .row02 {
+    padding-left: 15px;
     span {
       font-weight: 400;
       font-size: 16px;
@@ -698,7 +698,7 @@ div.panelHeader20 {
     // gap: 15px;
     width: auto;
     // margin-top: 5px;
-    // margin-left: 20px;
+    margin-left: 10px;
     // margin-right: 20px;  
 
 
@@ -719,12 +719,12 @@ div.panelHeader20 {
 
 div.panelHeader6 {
     // padding: 14px 30px;
-    padding-left: 30px;
     border-bottom: solid 1px $colorBorder01;
-  
+    
     //   background-color: rgb(245, 104, 69);
     .row01,
     .row02 {
+      padding-left: 20px;
       span {
         font-weight: 400;
         font-size: 16px;
@@ -740,8 +740,13 @@ div.panelHeader6 {
       display: grid;
       grid-template-columns: 120px 80px 80px 100px 50px;
       gap: 15px;
-      // margin-bottom: 16px;
-      // padding-top:20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+  
+    .selectedRow {
+      background-color: #ecf1ff;
+      /* 當前選擇項目的背景顏色 */
     }
   }
 
@@ -824,11 +829,11 @@ div.panelHeader6 {
 
 //#region 進貨單明細
 div.panelHeader26 {
-  padding-left: 20px;
   border-bottom: solid 1px $colorBorder01;
-
+  
   .row01,
   .row02 {
+    padding-left: 20px;
     span {
       font-weight: 400;
       font-size: 16px;

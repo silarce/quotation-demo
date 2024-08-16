@@ -34,6 +34,7 @@ import { Modal } from 'antd';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1048,7 +1049,7 @@ export default function ProdReceiptList() {
                                 </button>
 
 
-                                
+
                                 {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
                                 </span> */}
@@ -1535,7 +1536,13 @@ export default function ProdReceiptList() {
                         </div>
                     </div>
                 </div>
-                <Modal
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
+                >
+                    {/* <Modal
                     visible={searchmodalopen}
                     footer={null}
                     onCancel={SearchModalClose}
@@ -1552,8 +1559,15 @@ export default function ProdReceiptList() {
                         </div>
                     }
                     style={{ top: 250 }}
-                >
-
+                > */}
+                    <div className={scss.modal_head_head1}>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
+                        </div>
+                    </div>
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
                             <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
@@ -1701,7 +1715,8 @@ export default function ProdReceiptList() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
             </div>
         </SubLayer >
 

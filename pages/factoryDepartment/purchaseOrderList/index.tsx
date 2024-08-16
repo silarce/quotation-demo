@@ -35,6 +35,7 @@ import { Modal } from 'antd';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 
 type Tquery = {
@@ -1306,7 +1307,7 @@ export default function PurchaseOrderList() {
                         <div className={scss.head_foot2}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
-                                    進貨明細
+                                    進貨紀錄
                                 </button>
                             </div>
                             <div>
@@ -1506,7 +1507,7 @@ export default function PurchaseOrderList() {
                     </div>
                 </div>
 
-                <Modal
+                {/* <Modal
                     visible={searchmodalopen}
                     footer={null}
                     onCancel={SearchModalClose}
@@ -1523,6 +1524,12 @@ export default function PurchaseOrderList() {
                     //     </div>
                     // }
                     style={{ top: 200 }}
+                > */}
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
                 >
                     <div className={scss.modal_head_head1}>
                         <div>
@@ -1679,7 +1686,8 @@ export default function PurchaseOrderList() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
             </div>
         </SubLayer >
 

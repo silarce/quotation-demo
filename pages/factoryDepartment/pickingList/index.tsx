@@ -39,7 +39,8 @@ import icon_tray from 'public/image/icon/fc_tray.svg';
 import icon_tray_out from 'public/image/icon/fc_tray_out.svg';
 import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
 import { title } from 'process';
-
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_print from 'public/image/icon/fc_printer.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -916,6 +917,7 @@ export default function AddPurchaseRequisition() {
     }
 
     const handlechangepickinglist = (item: any) => {
+        handleRowClick(item.pickinglistid);
         setPickinglistid(item.pickinglistid);
         setStatus(item.status);
         setNote(item.note);
@@ -1584,16 +1586,86 @@ export default function AddPurchaseRequisition() {
                 }
             }
         };
-    
+
         // 為整個 document 添加事件監聽器
         document.addEventListener('keydown', handleKeyDown);
-    
+
         // 清理事件監聽器
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
-    
+
+    const Print = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+            if (!response.ok) {
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+            }
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
+
+        } catch (error: any) {
+            setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    const sentToPrint = async (ip: any) => {
+        try {
+            const conditionModel = {
+                id: pickinglistid,
+                type: "pickinglist",
+                clientip: ip,
+                data: []
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}Print`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
 
 
     return (
@@ -1670,6 +1742,10 @@ export default function AddPurchaseRequisition() {
                                     查詢
                                 </button>
                                 &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
+                                </button>
                             </div>
                             <div>
                                 <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlepreAddPickingList() }} title="新增單據">
@@ -2582,7 +2658,14 @@ export default function AddPurchaseRequisition() {
                         </div>
                     </div>
                 </Modal>
-                <Modal
+
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
+                >
+                    {/* <Modal
                     visible={searchmodalopen}
                     footer={null}
                     onCancel={SearchModalClose}
@@ -2599,7 +2682,7 @@ export default function AddPurchaseRequisition() {
                     //     </div>
                     // }
                     style={{ top: 200 }}
-                >
+                > */}
                     <div className={scss.modal_head_head1}>
                         <div>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
@@ -2755,14 +2838,20 @@ export default function AddPurchaseRequisition() {
                             {searchdata && (
                                 searchdata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader6}>
-                                        <div className={scss.row01}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.pickinglistid === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => handlechangepickinglist(_item)}
+                                        >
                                             <span>{_item.pickinglistid}</span>
                                             <span>{getTaiwanDateStr(_item.create_at)}</span>
                                             <span>{_item.create_by}</span>
                                             <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "領料中" ? '#28a745' : '#ea1833' }}>
                                                 {_item.status}
                                             </span>
-                                            <span ><IconDetail onClick={() => { handlechangepickinglist(_item) }} /></span>
+                                            <span >
+                                                {/* <IconDetail onClick={() => { handlechangepickinglist(_item) }} /> */}
+                                            </span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -2770,7 +2859,8 @@ export default function AddPurchaseRequisition() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
             </div>
         </SubLayer >
 

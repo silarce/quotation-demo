@@ -45,6 +45,7 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -972,7 +973,7 @@ export default function PurchaseRequisitionList() {
             sentToPrint(data);
 
         } catch (error: any) {
-            setError(error.message);
+            // setError(error.message);
             myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
         }
         finally {
@@ -1132,7 +1133,7 @@ export default function PurchaseRequisitionList() {
                                     送審
                                 </button>
                                 <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
                                 <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
@@ -1293,11 +1294,11 @@ export default function PurchaseRequisitionList() {
 
                                 <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                                    詢價管理
+                                    詢價紀錄
                                 </button>
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                                    詢價管理
+                                    詢價紀錄
                                 </button>
                             </div>
                             <div style={{ marginTop: '5px' }}>
@@ -1651,24 +1652,30 @@ export default function PurchaseRequisitionList() {
                     </div>
                 </Modal>
 
-
-                <Modal
-                    visible={searchmodalopen}
-                    footer={null}
-                    onCancel={SearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    // title='單據查找'
-                    // title={
-                    // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                    //     <span>查詢條件</span>
-                    //     <span >筆數：共 {data.length} 筆</span>
-                    // </div>
-
-                    // }
-                    // centered
-                    style={{ top: 200 }}
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
                 >
+                    {/* <Modal
+                        visible={searchmodalopen}
+                        footer={null}
+                        onCancel={SearchModalClose}
+                        width="1000px"
+                        maskClosable={false}
+                        // title='單據查找'
+                        // title={
+                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
+                        //     <span>查詢條件</span>
+                        //     <span >筆數：共 {data.length} 筆</span>
+                        // </div>
+
+                        // }
+                        // centered
+                        style={{ top: 200 }}
+                    > */}
+
                     <div className={scss.modal_head_head1}>
                         <div>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
@@ -1827,7 +1834,24 @@ export default function PurchaseRequisitionList() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
+                {/* 
+                <DragableModal
+                    handleText="收款統計明細表"
+                    style={{zIndex:'1001'}}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
+                >
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+
+                    <h1>測試</h1><h1>測試</h1>
+                </DragableModal> */}
+
 
             </div >
         </SubLayer >

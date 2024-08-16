@@ -34,7 +34,9 @@ import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
-
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
+import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -78,7 +80,7 @@ export default function AddPurchaseRequisition() {
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
-    const status = router.query.status as TquotationStatus;
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [searchproduct, setSearchProduct] = useState<string>("");
@@ -88,6 +90,7 @@ export default function AddPurchaseRequisition() {
     const [create_byin, setCreate_byin] = useState<string>("");
     const [note, setNote] = useState<string>("");
     const [need_date, setNeed_date] = useState<string>("");
+    const [status, setStatus] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -739,11 +742,43 @@ export default function AddPurchaseRequisition() {
         };
     }, []); // 空依賴陣列確保只在掛載和卸載時運行
 
+    const handlePreAddPR = () => {
+        setStatus("未儲存");
+    }
+
+    const handlecancelAddPR = () => {
+        setStatus("");
+        setData2([]);
+        setNote("");
+        setNeed_date(moment().toString());
+    }
+
+    const dropdownRef = useRef<HTMLUListElement | null>(null);
+
+    useEffect(() => {
+        // 按下 ESC 鍵關閉下拉選單
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
+                setFilteredData([]);
+                if (dropdownRef.current) {
+                    dropdownRef.current.style.display = 'none';
+                }
+            }
+        };
+
+        // 為整個 document 添加事件監聽器
+        document.addEventListener('keydown', handleKeyDown);
+
+        // 清理事件監聽器
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '新增請購單'} panelList={panelList} />
+            <PageHeader02 tag='新增請購單' panelList={panelList} />
             {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
@@ -808,15 +843,43 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }} title="查詢單據">
+                                <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }} title="品項查詢">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     查詢
                                 </button>
                             </div>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
+                                {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
                                     <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                     新增
+                                </button> */}
+                                <button className={scss.squarebtn} onClick={() => { handlePreAddPR() }} title="新增單據">
+                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    onClick={() => { handleAddPR() }}
+                                    title="儲存新增"
+                                    disabled={status !== '未儲存'}
+                                >
+                                    <img
+                                        src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
+                                        alt="search"
+                                        style={{ height: '20px', width: '20px' }}
+                                    />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    onClick={() => { handlecancelAddPR() }}
+                                    title="取消新增"
+                                    disabled={status !== '未儲存'}
+                                >
+                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
                                 </button>
                             </div>
                             <div></div>
@@ -859,7 +922,7 @@ export default function AddPurchaseRequisition() {
                                 <InputSel
                                     caption="需用日期"
                                     className="global_tip_must"
-                                    disabled={false}
+                                    disabled={status === "未儲存" ? false : true}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                     // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                     datePickerProps={{
@@ -871,13 +934,27 @@ export default function AddPurchaseRequisition() {
                                 />
                             </div>
                             <div></div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: status || ' ',
+                                        },
+                                    }}
+                                />
+
+                            </div>
                         </div>
                         <div className={scss.head_content2}>
                             <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="備註"
-                                    disabled={false}
+                                    disabled={status === "未儲存" ? false : true}
                                     inputProps={{
                                         props: {
                                             value: note || ' ',
@@ -901,9 +978,9 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span>
+                                {/* <span>
                                     <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -1013,7 +1090,7 @@ export default function AddPurchaseRequisition() {
                             ))}
 
 
-                            <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}>
+                            <div className={scss.addbar} style={{ display: `${status === "未儲存" ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 <div></div>
                                 <div>
                                     <input
@@ -1091,97 +1168,52 @@ export default function AddPurchaseRequisition() {
                                 </div>
                             </div>
                         </div>
+
+
                         <div className={scss.body_foot1}>
                             <div>
                                 {/* (1).可自行輸入請購項目。<br />
                             (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
-                                {showSuggestions && (
-                                    <div
+                                {filteredData.length > 0 && (
+                                    <ul ref={dropdownRef}
                                         style={{
+                                            border: '1px solid #c1c1c1',
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            marginTop: '0px',
+                                            left: '20px',
                                             position: 'absolute',
-                                            zIndex: 1003,
+                                            width: '1000px',
                                             backgroundColor: 'white',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                                            width: '750px',
-                                            maxHeight: '300px', // 擴大整個容器的高度
-                                            overflow: 'hidden', // 隱藏整個容器的滾動條
-                                            fontSize: '16px',
-                                            left: `${position.x}px`,
-                                            top: `${position.y}px`,
-                                            cursor: 'default',
-                                        }}
-                                        onMouseDown={handleMouseDown}
-                                    >
-                                        <div
-                                            style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                padding: '8px',
-                                                borderBottom: '1px solid #ccc',
-                                                backgroundColor: '#f5f5f5', // 標題列的背景色
-                                                cursor: 'move', // 讓用戶知道可以拖動
-                                            }}
-                                        >
-                                            <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
-                                            <button
-                                                onClick={() => setShowSuggestions(false)}
+                                            zIndex: 1004,
+                                            display: `${showSuggestions ? '' : 'none'}`
+                                        }}>
+                                        {filteredData.map(item => (
+                                            <li
+                                                key={item.id}
+                                                onClick={() => handleSelect(item)}
                                                 style={{
-                                                    background: 'transparent',
-                                                    border: 'none',
                                                     fontSize: '16px',
                                                     cursor: 'pointer',
-                                                    fontWeight: 'bold',
-                                                    color: '#555',
-                                                    outline: 'none',
-                                                    transition: 'color 0.3s ease',
+                                                    padding: '8px',
+                                                    border: '1px solid #c1c1c1',
+                                                    display: 'flex', // 使用 flexbox
+                                                    justifyContent: 'space-between', // 在項目之間創建間距
+                                                    alignItems: 'center' // 垂直置中
                                                 }}
-                                                onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
-                                                onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
                                             >
-                                                ×
-                                            </button>
-                                        </div>
-                                        <div
-                                            style={{
-                                                maxHeight: '350px', // 限制table區域的最大高度
-                                                overflowY: 'auto', // 允許垂直滾動
-                                            }}
-                                        >
-                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                                {filteredData.length > 0 ? (
-                                                    filteredData.map((item, index) => (
-                                                        <tr
-                                                            key={index}
-                                                            onClick={() => handleSelect(item)}
-                                                            style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
-                                                            onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                                                        >
-                                                            <td style={{ padding: '8px', width: '150px' }}>
-                                                                {item.productid}
-                                                            </td>
-                                                            <td style={{ padding: '8px', width: '250px' }}>
-                                                                {item.name}
-                                                            </td>
-                                                            <td style={{ padding: '8px', width: '350px' }}>
-                                                                {item.spec}
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                            沒有匹配的結果
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </table>
-                                        </div>
-                                    </div>
+                                                <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                    {item.productid}
+                                                </span>
+                                                <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
+                                                    {item.name}
+                                                </span>
+                                                <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                    {item.spec}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             <div>
@@ -1193,14 +1225,20 @@ export default function AddPurchaseRequisition() {
                     </div>
                 </div>
 
-                <Modal
+                <DragableModal
+                    handleText="品項查詢"
+                    style={{ zIndex: '1000', width: '900px' }}
+                    show={productSearchmodalopen}
+                    onCrossClick={productSearchModalClose}
+                >
+                    {/* <Modal
                     visible={productSearchmodalopen}
                     footer={null}
                     onCancel={productSearchModalClose}
                     width="1000px"
                     maskClosable={false}
                     style={{ top: 250 }}
-                >
+                > */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
                         <span style={{ fontSize: '16px', color: '#14256a' }}>類別：</span>
                         <span style={{ fontSize: '16px' }}>
@@ -1264,7 +1302,8 @@ export default function AddPurchaseRequisition() {
                             )}
                         </div>
                     </div>
-                </Modal>
+                    {/* </Modal> */}
+                </DragableModal>
 
             </div>
         </SubLayer >
