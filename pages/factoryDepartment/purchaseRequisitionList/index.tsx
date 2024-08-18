@@ -1156,17 +1156,6 @@ export default function PurchaseRequisitionList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="請購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                            // value: checkfirstin
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="請購單號"
                                     disabled={true}
                                     inputProps={{
@@ -1185,10 +1174,30 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                        },
+                                    }}
+                                />
 
                             </div>
                             <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                            // value: checkfirstin
+                                        },
+                                    }}
+                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="需用日期"
@@ -1238,18 +1247,7 @@ export default function PurchaseRequisitionList() {
                             </div>
                         </div>
                         <div className={scss.head_content2}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
