@@ -1335,6 +1335,9 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
 
+  // excel範本中有國外匯費(新臺幣)，但後端沒有相關property
+  // 預先建立欄位設定
+  // w 要使用的時要修改inputSelProps與reducer_input的引數
   // currencyFee_TWD: {
   //   label: '國外匯費(新臺幣)',
   //   style: { width: 100 },
@@ -1347,7 +1350,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   //   }) => {
   //     const { type, value } = reducer_input({
   //       disabled: disabled,
-  //       value: state_incomeBillSerial.fee,
+  //       value: state_incomeBillSerial.currencyFee_TWD,
   //     });
 
   //     const inputSelProps: TinputSelProps = {
@@ -1360,7 +1363,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   //           onChange: (e) => {
   //             setState_incomeBillSerial((state) => {
   //               const copy = { ...state };
-  //               copy.fee = Number(e.target.value || 0);
+  //               copy.currencyFee_TWD = Number(e.target.value || 0);
   //               copy.unpaidPayment = calcUnpaidPayment(copy).toString();
 
   //               return copy;
