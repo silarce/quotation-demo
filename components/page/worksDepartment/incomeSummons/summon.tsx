@@ -330,39 +330,77 @@ const Summons = forwardRef(Summons_pre);
 
 // region PROPSLIST
 
+// 舊的
+// const keyArr_ori: TconfigKey[] = [
+//   'billSerialNumber', // 收入傳票序號
+//   // 'invoiceType', //
+//   'receiveDate', // 日期
+//   'contractNumber', // 合約編號
+//   'projectName', // 工程名稱
+//   'vendorName', // 廠商名稱
+//   'contractPayment', // 承攬價
+//   'periodPayment', // 本期計價
+//   'priorPeriodPayment', // 前期已收
+//   'importAccountingNumber', // 票據/匯入帳號
+//   'noteNumber', // 票據號碼
+//   'noteMaturityDate', // 票據日期
+//   'receivablePayment', // 收款金額
+//   'deductionPayment', // 扣款金額
+//   'fee', // 匯費
+//   'unpaidPayment', // 餘額
+//   // 'difference', // 差額
+
+//   //
+//   'declarationCurrency', // 外銷 出口報單幣別
+//   'declarationExchangeRate', // 外銷 出口報單匯率
+//   'declarationPayment', // 外銷 出口報單台幣金額
+//   'declarationCurrencyPayment', // 外銷 出口報單外幣金額
+
+//   'receivableCurrency', // 外銷 收款幣別
+//   'receivableExchangeRate', // 外銷 收款匯率
+//   'receivableCurrencyPayment', // 外銷 收款外幣金額
+
+//   'currencyFee', // 外銷 國外匯費
+//   'exchangeBenefits', // 外銷 兌換利益
+//   //
+//   'note', // 備註
+// ];
+
+// 欄位順序要跟工務部討論
 const keyArr_ori: TconfigKey[] = [
-  'billSerialNumber',
-  // 'invoiceType',
-  'receiveDate',
-  'contractNumber',
-  'projectName',
-  'vendorName',
-  'contractPayment',
-  'periodPayment',
-  'priorPeriodPayment',
-  'importAccountingNumber',
-  'noteNumber',
-  'noteMaturityDate',
-  'receivablePayment',
-  'deductionPayment',
-  'fee',
-  'unpaidPayment',
-  // 'difference',
+  'billSerialNumber', // 收入傳票序號
+  'contractNumber', // 合約編號
+  'receiveDate', // 日期
+  'projectName', // 工程名稱
+  'vendorName', // 廠商名稱
+  'contractPayment', // 承攬價
+  'periodPayment', // 本期計價
+  'noteNumber', // 票據號碼
+  'importAccountingNumber', // 票據/匯入帳號
+  'noteMaturityDate', // 票據日期
 
-  //
-  'declarationCurrency', // 外銷
-  'declarationExchangeRate', // 外銷
-  'declarationPayment', // 外銷
-  'declarationCurrencyPayment', // 外銷
+  'declarationCurrency', // 外銷 出口報單幣別
+  'declarationExchangeRate', // 外銷 出口報單匯率
+  'declarationCurrencyPayment', // 外銷 出口報單外幣金額
+  'declarationPayment', // 外銷 出口報單台幣金額
 
-  'receivableCurrency', // 外銷
-  'receivableExchangeRate', // 外銷
-  'receivableCurrencyPayment', // 外銷
+  'priorPeriodPayment', // 前期已收
 
-  'currencyFee', // 外銷
-  'exchangeBenefits', // 外銷
-  //
-  'note',
+  'receivableCurrency', // 外銷 收款幣別
+  'receivableExchangeRate', // 外銷 收款匯率
+  'receivableCurrencyPayment', // 外銷 收款外幣金額
+  'receivablePayment', // w 收款金額 新臺幣
+
+  'fee', // 匯費
+  'currencyFee', // 外銷 國外匯費
+  // ____________________________________________________________
+  // w 缺property 國外匯費_新台幣
+  // ____________________________________________________________
+  'exchangeBenefits', // 外銷 兌換利益
+
+  'deductionPayment', // 扣款金額
+  'unpaidPayment', // 餘額
+  'note', // 備註
 ];
 
 const cellPropsList_summon: TcellPropsList_summon = {
@@ -1033,6 +1071,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   declarationCurrencyPayment: {
     label: '出口報單外幣金額',
     style: { width: 150 },
+    className: 'text-right',
     // className: 'text-center',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
@@ -1045,6 +1084,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         showBaseline: 'auto',
         inputProps: {
           props: {
+            className: 'text-right',
             // className: 'text-center',
             type,
             value,
@@ -1072,6 +1112,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   declarationPayment: {
     label: '出口報單台幣金額',
     style: { width: 150 },
+    className: 'text-right',
     // className: 'text-center',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
@@ -1084,6 +1125,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         inputProps: {
           props: {
             type,
+            className: 'text-right',
             // className: 'text-center',
             value,
             onChange: (e) => {
@@ -1150,12 +1192,14 @@ const cellPropsList_summon: TcellPropsList_summon = {
   receivableExchangeRate: {
     label: '收款匯率',
     style: { width: 150 },
-    // className: 'text-center',
+    // className: 'text-right',
+
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
-            // className: 'text-center',
+            // className: 'text-right',
+
             value: state_incomeBillSerial.receivableExchangeRate ?? '',
             onChange: (e) => {
               setState_incomeBillSerial((state) => {
@@ -1181,6 +1225,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   receivableCurrencyPayment: {
     label: '收款外幣金額',
     style: { width: 150 },
+    className: 'text-right',
     // className: 'text-center',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
@@ -1191,6 +1236,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
+            className: 'text-right',
             // className: 'text-center',
             type,
             value: value,
@@ -1218,7 +1264,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
   currencyFee: {
     label: '國外匯費',
     style: { width: 150 },
-    // className: 'text-center',
+    className: 'text-right',
+
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
         disabled,
@@ -1230,7 +1277,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         showBaseline: 'auto',
         inputProps: {
           props: {
-            // className: 'text-center',
+            className: 'text-right',
             type,
             value,
             onChange: (e) => {
@@ -1250,7 +1297,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   exchangeBenefits: {
     label: '兌換利益',
     style: { width: 150 },
-    // className: 'text-center',
+    className: 'text-right',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
         disabled,
@@ -1262,7 +1309,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         showBaseline: 'auto',
         inputProps: {
           props: {
-            // className: 'text-center',
+            className: 'text-right',
             type,
             value,
             onChange: (e) => {
