@@ -31,6 +31,7 @@ import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayme
 
 // global state
 import { useVipInfo } from 'hooks/globalState/useVipInfo';
+
 // context
 import { AppContext } from 'pages/_app';
 
@@ -1036,7 +1037,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
 
   declarationExchangeRate: {
     label: '出口報單匯率',
-    style: { width: 150 },
+    style: { width: 120 },
     // className: 'text-center',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
@@ -1079,7 +1080,15 @@ const cellPropsList_summon: TcellPropsList_summon = {
         value: state_incomeBillSerial.declarationCurrencyPayment ?? '',
       });
 
+      const declarationCurrency = state_incomeBillSerial.declarationCurrency;
+      // const currencyCode = declarationCurrency ? extractCurrencyCode(declarationCurrency) : '';
+
       const inputSelProps: TinputSelProps = {
+        // //
+        // caption: currencyCode,
+        // captionSize: '18',
+        // wrapperStyle: { gap: '5px' },
+        // //
         disabled,
         showBaseline: 'auto',
         inputProps: {
@@ -1191,7 +1200,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
 
   receivableExchangeRate: {
     label: '收款匯率',
-    style: { width: 150 },
+    style: { width: 100 },
     // className: 'text-right',
 
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
@@ -1566,6 +1575,14 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
 const checkStatus = (bool: boolean | null | undefined) => {
   return bool ? 'success' : 'error';
 };
+
+// 抽出貨幣代碼 // 留著，未來可能會用到
+// type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
+// const extractCurrencyCode = (currency: Tcurrency) => {
+//   const currencyCode = currency.split(' ')[0] as Tcurrency;
+
+//   return currencyCode;
+// };
 
 // =============================================================================
 
