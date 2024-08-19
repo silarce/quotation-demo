@@ -66,7 +66,7 @@ const leftStrArr = [
   '11月',
   '12月',
   // '舊合約',
-  '總計',
+  '總合計',
   '成長率',
 ];
 
@@ -87,7 +87,7 @@ const monthArr = [
 ] as const;
 
 const companyNameLookup: TcompanyNameLookup = {
-  Taichung: '台中分公司',
+  Taichung: '台中總公司',
   Taipei: '台北分公司',
 };
 
@@ -332,7 +332,9 @@ const dlExcel = async ({
 
   const col_data_Width = 15;
   const dataRowQty = 15;
-  const tableStartRow = 3;
+
+  const tableStartRowIndex = 3;
+  const reviewerRowIndex = 20;
 
   // -----------------------------------------------------------------------
 
@@ -346,7 +348,7 @@ const dlExcel = async ({
 
   // -----------------------------------------------------------------------
 
-  sheet.mergeCells(`A${tableStartRow}:A${tableStartRow + 1}`);
+  sheet.mergeCells(`A${tableStartRowIndex}:A${tableStartRowIndex + 1}`);
 
   // cnNums
   let thisYear_str = thisYear.toString();
@@ -386,7 +388,7 @@ const dlExcel = async ({
 
   batchMergeCells({
     sheet,
-    row: tableStartRow,
+    row: tableStartRowIndex,
     cellContentArr: locationArr,
     firstCol: 2,
     callBack_cell: (cell) => {
@@ -394,7 +396,7 @@ const dlExcel = async ({
         horizontal: 'center',
       };
       cell.font = {
-        size: 18,
+        size: 16,
         bold: true,
       };
     },
@@ -447,17 +449,6 @@ const dlExcel = async ({
     });
   });
 
-  latestYearColArr.forEach((col) => {
-    col.eachCell((cell) => {
-      cell.border = {
-        ...cell.border,
-        right: {
-          style: 'thin',
-        },
-      };
-    });
-  });
-
   colValues2DArr.forEach((item, index) => {
     index = index + 2;
 
@@ -468,7 +459,7 @@ const dlExcel = async ({
     col.values = valuesArr;
     col.eachCell((cell, rowIndex) => {
       // 3~15
-      if (rowIndex >= tableStartRow + 2 && rowIndex <= tableStartRow + dataRowQty - 1) {
+      if (rowIndex >= tableStartRowIndex + 2 && rowIndex <= tableStartRowIndex + dataRowQty - 1) {
         cell.numFmt = '#,##0';
       }
     });
@@ -495,6 +486,8 @@ const dlExcel = async ({
 
   // -----------------------------------------------------------------------
 
+  // -----------------------------------------------------------------------
+
   sheet.eachRow((row) => {
     row.eachCell((cell) => {
       cell.border = {
@@ -518,7 +511,7 @@ const dlExcel = async ({
     cell.border = {
       ...cell.border,
       right: {
-        style: 'thin',
+        style: 'thick',
       },
       left: {
         style: 'thin',
@@ -526,7 +519,7 @@ const dlExcel = async ({
     };
   });
 
-  const tableFirstRow = sheet.getRow(tableStartRow);
+  const tableFirstRow = sheet.getRow(tableStartRowIndex);
   tableFirstRow.eachCell((cell) => {
     cell.border = {
       ...cell.border,
@@ -536,7 +529,7 @@ const dlExcel = async ({
     };
   });
 
-  const tableSecondRow = sheet.getRow(tableStartRow + 1);
+  const tableSecondRow = sheet.getRow(tableStartRowIndex + 1);
   tableSecondRow.eachCell((cell) => {
     cell.alignment = {
       ...cell.alignment,
@@ -544,7 +537,7 @@ const dlExcel = async ({
     };
   });
 
-  const row_total = sheet.getRow(tableStartRow + dataRowQty - 1);
+  const row_total = sheet.getRow(tableStartRowIndex + dataRowQty - 1);
   row_total.eachCell((cell, colIndex) => {
     cell.border = {
       ...cell.border,
@@ -554,7 +547,7 @@ const dlExcel = async ({
     };
   });
 
-  const row_latest = sheet.getRow(tableStartRow + dataRowQty - 1 + 1);
+  const row_latest = sheet.getRow(tableStartRowIndex + dataRowQty - 1 + 1);
   row_latest.eachCell((cell, colIndex) => {
     cell.border = {
       ...cell.border,
@@ -562,6 +555,17 @@ const dlExcel = async ({
         style: 'thin',
       },
     };
+  });
+
+  latestYearColArr.forEach((col) => {
+    col.eachCell((cell) => {
+      cell.border = {
+        ...cell.border,
+        right: {
+          style: 'thick',
+        },
+      };
+    });
   });
 
   const firstRow = sheet.getRow(1);
@@ -606,6 +610,11 @@ const dlExcel = async ({
     horizontal: 'center',
     vertical: 'middle',
   };
+
+  // -----------------------------------------------------------------------
+
+  const reviewerRow = sheet.getRow(reviewerRowIndex);
+  reviewerRow.values = ['', '總經理 :', '', '主管 :', '', '製表 :'];
 
   // -----------------------------------------------------------------------
 
