@@ -737,23 +737,26 @@ const cellPropsList_summon: TcellPropsList_summon = {
         value: state_incomeBillSerial.receivablePayment,
       });
 
-      return {
+      const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
             className: 'text-right',
             type,
             value: value,
             onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  receivablePayment: e.target.value,
-                };
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.receivablePayment = e.target.value;
+                copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+                return copy;
               });
             },
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   deductionPayment: {
@@ -1405,6 +1408,7 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
     priorPeriodPayment,
     deductionPayment,
     fee,
+    receivablePayment,
   } = state_incomeBillSerial;
 
   const unpaidPayment = calcIncomeBillUnpaidPayment({
@@ -1413,6 +1417,7 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
     priorPeriodPayment: Number(priorPeriodPayment),
     deductionPayment: Number(deductionPayment),
     fee: Number(fee),
+    receivablePayment: Number(receivablePayment),
   });
   // const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
   //   .minus(priorPeriodPayment || 0)

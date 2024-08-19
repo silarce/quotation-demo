@@ -8,8 +8,9 @@ const calcIncomeBillUnpaidPayment = (params: {
   priorPeriodPayment: number;
   deductionPayment: number;
   fee: number;
+  receivablePayment: number;
 }) => {
-  // 餘額=承攬價/本期計價-上期已計價-扣款-匯費
+  // 餘額=承攬價/本期計價-上期已計價-扣款-匯費 - 收款金額
 
   const {
     //
@@ -18,12 +19,14 @@ const calcIncomeBillUnpaidPayment = (params: {
     priorPeriodPayment,
     deductionPayment,
     fee,
+    receivablePayment,
   } = params;
 
   const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
     .minus(priorPeriodPayment || 0)
     .minus(deductionPayment || 0)
     .minus(fee || 0)
+    .minus(receivablePayment || 0)
     .toNumber();
 
   return unpaidPayment;
