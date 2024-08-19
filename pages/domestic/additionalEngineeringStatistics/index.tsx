@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -23,9 +23,6 @@ import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from
 // api
 import { useQuotationAccounting_modifyContract } from 'js/api/api_quotation';
 
-// css
-import scss from './index.module.scss';
-
 // ==================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
@@ -42,6 +39,9 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 // ==================================================================
+
+// MARK: START
+
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
   const { year, month, region } = router.query as Tquery;
@@ -49,35 +49,14 @@ export default function AdditionalEngineeringStatistics() {
   // ------------------------------------------------------------------
 
   const { data, update } = useQuotationAccounting_modifyContract({
-    // year: 2023,
-    // month: 11,
-    // area: 'all',
     year: year ? Number(year) + 1911 : undefined,
     month: month ? Number(month) : undefined,
     area: region || 'all',
   });
 
-  useEffect(() => {
-    update();
-  }, [year, month, region]);
-
-  useEffect(() => {
-    const now = new Date();
-    const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month;
-
-    router.push({
-      query: {
-        year: theYear,
-        month: theMonth,
-        region: region,
-      },
-    });
-  }, []);
-
-  // console.log(data);
-
   // ------------------------------------------------------------------
+
+  // region cooked Data
 
   const control_table: Tcontrol_personalPerformanceStatistics = useMemo(() => {
     if (!data) {
@@ -207,6 +186,9 @@ export default function AdditionalEngineeringStatistics() {
   }, [data]);
 
   // ------------------------------------------------------------------
+
+  // region PROPS
+
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
@@ -267,6 +249,31 @@ export default function AdditionalEngineeringStatistics() {
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   // ------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [year, month, region]);
+
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+        region: region,
+      },
+    });
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  // region: RENDER
+
   return (
     <SubLayer>
       <PageHeader02 tag="追加工程統計表" customeLeft={customeLeft} />
@@ -275,3 +282,5 @@ export default function AdditionalEngineeringStatistics() {
     </SubLayer>
   );
 }
+
+// MARK: END
