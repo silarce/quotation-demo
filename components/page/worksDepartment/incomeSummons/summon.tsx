@@ -1080,7 +1080,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         value: state_incomeBillSerial.declarationCurrencyPayment ?? '',
       });
 
-      const declarationCurrency = state_incomeBillSerial.declarationCurrency;
+      // const declarationCurrency = state_incomeBillSerial.declarationCurrency;
       // const currencyCode = declarationCurrency ? extractCurrencyCode(declarationCurrency) : '';
 
       const inputSelProps: TinputSelProps = {
@@ -1334,6 +1334,45 @@ const cellPropsList_summon: TcellPropsList_summon = {
       return inputSelProps;
     },
   },
+
+  // currencyFee_TWD: {
+  //   label: '國外匯費(新臺幣)',
+  //   style: { width: 100 },
+  //   className: 'text-right',
+  //   createInputSelProps: ({
+  //     //
+  //     disabled,
+  //     state_incomeBillSerial,
+  //     setState_incomeBillSerial,
+  //   }) => {
+  //     const { type, value } = reducer_input({
+  //       disabled: disabled,
+  //       value: state_incomeBillSerial.fee,
+  //     });
+
+  //     const inputSelProps: TinputSelProps = {
+  //       disabled: disabled,
+  //       inputProps: {
+  //         props: {
+  //           type,
+  //           className: 'text-right',
+  //           value,
+  //           onChange: (e) => {
+  //             setState_incomeBillSerial((state) => {
+  //               const copy = { ...state };
+  //               copy.fee = Number(e.target.value || 0);
+  //               copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+  //               return copy;
+  //             });
+  //           },
+  //         },
+  //       },
+  //     };
+
+  //     return inputSelProps;
+  //   },
+  // },
 
   //
   //
