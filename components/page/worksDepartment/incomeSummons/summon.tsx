@@ -87,8 +87,10 @@ type Tstate_incomeBillSerial = {
   receivableExchangeRate: string | null;
   // '收款外幣金額'
   receivableCurrencyPayment: string | null;
-  // '國外匯費'
-  currencyFee: string | null;
+  // '國外匯費_新台幣'
+  foreignFee: string | null;
+  // '國外匯費_外幣'
+  foreignCurrencyFee: string | null;
   // '兌換利益'
   exchangeBenefits: string | null;
 };
@@ -146,7 +148,8 @@ type TconfigKey =
       | 'receivableCurrency'
       | 'receivableExchangeRate'
       | 'receivableCurrencyPayment'
-      | 'currencyFee'
+      | 'foreignFee'
+      | 'foreignCurrencyFee'
       | 'exchangeBenefits'
     >
   | 'fee'
@@ -393,10 +396,9 @@ const keyArr_ori: TconfigKey[] = [
   'receivablePayment', // w 收款金額 新臺幣
 
   'fee', // 匯費
-  'currencyFee', // 外銷 國外匯費
-  // ____________________________________________________________
-  // w 缺property 國外匯費_新台幣
-  // ____________________________________________________________
+  'foreignCurrencyFee', // 外銷 國外匯費_外幣
+  'foreignFee', // 外銷 國外匯費_新台幣
+
   'exchangeBenefits', // 外銷 兌換利益
 
   'deductionPayment', // 扣款金額
@@ -1223,6 +1225,11 @@ const cellPropsList_summon: TcellPropsList_summon = {
                 });
                 copy.receivableCurrencyPayment = receivableCurrencyPayment_num.toString();
 
+                copy.foreignFee = calc_foreignToTw({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
+                }).toString();
+
                 return copy;
               });
             },
@@ -1273,39 +1280,6 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
 
-  currencyFee: {
-    label: '國外匯費',
-    style: { width: 150 },
-    className: 'text-right',
-
-    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.currencyFee ?? '',
-      });
-
-      const inputSelProps: TinputSelProps = {
-        disabled,
-        showBaseline: 'auto',
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              setState_incomeBillSerial((state) => ({
-                ...state,
-                currencyFee: e.target.value,
-              }));
-            },
-          },
-        },
-      };
-
-      return inputSelProps;
-    },
-  },
-
   exchangeBenefits: {
     label: '兌換利益',
     style: { width: 150 },
@@ -1338,47 +1312,79 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
 
-  // excel範本中有國外匯費(新臺幣)，但後端沒有相關property
-  // 預先建立欄位設定
-  // w 要使用的時要修改inputSelProps與reducer_input的引數
-  // currencyFee_TWD: {
-  //   label: '國外匯費(新臺幣)',
-  //   style: { width: 100 },
-  //   className: 'text-right',
-  //   createInputSelProps: ({
-  //     //
-  //     disabled,
-  //     state_incomeBillSerial,
-  //     setState_incomeBillSerial,
-  //   }) => {
-  //     const { type, value } = reducer_input({
-  //       disabled: disabled,
-  //       value: state_incomeBillSerial.currencyFee_TWD,
-  //     });
+  foreignCurrencyFee: {
+    label: '國外匯費(外幣)',
+    style: { width: 150 },
+    className: 'text-right',
 
-  //     const inputSelProps: TinputSelProps = {
-  //       disabled: disabled,
-  //       inputProps: {
-  //         props: {
-  //           type,
-  //           className: 'text-right',
-  //           value,
-  //           onChange: (e) => {
-  //             setState_incomeBillSerial((state) => {
-  //               const copy = { ...state };
-  //               copy.currencyFee_TWD = Number(e.target.value || 0);
-  //               copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled,
+        value: state_incomeBillSerial.foreignCurrencyFee ?? '',
+      });
 
-  //               return copy;
-  //             });
-  //           },
-  //         },
-  //       },
-  //     };
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            type,
+            value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
 
-  //     return inputSelProps;
-  //   },
-  // },
+                copy.foreignCurrencyFee = e.target.value;
+                copy.foreignFee = calc_foreignToTw({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
+                }).toString();
+
+                return copy;
+              });
+            }, // onChange
+            //
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  foreignFee: {
+    label: '國外匯費(新台幣)',
+    style: { width: 150 },
+    className: 'text-right',
+
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      // const { type, value } = reducer_input({
+      //   disabled,
+      //   value: state_incomeBillSerial.currencyFee ?? '',
+      // });
+
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            type: 'text',
+            value: state_incomeBillSerial.foreignFee ?? '',
+            onChange: (e) => {
+              // setState_incomeBillSerial((state) => ({
+              //   ...state,
+              //   currencyFee: e.target.value,
+              // }));
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
 
   //
   //
@@ -1505,7 +1511,8 @@ const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
         key === 'receivableCurrency' ||
         key === 'receivableExchangeRate' ||
         key === 'receivableCurrencyPayment' ||
-        key === 'currencyFee' ||
+        key === 'foreignFee' ||
+        key === 'foreignCurrencyFee' ||
         key === 'exchangeBenefits'
       ) {
         pass = false;
@@ -1560,7 +1567,8 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       receivableCurrency,
       receivableExchangeRate,
       receivableCurrencyPayment,
-      currencyFee,
+      foreignFee,
+      foreignCurrencyFee,
       exchangeBenefits,
     } = incomeBillSerial;
 
@@ -1611,7 +1619,8 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       receivableCurrency,
       receivableExchangeRate,
       receivableCurrencyPayment,
-      currencyFee,
+      foreignFee: foreignFee,
+      foreignCurrencyFee,
       exchangeBenefits,
     };
 
