@@ -74,6 +74,8 @@ export default function AddPurchaseRequisition() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [modaldata, setModalData] = useState<any[]>([]);
     const [searchbardata, setSearchBarData] = useState<any[]>([]);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [prdata, setPrdata] = useState<any[]>([]);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -101,6 +103,13 @@ export default function AddPurchaseRequisition() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
@@ -205,11 +214,6 @@ export default function AddPurchaseRequisition() {
                     props: {
                         onOk: () => {
                             router.back();
-                            // router.push({
-                            //     pathname: `/factoryDepartment/purchaseRequisitionList`,
-                            //     query: {
-                            //     },
-                            // });
                         }
                     }
                 });
@@ -217,6 +221,87 @@ export default function AddPurchaseRequisition() {
         },
     ];
     //#endregion
+
+    const getPurchaseRequisition = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                type: "請購中"
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}GetPurchaseRequisition?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            setSearchdata(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const hasFetchedData = useRef(false);
+
+    useEffect(() => {
+        if (!hasFetchedData.current) {
+            getPurchaseRequisition();
+            getProduct();
+            hasFetchedData.current = true;
+        }
+    }, []);
+
+    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel: {
+                purchaserequisitionuuid: string | undefined
+            } = {
+                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}GetPurchaseRequisitionDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            // setData1(data);
+
+            setData2(data);
+
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+
+
 
     //#region api呼叫區
     //取物料清單
@@ -259,9 +344,6 @@ export default function AddPurchaseRequisition() {
             setIsLoading(false);
         }
     };
-    useEffect(() => {
-        getProduct();
-    }, []);
 
 
     useEffect(() => {
@@ -406,7 +488,7 @@ export default function AddPurchaseRequisition() {
     };
 
     //請購單申請
-    const AddPurchaseRequisitionDetail = async () => {
+    const ClosePurchaseRequisition = async () => {
 
         console.log(data2);
         // return;
@@ -414,14 +496,11 @@ export default function AddPurchaseRequisition() {
             setIsLoading(true);
             const conditionModel: {
                 purchaserequisitionid: any,
-                purchaserequisitionuuid: any,
-                data: any,
+                purchaserequisitionuuid: any
             } = {
                 purchaserequisitionid: purchaserequisitionid,
-                purchaserequisitionuuid: purchaserequisitionuuid,
-                data: data2
+                purchaserequisitionuuid: purchaserequisitionuuid
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -430,8 +509,7 @@ export default function AddPurchaseRequisition() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-
-            const response = await fetch(`${setting.apipath}AddPurchaseRequisitionDetail`, {
+            const response = await fetch(`${setting.apipath}ClosePurchaseRequisition`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -443,14 +521,6 @@ export default function AddPurchaseRequisition() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-
-
-            
-            
-
-            // getProduct();
-
-            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -474,8 +544,8 @@ export default function AddPurchaseRequisition() {
 
 
     // 手key加入
-    const handleAddByHandKey = () => {
-        if (handinputproductid === '' && handinputname === '' && handinputspec === '' && handinputquantity === '' && handinputunit === '' && handinputnote === '') {
+    const handleAddByHandKey = async () => {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '' || handinputquantity === '') {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -487,9 +557,6 @@ export default function AddPurchaseRequisition() {
                 unit: handinputunit,
                 note: handinputnote
             };
-            console.log(newEntry);
-
-            setData2(prevData2 => [...prevData2, newEntry]);
 
             setHandinputproductuuid('');
             setHandinputproductid('');
@@ -498,9 +565,51 @@ export default function AddPurchaseRequisition() {
             setHandinputquantity('');
             setHandinputunit('');
             setHandinputnote('');
-            // console.log(data2);
+
+            try {
+                setIsLoading(true);
+                const conditionModel: {
+                    purchaserequisitionid: any,
+                    purchaserequisitionuuid: any,
+                    data: any,
+                } = {
+                    purchaserequisitionid: purchaserequisitionid,
+                    purchaserequisitionuuid: purchaserequisitionuuid,
+                    data: newEntry
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                const response = await fetch(`${setting.apipath}AddPurchaseRequisitionDetail`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+
+                setData2(prevData2 => [...prevData2, data]);
+
+                getPurchaseRequisitionDetail(purchaserequisitionuuid);
+
+
+            } catch (error: any) {
+                setError(error.message);
+            }
+            finally {
+                setIsLoading(false);
+            }
         }
-        // console.log(data2);
     };
 
     // 結案按鈕
@@ -557,10 +666,6 @@ export default function AddPurchaseRequisition() {
     const handleSubmit = (e: any) => {
         e.preventDefault();
         searchData(keyword1, keyword2, keyword3)
-        // alert(keyword1);
-        // alert(keyword2);
-        // alert(keyword3);
-        // 在這裡可以添加搜索的邏輯，使用keyword1來進行搜索
     };
 
     //#endregion
@@ -779,6 +884,7 @@ export default function AddPurchaseRequisition() {
     const handlePreAddPR = () => {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
+        setNote("");
     }
 
     const handlecancelAddPR = () => {
@@ -814,8 +920,7 @@ export default function AddPurchaseRequisition() {
                     </>,
                     props: {
                         onOk: async () => {
-                            AddPurchaseRequisitionDetail();
-                            console.log("OK");
+                            ClosePurchaseRequisition();
                             setPurchaserequisitionid("");
                             setPurchaserequisitionuuid("");
                             setCreate_atin(moment().format('YYYY-MM-DD') || '');
@@ -823,7 +928,7 @@ export default function AddPurchaseRequisition() {
                             setStatus("");
                             setNote("")
                             setData2([]);
-                
+
                             await router.push({
                                 pathname: `/factoryDepartment/purchaseRequisitionList`,
                                 query: {},
@@ -833,76 +938,615 @@ export default function AddPurchaseRequisition() {
                 });
             }
         }
+    }
+
+    const dropdownRef = useRef<HTMLUListElement | null>(null);
+
+    useEffect(() => {
+        // 按下 ESC 鍵關閉下拉選單
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
+                setFilteredData([]);
+                if (dropdownRef.current) {
+                    dropdownRef.current.style.display = 'none';
+                }
+            }
+        };
+
+        // 為整個 document 添加事件監聽器
+        document.addEventListener('keydown', handleKeyDown);
+
+        // 清理事件監聽器
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
+    const SearchModalClose = async () => {
+        setSearchmodalopen(false);
+    }
+
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
+
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status) {
+            setSearchdata(prdata);
+            return;
         }
 
-        const dropdownRef = useRef<HTMLUListElement | null>(null);
+        // 過濾資料
+        let filteredData = prdata.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
 
-        useEffect(() => {
-            // 按下 ESC 鍵關閉下拉選單
-            const handleKeyDown = (event: KeyboardEvent) => {
-                if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
-                    setFilteredData([]);
-                    if (dropdownRef.current) {
-                        dropdownRef.current.style.display = 'none';
-                    }
-                }
-            };
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.purchaserequisitionid.toString().includes(requisitionId)
+            );
+        }
 
-            // 為整個 document 添加事件監聽器
-            document.addEventListener('keydown', handleKeyDown);
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
 
-            // 清理事件監聽器
-            return () => {
-                document.removeEventListener('keydown', handleKeyDown);
-            };
-        }, []);
+        setSearchdata(filteredData);
+    };
 
-        return (
-            <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-                {/* <SubLayer isLoading_subLayer={isLoading}> */}
-                <PageHeader02 tag='新增請購單' panelList={panelList} />
-                {/* <div className={scss.main}> */}
-                <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                    <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
-                        <div>
-                            <form onSubmit={handleSubmit}>
-                                <div className={scss.searchbar}>
-                                    <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                        <input
-                                            type="text"
-                                            placeholder='物料號碼'
-                                            value={keyword1}
-                                            onChange={(e) => setKeyword1(e.target.value)}
-                                        />
-                                    </div>
-                                    <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                        <input
-                                            type="text"
-                                            placeholder='物料名稱'
-                                            value={keyword2}
-                                            onChange={(e) => setKeyword2(e.target.value)}
-                                        />
-                                    </div>
-                                    <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                        <input
-                                            type="text"
-                                            placeholder='物料規格'
-                                            value={keyword3}
-                                            onChange={(e) => setKeyword3(e.target.value)}
-                                        />
-                                        <button type="submit">
-                                            <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '30px' }} />
-                                        </button>
-                                    </div>
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+
+
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        // setSearchdata(data);
+    }
+
+    const handlechangepr = (item: any) => {
+        handleRowClick(item.purchaserequisitionid);
+        setData2([]);
+        setPurchaserequisitionid(item.purchaserequisitionid);
+        setPurchaserequisitionuuid(item.purchaserequisitionuuid);
+        setStatus(item.status);
+        setNote(item.note);
+        setCreate_atin(item.create_at);
+        setNeed_date(item.need_date);
+        getPurchaseRequisitionDetail(item.purchaserequisitionuuid);
+    }
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
+
+    return (
+        <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
+            {/* <SubLayer isLoading_subLayer={isLoading}> */}
+            <PageHeader02 tag='新增請購單' panelList={panelList} />
+            {/* <div className={scss.main}> */}
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
+                    <div>
+                        <form onSubmit={handleSubmit}>
+                            <div className={scss.searchbar}>
+                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                    <input
+                                        type="text"
+                                        placeholder='物料號碼'
+                                        value={keyword1}
+                                        onChange={(e) => setKeyword1(e.target.value)}
+                                    />
                                 </div>
-                            </form>
+                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                    <input
+                                        type="text"
+                                        placeholder='物料名稱'
+                                        value={keyword2}
+                                        onChange={(e) => setKeyword2(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                    <input
+                                        type="text"
+                                        placeholder='物料規格'
+                                        value={keyword3}
+                                        onChange={(e) => setKeyword3(e.target.value)}
+                                    />
+                                    <button type="submit">
+                                        <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '30px' }} />
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div className={scss.content}>
+                        <div>
+                            <Thead01 type={'AddPR_GetProduct'} />
                         </div>
-                        <div className={scss.content}>
+                    </div>
+                </div>
+                <div className={scss.right}>
+                    <div className={scss.content}>
+                        <div className={scss.head_head1}>
                             <div>
-                                <Thead01 type={'AddPR_GetProduct'} />
-                                {/* <Tbody01 type={'AddPR_GetProduct'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                                {/* {data && (
-                                data.map((_item: any, index: number) => (
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
+                                </button>
+                            </div>
+                            <div>
+                                {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
+                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button> */}
+                                <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPR() }} title="新增單據">
+                                    <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    onClick={() => { handleAddPR() }}
+                                    title="儲存新增"
+                                    disabled={status !== '未儲存'}
+                                >
+                                    <img
+                                        src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
+                                        alt="search"
+                                        style={{ height: '20px', width: '20px' }}
+                                    />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    onClick={() => { handlecancelAddPR() }}
+                                    title="取消新增"
+                                    disabled={status !== '未儲存'}
+                                >
+                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+                            </div>
+                            <div></div>
+                            <div>
+                                <button style={{ display: `${status === "請購中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    送出
+                                </button>
+                            </div>
+                        </div>
+                        <div className={scss.head_content1}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請購單號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: purchaserequisitionid || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: getTaiwanDateStr(create_atin || '') || '',
+                                        },
+                                    }}
+                                />
+                                {/* <InputSel
+                                    {...inputSelProps}
+                                    caption="請購部門"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: create_byin,
+                                        },
+                                    }}
+                                /> */}
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="申請人員"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: create_byin,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    caption="需用日期"
+                                    className="global_tip_must"
+                                    disabled={status === "未儲存" ? false : true}
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                    datePickerProps={{
+                                        props: {
+                                            value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
+                                            onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div></div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: status || ' ',
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={status === "未儲存" ? false : true}
+                                    inputProps={{
+                                        props: {
+                                            value: note || ' ',
+                                            onChange: (e) => { setNote(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content3}>
+                            <div style={{ marginRight: '20px' }}>
+
+                            </div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_foot1}>
+                            <div>
+                            </div>
+                            <div></div>
+                            <div></div>
+                            <div style={{ textAlign: 'right' }}>
+                                {/* <span>
+                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
+                                </span> */}
+                            </div>
+                        </div>
+                        <div className={scss.head_foot2}>
+                            <div>
+                                {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
+                                    品項查詢
+                                </button> */}
+                            </div>
+                            <div style={{ marginTop: '5px' }}></div>
+                            <div></div>
+                            <div>
+                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
+                                    總比數：
+                                    {data2.length}
+                                </span>
+                            </div>
+                        </div>
+                        <div className={scss.body_content1}>
+                            <Thead01 type={'AddPR_ReqList'} />
+                            {data2.map((_item, index) => (
+                                <CellWithBar key={index} className={scss.panelHeader20}>
+                                    <div className={scss.row01}>
+                                        <span>{index + 1}</span>
+                                        <span>{_item.productid}</span>
+                                        <span>
+                                            <input
+                                                ref={nameRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                type="text"
+                                                value={_item.name !== undefined ? _item.name : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "name", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        {/* <span>{_item.spec}</span> */}
+                                        <span>
+                                            <input
+                                                ref={specRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                type="text"
+                                                value={_item.spec !== undefined ? _item.spec : ''}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "spec", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={quantityRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                type="text"
+                                                maxLength={5}
+                                                value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleNumberChange(index, "quantity", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={unitRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                type="text"
+                                                value={_item.unit !== undefined ? _item.unit : ''}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "unit", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                type="text"
+                                                value={_item.note !== undefined ? _item.note : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "note", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            &nbsp;&nbsp;&nbsp;
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
+                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                        </span>
+
+                                    </div>
+                                </CellWithBar>
+                            ))}
+
+
+                            <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '請購中') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                                <div></div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder="請輸入料號"
+                                        value={handinputproductid}
+                                        onChange={handleProductidChange}
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+                                <div>
+                                    {/* <input
+                                        type="text"
+                                        placeholder='請輸入品項名稱'
+                                        value={handinputname}
+                                        onChange={(e) => setHandinputname(e.target.value)}
+                                    /> */}
+                                    <input
+                                        type="text"
+                                        placeholder="請輸入品項名稱"
+                                        value={handinputname}
+                                        onChange={handleNameChange}
+                                        style={{ width: '100%' }}
+                                    />
+
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder="請輸入品項規格"
+                                        value={handinputspec}
+                                        onChange={handleSpecChange}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ backgroundColor: 'transparent', width: '50px' }}
+                                        type="text"
+                                        placeholder='數量'
+                                        maxLength={5}
+                                        value={handinputquantity}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (/^\d*$/.test(value)) { // 只允許數字
+                                                setHandinputquantity(value);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單位'
+                                        value={handinputunit}
+                                        onChange={(e) => setHandinputunit(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='備註'
+                                        value={handinputnote}
+                                        onChange={(e) => setHandinputnote(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <button onClick={() => { handleAddByHandKey() }}>
+                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                    &nbsp;&nbsp;
+                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
+                                        <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div className={scss.body_foot1}>
+                            <div>
+                                {/* (1).可自行輸入請購項目。<br />
+                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
+                                {filteredData.length > 0 && (
+                                    <ul ref={dropdownRef}
+                                        style={{
+                                            border: '1px solid #c1c1c1',
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            marginTop: '0px',
+                                            left: '20px',
+                                            position: 'absolute',
+                                            width: '1000px',
+                                            backgroundColor: 'white',
+                                            zIndex: 1004,
+                                            display: `${showSuggestions ? '' : 'none'}`
+                                        }}>
+                                        {filteredData.map(item => (
+                                            <li
+                                                key={item.id}
+                                                onClick={() => handleSelect(item)}
+                                                style={{
+                                                    fontSize: '16px',
+                                                    cursor: 'pointer',
+                                                    padding: '8px',
+                                                    border: '1px solid #c1c1c1',
+                                                    display: 'flex', // 使用 flexbox
+                                                    justifyContent: 'space-between', // 在項目之間創建間距
+                                                    alignItems: 'center' // 垂直置中
+                                                }}
+                                            >
+                                                <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                    {item.productid}
+                                                </span>
+                                                <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
+                                                    {item.name}
+                                                </span>
+                                                <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                    {item.spec}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            <div>
+
+                            </div>
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+                <DragableModal
+                    handleText="品項查詢"
+                    style={{ zIndex: '1000', width: '900px' }}
+                    show={productSearchmodalopen}
+                    onCrossClick={productSearchModalClose}
+                >
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>類別：</span>
+                        <span style={{ fontSize: '16px' }}>
+                            <select value={selectedOption}
+                                style={{ borderBottom: '1px solid #c1c1c1' }}
+                                onChange={(e) => { setSelectedOption(e.target.value) }}>
+                                <option value="物料">物料</option>
+                            </select>
+                        </span>
+
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>查詢：</span>
+                        <span style={{ fontSize: '16px' }}>
+                            <form onSubmit={handleSubmit}>
+                                <input
+                                    type="text"
+                                    placeholder='　料號'
+                                    value={keyword1}
+                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                    onChange={(e) => setKeyword1(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder='　名稱'
+                                    value={keyword2}
+                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                    onChange={(e) => setKeyword2(e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder='　規格'
+                                    value={keyword3}
+                                    style={{ borderBottom: '1px solid #c1c1c1' }}
+                                    onChange={(e) => setKeyword3(e.target.value)}
+                                />
+                                <button type="submit">
+                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
+                                </button>
+                            </form>
+                        </span>
+                    </div>
+                    <hr />
+                    <div>
+                        <Thead01 type={'AddPR_GetProduct'} />
+                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                            {modaldata && (
+                                modaldata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader19}>
                                         <div className={scss.row01}>
                                             <span>{_item.productid}</span>
@@ -917,494 +1561,223 @@ export default function AddPurchaseRequisition() {
                                         </div>
                                     </CellWithBar>
                                 ))
-                            )} */}
-                            </div>
+                            )}
                         </div>
                     </div>
-                    <div className={scss.right}>
-                        <div className={scss.content}>
-                            <div className={scss.head_head1}>
+                    {/* </Modal> */}
+                </DragableModal>
+
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
+                >
+                    {/* <Modal
+                        visible={searchmodalopen}
+                        footer={null}
+                        onCancel={SearchModalClose}
+                        width="1000px"
+                        maskClosable={false}
+                        // title='單據查找'
+                        // title={
+                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
+                        //     <span>查詢條件</span>
+                        //     <span >筆數：共 {data.length} 筆</span>
+                        // </div>
+
+                        // }
+                        // centered
+                        style={{ top: 200 }}
+                    > */}
+
+                    <div className={scss.modal_head_head1}>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
+                        </div>
+                    </div>
+                    <div className={scss.modal_head_content1}>
+                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
+                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
                                 <div>
-                                    <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }} title="品項查詢">
-                                        <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        查詢
-                                    </button>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
                                 </div>
                                 <div>
-                                    {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
-                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button> */}
-                                    <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPR() }} title="新增單據">
-                                        <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                        新增
-                                    </button>
-                                    &nbsp;
-                                    <button
-                                        className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                        onClick={() => { handleAddPR() }}
-                                        title="儲存新增"
-                                        disabled={status !== '未儲存'}
-                                    >
-                                        <img
-                                            src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
-                                            alt="search"
-                                            style={{ height: '20px', width: '20px' }}
-                                        />
-                                        儲存
-                                    </button>
-                                    &nbsp;
-                                    <button
-                                        className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                        onClick={() => { handlecancelAddPR() }}
-                                        title="取消新增"
-                                        disabled={status !== '未儲存'}
-                                    >
-                                        <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        取消
-                                    </button>
+                                    <InputSel
+                                        caption="起始日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: keywordstartdate || null,
+                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
+                                            }
+                                        }}
+                                    />
                                 </div>
-                                <div></div>
+                                <br />
                                 <div>
-                                    <button style={{ display: `${status === "請購中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
-                                        <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                        送出
-                                    </button>
+                                    <InputSel
+                                        caption="截止日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: keywordenddate || null,
+                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
+                                            }
+                                        }}
+                                    />
                                 </div>
-                            </div>
-                            <div className={scss.head_content1}>
+                                <br />
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="請購單號"
-                                        disabled={true}
+                                        disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: purchaserequisitionid || '',
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購日期"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(create_atin || '') || '',
-                                            },
-                                        }}
-                                    />
-                                    {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="請購部門"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: create_byin,
-                                        },
-                                    }}
-                                /> */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="申請人員"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                value: create_byin,
+                                                value: keyword2 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
                                 </div>
+                                <br />
                                 <div>
-                                    <InputSel
-                                        caption="需用日期"
-                                        className="global_tip_must"
-                                        disabled={status === "未儲存" ? false : true}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
-                                                onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div></div>
-                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="單據狀態"
-                                        disabled={true}
+                                        disabled={false}
                                         inputProps={{
                                             props: {
-                                                style: { color: 'red' },
-                                                value: status || ' ',
+                                                value: keyword3 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
-
                                 </div>
-                            </div>
-                            <div className={scss.head_content2}>
+                                <br />
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="備註"
-                                        disabled={status === "未儲存" ? false : true}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
                                         inputProps={{
                                             props: {
-                                                value: note || ' ',
-                                                onChange: (e) => { setNote(e.target.value) }
+                                                value: ' ',
                                             },
                                         }}
                                     />
                                 </div>
-                                <div></div>
-                                <div></div>
-                            </div>
-                            <div className={scss.head_content3}>
-                                <div style={{ marginRight: '20px' }}>
-
+                                <br />
+                                <div >
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
                                 </div>
-                                <div></div>
-                            </div>
-                            <div className={scss.head_foot1}>
-                                <div>
+                                <br />
+                                <div >
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
                                 </div>
-                                <div></div>
-                                <div></div>
-                                <div style={{ textAlign: 'right' }}>
-                                    {/* <span>
-                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
-                                </span> */}
+                                <br />
+                                <div >
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
                                 </div>
-                            </div>
-                            <div className={scss.head_foot2}>
-                                <div>
-                                    {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
-                                    品項查詢
-                                </button> */}
-                                </div>
-                                <div style={{ marginTop: '5px' }}></div>
-                                <div></div>
-                                <div>
-                                    <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
-                                        總比數：
-                                        {data2.length}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
+                                    <span>
+                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
+                                    {/* <span>
+                                        <button className={scss.minibtn} type="submit">查找</button>
+                                    </span> */}
                                 </div>
-                            </div>
-                            <div className={scss.body_content1}>
-                                <Thead01 type={'AddPR_ReqList'} />
-                                {data2.map((_item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader20}>
-                                        <div className={scss.row01}>
+                            </form>
+                        </div>
+                        <div style={{
+                            maxHeight: '465.81px',
+                            overflowY: 'auto',
+                            border: '1px solid #c1c1c1',
+                            // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
+                            // padding: '10px',
+                            // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
+                        }}>
+                            <Thead01 type={'PurchaseRequisition'} />
+                            {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {searchdata && (
+                                searchdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader15}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => { handlechangepr(_item) }}>
                                             <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>
-                                                <input
-                                                    ref={nameRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
-                                                    type="text"
-                                                    value={_item.name !== undefined ? _item.name : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "name", e.target.value);
-                                                    }}
-                                                />
+                                            <span>{_item.purchaserequisitionid}</span>
+                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                            {/* <span>{_item.totalprice.toLocaleString()}</span> */}
+                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                                                {_item.status}
                                             </span>
-                                            {/* <span>{_item.spec}</span> */}
-                                            <span>
-                                                <input
-                                                    ref={specRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    type="text"
-                                                    value={_item.spec !== undefined ? _item.spec : ''}
-                                                    readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "spec", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={quantityRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
-                                                    type="text"
-                                                    maxLength={5}
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleNumberChange(index, "quantity", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={unitRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    type="text"
-                                                    value={_item.unit !== undefined ? _item.unit : ''}
-                                                    readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "unit", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={noteRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
-                                                    type="text"
-                                                    value={_item.note !== undefined ? _item.note : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "note", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                &nbsp;&nbsp;&nbsp;
-                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                                {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            </span>
-
+                                            <span>{_item.note}</span>
+                                            {/* <span>{_item.create_by}</span> */}
+                                            {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
                                         </div>
                                     </CellWithBar>
-                                ))}
-
-
-                                <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '請購中') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
-                                    <div></div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="請輸入料號"
-                                            value={handinputproductid}
-                                            onChange={handleProductidChange}
-                                            style={{ width: '100%' }}
-                                        />
-                                    </div>
-                                    <div>
-                                        {/* <input
-                                        type="text"
-                                        placeholder='請輸入品項名稱'
-                                        value={handinputname}
-                                        onChange={(e) => setHandinputname(e.target.value)}
-                                    /> */}
-                                        <input
-                                            type="text"
-                                            placeholder="請輸入品項名稱"
-                                            value={handinputname}
-                                            onChange={handleNameChange}
-                                            style={{ width: '100%' }}
-                                        />
-
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="請輸入品項規格"
-                                            value={handinputspec}
-                                            onChange={handleSpecChange}
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            style={{ backgroundColor: 'transparent', width: '50px' }}
-                                            type="text"
-                                            placeholder='數量'
-                                            maxLength={5}
-                                            value={handinputquantity}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (/^\d*$/.test(value)) { // 只允許數字
-                                                    setHandinputquantity(value);
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder='單位'
-                                            value={handinputunit}
-                                            onChange={(e) => setHandinputunit(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder='備註'
-                                            value={handinputnote}
-                                            onChange={(e) => setHandinputnote(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <button onClick={() => { handleAddByHandKey() }}>
-                                            <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                        &nbsp;&nbsp;
-                                        <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
-                                            <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <div className={scss.body_foot1}>
-                                <div>
-                                    {/* (1).可自行輸入請購項目。<br />
-                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
-                                    {filteredData.length > 0 && (
-                                        <ul ref={dropdownRef}
-                                            style={{
-                                                border: '1px solid #c1c1c1',
-                                                maxHeight: '300px',
-                                                overflowY: 'auto',
-                                                marginTop: '0px',
-                                                left: '20px',
-                                                position: 'absolute',
-                                                width: '1000px',
-                                                backgroundColor: 'white',
-                                                zIndex: 1004,
-                                                display: `${showSuggestions ? '' : 'none'}`
-                                            }}>
-                                            {filteredData.map(item => (
-                                                <li
-                                                    key={item.id}
-                                                    onClick={() => handleSelect(item)}
-                                                    style={{
-                                                        fontSize: '16px',
-                                                        cursor: 'pointer',
-                                                        padding: '8px',
-                                                        border: '1px solid #c1c1c1',
-                                                        display: 'flex', // 使用 flexbox
-                                                        justifyContent: 'space-between', // 在項目之間創建間距
-                                                        alignItems: 'center' // 垂直置中
-                                                    }}
-                                                >
-                                                    <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                        {item.productid}
-                                                    </span>
-                                                    <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
-                                                        {item.name}
-                                                    </span>
-                                                    <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                        {item.spec}
-                                                    </span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                                <div>
-
-                                </div>
-                                <div>
-                                </div>
-                            </div>
+                                ))
+                            )}
                         </div>
+
                     </div>
+                    {/* </Modal > */}
+                </DragableModal>
 
-                    <DragableModal
-                        handleText="品項查詢"
-                        style={{ zIndex: '1000', width: '900px' }}
-                        show={productSearchmodalopen}
-                        onCrossClick={productSearchModalClose}
-                    >
-                        {/* <Modal
-                    visible={productSearchmodalopen}
-                    footer={null}
-                    onCancel={productSearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    style={{ top: 250 }}
-                > */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>類別：</span>
-                            <span style={{ fontSize: '16px' }}>
-                                <select value={selectedOption}
-                                    style={{ borderBottom: '1px solid #c1c1c1' }}
-                                    onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                    <option value="物料">物料</option>
-                                </select>
-                            </span>
 
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>查詢：</span>
-                            <span style={{ fontSize: '16px' }}>
-                                <form onSubmit={handleSubmit}>
-                                    <input
-                                        type="text"
-                                        placeholder='　料號'
-                                        value={keyword1}
-                                        style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                        onChange={(e) => setKeyword1(e.target.value)}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder='　名稱'
-                                        value={keyword2}
-                                        style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                        onChange={(e) => setKeyword2(e.target.value)}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder='　規格'
-                                        value={keyword3}
-                                        style={{ borderBottom: '1px solid #c1c1c1' }}
-                                        onChange={(e) => setKeyword3(e.target.value)}
-                                    />
-                                    <button type="submit">
-                                        <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                    </button>
-                                </form>
-                            </span>
-                        </div>
-                        <hr />
-                        <div>
-                            <Thead01 type={'AddPR_GetProduct'} />
-                            <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                                {modaldata && (
-                                    modaldata.map((_item: any, index: number) => (
-                                        <CellWithBar key={index} className={scss.panelHeader19}>
-                                            <div className={scss.row01}>
-                                                <span>{_item.productid}</span>
-                                                <span>{_item.name}</span>
-                                                <span>{_item.spec}</span>
-                                                <span>{_item.count}</span>
-                                                <span>
-                                                    <button onClick={() => { getProductById(_item.id) }}>
-                                                        <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                </span>
-                                            </div>
-                                        </CellWithBar>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                        {/* </Modal> */}
-                    </DragableModal>
 
-                </div>
-            </SubLayer >
+            </div>
+        </SubLayer >
 
-        )
+    )
 
-    }
+}

@@ -8,6 +8,7 @@ import icon_domestic from 'public/image/icon/domestic.svg';
 import icon_foreign from 'public/image/icon/foreign.svg';
 import icon_project from 'public/image/icon/project.svg';
 import icon_warehouse from 'public/image/icon/warehouse.svg';
+import icon_shareform from 'public/image/icon/sharedform.svg';
 
 type ErpFeaturesValues = (typeof erpFeaturesLookup)[keyof typeof erpFeaturesLookup];
 
@@ -808,27 +809,29 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        // {
-        //   label: '領料',
-        //   erpFeature: devPass,
-        //   list: [
-        //     // {
-        //     //   label: '領料查詢',
-        //     //   path: path01 + '/getMaterial/pickingList',
-        //     //   erpFeature: devPass,
-        //     // },
-        //     {
-        //       label: '物料查詢',
-        //       path: path01 + '/getMaterial/materialList',
-        //       erpFeature: devPass,
-        //     },
-        //     // {
-        //     //   label: '新增領料單',
-        //     //   path: path01 + '/getMaterial/addPickingList',
-        //     //   erpFeature: devPass,
-        //     // },
-        //   ],
-        // },
+        {
+          label: '單據審核',
+          erpFeature: devPass,
+          list: [
+            {
+              label: '簽核清單',
+              path: path01 + '/reviewList',
+              activeChecker: ({ router }) => {
+                const { pathname, query } = router;
+
+                if (pathname === '/factoryDepartment/reviewList') {
+                  return true;
+                }
+
+                return false;
+              },
+              query: {
+                type: 'WareHouse',
+              },
+              erpFeature: devPass,
+            },
+          ],
+        },
       ],
     };
   })(),
@@ -940,6 +943,18 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [fac],
   },
+  // {
+  //   icon: icon_shareform,
+  //   label: '共用表單',
+  //   path01: sidePathList['/factoryDepartment'].path01,
+  //   href: {
+  //     pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
+  //     query: {
+  //       type: 'WareHouse',
+  //     },
+  //   },
+  //   erpFeature: devPass,
+  // },
 ];
 
 export default sidePathList;

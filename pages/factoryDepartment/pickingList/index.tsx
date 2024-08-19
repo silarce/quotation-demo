@@ -541,10 +541,6 @@ export default function AddPurchaseRequisition() {
     //#region 按鈕作動區
     // 手key加入
     const handleAddByHandKey = async () => {
-        console.log(pickinglistuuid);
-
-        // console.log(handinputquantity);
-
         if (handinputname === '' || handinputspec === '' || handinputquantity === '') {
             myAlert.warning({ title: '請確認品名、規格或數量是否遺漏' });
         }
@@ -565,11 +561,6 @@ export default function AddPurchaseRequisition() {
                 picking_by: handinputpickingby
             };
 
-            // console.log(newPicking);
-            // console.log()
-
-            // setData2(prevData2 => [...prevData2, newPicking]);
-
             setHandinputproductuuid('');
             setHandinputproductid('');
             setHandinputname('');
@@ -578,10 +569,6 @@ export default function AddPurchaseRequisition() {
             setHandinputunit('');
             setHandinputnote('');
             setHandinputpickingby('');
-
-            console.log(data2);
-
-
 
             try {
                 setIsLoading(true);
@@ -918,12 +905,12 @@ export default function AddPurchaseRequisition() {
 
     const handlechangepickinglist = (item: any) => {
         handleRowClick(item.pickinglistid);
+        setData2([]);
         setPickinglistid(item.pickinglistid);
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
         getPickingListDetailById(item.id);
-        setData2([]);
     }
 
     const handleClearHandKey = () => {

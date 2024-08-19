@@ -624,3 +624,75 @@ div.panelHeader20 {
     border: solid 1px #c1c1c1;
   }
 }
+
+
+.modal_head_head1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 10px;
+  // margin-right: 20px;  
+
+
+}
+
+.modal_head_content1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+
+
+}
+
+.modal_search_bar {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: 100%;
+  margin-top: 5px;
+  padding-bottom: 5px;
+  // border-bottom: 1px solid rgb(214, 214, 214);
+  // padding-right:10px;
+}
+
+//#region 請購單
+div.panelHeader15 {
+
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    padding-left: 20px;
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 100px 80px 50px 200px;
+    gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
+
+//#endregion

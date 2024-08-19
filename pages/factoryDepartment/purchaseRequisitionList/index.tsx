@@ -241,10 +241,8 @@ export default function PurchaseRequisitionList() {
         try {
             // console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel = {
+                type: "詢價中"
             };
 
 
@@ -983,40 +981,51 @@ export default function PurchaseRequisitionList() {
 
 
     const sentToPrint = async (ip: any) => {
-        try {
-            const conditionModel = {
-                id: purchaserequisitionidin,
-                type: "purchaserequisition",
-                clientip: ip,
-                data: []
-            };
+        myAlert.confirm({
+            title: '確定要列印此單據嗎?',
+            content: <>
+                <h1>請確認單據是否詢價完成</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        const conditionModel = {
+                            id: purchaserequisitionidin,
+                            type: "purchaserequisition",
+                            clientip: ip,
+                            data: []
+                        };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
 
-            const response = await fetch(`${setting.apipath}Print`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+                        const response = await fetch(`${setting.apipath}Print`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        // setIsLoading(false);
+                    }
+                }
             }
+        });
 
-        } catch (error: any) {
-            // setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
 
     };
 
@@ -1166,16 +1175,6 @@ export default function PurchaseRequisitionList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="請購人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="備註"
                                     disabled={true}
                                     inputProps={{
@@ -1209,7 +1208,18 @@ export default function PurchaseRequisitionList() {
                                     }}
                                 />
                             </div>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請購人員"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                 <InputSel
                                     {...inputSelProps}
