@@ -266,7 +266,7 @@ export default function AdditionalEngineeringStatistics() {
   const panelList: TpanelList = [
     {
       type: 'myButton',
-      label: '下載excel',
+      label: '匯出excel',
       onClick: () => {
         dlExcel({
           data: control_table,
