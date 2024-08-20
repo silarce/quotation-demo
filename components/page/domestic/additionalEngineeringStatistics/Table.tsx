@@ -15,9 +15,9 @@ type Tcontrol_row = {
   list: {
     [key: string]:
       | {
-          totalsum: string;
-          pricesum: string;
-          percentage: string;
+          totalsum: string; // 牌價
+          pricesum: string; // 承價
+          percentage: string; // 百分比
         }
       | undefined;
   };
@@ -171,7 +171,7 @@ const Footer = ({
         <div style={config.total.style}></div> */}
       </div>
       {/*  */}
-      <div className={scss.bar02}>
+      {/* <div className={scss.bar02}>
         <div className={scss.left} style={config.group01.style}>
           <div>
             <span>---</span>
@@ -183,9 +183,9 @@ const Footer = ({
             <span>{'0'}</span>
           </div>
         </div>
-      </div>
+      </div> */}
       {/*  */}
-      <div className={scss.bar02}>
+      {/* <div className={scss.bar02}>
         <div className={scss.left} style={config.group01.style}>
           <div>
             <span>---</span>
@@ -197,7 +197,7 @@ const Footer = ({
             <span>{'0'}</span>
           </div>
         </div>
-      </div>
+      </div> */}
       {/*  */}
       <div className={scss.bar02}>
         <div className={scss.left} style={config.group01.style}>
