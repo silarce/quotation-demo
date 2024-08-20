@@ -105,3 +105,10 @@
 .inputSel_select_menuPortal.plus {
   z-index: 3;
 }
+
+.tipLabel.plus {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}

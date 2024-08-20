@@ -3761,8 +3761,11 @@ export type TincomeBillSerialDto = {
   receivableExchangeRate: string | null;
   // '收款外幣金額'
   receivableCurrencyPayment: string | null;
-  // '國外匯費'
-  currencyFee: string | null;
+  // '國外匯費-新台幣'
+  foreignFee: string | null;
+  // '國外匯費-外幣'
+  foreignCurrencyFee: string | null;
+
   // '兌換利益'
   exchangeBenefits: string | null;
 };
@@ -3801,7 +3804,8 @@ export type TupdateIncomeBillSerialDto = Pick<
   receivableCurrency: string | null;
   receivableExchangeRate: string | null;
   receivableCurrencyPayment: string | null;
-  currencyFee: string | null;
+  foreignFee: string | null;
+  foreignCurrencyFee: string | null;
   exchangeBenefits: string | null;
 };
 

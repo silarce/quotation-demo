@@ -29,7 +29,7 @@ import {
 
 import { TupdateIncomeBillSerialDto, apiPatchIncomeBill } from 'js/api/api_engineering';
 
-import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
+import { calcIncomeBillUnpaidPayment } from 'js/utils/calc/calcIncomeBill';
 
 // ===============================================================]
 
@@ -162,6 +162,7 @@ function EditDeductionPanel({
         priorPeriodPayment: Number(data_incomeBill.priorPeriodPayment || 0),
         deductionPayment: deductionPayment,
         fee: Number(data_incomeBill.fee || 0),
+        receivablePayment: Number(data_incomeBill.receivablePayment || 0),
       });
 
       const body: TupdateIncomeBillSerialDto = {

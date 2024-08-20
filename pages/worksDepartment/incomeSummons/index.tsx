@@ -158,7 +158,8 @@ export default function IncomeSummons() {
       receivableCurrency,
       receivableExchangeRate,
       receivableCurrencyPayment,
-      currencyFee,
+      foreignFee,
+      foreignCurrencyFee,
       exchangeBenefits,
     } = state_incomeBillSerial;
 
@@ -198,7 +199,8 @@ export default function IncomeSummons() {
       receivableCurrency,
       receivableExchangeRate,
       receivableCurrencyPayment,
-      currencyFee,
+      foreignFee: foreignFee,
+      foreignCurrencyFee,
       exchangeBenefits,
     };
 
