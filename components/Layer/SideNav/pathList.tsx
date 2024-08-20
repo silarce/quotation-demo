@@ -945,7 +945,7 @@ const topPathList: TtopPathListConfig[] = [
   },
   // {
   //   icon: icon_shareform,
-  //   label: '共用表單',
+  //   label: '單據管理',
   //   path01: sidePathList['/factoryDepartment'].path01,
   //   href: {
   //     pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
