@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
+import React, { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
@@ -14,6 +14,7 @@ import EditDefunctionBtn, {
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import Tip from 'components/global/myAntd/popover/tip';
 
 // type
 import type { Tcurrency, TincomeBillSerialDto } from 'js/api/dtoTypes';
@@ -27,7 +28,7 @@ import scss from './summon.module.scss';
 
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
+import { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits } from 'js/utils/calc/calcIncomeBill';
 
 // global state
 import { useVipInfo } from 'hooks/globalState/useVipInfo';
@@ -102,7 +103,7 @@ type Tstate_deduction = {
 };
 
 type TconfigItem = {
-  label: string;
+  label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
   createInputSelProps: (props: {
@@ -535,7 +536,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.contractPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
           copy.periodPayment = '';
 
           return copy;
@@ -577,7 +578,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.periodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
           copy.contractPayment = '';
 
           return copy;
@@ -619,7 +620,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.priorPeriodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
+          copy.exchangeBenefits = calcExchangeBebefits(copy);
 
           return copy;
         });
@@ -749,7 +751,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
               setState_incomeBillSerial((state) => {
                 const copy = { ...state };
                 copy.receivablePayment = e.target.value;
-                copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+                copy.unpaidPayment = calcUnpaidPayment(copy);
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -794,7 +797,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
             const copy = { ...prev };
             copy.state_deduction = state_deductionArr;
             copy.deductionPayment = deductionPayment.toString();
-            copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+            copy.unpaidPayment = calcUnpaidPayment(copy);
 
             return copy;
           });
@@ -837,7 +840,11 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
   unpaidPayment: {
-    label: '餘額',
+    label: (
+      <span className={classNames(scss.tipLabel, scss.plus)}>
+        餘額 <Tip content={calcIncomeBillUnpaidPayment.description} />
+      </span>
+    ),
     style: { width: 120 },
     className: 'text-right',
     createInputSelProps: ({
@@ -933,7 +940,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
               setState_incomeBillSerial((state) => {
                 const copy = { ...state };
                 copy.fee = Number(e.target.value || 0);
-                copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+                copy.unpaidPayment = calcUnpaidPayment(copy);
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -1111,6 +1119,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
                   foreignPayment: (copy.declarationCurrencyPayment || 0) as `${number}`,
                 });
                 copy.declarationPayment = declarationPayment_num.toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -1151,6 +1160,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
                   twPayment: (copy.declarationPayment || 0) as `${number}`,
                 });
                 copy.declarationCurrencyPayment = declarationCurrencyPayment_num.toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -1229,6 +1239,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
                   exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
                   foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
                 }).toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -1281,17 +1292,21 @@ const cellPropsList_summon: TcellPropsList_summon = {
   },
 
   exchangeBenefits: {
-    label: '兌換利益',
+    label: (
+      <span className={classNames(scss.tipLabel, scss.plus)}>
+        兌換利益 <Tip content={calcIncomeBillExchangeBenefits.description} />
+      </span>
+    ),
     style: { width: 150 },
     className: 'text-right',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const { type, value } = reducer_input({
-        disabled,
+        disabled: true,
         value: state_incomeBillSerial.exchangeBenefits ?? '',
       });
 
       const inputSelProps: TinputSelProps = {
-        disabled,
+        disabled: true,
         showBaseline: 'auto',
         inputProps: {
           props: {
@@ -1299,10 +1314,10 @@ const cellPropsList_summon: TcellPropsList_summon = {
             type,
             value,
             onChange: (e) => {
-              setState_incomeBillSerial((state) => ({
-                ...state,
-                exchangeBenefits: e.target.value,
-              }));
+              // setState_incomeBillSerial((state) => ({
+              //   ...state,
+              //   exchangeBenefits: e.target.value,
+              // }));
             },
           },
         },
@@ -1340,6 +1355,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
                   exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
                   foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
                 }).toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -1431,7 +1447,28 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
   //   .minus(fee || 0)
   //   .toNumber();
 
-  return unpaidPayment;
+  return unpaidPayment.toString();
+};
+
+const calcExchangeBebefits = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
+  const {
+    //
+    declarationPayment,
+    priorPeriodPayment,
+    receivablePayment,
+    fee,
+    foreignFee,
+  } = state_incomeBillSerial;
+
+  const exchangeBenefits = calcIncomeBillExchangeBenefits({
+    declarationPayment: Number(declarationPayment || 0),
+    priorPeriodPayment: Number(priorPeriodPayment || 0),
+    receivablePayment: Number(receivablePayment || 0),
+    fee: Number(fee || 0),
+    foreignFee: Number(foreignFee || 0),
+  });
+
+  return exchangeBenefits.toString();
 };
 
 // const calceCurrencyPayment = ({
