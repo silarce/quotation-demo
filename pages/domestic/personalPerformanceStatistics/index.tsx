@@ -369,6 +369,8 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
         totalSum,
         priceSum,
         percentage,
+        contractor,
+        designUnit,
       } = item;
 
       const isValid = typeof percentage === 'number';
@@ -408,8 +410,8 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
         list[quotationnumber] = {
           quotationNumber: quotationnumber,
           projectName: projectname,
-          builder: '',
-          designer: '',
+          builder: contractor ?? '',
+          designer: designUnit ?? '',
           list: {},
           total: 0,
         };
