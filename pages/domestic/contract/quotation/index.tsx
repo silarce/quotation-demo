@@ -192,6 +192,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   // const { data: contract, update } = useGetContract_id_noItems_2(id);
   // 這個技術債以後重構時再還...
+  // 貓的，重構之日遙遙無期
   const { data: contract, update } = useGetContract_id_contentProductItems(
     id,
 
@@ -409,24 +410,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
       customer: {
         value: content?.customer,
-        // onChange: (customer) => {
-        //   const customerPhoneNumber = customer.phone || '';
-        //   const contact = customer.contacts?.[0];
-        //   const name = contact?.name ?? '';
-        //   const phone = contact?.phone || customerPhoneNumber || '';
-        //   const fax = customer.fax || '';
-
-        //   setCustomer(customer);
-        //   changeProfile('contactPerson', `${name}`);
-        //   changeProfile('contactNumber', phone);
-        //   changeProfile('faxNumber', fax);
-        // },
-        // onClear: () => {
-        //   setCustomer(null);
-        //   changeProfile('contactPerson', '');
-        //   changeProfile('contactNumber', '');
-        //   changeProfile('faxNumber', '');
-        // },
+      },
+      designTeam: {
+        value: content?.designTeam,
       },
       itemList: {
         validityPeriod: {

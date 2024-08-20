@@ -521,7 +521,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
 
-  const { control_profile, state_profile, state_customer } = useProfile({
+  const { control_profile, state_profile, state_customer, state_designTeam } = useProfile({
     quotationContent: theContent,
     disabled,
   });
@@ -708,6 +708,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       validityPeriod: state_profile.validityPeriod ?? '',
       //
       customerId: state_customer?.id ?? '',
+      designTeamId: state_designTeam?.id ?? '',
       //
       projectName: state_profile.projectName ?? '',
       county: state_profile.county ?? '',

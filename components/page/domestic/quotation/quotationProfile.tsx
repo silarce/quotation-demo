@@ -56,6 +56,11 @@ type Tcontrol = {
     onChange?: (v: TcustomerDto) => void;
     onClear?: () => void;
   };
+  designTeam: {
+    value: TcustomerDto | undefined | null;
+    onChange?: (v: TcustomerDto) => void;
+    onClear?: () => void;
+  };
   //
   itemList: {
     validityPeriod: TcontrolItem; // 報價時效
@@ -94,9 +99,13 @@ export default function QuotationProfile({
 
   const [showModal, setShowModal] = useState(false);
   const openModal = () => (disabled ? '' : setShowModal(true));
+
+  const [showModal_designTeam, setShowModal_designTeam] = useState(false);
+  const openModal_designTeam = () => (disabled ? '' : setShowModal_designTeam(true));
+
   // ----------------------------------------------------------------
 
-  const { quotationNumber, quotationDate, customer, itemList } = control;
+  const { quotationNumber, quotationDate, customer, designTeam, itemList } = control;
 
   const {
     validityPeriod,
@@ -175,6 +184,19 @@ export default function QuotationProfile({
     customer.onClear?.();
   };
 
+  //
+  const designTeamSelConfirm = (v: TcustomerDto_TC[]) => {
+    designTeam.onChange?.(v[0]);
+  };
+
+  const clearDesignTeam = () => {
+    if (disabled) {
+      return;
+    }
+
+    designTeam.onClear?.();
+  };
+
   // ----------------------------------------------------------------------
   return (
     <div className={scss.container}>
@@ -245,7 +267,7 @@ export default function QuotationProfile({
             </div>
           </div>
 
-          {/* <div className={classNames(scss.clientName, disabled && scss.disabled)}>
+          <div className={classNames(scss.clientName, disabled && scss.disabled)}>
             <div>
               <InputSel
                 caption={'設計單位'}
@@ -255,21 +277,27 @@ export default function QuotationProfile({
                 captionStyle={{ width: captionStyle.width }}
                 // wrapperStyle={{ gap: wrapperStyle.gap }}
                 wrapperStyle={{
-                  width: customer.value ? undefined : '85px',
+                  width: designTeam.value ? undefined : '85px',
                   gap: wrapperStyle.gap,
                 }}
                 textareaProps={{
                   props: {
                     placeholder: undefined,
-                    value: customer.value?.name ?? '',
+                    value: designTeam.value?.name ?? '',
                     className: 'overflow-hidden',
                     // style: { height: 30 },
                   },
                 }}
               />
-              {!customer.value && (
+              {!designTeam.value && (
                 <>
-                  <MyButton_v2 px="px22" py="py4" className={scss.btnSelectCustomer} onClick={openModal}>
+                  <MyButton_v2
+                    //
+                    px="px22"
+                    py="py4"
+                    className={scss.btnSelectCustomer}
+                    onClick={openModal_designTeam}
+                  >
                     請選擇設計單位
                   </MyButton_v2>
                   <MyButton_v2
@@ -284,9 +312,9 @@ export default function QuotationProfile({
                   </MyButton_v2>
                 </>
               )}
-              {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
+              {designTeam.value && !disabled && <IconRemove02 onClick={clearDesignTeam} />}
             </div>
-          </div> */}
+          </div>
 
           <div>
             {/* 聯絡人，連絡電話，傳真號碼 */}
@@ -443,6 +471,14 @@ export default function QuotationProfile({
         onConfirm={customeSelConfirm}
         onCancel={() => setShowModal(false)}
       />
+
+      <CustomerSelector
+        label="請選擇設計單位"
+        selLimit={1}
+        showModal={showModal_designTeam}
+        onConfirm={designTeamSelConfirm}
+        onCancel={() => setShowModal_designTeam(false)}
+      />
     </div>
   );
 }
@@ -486,6 +522,7 @@ const useProfile = ({
 }) => {
   const [state_profile, setState_profile] = useState<Tstate_profile>(creEmptyProfile());
   const [state_customer, setState_customer] = useState<TcustomerDto | undefined | null>();
+  const [state_designTeam, setState_DesignTeam] = useState<TcustomerDto | undefined | null>();
 
   const changeProfile = (key: keyof Omit<Tstate_profile, 'isLost'>, value: string | boolean) => {
     setState_profile((state) => {
@@ -522,6 +559,11 @@ const useProfile = ({
           changeProfile('contactNumber', '');
           changeProfile('faxNumber', '');
         },
+      },
+      designTeam: {
+        value: state_designTeam,
+        onChange: (customer) => setState_DesignTeam(customer),
+        onClear: () => setState_DesignTeam(null),
       },
 
       isLost: {
@@ -589,7 +631,7 @@ const useProfile = ({
     };
 
     return control_profile;
-  }, [originContent?.quotationNumber, state_customer, state_profile]); // memo
+  }, [originContent?.quotationNumber, state_customer, state_designTeam, state_profile]); // memo
 
   useEffect(() => {
     if (disabled) {
@@ -634,6 +676,7 @@ const useProfile = ({
     control_profile,
     state_profile,
     state_customer,
+    state_designTeam,
   };
 
   //
