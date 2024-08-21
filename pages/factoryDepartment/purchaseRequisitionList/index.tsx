@@ -45,6 +45,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -240,10 +242,8 @@ export default function PurchaseRequisitionList() {
         try {
             // console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel = {
+                type: "詢價中"
             };
 
 
@@ -283,6 +283,7 @@ export default function PurchaseRequisitionList() {
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
+
                 // alert(data[0].need_date);
             }
         } catch (error: any) {
@@ -948,13 +949,12 @@ export default function PurchaseRequisitionList() {
     }, []); // 空依賴陣列確保只在掛載和卸載時運行
 
 
-    const Print = async (purchaserequisitionuuid: any) => {
+    const Print = async () => {
         try {
             setIsLoading(true);
-            const conditionModel= {
-                
-            };
+            const conditionModel = {
 
+            };
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -964,20 +964,76 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`http://127.0.0.1:5050/api/print/Print1?${queryParams}`);
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
             }
-            const data = await response.json();
-            setData2(data);
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
 
         } catch (error: any) {
-            setError(error.message);
+            // setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
         }
         finally {
             setIsLoading(false);
         }
     };
+
+
+    const sentToPrint = async (ip: any) => {
+        myAlert.confirm({
+            title: '確定要列印此單據嗎?',
+            content: <>
+                <h1>請確認單據是否詢價完成</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        const conditionModel = {
+                            id: purchaserequisitionidin,
+                            type: "purchaserequisition",
+                            clientip: ip,
+                            data: []
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const response = await fetch(`${setting.apipath}Print`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        // setIsLoading(false);
+                    }
+                }
+            }
+        });
+
+
+    };
+
+
+
+
 
 
     return (
@@ -1064,7 +1120,7 @@ export default function PurchaseRequisitionList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Print("test") }} title="列印">
+                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>
@@ -1079,16 +1135,15 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
                                 </button>
-
                             </div>
                             <div></div>
                             <div>
                                 <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
                                 <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
                                 <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
@@ -1111,6 +1166,29 @@ export default function PurchaseRequisitionList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
+                                    caption="請購單號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
                                     caption="請購日期"
                                     disabled={true}
                                     inputProps={{
@@ -1122,14 +1200,16 @@ export default function PurchaseRequisitionList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="請購單號"
+                                    caption="需用日期"
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
                                         },
                                     }}
                                 />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="請購人員"
@@ -1140,22 +1220,7 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-
-
                             </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="需用日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
                             <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                 <InputSel
                                     {...inputSelProps}
@@ -1170,41 +1235,30 @@ export default function PurchaseRequisitionList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="詢價進度"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${quotereqprogress}/${totalreqprogress}`,
                                         },
                                     }}
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="已轉採購"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${transpoprogress}/${totalreqprogress}`,
                                         },
                                     }}
                                 />
                             </div>
                         </div>
                         <div className={scss.head_content2}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -1249,29 +1303,31 @@ export default function PurchaseRequisitionList() {
 
                                 <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                                    詢價管理
+                                    詢價紀錄
                                 </button>
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                                    詢價管理
+                                    詢價紀錄
                                 </button>
                             </div>
                             <div style={{ marginTop: '5px' }}>
 
                             </div>
-                            <div> <InputSel
-                                {...inputSelProps}
-                                caption="詢價進度"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: `${quotereqprogress}/${totalreqprogress}`
-                                    },
-                                }}
-                            /></div>
+                            <div>
+                                {/* <InputSel
+                                    {...inputSelProps}
+                                    caption="詢價進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${quotereqprogress}/${totalreqprogress}`
+                                        },
+                                    }}
+                                /> */}
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <InputSel
+                                {/* <InputSel
                                     {...inputSelProps}
                                     caption="已轉採購"
                                     className='align-bottom'
@@ -1281,7 +1337,7 @@ export default function PurchaseRequisitionList() {
                                             value: `${transpoprogress}/${totalreqprogress}`
                                         },
                                     }}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <div className={scss.body_content1}>
@@ -1315,7 +1371,7 @@ export default function PurchaseRequisitionList() {
                                 ))
                             )}
                         </div>
-                        
+
                         <div className={scss.body_foot1}>
                             <div>
                                 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
@@ -1607,24 +1663,30 @@ export default function PurchaseRequisitionList() {
                     </div>
                 </Modal>
 
-
-                <Modal
-                    visible={searchmodalopen}
-                    footer={null}
-                    onCancel={SearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    // title='單據查找'
-                    // title={
-                    // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                    //     <span>查詢條件</span>
-                    //     <span >筆數：共 {data.length} 筆</span>
-                    // </div>
-
-                    // }
-                    // centered
-                    style={{ top: 200 }}
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
                 >
+                    {/* <Modal
+                        visible={searchmodalopen}
+                        footer={null}
+                        onCancel={SearchModalClose}
+                        width="1000px"
+                        maskClosable={false}
+                        // title='單據查找'
+                        // title={
+                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
+                        //     <span>查詢條件</span>
+                        //     <span >筆數：共 {data.length} 筆</span>
+                        // </div>
+
+                        // }
+                        // centered
+                        style={{ top: 200 }}
+                    > */}
+
                     <div className={scss.modal_head_head1}>
                         <div>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
@@ -1703,6 +1765,7 @@ export default function PurchaseRequisitionList() {
                                             },
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -1783,7 +1846,24 @@ export default function PurchaseRequisitionList() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
+                {/* 
+                <DragableModal
+                    handleText="收款統計明細表"
+                    style={{zIndex:'1001'}}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
+                >
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+                    <h1>測試</h1>
+
+                    <h1>測試</h1><h1>測試</h1>
+                </DragableModal> */}
+
 
             </div >
         </SubLayer >

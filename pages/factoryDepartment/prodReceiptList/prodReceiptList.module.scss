@@ -551,7 +551,7 @@ div.panelHeader13 {
   // gap: 15px;
   width: auto;
   // margin-top: 5px;
-  // margin-left: 20px;
+  margin-left: 10px;
   // margin-right: 20px;  
 
 
@@ -569,31 +569,6 @@ div.panelHeader13 {
 
 }
 
-.squarebtn {
-  height: 39px;
-  width: 39px;
-  // padding: 0px 40px;
-  border: solid 1px #c1c1c1;
-  ;
-  background-color: $bgc01;
-  padding: 0px 8px;
-  // padding-top: 4px;
-  // padding-bottom: 4px;
-  font-weight: 500;
-  font-size: 16px;
-  color: #14256a;
-  transform: translateY(2px);
-
-  &:hover {
-    border: solid 1px #c1c1c1;
-    background-color: #c1c1c17c
-  }
-
-  &:focus {
-    background-color: $bgc01;
-    border: solid 1px #c1c1c1;
-  }
-}
 
 .modal_container {
   display: flex;

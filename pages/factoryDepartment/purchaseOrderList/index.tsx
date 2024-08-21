@@ -20,7 +20,7 @@ import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import icon_edit from 'public/image/icon/edit.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
@@ -35,6 +35,8 @@ import { Modal } from 'antd';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 
 type Tquery = {
@@ -839,6 +841,78 @@ export default function PurchaseOrderList() {
     }
 
 
+    const Print = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+            if (!response.ok) {
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+            }
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
+
+        } catch (error: any) {
+            setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    const sentToPrint = async (ip: any) => {
+        try {
+            const conditionModel = {
+                id: purchaseorderidin,
+                type: "purchaseorder",
+                clientip: ip,
+                data: []
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}Print`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -923,12 +997,34 @@ export default function PurchaseOrderList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>
                             </div>
-                            <div></div>
+                            <div>
+                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+                            </div>
                             <div>
 
                             </div>
@@ -952,6 +1048,18 @@ export default function PurchaseOrderList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
+                                    caption="採購單號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
                                     caption="採購日期"
                                     disabled={true}
                                     inputProps={{
@@ -962,14 +1070,29 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="採購單號"
+                                    caption="排版用"
                                     disabled={true}
+                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
+                                            value: ' ',
                                         },
                                     }}
                                 />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="採購人員"
@@ -980,46 +1103,6 @@ export default function PurchaseOrderList() {
                                         },
                                     }}
                                 />
-
-
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -1058,12 +1141,12 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="進貨進度"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${completereq}/${totalreq}`
                                         },
                                     }}
                                 />
@@ -1082,23 +1165,7 @@ export default function PurchaseOrderList() {
                         </div>
                         <div className={scss.head_content2}>
                             <div>
-                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
-                                        編輯
-                                    </button>
-                                </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
@@ -1121,19 +1188,19 @@ export default function PurchaseOrderList() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
+                                    caption="備註"
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            value: notein ? notein : ' ',
+                                            onChange: (e) => { setNotein(e.target.value) }
                                         },
                                     }}
                                 />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
@@ -1171,17 +1238,6 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="發票號碼"
                                     disabled={!editmain}
                                     inputProps={{
@@ -1194,19 +1250,7 @@ export default function PurchaseOrderList() {
                             </div>
                         </div>
                         <div className={scss.head_content3}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: notein ? notein : ' ',
-                                            onChange: (e) => { setNotein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -1234,24 +1278,14 @@ export default function PurchaseOrderList() {
                         <div className={scss.head_foot2}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
-                                    進貨明細
+                                    進貨紀錄
                                 </button>
                             </div>
                             <div>
 
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨進度"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `${completereq}/${totalreq}`
-                                        },
-                                    }}
-                                />
+
                             </div>
                             <div style={{ textAlign: 'right' }}></div>
                         </div>
@@ -1434,7 +1468,7 @@ export default function PurchaseOrderList() {
                     </div>
                 </div>
 
-                <Modal
+                {/* <Modal
                     visible={searchmodalopen}
                     footer={null}
                     onCancel={SearchModalClose}
@@ -1451,6 +1485,12 @@ export default function PurchaseOrderList() {
                     //     </div>
                     // }
                     style={{ top: 200 }}
+                > */}
+                <DragableModal
+                    handleText="查找單據"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}
                 >
                     <div className={scss.modal_head_head1}>
                         <div>
@@ -1607,7 +1647,8 @@ export default function PurchaseOrderList() {
                         </div>
 
                     </div>
-                </Modal >
+                    {/* </Modal > */}
+                </DragableModal>
             </div>
         </SubLayer >
 
