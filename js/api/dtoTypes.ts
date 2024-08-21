@@ -1888,8 +1888,8 @@ export type TquotationContentDto = {
   //
   settleProducts: TsettleProductDto[];
   //
-  designTeamId: string | null;
-  designTeam?: TcustomerDto;
+  designUnitId: string | null;
+  designUnit?: TcustomerDto;
 };
 
 export type TquotationDto = {
@@ -2246,7 +2246,7 @@ export type TcreateQuotationContentDto = {
   // 失件
   isLost: boolean;
   //
-  designTeamId: string | null;
+  designUnitId: string | null;
 };
 
 /**合約 */

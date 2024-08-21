@@ -411,8 +411,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       customer: {
         value: content?.customer,
       },
-      designTeam: {
-        value: content?.designTeam,
+      designUnit : {
+        value: content?.designUnit,
       },
       itemList: {
         validityPeriod: {

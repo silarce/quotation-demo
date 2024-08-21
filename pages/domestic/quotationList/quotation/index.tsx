@@ -306,7 +306,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
   const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
-  const [designTeam, setDesignTeam] = useState<TcustomerDto | undefined | null>();
+  const [designUnit, setDesignUnit] = useState<TcustomerDto | undefined | null>();
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -711,7 +711,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       isLost: state_profile.isLost,
       //
-      designTeamId: designTeam?.id ?? null,
+      designUnitId: designUnit?.id ?? null,
     };
 
     if (!body.customerId) {
@@ -1209,10 +1209,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
           changeProfile('faxNumber', '');
         },
       },
-      designTeam: {
-        value: designTeam,
-        onChange: (customer) => setDesignTeam(customer),
-        onClear: () => setDesignTeam(null),
+      designUnit: {
+        value: designUnit,
+        onChange: (customer) => setDesignUnit(customer),
+        onClear: () => setDesignUnit(null),
       },
 
       isLost: {
@@ -1328,7 +1328,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return control_profile;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state_profile, designTeam]);
+  }, [state_profile, designUnit]);
 
   // ____________________________________________________________________
   // ____________________________________________________________________
@@ -2013,7 +2013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // setEditNotes(latestContent?.editNotes ?? '');
 
     setCustomer(latestContent?.customer ?? null);
-    setDesignTeam(latestContent?.designTeam ?? null);
+    setDesignUnit(latestContent?.designUnit ?? null);
 
     setState_profile({
       validityPeriod: latestContent?.validityPeriod ?? '',
