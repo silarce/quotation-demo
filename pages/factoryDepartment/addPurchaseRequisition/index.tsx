@@ -888,6 +888,7 @@ export default function AddPurchaseRequisition() {
     }
 
     const handlecancelAddPR = () => {
+        setPurchaserequisitionid("");
         setStatus("");
         setData2([]);
         setNote("");

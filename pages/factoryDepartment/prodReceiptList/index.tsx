@@ -21,7 +21,7 @@ import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import icon_edit from 'public/image/icon/edit.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
@@ -35,6 +35,7 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1032,7 +1033,31 @@ export default function ProdReceiptList() {
 
 
                             </div>
-                            <div></div>
+                            <div>
+                                <span style={{ display: `${statusin === "未結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+
+
+                            </div>
                             <div></div>
                             <div>
                                 <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
@@ -1067,44 +1092,11 @@ export default function ProdReceiptList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="進貨日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="進貨單號"
                                     disabled={true}
                                     inputProps={{
                                         props: {
                                             value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
-                                        },
-                                    }}
-                                />
-
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="採購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
                                         },
                                     }}
                                 />
@@ -1115,6 +1107,40 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="進貨日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="採購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="進貨人員"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -1129,7 +1155,6 @@ export default function ProdReceiptList() {
                                     }}
                                 />
                             </div>
-                            <div></div>
                             <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                 <InputSel
                                     {...inputSelProps}
@@ -1155,7 +1180,7 @@ export default function ProdReceiptList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="請付狀態"
+                                    caption="付款狀態"
                                     disabled={true}
                                     inputProps={{
                                         props: {
@@ -1164,28 +1189,21 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫進度"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: `${completeentry}/${totalentry}`
+                                        },
+                                    }}
+                                />
                             </div>
                         </div>
-
                         <div className={scss.head_content2}>
                             <div>
-                                <span style={{ display: `${statusin === "未結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
-                                        編輯
-                                    </button>
-                                </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
@@ -1212,17 +1230,6 @@ export default function ProdReceiptList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="聯絡電話"
                                     disabled={!editmain}
                                     inputProps={{
@@ -1245,17 +1252,6 @@ export default function ProdReceiptList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -1314,25 +1310,9 @@ export default function ProdReceiptList() {
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
-                            <div>
-
-                            </div>
-                            <div>
-
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫進度"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `${completeentry}/${totalentry}`
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                             <div></div>
                         </div>
                         <div className={scss.body_content1}>

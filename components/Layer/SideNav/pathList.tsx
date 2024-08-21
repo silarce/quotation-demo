@@ -809,29 +809,29 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        {
-          label: '單據審核',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '簽核清單',
-              path: path01 + '/reviewList',
-              activeChecker: ({ router }) => {
-                const { pathname, query } = router;
+        // {
+        //   label: '單據審核',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '簽核清單',
+        //       path: path01 + '/reviewList',
+        //       activeChecker: ({ router }) => {
+        //         const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/reviewList') {
-                  return true;
-                }
+        //         if (pathname === '/factoryDepartment/reviewList') {
+        //           return true;
+        //         }
 
-                return false;
-              },
-              query: {
-                type: 'WareHouse',
-              },
-              erpFeature: devPass,
-            },
-          ],
-        },
+        //         return false;
+        //       },
+        //       query: {
+        //         type: 'WareHouse',
+        //       },
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
       ],
     };
   })(),

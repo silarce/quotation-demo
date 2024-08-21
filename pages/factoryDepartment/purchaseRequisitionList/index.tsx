@@ -46,6 +46,7 @@ import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -282,6 +283,7 @@ export default function PurchaseRequisitionList() {
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
+
                 // alert(data[0].need_date);
             }
         } catch (error: any) {
@@ -1133,12 +1135,11 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
                                 </button>
-
                             </div>
                             <div></div>
                             <div>
                                 <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
                                 <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
@@ -1234,23 +1235,23 @@ export default function PurchaseRequisitionList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="詢價進度"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${quotereqprogress}/${totalreqprogress}`,
                                         },
                                     }}
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="已轉採購"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${transpoprogress}/${totalreqprogress}`,
                                         },
                                     }}
                                 />
@@ -1312,19 +1313,21 @@ export default function PurchaseRequisitionList() {
                             <div style={{ marginTop: '5px' }}>
 
                             </div>
-                            <div> <InputSel
-                                {...inputSelProps}
-                                caption="詢價進度"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: `${quotereqprogress}/${totalreqprogress}`
-                                    },
-                                }}
-                            /></div>
+                            <div>
+                                {/* <InputSel
+                                    {...inputSelProps}
+                                    caption="詢價進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${quotereqprogress}/${totalreqprogress}`
+                                        },
+                                    }}
+                                /> */}
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <InputSel
+                                {/* <InputSel
                                     {...inputSelProps}
                                     caption="已轉採購"
                                     className='align-bottom'
@@ -1334,7 +1337,7 @@ export default function PurchaseRequisitionList() {
                                             value: `${transpoprogress}/${totalreqprogress}`
                                         },
                                     }}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <div className={scss.body_content1}>
@@ -1762,6 +1765,7 @@ export default function PurchaseRequisitionList() {
                                             },
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>

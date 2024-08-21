@@ -1056,19 +1056,6 @@ export default function PurchaseOrderList() {
                                         },
                                     }}
                                 />
-
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: notein ? notein : ' ',
-                                            onChange: (e) => { setNotein(e.target.value) }
-                                        },
-                                    }}
-                                />
-
                             </div>
                             <div>
                                 <InputSel
@@ -1154,12 +1141,12 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
+                                    caption="進貨進度"
                                     disabled={true}
-                                    className='invisible'
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            style: { color: 'red' },
+                                            value: `${completereq}/${totalreq}`
                                         },
                                     }}
                                 />
@@ -1201,19 +1188,19 @@ export default function PurchaseOrderList() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
+                                    caption="備註"
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: ' ',
+                                            value: notein ? notein : ' ',
+                                            onChange: (e) => { setNotein(e.target.value) }
                                         },
                                     }}
                                 />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
@@ -1238,17 +1225,6 @@ export default function PurchaseOrderList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -1309,17 +1285,7 @@ export default function PurchaseOrderList() {
 
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨進度"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `${completereq}/${totalreq}`
-                                        },
-                                    }}
-                                />
+
                             </div>
                             <div style={{ textAlign: 'right' }}></div>
                         </div>

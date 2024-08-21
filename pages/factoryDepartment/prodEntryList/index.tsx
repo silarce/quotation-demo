@@ -21,7 +21,7 @@ import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import icon_edit from 'public/image/icon/edit.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
@@ -41,7 +41,7 @@ import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
-
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 
 
@@ -1557,7 +1557,31 @@ export default function ProdEntryList() {
 
 
                             </div>
-                            <div></div>
+                            <div>
+                            <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+
+
+                            </div>
                             <div>
 
                             </div>
@@ -1675,23 +1699,7 @@ export default function ProdEntryList() {
 
                         <div className={scss.head_content2}>
                             <div>
-                                <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
-                                        編輯
-                                    </button>
-                                </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
@@ -1716,17 +1724,7 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
@@ -1751,17 +1749,6 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"

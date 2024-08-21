@@ -34,6 +34,8 @@ import { Modal } from 'antd';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
+import icon_task_approved from 'public/image/icon/fc_approved.svg';
+import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 
 
 type Tquery = {
@@ -925,8 +927,8 @@ export default function ProductList() {
 
 
     //頁籤切換判斷
-    const [tabnow, setTabnow] = useState<string>("編輯");
-    const [tabshow, setTabshow] = useState<string>("編輯");
+    const [tabnow, setTabnow] = useState<string>("待審核");
+    const [tabshow, setTabshow] = useState<string>("待審核");
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
@@ -1089,7 +1091,9 @@ export default function ProductList() {
                     <div className={scss.content}>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <div className={scss.head_head1}>
-                                <div></div>
+                                <div>
+
+                                </div>
                                 <div></div>
                                 <div></div>
                                 <div></div>
@@ -1100,8 +1104,8 @@ export default function ProductList() {
                                     <span>
                                         <button
                                             className={scss.minitabbtn}
-                                            onClick={() => tabChosed('編輯')}
-                                            style={getButtonStyle('編輯')}
+                                            onClick={() => tabChosed('待審核')}
+                                            style={getButtonStyle('待審核')}
                                         >
                                             {/* <img src={icon_edit.src} alt="edit" style={{ height: '20px', width: '20px' }} title="編輯物料" /> */}
                                             待審核
@@ -1110,8 +1114,8 @@ export default function ProductList() {
                                     <span>
                                         <button
                                             className={scss.minitabbtn}
-                                            onClick={() => tabChosed('新增')}
-                                            style={getButtonStyle('新增')}
+                                            onClick={() => tabChosed('審核中')}
+                                            style={getButtonStyle('審核中')}
                                         >
                                             {/* <img src={icon_autoadd.src} alt="add" style={{ height: '20px', width: '20px' }} title="新增物料" /> */}
                                             審核中
@@ -1120,8 +1124,8 @@ export default function ProductList() {
                                     <span>
                                         <button
                                             className={scss.minitabbtn}
-                                            onClick={() => tabChosed('測試')}
-                                            style={getButtonStyle('測試')}
+                                            onClick={() => tabChosed('審核完成')}
+                                            style={getButtonStyle('審核完成')}
                                         >
                                             {/* <img src={icon_autoadd.src} alt="add" style={{ height: '20px', width: '20px' }} title="新增物料" /> */}
                                             審核完成
@@ -1132,87 +1136,106 @@ export default function ProductList() {
                                 <div></div>
                                 <div></div>
                             </div>
-                            <div style={{ display: `${tabshow === "編輯" ? '' : 'none'}` }}>
+                            <div className={scss.tabbody}>
+                                <div>
+                                    <div style={{ display: `${tabshow === "待審核" ? '' : 'none'}` }}>
+                                        <div style={{ border: '1px solid #c1c1c1' }}>
+                                            <div className={scss.head_foot2}>
+                                                <div>
+                                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder='請輸入單據類別'
+                                                        value={keyword2}
+                                                        style={{ padding: '0px 5px', width: '100px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                                        onChange={(e) => setKeyword2(e.target.value)}
+                                                    />
 
-
-                                <div className={scss.head_foot2}>
-                                    <div>
-                                        <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder='請輸入單號'
+                                                        value={keyword3}
+                                                        style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                                        onChange={(e) => setKeyword3(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        placeholder='請輸入人員'
+                                                        value={keyword4}
+                                                        style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                                        onChange={(e) => setKeyword4(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                                                        <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                                <div>
+                                                    <Thead01 type={'ReviewList'} />
+                                                    <span>
+                                                        {filteredData && (
+                                                            filteredData.slice(0, 100).map((_item: any, index: number) => (
+                                                                <CellWithBar key={index} className={scss.panelHeader21}>
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
+                                                                        onClick={() => { editProduct(_item) }}
+                                                                    >
+                                                                        <span>{index + 1}</span>
+                                                                        <span>{_item.productid}</span>
+                                                                        <span>{_item.name}</span>
+                                                                        <span></span>
+                                                                    </div>
+                                                                </CellWithBar>
+                                                            ))
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder='請輸單據類別'
-                                            value={keyword2}
-                                            style={{ padding: '0px 5px', width: '200px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                            onChange={(e) => setKeyword2(e.target.value)}
-                                        />
-
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder='請輸入單號'
-                                            value={keyword3}
-                                            style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                            onChange={(e) => setKeyword3(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder='請輸入人員'
-                                            value={keyword4}
-                                            style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
-                                            onChange={(e) => setKeyword4(e.target.value)}
-                                        />
-                                    </div>
-                                    <div>
-                                        <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
-                                            <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        </button>
-                                    </div>
-                                    <div style={{ padding: '0px 5px', textAlign: 'right' }}></div>
-                                    <div style={{ padding: '0px 5px', textAlign: 'right' }}></div>
                                 </div>
-
-
-                                <div className={scss.body_content1} style={{ height: '300px' }}>
-                                    <div>
-                                        <Thead01 type={'ReviewList'} />
-                                        <span>
-                                            {filteredData && (
-                                                filteredData.slice(0, 100).map((_item: any, index: number) => (
-                                                    <CellWithBar key={index} className={scss.panelHeader21}>
-                                                        <div
-                                                            key={index}
-                                                            className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
-                                                            onClick={() => { editProduct(_item) }}
-                                                        >
-                                                            <span>{index + 1}</span>
-                                                            <span>{_item.productid}</span>
-                                                            <span>{_item.name}</span>
-                                                            <span>
-                                                                {/* <button onClick={() => { editProduct(_item) }}>
-                                                        <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                                    </button> */}
-                                                            </span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                ))
-                                            )}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        2
-                                    </div>
+                                <div style={{ border: '1px solid #c1c1c1' }}>
+                                    2
                                 </div>
                             </div>
+
                         </div>
                         <div className={scss.body_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+                                <button className={scss.longsquarebtn} onClick={() => { }} title="單據核准">
+                                    {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                                    核准
+                                </button>
+                            </div>
+                            <div>
+                                <button className={scss.longsquarebtn} onClick={() => { }} title="單據核准">
+                                    {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                                    駁回
+                                </button>
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="意見"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                            // onChange: (e) => { setNote(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
                         </div>
                         <div>
                             <div style={{ display: `${tabshow === "編輯" ? '' : 'none'}` }}>

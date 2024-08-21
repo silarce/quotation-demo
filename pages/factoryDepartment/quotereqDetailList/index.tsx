@@ -428,9 +428,11 @@ export default function QuotereqDetailList() {
             // setIsLoading(true);
             const conditionModel: {
                 quoterequuid: any,
+                purchaserequisitionid: any,
                 data: any,
             } = {
                 quoterequuid: quoterequuidin,
+                purchaserequisitionid: purchaserequisitionidin,
                 data: prquotereqadddata
             };
 
