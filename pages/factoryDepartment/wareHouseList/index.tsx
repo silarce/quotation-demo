@@ -41,7 +41,7 @@ export default function WareHouseList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-
+    const { userInfo } = useContext(AppContext);
 
     const searchTargetList = [
         {
@@ -98,6 +98,7 @@ export default function WareHouseList() {
             const data = await response.json();
             setData(data);
             console.log("vvvvv" + data);
+            console.log(userInfo);
         } catch (error: any) {
             setError(error.message);
         }
