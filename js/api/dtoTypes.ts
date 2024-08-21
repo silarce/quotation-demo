@@ -2390,8 +2390,8 @@ export type TquotationAccouting_area = {
   year: number;
   month: number;
   county: string;
-  totalsum: string; // 牌價複價
-  pricesum: string; // 單價複價
+  totalsum: string; // 牌價
+  pricesum: string; // 承包價
   percentage: number | null; // 百分比
 };
 
