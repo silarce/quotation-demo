@@ -21,7 +21,7 @@ import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import icon_edit from 'public/image/icon/edit.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
@@ -40,7 +40,8 @@ import icon_wh from 'public/image/icon/fc_wh.svg';
 import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
-
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 
 
@@ -1464,7 +1465,7 @@ export default function ProdEntryList() {
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'入庫單'} panelList={panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
                         <div style={{
                             display: 'flex',
@@ -1531,26 +1532,56 @@ export default function ProdEntryList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_sidebar.src} alt="sidebar" style={{ height: '30px', width: '30px' }} title="側欄" />
                                 </button>
-                                &nbsp;
+                                &nbsp; */}
                                 {/* <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
                                     儲位管理
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
-                                    <img src={icon_wh.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    <img src={icon_wh.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲位
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    <img src={icon_print.src} alt="print" style={{ height: '20px', width: '20px' }} />
+                                    列印
                                 </button>
+
+
                             </div>
-                            <div></div>
+                            <div>
+                            <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+
+
+                            </div>
                             <div>
 
                             </div>
@@ -1668,23 +1699,7 @@ export default function ProdEntryList() {
 
                         <div className={scss.head_content2}>
                             <div>
-                                <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
-                                        編輯
-                                    </button>
-                                </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
@@ -1709,17 +1724,7 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
@@ -1744,17 +1749,6 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -2363,8 +2357,13 @@ export default function ProdEntryList() {
                     </div>
                 </div>
             </Modal>
-
-            <Modal
+            <DragableModal
+                handleText="查找單據"
+                style={{ zIndex: '1001', width: '1000px' }}
+                show={searchmodalopen}
+                onCrossClick={SearchModalClose}
+            >
+                {/* <Modal
                 visible={searchmodalopen}
                 footer={null}
                 onCancel={SearchModalClose}
@@ -2386,7 +2385,15 @@ export default function ProdEntryList() {
                 }
                 // centered
                 style={{ top: 200 }}
-            >
+            > */}
+                <div className={scss.modal_head_head1}>
+                    <div>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
+                    </div>
+                    <div>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
+                    </div>
+                </div>
                 <div className={scss.modal_head_content1}>
                     <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
                         <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
@@ -2537,7 +2544,8 @@ export default function ProdEntryList() {
                     </div>
 
                 </div>
-            </Modal >
+                {/* </Modal > */}
+            </DragableModal>
         </SubLayer >
 
     )

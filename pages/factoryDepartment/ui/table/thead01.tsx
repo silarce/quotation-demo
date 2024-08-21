@@ -440,6 +440,19 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+  //#region 審核明細
+  else if (type === "ReviewList") {
+    return (
+      <div className={style.thead29}>
+        <span>序</span>
+        <span>類別</span>
+        <span>單號</span>
+        <span>人員</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }
