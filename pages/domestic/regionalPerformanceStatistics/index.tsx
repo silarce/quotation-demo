@@ -236,12 +236,29 @@ export default function RegionalPerformanceStatistics() {
     })();
 
     // ______________________________________________________________________
+    // ______________________________________________________________________
 
-    return { formatedList: list, quotetypeArr };
+    const list_ordered: Tdata = (() => {
+      const { 北部, 中部, 南部, 東部, 外銷, 總價, ...rest } = list;
+
+      let list_ordered: Tdata = {
+        北部,
+        中部,
+        南部,
+        東部,
+        外銷,
+        ...rest,
+        總價,
+      };
+
+      list_ordered = _.omitBy(list_ordered, (item) => !item);
+
+      return list_ordered;
+    })();
+
+    // return { formatedList: list, quotetypeArr };
+    return { formatedList: list_ordered, quotetypeArr };
   }, [data]);
-
-  // console.log(formatedList);
-  // console.log(quotetypeArr);
 
   // -----------------------------------------------------------------------------
 
