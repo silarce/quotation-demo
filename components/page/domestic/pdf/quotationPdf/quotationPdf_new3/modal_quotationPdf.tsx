@@ -50,6 +50,8 @@ import { dlPdf } from './dlPdf';
 // api
 import { apiGetAssets } from 'js/api/api_product';
 
+import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
+
 // ============================================================================
 
 // region TYPE
@@ -1005,9 +1007,11 @@ const config: Tconfig = {
 const quotationProdAndOther_ToProdArr = ({
   quotationProductArr,
   quotationOtherArr,
+  checkIsSpecialDoor,
 }: {
   quotationProductArr: TquotationProductDto[];
   quotationOtherArr: TquotationContentOtherDto[];
+  checkIsSpecialDoor: (doorModelName: string) => boolean;
 }): Tprod[] => {
   const productArr: Tprod[] = (() => {
     return quotationProductArr.map((pro) => {
@@ -1035,6 +1039,9 @@ const quotationProdAndOther_ToProdArr = ({
         //
         reduceQty,
       } = pro;
+
+      const isSpecialDoor = checkIsSpecialDoor(doorModelName);
+      console.log(isSpecialDoor);
 
       let { quantity, totalPrice } = pro;
 
@@ -1067,13 +1074,22 @@ const quotationProdAndOther_ToProdArr = ({
 
       let material = materialName;
 
-      const doorRailForExcel =
-        doorModelName !== 'SJ-302'
-          ? ''
-          : findGuideRailUnicode({
-              isAntiTyphoon: !!isAntiTyphoon,
-              isSilencing: !!hasSilencingStrip,
-            });
+      const doorRailForExcel = isSpecialDoor
+        ? guideRail
+        : doorModelName === 'SJ-302'
+        ? findGuideRailUnicode({
+            isAntiTyphoon: !!isAntiTyphoon,
+            isSilencing: !!hasSilencingStrip,
+          })
+        : '';
+
+      // const doorRailForExcel =
+      //   doorModelName !== 'SJ-302'
+      //     ? ''
+      //     : findGuideRailUnicode({
+      //         isAntiTyphoon: !!isAntiTyphoon,
+      //         isSilencing: !!hasSilencingStrip,
+      //       });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
@@ -1156,6 +1172,7 @@ const useModalQuotationPdf = ({
 }) => {
   const [visible, setVisible] = useState(false);
   const [pdfData, setPdfData] = useState<TpdfData>();
+  const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
   useEffect(() => {
     if (!quotationContent) {
@@ -1256,6 +1273,7 @@ const useModalQuotationPdf = ({
     const prodArr = quotationProdAndOther_ToProdArr({
       quotationProductArr: quotationProductArr,
       quotationOtherArr: others ?? [],
+      checkIsSpecialDoor,
     });
 
     setPdfData({ top, prodArr, bottom });

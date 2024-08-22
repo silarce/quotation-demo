@@ -1888,6 +1888,8 @@ export type TquotationContentDto = {
   //
   settleProducts: TsettleProductDto[];
   //
+  designUnitId: string | null;
+  designUnit?: TcustomerDto;
 };
 
 export type TquotationDto = {
@@ -2243,6 +2245,8 @@ export type TcreateQuotationContentDto = {
 
   // 失件
   isLost: boolean;
+  //
+  designUnitId: string | null;
 };
 
 /**合約 */
@@ -2300,7 +2304,7 @@ export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 export type TcopyQuotationDto = {
   quotationId: string;
   customerId: string;
-  isRelationQuotation?: boolean;
+  isRelationQuotation: boolean;
 };
 
 // export type TcreateModifyQuotationDto = {
@@ -2386,8 +2390,8 @@ export type TquotationAccouting_area = {
   year: number;
   month: number;
   county: string;
-  totalsum: string; // 牌價複價
-  pricesum: string; // 單價複價
+  totalsum: string; // 牌價
+  pricesum: string; // 承包價
   percentage: number | null; // 百分比
 };
 
@@ -3739,6 +3743,34 @@ export type TincomeBillSerialDto = {
   isWorkSupervisorSeen: boolean | null;
   // '總經理是否已閱'
   isManagerSeen: boolean | null;
+  //
+  //
+  //
+  // 外銷相關
+  // '出口報單幣別'
+  declarationCurrency: Tcurrency | null;
+  // '出口報單匯率'
+  declarationExchangeRate: string | null;
+  // '出口報單外幣金額'
+  declarationCurrencyPayment: string | null;
+  // '出口報單台幣金額'
+  declarationPayment: string | null;
+  // '收款幣別'
+  receivableCurrency: Tcurrency | null;
+  // '收款匯率'
+  receivableExchangeRate: string | null;
+  // '收款外幣金額'
+  receivableCurrencyPayment: string | null;
+  // '國外匯費-新台幣'
+  foreignFee: string | null;
+  // '國外匯費-外幣'
+  foreignCurrencyFee: string | null;
+
+  // '兌換利益'
+  exchangeBenefits: string | null;
+
+  //
+  vendorName: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3767,6 +3799,19 @@ export type TupdateIncomeBillSerialDto = Pick<
   isCashierSeen?: boolean | null;
   isWorkSupervisorSeen?: boolean | null;
   isManagerSeen?: boolean | null;
+} & {
+  declarationCurrency: string | null;
+  declarationExchangeRate: string | null;
+  declarationPayment: string | null;
+  declarationCurrencyPayment: string | null;
+  receivableCurrency: string | null;
+  receivableExchangeRate: string | null;
+  receivableCurrencyPayment: string | null;
+  foreignFee: string | null;
+  foreignCurrencyFee: string | null;
+  exchangeBenefits: string | null;
+} & {
+  vendorName?: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {

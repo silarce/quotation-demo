@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
-
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -159,7 +159,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   // region get Data
 
   const {
-    data: data_accountant,
+    data: data_accountant_raw,
     update: update_accountant,
     isFetching,
   } = useGetAccountant({
@@ -189,6 +189,22 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   });
 
   const { data: data_accountantPreset } = useGetAccountantPreset();
+
+  const data_accountant = useMemo(() => {
+    const sortedData_accountant = _.orderBy(
+      data_accountant_raw,
+      (data) => {
+        // 之前更新insertDate的時候時分秒沒有歸零，使的排序出問題，因此在這裡歸零
+        const { insertDate, createdAt } = data;
+        const insertDate_format = moment(insertDate).format('YYYY-MM-DD');
+
+        return [insertDate_format, createdAt];
+      },
+      ['asc', 'asc']
+    );
+
+    return sortedData_accountant;
+  }, [data_accountant_raw]);
 
   // ----------------------------------------------------------------------------
   // region REQUEST

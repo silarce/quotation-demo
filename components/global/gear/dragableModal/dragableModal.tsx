@@ -1,11 +1,34 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+
 import classNames from 'classnames';
 import Image from 'next/image';
 
 import scss from './dragableModal.module.scss';
 import crossRed from 'public/image/icon/cross_red.svg';
 
+type Tprops = {
+  show: boolean;
+
+  handleText?: React.ReactNode;
+  children?: React.ReactNode;
+
+  className?: string;
+  style?: React.CSSProperties;
+
+  handleClassName?: string;
+  hanDleStyle?: React.CSSProperties;
+
+  showCross?: boolean;
+  crossClassName?: string;
+  crossStyle?: React.CSSProperties;
+  onCrossClick?: () => void;
+};
+
+type Tprops_call = Omit<Tprops, 'show'>;
+
+// =====================================================================
 const DragableModal = ({
   show,
 
@@ -22,23 +45,7 @@ const DragableModal = ({
   crossClassName,
   crossStyle,
   onCrossClick,
-}: {
-  show: boolean;
-
-  handleText?: React.ReactNode;
-  children?: React.ReactNode;
-
-  className?: string;
-  style?: React.CSSProperties;
-
-  handleClassName?: string;
-  hanDleStyle?: React.CSSProperties;
-
-  showCross?: boolean;
-  crossClassName?: string;
-  crossStyle?: React.CSSProperties;
-  onCrossClick?: () => void;
-}) => {
+}: Tprops) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [isReady, setIsReady] = useState(false);
@@ -197,4 +204,67 @@ const DragableModal = ({
 
 // =====================================================================
 
+const createDragableModal = (props?: Tprops_call) => {
+  const container = document.createElement('div');
+  container.className = 'tempDOMContainer';
+  document.body.appendChild(container);
+
+  const root = createRoot(container);
+
+  const unmountComponent = () => {
+    root.unmount();
+    // if (container) {
+    // }
+  };
+
+  const { children, onCrossClick } = props ?? {};
+
+  props &&
+    root.render(
+      <DragableModal
+        //
+        {...props}
+        show={true}
+        onCrossClick={() => {
+          unmountComponent();
+          onCrossClick?.();
+        }}
+      >
+        {children}
+      </DragableModal>
+    );
+  //
+  //
+  document.body.removeChild(container);
+
+  //
+  //
+  const update = (props: Tprops_call) => {
+    const { children, onCrossClick } = props ?? {};
+    root.render(
+      <DragableModal
+        //
+        {...props}
+        show={true}
+        onCrossClick={() => {
+          unmountComponent();
+          onCrossClick?.();
+        }}
+      >
+        {children}
+      </DragableModal>
+    );
+  };
+
+  return {
+    update,
+    unmount: unmountComponent,
+  };
+};
+
+DragableModal.create = createDragableModal;
+
+// =====================================================================
+
 export default DragableModal;
+export { createDragableModal };

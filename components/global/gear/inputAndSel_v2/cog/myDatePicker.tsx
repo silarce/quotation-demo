@@ -13,7 +13,9 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import scss from '../inputSel.module.scss';
 
 export type TdatePickerProps = {
-  props?: DatePickerProps;
+  props?: DatePickerProps & {
+    onChange_raw?: DatePickerProps['onChange'];
+  };
   wrapperClassName?: string;
   wrapperStyle?: React.CSSProperties;
   showSuffixIcon?: 'always' | 'never' | 'auto';
@@ -27,6 +29,8 @@ export default function MyDatePicker({
 }: TdatePickerProps) {
   let isShowSuffixIcon = true;
 
+  const { onChange, onChange_raw, className, ...antdProps } = props ?? {};
+
   switch (showSuffixIcon) {
     case 'always':
       isShowSuffixIcon = true;
@@ -35,7 +39,7 @@ export default function MyDatePicker({
       isShowSuffixIcon = false;
       break;
     case 'auto':
-      isShowSuffixIcon = !props?.disabled;
+      isShowSuffixIcon = !antdProps?.disabled;
       break;
     default:
       isShowSuffixIcon = true;
@@ -48,7 +52,7 @@ export default function MyDatePicker({
         format={(theMoment) => {
           const twDate = convertDate_reduce1911(theMoment.toISOString());
 
-          const picker = props?.picker;
+          const picker = antdProps?.picker;
 
           const format = picker === 'year' ? 'yy' : picker === 'month' ? 'yy-MM' : 'yy-MM-DD';
 
@@ -60,8 +64,19 @@ export default function MyDatePicker({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore // 明明就有showToday，但是ts表示沒有
         showToday={false}
-        {...props}
-        className={classNames(scss.timePicker, props?.className, !isShowSuffixIcon && scss.notShowSuffixIcon)}
+        //
+        {...antdProps}
+        //
+        onChange={(date_m, dateString) => {
+          if (onChange_raw) {
+            onChange_raw(date_m, dateString);
+          } else {
+            date_m = date_m?.startOf('day') ?? null;
+            dateString = date_m?.format('YYYY-MM-DD') ?? '';
+            onChange?.(date_m, dateString);
+          }
+        }}
+        className={classNames(scss.timePicker, className, !isShowSuffixIcon && scss.notShowSuffixIcon)}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
+import React, { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
@@ -14,9 +14,10 @@ import EditDefunctionBtn, {
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import Tip from 'components/global/myAntd/popover/tip';
 
 // type
-import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tcurrency, TincomeBillSerialDto } from 'js/api/dtoTypes';
 import { TreqPatch } from 'pages/worksDepartment/incomeSummons';
 
 // icon
@@ -27,12 +28,16 @@ import scss from './summon.module.scss';
 
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
+import { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits } from 'js/utils/calc/calcIncomeBill';
 
 // global state
 import { useVipInfo } from 'hooks/globalState/useVipInfo';
+
 // context
 import { AppContext } from 'pages/_app';
+
+import { optionsCreator_currency } from 'js/utils/options/options';
+
 // ============================================================================
 
 type Tstate_incomeBillSerial = {
@@ -65,6 +70,30 @@ type Tstate_incomeBillSerial = {
   isCashierSeen: boolean | null;
   isWorkSupervisorSeen: boolean | null;
   isManagerSeen: boolean | null;
+  //
+  //
+  // 外銷相關
+
+  // '出口報單幣別'
+  declarationCurrency: Tcurrency | null;
+  // '出口報單匯率'
+  declarationExchangeRate: string | null;
+  // '出口報單外幣金額'
+  declarationCurrencyPayment: string | null;
+  // '出口報單台幣金額'
+  declarationPayment: string | null;
+  // '收款幣別'
+  receivableCurrency: Tcurrency | null;
+  // '收款匯率'
+  receivableExchangeRate: string | null;
+  // '收款外幣金額'
+  receivableCurrencyPayment: string | null;
+  // '國外匯費_新台幣'
+  foreignFee: string | null;
+  // '國外匯費_外幣'
+  foreignCurrencyFee: string | null;
+  // '兌換利益'
+  exchangeBenefits: string | null;
 };
 
 type Tstate_deduction = {
@@ -74,7 +103,7 @@ type Tstate_deduction = {
 };
 
 type TconfigItem = {
-  label: string;
+  label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
   createInputSelProps: (props: {
@@ -112,9 +141,17 @@ type TconfigKey =
       | 'unpaidPayment'
       | 'difference'
       | 'note'
-
-      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-      // | 'temporary_separatePayment'
+      //
+      | 'declarationCurrency'
+      | 'declarationExchangeRate'
+      | 'declarationCurrencyPayment'
+      | 'declarationPayment'
+      | 'receivableCurrency'
+      | 'receivableExchangeRate'
+      | 'receivableCurrencyPayment'
+      | 'foreignFee'
+      | 'foreignCurrencyFee'
+      | 'exchangeBenefits'
     >
   | 'fee'
   | 'vendorName';
@@ -153,12 +190,14 @@ const Summons_pre = (
     reqPatch,
     update_incomeBill,
     changeActive,
+    isForeign,
   }: {
     className?: string;
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
     update_incomeBill: () => void;
     changeActive?: () => void;
+    isForeign: boolean;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
@@ -214,6 +253,10 @@ const Summons_pre = (
 
     await reqPatch(incomeBillSerial.id, body).then(() => {});
   };
+
+  // ---------------------------------------------------------------------
+
+  const keyArr = getKeyArr({ isForeign });
 
   // ---------------------------------------------------------------------
 
@@ -292,26 +335,76 @@ const Summons = forwardRef(Summons_pre);
 
 // region PROPSLIST
 
-const keyArr: TconfigKey[] = [
-  'billSerialNumber',
-  // 'invoiceType',
-  'receiveDate',
-  'contractNumber',
-  'projectName',
-  'vendorName',
-  'contractPayment',
-  'periodPayment',
-  'priorPeriodPayment',
-  'importAccountingNumber',
-  'noteNumber',
-  'noteMaturityDate',
-  'receivablePayment',
-  'deductionPayment',
-  'fee',
-  'unpaidPayment',
-  // 'difference',
+// 舊的
+// const keyArr_ori: TconfigKey[] = [
+//   'billSerialNumber', // 收入傳票序號
+//   // 'invoiceType', //
+//   'receiveDate', // 日期
+//   'contractNumber', // 合約編號
+//   'projectName', // 工程名稱
+//   'vendorName', // 廠商名稱
+//   'contractPayment', // 承攬價
+//   'periodPayment', // 本期計價
+//   'priorPeriodPayment', // 前期已收
+//   'importAccountingNumber', // 票據/匯入帳號
+//   'noteNumber', // 票據號碼
+//   'noteMaturityDate', // 票據日期
+//   'receivablePayment', // 收款金額
+//   'deductionPayment', // 扣款金額
+//   'fee', // 匯費
+//   'unpaidPayment', // 餘額
+//   // 'difference', // 差額
 
-  'note',
+//   //
+//   'declarationCurrency', // 外銷 出口報單幣別
+//   'declarationExchangeRate', // 外銷 出口報單匯率
+//   'declarationPayment', // 外銷 出口報單台幣金額
+//   'declarationCurrencyPayment', // 外銷 出口報單外幣金額
+
+//   'receivableCurrency', // 外銷 收款幣別
+//   'receivableExchangeRate', // 外銷 收款匯率
+//   'receivableCurrencyPayment', // 外銷 收款外幣金額
+
+//   'currencyFee', // 外銷 國外匯費
+//   'exchangeBenefits', // 外銷 兌換利益
+//   //
+//   'note', // 備註
+// ];
+
+// 欄位順序要跟工務部討論
+const keyArr_ori: TconfigKey[] = [
+  'billSerialNumber', // 收入傳票序號
+  'contractNumber', // 合約編號
+  'receiveDate', // 日期
+  'projectName', // 工程名稱
+  'vendorName', // 廠商名稱
+  'contractPayment', // 承攬價
+  'periodPayment', // 本期計價
+  'noteNumber', // 票據號碼
+  'importAccountingNumber', // 票據/匯入帳號
+  'noteMaturityDate', // 票據日期
+
+  'declarationCurrency', // 外銷 出口報單幣別
+  'declarationExchangeRate', // 外銷 出口報單匯率
+  'declarationCurrencyPayment', // 外銷 出口報單外幣金額
+  'declarationPayment', // 外銷 出口報單台幣金額
+
+  'priorPeriodPayment', // 前期已收
+
+  'receivableCurrency', // 外銷 收款幣別
+  'receivableExchangeRate', // 外銷 收款匯率
+  'receivableCurrencyPayment', // 外銷 收款外幣金額
+  'receivablePayment', // w 收款金額 新臺幣
+
+  'fee', // 匯費
+  'foreignCurrencyFee', // 外銷 國外匯費_外幣
+  'foreignFee', // 外銷 國外匯費_新台幣
+
+  'exchangeBenefits', // 外銷 兌換利益
+
+  'deductionPayment', // 扣款金額
+  'unpaidPayment', // 餘額
+  'note', // 備註
 ];
 
 const cellPropsList_summon: TcellPropsList_summon = {
@@ -443,7 +536,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.contractPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
           copy.periodPayment = '';
 
           return copy;
@@ -485,7 +578,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.periodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
           copy.contractPayment = '';
 
           return copy;
@@ -527,7 +620,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
         setState_incomeBillSerial((prev) => {
           const copy = { ...prev };
           copy.priorPeriodPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.unpaidPayment = calcUnpaidPayment(copy);
+          copy.exchangeBenefits = calcExchangeBebefits(copy);
 
           return copy;
         });
@@ -647,23 +741,27 @@ const cellPropsList_summon: TcellPropsList_summon = {
         value: state_incomeBillSerial.receivablePayment,
       });
 
-      return {
+      const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
             className: 'text-right',
             type,
             value: value,
             onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  receivablePayment: e.target.value,
-                };
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.receivablePayment = e.target.value;
+                copy.unpaidPayment = calcUnpaidPayment(copy);
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
+
+                return copy;
               });
             },
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   deductionPayment: {
@@ -699,7 +797,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
             const copy = { ...prev };
             copy.state_deduction = state_deductionArr;
             copy.deductionPayment = deductionPayment.toString();
-            copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+            copy.unpaidPayment = calcUnpaidPayment(copy);
 
             return copy;
           });
@@ -742,7 +840,11 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
   unpaidPayment: {
-    label: '餘額',
+    label: (
+      <span className={classNames(scss.tipLabel, scss.plus)}>
+        餘額 <Tip content={calcIncomeBillUnpaidPayment.description} />
+      </span>
+    ),
     style: { width: 120 },
     className: 'text-right',
     createInputSelProps: ({
@@ -838,7 +940,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
               setState_incomeBillSerial((state) => {
                 const copy = { ...state };
                 copy.fee = Number(e.target.value || 0);
-                copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+                copy.unpaidPayment = calcUnpaidPayment(copy);
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
                 return copy;
               });
@@ -882,15 +985,22 @@ const cellPropsList_summon: TcellPropsList_summon = {
     label: '廠商名稱',
     style: { width: 150 },
     // className: 'text-center',
-    createInputSelProps: ({ state_incomeBillSerial }) => {
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
-        disabled: true,
-        showBaseline: 'invisible',
+        disabled: disabled,
+        showBaseline: 'auto',
         inputProps: {
           props: {
             // className: 'text-center',
             value: state_incomeBillSerial.vendorName,
-            disabled: true,
+            onChange: (e) => {
+              setState_incomeBillSerial((prev) => {
+                return {
+                  ...prev,
+                  vendorName: e.target.value,
+                };
+              });
+            },
           },
         },
       };
@@ -898,7 +1008,411 @@ const cellPropsList_summon: TcellPropsList_summon = {
       return inputSelProps;
     },
   },
-} as const;
+  //
+  //
+  //
+
+  declarationCurrency: {
+    label: '出口報單幣別',
+    style: { width: 150 },
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const value = state_incomeBillSerial.declarationCurrency ?? '';
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'auto',
+        selectProps: {
+          props: {
+            classNames: {
+              menuPortal: () => classNames(scss.inputSel_select_menuPortal, scss.plus),
+            },
+            options: optionsCreator_currency(),
+            // className: 'text-center',
+            value: {
+              value: value,
+              label: value,
+            },
+            onChange: (option) => {
+              if (!option) {
+                return;
+              }
+
+              setState_incomeBillSerial((state) => {
+                return {
+                  ...state,
+                  declarationCurrency: option.value as Tcurrency,
+                  declarationExchangeRate: null,
+                  declarationCurrencyPayment: null,
+                };
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  declarationExchangeRate: {
+    label: '出口報單匯率',
+    style: { width: 120 },
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            // className: 'text-center',
+            value: state_incomeBillSerial.declarationExchangeRate ?? '',
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+
+                copy.declarationExchangeRate = e.target.value;
+                const declarationCurrencyPayment_num = calc_twToForeign({
+                  exchangeRate: (copy.declarationExchangeRate || 0) as `${number}`,
+                  twPayment: (copy.declarationPayment || 0) as `${number}`,
+                });
+                copy.declarationCurrencyPayment = declarationCurrencyPayment_num.toString();
+
+                return copy;
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  declarationCurrencyPayment: {
+    label: '出口報單外幣金額',
+    style: { width: 150 },
+    className: 'text-right',
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled,
+        value: state_incomeBillSerial.declarationCurrencyPayment ?? '',
+      });
+
+      // const declarationCurrency = state_incomeBillSerial.declarationCurrency;
+      // const currencyCode = declarationCurrency ? extractCurrencyCode(declarationCurrency) : '';
+
+      const inputSelProps: TinputSelProps = {
+        // //
+        // caption: currencyCode,
+        // captionSize: '18',
+        // wrapperStyle: { gap: '5px' },
+        // //
+        disabled,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            // className: 'text-center',
+            type,
+            value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.declarationCurrencyPayment = e.target.value;
+                const declarationPayment_num = calc_foreignToTw({
+                  exchangeRate: (copy.declarationExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.declarationCurrencyPayment || 0) as `${number}`,
+                });
+                copy.declarationPayment = declarationPayment_num.toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
+
+                return copy;
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  declarationPayment: {
+    label: '出口報單台幣金額',
+    style: { width: 150 },
+    className: 'text-right',
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled,
+        value: state_incomeBillSerial.declarationPayment ?? '',
+      });
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            type,
+            className: 'text-right',
+            // className: 'text-center',
+            value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.declarationPayment = e.target.value;
+                const declarationCurrencyPayment_num = calc_twToForeign({
+                  exchangeRate: (copy.declarationExchangeRate || 0) as `${number}`,
+                  twPayment: (copy.declarationPayment || 0) as `${number}`,
+                });
+                copy.declarationCurrencyPayment = declarationCurrencyPayment_num.toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
+
+                return copy;
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  receivableCurrency: {
+    label: '收款幣別',
+    style: { width: 150 },
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const value = state_incomeBillSerial.receivableCurrency ?? '';
+
+      const inputSelProps: TinputSelProps = {
+        showBaseline: 'auto',
+        selectProps: {
+          props: {
+            classNames: {
+              menuPortal: () => classNames(scss.inputSel_select_menuPortal, scss.plus),
+            },
+            options: optionsCreator_currency(),
+            // className: 'text-center',
+            value: {
+              value: value,
+              label: value,
+            },
+            onChange: (option) => {
+              if (!option) {
+                return;
+              }
+
+              setState_incomeBillSerial((state) => ({
+                ...state,
+                receivableCurrency: option.value as Tcurrency,
+                receivableExchangeRate: null,
+                receivableCurrencyPayment: null,
+              }));
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  receivableExchangeRate: {
+    label: '收款匯率',
+    style: { width: 100 },
+    // className: 'text-right',
+
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        inputProps: {
+          props: {
+            // className: 'text-right',
+
+            value: state_incomeBillSerial.receivableExchangeRate ?? '',
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.receivableExchangeRate = e.target.value;
+                const receivableCurrencyPayment_num = calc_twToForeign({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  twPayment: (copy.receivablePayment || 0) as `${number}`,
+                });
+                copy.receivableCurrencyPayment = receivableCurrencyPayment_num.toString();
+
+                copy.foreignFee = calc_foreignToTw({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
+                }).toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
+
+                return copy;
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  receivableCurrencyPayment: {
+    label: '收款外幣金額',
+    style: { width: 150 },
+    className: 'text-right',
+    // className: 'text-center',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled,
+        value: state_incomeBillSerial.receivableCurrencyPayment ?? '',
+      });
+
+      const inputSelProps: TinputSelProps = {
+        inputProps: {
+          props: {
+            className: 'text-right',
+            // className: 'text-center',
+            type,
+            value: value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.receivableCurrencyPayment = e.target.value;
+                const receivablePayment_num = calc_foreignToTw({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.receivableCurrencyPayment || 0) as `${number}`,
+                });
+                copy.receivablePayment = receivablePayment_num.toString();
+
+                return copy;
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  exchangeBenefits: {
+    label: (
+      <span className={classNames(scss.tipLabel, scss.plus)}>
+        兌換利益 <Tip content={calcIncomeBillExchangeBenefits.description} />
+      </span>
+    ),
+    style: { width: 150 },
+    className: 'text-right',
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled: true,
+        value: state_incomeBillSerial.exchangeBenefits ?? '',
+      });
+
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            type,
+            value,
+            onChange: (e) => {
+              // setState_incomeBillSerial((state) => ({
+              //   ...state,
+              //   exchangeBenefits: e.target.value,
+              // }));
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  foreignCurrencyFee: {
+    label: '國外匯費(外幣)',
+    style: { width: 150 },
+    className: 'text-right',
+
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const { type, value } = reducer_input({
+        disabled,
+        value: state_incomeBillSerial.foreignCurrencyFee ?? '',
+      });
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            type,
+            value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+
+                copy.foreignCurrencyFee = e.target.value;
+                copy.foreignFee = calc_foreignToTw({
+                  exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
+                  foreignPayment: (copy.foreignCurrencyFee || 0) as `${number}`,
+                }).toString();
+                copy.exchangeBenefits = calcExchangeBebefits(copy);
+
+                return copy;
+              });
+            }, // onChange
+            //
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  foreignFee: {
+    label: '國外匯費(新台幣)',
+    style: { width: 150 },
+    className: 'text-right',
+
+    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      // const { type, value } = reducer_input({
+      //   disabled,
+      //   value: state_incomeBillSerial.currencyFee ?? '',
+      // });
+
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'auto',
+        inputProps: {
+          props: {
+            className: 'text-right',
+            type: 'text',
+            value: state_incomeBillSerial.foreignFee ?? '',
+            onChange: (e) => {
+              // setState_incomeBillSerial((state) => ({
+              //   ...state,
+              //   currencyFee: e.target.value,
+              // }));
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  //
+  //
+  //
+}; // cellPropsList_summon END
 
 // ============================================================================
 const reducer_input = ({ disabled, value }: { disabled: boolean; value: string | number }) => {
@@ -923,6 +1437,7 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
     priorPeriodPayment,
     deductionPayment,
     fee,
+    receivablePayment,
   } = state_incomeBillSerial;
 
   const unpaidPayment = calcIncomeBillUnpaidPayment({
@@ -931,6 +1446,7 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
     priorPeriodPayment: Number(priorPeriodPayment),
     deductionPayment: Number(deductionPayment),
     fee: Number(fee),
+    receivablePayment: Number(receivablePayment),
   });
   // const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
   //   .minus(priorPeriodPayment || 0)
@@ -938,7 +1454,119 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
   //   .minus(fee || 0)
   //   .toNumber();
 
-  return unpaidPayment;
+  return unpaidPayment.toString();
+};
+
+const calcExchangeBebefits = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
+  const {
+    //
+    declarationPayment,
+    priorPeriodPayment,
+    receivablePayment,
+    fee,
+    foreignFee,
+  } = state_incomeBillSerial;
+
+  const exchangeBenefits = calcIncomeBillExchangeBenefits({
+    declarationPayment: Number(declarationPayment || 0),
+    priorPeriodPayment: Number(priorPeriodPayment || 0),
+    receivablePayment: Number(receivablePayment || 0),
+    fee: Number(fee || 0),
+    foreignFee: Number(foreignFee || 0),
+  });
+
+  return exchangeBenefits.toString();
+};
+
+// const calceCurrencyPayment = ({
+//   exchangeRate, // tw to foreign
+//   twPayment,
+//   foreignPayment,
+// }:
+//   | {
+//       exchangeRate: number;
+//     } & (
+//       | {
+//           twPayment: number;
+//           foreignPayment?: undefined;
+//         }
+//       | {
+//           twPayment?: undefined;
+//           foreignPayment: number;
+//         }
+//     )) => {
+//   if (twPayment) {
+//     foreignPayment = new Decimal(twPayment).div(exchangeRate).toNumber();
+//   }
+
+//   if (foreignPayment) {
+//     twPayment = new Decimal(foreignPayment).times(exchangeRate).toNumber();
+//   }
+
+//   return {
+//     exchangeRate,
+//     twPayment: twPayment as number,
+//     foreignPayment: foreignPayment as number,
+//   };
+// };
+
+const calc_twToForeign = ({
+  exchangeRate,
+  twPayment,
+}: {
+  exchangeRate: `${number}`;
+  twPayment: number | `${number}`;
+}) => {
+  return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(2).toNumber();
+};
+
+const calc_foreignToTw = ({
+  exchangeRate,
+  foreignPayment,
+}: {
+  exchangeRate: number | `${number}`;
+  foreignPayment: number | `${number}`;
+}) => {
+  return new Decimal(foreignPayment).times(exchangeRate).toDecimalPlaces(2).toNumber();
+};
+
+// const calc_exchangeRate = ({
+//   foreignPayment,
+//   twPayment,
+// }: {
+//   foreignPayment: number | `${number}`;
+//   twPayment: number | `${number}`;
+// }) => {
+//   return new Decimal(foreignPayment).div(twPayment).toNumber();
+// };
+
+const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
+  let theKeyArr = _.cloneDeep(keyArr_ori);
+
+  if (!isForeign) {
+    theKeyArr = theKeyArr.filter((key) => {
+      let pass = true;
+
+      if (
+        key === 'declarationCurrency' ||
+        key === 'declarationExchangeRate' ||
+        key === 'declarationPayment' ||
+        key === 'declarationCurrencyPayment' ||
+        key === 'receivableCurrency' ||
+        key === 'receivableExchangeRate' ||
+        key === 'receivableCurrencyPayment' ||
+        key === 'foreignFee' ||
+        key === 'foreignCurrencyFee' ||
+        key === 'exchangeBenefits'
+      ) {
+        pass = false;
+      }
+
+      return pass;
+    });
+  }
+
+  return theKeyArr;
 };
 
 // =============================================================================
@@ -973,6 +1601,20 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       isCashierSeen,
       isWorkSupervisorSeen,
       isManagerSeen,
+      //
+      //
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationCurrencyPayment,
+      declarationPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      foreignFee,
+      foreignCurrencyFee,
+      exchangeBenefits,
+      vendorName,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -1005,7 +1647,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       fee: fee || 0,
       //
       note: note ?? '',
-      vendorName: accountant.vendorName ?? '',
+      vendorName: vendorName ?? '',
 
       state_deduction: state_deduction,
       //
@@ -1013,6 +1655,18 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       isManagerSeen,
       isCashierSeen,
       isWorkSupervisorSeen,
+      //
+      //
+      declarationCurrency,
+      declarationExchangeRate,
+      declarationCurrencyPayment,
+      declarationPayment,
+      receivableCurrency,
+      receivableExchangeRate,
+      receivableCurrencyPayment,
+      foreignFee: foreignFee,
+      foreignCurrencyFee,
+      exchangeBenefits,
     };
 
     return defaultState;
@@ -1023,7 +1677,21 @@ const checkStatus = (bool: boolean | null | undefined) => {
   return bool ? 'success' : 'error';
 };
 
+// 抽出貨幣代碼 // 留著，未來可能會用到
+// type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
+// const extractCurrencyCode = (currency: Tcurrency) => {
+//   const currencyCode = currency.split(' ')[0] as Tcurrency;
+
+//   return currencyCode;
+// };
+
 // =============================================================================
 
 export default Summons;
-export { SummonsRow, keyArr, cellPropsList_summon };
+export {
+  //
+  getKeyArr,
+  keyArr_ori,
+  SummonsRow,
+  cellPropsList_summon,
+};

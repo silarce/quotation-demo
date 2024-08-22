@@ -306,6 +306,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
   const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
+  const [designUnit, setDesignUnit] = useState<TcustomerDto | undefined | null>();
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -709,6 +710,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // productsOrder: null,
       //
       isLost: state_profile.isLost,
+      //
+      designUnitId: designUnit?.id ?? null,
     };
 
     if (!body.customerId) {
@@ -965,7 +968,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const res = await apiPostCopyQuotation({
         quotationId,
         customerId,
-        isRelationQuotation: customerSelectorShow.isRelationQuotation,
+        isRelationQuotation: customerSelectorShow.isRelationQuotation || false,
       });
 
       if (res) {
@@ -1206,6 +1209,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           changeProfile('faxNumber', '');
         },
       },
+      designUnit: {
+        value: designUnit,
+        onChange: (customer) => setDesignUnit(customer),
+        onClear: () => setDesignUnit(null),
+      },
 
       isLost: {
         value: state_profile.isLost,
@@ -1320,7 +1328,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return control_profile;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state_profile]);
+  }, [state_profile, designUnit]);
 
   // ____________________________________________________________________
   // ____________________________________________________________________
@@ -2005,6 +2013,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // setEditNotes(latestContent?.editNotes ?? '');
 
     setCustomer(latestContent?.customer ?? null);
+    setDesignUnit(latestContent?.designUnit ?? null);
 
     setState_profile({
       validityPeriod: latestContent?.validityPeriod ?? '',

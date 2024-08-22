@@ -322,6 +322,7 @@ const apiGetQuotationContent_Id = async (id: string) => {
   const params = {
     populate: [
       'customer',
+      'designUnit',
       'agentEmployee',
       'supervisorEmployee',
       'managerEmployee',
@@ -1383,6 +1384,8 @@ export const useQuotationAccounting_personalContract = (
 
   const update = async () => {
     if (!params.employeeId || !params.year) {
+      setRes(undefined);
+
       return;
     }
 
@@ -1533,6 +1536,7 @@ const lookpu_contractPopulate = {
   // ],
   contract_noItem02: [
     'content.customer',
+    'content.designUnit',
     'content.agentEmployee',
     'content.supervisorEmployee',
     'content.managerEmployee',
@@ -1552,6 +1556,7 @@ const lookpu_contractPopulate = {
   ],
   forAttach: [
     'content.customer',
+    'content.designUnit',
     'content.agentEmployee',
     'content.supervisorEmployee',
     'content.managerEmployee',
@@ -1583,7 +1588,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 
   simple = [
     'contents.customer',
+    'contents.designUnit',
     'latestContent.customer',
+    'latestContent.designUnit',
     'latestContent.agentEmployee',
     'latestContent.supervisorEmployee',
     'latestContent.managerEmployee',

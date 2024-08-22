@@ -3,6 +3,7 @@
   flex-wrap: nowrap;
   // align-items: flex-end;
   // gap: 10px;
+  z-index: 5;
 
   border-bottom: solid 1px theme("colors.border");
   padding: 10px 0;
@@ -99,4 +100,15 @@
   z-index: 1;
   background-color: inherit;
   text-align: center;
+}
+
+.inputSel_select_menuPortal.plus {
+  z-index: 3;
+}
+
+.tipLabel.plus {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
 }

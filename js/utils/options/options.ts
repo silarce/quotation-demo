@@ -16,7 +16,7 @@ import iconDoorRail_sj302_90_30t from 'public/image/fakeDB/doorRail/antiTyphoon/
 import iconDoorRail_sj302_95_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg';
 import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg';
 
-import { TinvoiceType, TquotationStatus } from 'js/api/dtoTypes';
+import { TinvoiceType, TquotationStatus, Tcurrency } from 'js/api/dtoTypes';
 
 // ============================================================================
 
@@ -479,6 +479,8 @@ export const optionsCreator_deduction = ({ emptyOption }: { emptyOption?: boolea
     { value: '堆高機租用費', label: '堆高機租用費' },
     { value: '流動廁所分攤費', label: '流動廁所分攤費' },
     { value: '點工修繕費', label: '點工修繕費' },
+    { value: '欄杆拆裝', label: '欄杆拆裝' },
+    { value: '打石費用', label: '打石費用' },
   ];
 
   if (emptyOption) {
@@ -500,6 +502,18 @@ export const optionsCreator_invoiceType = ({ emptyOption }: { emptyOption?: bool
   if (emptyOption) {
     optionArr.unshift({ value: '', label: '不拘' });
   }
+
+  return optionArr;
+};
+
+export const optionsCreator_currency = (): Toption[] => {
+  const v1: Tcurrency = 'TWD 新臺幣';
+  const v2: Tcurrency = 'USD 美元';
+
+  const optionArr = [
+    { value: v1, label: v1 },
+    { value: v2, label: v2 },
+  ];
 
   return optionArr;
 };
