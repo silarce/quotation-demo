@@ -37,7 +37,7 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
-
+import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -875,42 +875,82 @@ export default function PurchaseOrderList() {
 
 
     const sentToPrint = async (ip: any) => {
-        try {
-            const conditionModel = {
-                id: purchaseorderidin,
-                type: "purchaseorder",
-                clientip: ip,
-                data: []
-            };
+        myAlert.confirm({
+            title: '確定要列印此單據嗎?',
+            content: <>
+                <h1>請確認單據是否詢價完成</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        const conditionModel = {
+                            id: purchaseorderidin,
+                            type: "purchaseorder",
+                            clientip: ip,
+                            data: []
+                        };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
 
-            const response = await fetch(`${setting.apipath}Print`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+                        console.log(JSON.stringify(inputModel));
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                        const response = await fetch(`${setting.apipath}Print`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const data = await response.text();
+                        console.log(data);
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+
+
+
+                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: data
+                        });
+
+                        if (!response2.ok) {
+                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
+                        }
+    
+                        const data2 = await response2.text();
+                        console.log("Received from print4:", data2);
+
+
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        // setIsLoading(false);
+                    }
+                }
             }
+        });
 
-        } catch (error: any) {
-            // setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
 
     };
+
 
 
     return (
@@ -1358,16 +1398,25 @@ export default function PurchaseOrderList() {
                             </div>
                         </div>
                         <div className={scss.foot_head1}>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${data2.length > 0 ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                <button style={{ display: `${data2.length > 0 ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ display: data2.length > 0 ? "" : "none" }}>
+                                {/* <span style={{ display: data2.length > 0 ? "" : "none" }}>
                                     <button className={scss.redbtn} onClick={handleTransfer} >新增進貨</button>
                                 </span>
                                 <span style={{ display: data2.length > 0 ? "none" : "" }}>
                                     <button className={scss.disabledbtn}>新增進貨</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.foot_content1}>
