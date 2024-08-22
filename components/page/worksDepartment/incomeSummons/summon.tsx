@@ -985,15 +985,22 @@ const cellPropsList_summon: TcellPropsList_summon = {
     label: '廠商名稱',
     style: { width: 150 },
     // className: 'text-center',
-    createInputSelProps: ({ state_incomeBillSerial }) => {
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
-        disabled: true,
-        showBaseline: 'invisible',
+        disabled: disabled,
+        showBaseline: 'auto',
         inputProps: {
           props: {
             // className: 'text-center',
             value: state_incomeBillSerial.vendorName,
-            disabled: true,
+            onChange: (e) => {
+              setState_incomeBillSerial((prev) => {
+                return {
+                  ...prev,
+                  vendorName: e.target.value,
+                };
+              });
+            },
           },
         },
       };
@@ -1607,6 +1614,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       foreignFee,
       foreignCurrencyFee,
       exchangeBenefits,
+      vendorName,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -1639,7 +1647,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       fee: fee || 0,
       //
       note: note ?? '',
-      vendorName: accountant.vendorName ?? '',
+      vendorName: vendorName ?? '',
 
       state_deduction: state_deduction,
       //
