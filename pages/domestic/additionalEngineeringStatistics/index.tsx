@@ -19,6 +19,8 @@ import Table, {
   Tcontrol_row,
   Tcontrol_subTotalList,
   Tcontrol_total,
+  TareaContent,
+  TareaList,
 } from 'components/page/domestic/additionalEngineeringStatistics/Table';
 
 // gaer
@@ -41,6 +43,16 @@ type Tquery = {
   regionArr: ('northern' | 'central' | 'southern' | 'eastern')[] | undefined;
   keyWord: string | undefined;
 };
+
+// type TareaContent = {
+//   areaName: string;
+//   pricesum_num: number; // 承價
+//   pricesum: string; // 承價
+// };
+
+// type TareaList = {
+//   [key: string]: TareaContent;
+// };
 
 // ==================================================================
 const yearOptionArr = optionsCreator_year();
@@ -79,8 +91,11 @@ export default function AdditionalEngineeringStatistics() {
           percentage: '',
         },
         listKeyArr: [],
+        areaList: {},
       };
     }
+
+    const areaList: TareaList = {};
 
     const rowList: {
       [key: string]: Tcontrol_row;
@@ -116,8 +131,15 @@ export default function AdditionalEngineeringStatistics() {
         totalsum,
         pricesum,
         county,
+        area,
         // percentage,
       } = item;
+
+      areaList[area || '---'] = {
+        areaName: area || '---',
+        pricesum_num: new Decimal(areaList[area || '---']?.pricesum_num ?? 0).add(pricesum || 0).toNumber(),
+        pricesum: '',
+      };
 
       const key = `${index}-${quotationnumber}`;
 
@@ -206,11 +228,17 @@ export default function AdditionalEngineeringStatistics() {
 
     const listKeyArr = Object.keys(listKeyQty);
 
+    Object.values(areaList).forEach((areaContent) => {
+      areaContent.pricesum = areaContent.pricesum_num.toLocaleString();
+    });
+
     return {
       rowArr: control_rowArr,
       subTotalList: theSubTotalList,
       total: theTotal,
       listKeyArr,
+      // areaList,
+      areaList: {}, // 待api更新
     };
   }, [data]);
 
@@ -385,7 +413,7 @@ const dlExcel = async ({
 }) => {
   data = _.cloneDeep(data);
 
-  const { listKeyArr, rowArr, subTotalList, total } = data;
+  const { listKeyArr, rowArr, subTotalList, total, areaList } = data;
 
   // ------------------------------------------------------------------
   const workbook = new ExcelJs.Workbook();
@@ -413,6 +441,7 @@ const dlExcel = async ({
 
   let row_empty: ExcelJs.Row;
 
+  const rowArr_area: ExcelJs.Row[] = [];
   let row_totalCaption: ExcelJs.Row;
   let row_total: ExcelJs.Row;
 
@@ -523,6 +552,12 @@ const dlExcel = async ({
   // row_totalCaption = sheet.addRow([]);
 
   (() => {
+    Object.values(areaList).forEach((areaContent) => {
+      rowArr_area.push(sheet.addRow(['', areaContent.areaName, areaContent.pricesum_num]));
+    });
+
+    // ________________________________________________________________
+    // ________________________________________________________________
     let {
       // percentage = '',
       pricesum = '',
@@ -536,7 +571,7 @@ const dlExcel = async ({
     // const totalsum_num = Number(totalsum.replace(/,/g, ''));
 
     row_total = sheet.addRow(['', '總承價', pricesum_num]);
-    rowArr_data.push(row_total);
+    // rowArr_data.push(row_total);
   })();
 
   // ------------------------------------------------------------------
@@ -612,13 +647,25 @@ const dlExcel = async ({
   //   horizontal: 'center',
   // };
   //
-  row_total.getCell(2).font = {
-    size: size_m,
-    bold: true,
-  };
-  row_total.getCell(2).alignment = {
-    horizontal: 'right',
-  };
+
+  [...rowArr_area, row_total].forEach((row) => {
+    row.getCell(2).font = {
+      size: size_m,
+      bold: true,
+    };
+    row.getCell(2).alignment = {
+      horizontal: 'right',
+    };
+    row.getCell(3).numFmt = '#,##0';
+  });
+
+  // row_total.getCell(2).font = {
+  //   size: size_m,
+  //   bold: true,
+  // };
+  // row_total.getCell(2).alignment = {
+  //   horizontal: 'right',
+  // };
   //
 
   reviewerRow.font = {
