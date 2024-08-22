@@ -159,7 +159,7 @@ export default function AnnualPerformanceStatistics() {
         });
         item_y.inTotal = inTotal_num.toLocaleString();
 
-        let 成長率 = '100%';
+        let 成長率 = '---';
 
         if (lastYearInTotal) {
           成長率 =
@@ -221,7 +221,7 @@ export default function AnnualPerformanceStatistics() {
       Object.values(total).forEach((content_year) => {
         const inTotal_num = Number(content_year.inTotal.replace(/,/g, ''));
 
-        let 成長率 = '100%';
+        let 成長率 = '---';
 
         if (lastYearInTotal) {
           成長率 =
@@ -503,6 +503,14 @@ const dlExcel = async ({
 
       const inTotal_num = Number(inTotal.replace(/,/g, ''));
 
+      let 成長率_num: number | string = Number(成長率.replace(/%/g, ''));
+
+      if (isNaN(成長率_num)) {
+        成長率_num = 成長率;
+      } else {
+        成長率_num = new Decimal(成長率_num).div(100).toNumber();
+      }
+
       itemArr[0] = year;
 
       new Array(12).fill(0).forEach((_, index) => {
@@ -514,7 +522,7 @@ const dlExcel = async ({
       });
 
       itemArr['13'] = inTotal_num;
-      itemArr['14'] = 成長率;
+      itemArr['14'] = 成長率_num;
       //
       colValues2DArr.push(itemArr);
 
@@ -536,6 +544,14 @@ const dlExcel = async ({
       // 3~15
       if (rowIndex >= tableStartRowIndex + 2 && rowIndex <= tableStartRowIndex + dataRowQty - 1) {
         cell.numFmt = '#,##0';
+      }
+
+      if (rowIndex === 18) {
+        cell.numFmt = '0.00%';
+        cell.alignment = {
+          ...cell.alignment,
+          horizontal: 'right',
+        };
       }
     });
     col.width = col_data_Width;
