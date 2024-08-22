@@ -473,19 +473,24 @@ const dlExcel = async ({
   rowArr_data.push(row_subTotal);
 
   // ------------------------------------------------------------------
-  row_empty = sheet.addRow([]);
-  row_totalCaption = sheet.addRow(['', '', '總牌價', '總承價', '總百分比']);
+  // row_empty = sheet.addRow([]);
+  // row_totalCaption = sheet.addRow(['', '', '總承價']);
+  // row_totalCaption = sheet.addRow([]);
 
   (() => {
-    let { percentage = '', pricesum = '', totalsum = '' } = total ?? {};
+    let {
+      // percentage = '',
+      pricesum = '',
+      // totalsum = '',
+    } = total ?? {};
 
-    percentage = percentage.replace('%', '');
-    const percentage_num = new Decimal(percentage).div(100).toNumber();
+    // percentage = percentage.replace('%', '');
+    // const percentage_num = new Decimal(percentage).div(100).toNumber();
 
     const pricesum_num = Number(pricesum.replace(/,/g, ''));
-    const totalsum_num = Number(totalsum.replace(/,/g, ''));
+    // const totalsum_num = Number(totalsum.replace(/,/g, ''));
 
-    row_total = sheet.addRow(['', '總計', totalsum_num, pricesum_num, percentage_num]);
+    row_total = sheet.addRow(['', '總承價', pricesum_num]);
     rowArr_data.push(row_total);
   })();
 
@@ -554,13 +559,13 @@ const dlExcel = async ({
     horizontal: 'right',
   };
   //
-  row_totalCaption.font = {
-    size: size_m,
-    bold: true,
-  };
-  row_totalCaption.alignment = {
-    horizontal: 'center',
-  };
+  // row_totalCaption.font = {
+  //   size: size_m,
+  //   bold: true,
+  // };
+  // row_totalCaption.alignment = {
+  //   horizontal: 'center',
+  // };
   //
   row_total.getCell(2).font = {
     size: size_m,
