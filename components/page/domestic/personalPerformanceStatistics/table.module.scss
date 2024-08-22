@@ -1,3 +1,31 @@
+$width_quotationNumber: 110px;
+$width_projectName: 200px;
+$width_group01: 480px;
+$width_builder: 147px;
+$width_designer: 147px;
+$width_total: 147px;
+$width_group02: 357px;
+$width_left: calc($width_group01 + $width_builder + $width_designer);
+
+.quotationNumber {
+  width: $width_quotationNumber;
+}
+.projectName {
+  width: $width_projectName;
+}
+.builder {
+  width: $width_builder;
+}
+.designer {
+  width: $width_designer;
+}
+.total {
+  width: $width_total;
+}
+.group02 {
+  width: $width_group02;
+}
+
 .table {
   width: fit-content;
 }
@@ -6,6 +34,7 @@
   display: flex;
   padding: 0px 30px;
   gap: 20px;
+  width: $width_group01;
   background-color: inherit;
   position: sticky;
   left: 0;
@@ -137,7 +166,8 @@
     }
     .left {
       position: sticky;
-      left: calc(-147px + -147px);
+      left: calc(0px - $width_builder - $width_designer);
+      width: $width_left;
 
       background-color: theme("colors.bgc01");
       > div {
@@ -167,6 +197,10 @@
       > span {
         margin: auto;
       }
+    }
+    &.total {
+      position: sticky;
+      left: $width_group01;
     }
   }
 }

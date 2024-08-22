@@ -65,19 +65,19 @@ export default function Table({ control }: { control: Tcontrol }) {
 const Thead = ({ listKeyArr }: { listKeyArr: string[] }) => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
-      <div className={scss.group01} style={config.group01.style}>
+      <div className={scss.group01}>
         <span>工程資訊</span>
       </div>
-      <div style={config.builder.style}>
+      <div className={scss.builder}>
         <span>營造</span>
       </div>
-      <div style={config.designer.style}>
+      <div className={scss.designer}>
         <span>設計單位</span>
       </div>
 
       {listKeyArr.map((key, index) => {
         return (
-          <div key={index} className={classNames(scss.group02)} style={config.group02.style}>
+          <div key={index} className={classNames(scss.group02)}>
             <div>
               <span>{key}</span>
             </div>
@@ -95,7 +95,7 @@ const Thead = ({ listKeyArr }: { listKeyArr: string[] }) => {
         );
       })}
 
-      <div style={config.total.style}>
+      <div className={scss.total}>
         <span>總價</span>
       </div>
     </div>
@@ -110,20 +110,26 @@ const Tbody = ({ rowArr, listKeyArr }: { rowArr: Tcontrol_row[]; listKeyArr: str
 
         return (
           <div key={index} className={classNames(scss.row)}>
-            <div className={scss.group01} style={config.group01.style}>
-              <div style={config.quotationNumber.style}>
+            {/*  */}
+            <div className={scss.group01}>
+              <div className={scss.quotationNumber}>
                 <span>編號</span>
                 <span>{quotationNumber}</span>
               </div>
-              <div>
+              <div className={scss.projectName}>
                 <span>工程名稱</span>
                 <span>{projectName}</span>
               </div>
+              {/* <div>
+                <span>業務</span>
+                <span>{'開發中'}</span>
+              </div> */}
             </div>
-            <div style={config.builder.style}>
+            {/*  */}
+            <div className={scss.builder}>
               <span>{builder}</span>
             </div>
-            <div style={config.designer.style}>
+            <div className={scss.designer}>
               <span>{designer}</span>
             </div>
             {/*  */}
@@ -131,7 +137,7 @@ const Tbody = ({ rowArr, listKeyArr }: { rowArr: Tcontrol_row[]; listKeyArr: str
               const { totalsum, pricesum, percentage } = list[key] ?? {};
 
               return (
-                <div key={index} className={classNames(scss.group02)} style={config.group02.style}>
+                <div key={index} className={classNames(scss.group02)}>
                   <div>
                     <span>{totalsum}</span>
                   </div>
@@ -146,7 +152,7 @@ const Tbody = ({ rowArr, listKeyArr }: { rowArr: Tcontrol_row[]; listKeyArr: str
             })}
 
             {/*  */}
-            <div style={config.total.style}>
+            <div className={scss.total}>
               <span>{total}</span>
             </div>
           </div>
@@ -165,15 +171,15 @@ const Footer = ({
   total: Tcontrol_total;
   listKeyArr: string[];
 }) => {
-  const { group01, builder, designer } = config;
+  // const { group01, builder, designer } = config;
 
-  const leftWidth = parseInt(group01.style.width) + parseInt(builder.style.width) + parseInt(designer.style.width);
+  // const leftWidth = parseInt(group01.style.width) + parseInt(builder.style.width) + parseInt(designer.style.width);
 
   return (
     <div className={scss.footer}>
       {/*  */}
       <div className={scss.bar01}>
-        <div className={scss.left} style={{ width: `${leftWidth}px` }}>
+        <div className={scss.left}>
           <div>
             <span>小計</span>
           </div>
@@ -183,7 +189,7 @@ const Footer = ({
           const { totalsum, pricesum, percentage } = subTotalList[key];
 
           return (
-            <div key={index} className={scss.group02} style={config.group02.style}>
+            <div key={index} className={scss.group02}>
               <div>
                 <span>{totalsum}</span>
               </div>
@@ -197,17 +203,17 @@ const Footer = ({
           );
         })}
 
-        <div style={config.total.style}></div>
+        <div className={scss.total} />
       </div>
       {/*  */}
       <div className={scss.bar02}>
-        <div className={scss.left} style={{ width: `${leftWidth}px` }}>
+        <div className={scss.left}>
           <div>
             <span>總計</span>
           </div>
         </div>
 
-        <div className={scss.group02} style={config.group02.style}>
+        <div className={classNames(scss.group02, scss.total)}>
           <div>
             <span>{total.totalsum}</span>
           </div>
@@ -226,36 +232,3 @@ const Footer = ({
 };
 
 // =======================================================================
-
-// region config
-
-type Tconfig = {
-  [key: string]: {
-    style: React.CSSProperties;
-  };
-};
-
-const config = {
-  quotationNumber: {
-    style: { width: '110px' },
-  },
-
-  group01: {
-    style: {
-      width: '465px',
-    },
-  },
-  builder: {
-    style: { width: '147px' },
-  },
-  designer: {
-    style: { width: '147px' },
-  },
-
-  total: {
-    style: { width: '147px' },
-  },
-  group02: {
-    style: { width: '357px' },
-  },
-};
