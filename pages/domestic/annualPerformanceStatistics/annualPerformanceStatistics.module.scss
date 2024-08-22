@@ -40,6 +40,7 @@
   @extend .grid;
   position: sticky;
   left: 0;
+  z-index: 1;
   border-left: 3px solid white;
   grid-auto-columns: 67px;
   background-color: theme("colors.bgc01");
@@ -61,7 +62,7 @@
   .companyName,
   .year {
     background-color: theme("colors.bgc01");
-    >span{
+    > span {
       margin-right: auto;
     }
   }

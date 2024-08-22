@@ -269,6 +269,7 @@ export default function AdditionalEngineeringStatistics() {
       label: '匯出excel',
       onClick: () => {
         dlExcel({
+          excelName: excelTitle.replaceAll('　', ''),
           data: control_table,
           title: excelTitle,
         });
