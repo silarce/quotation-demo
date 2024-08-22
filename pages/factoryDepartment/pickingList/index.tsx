@@ -1617,40 +1617,86 @@ export default function AddPurchaseRequisition() {
 
 
     const sentToPrint = async (ip: any) => {
-        try {
-            const conditionModel = {
-                id: pickinglistid,
-                type: "pickinglist",
-                clientip: ip,
-                data: []
-            };
+        myAlert.confirm({
+            title: '確定要列印此單據嗎?',
+            content: <>
+                <h1>請確認單據是否詢價完成</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    if (data2.length === 0) {
+                        myAlert.warning({ title: '目前沒有可以列印的明細' })
+                    } else {
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
 
-            const response = await fetch(`${setting.apipath}Print`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+                        try {
+                            const conditionModel = {
+                                id: pickinglistid,
+                                type: "pickinglist",
+                                clientip: ip,
+                                data: []
+                            };
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                            var inputModel = {
+                                TypeName: 'ERP',
+                                ServiceName: 'WareHouseService',
+                                FunctionName: 'no',
+                                FilterConditions: JSON.stringify(conditionModel),
+                            };
+
+                            console.log(JSON.stringify(inputModel));
+
+                            const response = await fetch(`${setting.apipath}Print`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(inputModel)
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch data');
+                            }
+                            const data = await response.text();
+                            console.log(data);
+
+                            await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+
+
+
+                            const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: data
+                            });
+
+                            if (!response2.ok) {
+                                throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
+                            }
+
+                            const data2 = await response2.text();
+                            console.log("Received from print4:", data2);
+
+
+
+                        } catch (error: any) {
+                            // setError(error.message);
+                            console.log(error.message);
+                        }
+                        finally {
+                            // setIsLoading(false);
+                        }
+
+                    }
+                }
             }
+        });
 
-        } catch (error: any) {
-            // setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
 
     };
 
