@@ -70,7 +70,8 @@ export default function IncomeSummons() {
   } = query;
 
   const month_whole = month.padStart(2, '0');
-  const isoDate = moment(`${year}-${month_whole}`).toISOString();
+  const yearMonth_m = moment(`${year}-${month_whole}`);
+  // const isoDate = yearMonth_m.toISOString();
 
   // -----------------------------------------------------------------------------
 
@@ -212,7 +213,7 @@ export default function IncomeSummons() {
 
   const reqApiPostIncomeBillSerialSettlementForm = async () => {
     return await apiPostIncomeBillSerialSettlementForm({
-      settlementDate: isoDate,
+      settlementDate: yearMonth_m.format('YYYY-MM-DD'),
     });
   };
 
