@@ -10,6 +10,9 @@ import ExcelJs, { TableProperties } from 'exceljs';
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
+// antd
+import { Select } from 'antd';
+
 // component
 import Table, {
   Tcontrol_personalPerformanceStatistics,
@@ -35,6 +38,7 @@ type Tquery = {
   year: string | undefined;
   month: string | undefined;
   region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+  regionArr: ('northern' | 'central' | 'southern' | 'eastern')[] | undefined;
   keyWord: string | undefined;
 };
 
@@ -42,6 +46,7 @@ type Tquery = {
 const yearOptionArr = optionsCreator_year();
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
+const regionOptionArr2 = optionsCreator_region();
 
 // ==================================================================
 
@@ -49,7 +54,7 @@ const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
-  const { year, month, region } = router.query as Tquery;
+  const { year, month, region, regionArr } = router.query as Tquery;
 
   // ------------------------------------------------------------------
 
@@ -280,7 +285,28 @@ export default function AdditionalEngineeringStatistics() {
     },
   ];
 
-  const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
+  const customeLeft = [
+    //
+    <SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />,
+    // <Select
+    //   key="1"
+    //   className="ml-[6px] w-[280px]"
+    //   mode="multiple"
+    //   allowClear
+    //   //
+    //   placeholder="區域，可複選"
+    //   value={regionArr}
+    //   options={regionOptionArr2}
+    //   onChange={(arr) => {
+    //     router.replace({
+    //       query: {
+    //         ...router.query,
+    //         regionArr: arr,
+    //       },
+    //     });
+    //   }}
+    // />,
+  ];
 
   const panelList: TpanelList = [
     {
