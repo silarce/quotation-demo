@@ -245,56 +245,34 @@ export default function ProductList() {
 
     //#region call api
     //取進貨單主檔
-    const getProduct = async () => {
+    const GetReview = async () => {
         try {
             // alert(checkfirstin);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel = {
+                username: userInfo?.username
             };
 
 
             var inputModel = {
                 TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
+                ServiceName: 'ReviewService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            const response = await fetch(`https://localhost:44383/Review/GetReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
 
-            // if (data.length === 0) {
-            //     myAlert.warning({
-            //         title: "查詢結果",
-            //         content: "目前沒有單據資訊可以顯示"
-            //     });
-            //     return;
-            // }
 
             setData(data);
-            setDatarestore(data);
-            setSearchdata(data);
-            setFilteredData(data);
             console.log(data);
 
-            setProductidin(data[0].productid);
-            setProductnamein(data[0].name);
-            setProductspecin(data[0].spec);
-            setProductquantityin(data[0].count);
-            setCreate_atin(data[0].create_at);
-            setUpdate_atin(data[0].create_at);
-            setCreate_byin(data[0].create_by);
-            setUnitin(data[0].unit);
-            setMaterialin(data[0].material);
-            setSurfacein(data[0].surface);
 
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -310,7 +288,7 @@ export default function ProductList() {
 
 
     useEffect(() => {
-        getProduct();
+        GetReview();
     }, []);
 
 
@@ -471,7 +449,7 @@ export default function ProductList() {
                 })
 
             setData2([]);
-            getProduct();
+            GetReview();
 
             getProdReceiptDetail(prodreceiptuuidin);
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -637,7 +615,7 @@ export default function ProductList() {
             const data = await response.json();
             // setData(data);
             await new Promise(resolve => setTimeout(resolve, 500));
-            getProduct();
+            GetReview();
             getProdReceiptDetail(prodreceiptuuidin);
             await new Promise(resolve => setTimeout(resolve, 500));
             // setStatusin(type);
@@ -755,7 +733,7 @@ export default function ProductList() {
                         // 顯示成功提示
                         myAlert.success({ title: '更新成功' })
                         setEditmain(false);
-                        getProduct();
+                        GetReview();
 
                         // 更新狀態或執行其他操作
                         console.log(result);
@@ -1019,7 +997,7 @@ export default function ProductList() {
                         // 顯示成功提示
                         myAlert.success({ title: '新增成功' })
                         // setEditmain(false);
-                        getProduct();
+                        GetReview();
                         setKeyword2('');
                         setKeyword3('');
                         setKeyword4('');

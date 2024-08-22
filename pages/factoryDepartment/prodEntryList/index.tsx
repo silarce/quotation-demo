@@ -42,7 +42,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
-
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 
 
 type Tquery = {
@@ -1558,7 +1559,7 @@ export default function ProdEntryList() {
 
                             </div>
                             <div>
-                            <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
+                                <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
@@ -1579,233 +1580,236 @@ export default function ProdEntryList() {
                                     <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     取消
                                 </button>
+                            </div>
+                            <div></div>
+                            <div>
+                                <button className={scss.squarebtn} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                            </div>
+                        </div>
+                        <div className={scss.head_body}>
+                            <div>
+                                <div className={scss.head_content1}>
+                                    <div>
+
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="入庫單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? prodentryidin : prodentryid) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
+                                                },
+                                            }}
+                                        />
 
 
+                                    </div>
+                                    <div>
+
+
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="入庫日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(prodreceiptcreate_atin)?.toString() : prodreceiptcreate_at) || ' ',
+                                                },
+                                            }}
+                                        />
+
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="入庫人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? prodreceiptcreate_byin : prodreceiptcreate_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商名稱"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliernamein ? suppliernamein : ' ',
+                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商地址"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplieraddressin ? supplieraddressin : ' ',
+                                                    onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="聯絡電話"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplierphonein ? supplierphonein : ' ',
+                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="統一編號"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="排版用"
+                                            disabled={true}
+                                            className='invisible'
+                                            inputProps={{
+                                                props: {
+                                                    value: ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="發票號碼"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: invoicein ? invoicein : ' ',
+                                                    onChange: (e) => { setInvoicein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: notein ? notein : ' ',
+                                                    onChange: (e) => { setNotein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style={{ textAlign: "right" }}>
+                                    </div>
+                                </div>
                             </div>
                             <div>
-
-                            </div>
-                            <div>
-                                {/* <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_task_close.src} alt="search" style={{ height: '30px', width: '30px' }} />
-                                </button> */}
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: statusin || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className={scss.head_content1}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? prodentryidin : prodentryid) || ' ',
-                                        },
-                                    }}
-                                />
-
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(prodreceiptcreate_atin)?.toString() : prodreceiptcreate_at) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? prodreceiptcreate_byin : prodreceiptcreate_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                            </div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: statusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <div className={scss.head_content2}>
-                            <div>
-
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: supplieraddressin ? supplieraddressin : ' ',
-                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="聯絡電話"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: supplierphonein ? supplierphonein : ' ',
-                                            onChange: (e) => { setSupplierphonein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="統一編號"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliertaxidin ? suppliertaxidin : ' ',
-                                            onChange: (e) => { setSuppliertaxidin(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="發票號碼"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: invoicein ? invoicein : ' ',
-                                            onChange: (e) => { setInvoicein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: notein ? notein : ' ',
-                                            onChange: (e) => { setNotein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: "right" }}>
-                                <span >
-                                    <button className={scss.redbtn} onClick={() => { alert("結案") }}>結案</button>
-                                </span>
-                            </div>
-                        </div>
                         <div className={scss.head_foot2}>
                             <div></div>
                             <div></div>
-                            <div>
-
-                            </div>
+                            <div></div>
                             <div></div>
                         </div>
                         <div className={scss.body_content1}>

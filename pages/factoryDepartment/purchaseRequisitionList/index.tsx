@@ -47,6 +47,7 @@ import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
+import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -952,18 +953,18 @@ export default function PurchaseRequisitionList() {
     const Print = async () => {
         try {
             setIsLoading(true);
-    
+
             const response = await fetch("http://127.0.0.1:5050/api/print/GetIP");
-    
+
             if (!response.ok) {
                 myAlert.warning({ title: '請檢查列印程式是否開啟' });
                 return;
             }
-    
+
             const data = await response.text();
             console.log(data);
             sentToPrint(data);
-    
+
         } catch (error: any) {
             const errorMessage = error.message || '未知錯誤';
             myAlert.warning({ title: '請檢查列印程式是否開啟', content: errorMessage });
@@ -971,7 +972,7 @@ export default function PurchaseRequisitionList() {
             setIsLoading(false);
         }
     };
-    
+
 
 
     const sentToPrint = async (ip: any) => {
@@ -1036,7 +1037,7 @@ export default function PurchaseRequisitionList() {
                         if (!response2.ok) {
                             throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
                         }
-    
+
                         const data2 = await response2.text();
                         console.log("Received from print4:", data2);
 
@@ -1186,119 +1187,87 @@ export default function PurchaseRequisitionList() {
                                 </button>
                             </div>
                         </div>
-                        <div className={scss.head_content1}>
-
+                        <div className={scss.head_body}>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
-                                        },
-                                    }}
-                                />
+                                <div className={scss.head_content1}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="需用日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                                    // value: checkfirstin
+                                                },
+                                            }}
+                                        />
+                                        
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+                                    <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style={{ textAlign: 'right' }}>
 
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                            // value: checkfirstin
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="需用日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: statusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="詢價進度"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: `${quotereqprogress}/${totalreqprogress}`,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="已轉採購"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: `${transpoprogress}/${totalreqprogress}`,
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
-
-                                {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
                                     <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
@@ -1317,8 +1286,48 @@ export default function PurchaseRequisitionList() {
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
                                 </span> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: statusin || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="詢價進度"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: `${quotereqprogress}/${totalreqprogress}`,
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="已轉採購"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: `${transpoprogress}/${totalreqprogress}`,
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
+
                         <div className={scss.head_foot2}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
@@ -1424,7 +1433,7 @@ export default function PurchaseRequisitionList() {
                                     新增
                                 </button>
                                 <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     新增
                                 </button>
                             </div>
