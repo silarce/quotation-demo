@@ -51,6 +51,7 @@ export default function QuotereqDetailList() {
         create_by,
         approved,
         quoterequuid,
+        quotereqid,
         need_date,
         note
     } = router.query;
@@ -95,6 +96,7 @@ export default function QuotereqDetailList() {
     const [create_atin, setCreate_atin] = useState<string>("");
     const [approvedin, setApprovedin] = useState<string>("");
     const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string);
+    const [quotereqidin, setquotereqidin] = useState<string>(quotereqid as string);
     const [purchaserequisitiondetailuuidin, setPurchaserequisitiondetailuuidin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
@@ -232,9 +234,10 @@ export default function QuotereqDetailList() {
                 setQuotereqname(data[0].name);
                 setQuotereqspec(data[0].spec);
                 setQuotereqquantity(data[0].quantity);
-                getQuotereqDetail(data[0].quoterequuid);
+                // getQuotereqDetail(data[0].quoterequuid);
                 setQuoterequnit(data[0].unit);
-                setquoterequuidin(data[0].quoterequuid)
+                setquoterequuidin(data[0].quoterequuid);
+                setquotereqidin(data[0].quotereqid);
                 setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
                 prquotereqadddata.unit = data[0].unit;
             }
@@ -373,7 +376,7 @@ export default function QuotereqDetailList() {
         try {
             // setIsLoading(true);
             const conditionModel: {
-                quoterequuid: string | undefined
+                quoterequuid: string | undefined,
             } = {
                 quoterequuid: quoterequuid as string | undefined,
             };
@@ -428,11 +431,11 @@ export default function QuotereqDetailList() {
             // setIsLoading(true);
             const conditionModel: {
                 quoterequuid: any,
-                purchaserequisitionid: any,
+                quotereqid:any,
                 data: any,
             } = {
                 quoterequuid: quoterequuidin,
-                purchaserequisitionid: purchaserequisitionidin,
+                quotereqid: quotereqidin,
                 data: prquotereqadddata
             };
 

@@ -952,34 +952,26 @@ export default function PurchaseRequisitionList() {
     const Print = async () => {
         try {
             setIsLoading(true);
-            const conditionModel = {
-
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+    
+            const response = await fetch("http://127.0.0.1:5050/api/print/GetIP");
+    
             if (!response.ok) {
-                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+                myAlert.warning({ title: '請檢查列印程式是否開啟' });
+                return;
             }
+    
             const data = await response.text();
             console.log(data);
             sentToPrint(data);
-
+    
         } catch (error: any) {
-            // setError(error.message);
-            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
-        }
-        finally {
+            const errorMessage = error.message || '未知錯誤';
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: errorMessage });
+        } finally {
             setIsLoading(false);
         }
     };
+    
 
 
     const sentToPrint = async (ip: any) => {
@@ -1005,6 +997,8 @@ export default function PurchaseRequisitionList() {
                             FilterConditions: JSON.stringify(conditionModel),
                         };
 
+                        console.log(JSON.stringify(inputModel));
+
                         const response = await fetch(`${setting.apipath}Print`, {
                             method: 'POST',
                             headers: {
@@ -1016,7 +1010,9 @@ export default function PurchaseRequisitionList() {
                         if (!response.ok) {
                             throw new Error('Failed to fetch data');
                         }
-
+                        const data = await response.text();
+                        console.log(data);
+                        
                     } catch (error: any) {
                         // setError(error.message);
                         console.log(error.message);
