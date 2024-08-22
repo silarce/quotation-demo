@@ -335,44 +335,42 @@ const Summons = forwardRef(Summons_pre);
 
 // region PROPSLIST
 
-// 舊的
 // const keyArr_ori: TconfigKey[] = [
 //   'billSerialNumber', // 收入傳票序號
-//   // 'invoiceType', //
-//   'receiveDate', // 日期
 //   'contractNumber', // 合約編號
+//   'receiveDate', // 日期
 //   'projectName', // 工程名稱
 //   'vendorName', // 廠商名稱
 //   'contractPayment', // 承攬價
 //   'periodPayment', // 本期計價
-//   'priorPeriodPayment', // 前期已收
-//   'importAccountingNumber', // 票據/匯入帳號
 //   'noteNumber', // 票據號碼
+//   'importAccountingNumber', // 票據/匯入帳號
 //   'noteMaturityDate', // 票據日期
-//   'receivablePayment', // 收款金額
-//   'deductionPayment', // 扣款金額
-//   'fee', // 匯費
-//   'unpaidPayment', // 餘額
-//   // 'difference', // 差額
 
-//   //
 //   'declarationCurrency', // 外銷 出口報單幣別
 //   'declarationExchangeRate', // 外銷 出口報單匯率
-//   'declarationPayment', // 外銷 出口報單台幣金額
 //   'declarationCurrencyPayment', // 外銷 出口報單外幣金額
+//   'declarationPayment', // 外銷 出口報單台幣金額
+
+//   'priorPeriodPayment', // 前期已收
 
 //   'receivableCurrency', // 外銷 收款幣別
 //   'receivableExchangeRate', // 外銷 收款匯率
 //   'receivableCurrencyPayment', // 外銷 收款外幣金額
+//   'receivablePayment', // w 收款金額 新臺幣
 
-//   'currencyFee', // 外銷 國外匯費
+//   'fee', // 匯費
+//   'foreignCurrencyFee', // 外銷 國外匯費_外幣
+//   'foreignFee', // 外銷 國外匯費_新台幣
+
 //   'exchangeBenefits', // 外銷 兌換利益
-//   //
+
+//   'deductionPayment', // 扣款金額
+//   'unpaidPayment', // 餘額
 //   'note', // 備註
 // ];
 
-// 欄位順序要跟工務部討論
-const keyArr_ori: TconfigKey[] = [
+const keyArr_domain: TconfigKey[] = [
   'billSerialNumber', // 收入傳票序號
   'contractNumber', // 合約編號
   'receiveDate', // 日期
@@ -383,6 +381,23 @@ const keyArr_ori: TconfigKey[] = [
   'noteNumber', // 票據號碼
   'importAccountingNumber', // 票據/匯入帳號
   'noteMaturityDate', // 票據日期
+
+  'priorPeriodPayment', // 前期已收
+
+  'receivablePayment', // w 收款金額 新臺幣
+
+  'fee', // 匯費
+
+  'deductionPayment', // 扣款金額
+  'unpaidPayment', // 餘額
+  'note', // 備註
+];
+
+const keyArr_foreign: TconfigKey[] = [
+  'billSerialNumber', // 收入傳票序號
+  'receiveDate', // 日期
+  'contractNumber', // 合約編號
+  'vendorName', // 廠商名稱
 
   'declarationCurrency', // 外銷 出口報單幣別
   'declarationExchangeRate', // 外銷 出口報單匯率
@@ -397,13 +412,11 @@ const keyArr_ori: TconfigKey[] = [
   'receivablePayment', // w 收款金額 新臺幣
 
   'fee', // 匯費
+
   'foreignCurrencyFee', // 外銷 國外匯費_外幣
   'foreignFee', // 外銷 國外匯費_新台幣
 
   'exchangeBenefits', // 外銷 兌換利益
-
-  'deductionPayment', // 扣款金額
-  'unpaidPayment', // 餘額
   'note', // 備註
 ];
 
@@ -1541,32 +1554,10 @@ const calc_foreignToTw = ({
 // };
 
 const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
-  let theKeyArr = _.cloneDeep(keyArr_ori);
+  let keyArr: TconfigKey[] = keyArr_domain;
+  isForeign && (keyArr = keyArr_foreign);
 
-  if (!isForeign) {
-    theKeyArr = theKeyArr.filter((key) => {
-      let pass = true;
-
-      if (
-        key === 'declarationCurrency' ||
-        key === 'declarationExchangeRate' ||
-        key === 'declarationPayment' ||
-        key === 'declarationCurrencyPayment' ||
-        key === 'receivableCurrency' ||
-        key === 'receivableExchangeRate' ||
-        key === 'receivableCurrencyPayment' ||
-        key === 'foreignFee' ||
-        key === 'foreignCurrencyFee' ||
-        key === 'exchangeBenefits'
-      ) {
-        pass = false;
-      }
-
-      return pass;
-    });
-  }
-
-  return theKeyArr;
+  return keyArr;
 };
 
 // =============================================================================
@@ -1691,7 +1682,6 @@ export default Summons;
 export {
   //
   getKeyArr,
-  keyArr_ori,
   SummonsRow,
   cellPropsList_summon,
 };
