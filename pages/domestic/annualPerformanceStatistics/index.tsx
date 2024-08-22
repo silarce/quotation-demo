@@ -103,7 +103,11 @@ export default function AnnualPerformanceStatistics() {
       return {};
     }
 
-    const list: Partial<Tlist> = {};
+    const list: Partial<Tlist> = {
+      Taichung: {},
+      Taipei: {},
+    };
+
     data.forEach((data) => {
       const { totalsum, company_location } = data;
 
