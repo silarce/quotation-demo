@@ -2421,7 +2421,7 @@ export type TcontractAccountingReportFormDto = {
 // 追加減工程統計表
 export type TquotationAccounting_modifyContract = {
   projectname: string;
-  quotationnumber: string;
+  quotationnumber: string | null;
   quotetype: string;
   year: number;
   month: number;

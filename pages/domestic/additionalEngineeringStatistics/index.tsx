@@ -100,7 +100,7 @@ export default function AdditionalEngineeringStatistics() {
     //
     //
     //
-    data.forEach((item) => {
+    data.forEach((item, index) => {
       const {
         //
         projectname,
@@ -113,6 +113,8 @@ export default function AdditionalEngineeringStatistics() {
         county,
         // percentage,
       } = item;
+
+      const key = `${index}-${quotationnumber}`;
 
       let { quotetype, percentage } = item;
 
@@ -142,19 +144,36 @@ export default function AdditionalEngineeringStatistics() {
       total.pricesum = new Decimal(total.pricesum).add(pricesum).toNumber();
       total.percentage = new Decimal(total.percentage).add(percentage).toNumber();
 
-      if (!rowList[quotationnumber]) {
-        rowList[quotationnumber] = {
-          quotationNumber: quotationnumber,
+      // 原本quotationnumber是唯一且不可為null的值
+      // 但是某天quotationnumber可null了，所以改用key處理rowList的索引
+      // 還好原本就沒有用quotationnumber找到特定資料的處理，所以key可以是任意唯一值
+      if (!rowList[key]) {
+        rowList[key] = {
+          quotationNumber: quotationnumber ?? '---',
           projectName: projectname,
           list: {},
         };
       }
 
-      rowList[quotationnumber].list[quotetype] = {
+      rowList[key].list[quotetype] = {
         totalsum: Number(totalsum).toLocaleString(),
         pricesum: Number(pricesum).toLocaleString(),
         percentage: `${percentage}%`,
       };
+
+      // if (!rowList[quotationnumber]) {
+      //   rowList[quotationnumber] = {
+      //     quotationNumber: quotationnumber,
+      //     projectName: projectname,
+      //     list: {},
+      //   };
+      // }
+
+      // rowList[quotationnumber].list[quotetype] = {
+      //   totalsum: Number(totalsum).toLocaleString(),
+      //   pricesum: Number(pricesum).toLocaleString(),
+      //   percentage: `${percentage}%`,
+      // };
     }); // data.forEach
     //
     const control_rowArr: Tcontrol_row[] = Object.values(rowList).map((item) => {
@@ -608,6 +627,7 @@ const dlExcel = async ({
 
       cell.alignment = {
         ...cell.alignment,
+        wrapText: true,
         vertical: 'middle',
       };
 
