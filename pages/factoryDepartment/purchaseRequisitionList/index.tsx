@@ -1012,7 +1012,36 @@ export default function PurchaseRequisitionList() {
                         }
                         const data = await response.text();
                         console.log(data);
-                        
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        const jsonData = JSON.stringify({
+                            data: data,
+                            type: "purchaserequisition"
+                        });
+
+
+
+
+
+
+                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: data
+                        });
+
+                        if (!response2.ok) {
+                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
+                        }
+    
+                        const data2 = await response2.text();
+                        console.log("Received from print4:", data2);
+
+
+
                     } catch (error: any) {
                         // setError(error.message);
                         console.log(error.message);
@@ -1394,7 +1423,7 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     新增
                                 </button>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
                                     <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     新增
                                 </button>
