@@ -161,6 +161,7 @@ export default function IncomeSummons() {
       foreignFee,
       foreignCurrencyFee,
       exchangeBenefits,
+      vendorName,
     } = state_incomeBillSerial;
 
     const incomeBillDeduction = state_deduction.map((item) => {
@@ -202,6 +203,8 @@ export default function IncomeSummons() {
       foreignFee: foreignFee,
       foreignCurrencyFee,
       exchangeBenefits,
+      //
+      vendorName,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);

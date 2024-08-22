@@ -2,6 +2,7 @@ import { useEffect, useMemo, Fragment } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import ExcelJs, { TableProperties } from 'exceljs';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -25,20 +26,21 @@ type Tlist = {
     [year: string]: {
       companyName: string;
       year: string; // totalSum
-      '1': string; // totalSum
-      '2': string; // totalSum
-      '3': string; // totalSum
-      '4': string; // totalSum
-      '5': string; // totalSum
-      '6': string; // totalSum
-      '7': string; // totalSum
-      '8': string; // totalSum
-      '9': string; // totalSum
-      '10': string; // totalSum
-      '11': string; // totalSum
-      '12': string; // totalSum
+      '1'?: string | undefined; // totalSum
+      '2'?: string | undefined; // totalSum
+      '3'?: string | undefined; // totalSum
+      '4'?: string | undefined; // totalSum
+      '5'?: string | undefined; // totalSum
+      '6'?: string | undefined; // totalSum
+      '7'?: string | undefined; // totalSum
+      '8'?: string | undefined; // totalSum
+      '9'?: string | undefined; // totalSum
+      '10'?: string | undefined; // totalSum
+      '11'?: string | undefined; // totalSum
+      '12'?: string | undefined; // totalSum
       inTotal: string; // 總合計
-      成長率: string;
+      成長率: string; // 成長率 =  (今年 - 去年) / 去年
+
       // noMonth: string; // totalSum
     };
   };
@@ -46,6 +48,14 @@ type Tlist = {
 
 type TcompanyNameLookup = {
   [key: string]: string | undefined;
+};
+
+type TlocationDir = {
+  [company_location: string]: {
+    key: string;
+    name: string;
+    cellQty: number;
+  };
 };
 
 // --------------------------------------------------------------------
@@ -89,6 +99,7 @@ const monthArr = [
 const companyNameLookup: TcompanyNameLookup = {
   Taichung: '台中總公司',
   Taipei: '台北分公司',
+  total: '總合計',
 };
 
 // --------------------------------------------------------------------
@@ -103,7 +114,11 @@ export default function AnnualPerformanceStatistics() {
       return {};
     }
 
-    const list: Partial<Tlist> = {};
+    const list: Partial<Tlist> = {
+      Taichung: {},
+      Taipei: {},
+    };
+
     data.forEach((data) => {
       const { totalsum, company_location } = data;
 
@@ -129,19 +144,6 @@ export default function AnnualPerformanceStatistics() {
       list[company_location]![year].companyName = companyNameLookup[company_location] ?? '查無分公司';
 
       list[company_location]![year][month] = totalsum;
-
-      // 統計表給的不一定齊全，可能沒有12月，而且12月在陣列中也不見得會在1月後面
-      // 所以這個部份不能用
-      // if (month === '12') {
-      //   let inTotal = 0;
-      //   monthArr.forEach((month) => {
-      //     const totalSum = Number(list[company_location]![year][month]);
-      //     inTotal += totalSum;
-      //     list[company_location]![year][month] = totalSum.toLocaleString();
-      //   });
-      //   list[company_location]![year].inTotal = inTotal.toLocaleString();
-      //   list[company_location]![year].成長率 = '成長率';
-      // }
     });
 
     Object.values(list).forEach((item_c) => {
@@ -149,26 +151,119 @@ export default function AnnualPerformanceStatistics() {
         return;
       }
 
+      let lastYearInTotal: number | null = null;
+
       Object.values(item_c).forEach((item_y) => {
-        let inTotal = 0;
+        let inTotal_num = 0;
 
         const keyArr = Object.keys(item_y) as (keyof typeof item_y)[];
+
         keyArr.forEach((key) => {
           if (Number(key) >= 1) {
             const value_num = Number(item_y[key]);
-            inTotal += value_num;
+            inTotal_num += value_num;
             item_y[key] = value_num.toLocaleString();
           }
         });
-        item_y.inTotal = inTotal.toLocaleString();
-        item_y.成長率 = '---';
+        item_y.inTotal = inTotal_num.toLocaleString();
+
+        let 成長率 = '---';
+
+        if (lastYearInTotal) {
+          成長率 =
+            new Decimal(inTotal_num)
+              .minus(lastYearInTotal)
+              .div(lastYearInTotal)
+              .mul(100)
+              .toDecimalPlaces(2)
+              .toString() + '%';
+        }
+
+        item_y.成長率 = 成長率;
+        lastYearInTotal = Number(item_y.inTotal.replace(/,/g, ''));
       });
     });
+
+    // 以後再考慮優化
+
+    const total: Tlist[string] = {};
+
+    Object.values(list).forEach((company_location) => {
+      const company = company_location!;
+
+      const yearEntries = Object.entries(company);
+
+      yearEntries.forEach(([key_year, content_year]) => {
+        if (!total[key_year]) {
+          total[key_year] = {
+            year: content_year.year,
+            // 不可以放入月份資料與inTotal，會重複計算
+            inTotal: '0',
+            companyName: '總合計',
+            成長率: '---',
+          };
+        }
+
+        (['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'inTotal'] as const)
+          //
+          .forEach((key) => {
+            let a = total[key_year][key] || '0';
+            let b = content_year[key] || '0';
+            a = a.replace(/,/g, '');
+            b = b.replace(/,/g, '');
+
+            const c = new Decimal(a).add(b).toNumber() || undefined;
+
+            if (key === 'inTotal') {
+              total[key_year][key] = c?.toLocaleString() || '0';
+            } else {
+              total[key_year][key] = c?.toLocaleString();
+            }
+          });
+      }); // yearEntries.forEach
+    }); // Object.values(list).forEach
+
+    (() => {
+      let lastYearInTotal: number | null = null;
+
+      Object.values(total).forEach((content_year) => {
+        const inTotal_num = Number(content_year.inTotal.replace(/,/g, ''));
+
+        let 成長率 = '---';
+
+        if (lastYearInTotal) {
+          成長率 =
+            new Decimal(inTotal_num)
+              .minus(lastYearInTotal)
+              .div(lastYearInTotal)
+              .mul(100)
+              .toDecimalPlaces(2)
+              .toString() + '%';
+        }
+
+        content_year.成長率 = 成長率;
+
+        lastYearInTotal = inTotal_num;
+      });
+    })();
+
+    list.total = total;
 
     return list as Tlist;
   }, [data]);
 
   // --------------------------------------------------------------------
+  const excelName = (() => {
+    const thisYear = new Date().getFullYear() - 1911;
+    let thisYear_str = thisYear.toString();
+    thisYear_str = thisYear_str
+      .split('')
+      .map((letter) => cnNums[Number(letter)])
+      .join('');
+
+    return `${thisYear_str}年業績統計表`;
+  })();
+
   const panelList: TpanelList = [
     {
       type: 'myButton',
@@ -176,7 +271,7 @@ export default function AnnualPerformanceStatistics() {
       onClick: () =>
         dlExcel({
           list,
-          excelName: 'foo',
+          excelName: excelName,
         }),
     },
     // {
@@ -284,17 +379,13 @@ export default function AnnualPerformanceStatistics() {
   );
 }
 
-// MARK: EDN
-
+// MARK: END
+// ===============================================================
+// ===============================================================
+// ===============================================================
 // ===============================================================
 
-type TlocationDir = {
-  [company_location: string]: {
-    key: string;
-    name: string;
-    cellQty: number;
-  };
-};
+// MARK: dlExcel
 
 const dlExcel = async ({
   //
@@ -428,6 +519,14 @@ const dlExcel = async ({
 
       const inTotal_num = Number(inTotal.replace(/,/g, ''));
 
+      let 成長率_num: number | string = Number(成長率.replace(/%/g, ''));
+
+      if (isNaN(成長率_num)) {
+        成長率_num = 成長率;
+      } else {
+        成長率_num = new Decimal(成長率_num).div(100).toNumber();
+      }
+
       itemArr[0] = year;
 
       new Array(12).fill(0).forEach((_, index) => {
@@ -439,7 +538,7 @@ const dlExcel = async ({
       });
 
       itemArr['13'] = inTotal_num;
-      itemArr['14'] = 成長率;
+      itemArr['14'] = 成長率_num;
       //
       colValues2DArr.push(itemArr);
 
@@ -461,6 +560,14 @@ const dlExcel = async ({
       // 3~15
       if (rowIndex >= tableStartRowIndex + 2 && rowIndex <= tableStartRowIndex + dataRowQty - 1) {
         cell.numFmt = '#,##0';
+      }
+
+      if (rowIndex === 18) {
+        cell.numFmt = '0.00%';
+        cell.alignment = {
+          ...cell.alignment,
+          horizontal: 'right',
+        };
       }
     });
     col.width = col_data_Width;

@@ -2390,8 +2390,8 @@ export type TquotationAccouting_area = {
   year: number;
   month: number;
   county: string;
-  totalsum: string; // 牌價複價
-  pricesum: string; // 單價複價
+  totalsum: string; // 牌價
+  pricesum: string; // 承包價
   percentage: number | null; // 百分比
 };
 
@@ -3768,6 +3768,9 @@ export type TincomeBillSerialDto = {
 
   // '兌換利益'
   exchangeBenefits: string | null;
+
+  //
+  vendorName: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3807,6 +3810,8 @@ export type TupdateIncomeBillSerialDto = Pick<
   foreignFee: string | null;
   foreignCurrencyFee: string | null;
   exchangeBenefits: string | null;
+} & {
+  vendorName?: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {
