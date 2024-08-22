@@ -551,6 +551,7 @@ export default function AddPurchaseRequisition() {
             const newEntry = {
                 id: handinputproductuuid,
                 productid: handinputproductid,
+                productuuid:handinputproductuuid,
                 name: handinputname,
                 spec: handinputspec,
                 quantity: handinputquantity,
