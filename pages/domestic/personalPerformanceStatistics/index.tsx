@@ -61,6 +61,8 @@ const empParams: Tparams = {
   },
 };
 
+const inValidSymbol = '---';
+
 // ==================================================================
 
 // MARK: START
@@ -137,7 +139,7 @@ export default function PersonalPerformanceStatistics() {
 
     const optionArr = empArr.map((emp) => {
       return {
-        label: emp.chName || emp.enName || '---',
+        label: emp.chName || emp.enName || inValidSymbol,
         value: emp.id,
       };
     });
@@ -156,8 +158,8 @@ export default function PersonalPerformanceStatistics() {
   const { bonus, sales } = useMemo(() => {
     if (!data_bonus) {
       return {
-        bonus: '---',
-        sales: '---',
+        bonus: inValidSymbol,
+        sales: inValidSymbol,
       };
     }
 
@@ -355,10 +357,10 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
     const total = {
       totalsum: 0,
       pricesum: 0,
-      percentage: 0,
+      // percentage: 0,
     };
 
-    const listKeyQty: { [key: string]: number } = {};
+    const listKeyList: { [key: string]: string } = {};
 
     data.forEach((item) => {
       const {
@@ -389,12 +391,11 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
         };
       }
 
-      if (listKeyQty[quotetype] === undefined) {
-        listKeyQty[quotetype] = 0;
+      if (listKeyList[quotetype] === undefined) {
+        listKeyList[quotetype] = quotetype;
       }
 
       if (isValid) {
-        listKeyQty[quotetype] = listKeyQty[quotetype] + 1;
         subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
         subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
         subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
@@ -403,7 +404,6 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
         total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
         total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
-        total.percentage = new Decimal(total.percentage).add(percentage ?? 0).toNumber();
       }
 
       if (!list[quotationnumber]) {
@@ -419,9 +419,9 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
       // 格子裡的文字
       list[quotationnumber].list[quotetype] = {
-        totalsum: isValid ? Number(totalSum).toLocaleString() : 'n/a',
-        pricesum: isValid ? Number(priceSum).toLocaleString() : 'n/a',
-        percentage: isValid ? `${percentage}%` : 'n/a',
+        totalsum: isValid ? Number(totalSum).toLocaleString() : inValidSymbol,
+        pricesum: isValid ? Number(priceSum).toLocaleString() : inValidSymbol,
+        percentage: isValid ? `${percentage}%` : inValidSymbol,
       };
 
       if (isValid) {
@@ -440,36 +440,27 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
     const theSubTotalList: Tcontrol_subTotalList = {};
 
     Object.keys(subTotalList).forEach((key) => {
-      const isValid = !!listKeyQty[key];
+      const percent = new Decimal(subTotalList[key].pricesum)
+        .div(subTotalList[key].totalsum)
+        .mul(100)
+        .toDecimalPlaces(2)
+        .toNumber();
 
-      if (isValid) {
-        const percent = new Decimal(subTotalList[key].percentage).div(listKeyQty[key]).toDecimalPlaces(2).toNumber();
-
-        theSubTotalList[key] = {
-          ...subTotalList[key],
-          totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
-          pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
-          percentage: `${percent}%`,
-        };
-      } else {
-        theSubTotalList[key] = {
-          ...subTotalList[key],
-          totalsum: 'n/a',
-          pricesum: 'n/a',
-          percentage: `n/a`,
-        };
-      }
+      theSubTotalList[key] = {
+        ...subTotalList[key],
+        totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
+        pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
+        percentage: isNaN(percent) ? inValidSymbol : `${percent}%`,
+      };
     });
-
-    const validDataQty = data.filter((item) => typeof item.percentage === 'number').length;
 
     const theTotal = {
       totalsum: Number(total.totalsum).toLocaleString(),
       pricesum: Number(total.pricesum).toLocaleString(),
-      percentage: `${new Decimal(total.percentage).div(validDataQty).toDecimalPlaces(2).toNumber()}%`,
+      percentage: new Decimal(total.pricesum).div(total.totalsum).mul(100).toDecimalPlaces(2).toString() + '%',
     };
 
-    const listKeyArr = Object.keys(listKeyQty);
+    const listKeyArr = Object.keys(listKeyList);
 
     return {
       rowArr: control_rowArr,
@@ -766,19 +757,19 @@ const createTable = ({
       return [];
     }
 
-    let totalsum: string | number = list[column.key]?.totalsum || 'n/a';
-    let pricesum: string | number = list[column.key]?.pricesum || 'n/a';
-    let percentage: string | number = list[column.key]?.percentage || 'n/a';
+    let totalsum: string | number = list[column.key]?.totalsum || inValidSymbol;
+    let pricesum: string | number = list[column.key]?.pricesum || inValidSymbol;
+    let percentage: string | number = list[column.key]?.percentage || inValidSymbol;
 
-    if (totalsum !== 'n/a') {
+    if (totalsum !== inValidSymbol) {
       totalsum = Number(totalsum.replaceAll(',', ''));
     }
 
-    if (pricesum !== 'n/a') {
+    if (pricesum !== inValidSymbol) {
       pricesum = Number(pricesum.replaceAll(',', ''));
     }
 
-    if (percentage !== 'n/a') {
+    if (percentage !== inValidSymbol) {
       // percentage = Number(percentage.replace('%', ''));
       percentage = percentage.replace('%', '');
       percentage = new Decimal(percentage).div(100).toNumber();
@@ -788,19 +779,19 @@ const createTable = ({
   });
 
   const lastRow = (() => {
-    let totalsum: string | number = subTotal.totalsum || 'n/a';
-    let pricesum: string | number = subTotal.pricesum || 'n/a';
-    let percentage: string | number = subTotal.percentage || 'n/a';
+    let totalsum: string | number = subTotal.totalsum || inValidSymbol;
+    let pricesum: string | number = subTotal.pricesum || inValidSymbol;
+    let percentage: string | number = subTotal.percentage || inValidSymbol;
 
-    if (totalsum !== 'n/a') {
+    if (totalsum !== inValidSymbol) {
       totalsum = Number(totalsum.replaceAll(',', ''));
     }
 
-    if (pricesum !== 'n/a') {
+    if (pricesum !== inValidSymbol) {
       pricesum = Number(pricesum.replaceAll(',', ''));
     }
 
-    if (percentage !== 'n/a') {
+    if (percentage !== inValidSymbol) {
       // percentage = Number(percentage.replace('%', ''));
       percentage = percentage.replace('%', '');
       percentage = new Decimal(percentage).div(100).toNumber();
