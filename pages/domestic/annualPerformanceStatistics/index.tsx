@@ -50,6 +50,14 @@ type TcompanyNameLookup = {
   [key: string]: string | undefined;
 };
 
+type TlocationDir = {
+  [company_location: string]: {
+    key: string;
+    name: string;
+    cellQty: number;
+  };
+};
+
 // --------------------------------------------------------------------
 
 // 會收到的資料結構
@@ -245,6 +253,17 @@ export default function AnnualPerformanceStatistics() {
   }, [data]);
 
   // --------------------------------------------------------------------
+  const excelName = (() => {
+    const thisYear = new Date().getFullYear() - 1911;
+    let thisYear_str = thisYear.toString();
+    thisYear_str = thisYear_str
+      .split('')
+      .map((letter) => cnNums[Number(letter)])
+      .join('');
+
+    return `${thisYear_str}年業績統計表`;
+  })();
+
   const panelList: TpanelList = [
     {
       type: 'myButton',
@@ -252,7 +271,7 @@ export default function AnnualPerformanceStatistics() {
       onClick: () =>
         dlExcel({
           list,
-          excelName: 'foo',
+          excelName: excelName,
         }),
     },
     // {
@@ -362,14 +381,11 @@ export default function AnnualPerformanceStatistics() {
 
 // MARK: END
 // ===============================================================
+// ===============================================================
+// ===============================================================
+// ===============================================================
 
-type TlocationDir = {
-  [company_location: string]: {
-    key: string;
-    name: string;
-    cellQty: number;
-  };
-};
+// MARK: dlExcel
 
 const dlExcel = async ({
   //
