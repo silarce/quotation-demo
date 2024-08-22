@@ -327,6 +327,8 @@ const lookup_region: { [key: string]: string | undefined } = {
   all: '全區',
 };
 
+// MARK: dlExcel
+
 const dlExcel = async ({
   excelName = 'fooo',
   data,
@@ -349,6 +351,14 @@ const dlExcel = async ({
     paperSize: 9,
   };
 
+  // ------------------------------------------------------------------
+
+  const width_A = 6;
+  const width_B = 20;
+  const width_data = 10;
+  const width_percent = 9;
+
+  // ------------------------------------------------------------------
   let row_title: ExcelJs.Row;
   let row_subTitle: ExcelJs.Row;
   let row_caption: ExcelJs.Row;
@@ -363,10 +373,23 @@ const dlExcel = async ({
 
   let reviewerRow: ExcelJs.Row;
 
+  let col_A = sheet.getColumn(1);
+  let col_B = sheet.getColumn(2);
+
   // ------------------------------------------------------------------
 
-  sheet.getColumn(1).width = 20;
-  sheet.getColumn(2).width = 40;
+  col_A.width = width_A;
+  col_B.width = width_B;
+
+  col_A.alignment = {
+    wrapText: true,
+  };
+  col_B.alignment = {
+    wrapText: true,
+  };
+
+  const mergeLetter01 = 'A';
+  const mergeLetter02 = 'N';
 
   // ------------------------------------------------------------------
 
@@ -398,7 +421,7 @@ const dlExcel = async ({
 
     let values_subCaption = row_subCaption.values as ExcelJs.CellValue[];
     values_subCaption.shift();
-    values_subCaption = [...values_subCaption, '牌價', '承價', '百分比'];
+    values_subCaption = [...values_subCaption, '牌價', '承價', '%'];
     row_subCaption.values = values_subCaption;
   });
 
@@ -472,7 +495,7 @@ const dlExcel = async ({
 
   reviewerRow = sheet.addRow([]);
   reviewerRow.values = ['　　　總經理 : 　　　　　　　　主管: 　　　　　　　　製表: 　　　　　　　　'];
-  sheet.mergeCells(reviewerRow.getCell(1).address, reviewerRow.getCell(5).address);
+
   // ------------------------------------------------------------------
 
   // 樣式調整
@@ -489,8 +512,12 @@ const dlExcel = async ({
     bold: true,
   };
   row_title.alignment = {
+    horizontal: 'center',
     vertical: 'middle',
   };
+
+  sheet.mergeCells(`${mergeLetter01}1:${mergeLetter02}1`);
+
   //
   row_subTitle.height = height_total;
   row_subTitle.font = {
@@ -498,9 +525,10 @@ const dlExcel = async ({
     bold: true,
   };
   row_subTitle.alignment = {
+    horizontal: 'center',
     vertical: 'middle',
   };
-
+  sheet.mergeCells(`${mergeLetter01}2:${mergeLetter02}2`);
   //
   row_caption.font = {
     size: size_m,
@@ -542,10 +570,16 @@ const dlExcel = async ({
     horizontal: 'right',
   };
   //
+
   reviewerRow.font = {
     size: size_m,
     bold: true,
   };
+  reviewerRow.getCell(1).alignment.wrapText = false;
+  reviewerRow.getCell(2).alignment.wrapText = false;
+  const reviewerRowNumber = reviewerRow.number;
+  sheet.mergeCells(`${mergeLetter01 + reviewerRowNumber}:${mergeLetter02 + reviewerRowNumber}`);
+
   //
   sheet.columns.forEach((col, index) => {
     index = index + 1;
@@ -554,12 +588,23 @@ const dlExcel = async ({
       return;
     }
 
-    col.width = 15;
+    const count = index - 2;
+
+    col.width = width_data;
+
+    if (count % 3 === 0) {
+      col.width = width_percent;
+    }
   });
 
   rowArr_data.forEach((row) => {
     row.eachCell((cell, index) => {
       index = index + 1;
+
+      cell.alignment = {
+        ...cell.alignment,
+        vertical: 'middle',
+      };
 
       if (index <= 2) {
         return;
