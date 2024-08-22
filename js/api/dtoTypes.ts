@@ -3768,6 +3768,9 @@ export type TincomeBillSerialDto = {
 
   // '兌換利益'
   exchangeBenefits: string | null;
+
+  //
+  vendorName: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3807,6 +3810,8 @@ export type TupdateIncomeBillSerialDto = Pick<
   foreignFee: string | null;
   foreignCurrencyFee: string | null;
   exchangeBenefits: string | null;
+} & {
+  vendorName?: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {
