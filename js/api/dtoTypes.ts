@@ -2429,6 +2429,7 @@ export type TquotationAccounting_modifyContract = {
   pricesum: `${number}`;
   county: string;
   percentage: number | null;
+  area: string | null; // property的key為推測，待後端更新後要與後端同步
 };
 
 // ========================================================================
