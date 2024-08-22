@@ -8,6 +8,7 @@ import icon_domestic from 'public/image/icon/domestic.svg';
 import icon_foreign from 'public/image/icon/foreign.svg';
 import icon_project from 'public/image/icon/project.svg';
 import icon_warehouse from 'public/image/icon/warehouse.svg';
+import icon_shareform from 'public/image/icon/sharedform.svg';
 
 type ErpFeaturesValues = (typeof erpFeaturesLookup)[keyof typeof erpFeaturesLookup];
 
@@ -92,6 +93,7 @@ const erpFeaturesLookup = {
   worksDepartment_worksheet: '工務部-工作表編輯',
   worksDepartment_deliveryList: '工務部-出庫單編輯',
   incomeBill: '收入傳票',
+  fac:'廠務部'
 } as const;
 
 // key:value逆轉版本的erpFeaturesLookup
@@ -116,6 +118,7 @@ const {
   worksDepartment_worksheet,
   worksDepartment_deliveryList,
   incomeBill,
+  fac
 } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
@@ -670,7 +673,7 @@ const sidePathList: TsidePathList = {
             {
               label: '請購申請',
               path: path01 + '/addPurchaseRequisition',
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '請購管理',
@@ -690,7 +693,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'purchaseRequisitionList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '採購管理',
@@ -710,7 +713,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'purchaseOrderList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '進貨管理',
@@ -728,7 +731,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'prodReceiptList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '領料管理',
@@ -746,7 +749,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'prodReceiptList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
           ],
         },
@@ -775,7 +778,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'WareHouse',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
 
             {
@@ -794,7 +797,7 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'prodEntryList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '物料維護',
@@ -802,29 +805,31 @@ const sidePathList: TsidePathList = {
               query: {
                 type: 'productList',
               },
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
           ],
         },
         // {
-        //   label: '領料',
+        //   label: '單據審核',
         //   erpFeature: devPass,
         //   list: [
-        //     // {
-        //     //   label: '領料查詢',
-        //     //   path: path01 + '/getMaterial/pickingList',
-        //     //   erpFeature: devPass,
-        //     // },
         //     {
-        //       label: '物料查詢',
-        //       path: path01 + '/getMaterial/materialList',
+        //       label: '簽核清單',
+        //       path: path01 + '/reviewList',
+        //       activeChecker: ({ router }) => {
+        //         const { pathname, query } = router;
+
+        //         if (pathname === '/factoryDepartment/reviewList') {
+        //           return true;
+        //         }
+
+        //         return false;
+        //       },
+        //       query: {
+        //         type: 'WareHouse',
+        //       },
         //       erpFeature: devPass,
         //     },
-        //     // {
-        //     //   label: '新增領料單',
-        //     //   path: path01 + '/getMaterial/addPickingList',
-        //     //   erpFeature: devPass,
-        //     // },
         //   ],
         // },
       ],
@@ -936,8 +941,20 @@ const topPathList: TtopPathListConfig[] = [
         type: 'WareHouse',
       },
     },
-    erpFeature: devPass,
+    erpFeature: [fac],
   },
+  // {
+  //   icon: icon_shareform,
+  //   label: '單據管理',
+  //   path01: sidePathList['/factoryDepartment'].path01,
+  //   href: {
+  //     pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
+  //     query: {
+  //       type: 'WareHouse',
+  //     },
+  //   },
+  //   erpFeature: devPass,
+  // },
 ];
 
 export default sidePathList;
