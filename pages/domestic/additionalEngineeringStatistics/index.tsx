@@ -442,8 +442,8 @@ const dlExcel = async ({
 
   // ------------------------------------------------------------------
 
-  const width_A = 6;
-  const width_B = 20;
+  const width_A = 8;
+  const width_B = 18;
   const width_data = 10;
   const width_percent = 9;
 
@@ -638,6 +638,12 @@ const dlExcel = async ({
   row_caption.alignment = {
     horizontal: 'center',
   };
+
+  row_caption.getCell(1).alignment = {
+    ...row_caption.getCell(1).alignment,
+    wrapText: true,
+  };
+
   //
   row_subCaption.font = {
     size: size_m,
