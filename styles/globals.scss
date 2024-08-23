@@ -22,6 +22,9 @@
   img {
     @apply inline-block;
   }
+  svg {
+    vertical-align: unset;
+  }
 }
 // 變量字體，有些瀏覽器或舊版瀏覽器不支援
 // @font-face {
