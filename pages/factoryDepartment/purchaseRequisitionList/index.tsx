@@ -149,7 +149,7 @@ export default function PurchaseRequisitionList() {
 
 
     const [review_flow, setReview_flow] = useState<string>("");
-
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
 
 
     // const [open, setOpen] = useState(false);
@@ -545,6 +545,9 @@ export default function PurchaseRequisitionList() {
 
         // alert("送出審核");
 
+        if (review_flow === "") {
+            setReviewbar(true);
+        }
 
 
 
@@ -1880,16 +1883,17 @@ export default function PurchaseRequisitionList() {
                 <DragableModal
                     handleText="選擇審核流程"
                     style={{ zIndex: '1001', width: '500px' }}
-                    show={searchmodalopen}
-                    onCrossClick={SearchModalClose}>
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
 
                     <Radio.Group onChange={onChange} value={value}>
                         <Space direction="vertical">
-                            <Radio value={1}>Option A</Radio>
-                            <Radio value={2}>Option B</Radio>
-                            <Radio value={3}>Option C</Radio>
+                            <Radio value={1} style={{ fontSize: '18px' }}>Option A</Radio>
+                            <Radio value={2} style={{ fontSize: '18px' }}>Option B</Radio>
+                            <Radio value={3} style={{ fontSize: '18px' }}>Option C</Radio>
                         </Space>
                     </Radio.Group>
+
                 </DragableModal>
 
 

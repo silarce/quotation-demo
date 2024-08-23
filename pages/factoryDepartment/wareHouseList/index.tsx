@@ -137,7 +137,6 @@ export default function WareHouseList() {
         }
     };
 
-
     return (
 
         <SubLayer isLoading_subLayer={isLoading}>
