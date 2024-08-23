@@ -202,7 +202,7 @@ export default function PurchaseOrderList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchPurchaseOrderById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchPurchaseOrderById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -257,7 +257,7 @@ export default function PurchaseOrderList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseOrder?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -326,7 +326,7 @@ export default function PurchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseOrderDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -424,7 +424,7 @@ export default function PurchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -477,7 +477,7 @@ export default function PurchaseOrderList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferPurchaseOrderToProductReceipt`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -536,7 +536,7 @@ export default function PurchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}ClosePO?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/ClosePO?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -733,7 +733,7 @@ export default function PurchaseOrderList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}UpdatePOSupplier`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdatePOSupplier`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -900,7 +900,7 @@ export default function PurchaseOrderList() {
 
                         console.log(JSON.stringify(inputModel));
 
-                        const response = await fetch(`${setting.apipath}Print`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

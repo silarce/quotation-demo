@@ -23,8 +23,8 @@ type Tquery = {
 
 
 export const setting = {
-    apipath: 'https://new-erp-api.beta.san-jeou.com.tw/WareHouse/', // 確保這裡包含正確的 API 路徑
-    // apipath: 'https://localhost:44383/WareHouse/', // 確保這裡包含正確的 API 路徑
+    apipath: 'https://new-erp-api.beta.san-jeou.com.tw', // 確保這裡包含正確的 API 路徑
+    // apipath: 'https://localhost:44383', // 確保這裡包含正確的 API 路徑
     env: 'prod'
     // env: 'local',
 };
@@ -91,7 +91,7 @@ export default function WareHouseList() {
             setIsLoading(true);
             // const response = await fetch('YOUR_C#_API_ENDPOINT');
             //erpAPI
-            const response = await fetch(`${setting.apipath}GetWareHouse`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWareHouse`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -125,7 +125,7 @@ export default function WareHouseList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchWareHouseByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchWareHouseByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }

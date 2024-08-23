@@ -223,7 +223,7 @@ export default function ProductList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchProdReceiptById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchProdReceiptById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -279,7 +279,7 @@ export default function ProductList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -348,7 +348,7 @@ export default function ProductList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -413,7 +413,7 @@ export default function ProductList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdEntryDetailByProdReceiptId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntryDetailByProdReceiptId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -465,7 +465,7 @@ export default function ProductList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferProdReceiptToProdEntry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -644,7 +644,7 @@ export default function ProductList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}sentPREToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPREToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -751,7 +751,7 @@ export default function ProductList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}UpdateProduct`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdateProduct`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1015,7 +1015,7 @@ export default function ProductList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}AddProduct`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/AddProduct`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

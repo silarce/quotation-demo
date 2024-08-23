@@ -259,7 +259,7 @@ export default function ProdEntryList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchProdEntryById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchProdEntryById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -313,7 +313,7 @@ export default function ProdEntryList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProdEntry?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntry?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -379,7 +379,7 @@ export default function ProdEntryList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdEntryDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntryDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -462,7 +462,7 @@ export default function ProdEntryList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetWhpositionDetailByProductId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -543,7 +543,7 @@ export default function ProdEntryList() {
             console.log(inputModel);
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetTrayLayOutById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -773,7 +773,7 @@ export default function ProdEntryList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdEntryDetailByProdReceiptId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntryDetailByProdReceiptId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -826,7 +826,7 @@ export default function ProdEntryList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferProdReceiptToProdEntry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -890,7 +890,7 @@ export default function ProdEntryList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}AddWHPositionQuantity?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/AddWHPositionQuantity?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -931,7 +931,7 @@ export default function ProdEntryList() {
     //         };
 
     //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    //         const response = await fetch(`${setting.apipath}ClosePO?${queryParams}`);
+    //         const response = await fetch(`${setting.apipath}/WareHouse/ClosePO?${queryParams}`);
     //         if (!response.ok) {
     //             throw new Error('Failed to fetch data');
     //         }
@@ -1322,7 +1322,7 @@ export default function ProdEntryList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}UpdatePEntrySupplier`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdatePEntrySupplier`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',

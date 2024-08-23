@@ -232,7 +232,7 @@ export default function AddPurchaseRequisition() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchProductById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchProductById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -302,7 +302,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -342,7 +342,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPickingList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPickingList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -401,7 +401,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetEmployeeList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetEmployeeList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -455,7 +455,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPickingListDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -498,7 +498,7 @@ export default function AddPurchaseRequisition() {
             };
 
 
-            const response = await fetch(`${setting.apipath}AddPickingList`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/AddPickingList`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -586,7 +586,7 @@ export default function AddPurchaseRequisition() {
                     FilterConditions: JSON.stringify(conditionModel),
                 };
 
-                const response = await fetch(`${setting.apipath}AddPickingListDetail`, {
+                const response = await fetch(`${setting.apipath}/WareHouse/AddPickingListDetail`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1021,7 +1021,7 @@ export default function AddPurchaseRequisition() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetWhpositionDetailByProductId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1102,7 +1102,7 @@ export default function AddPurchaseRequisition() {
             console.log(inputModel);
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetTrayLayOutById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1483,7 +1483,7 @@ export default function AddPurchaseRequisition() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}MinusPickingListDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/MinusPickingListDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1523,7 +1523,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}sentPickingListToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPickingListToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1646,7 +1646,7 @@ export default function AddPurchaseRequisition() {
 
                             console.log(JSON.stringify(inputModel));
 
-                            const response = await fetch(`${setting.apipath}Print`, {
+                            const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

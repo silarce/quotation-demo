@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, DatePicker, Modal } from 'antd';
+import { Button, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -66,7 +66,8 @@ export default function PurchaseRequisitionList() {
         approved,
         status,
         need_date,
-        note
+        note,
+        reviewtype // 判斷審核的
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -147,6 +148,8 @@ export default function PurchaseRequisitionList() {
     }, [firstin]);
 
 
+    const [review_flow, setReview_flow] = useState<string>("");
+
 
 
     // const [open, setOpen] = useState(false);
@@ -204,7 +207,7 @@ export default function PurchaseRequisitionList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchPurchaseRequisitionByDateAndId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchPurchaseRequisitionByDateAndId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -257,7 +260,7 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPurchaseRequisition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -295,11 +298,53 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            console.log(data);
+
+            // getProduct();
+
+            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
+            GetReviewFlow();
             hasFetchedData.current = true;
         }
     }, []);
@@ -324,7 +369,7 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisitionDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -409,7 +454,7 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -459,7 +504,7 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferPurchaseRequisitionToPurchaseOrder`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferPurchaseRequisitionToPurchaseOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -496,7 +541,21 @@ export default function PurchaseRequisitionList() {
     };
 
     //送出審核
-    const sentPRToReview = async (type: any) => {
+    const sentToReview = async (type: any) => {
+
+        // alert("送出審核");
+
+
+
+
+
+
+
+
+        return;
+
+
+
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -519,7 +578,7 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}sentPRToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -765,7 +824,7 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetQuotereqDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -822,7 +881,7 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}UpdateQuotereqDetailById`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateQuotereqDetailById`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1000,7 +1059,7 @@ export default function PurchaseRequisitionList() {
 
                         console.log(JSON.stringify(inputModel));
 
-                        const response = await fetch(`${setting.apipath}Print`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1058,7 +1117,12 @@ export default function PurchaseRequisitionList() {
     };
 
 
+    const [value, setValue] = useState(1);
 
+    const onChange = (e: RadioChangeEvent) => {
+        console.log('radio checked', e.target.value);
+        setValue(e.target.value);
+    };
 
 
 
@@ -1136,7 +1200,7 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
 
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        <div className={scss.head_head1} style={{ display: reviewtype === 'review' ? 'none' : '' }}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1152,19 +1216,19 @@ export default function PurchaseRequisitionList() {
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("核准") }} title="單據核准">
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
                                     <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     核准
                                 </button>
                                 &nbsp;
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("駁回") }} title="單據核准">
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("駁回") }} title="單據核准">
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
                                 </button>
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
+                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
                                     <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
@@ -1172,7 +1236,7 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
-                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
@@ -1224,7 +1288,7 @@ export default function PurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        
+
                                     </div>
                                     <div>
                                         <InputSel
@@ -1242,7 +1306,7 @@ export default function PurchaseRequisitionList() {
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
-                                    <InputSel
+                                        <InputSel
                                             {...inputSelProps}
                                             caption="備註"
                                             disabled={true}
@@ -1426,230 +1490,160 @@ export default function PurchaseRequisitionList() {
                             </div>
                         </div>
                         <br />
-                        <div className={scss.foot_head1}>
-                            <div>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
-                                    <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
-                            </div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
+                        <div style={{ display: reviewtype === "review" ? 'none' : '' }}>
+                            <div className={scss.foot_head1}>
+                                <div>
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                        <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
+                                        <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                </div>
+                                <div></div>
+                                <div></div>
+                                <div style={{ textAlign: 'right' }}>
 
-                                {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
+                                    {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handlePO() }}>新增採購</button>
                                 </span>
                                 <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增採購</button>
                                 </span> */}
+                                </div>
                             </div>
-                        </div>
-                        <div className={scss.foot_content1}>
-                            <Thead01 type={'PurchaseRequisitionDetail2'} />
-                            {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader21}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
-                                        <span>{_item.name}</span>
-                                        {/* <span style={{ color: '#ea1833' }}>
+                            <div className={scss.foot_content1}>
+                                <Thead01 type={'PurchaseRequisitionDetail2'} />
+                                {data2.map((_item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader21}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            {/* <span style={{ color: '#ea1833' }}>
                                             {_item.alreadyinquantity}
                                         </span> */}
-                                        <span>
-                                            <input
-                                                ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        quantity: newQuantity,
-                                                        totalprice: newQuantity * newData[index].unitprice
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>{_item.unit}</span>
-                                        <span>
-                                            <input
-                                                ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.unitprice.toLocaleString()}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        unitprice: newUnitPrice,
-                                                        totalprice: newUnitPrice * newData[index].quantity
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {_item.totalprice.toLocaleString()}
-                                        </span>
-                                        <span>
-                                            {_item.suppliername}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
-                                                type="text"
-                                                value={_item.note}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newNote = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        note: newNote
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <span>
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: newQuantity * newData[index].unitprice
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>{_item.unit}</span>
+                                            <span>
+                                                <input
+                                                    ref={unitpriceRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.unitprice.toLocaleString()}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: newUnitPrice,
+                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                {_item.totalprice.toLocaleString()}
+                                            </span>
+                                            <span>
+                                                {_item.suppliername}
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={noteRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                    type="text"
+                                                    value={_item.note}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newNote = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            note: newNote
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
-                                            </button>
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
-                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))}
-                        </div>
-                        <br />
-                        <div className={scss.foot_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div>
-                                <table className={scss.count_table}>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>小計</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : '0'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>營業稅</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : '0'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>應付金額</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : '0'}</td>
-                                    </tr>
-                                </table>
+                                                <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))}
+                            </div>
+                            <br />
+                            <div className={scss.foot_foot1}>
+                                <div></div>
+                                <div></div>
+                                <div>
+                                    <table className={scss.count_table}>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>小計</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : '0'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>營業稅</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : '0'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>應付金額</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : '0'}</td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 隱藏的popout */}
-                {/* 品項查詢 */}
-                {/* <div style={{
-                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
-                    position: 'fixed',
-                    top: '250px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '1000px',
-                    backgroundColor: '#fff',
-                    border: '1px solid #ccc',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-                    zIndex: 1000,
-                    padding: '16px',
-                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
-                    overflowY: 'auto'  // 啟用垂直滾動
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        position: 'sticky',
-                        top: 0,
-                        backgroundColor: '#fff',
-                        zIndex: 1000
-                    }}>
-                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='單號'
-                                    value={keyword1}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword1(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='名稱'
-                                    value={keyword2}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword2(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='請購人員'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </div>
-                        </form>
-                        <div>
-                            <button onClick={() => { setProductSearchmodalopen(false) }}>
-                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
-                            </button>
-                        </div>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'PurchaseRequisition'} />
-                        <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                    </div>
-                </div> */}
 
 
                 {/* 隱藏的modal */}
@@ -1882,25 +1876,27 @@ export default function PurchaseRequisitionList() {
                     </div>
                     {/* </Modal > */}
                 </DragableModal>
-                {/* 
-                <DragableModal
-                    handleText="收款統計明細表"
-                    style={{zIndex:'1001'}}
-                    show={searchmodalopen}
-                    onCrossClick={SearchModalClose}
-                >
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
 
-                    <h1>測試</h1><h1>測試</h1>
-                </DragableModal> */}
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '500px' }}
+                    show={searchmodalopen}
+                    onCrossClick={SearchModalClose}>
+
+                    <Radio.Group onChange={onChange} value={value}>
+                        <Space direction="vertical">
+                            <Radio value={1}>Option A</Radio>
+                            <Radio value={2}>Option B</Radio>
+                            <Radio value={3}>Option C</Radio>
+                        </Space>
+                    </Radio.Group>
+                </DragableModal>
+
 
 
             </div >
         </SubLayer >
+
 
     )
 
