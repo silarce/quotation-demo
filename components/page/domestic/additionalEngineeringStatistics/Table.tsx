@@ -7,6 +7,16 @@ import scss from './table.module.scss';
 
 // =========================================================================
 
+type TareaContent = {
+  areaName: string;
+  pricesum_num: number; // 承價
+  pricesum: string; // 承價
+};
+
+type TareaList = {
+  [key: string]: TareaContent;
+};
+
 type Tcontrol_row = {
   quotationNumber: string;
   projectName: string;
@@ -21,6 +31,7 @@ type Tcontrol_row = {
         }
       | undefined;
   };
+
   // total: string;
 };
 
@@ -39,9 +50,18 @@ type Tcontrol = {
   subTotalList: Tcontrol_subTotalList;
   total: Tcontrol_total;
   listKeyArr: string[];
+  areaList: TareaList;
 };
 
-export type { Tcontrol as Tcontrol_personalPerformanceStatistics, Tcontrol_row, Tcontrol_subTotalList, Tcontrol_total };
+export type {
+  //
+  Tcontrol as Tcontrol_personalPerformanceStatistics,
+  Tcontrol_row,
+  Tcontrol_subTotalList,
+  Tcontrol_total,
+  TareaContent,
+  TareaList,
+};
 
 // =========================================================================
 export default function Table({ control }: { control: Tcontrol }) {
@@ -51,7 +71,15 @@ export default function Table({ control }: { control: Tcontrol }) {
     <div className={classNames(scss.table)}>
       <Thead listKeyArr={listKeyArr} />
       <Tbody rowArr={rowArr} listKeyArr={listKeyArr} />
-      {rowArr.length > 0 && <Footer subTotalList={subTotalList} total={total} listKeyArr={listKeyArr} />}
+      {rowArr.length > 0 && (
+        <Footer
+          //
+          subTotalList={subTotalList}
+          total={total}
+          listKeyArr={listKeyArr}
+          areaList={control.areaList}
+        />
+      )}
     </div>
   );
 }
@@ -135,10 +163,12 @@ const Footer = ({
   subTotalList,
   total,
   listKeyArr,
+  areaList,
 }: {
   subTotalList: Tcontrol_subTotalList;
   total: Tcontrol_total;
   listKeyArr: string[];
+  areaList: TareaList;
 }) => {
   return (
     <div className={scss.footer}>
@@ -171,33 +201,24 @@ const Footer = ({
         <div style={config.total.style}></div> */}
       </div>
       {/*  */}
-      {/* <div className={scss.bar02}>
-        <div className={scss.left} style={config.group01.style}>
-          <div>
-            <span>---</span>
-          </div>
-        </div>
+      {Object.values(areaList).map((content, index) => {
+        return (
+          <div key={index} className={scss.bar02}>
+            <div className={scss.left} style={config.group01.style}>
+              <div>
+                <span>{content.areaName}</span>
+              </div>
+            </div>
 
-        <div className={scss.footTotalCell} style={config.footTotalCell.style}>
-          <div>
-            <span>{'0'}</span>
+            <div className={scss.footTotalCell} style={config.footTotalCell.style}>
+              <div>
+                <span>{content.pricesum}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div> */}
-      {/*  */}
-      {/* <div className={scss.bar02}>
-        <div className={scss.left} style={config.group01.style}>
-          <div>
-            <span>---</span>
-          </div>
-        </div>
+        );
+      })}
 
-        <div className={scss.footTotalCell} style={config.footTotalCell.style}>
-          <div>
-            <span>{'0'}</span>
-          </div>
-        </div>
-      </div> */}
       {/*  */}
       <div className={scss.bar02}>
         <div className={scss.left} style={config.group01.style}>
