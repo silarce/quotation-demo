@@ -55,7 +55,7 @@ const IncomeBillSerialSettlementForm = ({
     total: 0,
   });
 
-  const [state_internalReceivablePayment, setState_internalReceivablePayment] = useState<Tstate>({
+  const [state_receivablePayment, setState_receivablePayment] = useState<Tstate>({
     foreign: 0,
     domestic: 0,
     total: 0,
@@ -81,13 +81,13 @@ const IncomeBillSerialSettlementForm = ({
     //
     rowArr,
     defaultState_nextMonthEstimatePayment,
-    defaultState_internalReceivablePayment,
+    defaultState_receivablePayment,
   } = useMemo(() => {
     if (!data) {
       return {
         rowArr: [],
         defaultState_nextMonthEstimatePayment: createEmptyState(),
-        defaultState_internalReceivablePayment: createEmptyState(),
+        defaultState_receivablePayment: createEmptyState(),
       };
     }
 
@@ -121,8 +121,8 @@ const IncomeBillSerialSettlementForm = ({
     const rowArr = [
       {
         caption: '本月實際收款額',
-        foreign: internalActualReceivablePayment.toLocaleString(),
-        domestic: foreignActualReceivablePayment.toLocaleString(),
+        foreign: foreignActualReceivablePayment.toLocaleString(),
+        domestic: internalActualReceivablePayment.toLocaleString(),
         total: new Decimal(internalActualReceivablePayment)
           .add(foreignActualReceivablePayment)
           .toNumber()
@@ -130,26 +130,26 @@ const IncomeBillSerialSettlementForm = ({
       },
       {
         caption: '本月預估收款額',
-        foreign: internalEstimatePayment.toLocaleString(),
-        domestic: foreignEstimatePayment.toLocaleString(),
+        foreign: foreignEstimatePayment.toLocaleString(),
+        domestic: internalEstimatePayment.toLocaleString(),
         total: new Decimal(internalEstimatePayment).add(foreignEstimatePayment).toNumber().toLocaleString(),
       },
       // {
       //   caption: '應收帳款總額',
-      //   foreign: internalReceivablePayment.toLocaleString(),
-      //   domestic: foreignReceivablePayment.toLocaleString(),
+      //   domestic: internalReceivablePayment.toLocaleString(),
+      //   foreign: foreignReceivablePayment.toLocaleString(),
       //   total: new Decimal(internalReceivablePayment).add(foreignReceivablePayment).toNumber().toLocaleString(),
       // },
       {
         caption: '年度至今累積收款額',
-        foreign: internalAccumulatePayment.toLocaleString(),
-        domestic: foreignAccumulatePayment.toLocaleString(),
+        foreign: foreignAccumulatePayment.toLocaleString(),
+        domestic: internalAccumulatePayment.toLocaleString(),
         total: new Decimal(internalAccumulatePayment).add(foreignAccumulatePayment).toNumber().toLocaleString(),
       },
       // {
       //   caption: '下月預估收款額',
-      //   foreign: internalNextMonthEstimatePayment.toLocaleString(),
-      //   domestic: foreignNextMonthEstimatePayment.toLocaleString(),
+      //   foreign: foreignNextMonthEstimatePayment.toLocaleString(),
+      //   domestic: internalNextMonthEstimatePayment.toLocaleString(),
       //   total: new Decimal(internalNextMonthEstimatePayment)
       //     .add(foreignNextMonthEstimatePayment)
       //     .toNumber()
@@ -163,7 +163,7 @@ const IncomeBillSerialSettlementForm = ({
       total: new Decimal(internalNextMonthEstimatePayment).add(foreignNextMonthEstimatePayment).toNumber(),
     };
 
-    const defaultState_internalReceivablePayment = {
+    const defaultState_receivablePayment = {
       foreign: foreignReceivablePayment,
       domestic: internalReceivablePayment,
       total: new Decimal(internalReceivablePayment).add(foreignReceivablePayment).toNumber(),
@@ -172,7 +172,7 @@ const IncomeBillSerialSettlementForm = ({
     return {
       rowArr,
       defaultState_nextMonthEstimatePayment,
-      defaultState_internalReceivablePayment,
+      defaultState_receivablePayment,
     };
   }, [data]);
 
@@ -236,8 +236,8 @@ const IncomeBillSerialSettlementForm = ({
       internalNextMonthEstimatePayment: state_nextMonthEstimatePayment.domestic,
       foreignNextMonthEstimatePayment: state_nextMonthEstimatePayment.foreign,
       // 應收帳款總額
-      internalReceivablePayment: state_internalReceivablePayment.domestic,
-      foreignReceivablePayment: state_internalReceivablePayment.foreign,
+      internalReceivablePayment: state_receivablePayment.domestic,
+      foreignReceivablePayment: state_receivablePayment.foreign,
     };
 
     await apiPatchIncomeBillSerialSettlementForm(data.id, body)
@@ -264,7 +264,7 @@ const IncomeBillSerialSettlementForm = ({
     value = value.replace(/,/g, '');
     const value_num = Number(value || '0');
 
-    setState_internalReceivablePayment((prev) => {
+    setState_receivablePayment((prev) => {
       const copy = { ...prev };
       copy[key] = value_num;
       copy.total = new Decimal(copy.foreign).add(copy.domestic).toNumber();
@@ -283,8 +283,8 @@ const IncomeBillSerialSettlementForm = ({
   }, [defaultState_nextMonthEstimatePayment, disabled]);
 
   useEffect(() => {
-    setState_internalReceivablePayment(defaultState_internalReceivablePayment);
-  }, [defaultState_internalReceivablePayment, disabled]);
+    setState_receivablePayment(defaultState_receivablePayment);
+  }, [defaultState_receivablePayment, disabled]);
 
   // -=---------------------------------------------------------------------
 
@@ -349,11 +349,7 @@ const IncomeBillSerialSettlementForm = ({
                 readOnly={disabled}
                 className={classNames(scss.input, disabled && scss.disabled)}
                 type={disabled ? 'text' : 'number'}
-                value={
-                  disabled
-                    ? state_internalReceivablePayment.foreign.toLocaleString()
-                    : state_internalReceivablePayment.foreign
-                }
+                value={disabled ? state_receivablePayment.foreign.toLocaleString() : state_receivablePayment.foreign}
                 onChange={(e) => editInternalReceivablePayment('foreign', e.target.value)}
               />
             </Cell>
@@ -362,15 +358,11 @@ const IncomeBillSerialSettlementForm = ({
                 readOnly={disabled}
                 className={classNames(scss.input, disabled && scss.disabled)}
                 type={disabled ? 'text' : 'number'}
-                value={
-                  disabled
-                    ? state_internalReceivablePayment.domestic.toLocaleString()
-                    : state_internalReceivablePayment.domestic
-                }
+                value={disabled ? state_receivablePayment.domestic.toLocaleString() : state_receivablePayment.domestic}
                 onChange={(e) => editInternalReceivablePayment('domestic', e.target.value)}
               />
             </Cell>
-            <Cell style={cellProps_table.total.style}>{state_internalReceivablePayment.total}</Cell>
+            <Cell style={cellProps_table.total.style}>{state_receivablePayment.total}</Cell>
           </Row>
           {/*  */}
           <br />
