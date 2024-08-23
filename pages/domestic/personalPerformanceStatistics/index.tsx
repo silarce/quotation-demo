@@ -253,15 +253,14 @@ export default function PersonalPerformanceStatistics() {
   //________________________________________________________________________
   //________________________________________________________________________
 
-  console.log(control_table);
-
   const panelList: TpanelList = [
     {
       type: 'myButton',
       label: '下載Excel',
       onClick: () => {
-        // const theMonth = month ? month.padStart(2, '0') : '';
-        const subTitle = `${year} 年　${month} 月　業 績 統 計 表`;
+        let subTitle = `${year} 年　`;
+        month && (subTitle = subTitle + `${month} 月　`);
+        subTitle = subTitle + '業 績 統 計 表';
         dlExcel({
           data: control_table,
           excelName: `個人業績統計表_${activeEmp?.label}_${year}-${month}`,
@@ -339,180 +338,174 @@ const useControl_personalPerformanceStatistics = ({
   data: TquotationAccounting_personal_contract[] | undefined;
   bonus_closed?: string;
   sales_closed?: string;
-}) =>
-  //
-  {
-    const control: Tcontrol_personalPerformanceStatistics & {
-      bounsCalcProcess_str: string;
-    } = useMemo(() => {
-      if (!data) {
-        return {
-          rowArr: [],
-          subTotalList: {},
-          total: {
-            totalsum: '',
-            pricesum: '',
-            percentage: '',
-          },
-          listKeyArr: [],
-          bonus: '',
-          bounsCalcProcess: '',
-          bounsCalcProcess_str: '',
+}) => {
+  const control: Tcontrol_personalPerformanceStatistics & {
+    bounsCalcProcess_str: string;
+  } = useMemo(() => {
+    if (!data) {
+      return {
+        rowArr: [],
+        subTotalList: {},
+        total: {
+          totalsum: '',
+          pricesum: '',
+          percentage: '',
+        },
+        listKeyArr: [],
+        bonus: '',
+        bounsCalcProcess: '',
+        bounsCalcProcess_str: '',
+      };
+    }
+
+    const list: {
+      [key: string]: // Tcontrol_row
+      Omit<Tcontrol_row, 'total'> & { total: number };
+    } = {};
+
+    const subTotalList: {
+      [key: string]: {
+        totalsum: number;
+        pricesum: number;
+        percentage: number;
+      };
+    } = {};
+
+    const total = {
+      totalsum: 0,
+      pricesum: 0,
+      // percentage: 0,
+    };
+
+    const listKeyList: { [key: string]: string } = {};
+
+    data.forEach((item) => {
+      const {
+        //
+        projectName: projectname,
+        projectNumber: quotationnumber,
+        // quotetype,
+        totalSum,
+        priceSum,
+        percentage,
+        contractor,
+        designUnit,
+      } = item;
+
+      const isValid = typeof percentage === 'number';
+
+      let quotetype = item.quoteType;
+
+      if (!quotetype) {
+        quotetype = '無資料';
+      }
+
+      if (!subTotalList[quotetype]) {
+        subTotalList[quotetype] = {
+          totalsum: 0,
+          pricesum: 0,
+          percentage: 0,
         };
       }
 
-      const list: {
-        [key: string]: // Tcontrol_row
-        Omit<Tcontrol_row, 'total'> & { total: number };
-      } = {};
+      if (listKeyList[quotetype] === undefined) {
+        listKeyList[quotetype] = quotetype;
+      }
 
-      const subTotalList: {
-        [key: string]: {
-          totalsum: number;
-          pricesum: number;
-          percentage: number;
-        };
-      } = {};
-
-      const total = {
-        totalsum: 0,
-        pricesum: 0,
-        // percentage: 0,
-      };
-
-      const listKeyList: { [key: string]: string } = {};
-
-      data.forEach((item) => {
-        const {
-          //
-          projectName: projectname,
-          projectNumber: quotationnumber,
-          // quotetype,
-          totalSum,
-          priceSum,
-          percentage,
-          contractor,
-          designUnit,
-        } = item;
-
-        const isValid = typeof percentage === 'number';
-
-        let quotetype = item.quoteType;
-
-        if (!quotetype) {
-          quotetype = '無資料';
-        }
-
-        if (!subTotalList[quotetype]) {
-          subTotalList[quotetype] = {
-            totalsum: 0,
-            pricesum: 0,
-            percentage: 0,
-          };
-        }
-
-        if (listKeyList[quotetype] === undefined) {
-          listKeyList[quotetype] = quotetype;
-        }
-
-        if (isValid) {
-          subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
-          subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
-          subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
-            .add(percentage ?? 0)
-            .toNumber();
-
-          total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
-          total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
-        }
-
-        if (!list[quotationnumber]) {
-          list[quotationnumber] = {
-            quotationNumber: quotationnumber,
-            projectName: projectname,
-            builder: contractor ?? '',
-            designer: designUnit ?? '',
-            list: {},
-            total: 0,
-          };
-        }
-
-        // 格子裡的文字
-        list[quotationnumber].list[quotetype] = {
-          totalsum: isValid ? Number(totalSum).toLocaleString() : inValidSymbol,
-          pricesum: isValid ? Number(priceSum).toLocaleString() : inValidSymbol,
-          percentage: isValid ? `${percentage}%` : inValidSymbol,
-        };
-
-        if (isValid) {
-          list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
-        }
-      });
-      //
-      //
-      const control_rowArr: Tcontrol_row[] = Object.values(list).map((item) => {
-        return {
-          ...item,
-          total: Number(item.total).toLocaleString(),
-        };
-      });
-
-      const theSubTotalList: Tcontrol_subTotalList = {};
-
-      Object.keys(subTotalList).forEach((key) => {
-        const percent = new Decimal(subTotalList[key].pricesum)
-          .div(subTotalList[key].totalsum)
-          .mul(100)
-          .toDecimalPlaces(2)
+      if (isValid) {
+        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
+        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
+        subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
+          .add(percentage ?? 0)
           .toNumber();
 
-        theSubTotalList[key] = {
-          ...subTotalList[key],
-          totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
-          pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
-          percentage: isNaN(percent) ? inValidSymbol : `${percent}%`,
-        };
-      });
+        total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
+        total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
+      }
 
-      const totalPercentage_num = new Decimal(total.pricesum)
-        .div(total.totalsum)
+      if (!list[quotationnumber]) {
+        list[quotationnumber] = {
+          quotationNumber: quotationnumber,
+          projectName: projectname,
+          builder: contractor ?? '',
+          designer: designUnit ?? '',
+          list: {},
+          total: 0,
+        };
+      }
+
+      // 格子裡的文字
+      list[quotationnumber].list[quotetype] = {
+        totalsum: isValid ? Number(totalSum).toLocaleString() : inValidSymbol,
+        pricesum: isValid ? Number(priceSum).toLocaleString() : inValidSymbol,
+        percentage: isValid ? `${percentage}%` : inValidSymbol,
+      };
+
+      if (isValid) {
+        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
+      }
+    });
+    //
+    //
+    const control_rowArr: Tcontrol_row[] = Object.values(list).map((item) => {
+      return {
+        ...item,
+        total: Number(item.total).toLocaleString(),
+      };
+    });
+
+    const theSubTotalList: Tcontrol_subTotalList = {};
+
+    Object.keys(subTotalList).forEach((key) => {
+      const percent = new Decimal(subTotalList[key].pricesum)
+        .div(subTotalList[key].totalsum)
         .mul(100)
         .toDecimalPlaces(2)
         .toNumber();
 
-      const theTotal = {
-        totalsum: Number(total.totalsum).toLocaleString(),
-        pricesum: Number(total.pricesum).toLocaleString(),
-        percentage: totalPercentage_num.toString() + '%',
+      theSubTotalList[key] = {
+        ...subTotalList[key],
+        totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
+        pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
+        percentage: isNaN(percent) ? inValidSymbol : `${percent}%`,
       };
+    });
 
-      const listKeyArr = Object.keys(listKeyList);
-      // _______________________________________________________________________
-      const threshold = 2000000; // 六個0
-      const threshold_str = threshold.toLocaleString();
-      const performance = new Decimal(total.pricesum).minus(threshold).toNumber();
-      const performance_str = performance.toLocaleString();
+    const totalPercentage_num = new Decimal(total.pricesum).div(total.totalsum).mul(100).toDecimalPlaces(2).toNumber();
 
-      const bonus = new Decimal(total.pricesum)
-        .minus(threshold)
-        .mul(0.01)
-        .mul(totalPercentage_num)
-        .div(100)
-        .toDecimalPlaces(0)
-        .toNumber();
-      const bonus_str = bonus.toLocaleString();
-      const bounsCalcProcess = (
-        <>
-          <p>依統計表計算</p>
-          {theTotal.pricesum} - {threshold_str} = {performance_str}
-          <br />
-          {performance_str} * 1% * {totalPercentage_num}% = <span className="text-danger font-bold">{bonus_str}</span>
-          <hr />
-          結算業績 : {sales_closed}　 結算獎金 : <span className="text-danger font-bold">{bonus_closed}</span>
-        </>
-      );
+    const theTotal = {
+      totalsum: Number(total.totalsum).toLocaleString(),
+      pricesum: Number(total.pricesum).toLocaleString(),
+      percentage: totalPercentage_num.toString() + '%',
+    };
 
-      const bounsCalcProcess_str = `\
+    const listKeyArr = Object.keys(listKeyList);
+    // _______________________________________________________________________
+    const threshold = 2000000; // 六個0
+    const threshold_str = threshold.toLocaleString();
+    const performance = new Decimal(total.pricesum).minus(threshold).toNumber();
+    const performance_str = performance.toLocaleString();
+
+    const bonus = new Decimal(total.pricesum)
+      .minus(threshold)
+      .mul(0.01)
+      .mul(totalPercentage_num)
+      .div(100)
+      .toDecimalPlaces(0)
+      .toNumber();
+    const bonus_str = bonus.toLocaleString();
+    const bounsCalcProcess = (
+      <>
+        <p>依統計表計算</p>
+        {theTotal.pricesum} - {threshold_str} = {performance_str}
+        <br />
+        {performance_str} * 1% * {totalPercentage_num}% = <span className="text-danger font-bold">{bonus_str}</span>
+        <hr />
+        結算業績 : {sales_closed}　 結算獎金 : <span className="text-danger font-bold">{bonus_closed}</span>
+      </>
+    );
+
+    const bounsCalcProcess_str = `\
 依統計表計算
 ${theTotal.pricesum} - ${threshold_str} = ${performance_str}
 ${performance_str} * 1% * ${totalPercentage_num}% = ${bonus_str}
@@ -520,23 +513,23 @@ ${performance_str} * 1% * ${totalPercentage_num}% = ${bonus_str}
 結算業績 : ${sales_closed}　 結算獎金 : ${bonus_closed}
 `;
 
-      // _______________________________________________________________________
+    // _______________________________________________________________________
 
-      return {
-        rowArr: control_rowArr,
-        subTotalList: theSubTotalList,
-        total: theTotal,
-        listKeyArr,
-        bounsCalcProcess,
-        bounsCalcProcess_str,
-      };
+    return {
+      rowArr: control_rowArr,
+      subTotalList: theSubTotalList,
+      total: theTotal,
+      listKeyArr,
+      bounsCalcProcess,
+      bounsCalcProcess_str,
+    };
 
-      //
-      //
-    }, [data]);
+    //
+    //
+  }, [data]);
 
-    return control;
-  };
+  return control;
+};
 
 // =====================================================================
 // =====================================================================
@@ -561,35 +554,43 @@ const dlExcel = async ({
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet();
 
+  sheet.pageSetup = {
+    orientation: 'landscape',
+    paperSize: 9,
+  };
+
   // ----------------------------------------------------------------------
+
+  const width_data = 11;
+  const width_percent = 10;
 
   const colSetting_projectNumber = {
     label: '工程編號',
     key: 'projectNumber',
-    width: 32,
+    width: 12,
   };
   const colSetting_projectName = {
     label: '工程名稱',
     key: 'projectName',
-    width: 32,
+    width: 20,
   };
 
   const colSetting_contractor = {
     label: '營造',
     key: 'contractor',
-    width: 10,
+    width: 8,
   };
 
   const colSetting_designUnit = {
     label: '設計單位',
     key: 'designUnit',
-    width: 10,
+    width: 7,
   };
 
   const colSetting_projectTotal = {
     label: '總價',
     key: 'totalSum',
-    width: 15,
+    width: width_data,
   };
 
   const colSettingArr = [
@@ -607,15 +608,15 @@ const dlExcel = async ({
         return [
           {
             key: key + '_totalsum',
-            width: 15,
+            width: width_data,
           },
           {
             key: key + '_pricesum',
-            width: 15,
+            width: width_data,
           },
           {
             key: key + '_percentage',
-            width: 15,
+            width: width_percent,
           },
         ];
       })
@@ -634,6 +635,10 @@ const dlExcel = async ({
 
   // ----------------------------------------------------------------------
 
+  const col_projectNumber = sheet.getColumn('projectNumber');
+  const col_projectName = sheet.getColumn('projectName');
+  const col_contractor = sheet.getColumn('contractor');
+  const col_designUnit = sheet.getColumn('designUnit');
   const col_totalSum = sheet.getColumn('totalSum');
   // const col_latestData = sheet.getColumn(col_totalSum.number - 3);
   const colNumber_latestData = col_totalSum.number - 3;
@@ -737,7 +742,7 @@ const dlExcel = async ({
 
   (() => {
     row_calcProcess = sheet.addRow([]);
-    cell_bounsCalcProcess = row_calcProcess.getCell(col_totalSum.number - 3);
+    cell_bounsCalcProcess = row_calcProcess.getCell(colNumber_latestData);
     cell_bounsCalcProcess.value = bounsCalcProcess_str;
   })();
 
@@ -768,19 +773,30 @@ const dlExcel = async ({
 
   // ----------------------------------------------------------------------
 
-  // row_total = sheet.addRow([]);
-  row_total = sheet.addRow([]);
-
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-
   (() => {
-    const row = cell_bounsCalcProcess.fullAddress.row;
-    const col = cell_bounsCalcProcess.fullAddress.col;
+    const { totalsum, pricesum, percentage } = total;
 
-    sheet.mergeCells(row, col, row, col + 2);
+    let percentage_num = Number(percentage.replace('%', ''));
+    percentage_num = new Decimal(percentage_num).div(100).toNumber();
+
+    row_total = sheet.addRow(['', '總計']);
+    row_total.getCell(colNumber_latestData).value = Number(totalsum.replaceAll(',', ''));
+    row_total.getCell(colNumber_latestData + 1).value = Number(pricesum.replaceAll(',', ''));
+    row_total.getCell(colNumber_latestData + 2).value = percentage_num;
   })();
+
+  // ----------------------------------------------------------------------
+
+  row_reviewer = sheet.addRow([]);
+  row_reviewer.values = ['　　　總經理 : 　　　　　　　　主管: 　　　　　　　　製表: 　　　　　　　　'];
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  sheet.mergeCells(`A${row_title.number}:M${row_title.number}`);
+  sheet.mergeCells(`A${row_subTitle.number}:M${row_subTitle.number}`);
+
   // _______________________________________________________________________
   // _______________________________________________________________________
 
@@ -801,15 +817,157 @@ const dlExcel = async ({
   // _______________________________________________________________________
   // _______________________________________________________________________
 
+  (() => {
+    const row = cell_bounsCalcProcess.fullAddress.row;
+    const col = cell_bounsCalcProcess.fullAddress.col;
+
+    sheet.mergeCells(row, col, row, col + 3);
+  })();
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  sheet.mergeCells(`A${row_reviewer.number}:M${row_reviewer.number}`);
+
   // ----------------------------------------------------------------------
-  row_calcProcess.height = 100;
+
+  const size_l = 18;
+  const size_m = 13;
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+  [col_projectNumber, col_projectName, col_contractor, col_designUnit].forEach((col) => {
+    col.alignment = {
+      ...col.alignment,
+      vertical: 'middle',
+      horizontal: 'left',
+      wrapText: true,
+    };
+  });
+
+  col_totalSum.eachCell((cell) => {
+    cell.border = {
+      ...cell.border,
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' },
+    };
+  });
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  [row_title, row_subTitle].forEach((row) => {
+    const cell = row.getCell(1);
+
+    row.height = 30;
+
+    cell.alignment = {
+      ...cell.alignment,
+      horizontal: 'center',
+      vertical: 'middle',
+    };
+
+    cell.font = {
+      ...cell.font,
+      size: size_l,
+      bold: true,
+    };
+  });
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+  [row_caption, row_subCaption].forEach((row) => {
+    row.alignment = {
+      ...row.alignment,
+      vertical: 'middle',
+      horizontal: 'center',
+      wrapText: true,
+    };
+    row.font = {
+      ...row.font,
+      size: size_m,
+      bold: true,
+    };
+  });
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  [...rowArr_data, row_subTotal, row_total].forEach((row) => {
+    row.alignment = {
+      ...row.alignment,
+      vertical: 'middle',
+      // horizontal: 'center',
+      wrapText: true,
+    };
+
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      const colKey = sheet.getColumn(cell.fullAddress.col).key;
+
+      if (colKey?.includes('_totalsum') || colKey?.includes('_pricesum') || colKey?.includes('totalSum')) {
+        cell.numFmt = '#,##0';
+      } else if (colKey?.includes('_percentage')) {
+        cell.numFmt = '0.00%';
+      }
+    });
+  });
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  sheet.eachRow((row) => {
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.border = {
+        ...cell.border,
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' },
+        bottom: { style: 'thin' },
+      };
+    });
+  });
+
+  [row_title, row_subTitle].forEach((row) => {
+    row.border = {};
+  });
+
+  row_subCaption.eachCell({ includeEmpty: true }, (cell) => {
+    cell.border = {
+      ...cell.border,
+      bottom: { style: 'double' },
+    };
+  });
+
+  [row_subTotal, row_total].forEach((row) => {
+    row.eachCell({ includeEmpty: true }, (cell) => {
+      cell.border = {
+        ...cell.border,
+        top: { style: 'double' },
+      };
+    });
+  });
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+  row_reviewer.height = 50;
+  row_reviewer.alignment = {
+    ...row_reviewer.alignment,
+    vertical: 'middle',
+    horizontal: 'left',
+  };
+  row_reviewer.border = {};
+
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  row_calcProcess.height = 150;
   cell_bounsCalcProcess.alignment = {
     ...cell_bounsCalcProcess.alignment,
     wrapText: true,
     vertical: 'middle',
   };
 
-  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
 
   await workbook.xlsx.writeBuffer();
@@ -826,344 +984,3 @@ const dlExcel = async ({
     link.remove();
   });
 };
-
-// const dlExcel = async ({
-//   data,
-//   sheetName,
-//   excelName,
-//   year,
-//   month,
-// }: {
-//   data: Tcontrol_personalPerformanceStatistics;
-//   sheetName: string;
-//   excelName: string;
-//   year: string | number;
-//   month: string | undefined;
-// }) =>
-//   //
-//   {
-//     const { listKeyArr, rowArr, subTotalList, total } = data;
-
-//     const workbook = new ExcelJs.Workbook();
-//     const sheet = workbook.addWorksheet(sheetName);
-
-//     sheet.views = [{ state: 'frozen', xSplit: 2 }];
-
-//     // ----------------------------------------------------------------------
-
-//     // ----------------------------------------------------------------------
-//     // 先建好columns
-
-//     const listColumnsProps = listKeyArr.reduce((current, key) => {
-//       current.push(
-//         {
-//           header: key,
-//           key,
-//           width: 15,
-//         },
-//         {
-//           width: 15,
-//         },
-//         {
-//           width: 15,
-//         }
-//       );
-
-//       return current;
-//     }, [] as Partial<ExcelJs.Column>[]);
-
-//     sheet.columns = [
-//       { header: '編號', key: 'idNumber', width: 15 },
-//       { header: '工程名稱', key: 'projectName', width: 32 },
-//       { header: '營造', key: 'C', width: 15 }, // 目前還沒有相關資料
-//       { header: '設計單位', key: 'D', width: 15 }, // 目前還沒有相關資料
-//       ...listColumnsProps,
-//     ];
-
-//     // ----------------------------------------------------------------------
-//     const titleRow = sheet.insertRow(1, ['三久建材股份有限公司']);
-//     titleRow.font = {
-//       bold: true,
-//       size: 20,
-//     };
-//     sheet.mergeCells('A1:B1');
-
-//     // const dateRow = sheet.insertRow(2, [`${year}年${month}月業績統計表`]);
-//     const dateRow = sheet.insertRow(2, [`${year}年${month ? `${month}月` : ''}業績統計表`]);
-//     dateRow.font = {
-//       bold: true,
-//       size: 20,
-//     };
-//     sheet.mergeCells('A2:B2');
-
-//     // ----------------------------------------------------------------------
-
-//     // 取得放資料的row
-
-//     const row_start = 5;
-//     const row_end = rowArr.length;
-//     const rowArr_excel = sheet.getRows(row_start, row_end) ?? [];
-
-//     // ----------------------------------------------------------------------
-
-//     // 把編號與工程名稱放進去
-
-//     rowArr.forEach((row, index_row) => {
-//       const { quotationNumber, projectName } = row;
-
-//       if (rowArr_excel[index_row]) {
-//         rowArr_excel[index_row].values = [quotationNumber, projectName];
-//       }
-//     });
-
-//     // ----------------------------------------------------------------------
-
-//     // 建立table並把資料放進去
-
-//     sheet.columns.forEach((col, index) => {
-//       if (index <= 3) {
-//         return;
-//       }
-
-//       if (col.key) {
-//         sheet.mergeCells(3, index + 1, 3, index + 1 + 2);
-//         sheet.getCell(`${col.letter}${3}`).alignment = { vertical: 'middle', horizontal: 'center' };
-//       }
-//     });
-
-//     const listColumns = sheet.columns.slice(4).filter((col) => col.key);
-
-//     listColumns.forEach((column) => {
-//       const tableProps = createTable({
-//         column,
-//         rowArr,
-//         subTotalList,
-//       });
-
-//       sheet.addTable(tableProps);
-//     });
-
-//     sheet.columns.forEach((col, index) => {
-//       if (index < 4) {
-//         return;
-//       }
-
-//       col.numFmt = '$#,##0.00';
-
-//       if ((index - 3) % 3 === 0) {
-//         col.numFmt = '0.00%';
-//       }
-//     });
-
-//     const row_subTotal = sheet.lastRow;
-
-//     if (row_subTotal) {
-//       row_subTotal.getCell(4).value = '小計';
-//       row_subTotal.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
-//     }
-
-//     // --------------------------------------------------------------------
-
-//     const col_total = sheet.getColumn(sheet.columns.length + 1);
-//     col_total.width = 20;
-//     col_total.numFmt = '$#,##0.00';
-
-//     col_total.values = rowArr.reduce(
-//       (values, row) => {
-//         values.push(Number(row.total.replaceAll(',', '')));
-
-//         return values;
-//       },
-//       [undefined, undefined, undefined, '總價'] as (undefined | string | number)[]
-//     );
-
-//     // --------------------------------------------------------------------
-
-//     // 處理小計與總計
-
-//     sheet.addRow([]);
-//     const row_totalLabel = sheet.addRow([]);
-
-//     const row_total = sheet.addRow([]);
-
-//     row_totalLabel.values = [
-//       //
-//       undefined,
-//       undefined,
-//       undefined,
-//       undefined,
-//       '牌價',
-//       '承價',
-//       '百分比',
-//     ];
-
-//     row_total.values = [
-//       //
-//       undefined,
-//       undefined,
-//       undefined,
-//       '總計',
-//       Number(total.totalsum.replaceAll(',', '')),
-//       Number(total.pricesum.replaceAll(',', '')),
-//       new Decimal(total.percentage.replace('%', '')).div(100).toNumber(),
-//     ];
-
-//     row_total.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
-
-//     // ----------------------------------------------------------------------
-
-//     // const titleRow = sheet.insertRow(1, ['三  久  建  材  股  份  有  限  公  司']);
-//     // titleRow.font = {
-//     //   bold: true,
-//     //   size: 20,
-//     // };
-//     // // titleRow.getCell(1)
-//     // sheet.mergeCells('A1:D1');
-
-//     // ----------------------------------------------------------------------
-
-//     // 調整樣式
-
-//     row_subTotal?.eachCell({ includeEmpty: true }, (cell) => {
-//       cell.border = {
-//         top: {
-//           style: 'double',
-//           color: { argb: 'FF000000' },
-//         },
-//       };
-//     });
-
-//     rowArr_excel.forEach((row, index_row) => {
-//       const isOdd = index_row % 2 === 0;
-
-//       row.eachCell({ includeEmpty: true }, (cell) => {
-//         cell.fill = {
-//           type: 'pattern',
-//           pattern: 'solid',
-//           fgColor: { argb: isOdd ? 'ffeeeeee' : 'ffdddddd' },
-//         };
-//       });
-//       row.commit();
-//     });
-
-//     sheet.getRow(4).eachCell((cell) => {
-//       cell.alignment = {
-//         vertical: 'middle',
-//         horizontal: 'right',
-//       };
-//     });
-
-//     row_totalLabel.eachCell((cell) => {
-//       cell.alignment = {
-//         vertical: 'middle',
-//         horizontal: 'right',
-//       };
-//     });
-
-//     // --------------------------------------------------------------------
-//     await workbook.xlsx.writeBuffer();
-
-//     workbook.xlsx.writeBuffer().then((content) => {
-//       const link = document.createElement('a');
-//       const blobData = new Blob([content], {
-//         type: 'application/vnd.ms-excel;charset=utf-8;',
-//       });
-
-//       link.download = `${excelName}.xlsx`;
-//       link.href = URL.createObjectURL(blobData);
-//       link.click();
-//       link.remove();
-//     });
-//   };
-
-// // =====================================================================
-
-// // region createTable
-
-// const createTable = ({
-//   //
-//   column,
-//   rowArr,
-//   subTotalList,
-// }: {
-//   column: Partial<ExcelJs.Column>;
-//   rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
-//   subTotalList: Tcontrol_personalPerformanceStatistics['subTotalList'];
-// }) => {
-//   const subTotal: Tcontrol_personalPerformanceStatistics['subTotalList'][string] | undefined =
-//     subTotalList[column.key ?? 'undefined'];
-
-//   const rows: TableProperties['rows'] = rowArr.map((row) => {
-//     const { list } = row;
-
-//     if (!column.key || !list[column.key]) {
-//       return [];
-//     }
-
-//     let totalsum: string | number = list[column.key]?.totalsum || inValidSymbol;
-//     let pricesum: string | number = list[column.key]?.pricesum || inValidSymbol;
-//     let percentage: string | number = list[column.key]?.percentage || inValidSymbol;
-
-//     if (totalsum !== inValidSymbol) {
-//       totalsum = Number(totalsum.replaceAll(',', ''));
-//     }
-
-//     if (pricesum !== inValidSymbol) {
-//       pricesum = Number(pricesum.replaceAll(',', ''));
-//     }
-
-//     if (percentage !== inValidSymbol) {
-//       // percentage = Number(percentage.replace('%', ''));
-//       percentage = percentage.replace('%', '');
-//       percentage = new Decimal(percentage).div(100).toNumber();
-//     }
-
-//     return [totalsum, pricesum, percentage];
-//   });
-
-//   const lastRow = (() => {
-//     let totalsum: string | number = subTotal.totalsum || inValidSymbol;
-//     let pricesum: string | number = subTotal.pricesum || inValidSymbol;
-//     let percentage: string | number = subTotal.percentage || inValidSymbol;
-
-//     if (totalsum !== inValidSymbol) {
-//       totalsum = Number(totalsum.replaceAll(',', ''));
-//     }
-
-//     if (pricesum !== inValidSymbol) {
-//       pricesum = Number(pricesum.replaceAll(',', ''));
-//     }
-
-//     if (percentage !== inValidSymbol) {
-//       // percentage = Number(percentage.replace('%', ''));
-//       percentage = percentage.replace('%', '');
-//       percentage = new Decimal(percentage).div(100).toNumber();
-//     }
-
-//     return [totalsum, pricesum, percentage];
-//   })();
-
-//   const tableProps: TableProperties = {
-//     name: column.key ?? 'undefined',
-//     ref: `${column.letter}${4}`,
-//     headerRow: true,
-//     // totalsRow: true,
-//     style: {
-//       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//       // @ts-ignore
-//       theme: null,
-//       showRowStripes: true,
-//     },
-//     columns: [
-//       {
-//         name: '牌價',
-//         totalsRowFunction: 'sum',
-//       },
-//       { name: '承價', totalsRowFunction: 'sum' },
-//       { name: '百分比', totalsRowFunction: 'average' },
-//     ],
-//     rows: [...rows, lastRow],
-//   };
-
-//   return tableProps;
-// };
