@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
@@ -110,22 +112,6 @@ export default function PersonalPerformanceStatistics() {
   // ------------------------------------------------------------------
 
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
-
-  // ------------------------------------------------------------------
-
-  // region FUNCTION
-
-  const handle_dlExcel = () => {
-    const theMonth = month ? month.padStart(2, '0') : '';
-
-    dlExcel({
-      data: control_table,
-      sheetName: activeEmp?.label ?? '',
-      excelName: `個人業績統計表_${activeEmp?.label}_${year}${theMonth}`,
-      year,
-      month,
-    });
-  };
 
   // ------------------------------------------------------------------
   // region PROPS
@@ -266,11 +252,22 @@ export default function PersonalPerformanceStatistics() {
   ];
   //________________________________________________________________________
   //________________________________________________________________________
+
+  console.log(control_table);
+
   const panelList: TpanelList = [
     {
       type: 'myButton',
       label: '下載Excel',
-      onClick: handle_dlExcel,
+      onClick: () => {
+        // const theMonth = month ? month.padStart(2, '0') : '';
+        const subTitle = `${year} 年　${month} 月　業 績 統 計 表`;
+        dlExcel({
+          data: control_table,
+          excelName: `個人業績統計表_${activeEmp?.label}_${year}-${month}`,
+          subTitle,
+        });
+      },
     },
   ];
 
@@ -345,7 +342,9 @@ const useControl_personalPerformanceStatistics = ({
 }) =>
   //
   {
-    const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
+    const control: Tcontrol_personalPerformanceStatistics & {
+      bounsCalcProcess_str: string;
+    } = useMemo(() => {
       if (!data) {
         return {
           rowArr: [],
@@ -358,6 +357,7 @@ const useControl_personalPerformanceStatistics = ({
           listKeyArr: [],
           bonus: '',
           bounsCalcProcess: '',
+          bounsCalcProcess_str: '',
         };
       }
 
@@ -504,13 +504,22 @@ const useControl_personalPerformanceStatistics = ({
       const bounsCalcProcess = (
         <>
           <p>依統計表計算</p>
-          {theTotal.pricesum} - {threshold_str} ={performance_str}
+          {theTotal.pricesum} - {threshold_str} = {performance_str}
           <br />
           {performance_str} * 1% * {totalPercentage_num}% = <span className="text-danger font-bold">{bonus_str}</span>
           <hr />
           結算業績 : {sales_closed}　 結算獎金 : <span className="text-danger font-bold">{bonus_closed}</span>
         </>
       );
+
+      const bounsCalcProcess_str = `\
+依統計表計算
+${theTotal.pricesum} - ${threshold_str} = ${performance_str}
+${performance_str} * 1% * ${totalPercentage_num}% = ${bonus_str}
+
+結算業績 : ${sales_closed}　 結算獎金 : ${bonus_closed}
+`;
+
       // _______________________________________________________________________
 
       return {
@@ -519,6 +528,7 @@ const useControl_personalPerformanceStatistics = ({
         total: theTotal,
         listKeyArr,
         bounsCalcProcess,
+        bounsCalcProcess_str,
       };
 
       //
@@ -537,342 +547,623 @@ const useControl_personalPerformanceStatistics = ({
 // region dlExcel
 
 const dlExcel = async ({
-  data,
-  sheetName,
-  excelName,
-  year,
-  month,
-}: {
-  data: Tcontrol_personalPerformanceStatistics;
-  sheetName: string;
-  excelName: string;
-  year: string | number;
-  month: string | undefined;
-}) =>
   //
-  {
-    const { listKeyArr, rowArr, subTotalList, total } = data;
+  data,
+  excelName,
+  subTitle,
+}: {
+  data: Tcontrol_personalPerformanceStatistics & { bounsCalcProcess_str: string };
+  excelName: string;
+  subTitle: string;
+}) => {
+  const { listKeyArr, rowArr: dataArr, subTotalList, total, bounsCalcProcess_str } = data;
 
-    const workbook = new ExcelJs.Workbook();
-    const sheet = workbook.addWorksheet(sheetName);
+  const workbook = new ExcelJs.Workbook();
+  const sheet = workbook.addWorksheet();
 
-    sheet.views = [{ state: 'frozen', xSplit: 2 }];
+  // ----------------------------------------------------------------------
 
-    // ----------------------------------------------------------------------
+  const colSetting_projectNumber = {
+    label: '工程編號',
+    key: 'projectNumber',
+    width: 32,
+  };
+  const colSetting_projectName = {
+    label: '工程名稱',
+    key: 'projectName',
+    width: 32,
+  };
 
-    // ----------------------------------------------------------------------
-    // 先建好columns
+  const colSetting_contractor = {
+    label: '營造',
+    key: 'contractor',
+    width: 10,
+  };
 
-    const listColumnsProps = listKeyArr.reduce((current, key) => {
-      current.push(
-        {
-          header: key,
-          key,
-          width: 15,
-        },
-        {
-          width: 15,
-        },
-        {
-          width: 15,
-        }
-      );
+  const colSetting_designUnit = {
+    label: '設計單位',
+    key: 'designUnit',
+    width: 10,
+  };
 
-      return current;
-    }, [] as Partial<ExcelJs.Column>[]);
+  const colSetting_projectTotal = {
+    label: '總價',
+    key: 'totalSum',
+    width: 15,
+  };
+
+  const colSettingArr = [
+    colSetting_projectNumber,
+    colSetting_projectName,
+    colSetting_contractor,
+    colSetting_designUnit,
+  ];
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    const captionArr = listKeyArr
+      .map((key) => {
+        return [
+          {
+            key: key + '_totalsum',
+            width: 15,
+          },
+          {
+            key: key + '_pricesum',
+            width: 15,
+          },
+          {
+            key: key + '_percentage',
+            width: 15,
+          },
+        ];
+      })
+      .flat();
 
     sheet.columns = [
-      { header: '編號', key: 'idNumber', width: 15 },
-      { header: '工程名稱', key: 'projectName', width: 32 },
-      { header: '營造', key: 'C', width: 15 }, // 目前還沒有相關資料
-      { header: '設計單位', key: 'D', width: 15 }, // 目前還沒有相關資料
-      ...listColumnsProps,
-    ];
-
-    // ----------------------------------------------------------------------
-    const titleRow = sheet.insertRow(1, ['三久建材股份有限公司']);
-    titleRow.font = {
-      bold: true,
-      size: 20,
-    };
-    sheet.mergeCells('A1:B1');
-
-    // const dateRow = sheet.insertRow(2, [`${year}年${month}月業績統計表`]);
-    const dateRow = sheet.insertRow(2, [`${year}年${month ? `${month}月` : ''}業績統計表`]);
-    dateRow.font = {
-      bold: true,
-      size: 20,
-    };
-    sheet.mergeCells('A2:B2');
-
-    // ----------------------------------------------------------------------
-
-    // 取得放資料的row
-
-    const row_start = 5;
-    const row_end = rowArr.length;
-    const rowArr_excel = sheet.getRows(row_start, row_end) ?? [];
-
-    // ----------------------------------------------------------------------
-
-    // 把編號與工程名稱放進去
-
-    rowArr.forEach((row, index_row) => {
-      const { quotationNumber, projectName } = row;
-
-      if (rowArr_excel[index_row]) {
-        rowArr_excel[index_row].values = [quotationNumber, projectName];
-      }
-    });
-
-    // ----------------------------------------------------------------------
-
-    // 建立table並把資料放進去
-
-    sheet.columns.forEach((col, index) => {
-      if (index <= 3) {
-        return;
-      }
-
-      if (col.key) {
-        sheet.mergeCells(3, index + 1, 3, index + 1 + 2);
-        sheet.getCell(`${col.letter}${3}`).alignment = { vertical: 'middle', horizontal: 'center' };
-      }
-    });
-
-    const listColumns = sheet.columns.slice(4).filter((col) => col.key);
-
-    listColumns.forEach((column) => {
-      const tableProps = createTable({
-        column,
-        rowArr,
-        subTotalList,
-      });
-
-      sheet.addTable(tableProps);
-    });
-
-    sheet.columns.forEach((col, index) => {
-      if (index < 4) {
-        return;
-      }
-
-      col.numFmt = '$#,##0.00';
-
-      if ((index - 3) % 3 === 0) {
-        col.numFmt = '0.00%';
-      }
-    });
-
-    const row_subTotal = sheet.lastRow;
-
-    if (row_subTotal) {
-      row_subTotal.getCell(4).value = '小計';
-      row_subTotal.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
-    }
-
-    // --------------------------------------------------------------------
-
-    const col_total = sheet.getColumn(sheet.columns.length + 1);
-    col_total.width = 20;
-    col_total.numFmt = '$#,##0.00';
-
-    col_total.values = rowArr.reduce(
-      (values, row) => {
-        values.push(Number(row.total.replaceAll(',', '')));
-
-        return values;
-      },
-      [undefined, undefined, undefined, '總價'] as (undefined | string | number)[]
-    );
-
-    // --------------------------------------------------------------------
-
-    // 處理小計與總計
-
-    sheet.addRow([]);
-    const row_totalLabel = sheet.addRow([]);
-
-    const row_total = sheet.addRow([]);
-
-    row_totalLabel.values = [
       //
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      '牌價',
-      '承價',
-      '百分比',
+      colSetting_projectNumber,
+      colSetting_projectName,
+      colSetting_contractor,
+      colSetting_designUnit,
+      ...captionArr,
+      colSetting_projectTotal,
     ];
-
-    row_total.values = [
-      //
-      undefined,
-      undefined,
-      undefined,
-      '總計',
-      Number(total.totalsum.replaceAll(',', '')),
-      Number(total.pricesum.replaceAll(',', '')),
-      new Decimal(total.percentage.replace('%', '')).div(100).toNumber(),
-    ];
-
-    row_total.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
-
-    // ----------------------------------------------------------------------
-
-    // const titleRow = sheet.insertRow(1, ['三  久  建  材  股  份  有  限  公  司']);
-    // titleRow.font = {
-    //   bold: true,
-    //   size: 20,
-    // };
-    // // titleRow.getCell(1)
-    // sheet.mergeCells('A1:D1');
-
-    // ----------------------------------------------------------------------
-
-    // 調整樣式
-
-    row_subTotal?.eachCell({ includeEmpty: true }, (cell) => {
-      cell.border = {
-        top: {
-          style: 'double',
-          color: { argb: 'FF000000' },
-        },
-      };
-    });
-
-    rowArr_excel.forEach((row, index_row) => {
-      const isOdd = index_row % 2 === 0;
-
-      row.eachCell({ includeEmpty: true }, (cell) => {
-        cell.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: isOdd ? 'ffeeeeee' : 'ffdddddd' },
-        };
-      });
-      row.commit();
-    });
-
-    sheet.getRow(4).eachCell((cell) => {
-      cell.alignment = {
-        vertical: 'middle',
-        horizontal: 'right',
-      };
-    });
-
-    row_totalLabel.eachCell((cell) => {
-      cell.alignment = {
-        vertical: 'middle',
-        horizontal: 'right',
-      };
-    });
-
-    // --------------------------------------------------------------------
-    await workbook.xlsx.writeBuffer();
-
-    workbook.xlsx.writeBuffer().then((content) => {
-      const link = document.createElement('a');
-      const blobData = new Blob([content], {
-        type: 'application/vnd.ms-excel;charset=utf-8;',
-      });
-
-      link.download = `${excelName}.xlsx`;
-      link.href = URL.createObjectURL(blobData);
-      link.click();
-      link.remove();
-    });
-  };
-
-// =====================================================================
-
-// region createTable
-
-const createTable = ({
-  //
-  column,
-  rowArr,
-  subTotalList,
-}: {
-  column: Partial<ExcelJs.Column>;
-  rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
-  subTotalList: Tcontrol_personalPerformanceStatistics['subTotalList'];
-}) => {
-  const subTotal: Tcontrol_personalPerformanceStatistics['subTotalList'][string] | undefined =
-    subTotalList[column.key ?? 'undefined'];
-
-  const rows: TableProperties['rows'] = rowArr.map((row) => {
-    const { list } = row;
-
-    if (!column.key || !list[column.key]) {
-      return [];
-    }
-
-    let totalsum: string | number = list[column.key]?.totalsum || inValidSymbol;
-    let pricesum: string | number = list[column.key]?.pricesum || inValidSymbol;
-    let percentage: string | number = list[column.key]?.percentage || inValidSymbol;
-
-    if (totalsum !== inValidSymbol) {
-      totalsum = Number(totalsum.replaceAll(',', ''));
-    }
-
-    if (pricesum !== inValidSymbol) {
-      pricesum = Number(pricesum.replaceAll(',', ''));
-    }
-
-    if (percentage !== inValidSymbol) {
-      // percentage = Number(percentage.replace('%', ''));
-      percentage = percentage.replace('%', '');
-      percentage = new Decimal(percentage).div(100).toNumber();
-    }
-
-    return [totalsum, pricesum, percentage];
-  });
-
-  const lastRow = (() => {
-    let totalsum: string | number = subTotal.totalsum || inValidSymbol;
-    let pricesum: string | number = subTotal.pricesum || inValidSymbol;
-    let percentage: string | number = subTotal.percentage || inValidSymbol;
-
-    if (totalsum !== inValidSymbol) {
-      totalsum = Number(totalsum.replaceAll(',', ''));
-    }
-
-    if (pricesum !== inValidSymbol) {
-      pricesum = Number(pricesum.replaceAll(',', ''));
-    }
-
-    if (percentage !== inValidSymbol) {
-      // percentage = Number(percentage.replace('%', ''));
-      percentage = percentage.replace('%', '');
-      percentage = new Decimal(percentage).div(100).toNumber();
-    }
-
-    return [totalsum, pricesum, percentage];
   })();
 
-  const tableProps: TableProperties = {
-    name: column.key ?? 'undefined',
-    ref: `${column.letter}${4}`,
-    headerRow: true,
-    // totalsRow: true,
-    style: {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      theme: null,
-      showRowStripes: true,
-    },
-    columns: [
-      {
-        name: '牌價',
-        totalsRowFunction: 'sum',
-      },
-      { name: '承價', totalsRowFunction: 'sum' },
-      { name: '百分比', totalsRowFunction: 'average' },
-    ],
-    rows: [...rows, lastRow],
+  // ----------------------------------------------------------------------
+
+  const col_totalSum = sheet.getColumn('totalSum');
+  // const col_latestData = sheet.getColumn(col_totalSum.number - 3);
+  const colNumber_latestData = col_totalSum.number - 3;
+
+  let row_title: ExcelJs.Row;
+  let row_subTitle: ExcelJs.Row;
+  let row_caption: ExcelJs.Row;
+  let row_subCaption: ExcelJs.Row;
+  let row_subTotal: ExcelJs.Row;
+  let row_total: ExcelJs.Row;
+  let row_reviewer: ExcelJs.Row;
+  let row_calcProcess: ExcelJs.Row;
+
+  const rowArr_data: ExcelJs.Row[] = [];
+
+  let cell_bounsCalcProcess: ExcelJs.Cell;
+
+  // ----------------------------------------------------------------------
+
+  row_title = sheet.addRow(['三　久　建　材　股　份　有　限　公　司']);
+  row_subTitle = sheet.addRow([subTitle]);
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    const captionArr = listKeyArr
+      .map((key) => {
+        return [key, null, null];
+      })
+      .flat();
+
+    const values = [
+      //
+      ...colSettingArr.map((setting) => setting.label),
+      ...captionArr,
+      colSetting_projectTotal.label,
+    ];
+
+    row_caption = sheet.addRow(values);
+  })();
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    const subCaptionArr = listKeyArr
+      .map((key) => {
+        return ['牌價', '承價', '%'];
+      })
+      .flat();
+
+    const values = [
+      //
+      ...colSettingArr.map((setting) => null),
+      ...subCaptionArr,
+      null,
+    ];
+
+    row_subCaption = sheet.addRow(values);
+  })();
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    dataArr.forEach((data) => {
+      const { builder, designer, projectName, quotationNumber, total, list } = data;
+
+      const total_num = Number(total.replaceAll(',', ''));
+
+      const mainDataArr: ExcelJs.CellValue[] = listKeyArr
+        .map((key) => {
+          let totalsum: ExcelJs.CellValue = list[key]?.totalsum;
+          let pricesum: ExcelJs.CellValue = list[key]?.pricesum;
+          let percentage: ExcelJs.CellValue = list[key]?.percentage;
+
+          let percentage_num = Number(percentage?.replace('%', '') || '0');
+          percentage_num = new Decimal(percentage_num).div(100).toNumber();
+
+          totalsum && (totalsum = Number(totalsum.replaceAll(',', '')));
+          pricesum && (pricesum = Number(pricesum.replaceAll(',', '')));
+          percentage && (percentage = percentage_num);
+
+          return [totalsum, pricesum, percentage];
+        })
+        .flat();
+
+      const values: ExcelJs.CellValue[] = [
+        //
+        quotationNumber,
+        projectName,
+        builder,
+        designer,
+        ...mainDataArr,
+        total_num,
+      ];
+
+      rowArr_data.push(sheet.addRow(values));
+    });
+  })();
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    row_calcProcess = sheet.addRow([]);
+    cell_bounsCalcProcess = row_calcProcess.getCell(col_totalSum.number - 3);
+    cell_bounsCalcProcess.value = bounsCalcProcess_str;
+  })();
+
+  // ----------------------------------------------------------------------
+
+  (() => {
+    const mainDataArr: ExcelJs.CellValue[] = listKeyArr
+      .map((key) => {
+        let totalsum: ExcelJs.CellValue = subTotalList[key]?.totalsum;
+        let pricesum: ExcelJs.CellValue = subTotalList[key]?.pricesum;
+        let percentage: ExcelJs.CellValue = subTotalList[key]?.percentage;
+
+        let percentage_num = Number(percentage?.replace('%', '') || '0');
+        percentage_num = new Decimal(percentage_num).div(100).toNumber();
+
+        totalsum && (totalsum = Number(totalsum.replaceAll(',', '')));
+        pricesum && (pricesum = Number(pricesum.replaceAll(',', '')));
+        percentage && (percentage = percentage_num);
+
+        return [totalsum, pricesum, percentage];
+      })
+      .flat();
+
+    const values: ExcelJs.CellValue[] = ['', '小計', '', '', ...mainDataArr];
+
+    row_subTotal = sheet.addRow(values);
+  })();
+
+  // ----------------------------------------------------------------------
+
+  // row_total = sheet.addRow([]);
+  row_total = sheet.addRow([]);
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  (() => {
+    const row = cell_bounsCalcProcess.fullAddress.row;
+    const col = cell_bounsCalcProcess.fullAddress.col;
+
+    sheet.mergeCells(row, col, row, col + 2);
+  })();
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  row_caption.eachCell((cell, colNum) => {
+    const row = cell.fullAddress.row;
+    const col = cell.fullAddress.col;
+
+    if (colNum <= 4) {
+      sheet.mergeCells(row, col, row + 1, col);
+    } else if (colNum === row_caption.cellCount) {
+      sheet.mergeCells(row, col, row + 1, col);
+    } else {
+      if (!cell.isMerged) {
+        sheet.mergeCells(row, col, row, col + 2);
+      }
+    }
+  });
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  // ----------------------------------------------------------------------
+  row_calcProcess.height = 100;
+  cell_bounsCalcProcess.alignment = {
+    ...cell_bounsCalcProcess.alignment,
+    wrapText: true,
+    vertical: 'middle',
   };
 
-  return tableProps;
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  await workbook.xlsx.writeBuffer();
+
+  workbook.xlsx.writeBuffer().then((content) => {
+    const link = document.createElement('a');
+    const blobData = new Blob([content], {
+      type: 'application/vnd.ms-excel;charset=utf-8;',
+    });
+
+    link.download = `${excelName}.xlsx`;
+    link.href = URL.createObjectURL(blobData);
+    link.click();
+    link.remove();
+  });
 };
+
+// const dlExcel = async ({
+//   data,
+//   sheetName,
+//   excelName,
+//   year,
+//   month,
+// }: {
+//   data: Tcontrol_personalPerformanceStatistics;
+//   sheetName: string;
+//   excelName: string;
+//   year: string | number;
+//   month: string | undefined;
+// }) =>
+//   //
+//   {
+//     const { listKeyArr, rowArr, subTotalList, total } = data;
+
+//     const workbook = new ExcelJs.Workbook();
+//     const sheet = workbook.addWorksheet(sheetName);
+
+//     sheet.views = [{ state: 'frozen', xSplit: 2 }];
+
+//     // ----------------------------------------------------------------------
+
+//     // ----------------------------------------------------------------------
+//     // 先建好columns
+
+//     const listColumnsProps = listKeyArr.reduce((current, key) => {
+//       current.push(
+//         {
+//           header: key,
+//           key,
+//           width: 15,
+//         },
+//         {
+//           width: 15,
+//         },
+//         {
+//           width: 15,
+//         }
+//       );
+
+//       return current;
+//     }, [] as Partial<ExcelJs.Column>[]);
+
+//     sheet.columns = [
+//       { header: '編號', key: 'idNumber', width: 15 },
+//       { header: '工程名稱', key: 'projectName', width: 32 },
+//       { header: '營造', key: 'C', width: 15 }, // 目前還沒有相關資料
+//       { header: '設計單位', key: 'D', width: 15 }, // 目前還沒有相關資料
+//       ...listColumnsProps,
+//     ];
+
+//     // ----------------------------------------------------------------------
+//     const titleRow = sheet.insertRow(1, ['三久建材股份有限公司']);
+//     titleRow.font = {
+//       bold: true,
+//       size: 20,
+//     };
+//     sheet.mergeCells('A1:B1');
+
+//     // const dateRow = sheet.insertRow(2, [`${year}年${month}月業績統計表`]);
+//     const dateRow = sheet.insertRow(2, [`${year}年${month ? `${month}月` : ''}業績統計表`]);
+//     dateRow.font = {
+//       bold: true,
+//       size: 20,
+//     };
+//     sheet.mergeCells('A2:B2');
+
+//     // ----------------------------------------------------------------------
+
+//     // 取得放資料的row
+
+//     const row_start = 5;
+//     const row_end = rowArr.length;
+//     const rowArr_excel = sheet.getRows(row_start, row_end) ?? [];
+
+//     // ----------------------------------------------------------------------
+
+//     // 把編號與工程名稱放進去
+
+//     rowArr.forEach((row, index_row) => {
+//       const { quotationNumber, projectName } = row;
+
+//       if (rowArr_excel[index_row]) {
+//         rowArr_excel[index_row].values = [quotationNumber, projectName];
+//       }
+//     });
+
+//     // ----------------------------------------------------------------------
+
+//     // 建立table並把資料放進去
+
+//     sheet.columns.forEach((col, index) => {
+//       if (index <= 3) {
+//         return;
+//       }
+
+//       if (col.key) {
+//         sheet.mergeCells(3, index + 1, 3, index + 1 + 2);
+//         sheet.getCell(`${col.letter}${3}`).alignment = { vertical: 'middle', horizontal: 'center' };
+//       }
+//     });
+
+//     const listColumns = sheet.columns.slice(4).filter((col) => col.key);
+
+//     listColumns.forEach((column) => {
+//       const tableProps = createTable({
+//         column,
+//         rowArr,
+//         subTotalList,
+//       });
+
+//       sheet.addTable(tableProps);
+//     });
+
+//     sheet.columns.forEach((col, index) => {
+//       if (index < 4) {
+//         return;
+//       }
+
+//       col.numFmt = '$#,##0.00';
+
+//       if ((index - 3) % 3 === 0) {
+//         col.numFmt = '0.00%';
+//       }
+//     });
+
+//     const row_subTotal = sheet.lastRow;
+
+//     if (row_subTotal) {
+//       row_subTotal.getCell(4).value = '小計';
+//       row_subTotal.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+//     }
+
+//     // --------------------------------------------------------------------
+
+//     const col_total = sheet.getColumn(sheet.columns.length + 1);
+//     col_total.width = 20;
+//     col_total.numFmt = '$#,##0.00';
+
+//     col_total.values = rowArr.reduce(
+//       (values, row) => {
+//         values.push(Number(row.total.replaceAll(',', '')));
+
+//         return values;
+//       },
+//       [undefined, undefined, undefined, '總價'] as (undefined | string | number)[]
+//     );
+
+//     // --------------------------------------------------------------------
+
+//     // 處理小計與總計
+
+//     sheet.addRow([]);
+//     const row_totalLabel = sheet.addRow([]);
+
+//     const row_total = sheet.addRow([]);
+
+//     row_totalLabel.values = [
+//       //
+//       undefined,
+//       undefined,
+//       undefined,
+//       undefined,
+//       '牌價',
+//       '承價',
+//       '百分比',
+//     ];
+
+//     row_total.values = [
+//       //
+//       undefined,
+//       undefined,
+//       undefined,
+//       '總計',
+//       Number(total.totalsum.replaceAll(',', '')),
+//       Number(total.pricesum.replaceAll(',', '')),
+//       new Decimal(total.percentage.replace('%', '')).div(100).toNumber(),
+//     ];
+
+//     row_total.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+
+//     // ----------------------------------------------------------------------
+
+//     // const titleRow = sheet.insertRow(1, ['三  久  建  材  股  份  有  限  公  司']);
+//     // titleRow.font = {
+//     //   bold: true,
+//     //   size: 20,
+//     // };
+//     // // titleRow.getCell(1)
+//     // sheet.mergeCells('A1:D1');
+
+//     // ----------------------------------------------------------------------
+
+//     // 調整樣式
+
+//     row_subTotal?.eachCell({ includeEmpty: true }, (cell) => {
+//       cell.border = {
+//         top: {
+//           style: 'double',
+//           color: { argb: 'FF000000' },
+//         },
+//       };
+//     });
+
+//     rowArr_excel.forEach((row, index_row) => {
+//       const isOdd = index_row % 2 === 0;
+
+//       row.eachCell({ includeEmpty: true }, (cell) => {
+//         cell.fill = {
+//           type: 'pattern',
+//           pattern: 'solid',
+//           fgColor: { argb: isOdd ? 'ffeeeeee' : 'ffdddddd' },
+//         };
+//       });
+//       row.commit();
+//     });
+
+//     sheet.getRow(4).eachCell((cell) => {
+//       cell.alignment = {
+//         vertical: 'middle',
+//         horizontal: 'right',
+//       };
+//     });
+
+//     row_totalLabel.eachCell((cell) => {
+//       cell.alignment = {
+//         vertical: 'middle',
+//         horizontal: 'right',
+//       };
+//     });
+
+//     // --------------------------------------------------------------------
+//     await workbook.xlsx.writeBuffer();
+
+//     workbook.xlsx.writeBuffer().then((content) => {
+//       const link = document.createElement('a');
+//       const blobData = new Blob([content], {
+//         type: 'application/vnd.ms-excel;charset=utf-8;',
+//       });
+
+//       link.download = `${excelName}.xlsx`;
+//       link.href = URL.createObjectURL(blobData);
+//       link.click();
+//       link.remove();
+//     });
+//   };
+
+// // =====================================================================
+
+// // region createTable
+
+// const createTable = ({
+//   //
+//   column,
+//   rowArr,
+//   subTotalList,
+// }: {
+//   column: Partial<ExcelJs.Column>;
+//   rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
+//   subTotalList: Tcontrol_personalPerformanceStatistics['subTotalList'];
+// }) => {
+//   const subTotal: Tcontrol_personalPerformanceStatistics['subTotalList'][string] | undefined =
+//     subTotalList[column.key ?? 'undefined'];
+
+//   const rows: TableProperties['rows'] = rowArr.map((row) => {
+//     const { list } = row;
+
+//     if (!column.key || !list[column.key]) {
+//       return [];
+//     }
+
+//     let totalsum: string | number = list[column.key]?.totalsum || inValidSymbol;
+//     let pricesum: string | number = list[column.key]?.pricesum || inValidSymbol;
+//     let percentage: string | number = list[column.key]?.percentage || inValidSymbol;
+
+//     if (totalsum !== inValidSymbol) {
+//       totalsum = Number(totalsum.replaceAll(',', ''));
+//     }
+
+//     if (pricesum !== inValidSymbol) {
+//       pricesum = Number(pricesum.replaceAll(',', ''));
+//     }
+
+//     if (percentage !== inValidSymbol) {
+//       // percentage = Number(percentage.replace('%', ''));
+//       percentage = percentage.replace('%', '');
+//       percentage = new Decimal(percentage).div(100).toNumber();
+//     }
+
+//     return [totalsum, pricesum, percentage];
+//   });
+
+//   const lastRow = (() => {
+//     let totalsum: string | number = subTotal.totalsum || inValidSymbol;
+//     let pricesum: string | number = subTotal.pricesum || inValidSymbol;
+//     let percentage: string | number = subTotal.percentage || inValidSymbol;
+
+//     if (totalsum !== inValidSymbol) {
+//       totalsum = Number(totalsum.replaceAll(',', ''));
+//     }
+
+//     if (pricesum !== inValidSymbol) {
+//       pricesum = Number(pricesum.replaceAll(',', ''));
+//     }
+
+//     if (percentage !== inValidSymbol) {
+//       // percentage = Number(percentage.replace('%', ''));
+//       percentage = percentage.replace('%', '');
+//       percentage = new Decimal(percentage).div(100).toNumber();
+//     }
+
+//     return [totalsum, pricesum, percentage];
+//   })();
+
+//   const tableProps: TableProperties = {
+//     name: column.key ?? 'undefined',
+//     ref: `${column.letter}${4}`,
+//     headerRow: true,
+//     // totalsRow: true,
+//     style: {
+//       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//       // @ts-ignore
+//       theme: null,
+//       showRowStripes: true,
+//     },
+//     columns: [
+//       {
+//         name: '牌價',
+//         totalsRowFunction: 'sum',
+//       },
+//       { name: '承價', totalsRowFunction: 'sum' },
+//       { name: '百分比', totalsRowFunction: 'average' },
+//     ],
+//     rows: [...rows, lastRow],
+//   };
+
+//   return tableProps;
+// };
