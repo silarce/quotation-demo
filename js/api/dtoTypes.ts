@@ -3771,6 +3771,9 @@ export type TincomeBillSerialDto = {
 
   //
   vendorName: string | null;
+
+  internalUnderestimationPayment: number | null;
+  foreignUnderestimationPayment: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3812,6 +3815,8 @@ export type TupdateIncomeBillSerialDto = Pick<
   exchangeBenefits: string | null;
 } & {
   vendorName?: string | null;
+  internalUnderestimationPayment?: number | null; // 不足預估之收款
+  foreignUnderestimationPayment?: string | null; // 不足預估之收款 // 外銷用 新台幣
 };
 
 type TupdateIncomeBillDeductionDto = {
