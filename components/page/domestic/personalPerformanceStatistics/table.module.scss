@@ -168,8 +168,8 @@ $width_left: calc($width_group01 + $width_builder + $width_designer);
       position: sticky;
       left: calc(0px - $width_builder - $width_designer);
       width: $width_left;
-
       background-color: theme("colors.bgc01");
+
       > div {
         width: fit-content;
         padding: 11px 20px;
@@ -185,6 +185,22 @@ $width_left: calc($width_group01 + $width_builder + $width_designer);
   }
   .bar02 {
     width: 100%;
+    &.bonusBar {
+      .left {
+        > div {
+          display: flex;
+          align-items: center;
+          height: 100%;
+        }
+      }
+      .bonusWraper {
+        position: sticky;
+        left: $width_group01;
+        .bonus {
+          padding: 10px;
+        }
+      }
+    }
   }
   .group02 {
     display: grid;

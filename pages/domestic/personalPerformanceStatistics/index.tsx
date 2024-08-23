@@ -152,10 +152,8 @@ export default function PersonalPerformanceStatistics() {
   const activeEmp = empOptionArr.find((option) => option.value === emp);
   //________________________________________________________________________
   //________________________________________________________________________
-  const control_table = useControl_personalPerformanceStatistics(data);
-  //________________________________________________________________________
-  //________________________________________________________________________
-  const { bonus, sales } = useMemo(() => {
+
+  const { bonus: bonus_closed, sales: sales_closed } = useMemo(() => {
     if (!data_bonus) {
       return {
         bonus: inValidSymbol,
@@ -178,6 +176,16 @@ export default function PersonalPerformanceStatistics() {
       sales: sales_d.toNumber().toLocaleString(),
     };
   }, [data_bonus]);
+  //________________________________________________________________________
+  //________________________________________________________________________
+
+  const control_table = useControl_personalPerformanceStatistics({
+    data,
+    bonus_closed,
+    sales_closed,
+  });
+  //_____
+
   //________________________________________________________________________
   //________________________________________________________________________
   const selectPropsArr: TselectPropsArr = [
@@ -301,12 +309,12 @@ export default function PersonalPerformanceStatistics() {
       <div className={scss.body}>
         <div className={scss.selectBarWrapper}>
           <SelectBar selectPropsArr={selectPropsArr} />
-          <div className={scss.bonusBar}>
+          {/* <div className={scss.bonusBar}>
             <span>業績 : </span>
-            <span>{sales}</span>
+            <span>{sales_closed}</span>
             <span>獎金 : </span>
-            <span>{bonus}</span>
-          </div>
+            <span>{bonus_closed}</span>
+          </div> */}
         </div>
 
         <div className={scss.tableWrapper}>
@@ -326,155 +334,199 @@ export default function PersonalPerformanceStatistics() {
 
 // region HOOK
 
-const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
-  const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
-    if (!data) {
-      return {
-        rowArr: [],
-        subTotalList: {},
-        total: {
-          totalsum: '',
-          pricesum: '',
-          percentage: '',
-        },
-        listKeyArr: [],
-      };
-    }
-
-    const list: {
-      [key: string]: // Tcontrol_row
-      Omit<Tcontrol_row, 'total'> & { total: number };
-    } = {};
-
-    const subTotalList: {
-      [key: string]: {
-        totalsum: number;
-        pricesum: number;
-        percentage: number;
-      };
-    } = {};
-
-    const total = {
-      totalsum: 0,
-      pricesum: 0,
-      // percentage: 0,
-    };
-
-    const listKeyList: { [key: string]: string } = {};
-
-    data.forEach((item) => {
-      const {
-        //
-        projectName: projectname,
-        projectNumber: quotationnumber,
-        // quotetype,
-        totalSum,
-        priceSum,
-        percentage,
-        contractor,
-        designUnit,
-      } = item;
-
-      const isValid = typeof percentage === 'number';
-
-      let quotetype = item.quoteType;
-
-      if (!quotetype) {
-        quotetype = '無資料';
-      }
-
-      if (!subTotalList[quotetype]) {
-        subTotalList[quotetype] = {
-          totalsum: 0,
-          pricesum: 0,
-          percentage: 0,
+const useControl_personalPerformanceStatistics = ({
+  data,
+  bonus_closed,
+  sales_closed,
+}: {
+  data: TquotationAccounting_personal_contract[] | undefined;
+  bonus_closed?: string;
+  sales_closed?: string;
+}) =>
+  //
+  {
+    const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
+      if (!data) {
+        return {
+          rowArr: [],
+          subTotalList: {},
+          total: {
+            totalsum: '',
+            pricesum: '',
+            percentage: '',
+          },
+          listKeyArr: [],
+          bonus: '',
+          bounsCalcProcess: '',
         };
       }
 
-      if (listKeyList[quotetype] === undefined) {
-        listKeyList[quotetype] = quotetype;
-      }
+      const list: {
+        [key: string]: // Tcontrol_row
+        Omit<Tcontrol_row, 'total'> & { total: number };
+      } = {};
 
-      if (isValid) {
-        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
-        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
-        subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
-          .add(percentage ?? 0)
+      const subTotalList: {
+        [key: string]: {
+          totalsum: number;
+          pricesum: number;
+          percentage: number;
+        };
+      } = {};
+
+      const total = {
+        totalsum: 0,
+        pricesum: 0,
+        // percentage: 0,
+      };
+
+      const listKeyList: { [key: string]: string } = {};
+
+      data.forEach((item) => {
+        const {
+          //
+          projectName: projectname,
+          projectNumber: quotationnumber,
+          // quotetype,
+          totalSum,
+          priceSum,
+          percentage,
+          contractor,
+          designUnit,
+        } = item;
+
+        const isValid = typeof percentage === 'number';
+
+        let quotetype = item.quoteType;
+
+        if (!quotetype) {
+          quotetype = '無資料';
+        }
+
+        if (!subTotalList[quotetype]) {
+          subTotalList[quotetype] = {
+            totalsum: 0,
+            pricesum: 0,
+            percentage: 0,
+          };
+        }
+
+        if (listKeyList[quotetype] === undefined) {
+          listKeyList[quotetype] = quotetype;
+        }
+
+        if (isValid) {
+          subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
+          subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
+          subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
+            .add(percentage ?? 0)
+            .toNumber();
+
+          total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
+          total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
+        }
+
+        if (!list[quotationnumber]) {
+          list[quotationnumber] = {
+            quotationNumber: quotationnumber,
+            projectName: projectname,
+            builder: contractor ?? '',
+            designer: designUnit ?? '',
+            list: {},
+            total: 0,
+          };
+        }
+
+        // 格子裡的文字
+        list[quotationnumber].list[quotetype] = {
+          totalsum: isValid ? Number(totalSum).toLocaleString() : inValidSymbol,
+          pricesum: isValid ? Number(priceSum).toLocaleString() : inValidSymbol,
+          percentage: isValid ? `${percentage}%` : inValidSymbol,
+        };
+
+        if (isValid) {
+          list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
+        }
+      });
+      //
+      //
+      const control_rowArr: Tcontrol_row[] = Object.values(list).map((item) => {
+        return {
+          ...item,
+          total: Number(item.total).toLocaleString(),
+        };
+      });
+
+      const theSubTotalList: Tcontrol_subTotalList = {};
+
+      Object.keys(subTotalList).forEach((key) => {
+        const percent = new Decimal(subTotalList[key].pricesum)
+          .div(subTotalList[key].totalsum)
+          .mul(100)
+          .toDecimalPlaces(2)
           .toNumber();
 
-        total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
-        total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
-      }
-
-      if (!list[quotationnumber]) {
-        list[quotationnumber] = {
-          quotationNumber: quotationnumber,
-          projectName: projectname,
-          builder: contractor ?? '',
-          designer: designUnit ?? '',
-          list: {},
-          total: 0,
+        theSubTotalList[key] = {
+          ...subTotalList[key],
+          totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
+          pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
+          percentage: isNaN(percent) ? inValidSymbol : `${percent}%`,
         };
-      }
+      });
 
-      // 格子裡的文字
-      list[quotationnumber].list[quotetype] = {
-        totalsum: isValid ? Number(totalSum).toLocaleString() : inValidSymbol,
-        pricesum: isValid ? Number(priceSum).toLocaleString() : inValidSymbol,
-        percentage: isValid ? `${percentage}%` : inValidSymbol,
-      };
-
-      if (isValid) {
-        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
-      }
-    });
-    //
-    //
-    const control_rowArr: Tcontrol_row[] = Object.values(list).map((item) => {
-      return {
-        ...item,
-        total: Number(item.total).toLocaleString(),
-      };
-    });
-
-    const theSubTotalList: Tcontrol_subTotalList = {};
-
-    Object.keys(subTotalList).forEach((key) => {
-      const percent = new Decimal(subTotalList[key].pricesum)
-        .div(subTotalList[key].totalsum)
+      const totalPercentage_num = new Decimal(total.pricesum)
+        .div(total.totalsum)
         .mul(100)
         .toDecimalPlaces(2)
         .toNumber();
 
-      theSubTotalList[key] = {
-        ...subTotalList[key],
-        totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
-        pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
-        percentage: isNaN(percent) ? inValidSymbol : `${percent}%`,
+      const theTotal = {
+        totalsum: Number(total.totalsum).toLocaleString(),
+        pricesum: Number(total.pricesum).toLocaleString(),
+        percentage: totalPercentage_num.toString() + '%',
       };
-    });
 
-    const theTotal = {
-      totalsum: Number(total.totalsum).toLocaleString(),
-      pricesum: Number(total.pricesum).toLocaleString(),
-      percentage: new Decimal(total.pricesum).div(total.totalsum).mul(100).toDecimalPlaces(2).toString() + '%',
-    };
+      const listKeyArr = Object.keys(listKeyList);
+      // _______________________________________________________________________
+      const threshold = 2000000; // 六個0
+      const threshold_str = threshold.toLocaleString();
+      const performance = new Decimal(total.pricesum).minus(threshold).toNumber();
+      const performance_str = performance.toLocaleString();
 
-    const listKeyArr = Object.keys(listKeyList);
+      const bonus = new Decimal(total.pricesum)
+        .minus(threshold)
+        .mul(0.01)
+        .mul(totalPercentage_num)
+        .div(100)
+        .toDecimalPlaces(0)
+        .toNumber();
+      const bonus_str = bonus.toLocaleString();
+      const bounsCalcProcess = (
+        <>
+          <p>依統計表計算</p>
+          {theTotal.pricesum} - {threshold_str} ={performance_str}
+          <br />
+          {performance_str} * 1% * {totalPercentage_num}% = <span className="text-danger font-bold">{bonus_str}</span>
+          <hr />
+          結算業績 : {sales_closed}　 結算獎金 : <span className="text-danger font-bold">{bonus_closed}</span>
+        </>
+      );
+      // _______________________________________________________________________
 
-    return {
-      rowArr: control_rowArr,
-      subTotalList: theSubTotalList,
-      total: theTotal,
-      listKeyArr,
-    };
+      return {
+        rowArr: control_rowArr,
+        subTotalList: theSubTotalList,
+        total: theTotal,
+        listKeyArr,
+        bounsCalcProcess,
+      };
 
-    //
-    //
-  }, [data]);
+      //
+      //
+    }, [data]);
 
-  return control;
-};
+    return control;
+  };
 
 // =====================================================================
 // =====================================================================

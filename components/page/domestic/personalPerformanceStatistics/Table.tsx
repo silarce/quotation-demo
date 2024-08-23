@@ -39,6 +39,7 @@ type Tcontrol = {
   subTotalList: Tcontrol_subTotalList;
   total: Tcontrol_total;
   listKeyArr: string[];
+  bounsCalcProcess: React.ReactNode;
 };
 
 export type { Tcontrol as Tcontrol_personalPerformanceStatistics, Tcontrol_row, Tcontrol_subTotalList, Tcontrol_total };
@@ -47,13 +48,28 @@ export type { Tcontrol as Tcontrol_personalPerformanceStatistics, Tcontrol_row, 
 
 // region main
 export default function Table({ control }: { control: Tcontrol }) {
-  const { rowArr, subTotalList, total, listKeyArr } = control;
+  const {
+    //
+    rowArr,
+    subTotalList,
+    total,
+    listKeyArr,
+    bounsCalcProcess,
+  } = control;
 
   return (
     <div className={classNames(scss.table)}>
       <Thead listKeyArr={listKeyArr} />
       <Tbody rowArr={rowArr} listKeyArr={listKeyArr} />
-      {rowArr.length > 0 && <Footer subTotalList={subTotalList} total={total} listKeyArr={listKeyArr} />}
+      {rowArr.length > 0 && (
+        <Footer
+          //
+          subTotalList={subTotalList}
+          total={total}
+          listKeyArr={listKeyArr}
+          bounsCalcProcess={bounsCalcProcess}
+        />
+      )}
     </div>
   );
 }
@@ -166,15 +182,13 @@ const Footer = ({
   subTotalList,
   total,
   listKeyArr,
+  bounsCalcProcess,
 }: {
   subTotalList: Tcontrol_subTotalList;
   total: Tcontrol_total;
   listKeyArr: string[];
+  bounsCalcProcess: Tcontrol['bounsCalcProcess'];
 }) => {
-  // const { group01, builder, designer } = config;
-
-  // const leftWidth = parseInt(group01.style.width) + parseInt(builder.style.width) + parseInt(designer.style.width);
-
   return (
     <div className={scss.footer}>
       {/*  */}
@@ -224,7 +238,19 @@ const Footer = ({
             <span>{total.percentage}</span>
           </div>
         </div>
-        {/* <div style={config.total.style}></div> */}
+      </div>
+      <div className={classNames(scss.bar02, scss.bonusBar)}>
+        <div className={scss.left}>
+          <div>
+            <span>獎金</span>
+          </div>
+        </div>
+
+        <div className={classNames(scss.bonusWraper)}>
+          <div className={scss.bonus}>
+            <span>{bounsCalcProcess}</span>
+          </div>
+        </div>
       </div>
       {/*  */}
     </div>
