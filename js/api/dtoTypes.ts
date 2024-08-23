@@ -2421,7 +2421,7 @@ export type TcontractAccountingReportFormDto = {
 // 追加減工程統計表
 export type TquotationAccounting_modifyContract = {
   projectname: string;
-  quotationnumber: string;
+  quotationnumber: string | null;
   quotetype: string;
   year: number;
   month: number;
@@ -2429,6 +2429,7 @@ export type TquotationAccounting_modifyContract = {
   pricesum: `${number}`;
   county: string;
   percentage: number | null;
+  area: string | null; // property的key為推測，待後端更新後要與後端同步
 };
 
 // ========================================================================
@@ -3771,6 +3772,9 @@ export type TincomeBillSerialDto = {
 
   //
   vendorName: string | null;
+
+  internalUnderestimationPayment: number | null;
+  foreignUnderestimationPayment: string | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3812,6 +3816,8 @@ export type TupdateIncomeBillSerialDto = Pick<
   exchangeBenefits: string | null;
 } & {
   vendorName?: string | null;
+  internalUnderestimationPayment?: number | null; // 不足預估之收款
+  foreignUnderestimationPayment?: string | null; // 不足預估之收款 // 外銷用 新台幣
 };
 
 type TupdateIncomeBillDeductionDto = {
