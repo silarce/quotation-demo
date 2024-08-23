@@ -1325,9 +1325,14 @@ const apiQuotationAccounting_modifyContract = async (params: Tparam_accounting_m
 export const useQuotationAccounting_modifyContract = (params: {
   year: number | undefined;
   month: number | undefined;
-  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
+  area:
+    | ('northern' | 'central' | 'southern' | 'eastern' | 'all')
+    | ('northern' | 'central' | 'southern' | 'eastern' | 'all')[];
 }) => {
   const [res, setRes] = useState<TquotationAccounting_modifyContract[]>();
+
+  const { area } = params;
+  const areaStr = Array.isArray(area) ? area.join(',') : area;
 
   const update = async () => {
     if (!params.year || !params.area) {
@@ -1337,7 +1342,8 @@ export const useQuotationAccounting_modifyContract = (params: {
     const okParams = {
       year: params.year,
       month: params.month,
-      area: params.area,
+      // area: params.area,
+      area: areaStr,
     };
 
     const newRes = await apiQuotationAccounting_modifyContract(okParams);

@@ -39,8 +39,11 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
-  region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
-  regionArr: ('northern' | 'central' | 'southern' | 'eastern')[] | undefined;
+  // region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+  area:
+    | ('northern' | 'central' | 'southern' | 'eastern')[]
+    | ('northern' | 'central' | 'southern' | 'eastern')
+    | undefined;
   keyWord: string | undefined;
 };
 
@@ -66,14 +69,20 @@ const regionOptionArr2 = optionsCreator_region();
 
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
-  const { year, month, region, regionArr } = router.query as Tquery;
+  const {
+    year,
+    month,
+    area = 'all',
+    // region
+  } = router.query as Tquery;
+  // let { area } = router.query as Tquery;
 
   // ------------------------------------------------------------------
 
   const { data, update } = useQuotationAccounting_modifyContract({
     year: year ? Number(year) + 1911 : undefined,
     month: month ? Number(month) : undefined,
-    area: region || 'all',
+    area: area || 'all',
   });
 
   // ------------------------------------------------------------------
@@ -237,7 +246,6 @@ export default function AdditionalEngineeringStatistics() {
       subTotalList: theSubTotalList,
       total: theTotal,
       listKeyArr,
-      // areaList,
       areaList: {}, // 待api更新
     };
   }, [data]);
@@ -250,7 +258,15 @@ export default function AdditionalEngineeringStatistics() {
     let str = `${year}　年`;
 
     month && (str = str + `　${month}　月`);
-    region && (str = str + `　${lookup_region[region]}`);
+
+    // region && (str = str + `　${lookup_region[region]}`);
+    if (Array.isArray(area)) {
+      const areaLabel = (area as string[]).map((item) => lookup_region[item]).join('、');
+      str = str + '　' + areaLabel;
+    } else {
+      str = str + '　' + area;
+    }
+
     str = str + '　追加工程統計表';
 
     return str;
@@ -293,47 +309,47 @@ export default function AdditionalEngineeringStatistics() {
       placeholder: '選擇月份',
       boxStyle: { width: '140px' },
     },
-    {
-      selectProps: {
-        value: region,
-        options: regionOptionArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                region: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '選擇區域',
-      boxStyle: { width: '140px' },
-    },
+    // {
+    //   selectProps: {
+    //     value: region,
+    //     options: regionOptionArr,
+    //     onChange: (option) => {
+    //       if (typeof option?.value === 'string') {
+    //         router.push({
+    //           query: {
+    //             ...router.query,
+    //             region: option.value,
+    //           },
+    //         });
+    //       }
+    //     },
+    //   },
+    //   placeholder: '選擇區域',
+    //   boxStyle: { width: '140px' },
+    // },
   ];
 
   const customeLeft = [
     //
     <SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />,
-    // <Select
-    //   key="1"
-    //   className="ml-[6px] w-[280px]"
-    //   mode="multiple"
-    //   allowClear
-    //   //
-    //   placeholder="區域，可複選"
-    //   value={regionArr}
-    //   options={regionOptionArr2}
-    //   onChange={(arr) => {
-    //     router.replace({
-    //       query: {
-    //         ...router.query,
-    //         regionArr: arr,
-    //       },
-    //     });
-    //   }}
-    // />,
+    <Select
+      key="1"
+      className="ml-[6px] w-[280px]"
+      mode="multiple"
+      allowClear
+      //
+      placeholder="區域，可複選"
+      value={router.query.area}
+      options={regionOptionArr2}
+      onChange={(arr) => {
+        router.replace({
+          query: {
+            ...router.query,
+            area: arr,
+          },
+        });
+      }}
+    />,
   ];
 
   const panelList: TpanelList = [
@@ -356,7 +372,7 @@ export default function AdditionalEngineeringStatistics() {
 
   useEffect(() => {
     update();
-  }, [year, month, region]);
+  }, [year, month, area]);
 
   useEffect(() => {
     const now = new Date();
@@ -365,9 +381,9 @@ export default function AdditionalEngineeringStatistics() {
 
     router.push({
       query: {
+        ...router.query,
         year: theYear,
         month: theMonth,
-        region: region,
       },
     });
   }, []);
