@@ -22,6 +22,7 @@ type Tcontrol_row = {
       | undefined;
   };
   total: string;
+  employeeName: string;
 };
 
 type Tcontrol_total = {
