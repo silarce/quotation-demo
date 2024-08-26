@@ -50,6 +50,7 @@ import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_flow from 'public/image/icon/fc_flow.svg';
+import icon_review from 'public/image/icon/review.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -344,6 +345,7 @@ export default function PurchaseRequisitionList() {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
             GetReviewFlow();
+            GetReviewFlowById();
             hasFetchedData.current = true;
         }
     }, []);
@@ -1173,13 +1175,10 @@ export default function PurchaseRequisitionList() {
     const [reviewdata, setReviewdata] = useState<any[]>([]);
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
 
-    useEffect(() => {
-        alert("go");
-        alert(reviewflow);
-        GetReviewFlowById(reviewflow as string);
-    }, [reviewflow]);
+    // useEffect(() => {
+    // }, [reviewflow]);
 
-
+    //取全部的自訂流程
     const GetReviewFlow = async () => {
         try {
             setIsLoading(true);
@@ -1213,10 +1212,9 @@ export default function PurchaseRequisitionList() {
 
     }
 
-
-    const GetReviewFlowById = async (reviewflow: any) => {
+    //取單據的審核流程
+    const GetReviewFlowById = async () => {
         try {
-            alert("wow");
             setIsLoading(true);
             const conditionModel = {
                 id: reviewflow
@@ -1710,12 +1708,16 @@ export default function PurchaseRequisitionList() {
                             </div>
                         </div>
                         <div className={scss.body_foot2}>
+                            <span>審核流程</span>
                             <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
                                 {reviewflowdata.map((item, index) => (
                                     <div key={index} style={{ textAlign: 'left', flex: 1 }}>
                                         <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
                                         <br />
                                         <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                        <span style={{padding:'0px 5px'}}>
+                                            <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                        </span>
                                     </div>
                                 ))}
                             </div>
