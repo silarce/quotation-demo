@@ -48,6 +48,8 @@ import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_flow from 'public/image/icon/fc_flow.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -67,7 +69,8 @@ export default function PurchaseRequisitionList() {
         status,
         need_date,
         note,
-        reviewtype // 判斷審核的
+        viewtype, // 判斷審核的,
+        reviewflow
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -89,6 +92,9 @@ export default function PurchaseRequisitionList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+
+
+
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -139,7 +145,6 @@ export default function PurchaseRequisitionList() {
     //轉採購數
     const [transpoprogress, setTranspoprogress] = useState<number>(0);
 
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
     useEffect(() => {
         if (firstin !== undefined) {
@@ -148,8 +153,6 @@ export default function PurchaseRequisitionList() {
     }, [firstin]);
 
 
-    const [review_flow, setReview_flow] = useState<string>("");
-    const [reviewbar, setReviewbar] = useState<boolean>(false);
 
 
     // const [open, setOpen] = useState(false);
@@ -161,13 +164,7 @@ export default function PurchaseRequisitionList() {
     const searchTargetList = [
         {
             placeholder: '請購單號',
-        },
-        {
-            placeholder: '請購日期',
-        },
-        {
-            placeholder: '請購人員',
-        },
+        }
     ];
 
     //搜尋功能
@@ -298,46 +295,48 @@ export default function PurchaseRequisitionList() {
         }
     };
 
-    const GetReviewFlow = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                username: userInfo?.username
-            };
+    // const GetReviewFlow = async () => {
+    //     try {
+    //         setIsLoading(true);
+    //         const conditionModel = {
+    //             username: userInfo?.username
+    //         };
 
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'ReviewService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
 
 
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
+    //         const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
 
+    //         setReviewdata(data);
 
-            console.log(data);
+    //         console.log(data);
+    //         console.log(JSON.stringify(data));
 
-            // getProduct();
+    //         // getProduct();
 
-            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+    //         // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //     }
+    //     finally {
+    //         setIsLoading(false);
+    //     }
 
-    }
+    // }
 
     const hasFetchedData = useRef(false);
 
@@ -541,93 +540,140 @@ export default function PurchaseRequisitionList() {
     };
 
     //送出審核
-    const sentToReview = async (type: any) => {
+    // const sentToReview = async (type: any) => {
 
-        // alert("送出審核");
-
-        if (review_flow === "") {
-            setReviewbar(true);
-        }
+    //     // alert("送出審核");
 
 
+    //     if (review_flow === "") {
+    //         setReviewbar(true);
+    //     }
+    //     else {
+    //         alert("yo");
+    //         const review_query = {
+    //             purchaserequisitionuuid: purchaserequisitionuuidin,
+    //             purchaserequisitionid: purchaserequisitionidin,
+    //             create_at: create_atin,
+    //             create_by: create_byin,
+    //             status: '詢價中',
+    //             need_date: need_datein,
+    //             note: notein,
+    //             firstin: 1,
+    //         };
+
+    //         console.log(JSON.stringify(review_query));
+
+    //         // return;
+    //         const conditionModel = {
+    //             document_id: purchaserequisitionid,
+    //             document_uuid: purchaserequisitionuuid,
+    //             document_type: "請購單",
+    //             review_id: review_flow,
+    //             query: review_query,
+    //             username: userInfo?.username
+    //         };
+
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'ReviewService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+
+    //         const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(inputModel)
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+    //         await new Promise(resolve => setTimeout(resolve, 500));
 
 
 
 
 
-        return;
+
+    //     }
 
 
 
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                type: string | undefined,
-                purchaserequisitionuuid: string | undefined,
-                username: string | undefined
-            } = {
-                type: type,
-                purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
-                username: userInfo?.username as string | undefined
-            };
 
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            // setData(data);
-            await new Promise(resolve => setTimeout(resolve, 500));
-            getPurchaseRequisition();
-            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
-            await new Promise(resolve => setTimeout(resolve, 500));
+    //     return;
 
 
 
-            let status = '';
-            switch (type) {
-                case '請購':
-                    status = '詢價中';
-                    break;
-                case '詢價':
-                    status = '審核中';
-                    break;
-                case '核准':
-                    status = '已核准';
-                    break;
-                case '駁回':
-                    status = '已駁回';
-                    break;
-                case '結案':
-                    status = '已結案';
-                    break;
-                default:
-                    status = '未知狀態'; // 或者你可以選擇其他合適的默認值
-                    break;
-            }
+    //     try {
+    //         setIsLoading(true);
+    //         const conditionModel: {
+    //             type: string | undefined,
+    //             purchaserequisitionuuid: string | undefined,
+    //             username: string | undefined
+    //         } = {
+    //             type: type,
+    //             purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
+    //             username: userInfo?.username as string | undefined
+    //         };
 
-            setStatusin(status);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }
-    // useEffect(() => {
-    //     getPurchaseRequisitionDetail(purchaserequisitionuuidin);
-    // }, [statusin ]); // 依赖于这些状态
 
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'WareHouseService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+    //         const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+    //         // setData(data);
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+    //         getPurchaseRequisition();
+    //         getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+    //         let status = '';
+    //         switch (type) {
+    //             case '請購':
+    //                 status = '詢價中';
+    //                 break;
+    //             case '詢價':
+    //                 status = '審核中';
+    //                 break;
+    //             case '核准':
+    //                 status = '已核准';
+    //                 break;
+    //             case '駁回':
+    //                 status = '已駁回';
+    //                 break;
+    //             case '結案':
+    //                 status = '已結案';
+    //                 break;
+    //             default:
+    //                 status = '未知狀態'; // 或者你可以選擇其他合適的默認值
+    //                 break;
+    //         }
+
+    //         setStatusin(status);
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //     }
+    //     finally {
+    //         setIsLoading(false);
+    //     }
+    // }
 
 
 
@@ -1120,12 +1166,167 @@ export default function PurchaseRequisitionList() {
     };
 
 
-    const [value, setValue] = useState(1);
 
-    const onChange = (e: RadioChangeEvent) => {
-        console.log('radio checked', e.target.value);
+    //審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+
+    useEffect(() => {
+        alert("go");
+        alert(reviewflow);
+        GetReviewFlowById(reviewflow as string);
+    }, [reviewflow]);
+
+
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setReviewdata(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+
+    const GetReviewFlowById = async (reviewflow: any) => {
+        try {
+            alert("wow");
+            setIsLoading(true);
+            const conditionModel = {
+                id: reviewflow
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlowById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setReviewflowdata(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
         setValue(e.target.value);
     };
+
+
+    const setReview = async (item: any) => {
+        console.log(item);
+        setReview_flow(item.id);
+        setReviewflowdata(item.stages);
+        console.log(reviewflowdata);
+    }
+
+
+
+    //送出審核
+    const sentToReview = async (type: any) => {
+
+
+
+        if (review_flow === "") {
+            setReviewbar(true);
+        }
+        else {
+            alert("yo");
+            const review_query = {
+                purchaserequisitionuuid: purchaserequisitionuuidin,
+                purchaserequisitionid: purchaserequisitionidin,
+                create_at: create_atin,
+                create_by: create_byin,
+                status: '詢價中',
+                need_date: need_datein,
+                note: notein,
+                firstin: 1,
+            };
+
+            console.log(JSON.stringify(review_query));
+
+            // return;
+            const conditionModel = {
+                document_id: purchaserequisitionidin,
+                document_uuid: purchaserequisitionuuidin,
+                document_type: "請購單",
+                review_id: review_flow,
+                query: review_query,
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+
+
+
+        }
+    }
+
 
 
 
@@ -1203,7 +1404,7 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
 
                     <div className={scss.content}>
-                        <div className={scss.head_head1} style={{ display: reviewtype === 'review' ? 'none' : '' }}>
+                        <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1231,7 +1432,21 @@ export default function PurchaseRequisitionList() {
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
+                                <button className={scss.squarebtn} onClick={() => { setReviewbar(true) }} title="單據送審">
+                                    <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                &nbsp;
+                                {/* <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none' && review_flow === '' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button> */}
+                                <button style={{ display: `${(review_flow != "" && statusin === '詢價中' && parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10)) ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+
+                                {/* <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` && review_flow != "" ? '' : 'none' }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
                                     <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
@@ -1251,7 +1466,7 @@ export default function PurchaseRequisitionList() {
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
                                     <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     已結
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                         <div className={scss.head_body}>
@@ -1304,6 +1519,8 @@ export default function PurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
+                                        {/* {review_flow}
+                                        {statusin} */}
                                     </div>
                                     <div></div>
                                 </div>
@@ -1492,8 +1709,22 @@ export default function PurchaseRequisitionList() {
                                 </table>
                             </div>
                         </div>
+                        <div className={scss.body_foot2}>
+                            <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                {reviewflowdata.map((item, index) => (
+                                    <div key={index} style={{ textAlign: 'left', flex: 1 }}>
+                                        <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
+                                        <br />
+                                        <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+
+
                         <br />
-                        <div style={{ display: reviewtype === "review" ? 'none' : '' }}>
+                        <div style={{ display: viewtype === "review" ? 'none' : '' }}>
                             <div className={scss.foot_head1}>
                                 <div>
                                     <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
@@ -1700,23 +1931,6 @@ export default function PurchaseRequisitionList() {
                     show={searchmodalopen}
                     onCrossClick={SearchModalClose}
                 >
-                    {/* <Modal
-                        visible={searchmodalopen}
-                        footer={null}
-                        onCancel={SearchModalClose}
-                        width="1000px"
-                        maskClosable={false}
-                        // title='單據查找'
-                        // title={
-                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                        //     <span>查詢條件</span>
-                        //     <span >筆數：共 {data.length} 筆</span>
-                        // </div>
-
-                        // }
-                        // centered
-                        style={{ top: 200 }}
-                    > */}
 
                     <div className={scss.modal_head_head1}>
                         <div>
@@ -1858,9 +2072,6 @@ export default function PurchaseRequisitionList() {
                                     <span>
                                         <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
                                 </div>
                             </form>
                         </div>
@@ -1868,9 +2079,6 @@ export default function PurchaseRequisitionList() {
                             maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
-                            // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
-                            // padding: '10px',
-                            // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
                             <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
@@ -1880,19 +2088,38 @@ export default function PurchaseRequisitionList() {
                     {/* </Modal > */}
                 </DragableModal>
 
+
+
+
+                {/* 審核 */}
                 <DragableModal
                     handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '500px' }}
+                    style={{ zIndex: '1001', width: '820px' }}
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
 
-                    <Radio.Group onChange={onChange} value={value}>
-                        <Space direction="vertical">
-                            <Radio value={1} style={{ fontSize: '18px' }}>Option A</Radio>
-                            <Radio value={2} style={{ fontSize: '18px' }}>Option B</Radio>
-                            <Radio value={3} style={{ fontSize: '18px' }}>Option C</Radio>
-                        </Space>
-                    </Radio.Group>
+
 
                 </DragableModal>
 

@@ -241,7 +241,8 @@ export default function ReviewList() {
                     need_date: '113-08-21',
                     note: 'AAFFFDDD',
                     firstin: 1,
-                    reviewtype: 'review'
+                    viewtype: 'review',
+                    reviewflow:'72dd7daa-a18f-4033-b1d7-f172b5712f9d'
                 },
             }, undefined, { shallow: true });
         }
