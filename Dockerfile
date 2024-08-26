@@ -29,12 +29,6 @@ RUN yarn build:static
 # If using npm comment out above and use below instead
 # RUN npm run build
 
-COPY --from=builder /app/next.config.js ./next.config.js
-COPY --from=builder /app/next-i18next.config.js ./next-i18next.config.js
-
-
-
-
 # Production image, copy all the files and run next
 FROM nginx:alpine AS runner
 
