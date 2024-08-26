@@ -54,23 +54,30 @@
 div.panelHeader {
   padding: 17px 30px;
   border: none;
+
   .row01,
-  .row02 {
-    span {
+  .row02,
+  .row03 {
+    &:not(:nth-last-of-type(1)) {
+      margin-bottom: 16px;
+    }
+    span,
+    p {
       font-weight: 400;
       font-size: 16px;
     }
-    .clientName,
-    .country {
-      color: $colorMain;
-    }
   }
+
+  .row01 .clientName,
+  .row02 .country {
+    color: $colorMain;
+  }
+
   .row01 {
     display: grid;
-    // grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
     grid-template-columns: 110px auto 85px 105px 85px 20px;
     gap: 22px;
-    margin-bottom: 16px;
+    // margin-bottom: 16px;
   }
   .row02 {
     display: grid;
@@ -86,13 +93,20 @@ div.panelHeader {
       }
     }
   }
+  .row03 {
+    display: flex;
+    gap: 22px;
+    .num {
+      color: theme("colors.danger");
+      font-weight: 600;
+    }
+  }
 }
 
 div.panelBody {
   min-height: 82px;
   .detailRow {
     display: grid;
-    // grid-template-columns: 110px auto 65px 28px 85px 20px;
     grid-template-columns: 110px auto 20px;
     gap: 22px;
     padding: 8px 30px;
