@@ -190,6 +190,9 @@ export default function WdContractList() {
       date: content.quotationDate,
       county: content.county,
       projectName: content.projectName,
+      //
+      QtyOfProjectPatternForReview: 0,
+      QtyOfWorkwheetForReview: 0,
     };
 
     return obj;

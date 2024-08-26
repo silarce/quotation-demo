@@ -25,6 +25,9 @@ type TtheadInfo = {
   projectName: string;
   alertLight?: boolean;
   remindLight?: boolean;
+  //
+  QtyOfProjectPatternForReview: number;
+  QtyOfWorkwheetForReview: number;
 };
 
 // ===============================================================
@@ -61,6 +64,7 @@ export default function PanelHeader({
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive} onClick={onClick}>
+      {/* row01 */}
       <div ref={viewRef} className={scss.row01}>
         <span>{contractNumber}</span>
         <span className={scss.clientName}>{clientName}</span>
@@ -74,6 +78,7 @@ export default function PanelHeader({
           <IconDetail onClick={openQuotation} />
         </div>
       </div>
+      {/* row02 */}
       <div className={scss.row02}>
         <span>{date}</span>
         <div className={scss.place}>
@@ -92,6 +97,15 @@ export default function PanelHeader({
         </div>
         <div></div>
       </div>
+      {/* row03 */}
+      {/* <div className={scss.row03}>
+        <p>
+          應審核工程圖表 :　<span className={scss.num}>{9}</span>
+        </p>
+        <p>
+          應審核工作表 :　<span className={scss.num}>{9}</span>
+        </p>
+      </div> */}
     </CellWithBar>
   );
 }
