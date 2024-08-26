@@ -173,6 +173,9 @@ export default function WdContractList() {
         projectName,
         alertLight: hasNoContract,
         remindLight: hasUncollectedAmounts,
+        //
+        QtyOfProjectPatternForReview: 0,
+        QtyOfWorkwheetForReview: 0,
       };
 
       contractNumber.startsWith('N-')
