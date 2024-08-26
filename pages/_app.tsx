@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useCallback } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import _ from 'lodash';
+import { appWithTranslation } from 'next-i18next';
 
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
@@ -286,5 +287,5 @@ const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
 
 // =======================================================================
 export type { NextPageWithLayout, TappContext, TmyPageProps };
-export default MyApp;
+export default appWithTranslation(MyApp);
 export { AppContext };
