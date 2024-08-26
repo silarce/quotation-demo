@@ -2,6 +2,8 @@
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
 CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
+const { i18n } = require('./next-i18next.config')
+
 // =====================================================
 const path = require('path');
 // =====================================================
@@ -29,4 +31,5 @@ module.exports = {
 
     return config;
   },
+  i18n,
 };
