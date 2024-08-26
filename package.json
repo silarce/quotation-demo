@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:static": "next build && next export",
+    "export": "next export",
+    "build:static": "next build",
     "start": "next start",
     "lint": "next lint --quiet",
     "check": "tsc --noEmit"
