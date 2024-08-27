@@ -35,6 +35,9 @@ import 'moment/locale/zh-tw';
 // moment擴充套件
 import moment_tz from 'moment-timezone';
 
+// i18n
+import 'hooks/i18n';
+
 // 時區設為台北時間
 moment_tz.tz.setDefault('Asia/Taipei');
 
