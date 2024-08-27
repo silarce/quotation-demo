@@ -88,6 +88,7 @@ export default function ReviewList() {
     const [editmain, setEditmain] = useState<boolean>(false);
 
 
+    const [itemQuery, setItemQuery] = useState<any>({});
 
 
 
@@ -131,40 +132,41 @@ export default function ReviewList() {
             const conditionModel = {
                 username: userInfo?.username
             };
-
-
+    
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'ReviewService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-
+    
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            
+    
             const response = await fetch(`${setting.apipath}/Review/GetReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-
-
+    
             setData(data);
             console.log(data);
+    
+            // 檢查 data 是否有內容
+            if (data.length > 0) {
+                console.log(data[0]);
+                GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
 
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            if (data.length > 0 && checkfirstin === 0) {
-                // setProductnamein(data[0].name);
+            } else {
+                console.log('沒有撈到資料');
             }
         } catch (error: any) {
             setError("GetReview:" + error.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
     };
+    
 
     const hasFetchedData = useRef(false);
 
@@ -179,9 +181,10 @@ export default function ReviewList() {
 
 
     const GetReviewStatus = async (item: any) => {
-
         setReviewtype(item.document_type);
-        
+        // alert("in");
+        // GetDocument(item);
+        // setReviewtype("報價單");
 
         try {
             setIsLoading(true);
@@ -189,7 +192,6 @@ export default function ReviewList() {
                 document_id: item.document_id,
                 document_uuid: item.document_uuid
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -206,54 +208,74 @@ export default function ReviewList() {
             }
             const data = await response.json();
 
-
             setData2(data);
-            console.log(data2);
 
-            await new Promise(resolve => setTimeout(resolve, 500));
-            if (data2.length > 0 && checkfirstin === 0) {
-                // setProductnamein(data[0].name);
-            }
+            // 設定 itemQuery
+            GetDocument(item);
+
         } catch (error: any) {
             setError("GetReviewStatus:" + error.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
     };
 
 
 
-
-
-
-    useEffect(() => {
-        if (typeof window !== 'undefined' && reviewtype === "請購單") {
+    const GetDocument = async (item: any) => {
+        console.log(item);
+        if ( reviewtype === "請購單") {
+            // 將 JSON 字串解析為 JavaScript 對象
+            const parsedQuery = JSON.parse(item.query);
+    
+            console.log(parsedQuery); // 檢查解析後的資料
+    
             // 使用 shallow 模式更新 query 而不進行頁面跳轉
-            console.log(reviewtype);
-            router.push({
+            router.replace({
                 query: {
-                    purchaserequisitionuuid: '9fab25d6-b750-4508-8b11-9e8c1564be70',
-                    purchaserequisitionid: '20240800131',
-                    create_at: '113-08-21',
-                    create_by: 'Lai-1',
-                    status: '詢價中',
-                    need_date: '113-08-21',
-                    note: 'AAFFFDDD',
+                    purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
+                    purchaserequisitionid: parsedQuery.purchaserequisitionid,
+                    create_at: getTaiwanDateStr(parsedQuery.create_at),
+                    create_by: parsedQuery.create_by,
+                    status: '審核中',
+                    need_date: parsedQuery.need_date,
+                    note: parsedQuery.note,
                     firstin: 1,
-                    viewtype: 'review',
-                    reviewflow:'72dd7daa-a18f-4033-b1d7-f172b5712f9d'
+                    viewtype: 'review'
                 },
             }, undefined, { shallow: true });
         }
-    }, [reviewtype]);
+    }
+    
+    // 使用 useEffect 監聽 itemQuery 的變化
+    // useEffect(() => {
+    //     if (typeof window !== 'undefined' && reviewtype === "請購單" && itemQuery && Object.keys(itemQuery).length > 0) {
+    //         console.log("Navigating with query:", itemQuery);
+
+    //         // 使用 shallow 模式更新 query 而不進行頁面跳轉
+    //         router.push({
+    //             query: {
+    //                 purchaserequisitionuuid: itemQuery.purchaserequisitionuuid,
+    //                 purchaserequisitionid: itemQuery.purchaserequisitionid,
+    //                 create_at: itemQuery.create_at,
+    //                 create_by: itemQuery.create_by,
+    //                 status: '審核中',
+    //                 need_date: itemQuery.need_date,
+    //                 note: itemQuery.note,
+    //                 firstin: 1,
+    //                 viewtype: 'review'
+    //             },
+    //         }, undefined, { shallow: true });
+    //     }
+    // }, [itemQuery]);
 
 
-    useEffect(() => {
-        if (typeof window !== 'undefined' && reviewtype === "報價單") {
-            alert("報價單")
-        }
-    }, [reviewtype]);
+
+    // useEffect(() => {
+    //     if (typeof window !== 'undefined' && reviewtype === "報價單") {
+    //         alert("報價單")
+    //     }
+    // }, [reviewtype]);
 
 
 
@@ -633,7 +655,7 @@ export default function ReviewList() {
                                         }}
                                     /> */}
                                     {/* <span style={{fontSize:'18px',color:'#14256a'}}>意見</span> */}
-                                    <input placeholder="意見" style={{ padding:'10px',fontSize:'18px',border: '1px solid gray', height: '100%', width: '100%' }} />
+                                    <input placeholder="意見" style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }} />
 
                                 </div>
                             </div>

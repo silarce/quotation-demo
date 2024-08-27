@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -47,11 +47,13 @@ import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
+import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_flow from 'public/image/icon/fc_flow.svg';
 import icon_review from 'public/image/icon/review.svg';
-
+import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
+import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -245,7 +247,8 @@ export default function PurchaseRequisitionList() {
             // console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
-                type: "詢價中"
+                type: "詢價中",
+                username: userInfo?.username
             };
 
 
@@ -264,11 +267,11 @@ export default function PurchaseRequisitionList() {
             }
             const data = await response.json();
 
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: '尚無單據'
-                })
-            }
+            // if (data.length === 0) {
+            //     myAlert.warning({
+            //         title: '尚無單據'
+            //     })
+            // }
 
             setData(data);
             setData1Restore(data);
@@ -285,8 +288,8 @@ export default function PurchaseRequisitionList() {
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
+                GetReviewById(data[0].purchaserequisitionuuid);
 
-                // alert(data[0].need_date);
             }
         } catch (error: any) {
             setError(error.message);
@@ -345,7 +348,6 @@ export default function PurchaseRequisitionList() {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
             GetReviewFlow();
-            GetReviewFlowById();
             hasFetchedData.current = true;
         }
     }, []);
@@ -433,6 +435,7 @@ export default function PurchaseRequisitionList() {
             setData2([]);
             setNeed_datein(need_date as string);
             setNotein(note as string);
+            GetReviewById(purchaserequisitionuuid);
         }
     }, [purchaserequisitionuuid]);
 
@@ -1174,6 +1177,7 @@ export default function PurchaseRequisitionList() {
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
 
     // useEffect(() => {
     // }, [reviewflow]);
@@ -1213,14 +1217,17 @@ export default function PurchaseRequisitionList() {
     }
 
     //取單據的審核流程
-    const GetReviewFlowById = async () => {
+    const GetReviewById = async (document_uuid: any) => {
         try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
             setIsLoading(true);
+
             const conditionModel = {
-                id: reviewflow
+                document_uuid: document_uuid
             };
 
-            var inputModel = {
+            const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'ReviewService',
                 FunctionName: 'no',
@@ -1229,22 +1236,48 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/Review/GetReviewFlowById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
 
-            setReviewflowdata(data);
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+
+                // 確保 data 的內容已經設定
+                if (data[0] && data[0].document_status) {
+                    setStatusin(data[0].document_status);
+                } else {
+                    console.log('Document status not found');
+                }
+            } else {
+                console.log('No valid data');
+            }
 
         } catch (error: any) {
             setError(error.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
+    };
 
-    }
+
+
 
     const [value, setValue] = useState<number | null>(null);
     const onChange = (e: any) => {
@@ -1253,10 +1286,8 @@ export default function PurchaseRequisitionList() {
 
 
     const setReview = async (item: any) => {
-        console.log(item);
         setReview_flow(item.id);
-        setReviewflowdata(item.stages);
-        console.log(reviewflowdata);
+        setReviewflowdata2(item.stages);
     }
 
 
@@ -1264,65 +1295,97 @@ export default function PurchaseRequisitionList() {
     //送出審核
     const sentToReview = async (type: any) => {
 
-
-
-        if (review_flow === "") {
-            setReviewbar(true);
-        }
-        else {
-            alert("yo");
-            const review_query = {
-                purchaserequisitionuuid: purchaserequisitionuuidin,
-                purchaserequisitionid: purchaserequisitionidin,
-                create_at: create_atin,
-                create_by: create_byin,
-                status: '詢價中',
-                need_date: need_datein,
-                note: notein,
-                firstin: 1,
-            };
-
-            console.log(JSON.stringify(review_query));
-
-            // return;
-            const conditionModel = {
-                document_id: purchaserequisitionidin,
-                document_uuid: purchaserequisitionuuidin,
-                document_type: "請購單",
-                review_id: review_flow,
-                query: review_query,
-                username: userInfo?.username
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            console.log(JSON.stringify(conditionModel));
-
-            const response = await fetch(`${setting.apipath}/Review/AddReview`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
             }
-            const data = await response.json();
-            await new Promise(resolve => setTimeout(resolve, 500));
+            else {
+                const review_query = {
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    purchaserequisitionid: purchaserequisitionidin,
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    status: '詢價中',
+                    need_date: need_datein,
+                    note: notein,
+                    firstin: 1,
+                };
+
+                const conditionModel = {
+                    document_id: purchaserequisitionidin,
+                    document_uuid: purchaserequisitionuuidin,
+                    document_type: "請購單",
+                    review_id: review_flow,
+                    query: review_query,
+                    username: userInfo?.username
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(purchaserequisitionuuidin);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                //改變單據狀態
+                const conditionModel2 = {
+                    type: type,
+                    purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
+                    username: userInfo?.username as string | undefined
+                };
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel2),
+                };
+
+                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+                if (!response2.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data2 = await response2.json();
+                getPurchaseRequisition();
+                getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+
+                setStatusin("審核中");
 
 
 
 
 
+            }
 
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
         }
+
     }
 
 
@@ -1418,7 +1481,7 @@ export default function PurchaseRequisitionList() {
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
+                                {/* <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
                                     <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     核准
                                 </button>
@@ -1426,32 +1489,33 @@ export default function PurchaseRequisitionList() {
                                 <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("駁回") }} title="單據核准">
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
-                                </button>
+                                </button> */}
                             </div>
                             <div></div>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setReviewbar(true) }} title="單據送審">
+                                <button className={scss.squarebtn} onClick={() => { setReviewbar(true) }} title="單據送審" style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中')?'':'none'}` }}>
                                     <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     流程
                                 </button>
+                                <button className={scss.disablesquarebtn} title="審核流程" style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }}>
+                                    <img src={icon_flow_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
                                 &nbsp;
-                                {/* <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none' && review_flow === '' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
+                                <button className={scss.redsquarebtn} style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中') ? '' : 'none'}` }} onClick={() => { sentToReview("審核") }} title="單據送審">
                                     <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
-                                </button> */}
-                                <button style={{ display: `${(review_flow != "" && statusin === '詢價中' && parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10)) ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
-                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
+                                    <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
+                                    <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    抽單
                                 </button>
 
-                                {/* <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` && review_flow != "" ? '' : 'none' }} className={scss.redsquarebtn} onClick={() => { sentToReview("詢價") }} title="單據送審">
-                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    送審
-                                </button>
-                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
-                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    送審
-                                </button>
                                 <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
@@ -1464,7 +1528,7 @@ export default function PurchaseRequisitionList() {
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
                                     <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     已結
-                                </button> */}
+                                </button>
                             </div>
                         </div>
                         <div className={scss.head_body}>
@@ -1708,20 +1772,44 @@ export default function PurchaseRequisitionList() {
                             </div>
                         </div>
                         <div className={scss.body_foot2}>
-                            <span>審核流程</span>
-                            <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                            <div>
                                 {reviewflowdata.map((item, index) => (
-                                    <div key={index} style={{ textAlign: 'left', flex: 1 }}>
-                                        <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
-                                        <br />
-                                        <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
-                                        <span style={{padding:'0px 5px'}}>
-                                            <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                        </span>
+                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                            <div key={stageIndex} style={{ flex: 1, flexDirection: 'column', textAlign: 'left', marginRight: '10px' }}>
+                                                <span style={{ fontSize: '18px', color: '#14256a' }}>{stage.review_title}</span>
+                                                <br />
+                                                <span style={{ fontSize: '16px' }}>{stage.review_person}</span>
+                                                <span style={{ padding: '0px 5px', display: `${stage.review_time === "0001-01-01T00:00:00" ? 'none' : ''}` }}>
+                                                    <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </span>
+                                            </div>
+                                        ))}
                                     </div>
                                 ))}
                             </div>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.map((item, index) => (
+                                        <div key={index} style={{ textAlign: 'left', flex: 1 }}>
+                                            <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
+                                            <br />
+                                            <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                            {/* <span style={{ padding: '0px 5px' }}>
+                                                <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                            </span> */}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
+
+
+
+
+
+
+
 
 
 
