@@ -181,7 +181,7 @@ export default function ReviewList() {
 
 
     const GetReviewStatus = async (item: any) => {
-        setReviewtype(item.document_type);
+        
         // alert("in");
         // GetDocument(item);
         // setReviewtype("報價單");
@@ -209,10 +209,10 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData2(data);
-
+            setItemQuery(item);
             // 設定 itemQuery
-            GetDocument(item);
-
+            // GetDocument(item);
+            setReviewtype(item.document_type);
         } catch (error: any) {
             setError("GetReviewStatus:" + error.message);
         } finally {
@@ -222,11 +222,39 @@ export default function ReviewList() {
 
 
 
-    const GetDocument = async (item: any) => {
-        console.log(item);
+    // const GetDocument = async (item: any) => {
+    //     console.log(item);
+    //     if ( reviewtype === "請購單") {
+    //         // 將 JSON 字串解析為 JavaScript 對象
+    //         const parsedQuery = JSON.parse(item.query);
+    
+    //         console.log(parsedQuery); // 檢查解析後的資料
+    
+    //         // 使用 shallow 模式更新 query 而不進行頁面跳轉
+    //         router.replace({
+    //             query: {
+    //                 purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
+    //                 purchaserequisitionid: parsedQuery.purchaserequisitionid,
+    //                 create_at: getTaiwanDateStr(parsedQuery.create_at),
+    //                 create_by: parsedQuery.create_by,
+    //                 status: '審核中',
+    //                 need_date: parsedQuery.need_date,
+    //                 note: parsedQuery.note,
+    //                 firstin: 1,
+    //                 viewtype: 'review'
+    //             },
+    //         }, undefined, { shallow: true });
+    //     }
+    // }
+
+
+    
+    
+    
+    useEffect(() => {
         if ( reviewtype === "請購單") {
             // 將 JSON 字串解析為 JavaScript 對象
-            const parsedQuery = JSON.parse(item.query);
+            const parsedQuery = JSON.parse(itemQuery.query);
     
             console.log(parsedQuery); // 檢查解析後的資料
     
@@ -245,29 +273,7 @@ export default function ReviewList() {
                 },
             }, undefined, { shallow: true });
         }
-    }
-    
-    // 使用 useEffect 監聽 itemQuery 的變化
-    // useEffect(() => {
-    //     if (typeof window !== 'undefined' && reviewtype === "請購單" && itemQuery && Object.keys(itemQuery).length > 0) {
-    //         console.log("Navigating with query:", itemQuery);
-
-    //         // 使用 shallow 模式更新 query 而不進行頁面跳轉
-    //         router.push({
-    //             query: {
-    //                 purchaserequisitionuuid: itemQuery.purchaserequisitionuuid,
-    //                 purchaserequisitionid: itemQuery.purchaserequisitionid,
-    //                 create_at: itemQuery.create_at,
-    //                 create_by: itemQuery.create_by,
-    //                 status: '審核中',
-    //                 need_date: itemQuery.need_date,
-    //                 note: itemQuery.note,
-    //                 firstin: 1,
-    //                 viewtype: 'review'
-    //             },
-    //         }, undefined, { shallow: true });
-    //     }
-    // }, [itemQuery]);
+    }, [itemQuery]);
 
 
 
