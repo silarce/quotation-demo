@@ -29,7 +29,9 @@ export default function Lab00({
 }) {
   const router = useRouter();
 
-  const { t, i18n } = useTranslation();
+  // const { t, i18n } = useTranslation('fooo');
+  const { t, i18n } = useTranslation('common');
+  // const { t, i18n } = useTranslation();
 
   return (
     <div>
@@ -37,6 +39,7 @@ export default function Lab00({
       <br />
       <h1 className="text-5xl">{t('hello')}</h1>
       <h1 className="text-5xl">{t('meow')}</h1>
+      {/* <h1 className="text-5xl">{t('bark')}</h1> */}
       <br />
 
       <MyButton_v2 onClick={() => i18n.changeLanguage('zh-TW')}>中文</MyButton_v2>
