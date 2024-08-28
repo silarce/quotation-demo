@@ -3960,6 +3960,11 @@ export type TincomeBillSerialSettlementFormDto = {
   // 應收帳款總額(外銷)
   foreignReceivablePayment: number;
 
+  // 不足預估之收款
+  internalUnderestimationPayment: number | null;
+  // 不足預估之收款(外銷)
+  foreignUnderestimationPayment: string | null;
+
   // 應收帳款狀態
   reviewStatus: TincomeBillSerialSettlementFormStatus;
   // 審核狀態
@@ -3988,11 +3993,6 @@ export type TincomeBillSerialSettlementFormReviewRecordDto = {
   settlementFormId: string | null;
   //  所屬收入傳票統計表
   settlementForm: TincomeBillSerialSettlementFormDto;
-
-  // // 不足預估之收款
-  // internalUnderestimationPayment: number | null;
-  // // 不足預估之收款(外銷)
-  // foreignUnderestimationPayment: string | null;
 };
 
 export type TcreateIncomeBillSettlementFormDto = {
