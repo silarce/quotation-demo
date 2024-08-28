@@ -1,4 +1,11 @@
 {
   "languageName": "繁體中文",
-  "language": "語言"
+  "language": "語言",
+  "editTemplate": {
+    "name": "姓名",
+    "age": "年齡",
+    "gender": "性別",
+    "species": "物種",
+    "description": "描述"
+  }
 }

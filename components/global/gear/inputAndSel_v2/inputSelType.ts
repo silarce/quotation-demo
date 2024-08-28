@@ -69,7 +69,7 @@ interface Radio {
 }
 
 interface Span {
-  style: { [property: string]: string }; // React.CSSProperties
+  style?: { [property: string]: string }; // React.CSSProperties
 }
 
 // ============================================================================
@@ -79,7 +79,9 @@ interface InputSelTemplate {
   wrapperPreStyle?: 'ps01';
   wrapperStyle?: { [property: string]: string }; // React.CSSProperties
 
-  // caption?: string; 由前端i18n處理，帶入上面的key，t(key)
+  // 基本上由前端i18n處理，依據上面的key取得對應的值。
+  // 但若後端有給caption，則直接用caption
+  caption?: string;
   captionStyle?: { [property: string]: string }; // React.CSSProperties
   captionSize?: '14' | '16' | '18' | '20';
   captionWeight?: '400' | '500' | '600' | '700';
