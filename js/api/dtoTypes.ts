@@ -3770,11 +3770,6 @@ export type TincomeBillSerialDto = {
   foreignFee: string | null;
   // '兌換利益'
   exchangeBenefits: string | null;
-
-  // 不足預估之收款
-  internalUnderestimationPayment: number | null;
-  // 不足預估之收款(外銷)
-  foreignUnderestimationPayment: string | null;
 };
 
 // export type TincomeBillSerialDto = {
@@ -3913,8 +3908,6 @@ export type TupdateIncomeBillSerialDto = Pick<
   exchangeBenefits: string | null;
 } & {
   vendorName?: string | null;
-  internalUnderestimationPayment?: number | null; // 不足預估之收款
-  foreignUnderestimationPayment?: string | null; // 不足預估之收款 // 外銷用 新台幣
 };
 
 type TupdateIncomeBillDeductionDto = {
@@ -3995,6 +3988,11 @@ export type TincomeBillSerialSettlementFormReviewRecordDto = {
   settlementFormId: string | null;
   //  所屬收入傳票統計表
   settlementForm: TincomeBillSerialSettlementFormDto;
+
+  // // 不足預估之收款
+  // internalUnderestimationPayment: number | null;
+  // // 不足預估之收款(外銷)
+  // foreignUnderestimationPayment: string | null;
 };
 
 export type TcreateIncomeBillSettlementFormDto = {
