@@ -536,9 +536,13 @@ const useProfile = ({
   const originContent = useMemo(() => quotationContent, [quotationContent]);
 
   const control_profile = useMemo(() => {
+    const quotationDate = quotationContent?.quotationDate
+      ? moment(quotationContent.quotationDate).format('YYYY-MM-DD')
+      : '';
+
     const control_profile: Tcontrol = {
       quotationNumber: originContent?.quotationNumber ?? '',
-      quotationDate: moment().format('YYYY-MM-DD'),
+      quotationDate: quotationDate,
       customer: {
         value: state_customer,
         onChange: (customer) => {
