@@ -28,7 +28,7 @@ import {
   //
   useQuotationAccounting_personalContract,
 } from 'js/api/api_quotation';
-import { useEmployee, Tparams } from 'js/api/api_employee';
+import { useEmployee, TemployeeDto, Tparams } from 'js/api/api_employee';
 import {
   // TbonusDto,
   //
@@ -116,21 +116,26 @@ export default function PersonalPerformanceStatistics() {
   // ------------------------------------------------------------------
   // region PROPS
 
-  const empOptionArr = useMemo(() => {
+  const { empOptionArr, employee } = useMemo(() => {
     if (!data_emp) {
-      return [];
+      return {
+        empOptionArr: [],
+        employee: undefined,
+      };
     }
+
+    const employee = getEmployee(data_emp.data, emp || '');
 
     const empArr = data_emp.data;
 
-    const optionArr = empArr.map((emp) => {
+    const empOptionArr = empArr.map((emp) => {
       return {
         label: emp.chName || emp.enName || inValidSymbol,
         value: emp.id,
       };
     });
 
-    return optionArr;
+    return { empOptionArr, employee };
   }, [data_emp]);
 
   //________________________________________________________________________
@@ -169,6 +174,7 @@ export default function PersonalPerformanceStatistics() {
     data,
     bonus_closed,
     sales_closed,
+    employee,
   });
   //_____
 
@@ -334,10 +340,12 @@ const useControl_personalPerformanceStatistics = ({
   data,
   bonus_closed,
   sales_closed,
+  employee,
 }: {
   data: TquotationAccounting_personal_contract[] | undefined;
   bonus_closed?: string;
   sales_closed?: string;
+  employee: TemployeeDto | undefined;
 }) => {
   const control: Tcontrol_personalPerformanceStatistics & {
     bounsCalcProcess_str: string;
@@ -431,6 +439,7 @@ const useControl_personalPerformanceStatistics = ({
           designer: designUnit ?? '',
           list: {},
           total: 0,
+          employeeName: employee?.chName ?? '',
         };
       }
 
@@ -537,6 +546,12 @@ ${performance_str} * 1% * ${totalPercentage_num}% = ${bonus_str}
 // =====================================================================
 // =====================================================================
 
+const getEmployee = (employeeArr: TemployeeDto[], empId: string): TemployeeDto | undefined => {
+  return employeeArr.find((emp) => emp.id === empId);
+};
+
+// =====================================================================
+
 // region dlExcel
 
 const dlExcel = async ({
@@ -549,7 +564,14 @@ const dlExcel = async ({
   excelName: string;
   subTitle: string;
 }) => {
-  const { listKeyArr, rowArr: dataArr, subTotalList, total, bounsCalcProcess_str } = data;
+  const {
+    //
+    listKeyArr,
+    rowArr: dataArr,
+    subTotalList,
+    total,
+    bounsCalcProcess_str,
+  } = data;
 
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet();
@@ -593,6 +615,12 @@ const dlExcel = async ({
     width: width_data,
   };
 
+  const colSetting_employeeName = {
+    label: '業務',
+    key: 'salesName',
+    width: width_data,
+  };
+
   const colSettingArr = [
     colSetting_projectNumber,
     colSetting_projectName,
@@ -630,6 +658,7 @@ const dlExcel = async ({
       colSetting_designUnit,
       ...captionArr,
       colSetting_projectTotal,
+      colSetting_employeeName,
     ];
   })();
 
@@ -640,8 +669,8 @@ const dlExcel = async ({
   const col_contractor = sheet.getColumn('contractor');
   const col_designUnit = sheet.getColumn('designUnit');
   const col_totalSum = sheet.getColumn('totalSum');
-  // const col_latestData = sheet.getColumn(col_totalSum.number - 3);
-  const colNumber_latestData = col_totalSum.number - 3;
+  const col_employeeName = sheet.getColumn('salesName');
+  const colNumber_latestData = col_employeeName.number - 4;
 
   let row_title: ExcelJs.Row;
   let row_subTitle: ExcelJs.Row;
@@ -675,6 +704,7 @@ const dlExcel = async ({
       ...colSettingArr.map((setting) => setting.label),
       ...captionArr,
       colSetting_projectTotal.label,
+      colSetting_employeeName.label,
     ];
 
     row_caption = sheet.addRow(values);
@@ -703,7 +733,16 @@ const dlExcel = async ({
 
   (() => {
     dataArr.forEach((data) => {
-      const { builder, designer, projectName, quotationNumber, total, list } = data;
+      const {
+        //
+        builder,
+        designer,
+        projectName,
+        quotationNumber,
+        total,
+        list,
+        employeeName,
+      } = data;
 
       const total_num = Number(total.replaceAll(',', ''));
 
@@ -732,6 +771,7 @@ const dlExcel = async ({
         designer,
         ...mainDataArr,
         total_num,
+        employeeName,
       ];
 
       rowArr_data.push(sheet.addRow(values));
@@ -806,7 +846,7 @@ const dlExcel = async ({
 
     if (colNum <= 4) {
       sheet.mergeCells(row, col, row + 1, col);
-    } else if (colNum === row_caption.cellCount) {
+    } else if (colNum === row_caption.cellCount || colNum === row_caption.cellCount - 1) {
       sheet.mergeCells(row, col, row + 1, col);
     } else {
       if (!cell.isMerged) {
@@ -845,6 +885,15 @@ const dlExcel = async ({
   });
 
   col_totalSum.eachCell((cell) => {
+    cell.border = {
+      ...cell.border,
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      right: { style: 'thin' },
+      bottom: { style: 'thin' },
+    };
+  });
+  col_employeeName.eachCell((cell) => {
     cell.border = {
       ...cell.border,
       top: { style: 'thin' },

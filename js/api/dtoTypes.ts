@@ -3685,69 +3685,71 @@ export type TincomeBillSerialDto = {
   createdAt: string;
   updatedAt: string;
 
-  // 收入傳票號碼
+  // '收入傳票號碼'
   billSerialNumber: string;
-  // 匯款時間點/收到票據時間點
+  // '收入傳票歸屬的年月份'
+  incomeBillDate: string | null;
+  // '匯款時間點/收到票據時間點
   receiveDate: string | null;
-  // 合約編號
+  // '合約編號'
   contractNumber: string | null;
-  // 工程名稱
+  // '工程名稱'
   projectName: string | null;
-  // 承攬款
+  // '承攬款'
   contractPayment: number | null;
-  // 本期計價
+  // '本期計價'
   periodPayment: number | null;
-  // 前期已收
+  // '前期已收'
   priorPeriodPayment: number | null;
-  // 票據/匯款 匯入帳號
+  // '票據/匯款 匯入帳號'
   importAccountingNumber: string | null;
-  // 票據編號
+  // '票據編號'
   noteNumber: string | null;
-  // 票據到期日
+  // '票據到期日'
   noteMaturityDate: string | null;
-  // 收款金額
+  // '收款金額'
   receivablePayment: number | null;
-  // 扣款金額
+  // '扣款金額'
   deductionPayment: number | null;
-  // 未收款金額 // 餘額
+  // '未收款金額'
   unpaidPayment: number | null;
-  // 是否為國外收入傳票
+  // '是否為國外收入傳票'
   isForeign: boolean;
+
+  // '備註差額(帶入應收帳款的扣款明細和匯費)'
   // 差額 // 更新accountant的扣款明細、手續費會更新差額
   difference: string | null;
+  // '發票號碼'
+  invoiceNumber: string | null;
+  // '收款id'
+  accountantId: string | null;
+  // '收款'
+  accountant: TaccountantDto;
+  // '應收帳款id'
+  accountReceivableId: string | null;
+  // '應收帳款'
+  accountReceivable: TaccountsReceivableDto;
+  // '關聯的應收帳款發票'
+  invoices: TaccountsReceivableInvoiceDto[];
+  // '是否為紙本匯入之收入傳票'
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
-  // 收入傳票歸屬日期
-  incomeBillDate: string | null;
-  //
-  accountantId: string;
-  accountant: TaccountantDto;
-  //
+  // '手key的備註'
   note: string | null;
-
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // temporary_separatePayment: number | null;
-  //
-  accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
-  order: number | null;
+  // '廠商名稱'
+  vendorName: string | null;
+  // '廠商名稱'
+  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // '手續費'
   fee: number | null;
-
-  // 沒意外的話invoices裡應該最多只會有一筆資料
-  invoiceNumber: string | null;
-  invoices?: TaccountsReceivableInvoiceDto[];
-
-  //
-  //
+  // '排序'
+  order: number | null;
   // '應收是否已閱'
   isCashierSeen: boolean | null;
   // '應收是否已閱'
   isWorkSupervisorSeen: boolean | null;
   // '總經理是否已閱'
   isManagerSeen: boolean | null;
-  //
-  //
-  //
-  // 外銷相關
   // '出口報單幣別'
   declarationCurrency: Tcurrency | null;
   // '出口報單匯率'
@@ -3762,20 +3764,110 @@ export type TincomeBillSerialDto = {
   receivableExchangeRate: string | null;
   // '收款外幣金額'
   receivableCurrencyPayment: string | null;
-  // '國外匯費-新台幣'
-  foreignFee: string | null;
-  // '國外匯費-外幣'
+  // '國外匯費(外幣)'
   foreignCurrencyFee: string | null;
-
+  // '國外匯費(台幣)'
+  foreignFee: string | null;
   // '兌換利益'
   exchangeBenefits: string | null;
-
-  //
-  vendorName: string | null;
-
-  internalUnderestimationPayment: number | null;
-  foreignUnderestimationPayment: string | null;
 };
+
+// export type TincomeBillSerialDto = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+
+//   // 收入傳票號碼
+//   billSerialNumber: string;
+//   // 匯款時間點/收到票據時間點
+//   receiveDate: string | null;
+//   // 合約編號
+//   contractNumber: string | null;
+//   // 工程名稱
+//   projectName: string | null;
+//   // 承攬款
+//   contractPayment: number | null;
+//   // 本期計價
+//   periodPayment: number | null;
+//   // 前期已收
+//   priorPeriodPayment: number | null;
+//   // 票據/匯款 匯入帳號
+//   importAccountingNumber: string | null;
+//   // 票據編號
+//   noteNumber: string | null;
+//   // 票據到期日
+//   noteMaturityDate: string | null;
+//   // 收款金額
+//   receivablePayment: number | null;
+//   // 扣款金額
+//   deductionPayment: number | null;
+//   // 未收款金額 // 餘額
+//   unpaidPayment: number | null;
+//   // 是否為國外收入傳票
+//   isForeign: boolean;
+//   // 差額 // 更新accountant的扣款明細、手續費會更新差額
+//   difference: string | null;
+//   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
+//   isPaperImported: boolean;
+//   // 收入傳票歸屬日期
+//   incomeBillDate: string | null;
+//   //
+//   accountantId: string;
+//   accountant: TaccountantDto;
+//   //
+//   note: string | null;
+
+//   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+//   // temporary_separatePayment: number | null;
+//   //
+//   accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
+//   order: number | null;
+//   fee: number | null;
+
+//   // 沒意外的話invoices裡應該最多只會有一筆資料
+//   invoiceNumber: string | null;
+//   invoices?: TaccountsReceivableInvoiceDto[];
+
+//   //
+//   //
+//   // '應收是否已閱'
+//   isCashierSeen: boolean | null;
+//   // '應收是否已閱'
+//   isWorkSupervisorSeen: boolean | null;
+//   // '總經理是否已閱'
+//   isManagerSeen: boolean | null;
+//   //
+//   //
+//   //
+//   // 外銷相關
+//   // '出口報單幣別'
+//   declarationCurrency: Tcurrency | null;
+//   // '出口報單匯率'
+//   declarationExchangeRate: string | null;
+//   // '出口報單外幣金額'
+//   declarationCurrencyPayment: string | null;
+//   // '出口報單台幣金額'
+//   declarationPayment: string | null;
+//   // '收款幣別'
+//   receivableCurrency: Tcurrency | null;
+//   // '收款匯率'
+//   receivableExchangeRate: string | null;
+//   // '收款外幣金額'
+//   receivableCurrencyPayment: string | null;
+//   // '國外匯費-新台幣'
+//   foreignFee: string | null;
+//   // '國外匯費-外幣'
+//   foreignCurrencyFee: string | null;
+
+//   // '兌換利益'
+//   exchangeBenefits: string | null;
+
+//   //
+//   vendorName: string | null;
+
+//   internalUnderestimationPayment: number | null;
+//   foreignUnderestimationPayment: string | null;
+// };
 
 export type TupdateIncomeBillSerialDto = Pick<
   TincomeBillSerialDto,
@@ -3816,8 +3908,6 @@ export type TupdateIncomeBillSerialDto = Pick<
   exchangeBenefits: string | null;
 } & {
   vendorName?: string | null;
-  internalUnderestimationPayment?: number | null; // 不足預估之收款
-  foreignUnderestimationPayment?: string | null; // 不足預估之收款 // 外銷用 新台幣
 };
 
 type TupdateIncomeBillDeductionDto = {
@@ -3869,6 +3959,11 @@ export type TincomeBillSerialSettlementFormDto = {
   foreignAccumulatePayment: number;
   // 應收帳款總額(外銷)
   foreignReceivablePayment: number;
+
+  // 不足預估之收款
+  internalUnderestimationPayment: number | null;
+  // 不足預估之收款(外銷)
+  foreignUnderestimationPayment: string | null;
 
   // 應收帳款狀態
   reviewStatus: TincomeBillSerialSettlementFormStatus;
