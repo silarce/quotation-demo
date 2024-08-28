@@ -9,11 +9,6 @@
 
 import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
-// InputSelItem會轉換為TinputSelProps_key
-interface TinputSelProps_key extends TinputSelProps {
-  key: string;
-}
-
 interface Option {
   value: string;
   label: string;
@@ -91,6 +86,7 @@ interface Span {
 // ============================================================================
 interface InputSelItem {
   readonly valueType: 'string' | 'number' | 'dateString' | 'boolean';
+  readonly nullable?: boolean;
   readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
   caption?: {
     [localeCode: string]: string;
@@ -142,7 +138,7 @@ type InputSelItemDict = {
   [key: string]: InputSelItem;
 };
 
-interface Model {
+interface TemplateModel {
   //
   inputSelItemDict: InputSelItemDict;
   //
@@ -173,4 +169,4 @@ interface Model {
   //
 }
 
-export type { Model, InputSelItemDict, InputSelItem, TinputSelProps_key, TinputSelProps };
+export type { TemplateModel, InputSelItemDict, InputSelItem, TinputSelProps };

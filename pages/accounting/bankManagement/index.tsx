@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { TbankDto } from 'js/api/dtoTypes';
 
+import { TemplateModel } from 'components/editTemplate/modelType';
+
 // =================================================================================
 
 // MARK: START
@@ -32,4 +34,25 @@ export default function BankManagement(): React.ReactElement {
 // =================================================================================
 // =================================================================================
 
-const fakeApi = () => {};
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01
+// 接著建立TemplateModel實例與假資料
+// 測試使用useInputSel與template01

@@ -1,6 +1,6 @@
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
-import type { TinputSelProps_key } from './modelType';
+import type { TinputSelProps_key } from 'components/editTemplate/useInputSelProps';
 
 export default function Template01({ inputSelProps_key }: { inputSelProps_key: TinputSelProps_key[] }) {
   return (

@@ -108,8 +108,8 @@ interface InputSelTemplate {
   textarea?: Textarea;
   select?: Select;
   datePicker?: DatePicker;
-  checkBox?: CheckBox;
-  radio?: Radio;
+  // checkBox?: CheckBox;
+  // radio?: Radio;
   InputSelBar?: {
     updateOnChange?: boolean;
     input?: Input;
