@@ -116,6 +116,11 @@ const IncomeBillSerialSettlementForm = ({
       internalAccumulatePayment,
       // 年度至今累積收款額(外銷)
       foreignAccumulatePayment,
+
+      // 不足預估之收款
+      internalUnderestimationPayment,
+      // 不足預估之收款(外銷)
+      foreignUnderestimationPayment,
     } = data;
 
     const rowArr = [
@@ -145,6 +150,15 @@ const IncomeBillSerialSettlementForm = ({
         foreign: foreignAccumulatePayment.toLocaleString(),
         domestic: internalAccumulatePayment.toLocaleString(),
         total: new Decimal(internalAccumulatePayment).add(foreignAccumulatePayment).toNumber().toLocaleString(),
+      },
+      {
+        caption: '不足預估之收款',
+        foreign: foreignUnderestimationPayment?.toLocaleString() || '0',
+        domestic: internalUnderestimationPayment?.toLocaleString() || '0',
+        total: new Decimal(internalUnderestimationPayment || 0)
+          .add(foreignUnderestimationPayment || 0)
+          .toNumber()
+          .toLocaleString(),
       },
       // {
       //   caption: '下月預估收款額',

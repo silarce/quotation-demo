@@ -1,21 +1,23 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import en from 'public/locales/en/common.json';
-import zh_TW from 'public/locales/zh-TW/common.json';
+import zhTW_common from 'public/locales/zh-TW/common.json';
 
-// const resources = {
-//   en,
-//   'zh-TW': zh_TW,
-// };
+import en_common from 'public/locales/en/common.json';
+
+// ======================================================================
+const zhTW = {
+  common: zhTW_common,
+};
+
+const en = {
+  common: en_common,
+};
+// ======================================================================
 
 const resources = {
-  'zh-TW': {
-    translation: zh_TW,
-  },
-  en: {
-    translation: en,
-  },
+  'zh-TW': zhTW,
+  en,
 };
 
 i18n.use(initReactI18next).init({
