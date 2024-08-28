@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, forwardRef, useContext, use } from 'react';
+import React, { useState, useMemo, useEffect, forwardRef, useContext } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
@@ -94,9 +94,6 @@ type Tstate_incomeBillSerial = {
   foreignCurrencyFee: string | null;
   // '兌換利益'
   exchangeBenefits: string | null;
-
-  internalUnderestimationPayment: string | null; // 不足預估之收款
-  foreignUnderestimationPayment: string | null; // 不足預估之收款 // 外銷用 新台幣
 };
 
 type Tstate_deduction = {
@@ -155,8 +152,6 @@ type TconfigKey =
       | 'foreignFee'
       | 'foreignCurrencyFee'
       | 'exchangeBenefits'
-      | 'internalUnderestimationPayment'
-      | 'foreignUnderestimationPayment'
     >
   | 'fee'
   | 'vendorName';
@@ -395,7 +390,7 @@ const keyArr_domain: TconfigKey[] = [
 
   'deductionPayment', // 扣款金額
   'unpaidPayment', // 餘額
-  'internalUnderestimationPayment',
+
   'note', // 備註
 ];
 
@@ -424,7 +419,6 @@ const keyArr_foreign: TconfigKey[] = [
 
   'exchangeBenefits', // 外銷 兌換利益
 
-  'foreignUnderestimationPayment',
   'note', // 備註
 ];
 
@@ -1430,77 +1424,77 @@ const cellPropsList_summon: TcellPropsList_summon = {
     },
   },
 
-  internalUnderestimationPayment: {
-    label: '不足預估之收款',
-    style: { width: 150 },
-    className: 'text-right',
+  // internalUnderestimationPayment: {
+  //   label: '不足預估之收款',
+  //   style: { width: 150 },
+  //   className: 'text-right',
 
-    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.internalUnderestimationPayment ?? '',
-      });
+  //   createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+  //     const { type, value } = reducer_input({
+  //       disabled,
+  //       value: state_incomeBillSerial.internalUnderestimationPayment ?? '',
+  //     });
 
-      const inputSelProps: TinputSelProps = {
-        disabled,
-        showBaseline: 'auto',
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              setState_incomeBillSerial((state) => {
-                const copy = { ...state };
-                copy.internalUnderestimationPayment = e.target.value;
+  //     const inputSelProps: TinputSelProps = {
+  //       disabled,
+  //       showBaseline: 'auto',
+  //       inputProps: {
+  //         props: {
+  //           className: 'text-right',
+  //           type,
+  //           value,
+  //           onChange: (e) => {
+  //             setState_incomeBillSerial((state) => {
+  //               const copy = { ...state };
+  //               copy.internalUnderestimationPayment = e.target.value;
 
-                return copy;
-              });
-            }, // onChange
-            //
-          },
-        },
-      };
+  //               return copy;
+  //             });
+  //           }, // onChange
+  //           //
+  //         },
+  //       },
+  //     };
 
-      return inputSelProps;
-    },
-  },
+  //     return inputSelProps;
+  //   },
+  // },
 
-  foreignUnderestimationPayment: {
-    label: '不足預估之收款(外銷)',
-    style: { width: 150 },
-    className: 'text-right',
+  // foreignUnderestimationPayment: {
+  //   label: '不足預估之收款(外銷)',
+  //   style: { width: 150 },
+  //   className: 'text-right',
 
-    createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.foreignUnderestimationPayment ?? '',
-      });
+  //   createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+  //     const { type, value } = reducer_input({
+  //       disabled,
+  //       value: state_incomeBillSerial.foreignUnderestimationPayment ?? '',
+  //     });
 
-      const inputSelProps: TinputSelProps = {
-        disabled,
-        showBaseline: 'auto',
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              setState_incomeBillSerial((state) => {
-                const copy = { ...state };
-                copy.foreignUnderestimationPayment = e.target.value;
+  //     const inputSelProps: TinputSelProps = {
+  //       disabled,
+  //       showBaseline: 'auto',
+  //       inputProps: {
+  //         props: {
+  //           className: 'text-right',
+  //           type,
+  //           value,
+  //           onChange: (e) => {
+  //             setState_incomeBillSerial((state) => {
+  //               const copy = { ...state };
+  //               copy.foreignUnderestimationPayment = e.target.value;
 
-                return copy;
-              });
-            }, // onChange
-            //
-          },
-        },
-      };
+  //               return copy;
+  //             });
+  //           }, // onChange
+  //           //
+  //         },
+  //       },
+  //     };
 
-      return inputSelProps;
-    },
-  },
+  //     return inputSelProps;
+  //   },
+  // },
 
   //
   //
@@ -1686,8 +1680,6 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       foreignCurrencyFee,
       exchangeBenefits,
       vendorName,
-      internalUnderestimationPayment,
-      foreignUnderestimationPayment,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -1740,8 +1732,6 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       foreignFee: foreignFee,
       foreignCurrencyFee,
       exchangeBenefits,
-      internalUnderestimationPayment: internalUnderestimationPayment?.toString() || null,
-      foreignUnderestimationPayment,
     };
 
     return defaultState;
