@@ -2297,6 +2297,9 @@ export type TquotationContractDto = {
   //
   // 是否已簽回
   isSignedBack: boolean;
+  //
+  unReviewPicture: number;
+  unReviewWorkSheet: number;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
