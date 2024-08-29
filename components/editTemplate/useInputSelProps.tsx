@@ -1,13 +1,16 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import moment, { Moment } from 'moment';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { InputSelItemDict, InputSelItem, TinputSelProps } from './modelType';
-import i18n from 'hooks/i18n';
+import type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps } from './modelType';
+import { useTranslation } from 'react-i18next';
 
 import { Toption } from 'js/utils/options/options';
 
+import { templateLookup, TtemplateProps } from 'components/editTemplate/templateLookup';
+
+// ===========================================================================
 type TrawData = {
   [key: string]: string | number | boolean | null;
 };
@@ -17,7 +20,7 @@ interface TinputSelProps_key extends TinputSelProps {
 }
 
 type TinputSelDict = {
-  [key: string]: TinputSelProps;
+  [key: string]: TinputSelProps_key;
 };
 
 type Tvalue = string | boolean | Moment | null | undefined;
@@ -27,26 +30,38 @@ type Tstate = {
 
 // ===========================================================================
 
+// MARK:useInputSel
+
 const useInputSel = ({
-  //
   rawData,
-  inputSelItemDict,
+  templateModelProps,
 }: {
-  rawData: TrawData;
-  inputSelItemDict: InputSelItemDict;
+  rawData?: TrawData;
+  templateModelProps: TemplateModelProps;
 }) => {
+  const {
+    i18n: { language },
+  } = useTranslation();
+
+  const { inputSelItemDict } = templateModelProps;
+
+  // ----------------------------------------------------------------
   const defaultState = useDefaultState({ rawData, inputSelItemDict });
 
+  // ----------------------------------------------------------------
+  const [disabled, setDisabled] = useState(true);
   const [state, setState] = useState<Tstate>(defaultState);
-  const language = i18n.language;
 
+  // ----------------------------------------------------------------
+
+  // ----------------------------------------------------------------
   const inputSelDict = useMemo(() => {
     const inputSelDict: TinputSelDict = {};
 
     Object.entries(inputSelItemDict).forEach(([key, item]) => {
-      if (key !== item.key) {
-        myAlert.err({ title: 'useInputSel錯誤', content: `key與item.key不同` });
-      }
+      // if (key !== item.key) {
+      //   myAlert.err({ title: 'useInputSel錯誤', content: `key與item.key不同` });
+      // }
 
       const value = state[key];
 
@@ -60,8 +75,9 @@ const useInputSel = ({
         textarea,
         select,
         datePicker,
-        checkBox,
-        radio,
+        // checkBox,
+        // radio,
+        // InputSelBar
 
         ...rest
       } = item;
@@ -75,8 +91,14 @@ const useInputSel = ({
       const datePickerProps = datePicker && createDatePickerProps({ value, datePicker, key, setState });
 
       const inputSelProps: TinputSelProps_key = {
-        // key, // rest裡面有key
+        key,
+        showBaseline: 'auto',
+        captionColor: 'main',
+        fontColor: 'text',
+
         ...rest,
+
+        disabled,
         caption,
         node,
         inputProps,
@@ -89,17 +111,96 @@ const useInputSel = ({
     });
 
     return inputSelDict;
-  }, [state]);
+  }, [state, disabled, language]);
+
+  // ________________________________________________________________
+  // ________________________________________________________________
+  const Template = useMemo(() => {
+    const templateName = Object.keys(templateModelProps.template)[0] as keyof typeof templateLookup | undefined;
+
+    const template = (templateName ? templateLookup[templateName] : null) || null;
+
+    return template;
+  }, [templateModelProps.template]);
+
+  const templateProps: TtemplateProps = useMemo(() => {
+    const teamplateProps_pre = Object.values(templateModelProps.template)[0];
+
+    const { layout, ...rest } = teamplateProps_pre;
+
+    const blockDict: {
+      [
+        blockCode: string // a, b, c, ...
+      ]: TinputSelProps_key[];
+    } = {};
+
+    Object.entries(layout).forEach(([key, indexArr]) => {
+      const arr = indexArr.map((index) => {
+        if (!inputSelDict[index]) {
+          console.log(`key與inputSelItemDict不搭配，inputSelDict沒有${index}`);
+
+          return null;
+        }
+
+        return inputSelDict[index];
+      });
+
+      const filteredArr = arr.filter((item) => !!item) as TinputSelProps_key[];
+      blockDict[key] = filteredArr;
+    });
+
+    return {
+      ...rest,
+      ...blockDict,
+    };
+  }, [templateModelProps.template, inputSelDict]);
+
+  // 這個做法失敗，每一次輸入都會blur
+  // const Template = useCallback(() => {
+  //   if (!Template_ori) {
+  //     return null;
+  //   }
+
+  //   return <Template_ori {...templateProps} />;
+  // }, [Template_ori, templateProps]);
+
+  // ----------------------------------------------------------------
+
+  const switchDisabled = (bool?: boolean) => {
+    setDisabled((state) => {
+      if (bool) {
+        return bool;
+      }
+
+      return !state;
+    });
+  };
+
+  // ----------------------------------------------------------------
 
   useEffect(() => {
     setState(defaultState);
   }, [defaultState]);
 
+  useEffect(() => {
+    disabled && setState(defaultState);
+  }, [disabled]);
+
   return {
+    Template,
+    templateProps,
+    disabled,
+    switchDisabled,
+
     inputSelDict,
   };
 };
 
+// MARK: END
+
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
 // ===========================================================================
 
 const createNode = ({ value, span }: { value: Tvalue; span: NonNullable<InputSelItem['span']> }) => {
@@ -234,12 +335,19 @@ const createDatePickerProps = ({
 
 // ===========================================================================
 
-const useDefaultState = ({ rawData, inputSelItemDict }: { rawData: TrawData; inputSelItemDict: InputSelItemDict }) => {
+const useDefaultState = ({
+  rawData,
+  inputSelItemDict,
+}: {
+  rawData: TrawData | undefined;
+  inputSelItemDict: InputSelItemDict;
+}) => {
   return useMemo(() => {
     const defaultState: Tstate = {};
 
     Object.entries(inputSelItemDict).forEach(([key, item]) => {
-      const rawValue = rawData[key] || null;
+      const rawValue = rawData?.[key] || null;
+
       let value: Tvalue = null;
 
       const { valueType } = item;
@@ -252,9 +360,11 @@ const useDefaultState = ({ rawData, inputSelItemDict }: { rawData: TrawData; inp
         }
       } else if (valueType === 'boolean') {
         value = !!rawValue;
+      } else {
+        value = String(rawValue ?? '');
       }
 
-      defaultState[key] = String(value ?? '');
+      defaultState[key] = value;
     });
 
     return defaultState;

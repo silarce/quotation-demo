@@ -14,14 +14,16 @@ interface Option {
   label: string;
 }
 
+type Tstyle = {
+  [property: string]: string; // React.CSSProperties
+};
+
 interface Input {
-  wrapperStyle?: {
-    [property: string]: string; // React.CSSProperties
-  };
-  props: {
+  wrapperStyle?: Tstyle;
+  props?: {
     placeholder?: string;
     type?: 'text' | 'number';
-    style?: { [property: string]: string }; // React.CSSProperties
+    style?: Tstyle;
   };
 }
 
@@ -38,7 +40,7 @@ interface Textarea {
 }
 
 interface Select {
-  wrapperStyle?: { [property: string]: string }; // React.CSSProperties
+  wrapperStyle?: Tstyle;
   arrowType?: 'red' | 'black';
   props?: {
     options: Option[];
@@ -48,7 +50,7 @@ interface Select {
 }
 
 interface DatePicker {
-  wrapperStyle?: { [property: string]: string }; // React.CSSProperties
+  wrapperStyle?: Tstyle;
   showSuffixIcon?: 'always' | 'never' | 'auto';
   props?: {
     placeholder?: string;
@@ -58,36 +60,36 @@ interface DatePicker {
 }
 
 interface CheckBox {
-  wrapperStyle?: { [property: string]: string }; // React.CSSProperties
+  wrapperStyle?: Tstyle;
   checkBoxPropsArr?: {
     key: string;
     label?: string;
   }[];
-  props: {
+  props?: {
     name?: string;
   };
 }
 
 interface Radio {
-  wrapperStyle?: { [property: string]: string }; // React.CSSProperties
+  wrapperStyle?: Tstyle;
   radioPropsArr?: {
     key: string;
     label?: string;
   }[];
-  props: {
+  props?: {
     name?: string;
   };
 }
 
 interface Span {
-  style?: { [property: string]: string }; // React.CSSProperties
+  style?: Tstyle;
 }
 
 // ============================================================================
 interface InputSelItem {
   readonly valueType: 'string' | 'number' | 'dateString' | 'boolean';
   readonly nullable?: boolean;
-  readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
+  // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
   caption?: {
     [localeCode: string]: string;
     'zh-TW': string;
@@ -116,6 +118,33 @@ interface InputSelItem {
   //____________________
   //____________________
   // updateOnChange?: boolean;
+
+  // reducer?:string[];
+  // "decimal a.add.b.mul.c" 解析為 new Decimal(a)['add'](b)['mul'](c)
+  // "conditional a===b?c:d" 解析為 a===b?c:d
+  // "assignment a=0" 解析為 a=0
+  // reducer會長的像這樣
+  // [
+  //   "decimal a.add.b.mul.c",
+  //   "conditional a===b?c:d",
+  //   "assignment a=0"
+  // ]
+  // 或許直接寫表達式字串再用eval執行就好了?
+  //
+  //
+  // decoration?:string[];
+  // disabled時對值的修飾
+  // 例如"localeString"，執行Number(a).toLocaleString()
+  // 例如"prefix $"，執行"$"+a
+  // decoration會長的像這樣
+  // [
+  //   "localeString",
+  //   "prefix $"
+  // ]
+  // 反正後端懂js，直接用表達式字串再用eval執行就好了吧
+
+  // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval
+  // eval這個方案放棄
   //____________________
   //____________________
   span?: Span;
@@ -123,14 +152,14 @@ interface InputSelItem {
   textarea?: Textarea;
   select?: Select;
   datePicker?: DatePicker;
-  checkBox?: CheckBox;
-  radio?: Radio;
-  InputSelBar?: {
-    updateOnChange?: boolean;
-    input?: Input;
-    textarea?: Textarea;
-    select?: Select;
-  }[];
+  // checkBox?: CheckBox;
+  // radio?: Radio;
+  // InputSelBar?: {
+  //   updateOnChange?: boolean;
+  //   input?: Input;
+  //   textarea?: Textarea;
+  //   select?: Select;
+  // }[];
 }
 
 // type InputSelItemArr = InputSelItem[];
@@ -138,7 +167,7 @@ type InputSelItemDict = {
   [key: string]: InputSelItem;
 };
 
-interface TemplateModel {
+interface TemplateModelProps {
   //
   inputSelItemDict: InputSelItemDict;
   //
@@ -151,22 +180,31 @@ interface TemplateModel {
   // templateName: string;
   template: {
     t01?: {
-      a: string[]; // keyArr
+      style?: Tstyle;
+      layout: {
+        a: string[]; // keyArr
+      };
     };
 
     t02?: {
-      containerLabel01: string;
-      a: string[]; // keyArr
-      b: string[]; // keyArr
+      style?: Tstyle;
+      title01: string;
+      layout: {
+        a: string[]; // keyArr
+        b: string[]; // keyArr
+      };
     };
 
-    t03?: {
-      a: string[]; // keyArr
-      b: string[]; // keyArr
-      c: string[]; // keyArr
-    };
+    // t03?: {
+    //   style?: Tstyle;
+    //   layout: {
+    //     a: string[]; // keyArr
+    //     b: string[]; // keyArr
+    //     c: string[]; // keyArr
+    //   };
+    // };
   };
   //
 }
 
-export type { TemplateModel, InputSelItemDict, InputSelItem, TinputSelProps };
+export type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps };
