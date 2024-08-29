@@ -244,7 +244,6 @@ export default function PurchaseRequisitionList() {
     //請購單主檔
     const getPurchaseRequisition = async () => {
         try {
-            // console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
                 type: "詢價中",
@@ -267,18 +266,12 @@ export default function PurchaseRequisitionList() {
             }
             const data = await response.json();
 
-            // if (data.length === 0) {
-            //     myAlert.warning({
-            //         title: '尚無單據'
-            //     })
-            // }
 
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0]);
                 getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaserequisitionuuidin(data[0].purchaserequisitionuuid);
@@ -292,7 +285,7 @@ export default function PurchaseRequisitionList() {
 
             }
         } catch (error: any) {
-            setError(error.message);
+            // console.log(error.message);
         }
         finally {
             setIsLoading(false);
@@ -378,9 +371,7 @@ export default function PurchaseRequisitionList() {
             }
             const data = await response.json();
             setData1(data);
-            // setData2(data);
 
-            console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
@@ -884,21 +875,9 @@ export default function PurchaseRequisitionList() {
             }
             const data = await response.json();
 
-
-            // let awardedItem = data.find((item: any) => item.awarded);
-            // if (awardedItem) {
-            //   alert(awardedItem.id)
-            //   setSelectedsupplier(awardedItem.id);
-            //   alert(selectedsupplier);
-            // }
-
             setPrquotereqdata(data);
-            console.log(prquotereqdata);
-
-
 
         } catch (error: any) {
-            // setError(error.message);
             console.log(error.message);
         }
         finally {
@@ -1135,10 +1114,6 @@ export default function PurchaseRequisitionList() {
                         });
 
 
-
-
-
-
                         const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
                             method: 'POST',
                             headers: {
@@ -1157,7 +1132,6 @@ export default function PurchaseRequisitionList() {
 
 
                     } catch (error: any) {
-                        // setError(error.message);
                         console.log(error.message);
                     }
                     finally {
@@ -1178,6 +1152,7 @@ export default function PurchaseRequisitionList() {
     const [reviewdata, setReviewdata] = useState<any[]>([]);
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
 
     // useEffect(() => {
     // }, [reviewflow]);
@@ -1203,12 +1178,21 @@ export default function PurchaseRequisitionList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
 
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
             setReviewdata(data);
 
+
         } catch (error: any) {
-            setError(error.message);
+            console.log(error);
+            // setError(error.message);
         }
         finally {
             setIsLoading(false);
@@ -1246,7 +1230,7 @@ export default function PurchaseRequisitionList() {
             // 檢查響應內容是否為空
             const text = await response.text();
             if (text.trim() === '') {
-                console.log('No data returned');
+                // console.log('No data returned');
                 return;
             }
 
@@ -1388,12 +1372,16 @@ export default function PurchaseRequisitionList() {
 
     }
 
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【請購單】【${purchaserequisitionid}】_${userInfo?.username}`)
+    }
 
 
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'請購單'} panelList={panelList} />
+            <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === false ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -1493,7 +1481,7 @@ export default function PurchaseRequisitionList() {
                             </div>
                             <div></div>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setReviewbar(true) }} title="單據送審" style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中')?'':'none'}` }}>
+                                <button className={scss.squarebtn} onClick={() => { handleChoseflow() }} title="單據送審" style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中') ? '' : 'none'}` }}>
                                     <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     流程
                                 </button>
@@ -2188,6 +2176,12 @@ export default function PurchaseRequisitionList() {
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
+                        <span style={{fontSize:'18px'}}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
                         <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
                             <Space direction="vertical">
                                 {reviewdata.map((_item: any) => (

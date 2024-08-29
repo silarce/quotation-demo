@@ -97,8 +97,6 @@ export default function WareHouseList() {
             }
             const data = await response.json();
             setData(data);
-            console.log("vvvvv" + data);
-            console.log(userInfo);
         } catch (error: any) {
             setError(error.message);
         }
@@ -131,7 +129,6 @@ export default function WareHouseList() {
             }
             const data = await response.json();
             setData(data);
-            console.log("GetWHPosition:" + data);
         } catch (error: any) {
             setError(error.message);
         }

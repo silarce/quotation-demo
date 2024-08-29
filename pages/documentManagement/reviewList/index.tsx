@@ -36,9 +36,13 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
+import { Modal } from 'antd';
+
+
 import Quotation from 'pages/domestic/quotationList/quotation';
 import PurchaseRequisitionList from 'pages/factoryDepartment/purchaseRequisitionList';
-import { Modal } from 'antd';
+import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
+import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 
 
 
@@ -59,6 +63,8 @@ export default function ReviewList() {
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
+    const [data3, setData3] = useState<any[]>([]);
+    const [data4, setData4] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
 
@@ -132,25 +138,30 @@ export default function ReviewList() {
             const conditionModel = {
                 username: userInfo?.username
             };
-    
+
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'ReviewService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-    
+
+            console.log(JSON.stringify(inputModel));
+
+
+
+
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    
+
             const response = await fetch(`${setting.apipath}/Review/GetReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-    
+
             setData(data);
             console.log(data);
-    
+
             // 檢查 data 是否有內容
             if (data.length > 0) {
                 console.log(data[0]);
@@ -161,18 +172,99 @@ export default function ReviewList() {
                 console.log('沒有撈到資料');
             }
         } catch (error: any) {
-            setError("GetReview:" + error.message);
+            // setError("GetReview:" + error.message);
+            console.log(error.message);
         } finally {
             setIsLoading(false);
         }
     };
-    
+    // 取審核中主檔
+    const GetReviewing = async () => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewing?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setData3(data);
+
+            // 檢查 data 是否有內容
+            if (data3.length > 0) {
+                // console.log(data3[0]);
+                GetReviewStatus(data3[0]); // 只有當 data 有內容時才執行
+            } else {
+                // console.log('沒有撈到資料');
+            }
+        } catch (error: any) {
+            // setError("GetReview:" + error.message);
+            console.log(error.message);
+        } finally {
+            // setIsLoading(false);
+        }
+    };
+
+    // 取審核完成主檔
+    const GetReviewed = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewed?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setData4(data);
+
+            // 檢查 data 是否有內容
+            if (data4.length > 0) {
+                // console.log(data4[0]);
+                GetReviewStatus(data4[0]); // 只有當 data 有內容時才執行
+            } else {
+                // console.log('沒有撈到資料');
+            }
+        } catch (error: any) {
+            console.log(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
         if (!hasFetchedData.current) {
             GetReview();
+            GetReviewing();
+            GetReviewed();
             hasFetchedData.current = true;
         }
     }, []);
@@ -181,13 +273,13 @@ export default function ReviewList() {
 
 
     const GetReviewStatus = async (item: any) => {
-        
+        handleRowClick(item.id);
         // alert("in");
         // GetDocument(item);
         // setReviewtype("報價單");
 
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 document_id: item.document_id,
                 document_uuid: item.document_uuid
@@ -214,9 +306,10 @@ export default function ReviewList() {
             // GetDocument(item);
             setReviewtype(item.document_type);
         } catch (error: any) {
-            setError("GetReviewStatus:" + error.message);
+            // setError("GetReviewStatus:" + error.message);
+            console.log(error.message);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -227,9 +320,9 @@ export default function ReviewList() {
     //     if ( reviewtype === "請購單") {
     //         // 將 JSON 字串解析為 JavaScript 對象
     //         const parsedQuery = JSON.parse(item.query);
-    
+
     //         console.log(parsedQuery); // 檢查解析後的資料
-    
+
     //         // 使用 shallow 模式更新 query 而不進行頁面跳轉
     //         router.replace({
     //             query: {
@@ -248,16 +341,16 @@ export default function ReviewList() {
     // }
 
 
-    
-    
-    
+
+
+
     useEffect(() => {
-        if ( reviewtype === "請購單") {
+        if (reviewtype === "請購單") {
             // 將 JSON 字串解析為 JavaScript 對象
             const parsedQuery = JSON.parse(itemQuery.query);
-    
+
             console.log(parsedQuery); // 檢查解析後的資料
-    
+
             // 使用 shallow 模式更新 query 而不進行頁面跳轉
             router.replace({
                 query: {
@@ -449,7 +542,26 @@ export default function ReviewList() {
     const tabChosed = (tabName: string) => {
         setTabnow(tabName);
         setTabshow(tabName);
-        setEditmain(false);
+
+
+
+        setReviewtype('');
+        setSelectedItemId('');
+        setData2([]);
+        if (tabName === "待審核") {
+            if (data.length > 0) {
+                GetReviewStatus(data[0]);
+            }
+        } else if (tabName === "審核中") {
+            if (data3.length > 0) {
+                GetReviewStatus(data3[0]);
+            }
+        } else if (tabName === "審核完成") {
+            if (data4.length > 0) {
+                GetReviewStatus(data4[0]);
+            }
+        }
+
     };
     //#endregion
 
@@ -498,8 +610,27 @@ export default function ReviewList() {
                                             onClick={() => tabChosed('待審核')}
                                             style={getButtonStyle('待審核')}
                                         >
-                                            {/* <img src={icon_edit.src} alt="edit" style={{ height: '20px', width: '20px' }} title="編輯物料" /> */}
                                             待審核
+                                            &nbsp;
+                                            {data.length > 0 && (
+                                                <span style={{
+                                                    position: 'absolute',
+                                                    display: 'inline-block',
+                                                    backgroundColor: '#ea1833',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    textAlign: 'center',
+                                                    lineHeight: '24px',
+                                                    fontSize: '0.9rem',
+                                                }}>
+                                                    {data.length}
+                                                </span>
+                                            )}
+
+
+
                                         </button>
                                     </span>
                                     <span>
@@ -508,8 +639,25 @@ export default function ReviewList() {
                                             onClick={() => tabChosed('審核中')}
                                             style={getButtonStyle('審核中')}
                                         >
-                                            {/* <img src={icon_autoadd.src} alt="add" style={{ height: '20px', width: '20px' }} title="新增物料" /> */}
                                             審核中
+                                            &nbsp;
+                                            {data3.length > 0 && (
+                                                <span style={{
+                                                    position: 'absolute',
+                                                    display: 'inline-block',
+                                                    backgroundColor: '#007bff',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    textAlign: 'center',
+                                                    lineHeight: '24px',
+                                                    fontSize: '0.9rem',
+                                                }}>
+                                                    {data3.length}
+                                                </span>
+                                            )}
+
                                         </button>
                                     </span>
                                     <span>
@@ -518,8 +666,24 @@ export default function ReviewList() {
                                             onClick={() => tabChosed('審核完成')}
                                             style={getButtonStyle('審核完成')}
                                         >
-                                            {/* <img src={icon_autoadd.src} alt="add" style={{ height: '20px', width: '20px' }} title="新增物料" /> */}
                                             審核完成
+                                            &nbsp;
+                                            {data4.length > 0 && (
+                                                <span style={{
+                                                    display: 'inline-block',
+                                                    backgroundColor: '#ea1833',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    textAlign: 'center',
+                                                    lineHeight: '24px',
+                                                    fontSize: '0.9rem',
+                                                }}>
+                                                    {data4.length}
+                                                </span>
+                                            )}
+
                                         </button>
                                     </span>
                                 </div>
@@ -531,60 +695,87 @@ export default function ReviewList() {
                                 <div>
                                     <div style={{ display: `${tabshow === "待審核" ? '' : 'none'}` }}>
                                         <div style={{ border: '1px solid #c1c1c1' }}>
-                                            {/* <div className={scss.head_foot2}>
-                                                <div>
-                                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder='請輸入單據類別'
-                                                        value={keyword2}
-                                                        style={{ padding: '0px 5px', width: '100px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                                        onChange={(e) => setKeyword2(e.target.value)}
-                                                    />
 
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder='請輸入單號'
-                                                        value={keyword3}
-                                                        style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                                        onChange={(e) => setKeyword3(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <input
-                                                        type="text"
-                                                        placeholder='請輸入人員'
-                                                        value={keyword4}
-                                                        style={{ padding: '0px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
-                                                        onChange={(e) => setKeyword4(e.target.value)}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
-                                                        <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                                    </button>
-                                                </div>
-                                            </div> */}
                                             <div className={scss.body_content1} style={{ height: '300px' }}>
                                                 <div>
                                                     <Thead01 type={'ReviewList'} />
                                                     <span>
-                                                        {data && (
+                                                        {data && data.length > 0 && (
                                                             data.slice(0, 100).map((_item: any, index: number) => (
                                                                 <CellWithBar key={index} className={scss.panelHeader21}>
                                                                     <div
                                                                         key={index}
-                                                                        className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
+                                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                                                         onClick={() => { GetReviewStatus(_item) }}
                                                                     >
                                                                         <span>{index + 1}</span>
-                                                                        <span>{_item.document_type}</span>
-                                                                        <span>{_item.document_id}</span>
-                                                                        <span>{_item.create_by}</span>
+                                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                        <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_title}</span>
+                                                                        {/* <span>{_item.document_id}</span>
+                                                                        <span>{_item.create_by}</span> */}
+
+                                                                    </div>
+                                                                </CellWithBar>
+                                                            ))
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: `${tabshow === "審核中" ? '' : 'none'}` }}>
+                                        <div style={{ border: '1px solid #c1c1c1' }}>
+
+                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                                <div>
+                                                    <Thead01 type={'ReviewList'} />
+                                                    <span>
+                                                        {data3 && data3.length > 0 && (
+                                                            data3.slice(0, 100).map((_item: any, index: number) => (
+                                                                <CellWithBar key={index} className={scss.panelHeader21}>
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                        onClick={() => { GetReviewStatus(_item) }}
+                                                                    >
+                                                                        <span>{index + 1}</span>
+                                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                        <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_title}</span>
+                                                                        {/* <span>{_item.document_id}</span>
+                                                                        <span>{_item.create_by}</span> */}
+
+                                                                    </div>
+                                                                </CellWithBar>
+                                                            ))
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: `${tabshow === "審核完成" ? '' : 'none'}` }}>
+                                        <div style={{ border: '1px solid #c1c1c1' }}>
+
+                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                                <div>
+                                                    <Thead01 type={'ReviewList'} />
+                                                    <span>
+                                                        {data4 && data4.length > 0 && (
+                                                            data4.slice(0, 100).map((_item: any, index: number) => (
+                                                                <CellWithBar key={index} className={scss.panelHeader21}>
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                        onClick={() => { GetReviewStatus(_item) }}
+                                                                    >
+                                                                        <span>{index + 1}</span>
+                                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                        <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_title}</span>
+                                                                        {/* <span>{_item.document_id}</span>
+                                                                        <span>{_item.create_by}</span> */}
 
                                                                     </div>
                                                                 </CellWithBar>
@@ -635,43 +826,30 @@ export default function ReviewList() {
 
                         </div>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
-                            <div className={scss.body_foot1}>
+                            <div className={scss.body_foot1} style={{ pointerEvents: tabshow === "審核中" || tabshow === "審核完成" ? 'none' : 'auto' }}>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢 耶斯") }} title="單據核准">
+                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢 耶斯") }} title="核准">
                                         {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         核准
                                     </button>
                                 </div>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="單據核准">
+                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回">
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回
                                     </button>
                                 </div>
                                 <div>
-                                    {/* <InputSel
-                                        {...inputSelProps}
-                                        caption="意見"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {                                                
-                                                value: memo || ' ',
-                                                onChange: (e) => { setMemo(e.target.value) }
-                                            },
-                                        }}
-                                    /> */}
-                                    {/* <span style={{fontSize:'18px',color:'#14256a'}}>意見</span> */}
                                     <input placeholder="意見" style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }} />
-
                                 </div>
                             </div>
                         </div>
-                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '30px 20px' }}>
                             <div className={scss.body_foot2}>
                                 <div>
                                     {reviewtype === "請購單" && <PurchaseRequisitionList />}
-                                    {reviewtype === "採購單" && <PurchaseRequisitionList />}
-                                    {reviewtype === "進貨單" && <PurchaseRequisitionList />}
+                                    {reviewtype === "採購單" && <PurchaseOrderList />}
+                                    {reviewtype === "進貨單" && <ProdReceiptList />}
                                     {reviewtype === "報價單" && <Quotation />}
                                 </div>
                             </div>
@@ -679,6 +857,7 @@ export default function ReviewList() {
                     </div>
                 </div>
             </div>
+
 
         </SubLayer >
 

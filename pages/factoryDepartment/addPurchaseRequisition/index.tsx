@@ -443,13 +443,15 @@ export default function AddPurchaseRequisition() {
             };
 
 
+            
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-
+            
+            console.log(JSON.stringify(conditionModel));
 
             const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseRequisition`, {
                 method: 'POST',

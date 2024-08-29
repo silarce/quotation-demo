@@ -867,7 +867,37 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 250px 150px 30px;
+  grid-template-columns: 20px 80px 80px 500px 30px;
+  gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 16px;
+    color: #979797;
+  }
+}
+//#endregion
+
+//#region 審核流程狀態明細
+.thead30 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 60px 80px 60px 150px 150px 300px 30px;
   gap: 15px;
   height: 30px;
   padding: 0 20px;
@@ -890,14 +920,44 @@
 }
 //#endregion
 
-//#region productList 審核流程狀態明細
-.thead30 {
+//#region flowList 審核流程清單
+.thead31 {
   position: -webkit-sticky; // 為兼容性增加前綴
   position: sticky;
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 80px 60px 150px 150px 300px 30px;
+  grid-template-columns: 30px 150px 500px 30px;
+  gap: 15px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 16px;
+    color: #979797;
+  }
+}
+//#endregion
+
+//#region flowList 審核流程清單
+.thead32 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 60px 100px 100px 100px 30px ;
   gap: 15px;
   height: 30px;
   padding: 0 20px;
