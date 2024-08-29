@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import moment, { Moment } from 'moment';
+import { useRouter } from 'next/router';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -10,9 +11,19 @@ import { Toption } from 'js/utils/options/options';
 
 import { templateLookup, TtemplateProps } from 'components/editTemplate/templateLookup';
 
+import { axi, AxiosError } from 'js/api/_axiosCreator';
+import { TapiError } from 'js/api/dtoTypes';
+
 // ===========================================================================
+
+type Tquery = {
+  id?: string;
+};
+
+type rawDataItem = string | number | boolean | null;
+
 type TrawData = {
-  [key: string]: string | number | boolean | null;
+  [key: string]: rawDataItem;
 };
 
 interface TinputSelProps_key extends TinputSelProps {
@@ -33,28 +44,35 @@ type Tstate = {
 // MARK:useInputSel
 
 const useInputSel = ({
-  rawData,
+  // rawData,
+  rawData_fromParent,
   templateModelProps,
 }: {
-  rawData?: TrawData;
+  rawData_fromParent?: TrawData;
   templateModelProps: TemplateModelProps;
 }) => {
   const {
     i18n: { language },
   } = useTranslation();
 
-  const { inputSelItemDict } = templateModelProps;
+  const router = useRouter();
+  const { id } = router.query as Tquery;
 
   // ----------------------------------------------------------------
-  const defaultState = useDefaultState({ rawData, inputSelItemDict });
+  const { inputSelItemDict, apiGet, apiPost, apiPatch } = templateModelProps;
 
   // ----------------------------------------------------------------
-  const [disabled, setDisabled] = useState(true);
+  const [rawData, setRawData] = useState<TrawData | null>();
+
+  const defaultState = useDefaultState({ rawData: rawData || rawData_fromParent, inputSelItemDict });
+
+  // ----------------------------------------------------------------
+  const [disabled, setDisabled] = useState(!id);
   const [state, setState] = useState<Tstate>(defaultState);
 
   // ----------------------------------------------------------------
 
-  // ----------------------------------------------------------------
+  // MARK:inputSelDict
   const inputSelDict = useMemo(() => {
     const inputSelDict: TinputSelDict = {};
 
@@ -115,6 +133,8 @@ const useInputSel = ({
 
   // ________________________________________________________________
   // ________________________________________________________________
+
+  // MARK:Template
   const Template = useMemo(() => {
     const templateName = Object.keys(templateModelProps.template)[0] as keyof typeof templateLookup | undefined;
 
@@ -123,6 +143,10 @@ const useInputSel = ({
     return template;
   }, [templateModelProps.template]);
 
+  // ________________________________________________________________
+  // ________________________________________________________________
+
+  // MARK:templateProps
   const templateProps: TtemplateProps = useMemo(() => {
     const teamplateProps_pre = Object.values(templateModelProps.template)[0];
 
@@ -166,6 +190,83 @@ const useInputSel = ({
 
   // ----------------------------------------------------------------
 
+  // region API
+
+  const reqGet = useCallback(async () => {
+    if (!apiGet) {
+      return null;
+    }
+
+    return axi
+      .get<TrawData>(apiGet)
+      .then(({ data }) => data)
+      .catch((err: AxiosError<TapiError>) => {
+        myAlert.err({ title: '取得資料失敗', content: err.response?.data.message ?? err.message });
+
+        return Promise.reject(err);
+      });
+  }, [apiGet]);
+
+  // _____________________________________________________________________
+  // _____________________________________________________________________
+
+  const reqPost = useCallback(async () => {
+    if (!apiPost) {
+      return null;
+    }
+
+    const body = stateToBody({
+      inputSelItemDict,
+      state,
+    });
+
+    return axi
+      .post(apiPost, body)
+      .then(async ({ data }) => {
+        await update();
+
+        return data;
+      })
+      .catch((err: AxiosError<TapiError>) => {
+        myAlert.err({ title: '新增資料失敗', content: err.response?.data.message ?? err.message });
+      });
+  }, [apiPost, inputSelItemDict, state]);
+
+  // _____________________________________________________________________
+  // _____________________________________________________________________
+
+  const reqPatch = useCallback(async () => {
+    if (!apiPatch) {
+      return null;
+    }
+
+    const body = stateToBody({
+      inputSelItemDict,
+      state,
+    });
+
+    return axi
+      .patch(apiPatch, body)
+      .then(async ({ data }) => {
+        await update();
+
+        return data;
+      })
+      .catch((err: AxiosError<TapiError>) => {
+        myAlert.err({ title: '更新資料失敗', content: err.response?.data.message ?? err.message });
+      });
+  }, [apiPatch, inputSelItemDict, state]);
+
+  // ----------------------------------------------------------------
+
+  // region FUNCTION
+
+  const update = async () => {
+    await reqGet().then((res) => {
+      setRawData(res);
+    });
+  };
+
   const switchDisabled = (bool?: boolean) => {
     setDisabled((state) => {
       if (bool) {
@@ -178,6 +279,8 @@ const useInputSel = ({
 
   // ----------------------------------------------------------------
 
+  // region useEffect
+
   useEffect(() => {
     setState(defaultState);
   }, [defaultState]);
@@ -186,12 +289,24 @@ const useInputSel = ({
     disabled && setState(defaultState);
   }, [disabled]);
 
+  useEffect(() => {
+    if (rawData_fromParent) {
+      return;
+    }
+
+    update();
+  }, [apiGet, rawData_fromParent]);
+
+  // ----------------------------------------------------------------
   return {
     Template,
     templateProps,
     disabled,
     switchDisabled,
-
+    //
+    reqPost: id ? null : reqPost,
+    reqPatch: id ? reqPatch : null,
+    //
     inputSelDict,
   };
 };
@@ -202,6 +317,75 @@ const useInputSel = ({
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
+
+const stateToBody = ({ inputSelItemDict, state }: { inputSelItemDict: InputSelItemDict; state: Tstate }) => {
+  const body = Object.entries(inputSelItemDict).reduce((body, [key, item]) => {
+    const stateValue = state[key];
+    const { valueType, nullable } = item;
+
+    if (nullable && (stateValue === null || stateValue === '' || stateValue === undefined)) {
+      body[key] = null;
+
+      return body;
+    }
+
+    let value: rawDataItem = null;
+
+    valueType === 'string' && (value = String(stateValue ?? ''));
+    valueType === 'number' && (value = Number(stateValue || 0));
+    valueType === 'boolean' && (value = !!stateValue);
+    valueType === 'dateString' && stateValue instanceof moment && (value = (stateValue as Moment).toISOString());
+
+    body[key] = value;
+
+    return body;
+  }, {} as TrawData);
+
+  return body;
+};
+
+// ===========================================================================
+
+// MARK:useDefaultState
+const useDefaultState = ({
+  rawData,
+  inputSelItemDict,
+}: {
+  rawData: TrawData | undefined | null;
+  inputSelItemDict: InputSelItemDict;
+}) => {
+  return useMemo(() => {
+    const defaultState: Tstate = {};
+
+    Object.entries(inputSelItemDict).forEach(([key, item]) => {
+      const rawValue = rawData?.[key] || null;
+
+      let value: Tvalue = null;
+
+      const { valueType } = item;
+
+      if (valueType === 'dateString') {
+        value = rawValue ? moment(rawValue as string) : null;
+
+        if (value && !value.isValid()) {
+          myAlert.err({ title: '建立預設狀態錯誤', content: `${key}不是有效的時間字串` });
+        }
+      } else if (valueType === 'boolean') {
+        value = !!rawValue;
+      } else {
+        value = String(rawValue ?? '');
+      }
+
+      defaultState[key] = value;
+    });
+
+    return defaultState;
+  }, [rawData, inputSelItemDict]);
+};
+
+// ===========================================================================
+
+// region CREATE
 
 const createNode = ({ value, span }: { value: Tvalue; span: NonNullable<InputSelItem['span']> }) => {
   const cookedValue = value as string | number | boolean;
@@ -333,43 +517,9 @@ const createDatePickerProps = ({
   };
 };
 
+// endregion CREATE
+
 // ===========================================================================
-
-const useDefaultState = ({
-  rawData,
-  inputSelItemDict,
-}: {
-  rawData: TrawData | undefined;
-  inputSelItemDict: InputSelItemDict;
-}) => {
-  return useMemo(() => {
-    const defaultState: Tstate = {};
-
-    Object.entries(inputSelItemDict).forEach(([key, item]) => {
-      const rawValue = rawData?.[key] || null;
-
-      let value: Tvalue = null;
-
-      const { valueType } = item;
-
-      if (valueType === 'dateString') {
-        value = rawValue ? moment(rawValue as string) : null;
-
-        if (value && !value.isValid()) {
-          myAlert.err({ title: '建立預設狀態錯誤', content: `${key}不是有效的時間字串` });
-        }
-      } else if (valueType === 'boolean') {
-        value = !!rawValue;
-      } else {
-        value = String(rawValue ?? '');
-      }
-
-      defaultState[key] = value;
-    });
-
-    return defaultState;
-  }, [rawData, inputSelItemDict]);
-};
 
 export { useInputSel };
 export type { TinputSelProps_key, TinputSelDict, Tstate };

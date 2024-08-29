@@ -87,7 +87,7 @@ interface Span {
 
 // ============================================================================
 interface InputSelItem {
-  readonly valueType: 'string' | 'number' | 'dateString' | 'boolean';
+  readonly valueType: 'string' | 'number' | 'boolean' | 'dateString';
   readonly nullable?: boolean;
   // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
   caption?: {
@@ -144,7 +144,7 @@ interface InputSelItem {
   // 反正後端懂js，直接用表達式字串再用eval執行就好了吧
 
   // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval
-  // eval這個方案放棄
+  // 先不考慮用eval
   //____________________
   //____________________
   span?: Span;
@@ -171,9 +171,10 @@ interface TemplateModelProps {
   //
   inputSelItemDict: InputSelItemDict;
   //
-  getApi: string;
-  postApi: string;
-  patchApi: string;
+  apiGet?: string; // 取得資料
+  apiPost?: string; // 新增資料使用apiPost // 要回應id，用於更新url與資料
+  apiPatch?: string; // 更新資料使用apiPatch
+
   //
 
   // 根據template決定用哪一個模板

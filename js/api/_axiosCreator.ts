@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 const axi = axios.create({
@@ -84,3 +84,4 @@ axi.interceptors.response.use(
 );
 
 export { axi };
+export type { AxiosError };

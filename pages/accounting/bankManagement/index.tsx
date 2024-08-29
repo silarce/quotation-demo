@@ -6,6 +6,7 @@ import type { TbankDto } from 'js/api/dtoTypes';
 
 import { TemplateModelProps, InputSelItemDict } from 'components/editTemplate/modelType';
 import { useInputSel } from 'components/editTemplate/useInputSelProps';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // =================================================================================
 
@@ -18,33 +19,71 @@ export default function BankManagement(): React.ReactElement {
 
     disabled,
     switchDisabled,
+
+    reqPost,
+    reqPatch,
   } = useInputSel({
-    rawData: fakeData,
+    rawData_fromParent: fakeData,
     templateModelProps: fakeTemplateModelProps,
   });
 
   // --------------------------------------------------------------------
 
-  const panelList: TpanelList = [
-    disabled
-      ? {
-          type: 'myButton',
-          label: '編輯',
-          onClick: () => {
-            switchDisabled();
-          },
-        }
-      : null,
-    !disabled
-      ? {
-          type: 'myButton',
-          label: '取消',
-          onClick: () => {
-            switchDisabled();
-          },
-        }
-      : null,
+  // const panelList: TpanelList = [
+  //   disabled
+  //     ? {
+  //         type: 'myButton',
+  //         label: '編輯',
+  //         onClick: () => {
+  //           switchDisabled();
+  //         },
+  //       }
+  //     : null,
+  //   !disabled
+  //     ? {
+  //         type: 'myButton',
+  //         label: '取消',
+  //         onClick: () => {
+  //           switchDisabled();
+  //         },
+  //       }
+  //     : null,
+  // ];
+
+  const panelList_disabled: TpanelList = [
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => {
+        switchDisabled(false);
+      },
+    },
   ];
+
+  const panelList_abled: TpanelList = [
+    {
+      type: 'redButton',
+      label: reqPost ? '確定新增' : reqPatch ? '確定更新' : '後端設定錯誤',
+      onClick: () => {
+        if (reqPost) {
+          reqPost();
+        } else if (reqPatch) {
+          reqPatch();
+        } else {
+          myAlert.err({ title: '後端設定錯誤' });
+        }
+      },
+    },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        switchDisabled(true);
+      },
+    },
+  ];
+
+  const panelList = disabled ? panelList_disabled : panelList_abled;
 
   // --------------------------------------------------------------------
   // MARK: RENDER
@@ -144,9 +183,9 @@ const inputSelItemDict: InputSelItemDict = {
 const fakeTemplateModelProps: TemplateModelProps = {
   inputSelItemDict,
 
-  getApi: '',
-  postApi: '',
-  patchApi: '',
+  // apiGet: '',
+  // apiPost: '',
+  // apiPatch: '',
 
   template: {
     // t01: {
