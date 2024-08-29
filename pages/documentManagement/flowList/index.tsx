@@ -371,6 +371,10 @@ export default function FlowList() {
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
     const handleAddToData2 = () => {
+        if(newUserName===""&&newUserTitle===""){
+            myAlert.warning({title:'職稱、姓名不可為空'});
+            return;
+        }
         console.log(data2);
         const newStage = {
             stage_order: items.length + 1,
@@ -501,7 +505,7 @@ export default function FlowList() {
     const handleNewUserNameclick = (emp: any) => {
         isSelectingRef.current = true;
         setNewUserName(emp.ch_name);
-        setNewUserTitle(emp.stage_user_title);
+        setNewUserTitle(emp.title);
         setShowEmpSuggestions(false);  // 隱藏建議列表
     };
 
