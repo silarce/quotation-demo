@@ -96,7 +96,7 @@ const useInputSel = ({
         ...rest
       } = item;
 
-      const caption = (locale[key] ?? key) as string;
+      const caption = (locale?.items?.[key]?.caption ?? key) as string;
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState });
@@ -174,7 +174,7 @@ const useInputSel = ({
       blockDict[key] = filteredArr;
     });
 
-    const titleArr_locale = locale?.titleArr ?? [];
+    const titleArr_locale = locale?.titles ?? [];
     titleArr?.forEach((title, index) => {
       titleArr[index] = titleArr_locale[index] || title;
     });
@@ -185,8 +185,6 @@ const useInputSel = ({
       titleArr,
     };
   }, [templateModelProps.template, inputSelDict]);
-
-  console.log(templateProps);
 
   // 這個做法失敗，每一次輸入都會blur
   // const Template = useCallback(() => {
@@ -452,11 +450,11 @@ const createSelect = ({
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
 
-  const option_locale = locale[`${key}.options`] as string[] | undefined;
+  const optionDict_locale = locale?.items?.[key].options;
 
   options?.forEach((option, index) => {
-    const localeLabel = option_locale?.[index];
-    option.label = localeLabel || option.label;
+    const localeLabel = optionDict_locale?.[option.value];
+    option.label = localeLabel || option.label || option.value;
   });
 
   const { props, ...rest } = select;

@@ -1,18 +1,33 @@
 {
-  "title01": "Bank Management",
-  "accountName": "Account Name",
-  "account": "Account",
-  "bankName": "Bank",
-  "bankCode": "Bank Code",
-  "note": "Note",
-  "note2": "Note2",
-  "visiteDate": "Visite Date",
-  "agentName": "Agent Name",
-  "bankName.options": [
-    "Meow Bank",
-    "Woof Bank"
-  ],
-  "titleArr": [
+  "titles": [
     "Bank Management"
-  ]
+  ],
+  "items": {
+    "accountName": {
+      "caption": "Account Name"
+    },
+    "account": {
+      "caption": "Account"
+    },
+    "bankName": {
+      "caption": "Bank",
+      "options": {
+        "喵喵銀行": "Meow Bank",
+        "汪汪銀行": "Woof Bank",
+        "咩咩銀行": "Baa Bank"
+      }
+    },
+    "bankCode": {
+      "caption": "Bank Code"
+    },
+    "note": {
+      "caption": "Note"
+    },
+    "visiteDate": {
+      "caption": "Visit Date"
+    },
+    "agentName": {
+      "caption": "Agent"
+    }
+  }
 }

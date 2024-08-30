@@ -1,19 +1,33 @@
 {
-  "title01": "銀行管理",
-  "accountName": "帳戶名稱",
-  "account": "帳戶",
-  "bankName": "銀行",
-  "bankCode": "銀行代碼",
-  "note": "備註",
-  "note2": "備註2",
-  "visiteDate": "拜訪日期",
-  "agentName": "代理人",
-  "bankName.options": [
-    "喵喵銀行",
-    "汪汪銀行",
-    "咩咩銀行"
-  ],
-  "titleArr": [
+  "titles": [
     "銀行管理"
-  ]
+  ],
+  "items": {
+    "accountName": {
+      "caption": "帳戶名稱"
+    },
+    "account": {
+      "caption": "帳戶"
+    },
+    "bankName": {
+      "caption": "銀行",
+      "options": {
+        "喵喵銀行": "喵喵銀行",
+        "汪汪銀行": "汪汪銀行",
+        "咩咩銀行": "咩咩銀行"
+      }
+    },
+    "bankCode": {
+      "caption": "銀行代碼"
+    },
+    "note": {
+      "caption": "備註"
+    },
+    "visiteDate": {
+      "caption": "拜訪日期"
+    },
+    "agentName": {
+      "caption": "代理人"
+    }
+  }
 }

@@ -32,27 +32,6 @@ export default function BankManagement(): React.ReactElement {
 
   // --------------------------------------------------------------------
 
-  // const panelList: TpanelList = [
-  //   disabled
-  //     ? {
-  //         type: 'myButton',
-  //         label: '編輯',
-  //         onClick: () => {
-  //           switchDisabled();
-  //         },
-  //       }
-  //     : null,
-  //   !disabled
-  //     ? {
-  //         type: 'myButton',
-  //         label: '取消',
-  //         onClick: () => {
-  //           switchDisabled();
-  //         },
-  //       }
-  //     : null,
-  // ];
-
   const panelList_disabled: TpanelList = [
     {
       type: 'myButton',
@@ -125,7 +104,8 @@ const inputSelItemDict: InputSelItemDict = {
         options: [
           { value: '喵喵銀行', label: '預設值-喵喵銀行' },
           { value: '汪汪銀行', label: '預設值-汪汪銀行' },
-          { value: '啾啾銀行', label: '預設值-啾啾銀行' },
+          { value: '咩咩銀行', label: '預設值-咩咩銀行' },
+          { value: '啾啾銀行_值' },
         ],
       },
     },
@@ -135,17 +115,8 @@ const inputSelItemDict: InputSelItemDict = {
     captionStyle: { width: '140px' },
     input: {},
   },
-  //
-  //
-  note: {
-    valueType: 'string',
-    captionStyle: { width: '140px' },
-    textarea: {
-      allowNewLineByUser: true,
-    },
-  },
 
-  note2: {
+  note: {
     valueType: 'string',
     captionStyle: { width: '140px' },
     textarea: {
@@ -182,13 +153,14 @@ const fakeTemplateModelProps: TemplateModelProps = {
       titleArr: ['預設值-銀行管理'],
       layout: {
         a: ['accountName', 'account'],
-        b: ['bankName', 'bankCode', 'note', 'note2', 'visiteDate'],
+        b: ['bankName', 'bankCode', 'note', 'visiteDate'],
       },
     },
   },
 
   // locale: locale_tw,
   locale: locale_en,
+  // locale: undefined,
 };
 
 const fakeData = {

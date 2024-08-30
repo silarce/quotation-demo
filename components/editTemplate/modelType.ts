@@ -11,8 +11,8 @@ import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 interface Option {
   value: string;
-  label: string;
-  [key: string]: string | number | boolean;
+  label?: string; // 預設值，不給也不要緊，會被locale替換。若沒有預設值也沒有locale，就用value替代
+  // [key: string]: string | number | boolean | undefined;
 }
 
 type Tstyle = {
@@ -86,20 +86,25 @@ interface Span {
   style?: Tstyle;
 }
 
+interface Locale {
+  titles?: string[];
+  items?: {
+    [key: string]: {
+      caption?: string; // 如果在locale沒有取到值，用key替代
+      // suffix?: string; // 有需要時再做吧
+      // placeholder?: string; // 有需要時再做吧
+      options?: {
+        [value: string]: string;
+      }; // 考慮到可能會有動態option，改用字典型別。 key為option的value
+    };
+  };
+}
+
 // ============================================================================
 interface InputSelItem {
   readonly valueType: 'string' | 'number' | 'boolean' | 'dateString';
   readonly nullable?: boolean;
   // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
-
-  // 這個方案不採用
-  // caption?: {
-  //   [localeCode: string]: string;
-  //   'zh-TW': string;
-  //   en: string;
-  // };
-  // 改由送語系參數給後端，後端直接給對應語系的caption
-  // caption?: string;
 
   // wrapperPreStyle?: 'ps01';
   wrapperStyle?: { [property: string]: string }; // React.CSSProperties
@@ -190,7 +195,7 @@ interface TemplateModelProps {
     [templateName: string]: {
       [optionsForTemplate: string]: any;
       style?: Tstyle;
-      titleArr?: string[];
+      titleArr?: string[]; // 預設值，會被locale替換
       layout: {
         [sectionName: string]: string[]; // keyArr
       };
@@ -214,12 +219,8 @@ interface TemplateModelProps {
     // };
   };
   //
-  // locale: {
-  //   [key: string]: string | string[];
-  // };
-  locale: {
-    [key: string]: string | string[];
-  };
+
+  locale: Locale | undefined;
 }
 
 export type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps };
