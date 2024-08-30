@@ -4,8 +4,8 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 import type { TbankDto } from 'js/api/dtoTypes';
 
-import { TemplateModelProps, InputSelItemDict } from 'components/editTemplate/modelType';
-import { useInputSel } from 'components/editTemplate/useInputSelProps';
+import { TemplateModelProps, InputSelItemDict } from 'components/basicDataEditorTemplate/modelType';
+import { useInputSel } from 'components/basicDataEditorTemplate/useInputSelProps';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
@@ -151,11 +151,11 @@ const fakeTemplateModelProps: TemplateModelProps = {
     //   },
     // },
     t02: {
-      titleArr: ['預設值-銀行管理'],
-      layout: {
-        a: ['accountName', 'account'],
-        b: ['bankName', 'bankCode', 'note', 'visiteDate'],
-      },
+      // titleArr: ['預設值-銀行管理'],
+      // layout: {
+      //   a: ['accountName', 'account'],
+      //   b: ['bankName', 'bankCode', 'note', 'visiteDate'],
+      // },
     },
   },
 

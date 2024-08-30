@@ -1,9 +1,9 @@
-import T01, { Tt01Props } from './t01/t01';
-import T02, { Tt02Props } from './t02/t02';
+import T01 from './t01/t01';
+import T02 from './t02/t02';
 
 // ===========================================================================
 
-type TtemplateProps = Tt01Props | Tt02Props;
+// type TemplateInstanceProp = Tt01Props | Tt02Props;
 
 // ===========================================================================
 const templateLookup = {
@@ -12,5 +12,5 @@ const templateLookup = {
 };
 
 // ===========================================================================
-export type { Tt01Props, Tt02Props, TtemplateProps };
+// export type { TemplateInstanceProp };
 export { templateLookup };

@@ -5,12 +5,20 @@ import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps, Option } from './modelType';
-import { useTranslation } from 'react-i18next';
+import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
 
-import { Toption } from 'js/utils/options/options';
-
-import { templateLookup, TtemplateProps } from 'components/editTemplate/templateLookup';
+// type
+import type {
+  //
+  TemplateModelProps,
+  InputSelItemDict,
+  InputSelItem,
+  // TinputSelProps,
+  Option,
+} from './modelType';
+import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import type { Toption } from 'js/utils/options/options';
+import type { TinputSelProps_key, TemplateProps } from './templateProp';
 
 // ===========================================================================
 
@@ -24,18 +32,14 @@ type TrawData = {
   [key: string]: rawDataItem;
 };
 
-interface TinputSelProps_key extends TinputSelProps {
-  key: string;
-}
-
-type TinputSelDict = {
-  [key: string]: TinputSelProps_key;
-};
-
 type Tvalue = string | boolean | Moment | null | undefined;
 
 type Tstate = {
   [key: string]: Tvalue;
+};
+
+type TinputSelDict = {
+  [key: string]: TinputSelProps_key;
 };
 
 // ===========================================================================
@@ -49,10 +53,6 @@ const useInputSel = ({
   rawData: TrawData | undefined;
   templateModelProps: TemplateModelProps;
 }) => {
-  const {
-    i18n: { language },
-  } = useTranslation();
-
   const router = useRouter();
   const { id } = router.query as Tquery;
 
@@ -125,7 +125,7 @@ const useInputSel = ({
     });
 
     return inputSelDict;
-  }, [state, disabled, language]);
+  }, [inputSelItemDict, state, locale, disabled]);
 
   // ________________________________________________________________
   // ________________________________________________________________
@@ -143,13 +143,13 @@ const useInputSel = ({
   // ________________________________________________________________
 
   // MARK:templateProps
-  const templateProps: TtemplateProps = useMemo(() => {
+  const templateProps: TemplateProps = useMemo(() => {
     const teamplateProps_pre = Object.values(templateModelProps.template)[0];
 
     const {
       //
       titleArr,
-      layout,
+      layout = {},
       ...rest
     } = teamplateProps_pre;
 
@@ -179,12 +179,14 @@ const useInputSel = ({
       titleArr[index] = titleArr_locale[index] || title;
     });
 
-    return {
+    const templateProps: TemplateProps = {
       ...rest,
       ...blockDict,
       titleArr,
     };
-  }, [templateModelProps.template, inputSelDict]);
+
+    return templateProps;
+  }, [templateModelProps.template, locale, inputSelDict]);
 
   // 這個做法失敗，每一次輸入都會blur
   // const Template = useCallback(() => {
@@ -197,89 +199,7 @@ const useInputSel = ({
 
   // ----------------------------------------------------------------
 
-  // region API
-
-  const reqGet = useCallback(
-    async () => {
-      // if (!apiGet) {
-      //   return null;
-      // }
-      // return axi
-      //   .get<TrawData>(apiGet)
-      //   .then(({ data }) => data)
-      //   .catch((err: AxiosError<TapiError>) => {
-      //     myAlert.err({ title: '取得資料失敗', content: err.response?.data.message ?? err.message });
-      //     return Promise.reject(err);
-      //   });
-    },
-    [
-      // apiGet
-    ]
-  );
-
-  // _____________________________________________________________________
-  // _____________________________________________________________________
-
-  const reqPost = useCallback(
-    async () => {
-      // if (!apiPost) {
-      //   return null;
-      // }
-      // const body = stateToBody({
-      //   inputSelItemDict,
-      //   state,
-      // });
-      // return axi
-      //   .post(apiPost, body)
-      //   .then(async ({ data }) => {
-      //     await update();
-      //     return data;
-      //   })
-      //   .catch((err: AxiosError<TapiError>) => {
-      //     myAlert.err({ title: '新增資料失敗', content: err.response?.data.message ?? err.message });
-      //   });
-    },
-    [
-      // apiPost, inputSelItemDict, state
-    ]
-  );
-
-  // _____________________________________________________________________
-  // _____________________________________________________________________
-
-  const reqPatch = useCallback(
-    async () => {
-      // if (!apiPatch) {
-      //   return null;
-      // }
-      // const body = stateToBody({
-      //   inputSelItemDict,
-      //   state,
-      // });
-      // return axi
-      //   .patch(apiPatch, body)
-      //   .then(async ({ data }) => {
-      //     await update();
-      //     return data;
-      //   })
-      //   .catch((err: AxiosError<TapiError>) => {
-      //     myAlert.err({ title: '更新資料失敗', content: err.response?.data.message ?? err.message });
-      //   });
-    },
-    [
-      // apiPatch, inputSelItemDict, state
-    ]
-  );
-
-  // ----------------------------------------------------------------
-
   // region FUNCTION
-
-  // const update = async () => {
-  //   await reqGet().then((res) => {
-  //     setRawData(res);
-  //   });
-  // };
 
   const getBody = () => {
     return stateToBody({
@@ -310,14 +230,6 @@ const useInputSel = ({
     disabled && setState(defaultState);
   }, [disabled]);
 
-  // useEffect(() => {
-  //   if (rawData_fromParent) {
-  //     return;
-  //   }
-
-  //   update();
-  // }, [rawData_fromParent]);
-
   // ----------------------------------------------------------------
   return {
     Template,
@@ -325,11 +237,8 @@ const useInputSel = ({
     disabled,
     switchDisabled,
     //
-    // reqPost: id ? null : reqPost,
-    // reqPatch: id ? reqPatch : null,
     state,
     getBody,
-
     //
     inputSelDict,
   };
@@ -462,7 +371,7 @@ const createSelect = ({
 
   const optionDict_locale = locale?.items?.[key].options;
 
-  options?.forEach((option, index) => {
+  options?.forEach((option) => {
     const localeLabel = optionDict_locale?.[option.value];
     option.label = localeLabel || option.label || option.value;
   });
@@ -567,4 +476,3 @@ const createDatePickerProps = ({
 // ===========================================================================
 
 export { useInputSel };
-export type { TinputSelProps_key, TinputSelDict, Tstate };

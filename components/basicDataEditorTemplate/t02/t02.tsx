@@ -1,33 +1,37 @@
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
-import type { TinputSelProps_key } from 'components/editTemplate/useInputSelProps';
+import { TemplateProps } from 'components/basicDataEditorTemplate/templateProp';
 
 import scss from './t02.module.scss';
 
 // ===========================================================================
 
-type Tt02Props = {
-  style?: {
-    [property: string]: string; // React.CSSProperties
-  };
-  titleArr?: string[];
-  a?: TinputSelProps_key[];
-  b?: TinputSelProps_key[];
-};
+// type Tt02Props = {
+//   style?: {
+//     [property: string]: string; // React.CSSProperties
+//   };
+//   titleArr?: string[];
+//   a?: TinputSelProps_key[];
+//   b?: TinputSelProps_key[];
+// };
+// type Tt02Props = TemplateProps;
 
-type Tt02 = React.FC<Tt02Props>;
+type Tt02 = React.FC<TemplateProps>;
 
-export type { Tt02Props, Tt02 };
+export type { Tt02 };
 
 // ===========================================================================
 
-const T02: Tt02 = ({ style, titleArr, a, b }: Tt02Props) => {
+const T02: Tt02 = ({ style, titleArr, layout }) => {
+  const { a, b } = layout ?? {};
+
   return (
     <div className={scss.t02} style={style}>
       <div className={scss.ab}>
-        <p className={scss.title}>{titleArr?.[0]}</p>
+        <p className={scss.title}>{titleArr?.[0] ?? 'titleArr[0]'}</p>
         <div className={scss.main}>
           <div className={scss.a}>
+            {!a && <span>section a</span>}
             {a?.map((props, index) => {
               const { key, ...rest } = props;
 
@@ -36,6 +40,7 @@ const T02: Tt02 = ({ style, titleArr, a, b }: Tt02Props) => {
           </div>
           <div className={scss.pilar}></div>
           <div className={scss.b}>
+            {!b && <span>section b</span>}
             {b?.map((props, index) => {
               const { key, ...rest } = props;
 
