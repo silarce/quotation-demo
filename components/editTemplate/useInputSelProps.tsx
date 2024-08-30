@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import moment, { Moment } from 'moment';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps } from './modelType';
+import type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps, Option } from './modelType';
 import { useTranslation } from 'react-i18next';
 
 import { Toption } from 'js/utils/options/options';
@@ -32,6 +33,7 @@ type TinputSelDict = {
 };
 
 type Tvalue = string | boolean | Moment | null | undefined;
+
 type Tstate = {
   [key: string]: Tvalue;
 };
@@ -481,10 +483,22 @@ const createSelect = ({
       options,
       value: value_option,
       onChange: (option) => {
+        const { value, label, ...rest } = option ?? {};
+
+        const copy = _.cloneDeep(rest) as Option;
+        Object.entries(copy).forEach(([key, value]) => {
+          if (typeof value === 'number') {
+            copy[key] = value.toString();
+          }
+        });
+
+        const theRest = copy as { [key: string]: Tvalue };
+
         setState((state) => {
           return {
             ...state,
-            [key]: option?.value || '',
+            ...theRest,
+            [key]: value || '',
           };
         });
       },

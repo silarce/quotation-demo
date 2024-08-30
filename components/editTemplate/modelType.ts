@@ -12,7 +12,7 @@ import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 interface Option {
   value: string;
   label?: string; // 預設值，不給也不要緊，會被locale替換。若沒有預設值也沒有locale，就用value替代
-  // [key: string]: string | number | boolean | undefined;
+  [key: string]: string | number | boolean | undefined;
 }
 
 type Tstyle = {
@@ -223,4 +223,4 @@ interface TemplateModelProps {
   locale: Locale | undefined;
 }
 
-export type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps };
+export type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps, Option };

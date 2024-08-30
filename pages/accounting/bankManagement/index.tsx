@@ -102,18 +102,19 @@ const inputSelItemDict: InputSelItemDict = {
     select: {
       props: {
         options: [
-          { value: '喵喵銀行', label: '預設值-喵喵銀行' },
-          { value: '汪汪銀行', label: '預設值-汪汪銀行' },
-          { value: '咩咩銀行', label: '預設值-咩咩銀行' },
-          { value: '啾啾銀行_值' },
+          { value: '喵喵銀行', label: '預設值-喵喵銀行', bankCode: 'cc-001' },
+          { value: '汪汪銀行', label: '預設值-汪汪銀行', bankCode: 'ww-002' },
+          { value: '咩咩銀行', label: '預設值-咩咩銀行', bankCode: 'bb-003' },
+          { value: '啾啾銀行_值', bankCode: 'tt-004' },
         ],
       },
     },
   },
   bankCode: {
+    showBaseline: 'invisible',
     valueType: 'string',
     captionStyle: { width: '140px' },
-    input: {},
+    span: {},
   },
 
   note: {
@@ -172,7 +173,7 @@ const fakeData = {
 
   accountName: '這是銀行帳號',
   account: '05-78-65665',
-  bankCode: '735-45863',
+  bankCode: 'cc-001',
   bankName: '喵喵銀行',
   note: 'NOTE~~~~\nNOTE~~~~\nNOTE~~~~',
   visiteDate: '2022-11-11',
