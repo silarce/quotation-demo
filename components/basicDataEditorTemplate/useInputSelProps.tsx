@@ -153,7 +153,7 @@ const useInputSel = ({
       ...rest
     } = teamplateProps_pre;
 
-    const blockDict: {
+    const sectionDict: {
       [
         blockCode: string // a, b, c, ...
       ]: TinputSelProps_key[];
@@ -171,7 +171,7 @@ const useInputSel = ({
       });
 
       const filteredArr = arr.filter((item) => !!item) as TinputSelProps_key[];
-      blockDict[key] = filteredArr;
+      sectionDict[key] = filteredArr;
     });
 
     const titleArr_locale = locale?.titles ?? [];
@@ -181,7 +181,9 @@ const useInputSel = ({
 
     const templateProps: TemplateProps = {
       ...rest,
-      ...blockDict,
+      layout: {
+        ...sectionDict,
+      },
       titleArr,
     };
 

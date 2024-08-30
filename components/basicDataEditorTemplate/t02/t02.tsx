@@ -23,7 +23,7 @@ export type { Tt02 };
 // ===========================================================================
 
 const T02: Tt02 = ({ style, titleArr, layout }) => {
-  const { a, b } = layout ?? {};
+  const { a, b } = layout;
 
   return (
     <div className={scss.t02} style={style}>

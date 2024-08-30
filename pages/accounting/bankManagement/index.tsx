@@ -144,18 +144,12 @@ const fakeTemplateModelProps: TemplateModelProps = {
   inputSelItemDict,
 
   template: {
-    // t01: {
-    //   style: { width: '600px' },
-    //   layout: {
-    //     a: ['accountName', 'account', 'bankName', 'bankCode'],
-    //   },
-    // },
     t02: {
-      // titleArr: ['預設值-銀行管理'],
-      // layout: {
-      //   a: ['accountName', 'account'],
-      //   b: ['bankName', 'bankCode', 'note', 'visiteDate'],
-      // },
+      titleArr: ['預設值-銀行管理'],
+      layout: {
+        a: ['accountName', 'account'],
+        b: ['bankName', 'bankCode', 'note', 'visiteDate'],
+      },
     },
   },
 

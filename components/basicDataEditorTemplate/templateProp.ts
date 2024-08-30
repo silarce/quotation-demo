@@ -9,7 +9,7 @@ interface TemplateProps {
   // style?: React.CSSProperties;
   style?: { [cssProperty: string]: string };
   titleArr?: string[];
-  layout?: {
+  layout: {
     [sectionName: string]: TinputSelProps_key[]; // keyArr
   };
 }
