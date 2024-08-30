@@ -73,7 +73,9 @@ export default function ReviewList() {
 
     const [reviewtype, setReviewtype] = useState<string>("");
     const [memo, setMemo] = useState<string>("");
-
+    const [currentreview_id, setCurrentreview_id] = useState<string>("");
+    const [review_memo, setReview_memo] = useState<string>("");
+    
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -164,7 +166,8 @@ export default function ReviewList() {
 
             // 檢查 data 是否有內容
             if (data.length > 0) {
-                console.log(data[0]);
+
+                setCurrentreview_id(data[0].id);
                 GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
 
 
@@ -205,7 +208,8 @@ export default function ReviewList() {
 
             // 檢查 data 是否有內容
             if (data3.length > 0) {
-                // console.log(data3[0]);
+
+                setCurrentreview_id(data3[0].id);
                 GetReviewStatus(data3[0]); // 只有當 data 有內容時才執行
             } else {
                 // console.log('沒有撈到資料');
@@ -246,6 +250,7 @@ export default function ReviewList() {
             // 檢查 data 是否有內容
             if (data4.length > 0) {
                 // console.log(data4[0]);
+                setCurrentreview_id(data4[0].id);
                 GetReviewStatus(data4[0]); // 只有當 data 有內容時才執行
             } else {
                 // console.log('沒有撈到資料');
@@ -274,6 +279,7 @@ export default function ReviewList() {
 
     const GetReviewStatus = async (item: any) => {
         handleRowClick(item.id);
+        setCurrentreview_id(item.id);
         // alert("in");
         // GetDocument(item);
         // setReviewtype("報價單");
@@ -540,6 +546,25 @@ export default function ReviewList() {
     };
 
     const tabChosed = (tabName: string) => {
+        if (tabName === "待審核") {
+            if (data.length != 0) {
+                setCurrentreview_id(data[0].id)
+            } else {
+                setCurrentreview_id("");
+            }
+        } else if (tabName === "審核中") {
+            if (data3.length != 0) {
+                setCurrentreview_id(data3[0].id)
+            } else {
+                setCurrentreview_id("");
+            }
+        } else if (tabName === "審核完成") {
+            if (data4.length != 0) {
+                setCurrentreview_id(data4[0].id)
+            } else {
+                setCurrentreview_id("");
+            }
+        }
         setTabnow(tabName);
         setTabshow(tabName);
 
@@ -572,6 +597,55 @@ export default function ReviewList() {
 
     }
 
+    const handleReviewConfirm = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username,
+                review_memo: review_memo,
+                review_id: currentreview_id
+            };
+
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/ReviewConfirm`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            GetReview();
+            GetReviewing();
+            GetReviewed();
+            setReview_memo("");
+
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -596,7 +670,9 @@ export default function ReviewList() {
                     <div className={scss.content}>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <div className={scss.head_head1}>
-                                <div></div>
+                                <div>
+                                    審核id:{currentreview_id}
+                                </div>
                                 <div></div>
                                 <div></div>
                                 <div></div>
@@ -792,19 +868,16 @@ export default function ReviewList() {
                                     <span>
                                         {data2 && (
                                             data2.slice(0, 100).map((_item: any, index: number) => {
-                                                // 判斷當前是否為第一筆，如果不是，則檢查上一筆的 review_time
-                                                let prestageReviewDisplay = _item.prestage_review;
-
-                                                if (index > 0 && !data2[index - 1].review_time) {
-                                                    prestageReviewDisplay = ""; // 如果上一筆的 review_time 為空，將當前的 prestage_review 設定為空
-                                                }
+                                                // 根據 index 設定 prestageReviewDisplay
+                                                let prestageReviewDisplay = index === 0
+                                                    ? _item.create_at  // 第一筆資料顯示 item.prestage_review
+                                                    : data2[index - 1].review_time || '';  // 其他資料顯示上一筆的 review_time
 
                                                 return (
                                                     <CellWithBar key={index} className={scss.panelHeader22}>
                                                         <div
                                                             key={index}
                                                             className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
-                                                        // onClick={() => { alert(_item.document_id) }}
                                                         >
                                                             <span style={{ textAlign: 'center', backgroundColor: '#5b5a5ad6', color: 'white' }}>{_item.review_type}</span>
                                                             <span>{_item.review_person}</span>
@@ -820,6 +893,8 @@ export default function ReviewList() {
                                             })
                                         )}
 
+
+
                                     </span>
                                 </div>
                             </div>
@@ -827,8 +902,9 @@ export default function ReviewList() {
                         </div>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
                             <div className={scss.body_foot1} style={{ pointerEvents: tabshow === "審核中" || tabshow === "審核完成" ? 'none' : 'auto' }}>
+
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢 耶斯") }} title="核准">
+                                    <button className={scss.longsquarebtn} onClick={() => { handleReviewConfirm() }} title="核准">
                                         {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         核准
                                     </button>
@@ -840,7 +916,11 @@ export default function ReviewList() {
                                     </button>
                                 </div>
                                 <div>
-                                    <input placeholder="意見" style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }} />
+                                    <input
+                                        placeholder="意見"
+                                        style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                                        onChange={(e) => setReview_memo(e.target.value)}
+                                    />
                                 </div>
                             </div>
                         </div>

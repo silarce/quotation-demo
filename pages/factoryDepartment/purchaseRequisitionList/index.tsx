@@ -1301,7 +1301,8 @@ export default function PurchaseRequisitionList() {
                     document_type: "請購單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username
+                    username: userInfo?.username,
+                    document_title: documenttitle
                 };
 
                 var inputModel = {
@@ -2176,7 +2177,7 @@ export default function PurchaseRequisitionList() {
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
-                        <span style={{fontSize:'18px'}}>送審主旨</span>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
                         <input placeholder="主旨"
                             style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
                             value={documenttitle}

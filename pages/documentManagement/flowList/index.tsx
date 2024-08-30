@@ -38,6 +38,7 @@ import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_fc_add from 'public/image/icon/fc_add.svg';
 import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
 import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
+import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 
 export default function FlowList() {
 
@@ -368,17 +369,19 @@ export default function FlowList() {
     const [newReviewType, setNewReviewType] = useState('審查');
     const [newUserName, setNewUserName] = useState('');
     const [newUserTitle, setNewUserTitle] = useState('');
+    const [newUserId, setNewUserId] = useState('');
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
     const handleAddToData2 = () => {
-        if(newUserName===""&&newUserTitle===""){
-            myAlert.warning({title:'職稱、姓名不可為空'});
+        if (newUserName === "" && newUserTitle === "") {
+            myAlert.warning({ title: '職稱、姓名不可為空' });
             return;
         }
         console.log(data2);
         const newStage = {
             stage_order: items.length + 1,
             review_type: newReviewType,
+            stage_user_uuid: newUserId,
             stage_user_name: newUserName,
             stage_user_title: newUserTitle, // 根據需求這裡可以變更
         };
@@ -451,6 +454,7 @@ export default function FlowList() {
             {
                 stage_order: prevData2.length + 1, // 新增的資料順序號
                 review_type: '提出',
+                stage_user_uuid: userInfo?.id,
                 stage_user_name: userInfo?.username,
                 stage_user_title: '經辦',
             }
@@ -467,31 +471,31 @@ export default function FlowList() {
     // const [employeedata, setEmployeedata] = useState<any[]>([]);
     const [employeefilteredData, setEmployeeFilteredData] = useState<any[]>([]);
     const [showempSuggestions, setShowEmpSuggestions] = useState(false);
-    
+
     // const [newUserName, setNewUserName] = useState('');
 
     useEffect(() => {
         if (isSelectingRef.current) return;
-    
+
         const nameFilter = newUserName?.trim().toLowerCase();
         const titleFilter = newUserTitle?.trim().toLowerCase();
-    
+
         if (nameFilter !== "" || titleFilter !== "") {
             const filtered = employeedata.filter(item => {
                 const matchesName = item.ch_name?.toLowerCase().includes(nameFilter);
                 const matchesTitle = item.title?.toLowerCase().includes(titleFilter);
                 return matchesName && matchesTitle;
             });
-    
+
             setEmployeeFilteredData(filtered);
             setShowEmpSuggestions(filtered.length > 0);
         } else {
             setEmployeeFilteredData([]);
             setShowEmpSuggestions(false);
         }
-    }, [newUserName, newUserTitle, employeedata]);
-    
-    
+    }, [newUserName, newUserTitle]);
+
+
 
     const handleNewUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -506,9 +510,67 @@ export default function FlowList() {
         isSelectingRef.current = true;
         setNewUserName(emp.ch_name);
         setNewUserTitle(emp.title);
+        setNewUserId(emp.id);
         setShowEmpSuggestions(false);  // 隱藏建議列表
     };
 
+    const handleClearNewUserName = () => {
+        setNewUserName("");
+        setNewUserTitle("");
+    }
+
+    const handleSaveFlow = async () => {
+        if(flowname===""||flowname===undefined){
+            myAlert.warning({title:'流程名稱不可為空'});
+            return;
+        }
+
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username,
+                name: flowname,
+                stage_counter: data2.length,
+                data2: data2
+            };
+
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/AddFlowById`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setData2([]);
+            setFlowname("");
+
+
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
 
 
 
@@ -526,16 +588,27 @@ export default function FlowList() {
                         <div className={scss.head_head1}>
                             <div></div>
                             <div>
-                                <button className={status === '未儲存' ? scss.squarebtn : scss.squarebtn} onClick={() => { handleAddflow() }} title="新增單據">
-                                    <img src={status === '未儲存' ? icon_add2.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                <button
+                                    className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn}
+                                    onClick={status !== '未儲存' ? () => handleAddflow() : undefined}
+                                    title="新增單據"
+                                    disabled={status === '未儲存'} // 確保在未儲存狀態下按鈕無法互動
+                                >
+                                    <img
+                                        src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src}
+                                        alt="add"
+                                        style={{ height: '20px', width: '20px' }}
+                                    />
                                     新增
                                 </button>
+
                                 &nbsp;
                                 <button
                                     className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                    onClick={() => { }}
+                                    onClick={() => { handleSaveFlow() }}
                                     title="儲存新增"
-                                    disabled={status !== '未儲存'}
+                                    disabled={status !== '未儲存'
+                                    }
                                 >
                                     <img
                                         src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
@@ -730,10 +803,7 @@ export default function FlowList() {
                             </span>
                             <div style={{ display: `${status !== "" ? '' : 'none'}` }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', borderBottom: '1px solid #ccc', borderTop: '1px solid #ccc' }}>
-                                    <div style={{ width: '70px', padding: '0px 10px' }}>
-                                        <button>
-                                            <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
-                                        </button>
+                                    <div style={{ width: '70px', padding: '0px 15px' }}>
                                     </div>
                                     <div style={{ width: '105px', padding: '0px 15px' }}>
                                         <select
@@ -746,7 +816,7 @@ export default function FlowList() {
                                             <option value="核准">核准</option>
                                         </select>
                                     </div>
-                                    <div style={{ width: '105px', padding: '0px 15px' }}>
+                                    <div style={{ width: '145px', padding: '0px 15px' }}>
                                         <input
                                             type="text"
                                             placeholder="職稱"
@@ -755,7 +825,7 @@ export default function FlowList() {
                                             onChange={handleNewUserTitleChange}
                                         />
                                     </div>
-                                    <div style={{ width: '140px', padding: '0px 15px' }}>
+                                    <div style={{ width: '150px', padding: '0px 15px' }}>
                                         <input
                                             type="text"
                                             placeholder="姓名"
@@ -763,6 +833,17 @@ export default function FlowList() {
                                             value={newUserName}
                                             onChange={handleNewUserNameChange}
                                         />
+                                    </div>
+                                    <div style={{ width: '150px', padding: '0px 10px' }}>
+                                        <button>
+                                            <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
+                                        </button>
+                                        &nbsp;
+                                        &nbsp;
+                                        &nbsp;
+                                        <button onClick={() => { handleClearNewUserName() }} style={{ display: `${newUserName || newUserTitle ? '' : 'none'}` }}>
+                                            <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
+                                        </button>
                                     </div>
                                 </div>
                                 <div>
@@ -774,7 +855,7 @@ export default function FlowList() {
                                             marginTop: '0px',
                                             left: '220px',
                                             position: 'absolute',
-                                            width: '800px',
+                                            width: '400px',
                                             backgroundColor: 'white',
                                             zIndex: 1004, // 確保下拉清單在最上層,
                                             display: `${showempSuggestions ? '' : 'none'}`
@@ -794,15 +875,19 @@ export default function FlowList() {
                                                     }}
                                                 >
 
-                                                    <span style={{ flex: '1 1 10%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                        {emp.title}
-                                                    </span>
-                                                    <span style={{ flex: '1 1 50%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                        {emp.ch_name}
-                                                    </span>
-                                                    <span style={{ flex: '1 1 10%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                        {emp.department}
-                                                    </span>
+                                                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                                        <span style={{ width: '155px' }}>
+                                                            {emp.title}
+                                                        </span>
+                                                        <span style={{ width: '100px' }}>
+                                                            {emp.ch_name}
+                                                        </span>
+                                                        <span style={{ width: '120px' }}>
+                                                            {emp.department}
+                                                        </span>
+                                                    </div>
+
+
                                                 </li>
                                             ))}
                                         </ul>

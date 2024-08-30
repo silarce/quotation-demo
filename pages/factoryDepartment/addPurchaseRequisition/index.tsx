@@ -226,7 +226,8 @@ export default function AddPurchaseRequisition() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "請購中"
+                type: "請購中",
+                username:userInfo?.username
             };
 
             var inputModel = {
@@ -428,13 +429,7 @@ export default function AddPurchaseRequisition() {
         // return;
         try {
             setIsLoading(true);
-            const conditionModel: {
-                create_at: any,
-                need_date: any,
-                create_by: any,
-                note: any
-                data: any,
-            } = {
+            const conditionModel= {
                 create_at: create_atin,
                 need_date: moment(need_date).format('YYYY-MM-DD'),
                 create_by: create_byin,
@@ -935,7 +930,9 @@ export default function AddPurchaseRequisition() {
 
                             await router.push({
                                 pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {},
+                                query: {
+                                    purchaserequisitionid:purchaserequisitionid
+                                },
                             });
                         }
                     }
