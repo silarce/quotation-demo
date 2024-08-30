@@ -7,12 +7,9 @@
 // 這幾個型別皆是基於inputSel_v2的零組件
 // Option則是基於Toption
 
-import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-
 interface Option {
   value: string;
   label: string;
-  [key: string]: string | number | boolean;
 }
 
 type Tstyle = {
@@ -90,16 +87,9 @@ interface Span {
 interface InputSelItem {
   readonly valueType: 'string' | 'number' | 'boolean' | 'dateString';
   readonly nullable?: boolean;
-  // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
 
-  // 這個方案不採用
-  // caption?: {
-  //   [localeCode: string]: string;
-  //   'zh-TW': string;
-  //   en: string;
-  // };
   // 改由送語系參數給後端，後端直接給對應語系的caption
-  // caption?: string;
+  caption?: string;
 
   // wrapperPreStyle?: 'ps01';
   wrapperStyle?: { [property: string]: string }; // React.CSSProperties
@@ -115,41 +105,9 @@ interface InputSelItem {
 
   showBaseline?: 'invisible' | 'always' | 'auto';
   hrStyle?: { [property: string]: string }; // React.CSSProperties
-
   isMust?: boolean;
-  // isMustPreStyle?: 'minimal';
-
   suffix?: string | number;
-  //____________________
-  //____________________
-  // updateOnChange?: boolean;
 
-  // reducer?:string[];
-  // "decimal a.add.b.mul.c" 解析為 new Decimal(a)['add'](b)['mul'](c)
-  // "conditional a===b?c:d" 解析為 a===b?c:d
-  // "assignment a=0" 解析為 a=0
-  // reducer會長的像這樣
-  // [
-  //   "decimal a.add.b.mul.c",
-  //   "conditional a===b?c:d",
-  //   "assignment a=0"
-  // ]
-  // 或許直接寫表達式字串再用eval執行就好了?
-  //
-  //
-  // decoration?:string[];
-  // disabled時對值的修飾
-  // 例如"localeString"，執行Number(a).toLocaleString()
-  // 例如"prefix $"，執行"$"+a
-  // decoration會長的像這樣
-  // [
-  //   "localeString",
-  //   "prefix $"
-  // ]
-  // 反正後端懂js，直接用表達式字串再用eval執行就好了吧
-
-  // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/eval
-  // 先不考慮用eval
   //____________________
   //____________________
   span?: Span;
@@ -157,6 +115,7 @@ interface InputSelItem {
   textarea?: Textarea;
   select?: Select;
   datePicker?: DatePicker;
+  // checkBox radio InputSelBar 這三種欄位還未實作
   // checkBox?: CheckBox;
   // radio?: Radio;
   // InputSelBar?: {
@@ -167,7 +126,6 @@ interface InputSelItem {
   // }[];
 }
 
-// type InputSelItemArr = InputSelItem[];
 type InputSelItemDict = {
   [key: string]: InputSelItem;
 };
@@ -177,49 +135,25 @@ interface TemplateModelProps {
   inputSelItemDict: InputSelItemDict;
   //
 
-  //由後端給api url的方案不採用
-  // apiGet?: string; // 取得資料
-  // apiPost?: string; // 新增資料使用apiPost // 要回應id，用於更新url與資料
-  // apiPatch?: string; // 更新資料使用apiPatch
-
-  //
-
   // 根據template決定用哪一個模板
-  // templateName: string;
   template: {
-    [templateName: string]: {
-      [optionsForTemplate: string]: any;
+    t01?: {
       style?: Tstyle;
-      titleArr?: string[];
       layout: {
-        [sectionName: string]: string[]; // keyArr
+        a: string[]; // keyArr
       };
     };
 
-    // t01?: {
-    //   style?: Tstyle;
-    //   layout: {
-    //     a: string[]; // keyArr
-    //   };
-    // };
-
-    // t02?: {
-    //   style?: Tstyle;
-    //   // title01: string;
-    //   titleArr?: string[];
-    //   layout: {
-    //     a: string[]; // keyArr
-    //     b: string[]; // keyArr
-    //   };
-    // };
+    t02?: {
+      style?: Tstyle;
+      title01: string;
+      layout: {
+        a: string[]; // keyArr
+        b: string[]; // keyArr
+      };
+    };
   };
   //
-  // locale: {
-  //   [key: string]: string | string[];
-  // };
-  locale: {
-    [key: string]: string | string[];
-  };
 }
 
-export type { TemplateModelProps, InputSelItemDict, InputSelItem, TinputSelProps };
+export type { TemplateModelProps, InputSelItemDict, InputSelItem };

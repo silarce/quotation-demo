@@ -8,6 +8,9 @@ import { TemplateModelProps, InputSelItemDict } from 'components/editTemplate/mo
 import { useInputSel } from 'components/editTemplate/useInputSelProps';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
+import locale_en from 'pages/accounting/bankManagement/locale_en.json';
+
 // =================================================================================
 
 // MARK: START
@@ -105,76 +108,61 @@ export default function BankManagement(): React.ReactElement {
 
 const inputSelItemDict: InputSelItemDict = {
   accountName: {
-    // key: 'accountName',
     valueType: 'string',
-    caption: {
-      'zh-TW': '帳號名稱',
-      en: 'Account Name',
-    },
     captionStyle: { width: '140px' },
     input: {},
   },
   account: {
-    // key: 'account',
     valueType: 'string',
-    caption: {
-      'zh-TW': '帳號',
-      en: 'Account',
-    },
     captionStyle: { width: '140px' },
     input: {},
   },
   bankName: {
-    // key: 'bankName',
     valueType: 'string',
-    caption: {
-      'zh-TW': '銀行',
-      en: 'Bank',
-    },
     captionStyle: { width: '140px' },
-
     select: {
       props: {
         options: [
-          { value: '喵喵銀行', label: '喵喵銀行' },
-          { value: '汪汪銀行', label: '汪汪銀行' },
-          { value: '啾啾銀行', label: '啾啾銀行' },
+          { value: '喵喵銀行', label: '預設值-喵喵銀行' },
+          { value: '汪汪銀行', label: '預設值-汪汪銀行' },
+          { value: '啾啾銀行', label: '預設值-啾啾銀行' },
         ],
       },
     },
   },
   bankCode: {
-    // key: 'bankCode',
     valueType: 'string',
-    caption: {
-      'zh-TW': '銀行代號',
-      en: 'Bank Code',
-    },
     captionStyle: { width: '140px' },
     input: {},
   },
   //
   //
   note: {
-    // key: 'note',
     valueType: 'string',
-    caption: {
-      'zh-TW': '備註',
-      en: 'Note',
-    },
     captionStyle: { width: '140px' },
     textarea: {
       allowNewLineByUser: true,
     },
   },
 
-  theDate: {
-    // key: 'theDate',
-    valueType: 'dateString',
-    caption: {
-      'zh-TW': '日期',
-      en: 'Date',
+  note2: {
+    valueType: 'string',
+    captionStyle: { width: '140px' },
+    textarea: {
+      allowNewLineByUser: true,
     },
+  },
+
+  agentName: {
+    valueType: 'string',
+    captionStyle: { width: '140px' },
+    textarea: {
+      allowNewLineByUser: true,
+    },
+  },
+
+  visiteDate: {
+    valueType: 'dateString',
     captionStyle: { width: '140px' },
     datePicker: {},
   },
@@ -182,10 +170,6 @@ const inputSelItemDict: InputSelItemDict = {
 
 const fakeTemplateModelProps: TemplateModelProps = {
   inputSelItemDict,
-
-  // apiGet: '',
-  // apiPost: '',
-  // apiPatch: '',
 
   template: {
     // t01: {
@@ -195,13 +179,16 @@ const fakeTemplateModelProps: TemplateModelProps = {
     //   },
     // },
     t02: {
-      title01: '帳號帳號帳號',
+      titleArr: ['預設值-銀行管理'],
       layout: {
         a: ['accountName', 'account'],
-        b: ['bankName', 'bankCode', 'note', 'theDate'],
+        b: ['bankName', 'bankCode', 'note', 'note2', 'visiteDate'],
       },
     },
   },
+
+  // locale: locale_tw,
+  locale: locale_en,
 };
 
 const fakeData = {
@@ -216,5 +203,5 @@ const fakeData = {
   bankCode: '735-45863',
   bankName: '喵喵銀行',
   note: 'NOTE~~~~\nNOTE~~~~\nNOTE~~~~',
-  theDate: '2022-11-11',
+  visiteDate: '2022-11-11',
 };

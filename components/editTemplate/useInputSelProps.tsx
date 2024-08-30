@@ -11,9 +11,6 @@ import { Toption } from 'js/utils/options/options';
 
 import { templateLookup, TtemplateProps } from 'components/editTemplate/templateLookup';
 
-import { axi, AxiosError } from 'js/api/_axiosCreator';
-import { TapiError } from 'js/api/dtoTypes';
-
 // ===========================================================================
 
 type Tquery = {
@@ -59,7 +56,7 @@ const useInputSel = ({
   const { id } = router.query as Tquery;
 
   // ----------------------------------------------------------------
-  const { inputSelItemDict, apiGet, apiPost, apiPatch } = templateModelProps;
+  const { inputSelItemDict, locale } = templateModelProps;
 
   // ----------------------------------------------------------------
   const [rawData, setRawData] = useState<TrawData | null>();
@@ -86,7 +83,6 @@ const useInputSel = ({
       const {
         valueType,
         // key,
-        caption: captionI18n,
 
         span,
         input,
@@ -100,11 +96,11 @@ const useInputSel = ({
         ...rest
       } = item;
 
-      const caption = captionI18n && (captionI18n[language] || captionI18n['zh-TW']);
+      const caption = (locale[key] ?? key) as string;
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState });
-      const selectProps = select && createSelect({ value, select, key, setState });
+      const selectProps = select && createSelect({ value, select, key, setState, locale });
       const textareaProps = textarea && createTextareaProps({ value, textarea, key, setState });
       const datePickerProps = datePicker && createDatePickerProps({ value, datePicker, key, setState });
 
@@ -150,7 +146,12 @@ const useInputSel = ({
   const templateProps: TtemplateProps = useMemo(() => {
     const teamplateProps_pre = Object.values(templateModelProps.template)[0];
 
-    const { layout, ...rest } = teamplateProps_pre;
+    const {
+      //
+      titleArr,
+      layout,
+      ...rest
+    } = teamplateProps_pre;
 
     const blockDict: {
       [
@@ -173,11 +174,19 @@ const useInputSel = ({
       blockDict[key] = filteredArr;
     });
 
+    const titleArr_locale = locale?.titleArr ?? [];
+    titleArr?.forEach((title, index) => {
+      titleArr[index] = titleArr_locale[index] || title;
+    });
+
     return {
       ...rest,
       ...blockDict,
+      titleArr,
     };
   }, [templateModelProps.template, inputSelDict]);
+
+  console.log(templateProps);
 
   // 這個做法失敗，每一次輸入都會blur
   // const Template = useCallback(() => {
@@ -192,80 +201,87 @@ const useInputSel = ({
 
   // region API
 
-  const reqGet = useCallback(async () => {
-    if (!apiGet) {
-      return null;
-    }
-
-    return axi
-      .get<TrawData>(apiGet)
-      .then(({ data }) => data)
-      .catch((err: AxiosError<TapiError>) => {
-        myAlert.err({ title: '取得資料失敗', content: err.response?.data.message ?? err.message });
-
-        return Promise.reject(err);
-      });
-  }, [apiGet]);
-
-  // _____________________________________________________________________
-  // _____________________________________________________________________
-
-  const reqPost = useCallback(async () => {
-    if (!apiPost) {
-      return null;
-    }
-
-    const body = stateToBody({
-      inputSelItemDict,
-      state,
-    });
-
-    return axi
-      .post(apiPost, body)
-      .then(async ({ data }) => {
-        await update();
-
-        return data;
-      })
-      .catch((err: AxiosError<TapiError>) => {
-        myAlert.err({ title: '新增資料失敗', content: err.response?.data.message ?? err.message });
-      });
-  }, [apiPost, inputSelItemDict, state]);
+  const reqGet = useCallback(
+    async () => {
+      // if (!apiGet) {
+      //   return null;
+      // }
+      // return axi
+      //   .get<TrawData>(apiGet)
+      //   .then(({ data }) => data)
+      //   .catch((err: AxiosError<TapiError>) => {
+      //     myAlert.err({ title: '取得資料失敗', content: err.response?.data.message ?? err.message });
+      //     return Promise.reject(err);
+      //   });
+    },
+    [
+      // apiGet
+    ]
+  );
 
   // _____________________________________________________________________
   // _____________________________________________________________________
 
-  const reqPatch = useCallback(async () => {
-    if (!apiPatch) {
-      return null;
-    }
+  const reqPost = useCallback(
+    async () => {
+      // if (!apiPost) {
+      //   return null;
+      // }
+      // const body = stateToBody({
+      //   inputSelItemDict,
+      //   state,
+      // });
+      // return axi
+      //   .post(apiPost, body)
+      //   .then(async ({ data }) => {
+      //     await update();
+      //     return data;
+      //   })
+      //   .catch((err: AxiosError<TapiError>) => {
+      //     myAlert.err({ title: '新增資料失敗', content: err.response?.data.message ?? err.message });
+      //   });
+    },
+    [
+      // apiPost, inputSelItemDict, state
+    ]
+  );
 
-    const body = stateToBody({
-      inputSelItemDict,
-      state,
-    });
+  // _____________________________________________________________________
+  // _____________________________________________________________________
 
-    return axi
-      .patch(apiPatch, body)
-      .then(async ({ data }) => {
-        await update();
-
-        return data;
-      })
-      .catch((err: AxiosError<TapiError>) => {
-        myAlert.err({ title: '更新資料失敗', content: err.response?.data.message ?? err.message });
-      });
-  }, [apiPatch, inputSelItemDict, state]);
+  const reqPatch = useCallback(
+    async () => {
+      // if (!apiPatch) {
+      //   return null;
+      // }
+      // const body = stateToBody({
+      //   inputSelItemDict,
+      //   state,
+      // });
+      // return axi
+      //   .patch(apiPatch, body)
+      //   .then(async ({ data }) => {
+      //     await update();
+      //     return data;
+      //   })
+      //   .catch((err: AxiosError<TapiError>) => {
+      //     myAlert.err({ title: '更新資料失敗', content: err.response?.data.message ?? err.message });
+      //   });
+    },
+    [
+      // apiPatch, inputSelItemDict, state
+    ]
+  );
 
   // ----------------------------------------------------------------
 
   // region FUNCTION
 
-  const update = async () => {
-    await reqGet().then((res) => {
-      setRawData(res);
-    });
-  };
+  // const update = async () => {
+  //   await reqGet().then((res) => {
+  //     setRawData(res);
+  //   });
+  // };
 
   const switchDisabled = (bool?: boolean) => {
     setDisabled((state) => {
@@ -289,13 +305,13 @@ const useInputSel = ({
     disabled && setState(defaultState);
   }, [disabled]);
 
-  useEffect(() => {
-    if (rawData_fromParent) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (rawData_fromParent) {
+  //     return;
+  //   }
 
-    update();
-  }, [apiGet, rawData_fromParent]);
+  //   update();
+  // }, [rawData_fromParent]);
 
   // ----------------------------------------------------------------
   return {
@@ -426,13 +442,22 @@ const createSelect = ({
   select,
   key,
   setState,
+  locale,
 }: {
   value: Tvalue;
   select: NonNullable<InputSelItem['select']>;
   key: string;
   setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  locale: TemplateModelProps['locale'];
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
+
+  const option_locale = locale[`${key}.options`] as string[] | undefined;
+
+  options?.forEach((option, index) => {
+    const localeLabel = option_locale?.[index];
+    option.label = localeLabel || option.label;
+  });
 
   const { props, ...rest } = select;
 

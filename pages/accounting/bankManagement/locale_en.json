@@ -1,0 +1,18 @@
+{
+  "title01": "Bank Management",
+  "accountName": "Account Name",
+  "account": "Account",
+  "bankName": "Bank",
+  "bankCode": "Bank Code",
+  "note": "Note",
+  "note2": "Note2",
+  "visiteDate": "Visite Date",
+  "agentName": "Agent Name",
+  "bankName.options": [
+    "Meow Bank",
+    "Woof Bank"
+  ],
+  "titleArr": [
+    "Bank Management"
+  ]
+}
