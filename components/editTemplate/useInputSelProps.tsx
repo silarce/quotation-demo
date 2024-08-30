@@ -41,11 +41,10 @@ type Tstate = {
 // MARK:useInputSel
 
 const useInputSel = ({
-  // rawData,
-  rawData_fromParent,
+  rawData,
   templateModelProps,
 }: {
-  rawData_fromParent?: TrawData;
+  rawData: TrawData | undefined;
   templateModelProps: TemplateModelProps;
 }) => {
   const {
@@ -59,9 +58,8 @@ const useInputSel = ({
   const { inputSelItemDict, locale } = templateModelProps;
 
   // ----------------------------------------------------------------
-  const [rawData, setRawData] = useState<TrawData | null>();
 
-  const defaultState = useDefaultState({ rawData: rawData || rawData_fromParent, inputSelItemDict });
+  const defaultState = useDefaultState({ rawData: rawData, inputSelItemDict });
 
   // ----------------------------------------------------------------
   const [disabled, setDisabled] = useState(!id);
@@ -281,6 +279,13 @@ const useInputSel = ({
   //   });
   // };
 
+  const getBody = () => {
+    return stateToBody({
+      inputSelItemDict,
+      state,
+    });
+  };
+
   const switchDisabled = (bool?: boolean) => {
     setDisabled((state) => {
       if (bool) {
@@ -318,8 +323,11 @@ const useInputSel = ({
     disabled,
     switchDisabled,
     //
-    reqPost: id ? null : reqPost,
-    reqPatch: id ? reqPatch : null,
+    // reqPost: id ? null : reqPost,
+    // reqPatch: id ? reqPatch : null,
+    state,
+    getBody,
+
     //
     inputSelDict,
   };

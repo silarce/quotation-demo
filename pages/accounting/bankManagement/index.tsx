@@ -23,10 +23,10 @@ export default function BankManagement(): React.ReactElement {
     disabled,
     switchDisabled,
 
-    reqPost,
-    reqPatch,
+    state,
+    getBody,
   } = useInputSel({
-    rawData_fromParent: fakeData,
+    rawData: fakeData,
     templateModelProps: fakeTemplateModelProps,
   });
 
@@ -43,19 +43,19 @@ export default function BankManagement(): React.ReactElement {
   ];
 
   const panelList_abled: TpanelList = [
-    {
-      type: 'redButton',
-      label: reqPost ? '確定新增' : reqPatch ? '確定更新' : '後端設定錯誤',
-      onClick: () => {
-        if (reqPost) {
-          reqPost();
-        } else if (reqPatch) {
-          reqPatch();
-        } else {
-          myAlert.err({ title: '後端設定錯誤' });
-        }
-      },
-    },
+    // {
+    //   type: 'redButton',
+    //   label: reqPost ? '確定新增' : reqPatch ? '確定更新' : '後端設定錯誤',
+    //   onClick: () => {
+    //     if (reqPost) {
+    //       reqPost();
+    //     } else if (reqPatch) {
+    //       reqPatch();
+    //     } else {
+    //       myAlert.err({ title: '後端設定錯誤' });
+    //     }
+    //   },
+    // },
     {
       type: 'myButton',
       label: '取消',
