@@ -598,6 +598,8 @@ export default function ReviewList() {
     }
 
     const handleReviewConfirm = async () => {
+        setReview_memo("");
+        setData2([]);
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -630,10 +632,10 @@ export default function ReviewList() {
             }
             const data = await response.json();
 
+
             GetReview();
             GetReviewing();
             GetReviewed();
-            setReview_memo("");
 
 
         } catch (error: any) {
@@ -747,7 +749,7 @@ export default function ReviewList() {
                                             {data4.length > 0 && (
                                                 <span style={{
                                                     display: 'inline-block',
-                                                    backgroundColor: '#ea1833',
+                                                    backgroundColor: '#5b5a5ad6',
                                                     color: 'white',
                                                     borderRadius: '50%',
                                                     width: '24px',
@@ -882,7 +884,7 @@ export default function ReviewList() {
                                                             <span style={{ textAlign: 'center', backgroundColor: '#5b5a5ad6', color: 'white' }}>{_item.review_type}</span>
                                                             <span>{_item.review_person}</span>
                                                             <span style={{ textAlign: 'center', backgroundColor: '#1061c4', color: 'white' }}>
-                                                                {_item.review_order === 1 ? "提出" : "簽核中"}
+                                                                {_item.review_order === 1 ? "提出" : _item.review_status}
                                                             </span>
                                                             <span>{prestageReviewDisplay}</span>
                                                             <span>{_item.review_time}</span>
@@ -901,16 +903,18 @@ export default function ReviewList() {
 
                         </div>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
-                            <div className={scss.body_foot1} style={{ pointerEvents: tabshow === "審核中" || tabshow === "審核完成" ? 'none' : 'auto' }}>
+                            <div className={scss.body_foot1} style={{ pointerEvents: (tabshow === "審核中" || tabshow === "審核完成"||data.length===0) ? 'none' : 'auto' }}>
 
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { handleReviewConfirm() }} title="核准">
+                                    <button className={scss.longsquarebtn} onClick={() => { handleReviewConfirm() }} title="核准"
+                                        style={{color:`${(tabshow==="審核中"||tabshow==="審核完成"||data.length===0)?'#5b5a5ad6':'#14256a'}`}}>
                                         {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         核准
                                     </button>
                                 </div>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回">
+                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回"
+                                        style={{color:`${(tabshow==="審核中"||tabshow==="審核完成"||data.length===0)?'#5b5a5ad6':'#14256a'}`}}>
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回
                                     </button>
@@ -918,6 +922,7 @@ export default function ReviewList() {
                                 <div>
                                     <input
                                         placeholder="意見"
+                                        value={review_memo}
                                         style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
                                         onChange={(e) => setReview_memo(e.target.value)}
                                     />
