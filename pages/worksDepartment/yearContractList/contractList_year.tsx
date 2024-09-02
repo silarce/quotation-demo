@@ -144,7 +144,7 @@ export default function WdContractList() {
     };
 
     dataArr.forEach((contract) => {
-      const { content, accountReceivable } = contract;
+      const { content, accountReceivable, unReviewPicture, unReviewWorkSheet } = contract;
       let { contractNumber } = contract;
       contractNumber = contractNumber || '';
 
@@ -176,6 +176,8 @@ export default function WdContractList() {
         //
         QtyOfProjectPatternForReview: 0,
         QtyOfWorkwheetForReview: 0,
+        unReviewPicture,
+        unReviewWorkSheet,
       };
 
       contractNumber.startsWith('N-')

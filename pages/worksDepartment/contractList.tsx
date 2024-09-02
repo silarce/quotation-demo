@@ -177,7 +177,7 @@ export default function WdContractList() {
   // ===================================================
 
   const contractArr: Tcontract[] = dataArr.map((item) => {
-    const { content, contractNumber } = item;
+    const { content, contractNumber, unReviewPicture, unReviewWorkSheet } = item;
 
     const obj: Tcontract = {
       contractId: item.id,
@@ -193,6 +193,8 @@ export default function WdContractList() {
       //
       QtyOfProjectPatternForReview: 0,
       QtyOfWorkwheetForReview: 0,
+      unReviewPicture,
+      unReviewWorkSheet,
     };
 
     return obj;

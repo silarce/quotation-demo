@@ -75,6 +75,15 @@ export const DailyReportContext = createContext<TdailyReportContext>(null!);
 // --------------------------------------------------------
 // type
 
+type Tquery = {
+  isUserReviewed: '全部' | '未檢視' | '已檢視' | undefined;
+  date: string | undefined;
+  keyWord: string | undefined;
+
+  isMine: 'true' | 'false' | undefined;
+  isCalendar: 'true' | 'false' | undefined;
+};
+
 type TdailyReportContext = {
   reportInEdit: ThookEmptyReport | undefined;
   isReportEdit: boolean;
@@ -124,7 +133,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
   // const userId = userInfo.employee?.id ?? '';
   const router = useRouter();
-  const query = router.query;
+  const query = router.query as Tquery;
+  // const query = router.query as Tquery;
 
   const searchQuery = {
     isUserReviewed: query.isUserReviewed || '全部',
@@ -195,6 +205,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     userId: userInfo.employee?.id,
     _isUserReviewed: searchQuery?.isUserReviewed,
     isMine,
+    // date: searchQuery?.date,
     date: searchQuery?.date,
     keyWord: searchQuery.keyWord,
   });
@@ -283,7 +294,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return;
     }
 
-    router.push({
+    router.replace({
       query: {
         isUserReviewed: '全部',
         date: '',
@@ -635,13 +646,15 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   };
 
   const doSearch = () => {
-    router.push({
+    router.replace({
       query: {
+        ...query,
         isUserReviewed: searchObj.isUserReviewed,
-        date: searchObj.date,
+        // date: searchObj.date,
+        date: searchObj.date ? moment(searchObj.date).format('YYYY-MM-DD') : undefined,
         keyWord: searchObj.keyWord,
-        isMine,
-        isCalendar: isCalendar ? 'true' : undefined,
+        // isMine,
+        // isCalendar: isCalendar ? 'true' : undefined,
       },
     });
   }; // doSearch
