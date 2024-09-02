@@ -22,13 +22,13 @@ export type { Tt02 };
 
 // ===========================================================================
 
-const T02: Tt02 = ({ style, titleArr, layout }) => {
+const T02: Tt02 = ({ style, titles, layout }) => {
   const { a, b } = layout;
 
   return (
     <div className={scss.t02} style={style}>
       <div className={scss.ab}>
-        <p className={scss.title}>{titleArr?.[0] ?? 'titleArr[0]'}</p>
+        <p className={scss.title}>{titles?.title01 ?? 'titles.title01'}</p>
         <div className={scss.main}>
           <div className={scss.a}>
             {!a && <span>section a</span>}

@@ -145,7 +145,9 @@ const fakeTemplateModelProps: TemplateModelProps = {
 
   template: {
     t02: {
-      titleArr: ['預設值-銀行管理'],
+      titles: {
+        title01: '預設值-銀行管理',
+      },
       layout: {
         a: ['accountName', 'account'],
         b: ['bankName', 'bankCode', 'note', 'visiteDate'],
@@ -153,8 +155,8 @@ const fakeTemplateModelProps: TemplateModelProps = {
     },
   },
 
-  // locale: locale_tw,
-  locale: locale_en,
+  locale: locale_tw,
+  // locale: locale_en,
   // locale: undefined,
 };
 

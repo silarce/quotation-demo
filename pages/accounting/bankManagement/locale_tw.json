@@ -1,7 +1,7 @@
 {
-  "titles": [
-    "銀行管理"
-  ],
+  "titles": {
+    "title01": "銀行管理"
+  },
   "items": {
     "accountName": {
       "caption": "帳戶名稱"

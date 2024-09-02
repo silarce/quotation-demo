@@ -12,14 +12,20 @@
 interface TemplateIngredients {
   [optionsForTemplate: string]: any; // 未來給特定模板的property
   style?: Tstyle;
-  titleArr?: string[]; // 預設值，會被locale替換
+  // titleArr?: string[]; // 預設值，會被locale替換
+  titles?: {
+    [titleName: string]: string;
+  }; // 預設值，會被locale替換
   layout?: {
     [sectionName: string]: string[]; // keyArr
   };
 }
 
 interface Locale {
-  titles?: string[];
+  // titles?: string[];
+  titles?: {
+    [titleName: string]: string;
+  };
   items?: {
     [key: string]: {
       caption?: string; // 如果在locale沒有取到值，用key替代
@@ -221,4 +227,5 @@ export type {
   InputSelItem,
   TemplateIngredients,
   Option,
+  Locale,
 };

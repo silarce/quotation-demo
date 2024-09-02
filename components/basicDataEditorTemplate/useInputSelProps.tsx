@@ -15,6 +15,7 @@ import type {
   InputSelItem,
   // TinputSelProps,
   Option,
+  Locale,
 } from './modelType';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
@@ -148,7 +149,7 @@ const useInputSel = ({
 
     const {
       //
-      titleArr,
+      titles = {},
       layout = {},
       ...rest
     } = teamplateProps_pre;
@@ -174,9 +175,9 @@ const useInputSel = ({
       sectionDict[key] = filteredArr;
     });
 
-    const titleArr_locale = locale?.titles ?? [];
-    titleArr?.forEach((title, index) => {
-      titleArr[index] = titleArr_locale[index] || title;
+    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale['titles']>;
+    Object.entries(titles).forEach(([key, title]) => {
+      titles[key] = titleArr_locale[key] || title;
     });
 
     const templateProps: TemplateProps = {
@@ -184,7 +185,7 @@ const useInputSel = ({
       layout: {
         ...sectionDict,
       },
-      titleArr,
+      titles,
     };
 
     return templateProps;
