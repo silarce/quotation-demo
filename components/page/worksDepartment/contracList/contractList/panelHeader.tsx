@@ -28,6 +28,9 @@ type TtheadInfo = {
   //
   QtyOfProjectPatternForReview: number;
   QtyOfWorkwheetForReview: number;
+
+  unReviewPicture: number;
+  unReviewWorkSheet: number;
 };
 
 // ===============================================================
@@ -59,6 +62,9 @@ export default function PanelHeader({
     // totalPrice: budgetAmount,
     alertLight,
     remindLight,
+
+    unReviewPicture,
+    unReviewWorkSheet,
   } = contract;
   const { date, county: country, projectName } = contract;
 
@@ -98,14 +104,16 @@ export default function PanelHeader({
         <div></div>
       </div>
       {/* row03 */}
-      {/* <div className={scss.row03}>
+      <div className={scss.row03}>
         <p>
-          應審核工程圖表 :　<span className={scss.num}>{9}</span>
+          應審核工程圖表 :　
+          <span className={classNames(scss.num, unReviewPicture && scss.active)}>{unReviewPicture}</span>
         </p>
         <p>
-          應審核工作表 :　<span className={scss.num}>{9}</span>
+          應審核工作表 :　
+          <span className={classNames(scss.num, unReviewWorkSheet && scss.active)}>{unReviewWorkSheet}</span>
         </p>
-      </div> */}
+      </div>
     </CellWithBar>
   );
 }
