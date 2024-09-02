@@ -117,12 +117,12 @@
   grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
-  margin-top: 5px;
+  // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
   div {
-    margin-right: 20px;
+    margin-right: 2px;
   }
 }
 
@@ -131,12 +131,12 @@
   grid-template-columns: 600px 1fr 1fr;
   // gap: 15px;
   width: auto;
-  margin-top: 5px;
+  // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
   div {
-    margin-right: 20px;
+    margin-right: 2px;
   }
 }
 
@@ -150,7 +150,7 @@
   margin-right: 20px;
 
   div {
-    margin-right: 20px;
+    margin-right: 2px;
   }
 
   // background-color: gray;
@@ -161,9 +161,12 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
   // gap: 15px;
   width: auto;
-  margin-top: 5px;
+  // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
+  div {
+    margin-right: 2px;
+  }
 }
 
 .head_foot2 {
@@ -203,7 +206,13 @@
   padding-right: 20px;
   // background-color: gray;
 }
-
+.body_foot2 {
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-right: 20px;
+  border-bottom: 1px solid #c1c1c1;
+}
 
 .addBtn {
   position: sticky;
@@ -637,7 +646,7 @@ div.panelHeader14 {
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
 
@@ -662,7 +671,7 @@ div.panelHeader14 {
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
 
@@ -687,7 +696,7 @@ div.panelHeader14 {
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #5b5a5ad6;
   transform: translateY(2px);
 
@@ -715,4 +724,15 @@ div.panelHeader14 {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: middle; /* 可選，根據需要對齊文本 */
+}
+
+.head_body {
+  display: grid;
+  grid-template-columns: 75% 1fr;
+  // gap: 15px;
+  // width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
 }

@@ -30,12 +30,19 @@ import icon_search from 'public/image/icon/fc_search.svg';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
-import { Modal } from 'antd';
+import { Modal, Radio, Space } from 'antd';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_flow from 'public/image/icon/fc_flow.svg';
+import icon_review from 'public/image/icon/review.svg';
+import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
+import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
+import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
+import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -64,7 +71,8 @@ export default function ProdReceiptList() {
         status,
         entrystatus,
         paystatus,
-        note
+        note,
+        viewtype
     } = router.query;
 
 
@@ -208,7 +216,7 @@ export default function ProdReceiptList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchProdReceiptById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchProdReceiptById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -264,7 +272,7 @@ export default function ProdReceiptList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProdReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceipt?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -304,6 +312,7 @@ export default function ProdReceiptList() {
                 setEntrystatusin(data[0].entry_status);
                 setPaystatusin(data[0].pay_status);
                 setNotein(data[0].note);
+                GetReviewById(data[0].prodreceiptuuid);//審核
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
@@ -318,6 +327,7 @@ export default function ProdReceiptList() {
     useEffect(() => {
         if (!hasFetchedData.current) {
             getProdReceipt();
+            GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
@@ -343,7 +353,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -441,7 +451,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdEntryDetailByProdReceiptId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntryDetailByProdReceiptId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -493,7 +503,7 @@ export default function ProdReceiptList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferProdReceiptToProdEntry`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -672,7 +682,7 @@ export default function ProdReceiptList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}sentPREToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPREToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -772,7 +782,7 @@ export default function ProdReceiptList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}UpdatePReceiptSupplier`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdatePReceiptSupplier`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -926,7 +936,7 @@ export default function ProdReceiptList() {
 
                         console.log(JSON.stringify(inputModel));
 
-                        const response = await fetch(`${setting.apipath}Print`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -958,7 +968,7 @@ export default function ProdReceiptList() {
                         if (!response2.ok) {
                             throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
                         }
-    
+
                         const data2 = await response2.text();
                         console.log("Received from print4:", data2);
 
@@ -977,6 +987,265 @@ export default function ProdReceiptList() {
 
 
     };
+
+
+    const closeDoc = async (type: any) => {
+        try {
+            const conditionModel = {
+                prodreceiptuuid: prodreceiptuuidin,
+                type: type,
+                username: userInfo?.username,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPReceToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getProdReceipt();
+            getProdReceiptDetail(prodreceiptidin);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+            setIsLoading(true);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                // console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
+    const setReview = async (item: any) => {
+        setReview_flow(item.id);
+        setReviewflowdata2(item.stages);
+    }
+
+    const sentToReview = async (type: any) => {
+
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
+            }
+            else {
+                const review_query = {
+                    prodreceiptuuid: prodreceiptuuidin,
+                    prodreceiptid: prodreceiptidin,
+                    purchaseorderuuid:purchaseorderuuidin,
+                    purchaseorderid:purchaseorderidin,
+                    purchaseordercreate_at:purchaseordercreate_atin,
+                    purchaseordercreate_by:purchaseordercreate_byin,
+                    suppliername:suppliernamein,
+                    suppliertaxid:suppliertaxidin,
+                    supplieraddress:supplieraddressin,
+                    supplierphone:supplierphonein,
+                    invoice:invoicein,
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    status: '進貨中',
+                    note: notein,
+                    firstin: 1,
+                };
+
+                const conditionModel = {
+                    document_id: prodreceiptidin,
+                    document_uuid: prodreceiptuuidin,
+                    document_type: "進貨單",
+                    review_id: review_flow,
+                    query: review_query,
+                    username: userInfo?.username,
+                    document_title: documenttitle
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(prodreceiptuuidin);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                //改變單據狀態
+                const conditionModel2 = {
+                    type: type,
+                    prodreceiptuuid: prodreceiptuuidin as string | undefined,
+                    username: userInfo?.username as string | undefined
+                };
+
+
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel2),
+                };
+
+                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                const response2 = await fetch(`${setting.apipath}/WareHouse/sentPReceToReview?${queryParams}`);
+                if (!response2.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data2 = await response2.json();
+                getProdReceipt();
+                getProdReceiptDetail(prodreceiptuuidin);
+                setStatusin("審核中");
+
+
+
+
+
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【進貨單】【${prodreceiptidin}】_${userInfo?.username}`)
+    }
+    //#endregion
 
 
 
@@ -1052,7 +1321,7 @@ export default function ProdReceiptList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
                             <div>
                                 <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1100,7 +1369,7 @@ export default function ProdReceiptList() {
                             </div>
                             <div></div>
                             <div>
-                                <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
+                                {/* <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
@@ -1111,244 +1380,302 @@ export default function ProdReceiptList() {
                                 <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }} title="單據結案">
                                     <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     已結
+                                </button> */}
+                                <button
+                                    className={scss.squarebtn}
+                                    onClick={() => { handleChoseflow() }}
+                                    title="單據送審"
+                                    style={{
+                                        display: `${(statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    title="審核流程"
+                                    style={{
+                                        display: `${(statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={scss.squarebtn}
+                                    style={{
+                                        display: `${(statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                    onClick={() => { sentToReview("審核") }}
+                                    title="單據送審"
+                                >
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    style={{
+                                        display: `${(statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                    title="單據送審"
+                                >
+                                    <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} style={{ display: `${(completeentry < parseInt(totalentry) || statusin === '審核中') ? '' : 'none'}` }} title="單據抽單" onClick={() => { alert("抽單") }}>
+                                    <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    抽單
+                                </button>
+
+                                <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button style={{ display: `${completeentry != parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    已結
                                 </button>
 
 
-
-                                {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
-                                </span> */}
-                                {/* <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>未結案</button>
-                                </span>
-                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn} >已結案</button>
-                                </span> */}
-
+                            </div>
+                        </div>
+                        <div className={scss.head_body}>
+                            <div>
+                                <div className={scss.head_content1}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="採購單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="採購日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="進貨人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="採購人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商名稱"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliernamein ? suppliernamein : ' ',
+                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商地址"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplieraddressin ? supplieraddressin : ' ',
+                                                    onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="聯絡電話"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplierphonein ? supplierphonein : ' ',
+                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="統一編號"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="排版用"
+                                            disabled={true}
+                                            className='invisible'
+                                            inputProps={{
+                                                props: {
+                                                    value: ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="發票號碼"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: invoicein ? invoicein : ' ',
+                                                    onChange: (e) => { setInvoicein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: notein ? notein : ' ',
+                                                    onChange: (e) => { setNotein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style={{ textAlign: "right" }}>
+                                        {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
+                                            <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
+                                        </span>
+                                        <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
+                                            <button className={scss.disabledbtn}>未結案</button>
+                                        </span>
+                                        <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
+                                            <button className={scss.disabledbtn} >已結案</button>
+                                        </span> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: statusin || ' ',
+                                            },
+                                        }}
+                                    />
+                                    {/* <InputSel
+                                        {...inputSelProps}
+                                        caption="入庫狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: entrystatusin || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="付款狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: paystatusin || ' ',
+                                            },
+                                        }}
+                                    /> */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="入庫進度"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: `${completeentry}/${totalentry}`
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <div className={scss.head_content1}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="採購單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="採購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="採購人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: statusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: entrystatusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="付款狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: paystatusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫進度"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: `${completeentry}/${totalentry}`
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: supplieraddressin ? supplieraddressin : ' ',
-                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="聯絡電話"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: supplierphonein ? supplierphonein : ' ',
-                                            onChange: (e) => { setSupplierphonein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="統一編號"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliertaxidin ? suppliertaxidin : ' ',
-                                            onChange: (e) => { setSuppliertaxidin(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="發票號碼"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: invoicein ? invoicein : ' ',
-                                            onChange: (e) => { setInvoicein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: notein ? notein : ' ',
-                                            onChange: (e) => { setNotein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: "right" }}>
-                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
-                                </span>
-                                <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>未結案</button>
-                                </span>
-                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn} >已結案</button>
-                                </span>
-                            </div>
-                        </div>
                         <div className={scss.head_foot2}>
                             <div></div>
                             <div></div>
@@ -1372,15 +1699,16 @@ export default function ProdReceiptList() {
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>
-                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }}>
+                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }} style={{display:`${statusin==="已核准"?'':'none'}`}} >
                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                                                 </button>
                                                 {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                                                 </button> */}
-                                                {/* <button style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                                <button
+                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                </button> */}
+                                                </button>
                                             </span>
                                             <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
@@ -1421,6 +1749,38 @@ export default function ProdReceiptList() {
                                 </table>
                             </div>
                         </div>
+                        <div className={scss.body_foot2}>
+                            <div>
+                                {reviewflowdata.map((item, index) => (
+                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                            <div key={stageIndex} style={{ flex: 1, flexDirection: 'column', textAlign: 'left', marginRight: '10px' }}>
+                                                <span style={{ fontSize: '18px', color: '#14256a' }}>{stage.review_title}</span>
+                                                <br />
+                                                <span style={{ fontSize: '16px' }}>{stage.review_person}</span>
+                                                <span style={{ padding: '0px 5px', display: `${stage.review_time === "0001-01-01T00:00:00" ? 'none' : ''}` }}>
+                                                    <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.map((item, index) => (
+                                        <div key={index} style={{ textAlign: 'left', flex: 1 }}>
+                                            <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
+                                            <br />
+                                            <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                            {/* <span style={{ padding: '0px 5px' }}>
+                                                <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                            </span> */}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                         <div className={scss.foot_head1}>
                             <div>
                                 {/* <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "none" : "" }}>
@@ -1445,12 +1805,12 @@ export default function ProdReceiptList() {
                             </div>
                             <div style={{ textAlign: 'right' }}>
 
-                                <span style={{ display: `${(data2.length > 0 ? '' : 'none')}` }}>
+                                {/* <span style={{ display: `${(data2.length > 0 ? '' : 'none')}` }}>
                                     <button className={scss.redbtn} onClick={() => { alert("comming soon") }}>新增付款</button>
                                 </span>
                                 <span style={{ display: `${(data2.length > 0 ? 'none' : '')}` }}>
                                     <button className={scss.disabledbtn}>新增付款</button>
-                                </span>
+                                </span> */}
 
                             </div>
                         </div>
@@ -1736,6 +2096,44 @@ export default function ProdReceiptList() {
 
                     </div>
                     {/* </Modal > */}
+                </DragableModal>
+
+                {/* 審核 */}
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '820px' }}
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+
+
+
                 </DragableModal>
             </div>
         </SubLayer >

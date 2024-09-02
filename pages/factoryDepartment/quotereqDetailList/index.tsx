@@ -176,7 +176,7 @@ export default function QuotereqDetailList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchSupplierById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchSupplierById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -218,7 +218,7 @@ export default function QuotereqDetailList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisitionDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -389,7 +389,7 @@ export default function QuotereqDetailList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetQuotereqDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -446,7 +446,7 @@ export default function QuotereqDetailList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}AddQuotereqDetail`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/AddQuotereqDetail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -531,7 +531,7 @@ export default function QuotereqDetailList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}UpdateQuotereqDetailById`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateQuotereqDetailById`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -597,7 +597,7 @@ export default function QuotereqDetailList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetQuotereqSupplier?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqSupplier?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }

@@ -232,7 +232,7 @@ export default function AddPurchaseRequisition() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchProductById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchProductById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -302,7 +302,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -342,7 +342,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPickingList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPickingList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -401,7 +401,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetEmployeeList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetEmployeeList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -455,7 +455,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPickingListDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -498,7 +498,7 @@ export default function AddPurchaseRequisition() {
             };
 
 
-            const response = await fetch(`${setting.apipath}AddPickingList`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/AddPickingList`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -586,7 +586,7 @@ export default function AddPurchaseRequisition() {
                     FilterConditions: JSON.stringify(conditionModel),
                 };
 
-                const response = await fetch(`${setting.apipath}AddPickingListDetail`, {
+                const response = await fetch(`${setting.apipath}/WareHouse/AddPickingListDetail`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1021,7 +1021,7 @@ export default function AddPurchaseRequisition() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetWhpositionDetailByProductId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1102,7 +1102,7 @@ export default function AddPurchaseRequisition() {
             console.log(inputModel);
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetTrayLayOutById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1483,7 +1483,7 @@ export default function AddPurchaseRequisition() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}MinusPickingListDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/MinusPickingListDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1523,7 +1523,7 @@ export default function AddPurchaseRequisition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}sentPickingListToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPickingListToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1646,7 +1646,7 @@ export default function AddPurchaseRequisition() {
 
                             console.log(JSON.stringify(inputModel));
 
-                            const response = await fetch(`${setting.apipath}Print`, {
+                            const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -1824,93 +1824,113 @@ export default function AddPurchaseRequisition() {
                                 </button>
                             </div>
                         </div>
-                        <div className={scss.head_content1}>
+                        <div className={scss.head_body}>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="領料單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            // value: getTaiwanDateStr(create_atin || '') || '',
-                                            style: { color: `${pickinglistid ? '#404040' : '#c1c1c1'}` },
-                                            value: pickinglistid || ' '
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="製單人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: create_byin,
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="領料日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: getTaiwanDateStr(create_atin || '') || '',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: status || ' ',
-                                        },
-                                    }}
-                                />
+                                <div className={scss.head_content1}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="領料單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    // value: getTaiwanDateStr(create_atin || '') || '',
+                                                    style: { color: `${pickinglistid ? '#404040' : '#c1c1c1'}` },
+                                                    value: pickinglistid || ' '
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="製單人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: create_byin,
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="領料日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') || '',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={(status === '領料中' || status === '已結案' || status === '') ? true : false}
+                                            inputProps={{
+                                                props: {
+                                                    value: note || ' ',
+                                                    onChange: (e) => { setNote(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div style={{ marginRight: '20px' }}>
 
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={(status === '領料中' || status === '已結案' || status === '') ? true : false}
-                                    inputProps={{
-                                        props: {
-                                            value: note || ' ',
-                                            onChange: (e) => { setNote(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div style={{ marginRight: '20px' }}>
-
-                            </div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
-                            <div>
-                            </div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
-                                {/* <span>
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div>
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        {/* <span>
                                     <button className={scss.redbtn} onClick={() => { handleAddPR() }}>結案</button>
                                 </span> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: status || ' ',
+                                            },
+                                        }}
+                                    />
+                                                                        <InputSel
+                                        {...inputSelProps}
+                                        caption="總比數"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: data2.length || 0,
+                                            },
+                                        }}
+                                    />
+                                    
+                                    
+                                </div>
                             </div>
                         </div>
+
                         <div className={scss.head_foot2}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
@@ -1919,12 +1939,7 @@ export default function AddPurchaseRequisition() {
                             </div>
                             <div style={{ marginTop: '5px' }}></div>
                             <div></div>
-                            <div>
-                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
-                                    總比數：
-                                    {data2.length}
-                                </span>
-                            </div>
+                            <div></div>
                         </div>
                         <div className={scss.body_content1}>
                             <Thead01 type={'AddPR_PickingList'} />

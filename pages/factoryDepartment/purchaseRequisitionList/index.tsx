@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, JSXElementConstructor, ReactElement, ReactFragment, ReactPortal } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, DatePicker, Modal } from 'antd';
+import { Button, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -47,7 +47,13 @@ import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
-
+import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
+import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_flow from 'public/image/icon/fc_flow.svg';
+import icon_review from 'public/image/icon/review.svg';
+import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
+import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -65,7 +71,9 @@ export default function PurchaseRequisitionList() {
         approved,
         status,
         need_date,
-        note
+        note,
+        viewtype, // 判斷審核的,
+        reviewflow
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -87,6 +95,9 @@ export default function PurchaseRequisitionList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+
+
+
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -137,7 +148,6 @@ export default function PurchaseRequisitionList() {
     //轉採購數
     const [transpoprogress, setTranspoprogress] = useState<number>(0);
 
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
     useEffect(() => {
         if (firstin !== undefined) {
@@ -157,13 +167,7 @@ export default function PurchaseRequisitionList() {
     const searchTargetList = [
         {
             placeholder: '請購單號',
-        },
-        {
-            placeholder: '請購日期',
-        },
-        {
-            placeholder: '請購人員',
-        },
+        }
     ];
 
     //搜尋功能
@@ -203,7 +207,7 @@ export default function PurchaseRequisitionList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchPurchaseRequisitionByDateAndId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchPurchaseRequisitionByDateAndId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -240,10 +244,10 @@ export default function PurchaseRequisitionList() {
     //請購單主檔
     const getPurchaseRequisition = async () => {
         try {
-            // console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
-                type: "詢價中"
+                type: "詢價中",
+                username: userInfo?.username
             };
 
 
@@ -256,24 +260,18 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPurchaseRequisition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
 
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: '尚無單據'
-                })
-            }
 
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0]);
                 getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaserequisitionuuidin(data[0].purchaserequisitionuuid);
@@ -283,22 +281,66 @@ export default function PurchaseRequisitionList() {
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
+                GetReviewById(data[0].purchaserequisitionuuid);//審核
 
-                // alert(data[0].need_date);
             }
         } catch (error: any) {
-            setError(error.message);
+            // console.log(error.message);
         }
         finally {
             setIsLoading(false);
         }
     };
 
+    // const GetReviewFlow = async () => {
+    //     try {
+    //         setIsLoading(true);
+    //         const conditionModel = {
+    //             username: userInfo?.username
+    //         };
+
+
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'ReviewService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+
+
+    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+    //         const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+
+    //         setReviewdata(data);
+
+    //         console.log(data);
+    //         console.log(JSON.stringify(data));
+
+    //         // getProduct();
+
+    //         // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //     }
+    //     finally {
+    //         setIsLoading(false);
+    //     }
+
+    // }
+
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
+            GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
@@ -323,15 +365,13 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisitionDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
             setData1(data);
-            // setData2(data);
 
-            console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
@@ -386,6 +426,7 @@ export default function PurchaseRequisitionList() {
             setData2([]);
             setNeed_datein(need_date as string);
             setNotein(note as string);
+            GetReviewById(purchaserequisitionuuid);
         }
     }, [purchaserequisitionuuid]);
 
@@ -408,7 +449,7 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -458,7 +499,7 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}TransferPurchaseRequisitionToPurchaseOrder`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/TransferPurchaseRequisitionToPurchaseOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -495,76 +536,140 @@ export default function PurchaseRequisitionList() {
     };
 
     //送出審核
-    const sentPRToReview = async (type: any) => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                type: string | undefined,
-                purchaserequisitionuuid: string | undefined,
-                username: string | undefined
-            } = {
-                type: type,
-                purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
-                username: userInfo?.username as string | undefined
-            };
+    // const sentToReview = async (type: any) => {
+
+    //     // alert("送出審核");
 
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+    //     if (review_flow === "") {
+    //         setReviewbar(true);
+    //     }
+    //     else {
+    //         alert("yo");
+    //         const review_query = {
+    //             purchaserequisitionuuid: purchaserequisitionuuidin,
+    //             purchaserequisitionid: purchaserequisitionidin,
+    //             create_at: create_atin,
+    //             create_by: create_byin,
+    //             status: '詢價中',
+    //             need_date: need_datein,
+    //             note: notein,
+    //             firstin: 1,
+    //         };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+    //         console.log(JSON.stringify(review_query));
 
-            const response = await fetch(`${setting.apipath}sentPRToReview?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            // setData(data);
-            await new Promise(resolve => setTimeout(resolve, 500));
-            getPurchaseRequisition();
-            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
-            await new Promise(resolve => setTimeout(resolve, 500));
+    //         // return;
+    //         const conditionModel = {
+    //             document_id: purchaserequisitionid,
+    //             document_uuid: purchaserequisitionuuid,
+    //             document_type: "請購單",
+    //             review_id: review_flow,
+    //             query: review_query,
+    //             username: userInfo?.username
+    //         };
+
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'ReviewService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+
+    //         const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(inputModel)
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+    //         await new Promise(resolve => setTimeout(resolve, 500));
 
 
 
-            let status = '';
-            switch (type) {
-                case '請購':
-                    status = '詢價中';
-                    break;
-                case '詢價':
-                    status = '審核中';
-                    break;
-                case '核准':
-                    status = '已核准';
-                    break;
-                case '駁回':
-                    status = '已駁回';
-                    break;
-                case '結案':
-                    status = '已結案';
-                    break;
-                default:
-                    status = '未知狀態'; // 或者你可以選擇其他合適的默認值
-                    break;
-            }
 
-            setStatusin(status);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }
-    // useEffect(() => {
-    //     getPurchaseRequisitionDetail(purchaserequisitionuuidin);
-    // }, [statusin ]); // 依赖于这些状态
 
+
+    //     }
+
+
+
+
+    //     return;
+
+
+
+    //     try {
+    //         setIsLoading(true);
+    //         const conditionModel: {
+    //             type: string | undefined,
+    //             purchaserequisitionuuid: string | undefined,
+    //             username: string | undefined
+    //         } = {
+    //             type: type,
+    //             purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
+    //             username: userInfo?.username as string | undefined
+    //         };
+
+
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'WareHouseService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+    //         const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+    //         // setData(data);
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+    //         getPurchaseRequisition();
+    //         getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+    //         let status = '';
+    //         switch (type) {
+    //             case '請購':
+    //                 status = '詢價中';
+    //                 break;
+    //             case '詢價':
+    //                 status = '審核中';
+    //                 break;
+    //             case '核准':
+    //                 status = '已核准';
+    //                 break;
+    //             case '駁回':
+    //                 status = '已駁回';
+    //                 break;
+    //             case '結案':
+    //                 status = '已結案';
+    //                 break;
+    //             default:
+    //                 status = '未知狀態'; // 或者你可以選擇其他合適的默認值
+    //                 break;
+    //         }
+
+    //         setStatusin(status);
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //     }
+    //     finally {
+    //         setIsLoading(false);
+    //     }
+    // }
 
 
 
@@ -764,27 +869,15 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetQuotereqDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
 
-
-            // let awardedItem = data.find((item: any) => item.awarded);
-            // if (awardedItem) {
-            //   alert(awardedItem.id)
-            //   setSelectedsupplier(awardedItem.id);
-            //   alert(selectedsupplier);
-            // }
-
             setPrquotereqdata(data);
-            console.log(prquotereqdata);
-
-
 
         } catch (error: any) {
-            // setError(error.message);
             console.log(error.message);
         }
         finally {
@@ -805,11 +898,7 @@ export default function PurchaseRequisitionList() {
 
     const updateQuotereqDetail = async (quotereqdetailid: string, lastquotereqdetailid: string) => {
         try {
-            const conditionModel: {
-
-                lastquotereqdetailid: any,
-                quotereqdetailid: any,
-            } = {
+            const conditionModel = {
                 lastquotereqdetailid: lastquotereqdetailid,
                 quotereqdetailid: quotereqdetailid
             };
@@ -821,7 +910,7 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}UpdateQuotereqDetailById`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateQuotereqDetailById`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -952,18 +1041,18 @@ export default function PurchaseRequisitionList() {
     const Print = async () => {
         try {
             setIsLoading(true);
-    
+
             const response = await fetch("http://127.0.0.1:5050/api/print/GetIP");
-    
+
             if (!response.ok) {
                 myAlert.warning({ title: '請檢查列印程式是否開啟' });
                 return;
             }
-    
+
             const data = await response.text();
             console.log(data);
             sentToPrint(data);
-    
+
         } catch (error: any) {
             const errorMessage = error.message || '未知錯誤';
             myAlert.warning({ title: '請檢查列印程式是否開啟', content: errorMessage });
@@ -971,7 +1060,7 @@ export default function PurchaseRequisitionList() {
             setIsLoading(false);
         }
     };
-    
+
 
 
     const sentToPrint = async (ip: any) => {
@@ -999,7 +1088,7 @@ export default function PurchaseRequisitionList() {
 
                         console.log(JSON.stringify(inputModel));
 
-                        const response = await fetch(`${setting.apipath}Print`, {
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1021,10 +1110,6 @@ export default function PurchaseRequisitionList() {
                         });
 
 
-
-
-
-
                         const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
                             method: 'POST',
                             headers: {
@@ -1036,14 +1121,13 @@ export default function PurchaseRequisitionList() {
                         if (!response2.ok) {
                             throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
                         }
-    
+
                         const data2 = await response2.text();
                         console.log("Received from print4:", data2);
 
 
 
                     } catch (error: any) {
-                        // setError(error.message);
                         console.log(error.message);
                     }
                     finally {
@@ -1056,14 +1140,260 @@ export default function PurchaseRequisitionList() {
 
     };
 
+    const closeDoc = async (type: any) => {
+        try {
+            const conditionModel = {
+                purchaserequisitionuuid: purchaserequisitionuuidin,
+                type: type,
+                username: userInfo?.username,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getPurchaseRequisition();
+            getPurchaseRequisitionDetail(purchaserequisitionidin);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+            setIsLoading(true);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                // console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
+    const setReview = async (item: any) => {
+        setReview_flow(item.id);
+        setReviewflowdata2(item.stages);
+    }
+
+    const sentToReview = async (type: any) => {
+
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
+            }
+            else {
+                const review_query = {
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    purchaserequisitionid: purchaserequisitionidin,
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    status: '詢價中',
+                    need_date: need_datein,
+                    note: notein,
+                    firstin: 1,
+                };
+
+                const conditionModel = {
+                    document_id: purchaserequisitionidin,
+                    document_uuid: purchaserequisitionuuidin,
+                    document_type: "請購單",
+                    review_id: review_flow,
+                    query: review_query,
+                    username: userInfo?.username,
+                    document_title: documenttitle
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(purchaserequisitionuuidin);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                //改變單據狀態
+                const conditionModel2 = {
+                    type: type,
+                    purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
+                    username: userInfo?.username as string | undefined
+                };
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel2),
+                };
+
+                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+                if (!response2.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data2 = await response2.json();
+                getPurchaseRequisition();
+                getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+
+                setStatusin("審核中");
 
 
 
+
+
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【請購單】【${purchaserequisitionid}】_${userInfo?.username}`)
+    }
+    //#endregion
 
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'請購單'} panelList={panelList} />
+            <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === false ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -1135,7 +1465,7 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
 
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1151,27 +1481,69 @@ export default function PurchaseRequisitionList() {
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("核准") }} title="單據核准">
+                                {/* <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
                                     <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     核准
                                 </button>
                                 &nbsp;
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("駁回") }} title="單據核准">
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("駁回") }} title="單據核准">
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
-                                </button>
+                                </button> */}
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
+                                <button
+                                    className={scss.squarebtn}
+                                    onClick={() => { handleChoseflow() }}
+                                    title="單據送審"
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    title="審核流程"
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={scss.squarebtn}
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                    onClick={() => { sentToReview("審核") }}
+                                    title="單據送審"
+                                >
                                     <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
-                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
-                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                    title="單據送審"
+                                >
+                                    <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
-                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
+
+                                &nbsp;
+                                <button className={scss.squarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
+                                    <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    抽單
+                                </button>
+
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
@@ -1186,119 +1558,89 @@ export default function PurchaseRequisitionList() {
                                 </button>
                             </div>
                         </div>
-                        <div className={scss.head_content1}>
-
+                        <div className={scss.head_body}>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
-                                        },
-                                    }}
-                                />
+                                <div className={scss.head_content1}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="需用日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                                    // value: checkfirstin
+                                                },
+                                            }}
+                                        />
 
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
-                                            // value: checkfirstin
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="需用日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: statusin || ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="詢價進度"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: `${quotereqprogress}/${totalreqprogress}`,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="已轉採購"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: `${transpoprogress}/${totalreqprogress}`,
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                },
+                                            }}
+                                        />
+                                        {/* {review_flow}
+                                        {statusin} */}
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div style={{ textAlign: 'right' }}>
 
-                                {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
                                     <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
@@ -1317,8 +1659,48 @@ export default function PurchaseRequisitionList() {
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
                                 </span> */}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: statusin || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="詢價進度"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: `${quotereqprogress}/${totalreqprogress}`,
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="已轉採購"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: `${transpoprogress}/${totalreqprogress}`,
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
+
                         <div className={scss.head_foot2}>
                             <div>
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
@@ -1416,231 +1798,203 @@ export default function PurchaseRequisitionList() {
                                 </table>
                             </div>
                         </div>
-                        <br />
-                        <div className={scss.foot_head1}>
+                        <div className={scss.body_foot2}>
                             <div>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
+                                {reviewflowdata.map((item, index) => (
+                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                            <div key={stageIndex} style={{ flex: 1, flexDirection: 'column', textAlign: 'left', marginRight: '10px' }}>
+                                                <span style={{ fontSize: '18px', color: '#14256a' }}>{stage.review_title}</span>
+                                                <br />
+                                                <span style={{ fontSize: '16px' }}>{stage.review_person}</span>
+                                                <span style={{ padding: '0px 5px', display: `${stage.review_time === "0001-01-01T00:00:00" ? 'none' : ''}` }}>
+                                                    <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
                             </div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.map((item, index) => (
+                                        <div key={index} style={{ textAlign: 'left', flex: 1 }}>
+                                            <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
+                                            <br />
+                                            <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                            {/* <span style={{ padding: '0px 5px' }}>
+                                                <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                            </span> */}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
 
-                                {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
+
+
+
+
+
+
+
+
+
+                        <br />
+                        <div style={{ display: viewtype === "review" ? 'none' : '' }}>
+                            <div className={scss.foot_head1}>
+                                <div>
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                        <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
+                                        <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                </div>
+                                <div></div>
+                                <div></div>
+                                <div style={{ textAlign: 'right' }}>
+
+                                    {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handlePO() }}>新增採購</button>
                                 </span>
                                 <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增採購</button>
                                 </span> */}
+                                </div>
                             </div>
-                        </div>
-                        <div className={scss.foot_content1}>
-                            <Thead01 type={'PurchaseRequisitionDetail2'} />
-                            {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader21}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
-                                        <span>{_item.name}</span>
-                                        {/* <span style={{ color: '#ea1833' }}>
+                            <div className={scss.foot_content1}>
+                                <Thead01 type={'PurchaseRequisitionDetail2'} />
+                                {data2.map((_item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader21}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            {/* <span style={{ color: '#ea1833' }}>
                                             {_item.alreadyinquantity}
                                         </span> */}
-                                        <span>
-                                            <input
-                                                ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        quantity: newQuantity,
-                                                        totalprice: newQuantity * newData[index].unitprice
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>{_item.unit}</span>
-                                        <span>
-                                            <input
-                                                ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.unitprice.toLocaleString()}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        unitprice: newUnitPrice,
-                                                        totalprice: newUnitPrice * newData[index].quantity
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {_item.totalprice.toLocaleString()}
-                                        </span>
-                                        <span>
-                                            {_item.suppliername}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
-                                                type="text"
-                                                value={_item.note}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newNote = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        note: newNote
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <span>
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: newQuantity * newData[index].unitprice
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>{_item.unit}</span>
+                                            <span>
+                                                <input
+                                                    ref={unitpriceRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.unitprice.toLocaleString()}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: newUnitPrice,
+                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                {_item.totalprice.toLocaleString()}
+                                            </span>
+                                            <span>
+                                                {_item.suppliername}
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={noteRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                    type="text"
+                                                    value={_item.note}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newNote = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            note: newNote
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
-                                            </button>
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
-                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))}
-                        </div>
-                        <br />
-                        <div className={scss.foot_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div>
-                                <table className={scss.count_table}>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>小計</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : '0'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>營業稅</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : '0'}</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>應付金額</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : '0'}</td>
-                                    </tr>
-                                </table>
+                                                <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))}
+                            </div>
+                            <br />
+                            <div className={scss.foot_foot1}>
+                                <div></div>
+                                <div></div>
+                                <div>
+                                    <table className={scss.count_table}>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>小計</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : '0'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>營業稅</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : '0'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>應付金額</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : '0'}</td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* 隱藏的popout */}
-                {/* 品項查詢 */}
-                {/* <div style={{
-                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
-                    position: 'fixed',
-                    top: '250px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '1000px',
-                    backgroundColor: '#fff',
-                    border: '1px solid #ccc',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-                    zIndex: 1000,
-                    padding: '16px',
-                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
-                    overflowY: 'auto'  // 啟用垂直滾動
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        position: 'sticky',
-                        top: 0,
-                        backgroundColor: '#fff',
-                        zIndex: 1000
-                    }}>
-                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='單號'
-                                    value={keyword1}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword1(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='名稱'
-                                    value={keyword2}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword2(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='請購人員'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </div>
-                        </form>
-                        <div>
-                            <button onClick={() => { setProductSearchmodalopen(false) }}>
-                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
-                            </button>
-                        </div>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'PurchaseRequisition'} />
-                        <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                    </div>
-                </div> */}
 
 
                 {/* 隱藏的modal */}
@@ -1694,23 +2048,6 @@ export default function PurchaseRequisitionList() {
                     show={searchmodalopen}
                     onCrossClick={SearchModalClose}
                 >
-                    {/* <Modal
-                        visible={searchmodalopen}
-                        footer={null}
-                        onCancel={SearchModalClose}
-                        width="1000px"
-                        maskClosable={false}
-                        // title='單據查找'
-                        // title={
-                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                        //     <span>查詢條件</span>
-                        //     <span >筆數：共 {data.length} 筆</span>
-                        // </div>
-
-                        // }
-                        // centered
-                        style={{ top: 200 }}
-                    > */}
 
                     <div className={scss.modal_head_head1}>
                         <div>
@@ -1852,9 +2189,6 @@ export default function PurchaseRequisitionList() {
                                     <span>
                                         <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
                                 </div>
                             </form>
                         </div>
@@ -1862,9 +2196,6 @@ export default function PurchaseRequisitionList() {
                             maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
-                            // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
-                            // padding: '10px',
-                            // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
                             <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
@@ -1873,25 +2204,53 @@ export default function PurchaseRequisitionList() {
                     </div>
                     {/* </Modal > */}
                 </DragableModal>
-                {/* 
-                <DragableModal
-                    handleText="收款統計明細表"
-                    style={{zIndex:'1001'}}
-                    show={searchmodalopen}
-                    onCrossClick={SearchModalClose}
-                >
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
-                    <h1>測試</h1>
 
-                    <h1>測試</h1><h1>測試</h1>
-                </DragableModal> */}
+
+
+
+                {/* 審核 */}
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '820px' }}
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+
+
+
+                </DragableModal>
+
 
 
             </div >
         </SubLayer >
+
 
     )
 
