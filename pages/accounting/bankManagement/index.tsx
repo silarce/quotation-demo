@@ -23,7 +23,7 @@ export default function BankManagement(): React.ReactElement {
     disabled,
     switchDisabled,
 
-    state,
+    stateList: state,
     getBody,
   } = useInputSel({
     rawData: fakeData,

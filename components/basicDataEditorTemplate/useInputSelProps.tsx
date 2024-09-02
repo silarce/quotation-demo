@@ -26,21 +26,40 @@ import type { TinputSelProps_key, TemplateProps } from './templateProp';
 type Tquery = {
   id?: string;
 };
+// ______________________________________________________
+// ______________________________________________________
 
 type rawDataItem = string | number | boolean | null;
 
 type TrawData = {
+  [key: string]: rawDataItem | rawDataItem[];
+};
+
+type TrawData_primitive = {
   [key: string]: rawDataItem;
 };
 
-type Tvalue = string | boolean | Moment | null | undefined;
-
-type Tstate = {
-  [key: string]: Tvalue;
+type rawData_table = {
+  [key: string]: rawDataItem[];
 };
+
+// ______________________________________________________
+// ______________________________________________________
 
 type TinputSelDict = {
   [key: string]: TinputSelProps_key;
+};
+
+// ______________________________________________________
+// ______________________________________________________
+
+type Tstate = string | boolean | Moment | null | undefined;
+type TstateList = {
+  [key: string]: Tstate;
+};
+
+type TtableStateList = {
+  [key: string]: TstateList;
 };
 
 // ===========================================================================
@@ -58,15 +77,39 @@ const useInputSel = ({
   const { id } = router.query as Tquery;
 
   // ----------------------------------------------------------------
-  const { inputSelItemDict, locale } = templateModelProps;
+  const { inputSelItemDict, locale, tables } = templateModelProps;
 
   // ----------------------------------------------------------------
 
-  const defaultState = useDefaultState({ rawData: rawData, inputSelItemDict });
+  const { rowData_primitive, rawData_table } = useMemo(() => {
+    const rawData_copy = _.cloneDeep(rawData);
+
+    let rawData_table: rawData_table | null = null;
+
+    if (tables) {
+      rawData_table = {};
+      const targetPropertyArr = tables && Object.values(tables).map((item) => item.targetProperty);
+
+      targetPropertyArr.forEach((key) => {
+        rawData_table![key] = (rawData_copy?.[key] || []) as rawDataItem[];
+        rawData_copy && delete rawData_copy[key];
+      });
+    }
+
+    const rowData_primitive = rawData_copy as TrawData_primitive;
+
+    return { rowData_primitive: rowData_primitive, rawData_table };
+  }, [rawData]);
+
+  // 已將原始值與陣列值分開，接著要對陣列值建立state
+
+  // ----------------------------------------------------------------
+
+  const defaultState = useDefaultState({ rowData_primitive, inputSelItemDict });
 
   // ----------------------------------------------------------------
   const [disabled, setDisabled] = useState(!id);
-  const [state, setState] = useState<Tstate>(defaultState);
+  const [stateList, setStateList] = useState<TstateList>(defaultState);
 
   // ----------------------------------------------------------------
 
@@ -79,7 +122,7 @@ const useInputSel = ({
       //   myAlert.err({ title: 'useInputSel錯誤', content: `key與item.key不同` });
       // }
 
-      const value = state[key];
+      const value = stateList[key];
 
       const {
         valueType,
@@ -100,10 +143,10 @@ const useInputSel = ({
       const caption = (locale?.items?.[key]?.caption ?? key) as string;
 
       const node = span && createNode({ value, span });
-      const inputProps = input && createInput({ value, input, key, setState });
-      const selectProps = select && createSelect({ value, select, key, setState, locale });
-      const textareaProps = textarea && createTextareaProps({ value, textarea, key, setState });
-      const datePickerProps = datePicker && createDatePickerProps({ value, datePicker, key, setState });
+      const inputProps = input && createInput({ value, input, key, setState: setStateList });
+      const selectProps = select && createSelect({ value, select, key, setState: setStateList, locale });
+      const textareaProps = textarea && createTextareaProps({ value, textarea, key, setState: setStateList });
+      const datePickerProps = datePicker && createDatePickerProps({ value, datePicker, key, setState: setStateList });
 
       const inputSelProps: TinputSelProps_key = {
         key,
@@ -126,7 +169,7 @@ const useInputSel = ({
     });
 
     return inputSelDict;
-  }, [inputSelItemDict, state, locale, disabled]);
+  }, [inputSelItemDict, stateList, locale, disabled]);
 
   // ________________________________________________________________
   // ________________________________________________________________
@@ -151,8 +194,17 @@ const useInputSel = ({
       //
       titles = {},
       sections = {},
+      tables = {},
       ...rest
     } = teamplateProps_pre;
+
+    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale['titles']>;
+    Object.entries(titles).forEach(([key, title]) => {
+      titles[key] = titleArr_locale[key] || title;
+    });
+
+    // ________________________________________________________________
+    // ________________________________________________________________
 
     const sectionDict: {
       [
@@ -175,17 +227,19 @@ const useInputSel = ({
       sectionDict[key] = filteredArr;
     });
 
-    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale['titles']>;
-    Object.entries(titles).forEach(([key, title]) => {
-      titles[key] = titleArr_locale[key] || title;
-    });
+    // ________________________________________________________________
+    // ________________________________________________________________
+
+    // ________________________________________________________________
+    // ________________________________________________________________
 
     const templateProps: TemplateProps = {
       ...rest,
+      titles,
       sections: {
         ...sectionDict,
       },
-      titles,
+      // tables: {},
     };
 
     return templateProps;
@@ -207,17 +261,17 @@ const useInputSel = ({
   const getBody = () => {
     return stateToBody({
       inputSelItemDict,
-      state,
+      stateList: stateList,
     });
   };
 
   const switchDisabled = (bool?: boolean) => {
-    setDisabled((state) => {
+    setDisabled((prev) => {
       if (bool) {
         return bool;
       }
 
-      return !state;
+      return !prev;
     });
   };
 
@@ -226,11 +280,11 @@ const useInputSel = ({
   // region useEffect
 
   useEffect(() => {
-    setState(defaultState);
+    setStateList(defaultState);
   }, [defaultState]);
 
   useEffect(() => {
-    disabled && setState(defaultState);
+    disabled && setStateList(defaultState);
   }, [disabled]);
 
   // ----------------------------------------------------------------
@@ -240,7 +294,7 @@ const useInputSel = ({
     disabled,
     switchDisabled,
     //
-    state,
+    stateList,
     getBody,
     //
     inputSelDict,
@@ -254,9 +308,15 @@ const useInputSel = ({
 // ===========================================================================
 // ===========================================================================
 
-const stateToBody = ({ inputSelItemDict, state }: { inputSelItemDict: InputSelItemDict; state: Tstate }) => {
+const stateToBody = ({
+  inputSelItemDict,
+  stateList,
+}: {
+  inputSelItemDict: InputSelItemDict;
+  stateList: TstateList;
+}) => {
   const body = Object.entries(inputSelItemDict).reduce((body, [key, item]) => {
-    const stateValue = state[key];
+    const stateValue = stateList[key];
     const { valueType, nullable } = item;
 
     if (nullable && (stateValue === null || stateValue === '' || stateValue === undefined)) {
@@ -275,7 +335,7 @@ const stateToBody = ({ inputSelItemDict, state }: { inputSelItemDict: InputSelIt
     body[key] = value;
 
     return body;
-  }, {} as TrawData);
+  }, {} as TrawData_primitive);
 
   return body;
 };
@@ -284,19 +344,19 @@ const stateToBody = ({ inputSelItemDict, state }: { inputSelItemDict: InputSelIt
 
 // MARK:useDefaultState
 const useDefaultState = ({
-  rawData,
+  rowData_primitive,
   inputSelItemDict,
 }: {
-  rawData: TrawData | undefined | null;
+  rowData_primitive: TrawData_primitive | undefined | null;
   inputSelItemDict: InputSelItemDict;
 }) => {
   return useMemo(() => {
-    const defaultState: Tstate = {};
+    const defaultState: TstateList = {};
 
     Object.entries(inputSelItemDict).forEach(([key, item]) => {
-      const rawValue = rawData?.[key] || null;
+      const rawValue = rowData_primitive?.[key] || null;
 
-      let value: Tvalue = null;
+      let value: Tstate = null;
 
       const { valueType } = item;
 
@@ -316,14 +376,14 @@ const useDefaultState = ({
     });
 
     return defaultState;
-  }, [rawData, inputSelItemDict]);
+  }, [rowData_primitive, inputSelItemDict]);
 };
 
 // ===========================================================================
 
 // region CREATE
 
-const createNode = ({ value, span }: { value: Tvalue; span: NonNullable<InputSelItem['span']> }) => {
+const createNode = ({ value, span }: { value: Tstate; span: NonNullable<InputSelItem['span']> }) => {
   const cookedValue = value as string | number | boolean;
 
   return <span style={span.style}>{cookedValue}</span>;
@@ -335,10 +395,10 @@ const createInput = ({
   key,
   setState,
 }: {
-  value: Tvalue;
+  value: Tstate;
   input: NonNullable<InputSelItem['input']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  setState: React.Dispatch<React.SetStateAction<TstateList>>;
 }): TinputSelProps['inputProps'] => {
   const { props, ...rest } = input;
 
@@ -364,10 +424,10 @@ const createSelect = ({
   setState,
   locale,
 }: {
-  value: Tvalue;
+  value: Tstate;
   select: NonNullable<InputSelItem['select']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  setState: React.Dispatch<React.SetStateAction<TstateList>>;
   locale: TemplateModelProps['locale'];
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
@@ -404,11 +464,11 @@ const createSelect = ({
           }
         });
 
-        const theRest = copy as { [key: string]: Tvalue };
+        const theRest = copy as { [key: string]: Tstate };
 
-        setState((state) => {
+        setState((prev) => {
           return {
-            ...state,
+            ...prev,
             ...theRest,
             [key]: value || '',
           };
@@ -424,10 +484,10 @@ const createTextareaProps = ({
   key,
   setState,
 }: {
-  value: Tvalue;
+  value: Tstate;
   textarea: NonNullable<InputSelItem['textarea']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  setState: React.Dispatch<React.SetStateAction<TstateList>>;
 }): TinputSelProps['textareaProps'] => {
   const { props, ...rest } = textarea;
 
@@ -452,10 +512,10 @@ const createDatePickerProps = ({
   key,
   setState,
 }: {
-  value: Tvalue;
+  value: Tstate;
   datePicker: NonNullable<InputSelItem['datePicker']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  setState: React.Dispatch<React.SetStateAction<TstateList>>;
 }): TinputSelProps['datePickerProps'] => {
   const { props, ...rest } = datePicker;
 

@@ -13,6 +13,17 @@ interface TemplateProps {
   sections: {
     [sectionName: string]: TinputSelProps_key[]; // keyArr
   };
+
+  tables?: {
+    [tableName: string]: {
+      columns: {
+        key: string;
+        label: string;
+        width: string | number;
+      }[];
+      rows: TinputSelProps_key[];
+    };
+  };
 }
 
 export type { TinputSelProps_key, TemplateProps };

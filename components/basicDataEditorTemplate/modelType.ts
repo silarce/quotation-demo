@@ -9,16 +9,32 @@
 
 // ===============================================================================
 
+interface Titles {
+  [titleName: string]: string;
+}
+interface Sections {
+  [sectionName: string]: string[]; // keyArr
+}
+interface Table {
+  [tableName: string]: {
+    columns: {
+      key: string;
+      label: string;
+      width: string | number;
+    }[];
+    // sections?: {
+    //   [sectionName: string]: string[]; // keyArr
+    // };
+  }; // [tableName: string]
+}
+
 interface TemplateIngredients {
   // [optionsForTemplate: string]: any; // 未來給特定模板的property
   style?: Tstyle;
   // titleArr?: string[]; // 預設值，會被locale替換
-  titles?: {
-    [titleName: string]: string;
-  }; // 預設值，會被locale替換
-  sections?: {
-    [sectionName: string]: string[]; // keyArr
-  };
+  titles?: Titles; // 預設值，會被locale替換
+  sections?: Sections;
+  tables?: Table;
 }
 
 interface Locale {
@@ -193,31 +209,20 @@ interface InputSelItemDict {
 
 interface TemplateModelProps {
   inputSelItemDict: InputSelItemDict; // 欄位資料
-  locale: Locale | undefined; // 語系物件
 
+  // tableValueKeys?: string[]; // table的keyArr // 後端要告訴前端哪些資料要用table處理
+  tables?: {
+    [tableName: string]: {
+      targetProperty: string;
+      inputSelItemDict: InputSelItemDict;
+    };
+  };
+
+  locale: Locale | undefined; // 語系物件
   // 根據template決定用哪一個模板
   template: {
     [templateName: string]: TemplateIngredients;
-
-    // 例子
-    // t01?: {
-    //   style?: Tstyle;
-    //   layout: {
-    //     a: string[]; // keyArr
-    //   };
-    // };
-
-    // 例子
-    // t02?: {
-    //   style?: Tstyle;
-    //   titleArr?: string[];
-    //   layout: {
-    //     a: string[]; // keyArr
-    //     b: string[]; // keyArr
-    //   };
-    // };
   };
-  //
 }
 
 export type {
