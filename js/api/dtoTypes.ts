@@ -4351,6 +4351,9 @@ export type TaccountantDto = {
   // 已分出金額
   splitPayment: number[] | null;
   isAlreadyImportIncomeBill: boolean;
+
+  accountReceivableId: string | null;
+  accountReceivable: TaccountsReceivableDto | null;
 };
 
 export type TcreateAccountantDto = Pick<

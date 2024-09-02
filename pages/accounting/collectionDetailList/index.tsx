@@ -10,12 +10,11 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import EditDefunctionBtn, {
-  Tprops_deductionEditor_modal,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
+import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // utils
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
@@ -36,6 +35,9 @@ import {
   useGetAccountant,
   // useGetAccountantPreset,
 } from 'js/api/api_accountant';
+import { apiGetAccountReceivable_id } from 'js/api/api_engineering';
+import { TapiError } from 'js/api/api_engineering';
+import { AxiosError } from 'axios';
 
 // css
 import scss from './index.module.scss';
@@ -253,11 +255,17 @@ export default function CollectionDetailList() {
           );
 
           const node_billSerialNumber = _.sortBy(incomeBill, 'billSerialNumber').map((incomeBill) => {
-            const { id, accountantId, billSerialNumber } = incomeBill;
+            const { id, accountantId, billSerialNumber, accountReceivableId } = incomeBill;
 
             return (
               <div key={id}>
-                <span>{billSerialNumber}</span>
+                <span
+                  //
+                  className={classNames(accountReceivableId && scss.billSerialNumberWithAccountReceivable)}
+                  onClick={() => accountReceivableId && directToAccountReceivable(accountReceivableId)}
+                >
+                  {billSerialNumber}
+                </span>
                 <EditDefunctionBtn forbidden={true} className={'ml-2'} accountantId={accountantId} incomeBillId={id} />
               </div>
             );
@@ -317,6 +325,30 @@ export default function CollectionDetailList() {
 // =============================================================================
 // =============================================================================
 // =============================================================================
+// =============================================================================
+
+const directToAccountReceivable = async (accountReceivableId: string | null | undefined) => {
+  if (!accountReceivableId) {
+    myAlert.info({ title: '無應收帳款明細' });
+
+    return;
+  }
+
+  return await apiGetAccountReceivable_id(accountReceivableId, {
+    populate: ['contract'],
+  })
+    .then((AccountReceivable) => {
+      const { contract } = AccountReceivable;
+
+      const contractId = contract!.id;
+      const path = `/worksDepartment/contractList/contract/accountReceivable?contractId=${contractId}&version=1`;
+      window.open(path, '_blank');
+    })
+    .catch((err: AxiosError<TapiError>) => {
+      myAlert.err({ title: '取得應收帳款明細失敗', content: err.response?.data?.message || err.message });
+    });
+};
+
 // =============================================================================
 
 type Tkey =
