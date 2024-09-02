@@ -117,7 +117,7 @@ export default function WHPositionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetWHPosition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWHPosition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -147,7 +147,7 @@ export default function WHPositionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}SearchWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 myAlert.err({ content: "Failed to fetch data" });
             }

@@ -161,7 +161,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}AddWareHouse?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/AddWareHouse?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
