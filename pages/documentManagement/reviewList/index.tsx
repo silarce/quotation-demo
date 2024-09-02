@@ -75,7 +75,8 @@ export default function ReviewList() {
     const [memo, setMemo] = useState<string>("");
     const [currentreview_id, setCurrentreview_id] = useState<string>("");
     const [review_memo, setReview_memo] = useState<string>("");
-    
+    const [document_status, setDocument_status] = useState<string>("");
+
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -280,6 +281,7 @@ export default function ReviewList() {
     const GetReviewStatus = async (item: any) => {
         handleRowClick(item.id);
         setCurrentreview_id(item.id);
+
         // alert("in");
         // GetDocument(item);
         // setReviewtype("報價單");
@@ -311,6 +313,7 @@ export default function ReviewList() {
             // 設定 itemQuery
             // GetDocument(item);
             setReviewtype(item.document_type);
+            setDocument_status(item.document_status);
         } catch (error: any) {
             // setError("GetReviewStatus:" + error.message);
             console.log(error.message);
@@ -364,8 +367,58 @@ export default function ReviewList() {
                     purchaserequisitionid: parsedQuery.purchaserequisitionid,
                     create_at: getTaiwanDateStr(parsedQuery.create_at),
                     create_by: parsedQuery.create_by,
-                    status: '審核中',
+                    status: document_status,
                     need_date: parsedQuery.need_date,
+                    note: parsedQuery.note,
+                    firstin: 1,
+                    viewtype: 'review'
+                },
+            }, undefined, { shallow: true });
+        } else if (reviewtype === "採購單") {
+            const parsedQuery = JSON.parse(itemQuery.query);
+
+            console.log(parsedQuery); // 檢查解析後的資料
+
+            // 使用 shallow 模式更新 query 而不進行頁面跳轉
+            router.replace({
+                query: {
+                    purchaseorderuuid: parsedQuery.purchaseorderuuid,
+                    purchaseorderid: parsedQuery.purchaseorderid,
+                    suppliername:parsedQuery.suppliername,
+                    suppliertaxid:parsedQuery.suppliertaxid,
+                    supplieraddress:parsedQuery.supplieraddress,
+                    supplierphone:parsedQuery.supplierphone,
+                    invoice:parsedQuery.invoice,
+                    create_at: getTaiwanDateStr(parsedQuery.create_at),
+                    create_by: parsedQuery.create_by,
+                    status: document_status,
+                    note: parsedQuery.note,
+                    firstin: 1,
+                    viewtype: 'review'
+                },
+            }, undefined, { shallow: true });
+        } else if (reviewtype === "進貨單") {
+            const parsedQuery = JSON.parse(itemQuery.query);
+
+            console.log(parsedQuery); // 檢查解析後的資料
+
+            // 使用 shallow 模式更新 query 而不進行頁面跳轉
+            router.replace({
+                query: {
+                    prodreceiptuuid: parsedQuery.prodreceiptuuid,
+                    prodreceiptid: parsedQuery.prodreceiptid,
+                    purchaseorderuuid:parsedQuery.purchaseorderuuid,
+                    purchaseorderid:parsedQuery.purchaseorderid,
+                    purchaseordercreate_at:getTaiwanDateStr(parsedQuery.purchaseordercreate_at),
+                    purchaseordercreate_by:parsedQuery.purchaseordercreate_by,
+                    suppliername:parsedQuery.suppliername,
+                    suppliertaxid:parsedQuery.suppliertaxid,
+                    supplieraddress:parsedQuery.supplieraddress,
+                    supplierphone:parsedQuery.supplierphone,
+                    invoice:parsedQuery.invoice,
+                    create_at: getTaiwanDateStr(parsedQuery.create_at),
+                    create_by: parsedQuery.create_by,
+                    status: document_status,
                     note: parsedQuery.note,
                     firstin: 1,
                     viewtype: 'review'
@@ -870,10 +923,17 @@ export default function ReviewList() {
                                     <span>
                                         {data2 && (
                                             data2.slice(0, 100).map((_item: any, index: number) => {
-                                                // 根據 index 設定 prestageReviewDisplay
+                                                // 根據 index 設定 prestageReviewDisplay 和 reviewStatusDisplay
                                                 let prestageReviewDisplay = index === 0
-                                                    ? _item.create_at  // 第一筆資料顯示 item.prestage_review
+                                                    ? _item.create_at  // 第一筆資料顯示 item.create_at
                                                     : data2[index - 1].review_time || '';  // 其他資料顯示上一筆的 review_time
+
+                                                // 設定 reviewStatusDisplay 根據當前和前一筆的 review_status
+                                                let reviewStatusDisplay = _item.review_status === "核准"
+                                                    ? "核准"  // 當前項目狀態為"核准"，顯示"核准"
+                                                    : (index === 0
+                                                        ? (_item.review_order === 1 ? "提出" : _item.review_status)  // 第一筆資料顯示"提出"或其他 review_status
+                                                        : (data2[index - 1].review_status === "核准" ? "簽核中" : _item.review_status));  // 根據前一筆的 review_status
 
                                                 return (
                                                     <CellWithBar key={index} className={scss.panelHeader22}>
@@ -884,7 +944,7 @@ export default function ReviewList() {
                                                             <span style={{ textAlign: 'center', backgroundColor: '#5b5a5ad6', color: 'white' }}>{_item.review_type}</span>
                                                             <span>{_item.review_person}</span>
                                                             <span style={{ textAlign: 'center', backgroundColor: '#1061c4', color: 'white' }}>
-                                                                {_item.review_order === 1 ? "提出" : _item.review_status}
+                                                                {reviewStatusDisplay}
                                                             </span>
                                                             <span>{prestageReviewDisplay}</span>
                                                             <span>{_item.review_time}</span>
@@ -897,24 +957,26 @@ export default function ReviewList() {
 
 
 
+
+
                                     </span>
                                 </div>
                             </div>
 
                         </div>
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
-                            <div className={scss.body_foot1} style={{ pointerEvents: (tabshow === "審核中" || tabshow === "審核完成"||data.length===0) ? 'none' : 'auto' }}>
+                            <div className={scss.body_foot1} style={{ pointerEvents: (tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? 'none' : 'auto' }}>
 
                                 <div>
                                     <button className={scss.longsquarebtn} onClick={() => { handleReviewConfirm() }} title="核准"
-                                        style={{color:`${(tabshow==="審核中"||tabshow==="審核完成"||data.length===0)?'#5b5a5ad6':'#14256a'}`}}>
+                                        style={{ color: `${(tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? '#5b5a5ad6' : '#14256a'}` }}>
                                         {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         核准
                                     </button>
                                 </div>
                                 <div>
                                     <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回"
-                                        style={{color:`${(tabshow==="審核中"||tabshow==="審核完成"||data.length===0)?'#5b5a5ad6':'#14256a'}`}}>
+                                        style={{ color: `${(tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? '#5b5a5ad6' : '#14256a'}` }}>
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回
                                     </button>

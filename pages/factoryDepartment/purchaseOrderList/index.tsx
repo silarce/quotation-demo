@@ -31,7 +31,7 @@ import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_fc_collapse_right from 'public/image/icon/fc_collapse_right.svg';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 import icon_print from 'public/image/icon/fc_printer.svg';
-import { Modal } from 'antd';
+import { Modal, Radio, Space } from 'antd';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
@@ -39,6 +39,13 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
+import icon_flow from 'public/image/icon/fc_flow.svg';
+import icon_review from 'public/image/icon/review.svg';
+import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
+import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
+import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
+import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -62,7 +69,8 @@ export default function PurchaseOrderList() {
         invoice,
         purchaseorderdetailuuid,
         note,
-        status
+        status,
+        viewtype
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -219,19 +227,19 @@ export default function PurchaseOrderList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        {
-            type: 'addButton',
-            label: '新增採購單',
-            onClick: () => {
-                // setOpen(true);
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrder`,
-                    query: {
-                        type: 'AddPurchaseRequisition',
-                    },
-                });
-            },
-        },
+        // {
+        //     type: 'addButton',
+        //     label: '新增採購單',
+        //     onClick: () => {
+        //         // setOpen(true);
+        //         router.push({
+        //             pathname: `/factoryDepartment/addPurchaseOrder`,
+        //             query: {
+        //                 type: 'AddPurchaseRequisition',
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -286,6 +294,7 @@ export default function PurchaseOrderList() {
                 setSupplierphonein(data[0].supplierphone);
                 setNotein(data[0].note);
                 setStatusin(data[0].status);
+                GetReviewById(data[0].purchaseorderuuid);//審核
             }
         } catch (error: any) {
             setError(error.message);
@@ -300,6 +309,7 @@ export default function PurchaseOrderList() {
     useEffect(() => {
         if (!hasFetchedData.current) {
             getPurchaseOrder();
+            GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
@@ -396,6 +406,7 @@ export default function PurchaseOrderList() {
             setSupplierphonein(supplierphone as string);
             setNotein(note as string);
             setStatusin(status as string);
+            GetReviewById(purchaseorderuuid);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
@@ -952,6 +963,261 @@ export default function PurchaseOrderList() {
 
     };
 
+    const closeDoc = async (type: any) => {
+        try {
+            const conditionModel = {
+                purchaseorderuuid: purchaseorderuuidin,
+                type: type,
+                username: userInfo?.username,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getPurchaseOrder();
+            getPurchaseOrderDetail(purchaseorderidin);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+            setIsLoading(true);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                // console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
+    const setReview = async (item: any) => {
+        setReview_flow(item.id);
+        setReviewflowdata2(item.stages);
+    }
+
+    const sentToReview = async (type: any) => {
+
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
+            }
+            else {
+                const review_query = {
+                    purchaseorderuuid: purchaseorderuuidin,
+                    purchaseorderid: purchaseorderidin,
+                    suppliername:suppliernamein,
+                    suppliertaxid:suppliertaxidin,
+                    supplieraddress:supplieraddressin,
+                    supplierphone:supplierphonein,
+                    invoice:invoicein,
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    status: '採購中',
+                    note: notein,
+                    firstin: 1,
+                };
+
+                const conditionModel = {
+                    document_id: purchaseorderidin,
+                    document_uuid: purchaseorderuuidin,
+                    document_type: "採購單",
+                    review_id: review_flow,
+                    query: review_query,
+                    username: userInfo?.username,
+                    document_title: documenttitle
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(purchaseorderuuidin);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                //改變單據狀態
+                const conditionModel2 = {
+                    type: type,
+                    purchaseorderuuid: purchaseorderuuidin as string | undefined,
+                    username: userInfo?.username as string | undefined
+                };
+
+
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel2),
+                };
+
+                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                const response2 = await fetch(`${setting.apipath}/WareHouse/sentPOToReview?${queryParams}`);
+                if (!response2.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data2 = await response2.json();
+                getPurchaseOrder();
+                getPurchaseOrderDetail(purchaseorderuuidin);
+                setStatusin("審核中");
+
+
+
+
+
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.username}`)
+    }
+    //#endregion
+
+
 
 
     return (
@@ -1028,7 +1294,7 @@ export default function PurchaseOrderList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
                             <div>
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
@@ -1070,7 +1336,7 @@ export default function PurchaseOrderList() {
 
                             </div>
                             <div>
-                                <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">
+                                {/* <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
@@ -1081,7 +1347,71 @@ export default function PurchaseOrderList() {
                                 <button className={scss.disablesquarebtn} style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} title="單據已結">
                                     <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     已結
+                                </button> */}
+                                <button
+                                    className={scss.squarebtn}
+                                    onClick={() => { handleChoseflow() }}
+                                    title="單據送審"
+                                    style={{
+                                        display: `${(statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
                                 </button>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    title="審核流程"
+                                    style={{
+                                        display: `${(statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                >
+                                    <img src={icon_flow_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    流程
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={scss.squarebtn}
+                                    style={{
+                                        display: `${(statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                    onClick={() => { sentToReview("審核") }}
+                                    title="單據送審"
+                                >
+                                    <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    style={{
+                                        display: `${(statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                    title="單據送審"
+                                >
+                                    <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+
+                                &nbsp;
+                                <button className={scss.squarebtn} style={{ display: `${(completereq < parseInt(totalreq) || statusin === '審核中') ? '' : 'none'}` }} title="單據抽單" onClick={() => { alert("抽單") }}>
+                                    <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    抽單
+                                </button>
+
+                                <button style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+
                             </div>
                         </div>
                         <div className={scss.head_body}>
@@ -1285,9 +1615,9 @@ export default function PurchaseOrderList() {
 
                         <div className={scss.head_foot2}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
+                                {/* <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
                                     進貨紀錄
-                                </button>
+                                </button> */}
                             </div>
                             <div>
 
@@ -1314,12 +1644,17 @@ export default function PurchaseOrderList() {
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>
-                                                <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
+                                                <button
+                                                    style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
+                                                    onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                                                 </button>
-                                                <button style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                                <button
+                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
+
+
                                             </span>
                                             <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
@@ -1365,122 +1700,156 @@ export default function PurchaseOrderList() {
                                 </table>
                             </div>
                         </div>
-                        <div className={scss.foot_head1}>
+                        <div className={scss.body_foot2}>
                             <div>
-                                <button style={{ display: `${data2.length > 0 ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
-                                <button style={{ display: `${data2.length > 0 ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
-                                    <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
+                                {reviewflowdata.map((item, index) => (
+                                    <div key={index} style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                            <div key={stageIndex} style={{ flex: 1, flexDirection: 'column', textAlign: 'left', marginRight: '10px' }}>
+                                                <span style={{ fontSize: '18px', color: '#14256a' }}>{stage.review_title}</span>
+                                                <br />
+                                                <span style={{ fontSize: '16px' }}>{stage.review_person}</span>
+                                                <span style={{ padding: '0px 5px', display: `${stage.review_time === "0001-01-01T00:00:00" ? 'none' : ''}` }}>
+                                                    <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
                             </div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
-                                {/* <span style={{ display: data2.length > 0 ? "" : "none" }}>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.map((item, index) => (
+                                        <div key={index} style={{ textAlign: 'left', flex: 1 }}>
+                                            <span style={{ fontSize: '18px', color: '#14256a' }}>{item.stage_user_title}</span>
+                                            <br />
+                                            <span style={{ fontSize: '16px' }}>{item.stage_user_name}</span>
+                                            {/* <span style={{ padding: '0px 5px' }}>
+                                                <img src={icon_review.src} alt="review_status" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                            </span> */}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ display: viewtype === "review" ? 'none' : '' }}>
+                            <div className={scss.foot_head1}>
+                                <div>
+                                    <button style={{ display: `${data2.length > 0 ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增單據">
+                                        <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                    <button style={{ display: `${data2.length > 0 ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增單據">
+                                        <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                </div>
+                                <div></div>
+                                <div></div>
+                                <div style={{ textAlign: 'right' }}>
+                                    {/* <span style={{ display: data2.length > 0 ? "" : "none" }}>
                                     <button className={scss.redbtn} onClick={handleTransfer} >新增進貨</button>
                                 </span>
                                 <span style={{ display: data2.length > 0 ? "none" : "" }}>
                                     <button className={scss.disabledbtn}>新增進貨</button>
                                 </span> */}
+                                </div>
                             </div>
-                        </div>
-                        <div className={scss.foot_content1}>
-                            <Thead01 type={'PurchaseOrderDetail2'} />
-                            {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader13}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
-                                        <span>{_item.name}</span>
-                                        <span style={{ color: '#ea1833' }}>
-                                            {_item.alreadyinquantity}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                maxLength={9}
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        quantity: newQuantity,
-                                                        totalprice: newQuantity * newData[index].unitprice
-                                                    };
-                                                    setData2(newData);
-                                                    // handleChange(index, "quantity", e.target.value);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>{_item.unit}</span>
-                                        <span>
-                                            <input
-                                                ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                maxLength={8}
-                                                value={_item.unitprice.toLocaleString()}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        unitprice: newUnitPrice,
-                                                        totalprice: newUnitPrice * newData[index].quantity
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {_item.totalprice.toLocaleString()}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
-                                                type="text"
-                                                value={_item.note}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newNote = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        note: newNote
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            &nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                            <div className={scss.foot_content1}>
+                                <Thead01 type={'PurchaseOrderDetail2'} />
+                                {data2.map((_item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader13}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            <span style={{ color: '#ea1833' }}>
+                                                {_item.alreadyinquantity}
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    maxLength={9}
+                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: newQuantity * newData[index].unitprice
+                                                        };
+                                                        setData2(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>{_item.unit}</span>
+                                            <span>
+                                                <input
+                                                    ref={unitpriceRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    maxLength={8}
+                                                    value={_item.unitprice.toLocaleString()}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: newUnitPrice,
+                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                {_item.totalprice.toLocaleString()}
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={noteRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                    type="text"
+                                                    value={_item.note}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data2];
+                                                        const newNote = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            note: newNote
+                                                        };
+                                                        setData2(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                &nbsp;&nbsp;
+                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
                                             <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))}
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1666,6 +2035,48 @@ export default function PurchaseOrderList() {
                     </div>
                     {/* </Modal > */}
                 </DragableModal>
+
+
+                {/* 審核 */}
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '820px' }}
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+
+
+
+                </DragableModal>
+
+
+
             </div>
         </SubLayer >
 

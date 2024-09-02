@@ -281,7 +281,7 @@ export default function PurchaseRequisitionList() {
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
-                GetReviewById(data[0].purchaserequisitionuuid);
+                GetReviewById(data[0].purchaserequisitionuuid);//審核
 
             }
         } catch (error: any) {
@@ -340,7 +340,7 @@ export default function PurchaseRequisitionList() {
     useEffect(() => {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
-            GetReviewFlow();
+            GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
@@ -898,11 +898,7 @@ export default function PurchaseRequisitionList() {
 
     const updateQuotereqDetail = async (quotereqdetailid: string, lastquotereqdetailid: string) => {
         try {
-            const conditionModel: {
-
-                lastquotereqdetailid: any,
-                quotereqdetailid: any,
-            } = {
+            const conditionModel = {
                 lastquotereqdetailid: lastquotereqdetailid,
                 quotereqdetailid: quotereqdetailid
             };
@@ -1144,18 +1140,47 @@ export default function PurchaseRequisitionList() {
 
     };
 
+    const closeDoc = async (type: any) => {
+        try {
+            const conditionModel = {
+                purchaserequisitionuuid: purchaserequisitionuuidin,
+                type: type,
+                username: userInfo?.username,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getPurchaseRequisition();
+            getPurchaseRequisitionDetail(purchaserequisitionidin);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
 
 
-    //審核
+    //#region 審核
     const [review_flow, setReview_flow] = useState<string>("");
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
     const [documenttitle, setDocumenttitle] = useState<string>("");
-
-    // useEffect(() => {
-    // }, [reviewflow]);
 
     //取全部的自訂流程
     const GetReviewFlow = async () => {
@@ -1242,13 +1267,6 @@ export default function PurchaseRequisitionList() {
             // 檢查資料是否存在且有效
             if (data && data.length > 0) {
                 setReviewflowdata(data);
-
-                // 確保 data 的內容已經設定
-                if (data[0] && data[0].document_status) {
-                    setStatusin(data[0].document_status);
-                } else {
-                    console.log('Document status not found');
-                }
             } else {
                 console.log('No valid data');
             }
@@ -1260,23 +1278,16 @@ export default function PurchaseRequisitionList() {
         }
     };
 
-
-
-
     const [value, setValue] = useState<number | null>(null);
     const onChange = (e: any) => {
         setValue(e.target.value);
     };
-
 
     const setReview = async (item: any) => {
         setReview_flow(item.id);
         setReviewflowdata2(item.stages);
     }
 
-
-
-    //送出審核
     const sentToReview = async (type: any) => {
 
         try {
@@ -1377,7 +1388,7 @@ export default function PurchaseRequisitionList() {
         setReviewbar(true);
         setDocumenttitle(`【請購單】【${purchaserequisitionid}】_${userInfo?.username}`)
     }
-
+    //#endregion
 
 
     return (
@@ -1482,30 +1493,57 @@ export default function PurchaseRequisitionList() {
                             </div>
                             <div></div>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { handleChoseflow() }} title="單據送審" style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中') ? '' : 'none'}` }}>
+                                <button
+                                    className={scss.squarebtn}
+                                    onClick={() => { handleChoseflow() }}
+                                    title="單據送審"
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                >
                                     <img src={icon_flow.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     流程
                                 </button>
-                                <button className={scss.disablesquarebtn} title="審核流程" style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }}>
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    title="審核流程"
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                >
                                     <img src={icon_flow_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     流程
                                 </button>
                                 &nbsp;
-                                <button className={scss.redsquarebtn} style={{ display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin != '審核中') ? '' : 'none'}` }} onClick={() => { sentToReview("審核") }} title="單據送審">
+                                <button
+                                    className={scss.squarebtn}
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) === parseInt(totalreqprogress) && statusin !== '審核中' && statusin !== '已核准' && statusin !== '已結案') ? '' : 'none'}`
+                                    }}
+                                    onClick={() => { sentToReview("審核") }}
+                                    title="單據送審"
+                                >
                                     <img src={icon_sent_review.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
-                                <button className={scss.disablesquarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
+                                <button
+                                    className={scss.disablesquarebtn}
+                                    style={{
+                                        display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中' || statusin === '已核准' || statusin === '已結案') ? '' : 'none'}`
+                                    }}
+                                    title="單據送審"
+                                >
                                     <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
+
                                 &nbsp;
                                 <button className={scss.squarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
 
-                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("結案") }} title="單據結案">
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>

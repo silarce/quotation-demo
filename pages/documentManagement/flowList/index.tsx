@@ -560,6 +560,7 @@ export default function FlowList() {
 
             setData2([]);
             setFlowname("");
+            GetFlow();
 
 
 
