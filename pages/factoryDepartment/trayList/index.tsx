@@ -104,7 +104,7 @@ export default function TrayList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}SearchWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/SearchWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -123,7 +123,7 @@ export default function TrayList() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`${setting.apipath}GetTray?Input=${whid}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTray?Input=${whid}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -168,7 +168,7 @@ export default function TrayList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetWHPosition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWHPosition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -197,7 +197,7 @@ export default function TrayList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetTrayLayOut?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOut?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -338,7 +338,7 @@ export default function TrayList() {
     //         };
 
     //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    //         const response = await fetch(`${setting.apipath}GetDataTrans?${queryParams}`);
+    //         const response = await fetch(`${setting.apipath}/WareHouse/GetDataTrans?${queryParams}`);
 
     //         if (!response.ok) {
     //             throw new Error('Failed to fetch data');
@@ -386,7 +386,7 @@ export default function TrayList() {
     //             FilterConditions: JSON.stringify(conditionModel),
     //         };
 
-    //         const response = await fetch(`${setting.apipath}DataTrans`, {
+    //         const response = await fetch(`${setting.apipath}/WareHouse/DataTrans`, {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json',

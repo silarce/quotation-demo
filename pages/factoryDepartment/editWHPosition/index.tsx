@@ -233,7 +233,7 @@ export default function EditWHPosition() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -275,7 +275,7 @@ export default function EditWHPosition() {
 
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}EditWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/EditWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -341,7 +341,7 @@ export default function EditWHPosition() {
 
             console.log(inputModel);
 
-            const response = await fetch(`${setting.apipath}UpdateWHPositionByID`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionByID`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -392,7 +392,7 @@ export default function EditWHPosition() {
 
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetTrayLayOutById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
