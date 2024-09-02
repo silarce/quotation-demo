@@ -3738,7 +3738,7 @@ export type TincomeBillSerialDto = {
   note: string | null;
   // '廠商名稱'
   vendorName: string | null;
-  // '廠商名稱'
+  // '扣款明細'
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
   // '手續費'
   fee: number | null;

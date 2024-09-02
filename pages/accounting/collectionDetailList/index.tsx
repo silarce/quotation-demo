@@ -2,9 +2,17 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
+import _ from 'lodash';
 
+// layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// component
+import EditDefunctionBtn, {
+  Tprops_deductionEditor_modal,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
@@ -16,17 +24,17 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 // api
 import {
   Tparams,
-  TcreateAccountantDto,
-  TupdateAccountantDto,
-  TupdateAccountReceivableDeductionDto,
+  // TcreateAccountantDto,
+  // TupdateAccountantDto,
+  // TupdateAccountReceivableDeductionDto,
   //
-  apiPostAccountant,
-  apiPatchAccountant,
-  deleteAccountant,
+  // apiPostAccountant,
+  // apiPatchAccountant,
+  // deleteAccountant,
 
   //
   useGetAccountant,
-  useGetAccountantPreset,
+  // useGetAccountantPreset,
 } from 'js/api/api_accountant';
 
 // css
@@ -54,7 +62,7 @@ export default function CollectionDetailList() {
 
   const params: Tparams = useMemo(() => {
     return {
-      populate: ['incomeBill', 'invoices'],
+      populate: ['incomeBill.accountsReceivableDeduction', 'invoices'],
       pageSize: 999999,
       filter: {
         insertDate: {
@@ -142,6 +150,10 @@ export default function CollectionDetailList() {
   const { data: data_accountant = [] } = useGetAccountant({ params });
 
   // --------------------------------------------------------------
+  // 底下的總計
+  const total = data_accountant.reduce((acc, curr) => acc + curr.price || 0, 0).toLocaleString();
+
+  // --------------------------------------------------------------
   // MARK:PROPS
 
   const selectPropsArr = useYearMonth_selectBar_query({
@@ -176,8 +188,6 @@ export default function CollectionDetailList() {
   const panelList: TpanelList = [{ searchGroup }];
   // ________________________________________________________________
   // ________________________________________________________________
-
-  const total = data_accountant.reduce((acc, curr) => acc + curr.price || 0, 0).toLocaleString();
 
   // --------------------------------------------------------------
   // MARK: RENDER
@@ -220,15 +230,40 @@ export default function CollectionDetailList() {
             noteNumber,
             noteMaturityDate,
             // invoiceNumber,
-            billSerialNumber,
+            // billSerialNumber,
 
-            // incomeBill,
+            incomeBill,
             invoices,
           } = accountant;
 
-          const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
+          const { totalFee, totalDeduction } = incomeBill.reduce(
+            (obj, bill) => {
+              const { fee } = bill;
+              const accountsReceivableDeduction = bill.accountsReceivableDeduction ?? [];
+              const deductionAmount = accountsReceivableDeduction.reduce((detailedAmount, curr) => {
+                return new Decimal(detailedAmount).add(curr.detailedAmount || 0).toNumber();
+              }, 0);
 
-          const billSerialNumber_str = billSerialNumber?.join('\n') ?? '';
+              obj.totalFee = new Decimal(obj.totalFee).add(fee || 0).toNumber();
+              obj.totalDeduction = new Decimal(obj.totalDeduction).add(deductionAmount).toNumber();
+
+              return obj;
+            },
+            { totalFee: 0, totalDeduction: 0 }
+          );
+
+          const node_billSerialNumber = _.sortBy(incomeBill, 'billSerialNumber').map((incomeBill) => {
+            const { id, accountantId, billSerialNumber } = incomeBill;
+
+            return (
+              <div key={id}>
+                <span>{billSerialNumber}</span>
+                <EditDefunctionBtn forbidden={true} className={'ml-2'} accountantId={accountantId} incomeBillId={id} />
+              </div>
+            );
+          });
+
+          const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
 
           const list = {
             insertDate: getTaiwanDateStr(insertDate),
@@ -239,8 +274,10 @@ export default function CollectionDetailList() {
             noteNumber,
             noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
             invoiceNumber,
-            // billSerialNumber,
-            billSerialNumber: billSerialNumber_str,
+            // billSerialNumber: billSerialNumber?.join('\n') ?? '',
+            billSerialNumber: node_billSerialNumber,
+            totalFee,
+            totalDeduction,
           } as const;
 
           return (
@@ -291,18 +328,22 @@ type Tkey =
   | 'noteNumber'
   | 'noteMaturityDate'
   | 'invoiceNumber'
-  | 'billSerialNumber';
+  | 'billSerialNumber'
+  | 'totalFee'
+  | 'totalDeduction';
 
 const keyArr: Tkey[] = [
   'insertDate',
   'vendorName',
   'importAccountingNumber',
   'price',
-  'notes',
   'noteNumber',
   'noteMaturityDate',
   'invoiceNumber',
+  'totalFee',
+  'totalDeduction',
   'billSerialNumber',
+  'notes',
 ];
 
 type TconfigItem = {
@@ -334,7 +375,7 @@ const config: Tconfig = {
   },
   price: {
     label: '收款金額',
-    style: { width: 160, textAlign: 'right' },
+    style: { width: 100, textAlign: 'right' },
   },
   notes: {
     label: '備註',
@@ -362,6 +403,16 @@ const config: Tconfig = {
   billSerialNumber: {
     label: '收入傳票序號',
     style: { width: 120 },
+    className: undefined,
+  },
+  totalFee: {
+    label: '匯費',
+    style: { width: 100 },
+    className: undefined,
+  },
+  totalDeduction: {
+    label: '扣款金額',
+    style: { width: 100 },
     className: undefined,
   },
 };
