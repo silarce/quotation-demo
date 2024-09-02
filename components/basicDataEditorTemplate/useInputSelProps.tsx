@@ -150,7 +150,7 @@ const useInputSel = ({
     const {
       //
       titles = {},
-      layout = {},
+      sections = {},
       ...rest
     } = teamplateProps_pre;
 
@@ -160,7 +160,7 @@ const useInputSel = ({
       ]: TinputSelProps_key[];
     } = {};
 
-    Object.entries(layout).forEach(([key, indexArr]) => {
+    Object.entries(sections).forEach(([key, indexArr]) => {
       const arr = indexArr.map((index) => {
         if (!inputSelDict[index]) {
           console.log(`key與inputSelItemDict不搭配，inputSelDict沒有${index}`);
@@ -182,7 +182,7 @@ const useInputSel = ({
 
     const templateProps: TemplateProps = {
       ...rest,
-      layout: {
+      sections: {
         ...sectionDict,
       },
       titles,

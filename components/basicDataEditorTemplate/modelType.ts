@@ -10,13 +10,13 @@
 // ===============================================================================
 
 interface TemplateIngredients {
-  [optionsForTemplate: string]: any; // 未來給特定模板的property
+  // [optionsForTemplate: string]: any; // 未來給特定模板的property
   style?: Tstyle;
   // titleArr?: string[]; // 預設值，會被locale替換
   titles?: {
     [titleName: string]: string;
   }; // 預設值，會被locale替換
-  layout?: {
+  sections?: {
     [sectionName: string]: string[]; // keyArr
   };
 }

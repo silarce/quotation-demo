@@ -21,7 +21,7 @@ export type { Tt01 };
 
 // ===========================================================================
 
-const T01: Tt01 = ({ style, layout }) => {
+const T01: Tt01 = ({ style, sections: layout }) => {
   const { a } = layout;
 
   return (

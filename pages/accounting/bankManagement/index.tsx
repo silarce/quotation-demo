@@ -148,7 +148,7 @@ const fakeTemplateModelProps: TemplateModelProps = {
       titles: {
         title01: '預設值-銀行管理',
       },
-      layout: {
+      sections: {
         a: ['accountName', 'account'],
         b: ['bankName', 'bankCode', 'note', 'visiteDate'],
       },

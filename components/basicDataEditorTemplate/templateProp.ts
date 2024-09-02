@@ -5,11 +5,12 @@ interface TinputSelProps_key extends TinputSelProps {
 }
 
 interface TemplateProps {
-  [optionsForTemplate: string]: any; // 未來給特定模板的property
-  // style?: React.CSSProperties;
-  style?: { [cssProperty: string]: string };
-  titleArr?: string[];
-  layout: {
+  // [optionsForTemplate: string]: any; // 未來給特定模板的property
+  style?: { [cssProperty: string]: string }; // React.CSSProperties
+  titles?: {
+    [titleName: string]: string;
+  };
+  sections: {
     [sectionName: string]: TinputSelProps_key[]; // keyArr
   };
 }
