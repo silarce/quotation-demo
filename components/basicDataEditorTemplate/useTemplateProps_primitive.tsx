@@ -5,22 +5,30 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type { TemplateModelProps, InputSelItemDict, InputSelItem, Option, Locale } from './modelType';
+import type {
+  TemplateModelProps,
+  TemplateIngredients,
+  InputSelItemDict,
+  InputSelItem,
+  Option,
+  Locale,
+} from './modelType';
+import type {
+  //
+  Tstate,
+  TrawData_primitive,
+  rawDataItem,
+  TinputSelProps_key,
+  TemplateProps,
+  TstateList,
+} from './types';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
-
-import type { TrawData_primitive, rawDataItem, TinputSelProps_key, TemplateProps } from './types';
 
 // ===========================================================================
 
 type TinputSelDict = {
   [key: string]: TinputSelProps_key;
-};
-
-type Tstate = string | boolean | Moment | null | undefined;
-
-type TstateList = {
-  [key: string]: Tstate;
 };
 
 // ===========================================================================
@@ -29,13 +37,15 @@ type TstateList = {
 
 const useTemplateProps_primitive = ({
   rowData_primitive,
-  templateModelProps,
+  templateIngredients,
+  // templateModelProps,
   inputSelItemDict,
   locale,
   disabled,
 }: {
   rowData_primitive: TrawData_primitive | undefined | null;
-  templateModelProps: TemplateModelProps;
+  templateIngredients: TemplateIngredients;
+  // templateModelProps: TemplateModelProps;
   inputSelItemDict: InputSelItemDict;
   locale: Locale | undefined;
   disabled: boolean;
@@ -110,15 +120,13 @@ const useTemplateProps_primitive = ({
 
   // MARK:templateProps
   const templateProps: TemplateProps = useMemo(() => {
-    const teamplateProps_pre = Object.values(templateModelProps.template)[0];
-
     const {
       //
       titles = {},
       sections = {},
       tables = {},
       ...rest
-    } = teamplateProps_pre;
+    } = templateIngredients;
 
     const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale['titles']>;
     Object.entries(titles).forEach(([key, title]) => {
@@ -161,7 +169,7 @@ const useTemplateProps_primitive = ({
     };
 
     return templateProps;
-  }, [templateModelProps.template, locale, inputSelDict]);
+  }, [templateIngredients, locale, inputSelDict]);
 
   // ----------------------------------------------------------------
 
@@ -431,4 +439,4 @@ const createDatePickerProps = ({
 
 // ===========================================================================
 
-export { useTemplateProps_primitive as useInputSel };
+export { useTemplateProps_primitive };

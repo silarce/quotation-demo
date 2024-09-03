@@ -5,7 +5,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import type { TbankDto } from 'js/api/dtoTypes';
 
 import { TemplateModelProps, InputSelItemDict } from 'components/basicDataEditorTemplate/modelType';
-import { useInputSel } from 'components/basicDataEditorTemplate/useTemplateProps_primitive';
+import { useTemplateProps_primitive } from 'components/basicDataEditorTemplate/useTemplateProps_primitive';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
@@ -18,7 +18,7 @@ import { useTemplate } from 'components/basicDataEditorTemplate/useTemplate';
 // MARK: START
 
 export default function BankManagement(): React.ReactElement {
-  const { Template, templateProps, disabled, switchDisabled, stateList, getBody } = useTemplate({
+  const { Template, templateProps, disabled, switchDisabled } = useTemplate({
     rawData: fakeData,
     templateModelProps: fakeTemplateModelProps,
   });
@@ -136,6 +136,34 @@ const inputSelItemDict: InputSelItemDict = {
 const fakeTemplateModelProps: TemplateModelProps = {
   inputSelItemDict,
 
+  tables: {
+    testTable: {
+      targetProperty: 'testTable',
+      inputSelItemDict: {
+        a: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        b: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        c: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        d: {
+          valueType: 'dateString',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+      },
+    },
+  },
+
   template: {
     t02: {
       titles: {
@@ -166,4 +194,19 @@ const fakeData = {
   bankName: '喵喵銀行',
   note: 'NOTE~~~~\nNOTE~~~~\nNOTE~~~~',
   visiteDate: '2022-11-11',
+
+  testTable: [
+    {
+      a: 'a0',
+      b: 'b0',
+      c: 'c0',
+      d: '2022-11-11',
+    },
+    {
+      a: 'a1',
+      b: 'b1',
+      c: 'c1',
+      d: '2022-11-11',
+    },
+  ],
 };

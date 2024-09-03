@@ -28,6 +28,14 @@ interface Table {
   }; // [tableName: string]
 }
 
+type Ttables = {
+  [tableName: string]: {
+    targetProperty: string;
+    inputSelItemDict: InputSelItemDict;
+  };
+};
+
+// _______________________________________________________________________
 interface TemplateIngredients {
   // [optionsForTemplate: string]: any; // 未來給特定模板的property
   style?: Tstyle;
@@ -54,6 +62,7 @@ interface Locale {
   };
 }
 
+// _______________________________________________________________________
 interface Option {
   value: string;
   label?: string; // 預設值，不給也不要緊，會被locale替換。若沒有預設值也沒有locale，就用value替代
@@ -211,12 +220,7 @@ interface TemplateModelProps {
   inputSelItemDict: InputSelItemDict; // 欄位資料
 
   // tableValueKeys?: string[]; // table的keyArr // 後端要告訴前端哪些資料要用table處理
-  tables?: {
-    [tableName: string]: {
-      targetProperty: string;
-      inputSelItemDict: InputSelItemDict;
-    };
-  };
+  tables?: Ttables;
 
   locale: Locale | undefined; // 語系物件
   // 根據template決定用哪一個模板
@@ -230,7 +234,10 @@ export type {
   TemplateModelProps,
   InputSelItemDict,
   InputSelItem,
+  Ttables,
+  //
   TemplateIngredients,
+  //
   Option,
   Locale,
 };

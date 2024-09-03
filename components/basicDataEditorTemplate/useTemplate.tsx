@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import _ from 'lodash';
 
-import { useInputSel } from './useTemplateProps_primitive';
+import { useTemplateProps_primitive } from './useTemplateProps_primitive';
+import { useTemplateProps_table } from './useTemplateProps_table';
 
 import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
 
@@ -16,7 +17,7 @@ import type {
   Locale,
 } from './modelType';
 
-import type { TrawData, TrawData_primitive, rawDataItem, rawData_table } from './types';
+import type { TrawData, TrawData_primitive, rawDataItem, TrawData_table, TrawData_tableDict } from './types';
 // ==============================================================================
 
 const useTemplate = ({
@@ -38,40 +39,53 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
 
+  // 將原始值資料與table用的陣列資料分離
   const { rowData_primitive, rawData_table } = useMemo(() => {
     const rawData_copy = _.cloneDeep(rawData);
 
-    let rawData_table: rawData_table | null = null;
+    let rawData_tableDict: TrawData_tableDict | null = null;
 
     if (tables) {
-      rawData_table = {};
-      const targetPropertyArr = tables && Object.values(tables).map((item) => item.targetProperty);
+      rawData_tableDict = {};
 
-      targetPropertyArr.forEach((key) => {
-        rawData_table![key] = (rawData_copy?.[key] || []) as rawDataItem[];
-        rawData_copy && delete rawData_copy[key];
+      Object.values(tables).forEach(({ targetProperty, inputSelItemDict }) => {
+        rawData_tableDict![targetProperty] = (rawData_copy?.[targetProperty] || []) as TrawData_table;
+        rawData_copy && delete rawData_copy[targetProperty];
       });
     }
 
     const rowData_primitive = rawData_copy as TrawData_primitive;
 
-    return { rowData_primitive: rowData_primitive, rawData_table };
-  }, [rawData]);
+    return { rowData_primitive: rowData_primitive, rawData_table: rawData_tableDict };
+  }, [rawData, templateModelProps]);
 
   // --------------------------------------------------------------------
 
-  const Template = useMemo(() => {
+  // 取得模板
+  const { Template, templateIngredients } = useMemo(() => {
     const templateName = Object.keys(templateModelProps.template)[0] as keyof typeof templateLookup | undefined;
 
-    const template = (templateName ? templateLookup[templateName] : null) || null;
+    const Template = (templateName ? templateLookup[templateName] : null) || null;
 
-    return template;
+    const templateIngredients = templateModelProps.template[Object.keys(templateModelProps.template)[0]];
+
+    return { Template, templateIngredients };
   }, [templateModelProps.template]);
 
-  const { templateProps, stateList, getBody } = useInputSel({
+  // --------------------------------------------------------------------
+  // 原始值模板參數與狀態
+  const { templateProps, stateList, getBody } = useTemplateProps_primitive({
     rowData_primitive,
-    templateModelProps,
+    templateIngredients,
     inputSelItemDict,
+    locale,
+    disabled,
+  });
+
+  const {} = useTemplateProps_table({
+    rawData_table,
+    templateIngredients,
+    tables,
     locale,
     disabled,
   });
@@ -91,13 +105,10 @@ const useTemplate = ({
   // --------------------------------------------------------------------
 
   return {
-    //
     Template,
     templateProps,
     disabled,
     switchDisabled,
-    stateList,
-    getBody,
   };
 };
 
