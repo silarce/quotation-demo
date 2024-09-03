@@ -838,17 +838,17 @@ const sidePathList: TsidePathList = {
       list: [
         {
           label: '單據管理',
-          erpFeature: devPass,
+          erpFeature: [fac],
           list: [
             {
               label: '審核清單',
               path: path01 + '/reviewList',
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
             {
               label: '自訂審核',
               path: path01 + '/flowList',
-              erpFeature: devPass,
+              erpFeature: [fac],
             },
           ],
         },
@@ -995,7 +995,7 @@ const topPathList: TtopPathListConfig[] = [
         type: 'Review',
       },
     },
-    erpFeature: devPass,
+    erpFeature: [fac],
   },
 ];
 
