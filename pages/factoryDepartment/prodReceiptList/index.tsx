@@ -428,6 +428,7 @@ export default function ProdReceiptList() {
             setEntrystatusin(entrystatus as string);
             setPaystatusin(paystatus as string);
             setNotein(note as string);
+            GetReviewById(prodreceiptuuid);//審核
         }
     }, [prodreceiptuuid]);
 
@@ -1425,10 +1426,10 @@ export default function ProdReceiptList() {
                                     送審
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} style={{ display: `${(completeentry < parseInt(totalentry) || statusin === '審核中') ? '' : 'none'}` }} title="單據抽單" onClick={() => { alert("抽單") }}>
+                                {/* <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
-                                </button>
+                                </button> */}
 
                                 <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
