@@ -26,3 +26,8 @@
     border-left: 1px solid theme("colors.border");
   }
 }
+
+.billSerialNumberWithAccountReceivable {
+  cursor: pointer;
+  color: theme("colors.antdBlue.primary");
+}

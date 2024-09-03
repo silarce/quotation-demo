@@ -18,7 +18,10 @@
     flex: none;
   }
   &:nth-last-of-type(1) {
-    border: none;
+    border-bottom: none;
+  }
+  &:nth-last-of-type(2) {
+    border-bottom: none;
   }
 }
 
@@ -41,6 +44,8 @@
 .tfoot {
   position: sticky;
   bottom: 0;
+  background-color: #fff;
+  border-top: solid 1px theme("colors.border");
 }
 
 .fee {

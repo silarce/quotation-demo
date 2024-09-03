@@ -3741,7 +3741,7 @@ export type TincomeBillSerialDto = {
   note: string | null;
   // '廠商名稱'
   vendorName: string | null;
-  // '廠商名稱'
+  // '扣款明細'
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
   // '手續費'
   fee: number | null;
@@ -4354,6 +4354,9 @@ export type TaccountantDto = {
   // 已分出金額
   splitPayment: number[] | null;
   isAlreadyImportIncomeBill: boolean;
+
+  accountReceivableId: string | null;
+  accountReceivable: TaccountsReceivableDto | null;
 };
 
 export type TcreateAccountantDto = Pick<
