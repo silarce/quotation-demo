@@ -1,3 +1,6 @@
+import { blue } from '@ant-design/colors';
+
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -17,7 +20,21 @@ module.exports = {
         chosenBgc: "#ffeeee",
         danger: "#ea1833",
         success: "#08f366",
-        pass: "#008000"
+        pass: "#008000",
+        antdBlue:{
+          // DEFAULT: blue.primary, // 沒有DEFAULT的效果以後再研究
+          primary: blue.primary,
+          // '1': blue[0],
+          // '2': blue[1],
+          // '3': blue[2],
+          // '4': blue[3],
+          // '5': blue[4],
+          // '6': blue[5],
+          // '7': blue[6],
+          // '8': blue[7],
+          // '9': blue[8],
+          // '10': blue[9],
+        },
       },
       width: {
         table: "1100px"

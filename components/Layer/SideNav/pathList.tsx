@@ -93,7 +93,7 @@ const erpFeaturesLookup = {
   worksDepartment_worksheet: '工務部-工作表編輯',
   worksDepartment_deliveryList: '工務部-出庫單編輯',
   incomeBill: '收入傳票',
-  fac:'廠務部'
+  fac: '廠務部'
 } as const;
 
 // key:value逆轉版本的erpFeaturesLookup
@@ -680,7 +680,6 @@ const sidePathList: TsidePathList = {
               path: path01 + '/purchaseRequisitionList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
-                console.log(router);
 
                 if (pathname === '/factoryDepartment/purchaseRequisitionList') {
                   return true;
@@ -700,7 +699,6 @@ const sidePathList: TsidePathList = {
               path: path01 + '/purchaseOrderList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
-                console.log(router);
 
                 if (pathname === '/factoryDepartment/purchaseOrderList') {
                   return true;
@@ -720,7 +718,6 @@ const sidePathList: TsidePathList = {
               path: path01 + '/prodReceiptList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
-                console.log(router);
 
                 if (pathname === '/factoryDepartment/prodReceiptList') {
                   return true;
@@ -738,7 +735,6 @@ const sidePathList: TsidePathList = {
               path: path01 + '/pickingList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
-                console.log(router);
 
                 if (pathname === '/factoryDepartment/pickingList') {
                   return true;
@@ -786,7 +782,6 @@ const sidePathList: TsidePathList = {
               path: path01 + '/prodEntryList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
-                console.log(router);
 
                 if (pathname === '/factoryDepartment/prodEntryList') {
                   return true;
@@ -835,7 +830,54 @@ const sidePathList: TsidePathList = {
       ],
     };
   })(),
+  '/documentManagement': ((): TsidePathConfig => {
+    const path01 = '/documentManagement';
 
+    return {
+      path01,
+      list: [
+        {
+          label: '單據管理',
+          erpFeature: devPass,
+          list: [
+            {
+              label: '審核清單',
+              path: path01 + '/reviewList',
+              erpFeature: devPass,
+            },
+            {
+              label: '自訂審核',
+              path: path01 + '/flowList',
+              erpFeature: devPass,
+            },
+          ],
+        },
+        // {
+        //   label: '單據審核',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '簽核清單',
+        //       path: path01 + '/reviewList',
+        //       activeChecker: ({ router }) => {
+        //         const { pathname, query } = router;
+
+        //         if (pathname === '/factoryDepartment/reviewList') {
+        //           return true;
+        //         }
+
+        //         return false;
+        //       },
+        //       query: {
+        //         type: 'WareHouse',
+        //       },
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
+      ],
+    };
+  })(),
   // =======================================
 };
 
@@ -943,18 +985,18 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [fac],
   },
-  // {
-  //   icon: icon_shareform,
-  //   label: '單據管理',
-  //   path01: sidePathList['/factoryDepartment'].path01,
-  //   href: {
-  //     pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
-  //     query: {
-  //       type: 'WareHouse',
-  //     },
-  //   },
-  //   erpFeature: devPass,
-  // },
+  {
+    icon: icon_shareform,
+    label: '單據管理',
+    path01: sidePathList['/documentManagement'].path01,
+    href: {
+      pathname: sidePathList['/documentManagement'].path01 + '/reviewList',
+      query: {
+        type: 'Review',
+      },
+    },
+    erpFeature: devPass,
+  },
 ];
 
 export default sidePathList;

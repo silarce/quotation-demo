@@ -40,8 +40,8 @@ type Tstate_deduction = {
 };
 
 type Tprops = {
-  accountantId?: string;
-  incomeBillId?: string;
+  accountantId?: string | null;
+  incomeBillId?: string | null;
   defaultStateArr?: Tstate_deduction[];
 
   // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto

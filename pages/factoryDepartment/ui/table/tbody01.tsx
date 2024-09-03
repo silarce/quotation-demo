@@ -308,7 +308,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         status: item.status,
         need_date: item.need_date,
         note: item.note,
-        firstin: 1
+        firstin: 1,
       }
     })
   }
@@ -636,7 +636,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{index + 1}</span>
                 <span>{_item.purchaseorderid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
+                {/* <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span> */}
+                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "採購中" ? '#28a745' : '#ea1833' }}>
+                {_item.status}
+                </span>
                 <span>{_item.suppliername}</span>
                 {/* <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span> */}
               </div>
