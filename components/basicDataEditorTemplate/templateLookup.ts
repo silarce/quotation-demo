@@ -1,5 +1,6 @@
 import T01 from './t01/t01';
 import T02 from './t02/t02';
+import T03 from './t03/t03';
 
 import { Ttemplate } from 'components/basicDataEditorTemplate/types';
 
@@ -13,6 +14,7 @@ const templateLookup: {
 } = {
   t01: T01,
   t02: T02,
+  t03: T03,
 };
 
 // ===========================================================================

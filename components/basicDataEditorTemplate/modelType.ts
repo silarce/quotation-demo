@@ -15,20 +15,21 @@ interface Titles {
 interface Sections {
   [sectionName: string]: string[]; // keyArr
 }
-interface Table {
-  [tableName: string]: {
+interface Table_template {
+  [tableTemplateName: string]: {
+    targetKey: string;
     columns: {
-      key: string;
-      label: string;
-      width: string | number;
-    }[];
-    // sections?: {
-    //   [sectionName: string]: string[]; // keyArr
-    // };
-  }; // [tableName: string]
+      [key: string]: {
+        label: string;
+        width: string | number; // auto | 100px
+        flex?: string; // "1" | "none" | "auto"
+      };
+    };
+    keyArr: string[];
+  };
 }
 
-type Ttables = {
+type Ttables_inputSelProps = {
   [tableName: string]: {
     targetProperty: string;
     inputSelItemDict: InputSelItemDict;
@@ -42,7 +43,7 @@ interface TemplateIngredients {
   // titleArr?: string[]; // 預設值，會被locale替換
   titles?: Titles; // 預設值，會被locale替換
   sections?: Sections;
-  tables?: Table;
+  tables?: Table_template;
 }
 
 interface Locale {
@@ -146,6 +147,11 @@ interface InputSelItem {
   readonly nullable?: boolean;
   // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
 
+  // 為undefined，視為沒有caption
+  // 為null，取i8n的值，若沒有值就取key
+  // 為string，視為預設值，取i8n的值，若沒有值就取caption的值
+  caption?: string | null;
+
   // wrapperPreStyle?: 'ps01';
   wrapperStyle?: { [property: string]: string }; // React.CSSProperties
 
@@ -218,15 +224,14 @@ interface InputSelItemDict {
 
 interface TemplateModelProps {
   inputSelItemDict: InputSelItemDict; // 欄位資料
-
-  // tableValueKeys?: string[]; // table的keyArr // 後端要告訴前端哪些資料要用table處理
-  tables?: Ttables;
-
-  locale: Locale | undefined; // 語系物件
+  tables?: Ttables_inputSelProps;
+  //
   // 根據template決定用哪一個模板
   template: {
     [templateName: string]: TemplateIngredients;
   };
+  //
+  locale: Locale | undefined; // 語系物件
 }
 
 export type {
@@ -234,7 +239,7 @@ export type {
   TemplateModelProps,
   InputSelItemDict,
   InputSelItem,
-  Ttables,
+  Ttables_inputSelProps as Ttables,
   //
   TemplateIngredients,
   //

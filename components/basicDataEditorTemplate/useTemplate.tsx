@@ -74,7 +74,7 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
   // 原始值模板參數與狀態
-  const { templateProps, stateList, getBody } = useTemplateProps_primitive({
+  const { templateProps_primitive, stateList, getBody } = useTemplateProps_primitive({
     rowData_primitive,
     templateIngredients,
     inputSelItemDict,
@@ -82,13 +82,16 @@ const useTemplate = ({
     disabled,
   });
 
-  const {} = useTemplateProps_table({
+  const { templateProps_tables, state_table } = useTemplateProps_table({
     rawData_table,
     templateIngredients,
-    tables,
+    tables_inputSelProps: tables,
     locale,
     disabled,
   });
+
+  console.log(templateProps_tables);
+  console.log(state_table);
 
   // --------------------------------------------------------------------
 
@@ -103,6 +106,11 @@ const useTemplate = ({
   };
 
   // --------------------------------------------------------------------
+
+  const templateProps = {
+    ...templateProps_primitive,
+    tables: templateProps_tables,
+  };
 
   return {
     Template,

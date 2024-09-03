@@ -142,23 +142,23 @@ const fakeTemplateModelProps: TemplateModelProps = {
       inputSelItemDict: {
         a: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         b: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         c: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         d: {
           valueType: 'dateString',
-          captionStyle: { width: '140px' },
-          input: {},
+          // captionStyle: { width: '140px' },
+          datePicker: {},
         },
       },
     },
@@ -168,30 +168,30 @@ const fakeTemplateModelProps: TemplateModelProps = {
       inputSelItemDict: {
         a: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         b: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         c: {
           valueType: 'string',
-          captionStyle: { width: '140px' },
+          // captionStyle: { width: '140px' },
           input: {},
         },
         d: {
           valueType: 'dateString',
-          captionStyle: { width: '140px' },
-          input: {},
+          // captionStyle: { width: '140px' },
+          datePicker: {},
         },
       },
     },
   },
 
   template: {
-    t02: {
+    t03: {
       titles: {
         title01: '預設值-銀行管理',
       },
@@ -199,6 +199,53 @@ const fakeTemplateModelProps: TemplateModelProps = {
         a: ['accountName', 'account'],
         b: ['bankName', 'bankCode', 'note', 'visiteDate'],
       },
+      tables: {
+        tableA: {
+          targetKey: 'testTable',
+          keyArr: ['a', 'b', 'd', 'c'],
+          columns: {
+            a: {
+              label: 'A',
+              width: '200px',
+            },
+            b: {
+              label: 'B',
+              width: '200px',
+            },
+            c: {
+              label: 'C',
+              width: '200px',
+            },
+            d: {
+              label: 'D',
+              width: '200px',
+            },
+          },
+        },
+        tableB: {
+          targetKey: 'testTable02',
+          columns: {
+            a: {
+              label: 'A',
+              width: '150px',
+            },
+            b: {
+              label: 'B',
+              width: '150px',
+            },
+            c: {
+              label: 'C',
+              width: '150px',
+            },
+            d: {
+              label: 'D',
+              width: '150px',
+            },
+          },
+          keyArr: ['a', 'b', 'c', 'd'],
+        },
+      }, //tables
+      //
     },
   },
 

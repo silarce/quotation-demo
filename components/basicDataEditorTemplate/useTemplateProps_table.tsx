@@ -4,7 +4,14 @@ import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { rawToState } from './library';
+import {
+  createNode,
+  createInput,
+  createSelect,
+  createTextareaProps,
+  createDatePickerProps,
+  rawToState,
+} from 'components/basicDataEditorTemplate/library';
 
 // type
 import type {
@@ -27,15 +34,12 @@ import type {
   TemplateProps,
   TrawData_tableDict,
   TstateList,
+  Ttemplate_table,
+  TcellDict,
+  Tstate_table,
 } from './types';
 
 // ==============================================================================
-
-type Tstate_table = {
-  [key: string]: {
-    [key: string]: Tstate;
-  }[];
-};
 
 // 範例
 // const tableState: Tstate_table = {
@@ -54,13 +58,13 @@ type Tstate_table = {
 const useTemplateProps_table = ({
   rawData_table,
   templateIngredients,
-  tables,
+  tables_inputSelProps,
   locale,
   disabled,
 }: {
   rawData_table: TrawData_tableDict | null;
   templateIngredients: TemplateIngredients;
-  tables: Ttables | undefined | null;
+  tables_inputSelProps: Ttables | undefined | null;
   locale: Locale | undefined;
   disabled?: boolean;
 }) => {
@@ -70,10 +74,111 @@ const useTemplateProps_table = ({
 
   const defaultState_table = useDefaultState({
     rawData_table,
-    tables,
+    tables: tables_inputSelProps,
   });
 
-  console.log(defaultState_table);
+  // --------------------------------------------------------------------
+
+  const templateProps_tables = useMemo(() => {
+    if (!state_table) {
+      return null;
+    }
+
+    const templateProps_tables: Ttemplate_table = {};
+
+    Object.entries(templateIngredients.tables ?? {}).forEach(([templateTableKey, setting]) => {
+      const { targetKey, columns, keyArr } = setting;
+
+      const targetStateTable = state_table[targetKey];
+
+      const targetInputSelProps = tables_inputSelProps?.[targetKey];
+
+      if (!targetStateTable || !targetInputSelProps) {
+        return;
+      }
+
+      const { inputSelItemDict } = targetInputSelProps;
+
+      const rowArr = targetStateTable.map((stateList, rowIndex) => {
+        const cellDict: TcellDict = {};
+
+        Object.entries(inputSelItemDict).forEach(([key, item]) => {
+          const kit = {
+            setState_table,
+            name: targetKey,
+            rowIndex: rowIndex,
+          };
+
+          const value = stateList[key];
+
+          const {
+            valueType,
+            // key,
+            caption,
+            span,
+            input,
+            textarea,
+            select,
+            datePicker,
+            // checkBox,
+            // radio,
+            // InputSelBar
+
+            ...rest
+          } = item;
+
+          // const caption = (locale?.items?.[key]?.caption ?? key) as string;
+          const theCaption = caption === undefined ? undefined : locale?.items?.[key]?.caption ?? caption ?? key;
+
+          const node = span && createNode({ value, span });
+
+          const inputProps =
+            input &&
+            createInput({
+              value,
+              input,
+              key,
+              setStateKit_table: kit,
+            });
+          const selectProps = select && createSelect({ value, select, key, locale, setStateKit_table: kit });
+          const textareaProps = textarea && createTextareaProps({ value, textarea, key, setStateKit_table: kit });
+          const datePickerProps =
+            datePicker && createDatePickerProps({ value, datePicker, key, setStateKit_table: kit });
+
+          const inputSelProps: TinputSelProps_key = {
+            key,
+            showBaseline: 'auto',
+            captionColor: 'main',
+            fontColor: 'text',
+
+            ...rest,
+
+            disabled,
+            caption: theCaption,
+            node,
+            inputProps,
+            selectProps,
+            textareaProps,
+            datePickerProps,
+          };
+
+          cellDict[key] = inputSelProps;
+        });
+
+        return cellDict;
+      });
+
+      templateProps_tables[templateTableKey] = {
+        rowArr,
+        keyArr,
+        columns,
+      };
+      //
+    });
+    //
+
+    return templateProps_tables;
+  }, [disabled, state_table, tables_inputSelProps, templateIngredients.tables]);
 
   // --------------------------------------------------------------------
 
@@ -83,7 +188,10 @@ const useTemplateProps_table = ({
 
   // --------------------------------------------------------------------
 
-  return {};
+  return {
+    templateProps_tables,
+    state_table,
+  };
 };
 // =============================================================================='
 

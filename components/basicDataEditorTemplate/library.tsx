@@ -19,6 +19,7 @@ import type {
   TinputSelProps_key,
   TemplateProps,
   TstateList,
+  Tstate_table,
 } from './types';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
@@ -64,11 +65,17 @@ const createInput = ({
   input,
   key,
   setState,
+  setStateKit_table,
 }: {
   value: Tstate;
   input: NonNullable<InputSelItem['input']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
+  setState?: React.Dispatch<React.SetStateAction<TstateList>>;
+  setStateKit_table?: {
+    setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
+    name: string;
+    rowIndex: number;
+  };
 }): TinputSelProps['inputProps'] => {
   const { props, ...rest } = input;
 
@@ -78,10 +85,23 @@ const createInput = ({
       ...props,
       value: (value ?? '') as string,
       onChange: (e) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: e.target.value,
-        }));
+        setState &&
+          setState((prev) => ({
+            ...prev,
+            [key]: e.target.value,
+          }));
+
+        // _____________________________________________
+        if (setStateKit_table) {
+          const { setState_table: setState, rowIndex, name } = setStateKit_table;
+
+          setState((prev) => {
+            const copy = _.cloneDeep(prev) as Tstate_table;
+            copy[name][rowIndex][key] = e.target.value;
+
+            return copy;
+          });
+        }
       },
     },
   };
@@ -91,14 +111,20 @@ const createSelect = ({
   value,
   select,
   key,
-  setState,
   locale,
+  setState,
+  setStateKit_table: setState_table,
 }: {
   value: Tstate;
   select: NonNullable<InputSelItem['select']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
   locale: TemplateModelProps['locale'];
+  setState?: React.Dispatch<React.SetStateAction<TstateList>>;
+  setStateKit_table?: {
+    setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
+    name: string;
+    rowIndex: number;
+  };
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
 
@@ -136,14 +162,28 @@ const createSelect = ({
 
         const theRest = copy as { [key: string]: Tstate };
 
-        setState((prev) => {
-          return {
-            ...prev,
-            ...theRest,
-            [key]: value || '',
-          };
-        });
+        setState &&
+          setState((prev) => {
+            return {
+              ...prev,
+              ...theRest,
+              [key]: value || '',
+            };
+          });
+
+        // _____________________________________________
+        if (setState_table) {
+          const { setState_table: setState, name, rowIndex } = setState_table;
+
+          setState((prev) => {
+            const copy = _.cloneDeep(prev) as Tstate_table;
+            copy[name][rowIndex][key] = value || '';
+
+            return copy;
+          });
+        }
       },
+      //
     },
   };
 };
@@ -153,11 +193,17 @@ const createTextareaProps = ({
   textarea,
   key,
   setState,
+  setStateKit_table,
 }: {
   value: Tstate;
   textarea: NonNullable<InputSelItem['textarea']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
+  setState?: React.Dispatch<React.SetStateAction<TstateList>>;
+  setStateKit_table?: {
+    setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
+    name: string;
+    rowIndex: number;
+  };
 }): TinputSelProps['textareaProps'] => {
   const { props, ...rest } = textarea;
 
@@ -167,10 +213,23 @@ const createTextareaProps = ({
       ...props,
       value: (value ?? '') as string,
       onChange: (e) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: e.target.value,
-        }));
+        setState &&
+          setState((prev) => ({
+            ...prev,
+            [key]: e.target.value,
+          }));
+
+        // _____________________________________________
+        if (setStateKit_table) {
+          const { setState_table: setState, rowIndex, name } = setStateKit_table;
+
+          setState((prev) => {
+            const copy = _.cloneDeep(prev) as Tstate_table;
+            copy[name][rowIndex][key] = e.target.value;
+
+            return copy;
+          });
+        }
       },
     },
   };
@@ -181,11 +240,17 @@ const createDatePickerProps = ({
   datePicker,
   key,
   setState,
+  setStateKit_table,
 }: {
   value: Tstate;
   datePicker: NonNullable<InputSelItem['datePicker']>;
   key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
+  setState?: React.Dispatch<React.SetStateAction<TstateList>>;
+  setStateKit_table?: {
+    setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
+    name: string;
+    rowIndex: number;
+  };
 }): TinputSelProps['datePickerProps'] => {
   const { props, ...rest } = datePicker;
 
@@ -195,10 +260,23 @@ const createDatePickerProps = ({
       ...props,
       value: value as Moment | null,
       onChange: (date_m) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: date_m,
-        }));
+        setState &&
+          setState((prev) => ({
+            ...prev,
+            [key]: date_m,
+          }));
+
+        // _____________________________________________
+        if (setStateKit_table) {
+          const { setState_table: setState, rowIndex, name } = setStateKit_table;
+
+          setState((prev) => {
+            const copy = _.cloneDeep(prev) as Tstate_table;
+            copy[name][rowIndex][key] = date_m;
+
+            return copy;
+          });
+        }
       },
     },
   };

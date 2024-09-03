@@ -25,14 +25,39 @@ type TrawData_tableDict = {
 // ---------------------------------------------------------------------------
 
 type Tstate = string | boolean | Moment | null | undefined;
+
 type TstateList = {
   [key: string]: Tstate;
+};
+
+type Tstate_table = {
+  [key: string]: {
+    [key: string]: Tstate;
+  }[];
 };
 
 // ===========================================================================
 
 interface TinputSelProps_key extends TinputSelProps {
   key: string;
+}
+
+type TcellDict = {
+  [key: string]: TinputSelProps_key;
+};
+
+interface Ttemplate_table {
+  [tableTemplateName: string]: {
+    keyArr: string[];
+    columns: {
+      [key: string]: {
+        label: string;
+        width: React.CSSProperties['width'];
+        flex?: React.CSSProperties['flex'];
+      };
+    };
+    rowArr: TcellDict[];
+  };
 }
 
 interface TemplateProps {
@@ -45,16 +70,7 @@ interface TemplateProps {
     [sectionName: string]: TinputSelProps_key[]; // keyArr
   };
 
-  tables?: {
-    [tableName: string]: {
-      columns: {
-        key: string;
-        label: string;
-        width: string | number;
-      }[];
-      rows: TinputSelProps_key[];
-    };
-  };
+  tables?: Ttemplate_table | null;
 }
 
 type Ttemplate = React.FC<TemplateProps>;
@@ -67,8 +83,10 @@ export type {
   Tstate,
   TrawData_tableDict,
   TstateList,
-  //
+  Ttemplate_table,
   TinputSelProps_key,
   TemplateProps,
   Ttemplate,
+  TcellDict,
+  Tstate_table,
 };
