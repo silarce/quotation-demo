@@ -25,6 +25,15 @@ import type {
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 
+import {
+  createNode,
+  createInput,
+  createSelect,
+  createTextareaProps,
+  createDatePickerProps,
+  rawToState,
+} from 'components/basicDataEditorTemplate/library';
+
 // ===========================================================================
 
 type TinputSelDict = {
@@ -254,24 +263,14 @@ const useDefaultState = ({
   return useMemo(() => {
     const defaultState: TstateList = {};
 
-    Object.entries(inputSelItemDict).forEach(([key, item]) => {
+    Object.entries(inputSelItemDict).forEach(([key, itemSetting]) => {
       const rawValue = rowData_primitive?.[key] || null;
 
-      let value: Tstate = null;
-
-      const { valueType } = item;
-
-      if (valueType === 'dateString') {
-        value = rawValue ? moment(rawValue as string) : null;
-
-        if (value && !value.isValid()) {
-          myAlert.err({ title: '建立預設狀態錯誤', content: `${key}不是有效的時間字串` });
-        }
-      } else if (valueType === 'boolean') {
-        value = !!rawValue;
-      } else {
-        value = String(rawValue ?? '');
-      }
+      const value = rawToState({
+        rawValue,
+        valueType: itemSetting.valueType,
+        key,
+      });
 
       defaultState[key] = value;
     });
@@ -282,160 +281,160 @@ const useDefaultState = ({
 
 // ===========================================================================
 
-// region CREATE
+// // region CREATE
 
-const createNode = ({ value, span }: { value: Tstate; span: NonNullable<InputSelItem['span']> }) => {
-  const cookedValue = value as string | number | boolean;
+// const createNode = ({ value, span }: { value: Tstate; span: NonNullable<InputSelItem['span']> }) => {
+//   const cookedValue = value as string | number | boolean;
 
-  return <span style={span.style}>{cookedValue}</span>;
-};
+//   return <span style={span.style}>{cookedValue}</span>;
+// };
 
-const createInput = ({
-  value,
-  input,
-  key,
-  setState,
-}: {
-  value: Tstate;
-  input: NonNullable<InputSelItem['input']>;
-  key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
-}): TinputSelProps['inputProps'] => {
-  const { props, ...rest } = input;
+// const createInput = ({
+//   value,
+//   input,
+//   key,
+//   setState,
+// }: {
+//   value: Tstate;
+//   input: NonNullable<InputSelItem['input']>;
+//   key: string;
+//   setState: React.Dispatch<React.SetStateAction<TstateList>>;
+// }): TinputSelProps['inputProps'] => {
+//   const { props, ...rest } = input;
 
-  return {
-    ...rest,
-    props: {
-      ...props,
-      value: (value ?? '') as string,
-      onChange: (e) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: e.target.value,
-        }));
-      },
-    },
-  };
-};
+//   return {
+//     ...rest,
+//     props: {
+//       ...props,
+//       value: (value ?? '') as string,
+//       onChange: (e) => {
+//         setState((prev) => ({
+//           ...prev,
+//           [key]: e.target.value,
+//         }));
+//       },
+//     },
+//   };
+// };
 
-const createSelect = ({
-  value,
-  select,
-  key,
-  setState,
-  locale,
-}: {
-  value: Tstate;
-  select: NonNullable<InputSelItem['select']>;
-  key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
-  locale: TemplateModelProps['locale'];
-}): TinputSelProps['selectProps'] => {
-  const options = (select.props?.options || []) as Toption[];
+// const createSelect = ({
+//   value,
+//   select,
+//   key,
+//   setState,
+//   locale,
+// }: {
+//   value: Tstate;
+//   select: NonNullable<InputSelItem['select']>;
+//   key: string;
+//   setState: React.Dispatch<React.SetStateAction<TstateList>>;
+//   locale: TemplateModelProps['locale'];
+// }): TinputSelProps['selectProps'] => {
+//   const options = (select.props?.options || []) as Toption[];
 
-  const optionDict_locale = locale?.items?.[key].options;
+//   const optionDict_locale = locale?.items?.[key].options;
 
-  options?.forEach((option) => {
-    const localeLabel = optionDict_locale?.[option.value];
-    option.label = localeLabel || option.label || option.value;
-  });
+//   options?.forEach((option) => {
+//     const localeLabel = optionDict_locale?.[option.value];
+//     option.label = localeLabel || option.label || option.value;
+//   });
 
-  const { props, ...rest } = select;
+//   const { props, ...rest } = select;
 
-  const value_option = value
-    ? options.find((option) => option.value === value) || {
-        value: value as string,
-        label: value as string,
-      }
-    : null;
+//   const value_option = value
+//     ? options.find((option) => option.value === value) || {
+//         value: value as string,
+//         label: value as string,
+//       }
+//     : null;
 
-  return {
-    ...rest,
-    props: {
-      ...props,
-      options,
-      value: value_option,
-      onChange: (option) => {
-        const { value, label, ...rest } = option ?? {};
+//   return {
+//     ...rest,
+//     props: {
+//       ...props,
+//       options,
+//       value: value_option,
+//       onChange: (option) => {
+//         const { value, label, ...rest } = option ?? {};
 
-        const copy = _.cloneDeep(rest) as Option;
-        Object.entries(copy).forEach(([key, value]) => {
-          if (typeof value === 'number') {
-            copy[key] = value.toString();
-          }
-        });
+//         const copy = _.cloneDeep(rest) as Option;
+//         Object.entries(copy).forEach(([key, value]) => {
+//           if (typeof value === 'number') {
+//             copy[key] = value.toString();
+//           }
+//         });
 
-        const theRest = copy as { [key: string]: Tstate };
+//         const theRest = copy as { [key: string]: Tstate };
 
-        setState((prev) => {
-          return {
-            ...prev,
-            ...theRest,
-            [key]: value || '',
-          };
-        });
-      },
-    },
-  };
-};
+//         setState((prev) => {
+//           return {
+//             ...prev,
+//             ...theRest,
+//             [key]: value || '',
+//           };
+//         });
+//       },
+//     },
+//   };
+// };
 
-const createTextareaProps = ({
-  value,
-  textarea,
-  key,
-  setState,
-}: {
-  value: Tstate;
-  textarea: NonNullable<InputSelItem['textarea']>;
-  key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
-}): TinputSelProps['textareaProps'] => {
-  const { props, ...rest } = textarea;
+// const createTextareaProps = ({
+//   value,
+//   textarea,
+//   key,
+//   setState,
+// }: {
+//   value: Tstate;
+//   textarea: NonNullable<InputSelItem['textarea']>;
+//   key: string;
+//   setState: React.Dispatch<React.SetStateAction<TstateList>>;
+// }): TinputSelProps['textareaProps'] => {
+//   const { props, ...rest } = textarea;
 
-  return {
-    ...rest,
-    props: {
-      ...props,
-      value: (value ?? '') as string,
-      onChange: (e) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: e.target.value,
-        }));
-      },
-    },
-  };
-};
+//   return {
+//     ...rest,
+//     props: {
+//       ...props,
+//       value: (value ?? '') as string,
+//       onChange: (e) => {
+//         setState((prev) => ({
+//           ...prev,
+//           [key]: e.target.value,
+//         }));
+//       },
+//     },
+//   };
+// };
 
-const createDatePickerProps = ({
-  value,
-  datePicker,
-  key,
-  setState,
-}: {
-  value: Tstate;
-  datePicker: NonNullable<InputSelItem['datePicker']>;
-  key: string;
-  setState: React.Dispatch<React.SetStateAction<TstateList>>;
-}): TinputSelProps['datePickerProps'] => {
-  const { props, ...rest } = datePicker;
+// const createDatePickerProps = ({
+//   value,
+//   datePicker,
+//   key,
+//   setState,
+// }: {
+//   value: Tstate;
+//   datePicker: NonNullable<InputSelItem['datePicker']>;
+//   key: string;
+//   setState: React.Dispatch<React.SetStateAction<TstateList>>;
+// }): TinputSelProps['datePickerProps'] => {
+//   const { props, ...rest } = datePicker;
 
-  return {
-    ...rest,
-    props: {
-      ...props,
-      value: value as Moment | null,
-      onChange: (date_m) => {
-        setState((prev) => ({
-          ...prev,
-          [key]: date_m,
-        }));
-      },
-    },
-  };
-};
+//   return {
+//     ...rest,
+//     props: {
+//       ...props,
+//       value: value as Moment | null,
+//       onChange: (date_m) => {
+//         setState((prev) => ({
+//           ...prev,
+//           [key]: date_m,
+//         }));
+//       },
+//     },
+//   };
+// };
 
-// endregion CREATE
+// // endregion CREATE
 
 // ===========================================================================
 

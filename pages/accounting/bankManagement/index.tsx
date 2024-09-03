@@ -162,6 +162,32 @@ const fakeTemplateModelProps: TemplateModelProps = {
         },
       },
     },
+
+    testTable02: {
+      targetProperty: 'testTable02',
+      inputSelItemDict: {
+        a: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        b: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        c: {
+          valueType: 'string',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+        d: {
+          valueType: 'dateString',
+          captionStyle: { width: '140px' },
+          input: {},
+        },
+      },
+    },
   },
 
   template: {
@@ -207,6 +233,20 @@ const fakeData = {
       b: 'b1',
       c: 'c1',
       d: '2022-11-11',
+    },
+  ],
+  testTable02: [
+    {
+      a: 'a0-2',
+      b: 'b0-2',
+      c: 'c0-2',
+      d: '2022-11-02',
+    },
+    {
+      a: 'a1-2',
+      b: 'b1-2',
+      c: 'c1-2',
+      d: '2022-11-02',
     },
   ],
 };

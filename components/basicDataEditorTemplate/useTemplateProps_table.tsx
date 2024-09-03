@@ -4,7 +4,8 @@ import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-// type
+import { rawToState } from './library';
+
 // type
 import type {
   TemplateModelProps,
@@ -86,6 +87,8 @@ const useTemplateProps_table = ({
 };
 // =============================================================================='
 
+// MARK:useDefaultState
+
 const useDefaultState = ({
   //
   rawData_table,
@@ -105,7 +108,7 @@ const useDefaultState = ({
       const { targetProperty, inputSelItemDict } = tableSetting;
 
       defaultState_table[targetProperty] = [];
-      // const defaultRowArr = defaultState[targetProperty];
+
       const rawRowArr = rawData_table?.[targetProperty] ?? [];
 
       defaultState_table[targetProperty] = rawRowArr.map((raw) => {
@@ -113,21 +116,12 @@ const useDefaultState = ({
 
         Object.entries(inputSelItemDict).forEach(([key, itemSetting]) => {
           const rawValue = raw?.[key] || null;
-          let value: Tstate = null;
 
-          const { valueType } = itemSetting;
-
-          if (valueType === 'dateString') {
-            value = rawValue ? moment(rawValue as string) : null;
-
-            if (value && !value.isValid()) {
-              myAlert.err({ title: '建立預設狀態錯誤', content: `${key}不是有效的時間字串` });
-            }
-          } else if (valueType === 'boolean') {
-            value = !!rawValue;
-          } else {
-            value = String(rawValue ?? '');
-          }
+          const value = rawToState({
+            rawValue,
+            valueType: itemSetting.valueType,
+            key,
+          });
 
           defaultStateList[key] = value;
         });
