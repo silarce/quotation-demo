@@ -46,6 +46,7 @@ import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_add2 from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -469,12 +470,7 @@ export default function PurchaseOrderList() {
             setIsLoading(true);
 
 
-            const conditionModel: {
-                purchaseorderuuid: string | undefined,
-                data: any,
-                username: string | undefined,
-                note: any
-            } = {
+            const conditionModel = {
                 purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
                 data: data2,
                 username: userInfo?.username as string | undefined,
@@ -487,6 +483,10 @@ export default function PurchaseOrderList() {
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
+
+
+
+
 
             const response = await fetch(`${setting.apipath}/WareHouse/TransferPurchaseOrderToProductReceipt`, {
                 method: 'POST',
@@ -979,7 +979,7 @@ export default function PurchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPOToReview?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -1120,11 +1120,11 @@ export default function PurchaseOrderList() {
                 const review_query = {
                     purchaseorderuuid: purchaseorderuuidin,
                     purchaseorderid: purchaseorderidin,
-                    suppliername:suppliernamein,
-                    suppliertaxid:suppliertaxidin,
-                    supplieraddress:supplieraddressin,
-                    supplierphone:supplierphonein,
-                    invoice:invoicein,
+                    suppliername: suppliernamein,
+                    suppliertaxid: suppliertaxidin,
+                    supplieraddress: supplieraddressin,
+                    supplierphone: supplierphonein,
+                    invoice: invoicein,
                     create_at: create_atin,
                     create_by: create_byin,
                     status: '採購中',
@@ -1215,9 +1215,62 @@ export default function PurchaseOrderList() {
         setReviewbar(true);
         setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.username}`)
     }
+
+    const handleGetReviewBack = () => {
+        myAlert.confirm({
+            title: '確定要抽單嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            document_uuid: purchaseorderuuidin,
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                        setReviewflowdata([]);
+                        setStatusin("採購中");
+
+
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
+    }
     //#endregion
 
-
+    const handleGoToAddPO = () => {
+        router.push({
+            pathname: `/factoryDepartment/addPurchaseOrder`,
+            query: {
+                type: 'addPurchaseOrder',
+            },
+        });
+    }
 
 
     return (
@@ -1310,6 +1363,13 @@ export default function PurchaseOrderList() {
                                 </button>
                             </div>
                             <div>
+                                <span>
+                                    <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPO() }} title="新增單據">
+                                        <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                </span>
+                                &nbsp;
                                 <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1393,7 +1453,7 @@ export default function PurchaseOrderList() {
                                 </button>
 
                                 &nbsp;
-                                <button className={scss.squarebtn} style={{ display: `${(completereq < parseInt(totalreq) || statusin === '審核中') ? '' : 'none'}` }} title="單據抽單" onClick={() => { alert("抽單") }}>
+                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
