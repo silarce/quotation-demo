@@ -1,12 +1,16 @@
 import T01 from './t01/t01';
 import T02 from './t02/t02';
 
+import { Ttemplate } from 'components/basicDataEditorTemplate/types';
+
 // ===========================================================================
 
 // type TemplateInstanceProp = Tt01Props | Tt02Props;
 
 // ===========================================================================
-const templateLookup = {
+const templateLookup: {
+  [name: string]: Ttemplate;
+} = {
   t01: T01,
   t02: T02,
 };

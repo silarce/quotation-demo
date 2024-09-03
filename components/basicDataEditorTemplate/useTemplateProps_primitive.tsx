@@ -1,114 +1,48 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import moment, { Moment } from 'moment';
-import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
-
 // type
-import type {
-  //
-  TemplateModelProps,
-  InputSelItemDict,
-  InputSelItem,
-  // TinputSelProps,
-  Option,
-  Locale,
-} from './modelType';
+import type { TemplateModelProps, InputSelItemDict, InputSelItem, Option, Locale } from './modelType';
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
-import type { TinputSelProps_key, TemplateProps } from './templateProp';
+
+import type { TrawData_primitive, rawDataItem, TinputSelProps_key, TemplateProps } from './types';
 
 // ===========================================================================
-
-type Tquery = {
-  id?: string;
-};
-// ______________________________________________________
-// ______________________________________________________
-
-type rawDataItem = string | number | boolean | null;
-
-type TrawData = {
-  [key: string]: rawDataItem | rawDataItem[];
-};
-
-type TrawData_primitive = {
-  [key: string]: rawDataItem;
-};
-
-type rawData_table = {
-  [key: string]: rawDataItem[];
-};
-
-// ______________________________________________________
-// ______________________________________________________
 
 type TinputSelDict = {
   [key: string]: TinputSelProps_key;
 };
 
-// ______________________________________________________
-// ______________________________________________________
-
 type Tstate = string | boolean | Moment | null | undefined;
+
 type TstateList = {
   [key: string]: Tstate;
-};
-
-type TtableStateList = {
-  [key: string]: TstateList;
 };
 
 // ===========================================================================
 
 // MARK:useInputSel
 
-const useInputSel = ({
-  rawData,
+const useTemplateProps_primitive = ({
+  rowData_primitive,
   templateModelProps,
+  inputSelItemDict,
+  locale,
+  disabled,
 }: {
-  rawData: TrawData | undefined;
+  rowData_primitive: TrawData_primitive | undefined | null;
   templateModelProps: TemplateModelProps;
+  inputSelItemDict: InputSelItemDict;
+  locale: Locale | undefined;
+  disabled: boolean;
 }) => {
-  const router = useRouter();
-  const { id } = router.query as Tquery;
-
-  // ----------------------------------------------------------------
-  const { inputSelItemDict, locale, tables } = templateModelProps;
-
-  // ----------------------------------------------------------------
-
-  const { rowData_primitive, rawData_table } = useMemo(() => {
-    const rawData_copy = _.cloneDeep(rawData);
-
-    let rawData_table: rawData_table | null = null;
-
-    if (tables) {
-      rawData_table = {};
-      const targetPropertyArr = tables && Object.values(tables).map((item) => item.targetProperty);
-
-      targetPropertyArr.forEach((key) => {
-        rawData_table![key] = (rawData_copy?.[key] || []) as rawDataItem[];
-        rawData_copy && delete rawData_copy[key];
-      });
-    }
-
-    const rowData_primitive = rawData_copy as TrawData_primitive;
-
-    return { rowData_primitive: rowData_primitive, rawData_table };
-  }, [rawData]);
-
-  // 已將原始值與陣列值分開，接著要對陣列值建立state
-
   // ----------------------------------------------------------------
 
   const defaultState = useDefaultState({ rowData_primitive, inputSelItemDict });
-
-  // ----------------------------------------------------------------
-  const [disabled, setDisabled] = useState(!id);
   const [stateList, setStateList] = useState<TstateList>(defaultState);
 
   // ----------------------------------------------------------------
@@ -174,18 +108,6 @@ const useInputSel = ({
   // ________________________________________________________________
   // ________________________________________________________________
 
-  // MARK:Template
-  const Template = useMemo(() => {
-    const templateName = Object.keys(templateModelProps.template)[0] as keyof typeof templateLookup | undefined;
-
-    const template = (templateName ? templateLookup[templateName] : null) || null;
-
-    return template;
-  }, [templateModelProps.template]);
-
-  // ________________________________________________________________
-  // ________________________________________________________________
-
   // MARK:templateProps
   const templateProps: TemplateProps = useMemo(() => {
     const teamplateProps_pre = Object.values(templateModelProps.template)[0];
@@ -230,29 +152,16 @@ const useInputSel = ({
     // ________________________________________________________________
     // ________________________________________________________________
 
-    // ________________________________________________________________
-    // ________________________________________________________________
-
     const templateProps: TemplateProps = {
       ...rest,
       titles,
       sections: {
         ...sectionDict,
       },
-      // tables: {},
     };
 
     return templateProps;
   }, [templateModelProps.template, locale, inputSelDict]);
-
-  // 這個做法失敗，每一次輸入都會blur
-  // const Template = useCallback(() => {
-  //   if (!Template_ori) {
-  //     return null;
-  //   }
-
-  //   return <Template_ori {...templateProps} />;
-  // }, [Template_ori, templateProps]);
 
   // ----------------------------------------------------------------
 
@@ -262,16 +171,6 @@ const useInputSel = ({
     return stateToBody({
       inputSelItemDict,
       stateList: stateList,
-    });
-  };
-
-  const switchDisabled = (bool?: boolean) => {
-    setDisabled((prev) => {
-      if (bool) {
-        return bool;
-      }
-
-      return !prev;
     });
   };
 
@@ -289,15 +188,9 @@ const useInputSel = ({
 
   // ----------------------------------------------------------------
   return {
-    Template,
     templateProps,
-    disabled,
-    switchDisabled,
-    //
     stateList,
     getBody,
-    //
-    inputSelDict,
   };
 };
 
@@ -538,4 +431,4 @@ const createDatePickerProps = ({
 
 // ===========================================================================
 
-export { useInputSel };
+export { useTemplateProps_primitive as useInputSel };

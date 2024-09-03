@@ -5,27 +5,20 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import type { TbankDto } from 'js/api/dtoTypes';
 
 import { TemplateModelProps, InputSelItemDict } from 'components/basicDataEditorTemplate/modelType';
-import { useInputSel } from 'components/basicDataEditorTemplate/useInputSelProps';
+import { useInputSel } from 'components/basicDataEditorTemplate/useTemplateProps_primitive';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
 import locale_en from 'pages/accounting/bankManagement/locale_en.json';
+
+import { useTemplate } from 'components/basicDataEditorTemplate/useTemplate';
 
 // =================================================================================
 
 // MARK: START
 
 export default function BankManagement(): React.ReactElement {
-  const {
-    Template,
-    templateProps,
-
-    disabled,
-    switchDisabled,
-
-    stateList: state,
-    getBody,
-  } = useInputSel({
+  const { Template, templateProps, disabled, switchDisabled, stateList, getBody } = useTemplate({
     rawData: fakeData,
     templateModelProps: fakeTemplateModelProps,
   });

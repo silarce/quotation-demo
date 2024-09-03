@@ -1,6 +1,6 @@
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
-import { TemplateProps } from 'components/basicDataEditorTemplate/templateProp';
+import { Ttemplate } from 'components/basicDataEditorTemplate/types';
 
 import scss from './t01.module.scss';
 
@@ -15,7 +15,7 @@ import scss from './t01.module.scss';
 // } & TemplateProps;
 // type Tt01Props = TemplateProps;
 
-type Tt01 = React.FC<TemplateProps>;
+type Tt01 = Ttemplate;
 
 export type { Tt01 };
 

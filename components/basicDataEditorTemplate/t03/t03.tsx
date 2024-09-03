@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { Tabs } from 'antd';
 
-import { TemplateProps } from 'components/basicDataEditorTemplate/templateProp';
+import { TemplateProps } from 'components/basicDataEditorTemplate/types';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Row, { Cell } from 'components/global/gear/table/row';
 

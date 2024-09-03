@@ -1,5 +1,21 @@
 import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
+type rawDataItem = string | number | boolean | null;
+
+type TrawData = {
+  [key: string]: rawDataItem | rawDataItem[];
+};
+
+type TrawData_primitive = {
+  [key: string]: rawDataItem;
+};
+
+type rawData_table = {
+  [key: string]: rawDataItem[];
+};
+
+// ===========================================================================
+
 interface TinputSelProps_key extends TinputSelProps {
   key: string;
 }
@@ -26,4 +42,15 @@ interface TemplateProps {
   };
 }
 
-export type { TinputSelProps_key, TemplateProps };
+type Ttemplate = React.FC<TemplateProps>;
+
+export type {
+  rawDataItem,
+  TrawData,
+  TrawData_primitive,
+  rawData_table,
+  //
+  TinputSelProps_key,
+  TemplateProps,
+  Ttemplate,
+};
