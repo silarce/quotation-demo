@@ -520,8 +520,8 @@ export default function FlowList() {
     }
 
     const handleSaveFlow = async () => {
-        if(flowname===""||flowname===undefined){
-            myAlert.warning({title:'流程名稱不可為空'});
+        if (flowname === "" || flowname === undefined) {
+            myAlert.warning({ title: '流程名稱不可為空' });
             return;
         }
 
@@ -558,9 +558,10 @@ export default function FlowList() {
             }
             const data = await response.json();
 
-            setData2([]);
+            setItems([]);
             setFlowname("");
             GetFlow();
+            setStatus("");
 
 
 
@@ -573,7 +574,60 @@ export default function FlowList() {
         }
     }
 
+    const handleRemoveFlow = async (item: any) => {
+        myAlert.confirm({
+            title: '確定刪除這筆流程嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            user_id: userInfo?.employee?.id,
+                            review_id: item.id
+                        };
 
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        console.log(JSON.stringify(conditionModel));
+
+                        const response = await fetch(`${setting.apipath}/Review/RemoveFlowById`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        // const responsedata = await response.json();
+
+                        GetFlow();
+                        // alert("OK");
+
+
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
+
+
+    }
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -672,7 +726,7 @@ export default function FlowList() {
                                             <div
                                                 key={index}
                                                 className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
-                                                onClick={() => { alert("取得流程順序") }}
+                                                onClick={() => { }}
                                             >
                                                 <span>{index + 1}</span>
                                                 <span>{_item.name}</span>
@@ -693,6 +747,11 @@ export default function FlowList() {
                                                             </div>
                                                         ))}
                                                     </div>
+                                                </span>
+                                                <span>
+                                                    <button onClick={() => handleRemoveFlow(_item)}>
+                                                        <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                    </button>
                                                 </span>
                                             </div>
                                         </CellWithBar>
@@ -723,6 +782,7 @@ export default function FlowList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="名稱"
+                                            className="global_tip_must"
                                             disabled={status != "" ? false : true}
                                             inputProps={{
                                                 props: {

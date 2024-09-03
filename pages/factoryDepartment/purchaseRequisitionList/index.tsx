@@ -54,6 +54,8 @@ import icon_flow from 'public/image/icon/fc_flow.svg';
 import icon_review from 'public/image/icon/review.svg';
 import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
 import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
+import icon_add2 from 'public/image/icon/fc_add2.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -224,19 +226,19 @@ export default function PurchaseRequisitionList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        {
-            type: 'addButton',
-            label: '新增請購單',
-            onClick: () => {
-                // setOpen(true);
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseRequisition`,
-                    query: {
-                        type: 'AddPurchaseRequisition',
-                    },
-                });
-            },
-        },
+        // {
+        //     type: 'addButton',
+        //     label: '新增請購單',
+        //     onClick: () => {
+        //         // setOpen(true);
+        //         router.push({
+        //             pathname: `/factoryDepartment/addPurchaseRequisition`,
+        //             query: {
+        //                 type: 'AddPurchaseRequisition',
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -1386,10 +1388,64 @@ export default function PurchaseRequisitionList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【請購單】【${purchaserequisitionid}】_${userInfo?.username}`)
+        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.username}`)
+    }
+
+    const handleGetReviewBack = () => {
+        myAlert.confirm({
+            title: '確定要抽單嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            document_uuid: purchaserequisitionuuidin,
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                        setReviewflowdata([]);
+                        setStatusin("詢價中");
+
+
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
     }
     //#endregion
 
+    const handleGoToAddPR = () => {
+        router.push({
+            pathname: `/factoryDepartment/addPurchaseRequisition`,
+            query: {
+                type: 'AddPurchaseRequisition',
+            },
+        });
+    }
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1490,6 +1546,10 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
                                 </button> */}
+                                <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPR() }} title="新增單據">
+                                    <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
                             </div>
                             <div></div>
                             <div>
@@ -1538,7 +1598,7 @@ export default function PurchaseRequisitionList() {
                                 </button>
 
                                 &nbsp;
-                                <button className={scss.squarebtn} style={{ display: `${(parseInt(quotereqprogress) < parseInt(totalreqprogress) || statusin === '審核中') ? '' : 'none'}` }} title="單據送審">
+                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={()=>{handleGetReviewBack()}}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
@@ -1551,7 +1611,6 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     未結
                                 </button>
-                                &nbsp;
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
                                     <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     已結
