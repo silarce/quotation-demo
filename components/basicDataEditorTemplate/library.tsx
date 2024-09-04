@@ -118,7 +118,7 @@ const createSelect = ({
   value: Tstate;
   select: NonNullable<InputSelItem['select']>;
   key: string;
-  locale: TemplateModelProps['locale'];
+  locale: Locale | undefined;
   setState?: React.Dispatch<React.SetStateAction<TstateList>>;
   setStateKit_table?: {
     setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;

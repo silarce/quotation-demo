@@ -251,7 +251,7 @@ const fakeTemplateModelProps: TemplateModelProps = {
   template: {
     t03: t03,
   },
-
+  localeSrc: 'bankManagement',
   locale: locale_tw,
   // locale: locale_en,
   // locale: undefined,

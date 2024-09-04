@@ -46,7 +46,6 @@ interface TemplateIngredients {
 }
 
 interface Locale {
-  // titles?: string[];
   titles?: {
     [titleName: string]: string;
   };
@@ -60,6 +59,10 @@ interface Locale {
       }; // 考慮到可能會有動態option，改用字典型別。 key為option的value
     };
   };
+}
+
+interface WholeLocale {
+  [key: string]: Locale;
 }
 
 // _______________________________________________________________________
@@ -238,7 +241,8 @@ interface TemplateModelProps {
   };
 
   // 語系物件
-  locale: Locale | undefined;
+  locale: WholeLocale | undefined;
+  localeSrc: string;
 }
 
 export type {

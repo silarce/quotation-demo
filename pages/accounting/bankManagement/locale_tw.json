@@ -1,62 +1,64 @@
 {
-  "titles": {
-    "title01": "銀行管理"
-  },
-  "items": {
-    "accountName": {
-      "caption": "帳戶名稱"
+  "bankManagement": {
+    "titles": {
+      "title01": "銀行管理"
     },
-    "account": {
-      "caption": "帳戶"
-    },
-    "bankName": {
-      "caption": "銀行",
-      "options": {
-        "喵喵銀行": "喵喵銀行",
-        "汪汪銀行": "汪汪銀行",
-        "咩咩銀行": "咩咩銀行"
+    "items": {
+      "accountName": {
+        "caption": "帳戶名稱"
+      },
+      "account": {
+        "caption": "帳戶"
+      },
+      "bankName": {
+        "caption": "銀行",
+        "options": {
+          "喵喵銀行": "喵喵銀行",
+          "汪汪銀行": "汪汪銀行",
+          "咩咩銀行": "咩咩銀行"
+        }
+      },
+      "bankCode": {
+        "caption": "銀行代碼"
+      },
+      "note": {
+        "caption": "備註"
+      },
+      "visiteDate": {
+        "caption": "拜訪日期"
+      },
+      "agentName": {
+        "caption": "代理人"
       }
     },
-    "bankCode": {
-      "caption": "銀行代碼"
-    },
-    "note": {
-      "caption": "備註"
-    },
-    "visiteDate": {
-      "caption": "拜訪日期"
-    },
-    "agentName": {
-      "caption": "代理人"
-    }
-  },
-  "tables": {
-    "abcd": {
-      "a": {
-        "columnLabel": "ㄟ"
+    "tables": {
+      "abcd": {
+        "a": {
+          "columnLabel": "ㄟ"
+        },
+        "b": {
+          "columnLabel": "逼"
+        },
+        "c": {
+          "columnLabel": "西"
+        },
+        "d": {
+          "columnLabel": "豬"
+        }
       },
-      "b": {
-        "columnLabel": "逼"
-      },
-      "c": {
-        "columnLabel": "西"
-      },
-      "d": {
-        "columnLabel": "豬"
-      }
-    },
-    "efgh": {
-      "e": {
-        "columnLabel": "伊"
-      },
-      "f": {
-        "columnLabel": "ㄟ夫"
-      },
-      "g": {
-        "columnLabel": "基"
-      },
-      "h": {
-        "columnLabel": "ㄟ取"
+      "efgh": {
+        "e": {
+          "columnLabel": "伊"
+        },
+        "f": {
+          "columnLabel": "ㄟ夫"
+        },
+        "g": {
+          "columnLabel": "基"
+        },
+        "h": {
+          "columnLabel": "ㄟ取"
+        }
       }
     }
   }

@@ -101,12 +101,10 @@ const useTemplateProps_table = ({
         return;
       }
 
-      const { inputSelItemDict, columns } = tableProps;
-
       const rowArr = target_state_table.map((stateList, rowIndex) => {
         const cellDict: TcellDict = {};
 
-        Object.entries(inputSelItemDict).forEach(([key, item]) => {
+        Object.entries(tableProps.inputSelItemDict).forEach(([key, item]) => {
           const kit = {
             setState_table,
             name: targetTableKey,
@@ -172,24 +170,12 @@ const useTemplateProps_table = ({
         return cellDict;
       });
 
-      const columns_locale = _.cloneDeep(columns);
-
+      const columns_locale = _.cloneDeep(tableProps.columns);
       Object.entries(columns_locale).forEach(([key, colSetting]) => {
         const path = `tables.${targetTableKey}.${key}.columnLabel`;
         const label = _.get(locale, path) ?? key;
         colSetting.label = label;
       });
-
-      // const columns: Ttables_inputSelProps[string]['columns'][string][] = Object.entries(tableProps.columns).map(
-      //   ([key, colSetting]) => {
-      //     const path = `tables.${targetTableKey}.${key}.columnLabel`;
-      //     // const label = locale?.items?.[path]?.caption ?? key;
-      //     const label = _.get(locale, path) ?? key;
-      //     colSetting.label = label;
-
-      //     return colSetting;
-      //   }
-      // );
 
       templateProps_tables[templateTableKey] = {
         rowArr,
@@ -201,7 +187,7 @@ const useTemplateProps_table = ({
     //
 
     return templateProps_tables;
-  }, [disabled, state_table, tables_inputSelProps, templateIngredients.tables]);
+  }, [disabled, locale, state_table, tables_inputSelProps, templateIngredients.tables]);
 
   // --------------------------------------------------------------------
 

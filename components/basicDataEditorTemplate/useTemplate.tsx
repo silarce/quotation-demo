@@ -39,9 +39,22 @@ const useTemplate = ({
 
   const {
     inputSelItemDict,
-    locale,
+    locale: locale_ori,
+    localeSrc,
     //  tables
   } = templateModelProps;
+
+  // --------------------------------------------------------------------
+
+  const locale = useMemo(() => {
+    if (!locale_ori || !localeSrc) {
+      return undefined;
+    }
+
+    const locale = _.get(locale_ori, localeSrc);
+
+    return locale;
+  }, [locale_ori, localeSrc]);
 
   // --------------------------------------------------------------------
 
@@ -53,11 +66,6 @@ const useTemplate = ({
 
     if (templateModelProps.tables) {
       rawData_tableDict = {};
-
-      // Object.values(tables).forEach(({ targetProperty, inputSelItemDict }) => {
-      //   rawData_tableDict![targetProperty] = (rawData_copy?.[targetProperty] || []) as TrawData_table;
-      //   rawData_copy && delete rawData_copy[targetProperty];
-      // });
 
       // 依據templateModelProps.tables將要作為陣列的值抽出
       Object.entries(templateModelProps.tables).forEach(([key, { inputSelItemDict }]) => {
