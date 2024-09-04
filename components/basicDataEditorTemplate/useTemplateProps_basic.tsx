@@ -3,7 +3,7 @@ import moment, { Moment } from 'moment';
 
 // type
 import type { TemplateIngredients, InputSelItemDict, Locale } from './modelType';
-import type { TrawData_primitive, rawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
+import type { TrawData_primitive, TrawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
   createNode,

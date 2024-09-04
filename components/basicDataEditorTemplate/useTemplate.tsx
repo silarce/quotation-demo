@@ -9,8 +9,18 @@ import { templateLookup } from 'components/basicDataEditorTemplate/templateLooku
 // type
 import type { TemplateModelProps } from './modelType';
 
-import type { TrawData, TrawData_primitive, rawDataItem, TrawData_table, TrawData_tableDict } from './types';
+import type { TrawData, TrawData_primitive, TrawDataItem, TrawData_table, TrawData_tableDict } from './types';
 // ==============================================================================
+
+// w =========================================================================
+// w =========================================================================
+// w =========================================================================
+// 如果後端給了欄位之外的值，包括重要的id或其他不相關的任何東西(型別any)
+// 目前的方案是
+// 通通送進state裡，但是當作沒有這些值，最後再原封不動的輸出回來
+// w =========================================================================
+// w =========================================================================
+// w =========================================================================
 
 const useTemplate = ({
   rawData,
@@ -101,6 +111,9 @@ const useTemplate = ({
     locale,
     disabled,
   });
+
+  console.log('state_table', state_table);
+  console.log('getBody_table', getBody_table());
 
   // --------------------------------------------------------------------
 

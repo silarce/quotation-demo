@@ -243,7 +243,10 @@ const useDefaultState = ({
       const rawRowArr = rawData_table?.[key] ?? [];
 
       defaultState_table[key] = rawRowArr.map((raw) => {
-        const defaultStateList: TstateList = {};
+        // 要注意
+        // 無法保證後端會給什麼東西，現在預期是TrawData_primitive
+        // 實際上可能會再放物件、陣列之類的東西
+        const defaultStateList: TstateList = raw as TstateList;
 
         Object.entries(inputSelItemDict).forEach(([key, itemSetting]) => {
           const rawValue = raw?.[key] || null;

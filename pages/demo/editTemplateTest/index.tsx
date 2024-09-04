@@ -4,7 +4,6 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 import type { TbankDto } from 'js/api/dtoTypes';
 
-import { TemplateModelProps, InputSelItemDict, WholeLocale } from 'components/basicDataEditorTemplate/modelType';
 import { useTemplateProps_primitive } from 'components/basicDataEditorTemplate/useTemplateProps_basic';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -12,6 +11,10 @@ import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
 import locale_en from 'pages/accounting/bankManagement/locale_en.json';
 
 import { useTemplate } from 'components/basicDataEditorTemplate/useTemplate';
+
+// type
+import { TemplateModelProps, InputSelItemDict, WholeLocale } from 'components/basicDataEditorTemplate/modelType';
+import { TrawData } from 'components/basicDataEditorTemplate/types';
 
 // =================================================================================
 
@@ -242,7 +245,7 @@ const t03: TemplateModelProps['template'][string] = {
       targetTableKey: 'efgh',
       keyArr: ['e', 'f', 'g', 'h'],
     },
-  }, //tables
+  },
   tabs_table: {
     a: ['tableB', 'tableA'],
   },
@@ -262,7 +265,7 @@ const fakeTemplateModelProps: TemplateModelProps = {
   // locale: undefined,
 };
 
-const fakeData = {
+const fakeData: TrawData = {
   id: '1',
   createAt: '',
   updateAt: '',
@@ -278,10 +281,17 @@ const fakeData = {
 
   abcd: [
     {
+      id: 'fooooo',
       a: 'a0',
       b: 'b0',
       c: 'c0',
       d: '2022-11-11',
+
+      nouse01: 'nouse',
+      // meow: {
+      //   foo: 'ff',
+      //   bar: 'bbbb',
+      // },
     },
     {
       a: 'a1',
@@ -302,6 +312,8 @@ const fakeData = {
       f: 'b1-2',
       g: 'c1-2',
       h: '2022-11-02',
+      //
+      nouse02: 'nouse',
     },
   ],
 };

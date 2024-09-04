@@ -7,7 +7,7 @@ import type { InputSelItemDict, InputSelItem, Option, Locale } from './modelType
 import type {
   //
   Tstate,
-  rawDataItem,
+  TrawDataItem,
   TstateList,
   Tstate_table,
   TrawData_primitive,
@@ -23,7 +23,7 @@ const rawToState = ({
   valueType,
   key,
 }: {
-  rawValue: rawDataItem | null;
+  rawValue: TrawDataItem | null;
   valueType: InputSelItem['valueType'];
   key: string;
 }) => {
@@ -53,7 +53,9 @@ const stateToBody = ({
   inputSelItemDict: InputSelItemDict;
   stateList: TstateList;
 }) => {
-  const body = Object.entries(inputSelItemDict).reduce((body, [key, item]) => {
+  const body: TrawData_primitive = _.cloneDeep(stateList) as TrawData_primitive;
+
+  Object.entries(inputSelItemDict).forEach(([key, item]) => {
     const stateValue = stateList[key];
     const { valueType, nullable } = item;
 
@@ -63,7 +65,7 @@ const stateToBody = ({
       return body;
     }
 
-    let value: rawDataItem = null;
+    let value: TrawDataItem = null;
 
     valueType === 'string' && (value = String(stateValue ?? ''));
     valueType === 'number' && (value = Number(stateValue || 0));
@@ -73,7 +75,7 @@ const stateToBody = ({
     body[key] = value;
 
     return body;
-  }, {} as TrawData_primitive);
+  });
 
   return body;
 };

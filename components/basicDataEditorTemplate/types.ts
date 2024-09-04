@@ -5,16 +5,16 @@ import { Moment } from 'moment';
 
 // 這裡是預期會得到的資料型別
 
-type rawDataItem = string | number | boolean | null;
+type TrawDataItem = string | number | boolean | null;
 
 type TrawData_primitive = {
-  [key: string]: rawDataItem;
+  [key: string]: TrawDataItem;
 };
 
 type TrawData_table = TrawData_primitive[];
 
 type TrawData = {
-  [key: string]: rawDataItem | TrawData_table;
+  [key: string]: TrawDataItem | TrawData_table;
 };
 // ---------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@ interface TemplateProps {
 type Ttemplate = React.FC<TemplateProps>;
 
 export type {
-  rawDataItem,
+  TrawDataItem,
   TrawData,
   TrawData_primitive,
   TrawData_table,
