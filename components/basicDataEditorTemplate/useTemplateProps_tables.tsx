@@ -143,6 +143,7 @@ const useTemplateProps_tables = ({
           cellDict,
           getData: () => ({
             propertyName: targetTableKey,
+            index: rowIndex,
             state: stateList,
             body: stateToBody({ stateList, inputSelItemDict: tableProps.inputSelItemDict }),
           }),
