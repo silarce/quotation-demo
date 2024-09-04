@@ -102,7 +102,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch(`${setting.apipath}SetTray`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -147,7 +147,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch(`${setting.apipath}SetTray`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -194,7 +194,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch(`${setting.apipath}SetTray`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -247,7 +247,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch(`${setting.apipath}AddTray`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/AddTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

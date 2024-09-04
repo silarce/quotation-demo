@@ -1202,8 +1202,8 @@ export const useGetAccountReceivable = createUseInfinite<TgetAccountReceivableDt
   errTitle: '取得應收帳款明細列表失敗',
 });
 
-/**取得應收帳款明細 by id */
-const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
+// 取得應收帳款明細 by id
+export const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi

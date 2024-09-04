@@ -11,7 +11,7 @@
 
 .grid {
     display: grid;
-    grid-template-columns: 500px;
+    grid-template-columns: 1000px 1fr;
     justify-content: space-between;
     gap: 35px;
 }
@@ -23,7 +23,7 @@
 }
 
 .left {
-    width: 500px;
+    width: 1000px;
     display: grid;
     grid-template-columns: 1fr;
     justify-content: space-between;
@@ -34,41 +34,6 @@
     // margin-right: 15px;
 }
 
-.searchbar {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
-    width: auto;
-    margin: 5px 20px;
-    height: 41px;
-
-    div {
-        border-bottom: 1px solid gray;
-        text-align: right;
-        display: flex;
-        align-items: center;
-
-        input {
-            height: 32px;
-            font-size: 16px;
-        }
-
-        button {
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-
-        img {
-            width: 30px;
-            height: 20px;
-        }
-    }
-}
 
 .right {
     flex: 1;
@@ -100,8 +65,8 @@
     // gap: 15px;
     width: auto;
     margin-top: 5px;
-    //   margin-left: 20px;
-    //   margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     padding-bottom: 5px;
     border-bottom: 1px solid rgb(214, 214, 214);
 
@@ -113,24 +78,18 @@
 }
 
 .head_content1 {
-    // display: grid;
-    // grid-template-columns: 1fr 1fr 1fr 1fr;
-    // width: auto;
-    // margin-top: 5px;
-    // margin-left: 20px;
-    // margin-right: 20px;
-
-    // div {
-    //     margin-right: 20px;
-    // }
 
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
 
     width: auto;
-    // margin-left: 20px;
+    margin-left: 20px;
     margin-right: 20px;
     padding-right: 20px;
+
+    div {
+        margin-right: 2px;
+    }
 }
 
 
@@ -192,11 +151,11 @@
 
 .body_content1 {
     display: grid;
-    grid-template-columns: 830px;
+    grid-template-columns: 1fr;
     gap: 0px;
     width: auto;
-    // margin-left: 20px;
-    // margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     overflow-x: hidden;
     max-height: 350px; // 最大高度設定為300px
 }
@@ -221,29 +180,45 @@
 
 .body_foot1 {
     display: grid;
-    grid-template-columns: 300px 300px 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 300px 300px 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 10px;
+    // margin-left: 20px;
+    // margin-right: 20px;
+    // padding-right: 20px;
+    // padding-bottom: 10px;
+    // border-bottom: 1px solid #ccc;
+    // background-color: gray;
+    // margin-bottom: 10px;
+
+}
+
+.body_foot2 {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     // margin-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding-right: 20px;
+    // margin-left: 20px;
+    // margin-right: 20px;
+    // padding-right: 20px;
     // background-color: gray;
-    
+
 }
 
 // tabbody
 .tabbody {
     display: grid;
-    grid-template-columns: 830px 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 650px 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     // margin-top: 10px;
     // margin-left: 20px;
-    margin-right: 20px;
-    padding-right: 20px;
+    // margin-right: 20px;
+    // padding-right: 20px;
     // background-color: gray;
-    
+
 }
 
 
@@ -275,7 +250,22 @@
 
 .foot_head1 {
     display: grid;
-    grid-template-columns: 390px 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-right: 20px;
+    
+
+    div {
+        margin-right: 2px;
+    }
+}
+
+.foot_head2 {
+    display: grid;
+    grid-template-columns: 500px 1fr 1fr;
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -284,21 +274,6 @@
 
     // margin-bottom: 5px;
     // border-top:1px solid #c1c1c1;
-    div {
-        margin-right: 20px;
-    }
-}
-
-.foot_head2 {
-    display: grid;
-    grid-template-columns: 700px 1fr 1fr 1fr;
-    // gap: 15px;
-    width: auto;
-    // margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 5px;
-
     div {
         margin-right: 20px;
     }
@@ -476,7 +451,7 @@ div.panelHeader13 {
         color: #14256a;
         background-color: #c1c1c17c
     }
-    
+
 
     // &:focus {
     //     color: #14256a;
@@ -823,7 +798,7 @@ div.panelHeader14 {
     }
 }
 
-//#region 物料維護
+//#region 審核
 div.panelHeader21 {
     border-bottom: solid 1px $colorBorder01;
 
@@ -831,9 +806,10 @@ div.panelHeader21 {
     .row02 {
         padding-left: 20px;
 
+        // padding-top:10px;
         span {
             font-weight: 400;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .clientName,
@@ -844,7 +820,7 @@ div.panelHeader21 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 30px 150px 320px ;
+        grid-template-columns: 30px 150px 500px 30px;
         gap: 15px;
         // border-bottom: 1px solid #ddd;
         cursor: pointer;
@@ -871,19 +847,19 @@ div.panelHeader21 {
     font-size: 1rem;
     color: #14256a;
     transform: translateY(2px);
-  
+
     &:hover {
-      border: solid 1px #c1c1c1;
-      background-color: #c1c1c17c
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c
     }
-  
+
     &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1;
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
     }
-  }
-  
-  .redsquarebtn {
+}
+
+.redsquarebtn {
     height: 50px;
     width: 50px;
     // padding: 0px 40px;
@@ -896,19 +872,19 @@ div.panelHeader21 {
     font-size: 1rem;
     color: #14256a;
     transform: translateY(2px);
-  
+
     &:hover {
-      border: solid 1px #c1c1c1;
-      background-color: #c1c1c17c
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c
     }
-  
+
     &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1;
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
     }
-  }
-  
-  .disablesquarebtn {
+}
+
+.disablesquarebtn {
     height: 50px;
     width: 50px;
     // padding: 0px 40px;
@@ -921,23 +897,23 @@ div.panelHeader21 {
     font-size: 1rem;
     color: #5b5a5ad6;
     transform: translateY(2px);
-  
+
     &:hover {
-      background-repeat: no-repeat;
-      background-position: center right 10px;
-      /* 調整圖標位置 */
-      cursor: not-allowed;
-      /* 添加這行使滑鼠顯示禁止符號 */
+        background-repeat: no-repeat;
+        background-position: center right 10px;
+        /* 調整圖標位置 */
+        cursor: not-allowed;
+        /* 添加這行使滑鼠顯示禁止符號 */
     }
-  
+
     &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1;
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
     }
-  }
+}
 
 
-  .longsquarebtn {
+.longsquarebtn {
     height: 39px;
     width: 139px;
     // padding: 0px 40px;
@@ -962,3 +938,68 @@ div.panelHeader21 {
         border: solid 1px #c1c1c1;
     }
 }
+
+div.panelHeader22 {
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        padding-left: 20px;
+
+        span {
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns: 60px 100px 140px 140px 30px;
+        gap: 15px;
+        // border-bottom: 1px solid #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .selectedRow {
+        background-color: #ecf1ff;
+        /* 當前選擇項目的背景顏色 */
+    }
+}
+
+
+.head_body {
+    display: grid;
+    grid-template-columns: 75% 1fr;
+    // gap: 15px;
+    // width: auto;
+    // margin-top: 5px;
+    // margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    padding-top:20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.draggable {
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    cursor: move;
+}
+  

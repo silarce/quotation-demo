@@ -445,9 +445,55 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead29}>
         <span>序</span>
+        <span>送審日期</span>
         <span>類別</span>
-        <span>單號</span>
+        <span>主旨</span>
+        {/* <span>單號</span>
+        <span>人員</span> */}
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 審核明細
+  else if (type === "ReviewStatusList") {
+    return (
+      <div className={style.thead30}>
+        <span>流程</span>
         <span>人員</span>
+        <span>狀態</span>
+        <span>接收時間</span>
+        <span>完成時間</span>
+        <span>意見</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 審核明細
+  else if (type === "FlowList") {
+    return (
+      <div className={style.thead31}>
+        <span>序</span>
+        <span>名稱</span>
+        <span>審核流程</span>
+        {/* <span>單號</span>
+        <span>人員</span> */}
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 審核明細
+  else if (type === "FlowDetailList") {
+    return (
+      <div className={style.thead32}>
+        <span>關卡</span>
+        <span>流程</span>
+        <span>職稱</span>
+        <span>姓名</span>
+        {/* <span>單號</span>
+          <span>人員</span> */}
         <span></span>
       </div>
     )
