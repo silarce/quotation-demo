@@ -59,6 +59,13 @@ interface Locale {
       }; // 考慮到可能會有動態option，改用字典型別。 key為option的value
     };
   };
+  tables?: {
+    [tableName: string]: {
+      [key: string]: {
+        columnLable?: string;
+      };
+    };
+  };
 }
 
 interface WholeLocale {
@@ -230,7 +237,7 @@ interface TemplateModelProps {
   // inputSelItemDict與tables
   // 放的是欄位的設定
   // tables中還有columns的設定
-  inputSelItemDict: InputSelItemDict; // 欄位資料
+  basic: InputSelItemDict; // 欄位資料
   tables?: Ttables_inputSelProps;
 
   //
@@ -256,4 +263,5 @@ export type {
   //
   Option,
   Locale,
+  WholeLocale,
 };

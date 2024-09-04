@@ -1,8 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import moment, { Moment } from 'moment';
 import _ from 'lodash';
-
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
   createNode,
@@ -14,24 +11,10 @@ import {
 } from 'components/basicDataEditorTemplate/library';
 
 // type
-import type {
-  TemplateModelProps,
-  TemplateIngredients,
-  InputSelItemDict,
-  InputSelItem,
-  Ttables_inputSelProps,
-  Option,
-  Locale,
-} from './modelType';
-import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import type { Toption } from 'js/utils/options/options';
+import type { TemplateIngredients, Ttables_inputSelProps, Locale } from './modelType';
 
 import type {
-  Tstate,
-  TrawData_table,
-  rawDataItem,
   TinputSelProps_key,
-  TemplateProps,
   TrawData_tableDict,
   TstateList,
   Ttemplate_table,
@@ -41,21 +24,7 @@ import type {
 
 // ==============================================================================
 
-// 範例
-// const tableState: Tstate_table = {
-//   table1: [
-//     { column1: 'value1', column2: 'value2' },
-//     { column1: 'value3', column2: 'value4' },
-//   ],
-//   table2: [
-//     { columnA: 'valueA', columnB: 'valueB' },
-//     { columnA: 'valueC', columnB: 'valueD' },
-//   ],
-// };
-
-// ==============================================================================
-
-const useTemplateProps_table = ({
+const useTemplateProps_tables = ({
   rawData_table,
   templateIngredients,
   tables_inputSelProps,
@@ -129,7 +98,6 @@ const useTemplateProps_table = ({
             ...rest
           } = item;
 
-          // const caption = (locale?.items?.[key]?.caption ?? key) as string;
           const theCaption = caption === undefined ? undefined : locale?.items?.[key]?.caption ?? caption ?? key;
 
           const node = span && createNode({ value, span });
@@ -255,4 +223,4 @@ const useDefaultState = ({
   }, [rawData_table, tables]);
 };
 
-export { useTemplateProps_table };
+export { useTemplateProps_tables as useTemplateProps_table };

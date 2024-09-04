@@ -1,29 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import moment, { Moment } from 'moment';
-import _ from 'lodash';
-
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type {
-  TemplateModelProps,
-  TemplateIngredients,
-  InputSelItemDict,
-  InputSelItem,
-  Option,
-  Locale,
-} from './modelType';
-import type {
-  //
-  Tstate,
-  TrawData_primitive,
-  rawDataItem,
-  TinputSelProps_key,
-  TemplateProps,
-  TstateList,
-} from './types';
-import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import type { Toption } from 'js/utils/options/options';
+import type { TemplateIngredients, InputSelItemDict, Locale } from './modelType';
+import type { TrawData_primitive, rawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
   createNode,
@@ -44,18 +24,16 @@ type TinputSelDict = {
 
 // MARK:useInputSel
 
-const useTemplateProps_primitive = ({
+const useTemplateProps_basic = ({
   rowData_primitive,
   templateIngredients,
-  // templateModelProps,
-  inputSelItemDict,
+  basic: inputSelItemDict,
   locale,
   disabled,
 }: {
   rowData_primitive: TrawData_primitive | undefined | null;
   templateIngredients: TemplateIngredients;
-  // templateModelProps: TemplateModelProps;
-  inputSelItemDict: InputSelItemDict;
+  basic: InputSelItemDict;
   locale: Locale | undefined;
   disabled: boolean;
 }) => {
@@ -282,4 +260,4 @@ const useDefaultState = ({
 
 // ===========================================================================
 
-export { useTemplateProps_primitive };
+export { useTemplateProps_basic as useTemplateProps_primitive };

@@ -3,21 +3,11 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type {
-  TemplateModelProps,
-  TemplateIngredients,
-  InputSelItemDict,
-  InputSelItem,
-  Option,
-  Locale,
-} from './modelType';
+import type { InputSelItem, Option, Locale } from './modelType';
 import type {
   //
   Tstate,
-  TrawData_primitive,
   rawDataItem,
-  TinputSelProps_key,
-  TemplateProps,
   TstateList,
   Tstate_table,
 } from './types';

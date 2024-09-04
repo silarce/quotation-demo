@@ -1,21 +1,13 @@
 import { useState, useMemo } from 'react';
 import _ from 'lodash';
 
-import { useTemplateProps_primitive } from './useTemplateProps_primitive';
-import { useTemplateProps_table } from './useTemplateProps_table';
+import { useTemplateProps_primitive } from './useTemplateProps_basic';
+import { useTemplateProps_table } from './useTemplateProps_tables';
 
 import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
 
 // type
-import type {
-  //
-  TemplateModelProps,
-  InputSelItemDict,
-  InputSelItem,
-  // TinputSelProps,
-  Option,
-  Locale,
-} from './modelType';
+import type { TemplateModelProps } from './modelType';
 
 import type { TrawData, TrawData_primitive, rawDataItem, TrawData_table, TrawData_tableDict } from './types';
 // ==============================================================================
@@ -38,7 +30,7 @@ const useTemplate = ({
   const templateModelProps = useMemo(() => _.cloneDeep(templateModelProps_ori), [templateModelProps_ori]);
 
   const {
-    inputSelItemDict,
+    basic,
     locale: locale_ori,
     localeSrc,
     //  tables
@@ -97,7 +89,7 @@ const useTemplate = ({
   const { templateProps_primitive, stateList, getBody } = useTemplateProps_primitive({
     rowData_primitive,
     templateIngredients,
-    inputSelItemDict,
+    basic,
     locale,
     disabled,
   });
@@ -113,18 +105,6 @@ const useTemplate = ({
   console.log(templateProps_tables);
   console.log(state_table);
 
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
-  // 接下來處理table的i18n
   // 還有處理body輸出
   // 還有處理body輸出
   // 還有處理body輸出

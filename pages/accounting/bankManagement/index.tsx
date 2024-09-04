@@ -4,8 +4,8 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 import type { TbankDto } from 'js/api/dtoTypes';
 
-import { TemplateModelProps, InputSelItemDict } from 'components/basicDataEditorTemplate/modelType';
-import { useTemplateProps_primitive } from 'components/basicDataEditorTemplate/useTemplateProps_primitive';
+import { TemplateModelProps, InputSelItemDict, WholeLocale } from 'components/basicDataEditorTemplate/modelType';
+import { useTemplateProps_primitive } from 'components/basicDataEditorTemplate/useTemplateProps_basic';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
@@ -78,7 +78,7 @@ export default function BankManagement(): React.ReactElement {
 // =================================================================================
 // =================================================================================
 
-const inputSelItemDict: InputSelItemDict = {
+const basic: TemplateModelProps['basic'] = {
   accountName: {
     valueType: 'string',
     captionStyle: { width: '140px' },
@@ -245,15 +245,15 @@ const t03: TemplateModelProps['template'][string] = {
 };
 
 const fakeTemplateModelProps: TemplateModelProps = {
-  inputSelItemDict,
+  basic: basic,
   tables: tables,
 
   template: {
     t03: t03,
   },
   localeSrc: 'bankManagement',
-  locale: locale_tw,
-  // locale: locale_en,
+  locale: locale_tw as WholeLocale,
+  // locale: locale_en as WholeLocale,
   // locale: undefined,
 };
 
