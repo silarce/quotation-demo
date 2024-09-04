@@ -1424,7 +1424,8 @@ export default function PurchaseRequisitionList() {
 
                         setReviewflowdata([]);
                         setStatusin("詢價中");
-
+                        setReview_flow("");
+                        setValue(null);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1889,16 +1890,6 @@ export default function PurchaseRequisitionList() {
                                 </div>
                             </div>
                         </div>
-
-
-
-
-
-
-
-
-
-
                         <br />
                         <div style={{ display: viewtype === "review" ? 'none' : '' }}>
                             <div className={scss.foot_head1}>

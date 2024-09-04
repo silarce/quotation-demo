@@ -696,3 +696,15 @@ div.panelHeader15 {
 }
 
 //#endregion
+
+
+.head_body {
+  display: grid;
+  grid-template-columns: 75% 1fr;
+  // gap: 15px;
+  // width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+}

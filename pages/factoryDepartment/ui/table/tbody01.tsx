@@ -236,7 +236,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         invoice: item.invoice,
         firstin: 1,
         status: item.status,
-        note: item.note
+        note: item.note,
+        shippingaddress:item.shippingaddress
       }
     })
   }

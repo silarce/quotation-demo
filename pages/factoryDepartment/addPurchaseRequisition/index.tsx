@@ -226,7 +226,7 @@ export default function AddPurchaseRequisition() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "請購中",
+                type: "未送出",
                 username:userInfo?.username
             };
 

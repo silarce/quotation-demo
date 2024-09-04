@@ -71,6 +71,7 @@ export default function PurchaseOrderList() {
         purchaseorderdetailuuid,
         note,
         status,
+        shippingaddress,
         viewtype
     } = router.query;
 
@@ -115,6 +116,7 @@ export default function PurchaseOrderList() {
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
+    const [shippingaddressin, setShippingaddressin] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -143,6 +145,7 @@ export default function PurchaseOrderList() {
     const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
     const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
     const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
+    const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
 
 
     //進貨總數
@@ -250,12 +253,12 @@ export default function PurchaseOrderList() {
         try {
             // console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
+            const conditionModel = {
+                type: '採購中',
+                username: userInfo?.username
                 // keyword: "search" as string | undefined,
             };
-
+            console.log(userInfo?.username);
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -295,6 +298,7 @@ export default function PurchaseOrderList() {
                 setSupplierphonein(data[0].supplierphone);
                 setNotein(data[0].note);
                 setStatusin(data[0].status);
+                setShippingaddressin(data[0].shippingaddress);
                 GetReviewById(data[0].purchaseorderuuid);//審核
             }
         } catch (error: any) {
@@ -407,6 +411,7 @@ export default function PurchaseOrderList() {
             setSupplierphonein(supplierphone as string);
             setNotein(note as string);
             setStatusin(status as string);
+            setShippingaddressin(shippingaddress as string);
             GetReviewById(purchaseorderuuid);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
@@ -678,6 +683,7 @@ export default function PurchaseOrderList() {
         setOriginalSuppliertaxidin(suppliertaxidin);
         setOriginalInvoicein(invoicein);
         setOriginalSupplieraddressin(supplieraddressin);
+        setOriginalShippingaddressin(shippingaddressin);
         setEditmain(true);
     };
 
@@ -695,6 +701,7 @@ export default function PurchaseOrderList() {
                     setSuppliertaxidin(originalSuppliertaxidin);
                     setInvoicein(originalInvoicein);
                     setSupplieraddressin(originalSupplieraddressin);
+                    setShippingaddressin(originalShippingaddressin);
                     setEditmain(false);
                 }
             }
@@ -715,7 +722,8 @@ export default function PurchaseOrderList() {
                             supplieraddress: supplieraddressin,
                             supplierphone: supplierphonein,
                             suppliertaxid: suppliertaxidin,
-                            invoice: invoicein
+                            invoice: invoicein,
+                            shippingaddress: shippingaddressin
                         };
 
                         // 打印數據到控制台以供調試
@@ -1129,6 +1137,7 @@ export default function PurchaseOrderList() {
                     create_by: create_byin,
                     status: '採購中',
                     note: notein,
+                    shippingaddress: shippingaddressin,
                     firstin: 1,
                 };
 
@@ -1249,7 +1258,8 @@ export default function PurchaseOrderList() {
 
                         setReviewflowdata([]);
                         setStatusin("採購中");
-
+                        setReview_flow("");
+                        setValue(null);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1551,6 +1561,17 @@ export default function PurchaseOrderList() {
                                                 props: {
                                                     value: notein ? notein : ' ',
                                                     onChange: (e) => { setNotein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="送貨地址"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: shippingaddressin ? shippingaddressin : ' ',
+                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
                                                 },
                                             }}
                                         />
