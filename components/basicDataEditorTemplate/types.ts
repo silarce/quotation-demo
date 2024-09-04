@@ -57,7 +57,18 @@ interface Ttemplate_table {
         flex?: React.CSSProperties['flex'];
       };
     };
-    rowArr: TcellDict[];
+    // rowArr: TcellDict[];
+    // rowArr: {
+    //   row: TcellDict[];
+    // };
+    rowArr: {
+      cellDict: TcellDict;
+      getData: () => {
+        propertyName: string;
+        state: unknown;
+        body: unknown;
+      };
+    }[];
   };
 }
 

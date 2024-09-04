@@ -82,10 +82,18 @@ const Table = ({ tableProps }: { tableProps: Ttemplate_table[string] | undefined
       </Row>
 
       {rowArr.map((row, index) => {
+        const { cellDict, getData } = row;
+
         return (
-          <Row key={index}>
+          <Row
+            key={index}
+            className={classNames(scss.row)}
+            onClick={() => {
+              console.log(getData());
+            }}
+          >
             {keyArr.map((key) => {
-              const inputSelProps = row[key];
+              const inputSelProps = cellDict[key];
               const { width, flex } = columns[key];
               const style = {
                 width,

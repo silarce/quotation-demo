@@ -74,7 +74,7 @@ const useTemplateProps_tables = ({
         return;
       }
 
-      const rowArr = target_state_table.map((stateList, rowIndex) => {
+      const row = target_state_table.map((stateList, rowIndex) => {
         const cellDict: TcellDict = {};
 
         Object.entries(tableProps.inputSelItemDict).forEach(([key, item]) => {
@@ -139,7 +139,14 @@ const useTemplateProps_tables = ({
           cellDict[key] = inputSelProps;
         });
 
-        return cellDict;
+        return {
+          cellDict,
+          getData: () => ({
+            propertyName: targetTableKey,
+            state: stateList,
+            body: stateToBody({ stateList, inputSelItemDict: tableProps.inputSelItemDict }),
+          }),
+        };
       });
 
       const columns_locale = _.cloneDeep(tableProps.columns);
@@ -166,7 +173,7 @@ const useTemplateProps_tables = ({
 
       templateProps_tables[templateTableKey] = {
         title: tableTitle_locale,
-        rowArr,
+        rowArr: row,
         keyArr,
         columns: columns_locale,
       };

@@ -112,8 +112,8 @@ const useTemplate = ({
     disabled,
   });
 
-  console.log('state_table', state_table);
-  console.log('getBody_table', getBody_table());
+  // console.log('state_table', state_table);
+  // console.log('getBody_table', getBody_table());
 
   // --------------------------------------------------------------------
 
