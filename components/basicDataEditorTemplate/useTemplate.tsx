@@ -86,7 +86,7 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
   // 原始值模板參數與狀態
-  const { templateProps_primitive, stateList, getBody } = useTemplateProps_primitive({
+  const { templateProps_primitive, stateList_basic, getBody_basic } = useTemplateProps_primitive({
     rowData_primitive,
     templateIngredients,
     basic,
@@ -94,25 +94,13 @@ const useTemplate = ({
     disabled,
   });
 
-  const { templateProps_tables, state_table } = useTemplateProps_table({
+  const { templateProps_tables, state_table, getBody_table } = useTemplateProps_table({
     rawData_table,
     templateIngredients,
     tables_inputSelProps: templateModelProps.tables,
     locale,
     disabled,
   });
-
-  console.log(templateProps_tables);
-  console.log(state_table);
-
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
-  // 還有處理body輸出
 
   // --------------------------------------------------------------------
 

@@ -8,12 +8,14 @@ import {
   createTextareaProps,
   createDatePickerProps,
   rawToState,
+  stateToBody,
 } from 'components/basicDataEditorTemplate/library';
 
 // type
 import type { TemplateIngredients, Ttables_inputSelProps, Locale } from './modelType';
 
 import type {
+  TrawData_primitive,
   TinputSelProps_key,
   TrawData_tableDict,
   TstateList,
@@ -37,6 +39,8 @@ const useTemplateProps_tables = ({
   locale: Locale | undefined;
   disabled?: boolean;
 }) => {
+  // 這裡面有多個table，以key:value型式儲存
+  // table就是{[key: string]: Tstate;}[];
   const [state_table, setState_table] = useState<Tstate_table>();
 
   // --------------------------------------------------------------------
@@ -164,6 +168,28 @@ const useTemplateProps_tables = ({
 
   // --------------------------------------------------------------------
 
+  const getBody = () => {
+    if (!state_table || !tables_inputSelProps) {
+      return;
+    }
+
+    const list: {
+      [key: string]: TrawData_primitive[];
+    } = {};
+
+    Object.entries(state_table).forEach(([key, table]) => {
+      const bodyList = table.map((stateList) =>
+        stateToBody({ stateList, inputSelItemDict: tables_inputSelProps[key].inputSelItemDict })
+      );
+
+      list[key] = bodyList;
+    });
+
+    return list;
+  };
+
+  // --------------------------------------------------------------------
+
   useEffect(() => {
     setState_table(defaultState_table);
   }, [disabled]);
@@ -173,6 +199,7 @@ const useTemplateProps_tables = ({
   return {
     templateProps_tables,
     state_table,
+    getBody_table: getBody,
   };
 };
 // =============================================================================='

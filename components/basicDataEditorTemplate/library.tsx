@@ -3,14 +3,16 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type { InputSelItem, Option, Locale } from './modelType';
+import type { InputSelItemDict, InputSelItem, Option, Locale } from './modelType';
 import type {
   //
   Tstate,
   rawDataItem,
   TstateList,
   Tstate_table,
+  TrawData_primitive,
 } from './types';
+
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
 
@@ -40,6 +42,40 @@ const rawToState = ({
   }
 
   return value;
+};
+
+// ==============================================================================
+
+const stateToBody = ({
+  inputSelItemDict,
+  stateList,
+}: {
+  inputSelItemDict: InputSelItemDict;
+  stateList: TstateList;
+}) => {
+  const body = Object.entries(inputSelItemDict).reduce((body, [key, item]) => {
+    const stateValue = stateList[key];
+    const { valueType, nullable } = item;
+
+    if (nullable && (stateValue === null || stateValue === '' || stateValue === undefined)) {
+      body[key] = null;
+
+      return body;
+    }
+
+    let value: rawDataItem = null;
+
+    valueType === 'string' && (value = String(stateValue ?? ''));
+    valueType === 'number' && (value = Number(stateValue || 0));
+    valueType === 'boolean' && (value = !!stateValue);
+    valueType === 'dateString' && stateValue instanceof moment && (value = (stateValue as Moment).toISOString());
+
+    body[key] = value;
+
+    return body;
+  }, {} as TrawData_primitive);
+
+  return body;
 };
 
 // ==============================================================================
@@ -275,11 +311,12 @@ const createDatePickerProps = ({
 // ==============================================================================
 
 export {
+  rawToState,
+  stateToBody,
+  //
   createNode,
   createInput,
   createSelect,
   createTextareaProps,
   createDatePickerProps,
-  //
-  rawToState,
 };

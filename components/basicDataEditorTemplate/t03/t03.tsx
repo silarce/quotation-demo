@@ -19,7 +19,7 @@ const T03: Tt03 = ({ style, titles, sections, tables }) => {
 
   return (
     <div>
-      <p>TITLE</p>
+      {/* <p>TITLE</p>
 
       <div className={scss.a}>
         <InputSel caption="CAPTION" inputProps={{}} />
@@ -31,7 +31,7 @@ const T03: Tt03 = ({ style, titles, sections, tables }) => {
       </div>
 
       <br />
-      <div></div>
+      <div></div> */}
 
       <div>
         <Tabs defaultActiveKey="1">
@@ -79,7 +79,6 @@ const TableA = ({ tableA }: { tableA: Ttemplate_table[string] | undefined }) => 
           <Row key={index}>
             {keyArr.map((key) => {
               const inputSelProps = row[key];
-              console.log(inputSelProps);
               const { width, flex } = columns[key];
               const style = {
                 width,

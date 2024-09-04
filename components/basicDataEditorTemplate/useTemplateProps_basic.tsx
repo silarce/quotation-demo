@@ -12,6 +12,7 @@ import {
   createTextareaProps,
   createDatePickerProps,
   rawToState,
+  stateToBody,
 } from 'components/basicDataEditorTemplate/library';
 
 // ===========================================================================
@@ -185,8 +186,8 @@ const useTemplateProps_basic = ({
   // ----------------------------------------------------------------
   return {
     templateProps_primitive: templateProps,
-    stateList,
-    getBody,
+    stateList_basic: stateList,
+    getBody_basic: getBody,
   };
 };
 
@@ -195,40 +196,6 @@ const useTemplateProps_basic = ({
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
-// ===========================================================================
-
-const stateToBody = ({
-  inputSelItemDict,
-  stateList,
-}: {
-  inputSelItemDict: InputSelItemDict;
-  stateList: TstateList;
-}) => {
-  const body = Object.entries(inputSelItemDict).reduce((body, [key, item]) => {
-    const stateValue = stateList[key];
-    const { valueType, nullable } = item;
-
-    if (nullable && (stateValue === null || stateValue === '' || stateValue === undefined)) {
-      body[key] = null;
-
-      return body;
-    }
-
-    let value: rawDataItem = null;
-
-    valueType === 'string' && (value = String(stateValue ?? ''));
-    valueType === 'number' && (value = Number(stateValue || 0));
-    valueType === 'boolean' && (value = !!stateValue);
-    valueType === 'dateString' && stateValue instanceof moment && (value = (stateValue as Moment).toISOString());
-
-    body[key] = value;
-
-    return body;
-  }, {} as TrawData_primitive);
-
-  return body;
-};
-
 // ===========================================================================
 
 // MARK:useDefaultState
