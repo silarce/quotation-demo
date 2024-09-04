@@ -24,6 +24,7 @@ interface Table_template {
 
 type Ttables_inputSelProps = {
   [propertyName: string]: {
+    title?: string | null;
     inputSelItemDict: InputSelItemDict;
     columns: {
       [key: string]: {
@@ -45,6 +46,7 @@ interface TemplateIngredients {
   titles?: Titles; // 預設值，會被locale替換
   sections?: Sections;
   tables?: Table_template;
+  tabs_table?: string[];
 }
 
 interface Locale {
@@ -63,8 +65,11 @@ interface Locale {
   };
   tables?: {
     [tableName: string]: {
-      [key: string]: {
-        columnLable?: string;
+      title?: string;
+      items?: {
+        [key: string]: {
+          columnLable?: string;
+        };
       };
     };
   };
@@ -251,7 +256,7 @@ interface TemplateModelProps {
 
   // 語系物件
   locale: WholeLocale | undefined;
-  localeSrc: string;
+  localeSrc: string; // 例如 "bankManage" 或 "foo.bar.meow"
 }
 
 export type {

@@ -35,11 +35,11 @@ const T03: Tt03 = ({ style, titles, sections, tables }) => {
 
       <div>
         <Tabs defaultActiveKey="1">
-          <Tabs.TabPane tab="table01" key="1">
-            <TableA tableA={tableA} />
+          <Tabs.TabPane tab={tableA?.title} key="1">
+            <Table tableProps={tableA} />
           </Tabs.TabPane>
-          <Tabs.TabPane tab="table02" key="2">
-            <TableB tableB={tableB} />
+          <Tabs.TabPane tab={tableB?.title} key="2">
+            <Table tableProps={tableB} />
           </Tabs.TabPane>
         </Tabs>
       </div>
@@ -49,12 +49,12 @@ const T03: Tt03 = ({ style, titles, sections, tables }) => {
 
 // ===========================================================================
 
-const TableA = ({ tableA }: { tableA: Ttemplate_table[string] | undefined }) => {
-  if (!tableA) {
+const Table = ({ tableProps }: { tableProps: Ttemplate_table[string] | undefined }) => {
+  if (!tableProps) {
     return null;
   }
 
-  const { columns, keyArr, rowArr } = tableA;
+  const { columns, keyArr, rowArr } = tableProps;
 
   return (
     <div>
@@ -98,110 +98,110 @@ const TableA = ({ tableA }: { tableA: Ttemplate_table[string] | undefined }) => 
   );
 };
 
-const TableB = ({ tableB }: { tableB: Ttemplate_table[string] | undefined }) => {
-  if (!tableB) {
-    return null;
-  }
+// const TableB = ({ tableB }: { tableB: Ttemplate_table[string] | undefined }) => {
+//   if (!tableB) {
+//     return null;
+//   }
 
-  const { columns, keyArr, rowArr } = tableB;
+//   const { columns, keyArr, rowArr } = tableB;
 
-  return (
-    <div>
-      <Row thead={true}>
-        {keyArr.map((key) => {
-          const { label, width, flex } = columns[key];
-          const style = {
-            width,
-            flex,
-          };
+//   return (
+//     <div>
+//       <Row thead={true}>
+//         {keyArr.map((key) => {
+//           const { label, width, flex } = columns[key];
+//           const style = {
+//             width,
+//             flex,
+//           };
 
-          return (
-            <Cell key={key} style={style}>
-              {label}
-            </Cell>
-          );
-        })}
-      </Row>
+//           return (
+//             <Cell key={key} style={style}>
+//               {label}
+//             </Cell>
+//           );
+//         })}
+//       </Row>
 
-      {rowArr.map((row, index) => {
-        return (
-          <Row key={index}>
-            {keyArr.map((key) => {
-              const inputSelProps = row[key];
-              console.log(inputSelProps);
-              const { width, flex } = columns[key];
-              const style = {
-                width,
-                flex,
-              };
+//       {rowArr.map((row, index) => {
+//         return (
+//           <Row key={index}>
+//             {keyArr.map((key) => {
+//               const inputSelProps = row[key];
+//               console.log(inputSelProps);
+//               const { width, flex } = columns[key];
+//               const style = {
+//                 width,
+//                 flex,
+//               };
 
-              return (
-                <Cell key={key} style={style}>
-                  <InputSel {...inputSelProps} />
-                </Cell>
-              );
-            })}
-          </Row>
-        );
-      })}
-    </div>
-  );
-};
+//               return (
+//                 <Cell key={key} style={style}>
+//                   <InputSel {...inputSelProps} />
+//                 </Cell>
+//               );
+//             })}
+//           </Row>
+//         );
+//       })}
+//     </div>
+//   );
+// };
 
-const Table03 = () => {
-  return (
-    <div>
-      <Row thead={true}>
-        <Cell style={{ width: '200px' }}>I</Cell>
-        <Cell style={{ width: '200px' }}>II</Cell>
-        <Cell style={{ width: '200px' }}>III</Cell>
-        <Cell style={{ width: '200px' }}>IV</Cell>
-      </Row>
-      <Row>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-      </Row>
-      <Row>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-      </Row>
-      <Row>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-        <Cell style={{ width: '200px' }}>
-          <InputSel caption="CAPTION" inputProps={{}} />
-        </Cell>
-      </Row>
-    </div>
-  );
-};
+// const Table03 = () => {
+//   return (
+//     <div>
+//       <Row thead={true}>
+//         <Cell style={{ width: '200px' }}>I</Cell>
+//         <Cell style={{ width: '200px' }}>II</Cell>
+//         <Cell style={{ width: '200px' }}>III</Cell>
+//         <Cell style={{ width: '200px' }}>IV</Cell>
+//       </Row>
+//       <Row>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//       </Row>
+//       <Row>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//       </Row>
+//       <Row>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//         <Cell style={{ width: '200px' }}>
+//           <InputSel caption="CAPTION" inputProps={{}} />
+//         </Cell>
+//       </Row>
+//     </div>
+//   );
+// };
 
 // ===========================================================================
 

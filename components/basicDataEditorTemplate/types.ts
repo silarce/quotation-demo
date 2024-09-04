@@ -48,6 +48,7 @@ type TcellDict = {
 
 interface Ttemplate_table {
   [tableTemplateName: string]: {
+    title?: string | undefined | null;
     keyArr: string[];
     columns: {
       [key: string]: {

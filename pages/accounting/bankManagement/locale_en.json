@@ -33,31 +33,37 @@
     },
     "tables": {
       "abcd": {
-        "a": {
-          "columnLabel": "A"
-        },
-        "b": {
-          "columnLabel": "B"
-        },
-        "c": {
-          "columnLabel": "C"
-        },
-        "d": {
-          "columnLabel": "D"
+        "title": "ABCD",
+        "items": {
+          "a": {
+            "columnLabel": "A"
+          },
+          "b": {
+            "columnLabel": "B"
+          },
+          "c": {
+            "columnLabel": "C"
+          },
+          "d": {
+            "columnLabel": "D"
+          }
         }
       },
       "efgh": {
-        "e": {
-          "columnLabel": "E"
-        },
-        "f": {
-          "columnLabel": "F"
-        },
-        "g": {
-          "columnLabel": "G"
-        },
-        "h": {
-          "columnLabel": "H"
+        "title": "EFGH",
+        "items": {
+          "e": {
+            "columnLabel": "E"
+          },
+          "f": {
+            "columnLabel": "F"
+          },
+          "g": {
+            "columnLabel": "G"
+          },
+          "h": {
+            "columnLabel": "H"
+          }
         }
       }
     }

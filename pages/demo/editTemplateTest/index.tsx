@@ -64,7 +64,7 @@ export default function BankManagement(): React.ReactElement {
   // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader02 tag="銀行管理" panelList={panelList} />
+      <PageHeader02 tag="複合資料編輯模板-測試" panelList={panelList} />
 
       <div>{Template && <Template {...templateProps} />}</div>
     </SubLayer>
@@ -136,6 +136,7 @@ const basic: TemplateModelProps['basic'] = {
 const tables: TemplateModelProps['tables'] = {
   abcd: {
     // targetProperty: 'abcd',
+    title: 'ABCD',
     inputSelItemDict: {
       a: {
         valueType: 'string',
@@ -180,6 +181,7 @@ const tables: TemplateModelProps['tables'] = {
 
   efgh: {
     // targetProperty: 'efgh',
+    // title: null,
     inputSelItemDict: {
       e: {
         valueType: 'string',
@@ -241,6 +243,7 @@ const t03: TemplateModelProps['template'][string] = {
       keyArr: ['e', 'f', 'g', 'h'],
     },
   }, //tables
+  tabs_table: ['tableA', 'tableB'],
   //
 };
 

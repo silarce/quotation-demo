@@ -147,14 +147,25 @@ const useTemplateProps_tables = ({
         let label = colSetting.label;
 
         if (label !== null) {
-          const path = `tables.${targetTableKey}.${key}.columnLabel`;
+          const path = `tables.${targetTableKey}.items.${key}.columnLabel`;
           label = _.get(locale, path) ?? label ?? key;
         }
 
         colSetting.label = label;
       });
 
+      const tableTitle_locale = (() => {
+        let title = tableProps.title;
+
+        if (title !== null) {
+          title = _.get(locale, `tables.${targetTableKey}.title`) ?? tableProps.title;
+        }
+
+        return title;
+      })();
+
       templateProps_tables[templateTableKey] = {
+        title: tableTitle_locale,
         rowArr,
         keyArr,
         columns: columns_locale,
