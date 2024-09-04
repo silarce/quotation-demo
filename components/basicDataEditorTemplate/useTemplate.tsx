@@ -22,7 +22,7 @@ import type { TrawData, TrawData_primitive, rawDataItem, TrawData_table, TrawDat
 
 const useTemplate = ({
   rawData,
-  templateModelProps,
+  templateModelProps: templateModelProps_ori,
   isNew,
 }: {
   rawData: TrawData | undefined;
@@ -34,6 +34,8 @@ const useTemplate = ({
   const [disabled, setDisabled] = useState(!isNew);
 
   // --------------------------------------------------------------------
+
+  const templateModelProps = useMemo(() => _.cloneDeep(templateModelProps_ori), [templateModelProps_ori]);
 
   const {
     inputSelItemDict,

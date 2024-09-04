@@ -29,5 +29,35 @@
     "agentName": {
       "caption": "Agent"
     }
+  },
+  "tables": {
+    "abcd": {
+      "a": {
+        "columnLabel": "A"
+      },
+      "b": {
+        "columnLabel": "B"
+      },
+      "c": {
+        "columnLabel": "C"
+      },
+      "d": {
+        "columnLabel": "D"
+      }
+    },
+    "efgh": {
+      "e": {
+        "columnLabel": "E"
+      },
+      "f": {
+        "columnLabel": "F"
+      },
+      "g": {
+        "columnLabel": "G"
+      },
+      "h": {
+        "columnLabel": "H"
+      }
+    }
   }
 }

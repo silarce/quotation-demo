@@ -17,7 +17,7 @@ interface Sections {
 }
 interface Table_template {
   [tableTemplateName: string]: {
-    targetTable: string; // 指定要置入的Ttables_inputSelProps[string]
+    targetTableKey: string; // 指定要置入的Ttables_inputSelProps[string]
     keyArr: string[];
   };
 }
@@ -246,7 +246,7 @@ export type {
   TemplateModelProps,
   InputSelItemDict,
   InputSelItem,
-  Ttables_inputSelProps as Ttables,
+  Ttables_inputSelProps,
   //
   TemplateIngredients,
   //

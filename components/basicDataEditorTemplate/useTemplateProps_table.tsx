@@ -19,7 +19,7 @@ import type {
   TemplateIngredients,
   InputSelItemDict,
   InputSelItem,
-  Ttables,
+  Ttables_inputSelProps,
   Option,
   Locale,
 } from './modelType';
@@ -64,7 +64,7 @@ const useTemplateProps_table = ({
 }: {
   rawData_table: TrawData_tableDict | null;
   templateIngredients: TemplateIngredients;
-  tables_inputSelProps: Ttables | undefined | null;
+  tables_inputSelProps: Ttables_inputSelProps | undefined | null;
   locale: Locale | undefined;
   disabled?: boolean;
 }) => {
@@ -88,28 +88,28 @@ const useTemplateProps_table = ({
 
     Object.entries(templateIngredients.tables ?? {}).forEach(([templateTableKey, setting]) => {
       const {
-        targetTable: targetKey,
+        targetTableKey,
         // columns,
         keyArr,
       } = setting;
 
-      const targetStateTable = state_table[targetKey];
+      const target_state_table = state_table[targetTableKey];
 
-      const targetInputSelProps = tables_inputSelProps?.[targetKey];
+      const tableProps = tables_inputSelProps?.[targetTableKey];
 
-      if (!targetStateTable || !targetInputSelProps) {
+      if (!target_state_table || !tableProps) {
         return;
       }
 
-      const { inputSelItemDict, columns } = targetInputSelProps;
+      const { inputSelItemDict, columns } = tableProps;
 
-      const rowArr = targetStateTable.map((stateList, rowIndex) => {
+      const rowArr = target_state_table.map((stateList, rowIndex) => {
         const cellDict: TcellDict = {};
 
         Object.entries(inputSelItemDict).forEach(([key, item]) => {
           const kit = {
             setState_table,
-            name: targetKey,
+            name: targetTableKey,
             rowIndex: rowIndex,
           };
 
@@ -172,10 +172,29 @@ const useTemplateProps_table = ({
         return cellDict;
       });
 
+      const columns_locale = _.cloneDeep(columns);
+
+      Object.entries(columns_locale).forEach(([key, colSetting]) => {
+        const path = `tables.${targetTableKey}.${key}.columnLabel`;
+        const label = _.get(locale, path) ?? key;
+        colSetting.label = label;
+      });
+
+      // const columns: Ttables_inputSelProps[string]['columns'][string][] = Object.entries(tableProps.columns).map(
+      //   ([key, colSetting]) => {
+      //     const path = `tables.${targetTableKey}.${key}.columnLabel`;
+      //     // const label = locale?.items?.[path]?.caption ?? key;
+      //     const label = _.get(locale, path) ?? key;
+      //     colSetting.label = label;
+
+      //     return colSetting;
+      //   }
+      // );
+
       templateProps_tables[templateTableKey] = {
         rowArr,
         keyArr,
-        columns,
+        columns: columns_locale,
       };
       //
     });
@@ -207,7 +226,7 @@ const useDefaultState = ({
   tables,
 }: {
   rawData_table: TrawData_tableDict | null;
-  tables: Ttables | undefined | null;
+  tables: Ttables_inputSelProps | undefined | null;
 }) => {
   return useMemo(() => {
     if (!rawData_table || !tables) {

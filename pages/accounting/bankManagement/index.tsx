@@ -233,11 +233,11 @@ const t03: TemplateModelProps['template'][string] = {
   },
   tables: {
     tableA: {
-      targetTable: 'abcd',
+      targetTableKey: 'abcd',
       keyArr: ['a', 'b', 'd', 'c'],
     },
     tableB: {
-      targetTable: 'efgh',
+      targetTableKey: 'efgh',
       keyArr: ['e', 'f', 'g', 'h'],
     },
   }, //tables
