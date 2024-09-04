@@ -140,8 +140,13 @@ const useTemplateProps_tables = ({
 
       const columns_locale = _.cloneDeep(tableProps.columns);
       Object.entries(columns_locale).forEach(([key, colSetting]) => {
-        const path = `tables.${targetTableKey}.${key}.columnLabel`;
-        const label = _.get(locale, path) ?? key;
+        let label = colSetting.label;
+
+        if (label !== null) {
+          const path = `tables.${targetTableKey}.${key}.columnLabel`;
+          label = _.get(locale, path) ?? label ?? key;
+        }
+
         colSetting.label = label;
       });
 

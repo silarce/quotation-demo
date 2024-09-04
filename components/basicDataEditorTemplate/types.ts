@@ -51,7 +51,7 @@ interface Ttemplate_table {
     keyArr: string[];
     columns: {
       [key: string]: {
-        label: string;
+        label?: string | undefined | null;
         width: React.CSSProperties['width'];
         flex?: React.CSSProperties['flex'];
       };

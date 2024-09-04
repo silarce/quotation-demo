@@ -27,7 +27,9 @@ type Ttables_inputSelProps = {
     inputSelItemDict: InputSelItemDict;
     columns: {
       [key: string]: {
-        label: string;
+        // 預設值，若有值，找不到語系資料就會帶入預設值，
+        // 若是null就不顯示
+        label?: string | null;
         width: string | number; // auto | 100px
         flex?: string; // "1" | "none" | "auto"
       };
