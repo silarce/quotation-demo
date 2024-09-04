@@ -133,120 +133,123 @@ const inputSelItemDict: InputSelItemDict = {
   },
 };
 
-const fakeTemplateModelProps: TemplateModelProps = {
-  inputSelItemDict,
-
-  tables: {
-    testTable: {
-      targetProperty: 'testTable',
-      inputSelItemDict: {
-        a: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        b: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        c: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        d: {
-          valueType: 'dateString',
-          // captionStyle: { width: '140px' },
-          datePicker: {},
-        },
+const tables: TemplateModelProps['tables'] = {
+  abcd: {
+    // targetProperty: 'abcd',
+    inputSelItemDict: {
+      a: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
+      },
+      b: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
+      },
+      c: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
+      },
+      d: {
+        valueType: 'dateString',
+        // captionStyle: { width: '140px' },
+        datePicker: {},
       },
     },
-
-    testTable02: {
-      targetProperty: 'testTable02',
-      inputSelItemDict: {
-        a: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        b: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        c: {
-          valueType: 'string',
-          // captionStyle: { width: '140px' },
-          input: {},
-        },
-        d: {
-          valueType: 'dateString',
-          // captionStyle: { width: '140px' },
-          datePicker: {},
-        },
+    columns: {
+      a: {
+        label: 'a',
+        width: '200px',
+      },
+      b: {
+        label: 'b',
+        width: '200px',
+      },
+      c: {
+        label: 'c',
+        width: '200px',
+      },
+      d: {
+        label: 'd',
+        width: '200px',
       },
     },
   },
 
-  template: {
-    t03: {
-      titles: {
-        title01: '預設值-銀行管理',
+  efgh: {
+    // targetProperty: 'efgh',
+    inputSelItemDict: {
+      e: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
       },
-      sections: {
-        a: ['accountName', 'account'],
-        b: ['bankName', 'bankCode', 'note', 'visiteDate'],
+      f: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
       },
-      tables: {
-        tableA: {
-          targetKey: 'testTable',
-          keyArr: ['a', 'b', 'd', 'c'],
-          columns: {
-            a: {
-              label: 'A',
-              width: '200px',
-            },
-            b: {
-              label: 'B',
-              width: '200px',
-            },
-            c: {
-              label: 'C',
-              width: '200px',
-            },
-            d: {
-              label: 'D',
-              width: '200px',
-            },
-          },
-        },
-        tableB: {
-          targetKey: 'testTable02',
-          columns: {
-            a: {
-              label: 'A',
-              width: '150px',
-            },
-            b: {
-              label: 'B',
-              width: '150px',
-            },
-            c: {
-              label: 'C',
-              width: '150px',
-            },
-            d: {
-              label: 'D',
-              width: '150px',
-            },
-          },
-          keyArr: ['a', 'b', 'c', 'd'],
-        },
-      }, //tables
-      //
+      g: {
+        valueType: 'string',
+        // captionStyle: { width: '140px' },
+        input: {},
+      },
+      h: {
+        valueType: 'dateString',
+        // captionStyle: { width: '140px' },
+        datePicker: {},
+      },
     },
+    columns: {
+      e: {
+        label: 'e',
+        width: '150px',
+      },
+      f: {
+        label: 'f',
+        width: '150px',
+      },
+      g: {
+        label: 'g',
+        width: '150px',
+      },
+      h: {
+        label: 'h',
+        width: '150px',
+      },
+    },
+  },
+};
+
+const t03: TemplateModelProps['template'][string] = {
+  titles: {
+    title01: '預設值-銀行管理',
+  },
+  sections: {
+    a: ['accountName', 'account'],
+    b: ['bankName', 'bankCode', 'note', 'visiteDate'],
+  },
+  tables: {
+    tableA: {
+      targetTable: 'abcd',
+      keyArr: ['a', 'b', 'd', 'c'],
+    },
+    tableB: {
+      targetTable: 'efgh',
+      keyArr: ['e', 'f', 'g', 'h'],
+    },
+  }, //tables
+  //
+};
+
+const fakeTemplateModelProps: TemplateModelProps = {
+  inputSelItemDict,
+  tables: tables,
+
+  template: {
+    t03: t03,
   },
 
   locale: locale_tw,
@@ -268,7 +271,7 @@ const fakeData = {
   note: 'NOTE~~~~\nNOTE~~~~\nNOTE~~~~',
   visiteDate: '2022-11-11',
 
-  testTable: [
+  abcd: [
     {
       a: 'a0',
       b: 'b0',
@@ -282,18 +285,18 @@ const fakeData = {
       d: '2022-11-11',
     },
   ],
-  testTable02: [
+  efgh: [
     {
-      a: 'a0-2',
-      b: 'b0-2',
-      c: 'c0-2',
-      d: '2022-11-02',
+      e: 'a0-2',
+      f: 'b0-2',
+      g: 'c0-2',
+      h: '2022-11-02',
     },
     {
-      a: 'a1-2',
-      b: 'b1-2',
-      c: 'c1-2',
-      d: '2022-11-02',
+      e: 'a1-2',
+      f: 'b1-2',
+      g: 'c1-2',
+      h: '2022-11-02',
     },
   ],
 };

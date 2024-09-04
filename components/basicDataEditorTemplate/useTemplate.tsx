@@ -35,7 +35,11 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
 
-  const { inputSelItemDict, locale, tables } = templateModelProps;
+  const {
+    inputSelItemDict,
+    locale,
+    //  tables
+  } = templateModelProps;
 
   // --------------------------------------------------------------------
 
@@ -45,12 +49,18 @@ const useTemplate = ({
 
     let rawData_tableDict: TrawData_tableDict | null = null;
 
-    if (tables) {
+    if (templateModelProps.tables) {
       rawData_tableDict = {};
 
-      Object.values(tables).forEach(({ targetProperty, inputSelItemDict }) => {
-        rawData_tableDict![targetProperty] = (rawData_copy?.[targetProperty] || []) as TrawData_table;
-        rawData_copy && delete rawData_copy[targetProperty];
+      // Object.values(tables).forEach(({ targetProperty, inputSelItemDict }) => {
+      //   rawData_tableDict![targetProperty] = (rawData_copy?.[targetProperty] || []) as TrawData_table;
+      //   rawData_copy && delete rawData_copy[targetProperty];
+      // });
+
+      // 依據templateModelProps.tables將要作為陣列的值抽出
+      Object.entries(templateModelProps.tables).forEach(([key, { inputSelItemDict }]) => {
+        rawData_tableDict![key] = (rawData_copy?.[key] || []) as TrawData_table;
+        rawData_copy && delete rawData_copy[key];
       });
     }
 
@@ -85,13 +95,34 @@ const useTemplate = ({
   const { templateProps_tables, state_table } = useTemplateProps_table({
     rawData_table,
     templateIngredients,
-    tables_inputSelProps: tables,
+    tables_inputSelProps: templateModelProps.tables,
     locale,
     disabled,
   });
 
   console.log(templateProps_tables);
   console.log(state_table);
+
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 接下來處理table的i18n
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
+  // 還有處理body輸出
 
   // --------------------------------------------------------------------
 

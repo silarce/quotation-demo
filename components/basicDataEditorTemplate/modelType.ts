@@ -17,7 +17,14 @@ interface Sections {
 }
 interface Table_template {
   [tableTemplateName: string]: {
-    targetKey: string;
+    targetTable: string; // 指定要置入的Ttables_inputSelProps[string]
+    keyArr: string[];
+  };
+}
+
+type Ttables_inputSelProps = {
+  [propertyName: string]: {
+    inputSelItemDict: InputSelItemDict;
     columns: {
       [key: string]: {
         label: string;
@@ -25,14 +32,6 @@ interface Table_template {
         flex?: string; // "1" | "none" | "auto"
       };
     };
-    keyArr: string[];
-  };
-}
-
-type Ttables_inputSelProps = {
-  [tableName: string]: {
-    targetProperty: string;
-    inputSelItemDict: InputSelItemDict;
   };
 };
 
@@ -218,20 +217,28 @@ interface InputSelItem {
   // }[];
 }
 
+// InputSelItem裝的僅有inputSel的props
 interface InputSelItemDict {
   [key: string]: InputSelItem;
 }
 
 interface TemplateModelProps {
+  //
+  // inputSelItemDict與tables
+  // 放的是欄位的設定
+  // tables中還有columns的設定
   inputSelItemDict: InputSelItemDict; // 欄位資料
   tables?: Ttables_inputSelProps;
+
   //
-  // 根據template決定用哪一個模板
+  // 根據template決定用哪一個板
+  // template只有設定那些欄位要放在哪裡，不管欄位的設定
   template: {
     [templateName: string]: TemplateIngredients;
   };
-  //
-  locale: Locale | undefined; // 語系物件
+
+  // 語系物件
+  locale: Locale | undefined;
 }
 
 export type {

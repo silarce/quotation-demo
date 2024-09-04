@@ -87,7 +87,11 @@ const useTemplateProps_table = ({
     const templateProps_tables: Ttemplate_table = {};
 
     Object.entries(templateIngredients.tables ?? {}).forEach(([templateTableKey, setting]) => {
-      const { targetKey, columns, keyArr } = setting;
+      const {
+        targetTable: targetKey,
+        // columns,
+        keyArr,
+      } = setting;
 
       const targetStateTable = state_table[targetKey];
 
@@ -97,7 +101,7 @@ const useTemplateProps_table = ({
         return;
       }
 
-      const { inputSelItemDict } = targetInputSelProps;
+      const { inputSelItemDict, columns } = targetInputSelProps;
 
       const rowArr = targetStateTable.map((stateList, rowIndex) => {
         const cellDict: TcellDict = {};
@@ -212,14 +216,17 @@ const useDefaultState = ({
 
     const defaultState_table: Tstate_table = {};
 
-    Object.entries(tables).forEach(([tableKey, tableSetting]) => {
-      const { targetProperty, inputSelItemDict } = tableSetting;
+    Object.entries(tables).forEach(([key, tableSetting]) => {
+      const {
+        // targetProperty,
+        inputSelItemDict,
+      } = tableSetting;
 
-      defaultState_table[targetProperty] = [];
+      defaultState_table[key] = [];
 
-      const rawRowArr = rawData_table?.[targetProperty] ?? [];
+      const rawRowArr = rawData_table?.[key] ?? [];
 
-      defaultState_table[targetProperty] = rawRowArr.map((raw) => {
+      defaultState_table[key] = rawRowArr.map((raw) => {
         const defaultStateList: TstateList = {};
 
         Object.entries(inputSelItemDict).forEach(([key, itemSetting]) => {
