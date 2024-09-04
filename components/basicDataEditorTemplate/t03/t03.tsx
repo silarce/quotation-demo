@@ -14,7 +14,7 @@ import scss from './t03.module.scss';
 type Tt03 = React.FC<TemplateProps>;
 
 // ===========================================================================
-const T03: Tt03 = ({ style, titles, sections, tables }) => {
+const T03: Tt03 = ({ style, titles, sections, tables, tabs_table }) => {
   const { tableA, tableB } = tables ?? {};
 
   return (
@@ -35,12 +35,19 @@ const T03: Tt03 = ({ style, titles, sections, tables }) => {
 
       <div>
         <Tabs defaultActiveKey="1">
-          <Tabs.TabPane tab={tableA?.title} key="1">
-            <Table tableProps={tableA} />
-          </Tabs.TabPane>
-          <Tabs.TabPane tab={tableB?.title} key="2">
-            <Table tableProps={tableB} />
-          </Tabs.TabPane>
+          {tabs_table?.a?.map((tableName) => {
+            const tableProps = tables?.[tableName];
+
+            if (!tableProps) {
+              return null;
+            }
+
+            return (
+              <Tabs.TabPane tab={tableProps?.title} key={tableName}>
+                <Table tableProps={tableProps} />
+              </Tabs.TabPane>
+            );
+          })}
         </Tabs>
       </div>
     </div>
@@ -97,111 +104,6 @@ const Table = ({ tableProps }: { tableProps: Ttemplate_table[string] | undefined
     </div>
   );
 };
-
-// const TableB = ({ tableB }: { tableB: Ttemplate_table[string] | undefined }) => {
-//   if (!tableB) {
-//     return null;
-//   }
-
-//   const { columns, keyArr, rowArr } = tableB;
-
-//   return (
-//     <div>
-//       <Row thead={true}>
-//         {keyArr.map((key) => {
-//           const { label, width, flex } = columns[key];
-//           const style = {
-//             width,
-//             flex,
-//           };
-
-//           return (
-//             <Cell key={key} style={style}>
-//               {label}
-//             </Cell>
-//           );
-//         })}
-//       </Row>
-
-//       {rowArr.map((row, index) => {
-//         return (
-//           <Row key={index}>
-//             {keyArr.map((key) => {
-//               const inputSelProps = row[key];
-//               console.log(inputSelProps);
-//               const { width, flex } = columns[key];
-//               const style = {
-//                 width,
-//                 flex,
-//               };
-
-//               return (
-//                 <Cell key={key} style={style}>
-//                   <InputSel {...inputSelProps} />
-//                 </Cell>
-//               );
-//             })}
-//           </Row>
-//         );
-//       })}
-//     </div>
-//   );
-// };
-
-// const Table03 = () => {
-//   return (
-//     <div>
-//       <Row thead={true}>
-//         <Cell style={{ width: '200px' }}>I</Cell>
-//         <Cell style={{ width: '200px' }}>II</Cell>
-//         <Cell style={{ width: '200px' }}>III</Cell>
-//         <Cell style={{ width: '200px' }}>IV</Cell>
-//       </Row>
-//       <Row>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//       </Row>
-//       <Row>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//       </Row>
-//       <Row>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//         <Cell style={{ width: '200px' }}>
-//           <InputSel caption="CAPTION" inputProps={{}} />
-//         </Cell>
-//       </Row>
-//     </div>
-//   );
-// };
 
 // ===========================================================================
 

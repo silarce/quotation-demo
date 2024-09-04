@@ -24,7 +24,7 @@ interface Table_template {
 
 type Ttables_inputSelProps = {
   [propertyName: string]: {
-    title?: string | null;
+    title?: string | null; // 預設值 // 若使用於tab，請確保title在經過i18n後有值，或設好預設值
     inputSelItemDict: InputSelItemDict;
     columns: {
       [key: string]: {
@@ -46,7 +46,10 @@ interface TemplateIngredients {
   titles?: Titles; // 預設值，會被locale替換
   sections?: Sections;
   tables?: Table_template;
-  tabs_table?: string[];
+  // tabs_table裡的string對應指定的Table_template[string]
+  tabs_table?: {
+    [key: string]: string[];
+  };
 }
 
 interface Locale {

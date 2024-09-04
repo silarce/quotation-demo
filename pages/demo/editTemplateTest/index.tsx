@@ -243,7 +243,9 @@ const t03: TemplateModelProps['template'][string] = {
       keyArr: ['e', 'f', 'g', 'h'],
     },
   }, //tables
-  tabs_table: ['tableA', 'tableB'],
+  tabs_table: {
+    a: ['tableB', 'tableA'],
+  },
   //
 };
 

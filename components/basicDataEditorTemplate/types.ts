@@ -72,6 +72,9 @@ interface TemplateProps {
   };
 
   tables?: Ttemplate_table | null;
+  tabs_table?: {
+    [key: string]: string[];
+  };
 }
 
 type Ttemplate = React.FC<TemplateProps>;
