@@ -12,7 +12,7 @@ import {
 } from 'components/basicDataEditorTemplate/library';
 
 // type
-import type { TemplateIngredients, Ttables_inputSelProps, Locale } from './modelType';
+import type { TemplateIngredients, Ttables_inputSelProps, Locale_tamplateDoc } from './modelType';
 
 import type {
   TrawData_primitive,
@@ -36,7 +36,7 @@ const useTemplateProps_tables = ({
   rawData_table: TrawData_tableDict | null;
   templateIngredients: TemplateIngredients;
   tables_inputSelProps: Ttables_inputSelProps | undefined | null;
-  locale: Locale | undefined;
+  locale: Locale_tamplateDoc | undefined;
   disabled?: boolean;
 }) => {
   // 這裡面有多個table，以key:value型式儲存
@@ -114,7 +114,8 @@ const useTemplateProps_tables = ({
               key,
               setStateKit_table: kit,
             });
-          const selectProps = select && createSelect({ value, select, key, locale, setStateKit_table: kit });
+          const selectProps =
+            select && createSelect({ value, select, key, locale_tamplateDoc: locale, setStateKit_table: kit });
           const textareaProps = textarea && createTextareaProps({ value, textarea, key, setStateKit_table: kit });
           const datePickerProps =
             datePicker && createDatePickerProps({ value, datePicker, key, setStateKit_table: kit });

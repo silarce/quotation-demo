@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import moment, { Moment } from 'moment';
 
 // type
-import type { TemplateIngredients, InputSelItemDict, Locale } from './modelType';
+import type { TemplateIngredients, InputSelItemDict, Locale_tamplateDoc } from './modelType';
 import type { TrawData_primitive, TrawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
@@ -35,7 +35,7 @@ const useTemplateProps_basic = ({
   rowData_primitive: TrawData_primitive | undefined | null;
   templateIngredients: TemplateIngredients;
   basic: InputSelItemDict;
-  locale: Locale | undefined;
+  locale: Locale_tamplateDoc | undefined;
   disabled: boolean;
 }) => {
   // ----------------------------------------------------------------
@@ -77,7 +77,8 @@ const useTemplateProps_basic = ({
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState: setStateList });
-      const selectProps = select && createSelect({ value, select, key, setState: setStateList, locale });
+      const selectProps =
+        select && createSelect({ value, select, key, setState: setStateList, locale_tamplateDoc: locale });
       const textareaProps = textarea && createTextareaProps({ value, textarea, key, setState: setStateList });
       const datePickerProps = datePicker && createDatePickerProps({ value, datePicker, key, setState: setStateList });
 
@@ -117,7 +118,7 @@ const useTemplateProps_basic = ({
       ...rest
     } = templateIngredients;
 
-    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale['titles']>;
+    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale_tamplateDoc['titles']>;
     Object.entries(titles).forEach(([key, title]) => {
       titles[key] = titleArr_locale[key] || title;
     });

@@ -3,7 +3,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type { InputSelItemDict, InputSelItem, Option, Locale } from './modelType';
+import type { InputSelItemDict, InputSelItem, Option, Locale_tamplateDoc } from './modelType';
 import type {
   //
   Tstate,
@@ -139,14 +139,14 @@ const createSelect = ({
   value,
   select,
   key,
-  locale,
+  locale_tamplateDoc,
   setState,
   setStateKit_table: setState_table,
 }: {
   value: Tstate;
   select: NonNullable<InputSelItem['select']>;
   key: string;
-  locale: Locale | undefined;
+  locale_tamplateDoc: Locale_tamplateDoc | undefined;
   setState?: React.Dispatch<React.SetStateAction<TstateList>>;
   setStateKit_table?: {
     setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
@@ -156,7 +156,7 @@ const createSelect = ({
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
 
-  const optionDict_locale = locale?.basic?.[key]?.options;
+  const optionDict_locale = locale_tamplateDoc?.basic?.[key]?.options;
 
   options?.forEach((option) => {
     const localeLabel = optionDict_locale?.[option.value];

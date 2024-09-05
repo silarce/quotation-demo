@@ -10,6 +10,9 @@ import { templateLookup } from 'components/basicDataEditorTemplate/templateLooku
 import type { TemplateModelProps } from './modelType';
 
 import type { TrawData, TrawData_primitive, TrawDataItem, TrawData_table, TrawData_tableDict } from './types';
+
+// i18n
+import { useI18nEditTemplate } from 'hooks/globalState/useI18n_editTemplate';
 // ==============================================================================
 
 // w =========================================================================
@@ -32,31 +35,13 @@ const useTemplate = ({
   isNew?: boolean;
 }) => {
   // --------------------------------------------------------------------
-
-  const [disabled, setDisabled] = useState(!isNew);
-
-  // --------------------------------------------------------------------
-
   const templateModelProps = useMemo(() => _.cloneDeep(templateModelProps_ori), [templateModelProps_ori]);
 
-  const {
-    basic,
-    locale: locale_ori,
-    localeSrc,
-    //  tables
-  } = templateModelProps;
+  const locale = useI18nEditTemplate((state) => state.getTemplateDoc(templateModelProps.localeDocSrc));
 
   // --------------------------------------------------------------------
 
-  const locale = useMemo(() => {
-    if (!locale_ori || !localeSrc) {
-      return undefined;
-    }
-
-    const locale = _.get(locale_ori, localeSrc);
-
-    return locale;
-  }, [locale_ori, localeSrc]);
+  const [disabled, setDisabled] = useState(!isNew);
 
   // --------------------------------------------------------------------
 
@@ -99,7 +84,7 @@ const useTemplate = ({
   const { templateProps_primitive, stateList_basic, getBody_basic } = useTemplateProps_basic({
     rowData_primitive,
     templateIngredients,
-    basic,
+    basic: templateModelProps.basic,
     locale,
     disabled,
   });

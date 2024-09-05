@@ -22,8 +22,6 @@ type Tt03 = React.FC<TemplateProps>;
 const T03: Tt03 = ({ style, titles, sections, tables, tabs_table }) => {
   const { tableA, tableB } = tables ?? {};
 
-  console.log(titles);
-
   return (
     <div className={scss.t03}>
       <div>

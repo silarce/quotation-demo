@@ -7,6 +7,9 @@
 // 這幾個型別皆是基於inputSel_v2的零組件
 // Option則是基於Toption
 
+// i18n
+import type { Locale_tamplateDoc, Locale } from 'hooks/globalState/useI18n_editTemplate';
+
 // ===============================================================================
 
 interface Titles {
@@ -50,36 +53,6 @@ interface TemplateIngredients {
   tabs_table?: {
     [key: string]: string[];
   };
-}
-
-interface Locale {
-  titles?: {
-    [titleName: string]: string;
-  };
-  basic?: {
-    [key: string]: {
-      caption?: string; // 如果在locale沒有取到值，用key替代
-      // suffix?: string; // 有需要時再做吧
-      // placeholder?: string; // 有需要時再做吧
-      options?: {
-        [value: string]: string;
-      }; // 考慮到可能會有動態option，改用字典型別。 key為option的value
-    };
-  };
-  tables?: {
-    [tableName: string]: {
-      title?: string;
-      items?: {
-        [key: string]: {
-          columnLable?: string;
-        };
-      };
-    };
-  };
-}
-
-interface WholeLocale {
-  [key: string]: Locale;
 }
 
 // _______________________________________________________________________
@@ -257,9 +230,8 @@ interface TemplateModelProps {
     [templateName: string]: TemplateIngredients;
   };
 
-  // 語系物件
-  locale: WholeLocale | undefined;
-  localeSrc: string; // 例如 "bankManage" 或 "foo.bar.meow"
+  // 語系物件路徑
+  localeDocSrc: string; // 例如 "bankManage" 或 "foo.bar.meow"
 }
 
 export type {
@@ -272,6 +244,6 @@ export type {
   TemplateIngredients,
   //
   Option,
+  Locale_tamplateDoc,
   Locale,
-  WholeLocale,
 };
