@@ -6,6 +6,11 @@ const axi = axios.create({
   withCredentials: true,
 });
 
+const axi2 = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_NETCORE_URL,
+  withCredentials: true,
+});
+
 export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 axi.interceptors.request.use(
@@ -83,5 +88,5 @@ axi.interceptors.response.use(
   }
 );
 
-export { axi };
+export { axi, axi2 };
 export type { AxiosError };
