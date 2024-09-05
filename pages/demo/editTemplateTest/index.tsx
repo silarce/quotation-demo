@@ -22,7 +22,7 @@ import { TrawData, TrawData_table } from 'components/basicDataEditorTemplate/typ
 // MARK: START
 
 export default function BankManagement(): React.ReactElement {
-  const { Template, templateProps, disabled, switchDisabled } = useTemplate({
+  const { Template, templateProps, disabled, switchDisabled, data } = useTemplate({
     rawData: fakeData,
     rawData_additionalTable: {
       keeper: fakeAdditionData2,

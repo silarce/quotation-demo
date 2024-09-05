@@ -132,6 +132,12 @@ const useTemplate = ({
     templateProps,
     disabled,
     switchDisabled,
+    data: {
+      stateList_basic,
+      getBody_basic,
+      state_table,
+      getBody_table,
+    },
   };
 };
 
