@@ -3,7 +3,7 @@
     "titles": {
       "title01": "Bank Management"
     },
-    "items": {
+    "basic": {
       "accountName": {
         "caption": "Account Name"
       },
@@ -63,6 +63,104 @@
           },
           "h": {
             "columnLabel": "H"
+          }
+        }
+      }
+    }
+  },
+  "zoo": {
+    "titles": {
+      "title01": "ZOO"
+    },
+    "basic": {
+      "companyName": {
+        "caption": "Company Name"
+      },
+      "taxNumber": {
+        "caption": "Tax Number"
+      },
+      "tel": {
+        "caption": "Tel"
+      },
+      "fax": {
+        "caption": "Fax"
+      },
+      "creationDate": {
+        "caption": "Creation Date"
+      },
+      "openStatus": {
+        "caption": "Open Status",
+        "options": {
+          "opened": "opened",
+          "closed": "closed",
+          "renovation": "renovation"
+        }
+      },
+      "note": {
+        "caption": "Note"
+      }
+    },
+    "tables": {
+      "dogArea": {
+        "title": "DOG",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "personality": {
+            "columnLabel": "Personality"
+          }
+        }
+      },
+      "catArea": {
+        "title": "CAT",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "killingCount": {
+            "columnLabel": "Killing Count"
+          },
+          "lifeCount": {
+            "columnLabel": "Life Count"
+          }
+        }
+      },
+      "birdArea": {
+        "title": "BIRD",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "title": {
+            "columnLabel": "Title"
           }
         }
       }

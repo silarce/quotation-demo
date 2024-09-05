@@ -102,7 +102,7 @@ const useTemplateProps_tables = ({
             ...rest
           } = item;
 
-          const theCaption = caption === undefined ? undefined : locale?.items?.[key]?.caption ?? caption ?? key;
+          const theCaption = caption === undefined ? undefined : locale?.basic?.[key]?.caption ?? caption ?? key;
 
           const node = span && createNode({ value, span });
 

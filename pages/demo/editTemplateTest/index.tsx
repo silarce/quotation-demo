@@ -124,16 +124,30 @@ const basic: TemplateModelProps['basic'] = {
     datePicker: {},
   },
 
-  county: {
+  openStatus: {
     valueType: 'string',
-    caption: '縣市',
+    caption: '開園狀態',
     captionStyle: { width: basicCaptionWidth },
     select: {
       props: {
-        options: optionsCreator_county() as Option[],
+        options: [
+          {
+            value: 'opened',
+            label: '開放',
+          },
+          {
+            value: 'closed',
+            label: '閉園',
+          },
+          {
+            value: 'renovation',
+            label: '整修',
+          },
+        ],
       },
     },
   },
+
   note: {
     valueType: 'string',
     caption: '備註',
@@ -310,7 +324,7 @@ const t03: TemplateModelProps['template'][string] = {
     title01: '預設值-動物園',
   },
   sections: {
-    a: ['companyName', 'taxNumber', 'tel', 'fax', 'creationDate', 'county'],
+    a: ['companyName', 'taxNumber', 'tel', 'fax', 'creationDate', 'openStatus'],
     b: ['note'],
   },
   tables: {
@@ -327,6 +341,7 @@ const t03: TemplateModelProps['template'][string] = {
       keyArr: ['name', 'age', 'color', 'birthday', 'title'],
     },
   },
+
   tabs_table: {
     a: ['tableA', 'tableB', 'tableC'],
   },
@@ -340,6 +355,7 @@ const fakeTemplateModelProps: TemplateModelProps = {
   },
   localeSrc: 'zoo',
   locale: locale_tw as WholeLocale,
+  // locale: locale_en as WholeLocale,
 };
 // ------------------------------------------------------------------------
 
@@ -352,7 +368,7 @@ const fakeData: TrawData = {
   tel: '02-12345678',
   fax: '02-87654321',
   creationDate: '2022-11-11',
-  county: '台北市',
+  openStatus: 'renovation',
   note: '備註~~~~\n備註~~~~\n備註~~~~',
   dogArea: [
     {
@@ -416,6 +432,13 @@ const fakeData: TrawData = {
       color: '黃色',
       birthday: '2016-01-08',
       title: '飛天老鼠',
+    },
+    {
+      name: '小雞',
+      age: 9999,
+      color: '朱色',
+      birthday: null,
+      title: '神鳥鳳凰',
     },
   ],
 };

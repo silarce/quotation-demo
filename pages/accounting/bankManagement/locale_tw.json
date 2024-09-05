@@ -3,7 +3,7 @@
     "titles": {
       "title01": "銀行管理"
     },
-    "items": {
+    "basic": {
       "accountName": {
         "caption": "帳戶名稱"
       },
@@ -63,6 +63,104 @@
           },
           "h": {
             "columnLabel": "ㄟ取"
+          }
+        }
+      }
+    }
+  },
+  "zoo": {
+    "titles": {
+      "title01": "動物園"
+    },
+    "basic": {
+      "companyName": {
+        "caption": "公司名稱"
+      },
+      "taxNumber": {
+        "caption": "統一編號"
+      },
+      "tel": {
+        "caption": "電話"
+      },
+      "fax": {
+        "caption": "傳真"
+      },
+      "creationDate": {
+        "caption": "創建日期"
+      },
+      "openStatus": {
+        "caption": "開園狀態",
+        "options": {
+          "opened": "開放",
+          "closed": "閉園",
+          "renovation": "整修"
+        }
+      },
+      "note": {
+        "caption": "備註"
+      }
+    },
+    "tables": {
+      "dogArea": {
+        "title": "阿狗",
+        "items": {
+          "name": {
+            "columnLabel": "名稱"
+          },
+          "age": {
+            "columnLabel": "年齡"
+          },
+          "color": {
+            "columnLabel": "顏色"
+          },
+          "birthday": {
+            "columnLabel": "生日"
+          },
+          "personality": {
+            "columnLabel": "個性"
+          }
+        }
+      },
+      "catArea": {
+        "title": "阿貓",
+        "items": {
+          "name": {
+            "columnLabel": "名稱"
+          },
+          "age": {
+            "columnLabel": "年齡"
+          },
+          "color": {
+            "columnLabel": "顏色"
+          },
+          "birthday": {
+            "columnLabel": "生日"
+          },
+          "killingCount": {
+            "columnLabel": "擊殺數"
+          },
+          "lifeCount": {
+            "columnLabel": "餘命"
+          }
+        }
+      },
+      "birdArea": {
+        "title": "阿鳥",
+        "items": {
+          "name": {
+            "columnLabel": "名稱"
+          },
+          "age": {
+            "columnLabel": "年齡"
+          },
+          "color": {
+            "columnLabel": "顏色"
+          },
+          "birthday": {
+            "columnLabel": "生日"
+          },
+          "title": {
+            "columnLabel": "頭銜"
           }
         }
       }

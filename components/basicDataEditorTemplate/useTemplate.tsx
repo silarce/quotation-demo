@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import _ from 'lodash';
 
-import { useTemplateProps_primitive } from './useTemplateProps_basic';
+import { useTemplateProps_basic } from './useTemplateProps_basic';
 import { useTemplateProps_table } from './useTemplateProps_tables';
 
 import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
@@ -96,7 +96,7 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
   // 原始值模板參數與狀態
-  const { templateProps_primitive, stateList_basic, getBody_basic } = useTemplateProps_primitive({
+  const { templateProps_primitive, stateList_basic, getBody_basic } = useTemplateProps_basic({
     rowData_primitive,
     templateIngredients,
     basic,

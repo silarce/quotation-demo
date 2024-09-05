@@ -156,7 +156,7 @@ const createSelect = ({
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
 
-  const optionDict_locale = locale?.items?.[key].options;
+  const optionDict_locale = locale?.basic?.[key]?.options;
 
   options?.forEach((option) => {
     const localeLabel = optionDict_locale?.[option.value];

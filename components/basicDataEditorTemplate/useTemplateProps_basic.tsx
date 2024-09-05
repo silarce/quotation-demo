@@ -73,7 +73,7 @@ const useTemplateProps_basic = ({
         ...rest
       } = item;
 
-      const theCaption = caption === undefined ? undefined : locale?.items?.[key]?.caption ?? caption ?? key;
+      const theCaption = caption === undefined ? undefined : locale?.basic?.[key]?.caption ?? caption ?? key;
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState: setStateList });
@@ -227,4 +227,4 @@ const useDefaultState = ({
 
 // ===========================================================================
 
-export { useTemplateProps_basic as useTemplateProps_primitive };
+export { useTemplateProps_basic };

@@ -56,7 +56,7 @@ interface Locale {
   titles?: {
     [titleName: string]: string;
   };
-  items?: {
+  basic?: {
     [key: string]: {
       caption?: string; // 如果在locale沒有取到值，用key替代
       // suffix?: string; // 有需要時再做吧
@@ -167,7 +167,7 @@ interface InputSelItem {
   // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
 
   // 為undefined，視為沒有caption
-  // 為null，取i8n的值，若沒有值就取key
+  // 為null，取i8n的值，若沒有值就取key (這個處理好像是多餘的)
   // 為string，視為預設值，取i8n的值，若沒有值就取caption的值
   caption?: string | null;
 
