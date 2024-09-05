@@ -163,6 +163,20 @@
             "columnLabel": "Title"
           }
         }
+      },
+      "keeper": {
+        "title": "KEEPER",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "gender": {
+            "columnLabel": "Gender"
+          }
+        }
       }
     }
   }

@@ -163,6 +163,20 @@
             "columnLabel": "頭銜"
           }
         }
+      },
+      "keeper": {
+        "title": "保育員",
+        "items": {
+          "name": {
+            "columnLabel": "名稱"
+          },
+          "age": {
+            "columnLabel": "年齡"
+          },
+          "gender": {
+            "columnLabel": "性別"
+          }
+        }
       }
     }
   }

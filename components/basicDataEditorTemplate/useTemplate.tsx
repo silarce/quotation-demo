@@ -27,10 +27,12 @@ import { useI18nEditTemplate } from 'hooks/globalState/useI18n_editTemplate';
 
 const useTemplate = ({
   rawData,
+  rawData_additionalTable,
   templateModelProps: templateModelProps_ori,
   isNew,
 }: {
   rawData: TrawData | undefined;
+  rawData_additionalTable: TrawData_tableDict;
   templateModelProps: TemplateModelProps;
   isNew?: boolean;
 }) => {
@@ -97,8 +99,13 @@ const useTemplate = ({
     disabled,
   });
 
-  // console.log('state_table', state_table);
-  // console.log('getBody_table', getBody_table());
+  const { templateProps_tables: templateProps_additionalTables } = useTemplateProps_table({
+    rawData_table: rawData_additionalTable,
+    templateIngredients,
+    tables_inputSelProps: templateModelProps.additionalTables,
+    locale,
+    disabled,
+  });
 
   // --------------------------------------------------------------------
 
@@ -116,7 +123,8 @@ const useTemplate = ({
 
   const templateProps = {
     ...templateProps_primitive,
-    tables: templateProps_tables,
+    // tables: templateProps_tables,
+    tables: { ...templateProps_tables, ...templateProps_additionalTables },
   };
 
   return {

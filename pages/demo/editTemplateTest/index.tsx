@@ -15,7 +15,7 @@ import {
   Locale_tamplateDoc,
   Option,
 } from 'components/basicDataEditorTemplate/modelType';
-import { TrawData } from 'components/basicDataEditorTemplate/types';
+import { TrawData, TrawData_table } from 'components/basicDataEditorTemplate/types';
 
 // =================================================================================
 
@@ -24,6 +24,9 @@ import { TrawData } from 'components/basicDataEditorTemplate/types';
 export default function BankManagement(): React.ReactElement {
   const { Template, templateProps, disabled, switchDisabled } = useTemplate({
     rawData: fakeData,
+    rawData_additionalTable: {
+      keeper: fakeAdditionData2,
+    },
     templateModelProps: fakeTemplateModelProps,
   });
 
@@ -82,7 +85,7 @@ export default function BankManagement(): React.ReactElement {
 // =================================================================================
 // =================================================================================
 
-// region FAKE
+// region Fake Template
 
 const basicCaptionWidth = '140px';
 
@@ -91,12 +94,14 @@ const basic: TemplateModelProps['basic'] = {
     valueType: 'string',
     caption: '公司名稱',
     captionStyle: { width: basicCaptionWidth },
+    showBaseline: 'invisible',
     span: {},
   },
   taxNumber: {
     valueType: 'string',
     caption: '統一編號',
     captionStyle: { width: basicCaptionWidth },
+    showBaseline: 'invisible',
     span: {},
   },
   tel: {
@@ -310,7 +315,40 @@ const tables: TemplateModelProps['tables'] = {
       },
     },
   },
-  //
+};
+
+const additionalTables: TemplateModelProps['additionalTables'] = {
+  keeper: {
+    title: '保育員',
+    inputSelItemDict: {
+      name: {
+        valueType: 'string',
+        span: {},
+      },
+      gender: {
+        valueType: 'string',
+        span: {},
+      },
+      age: {
+        valueType: 'string',
+        span: {},
+      },
+    },
+    columns: {
+      name: {
+        label: '姓名',
+        width: '100px',
+      },
+      gender: {
+        label: '性別',
+        width: '100px',
+      },
+      age: {
+        label: '年齡',
+        width: '100px',
+      },
+    },
+  },
 };
 
 const t03: TemplateModelProps['template'][string] = {
@@ -334,6 +372,10 @@ const t03: TemplateModelProps['template'][string] = {
       targetTableKey: 'birdArea',
       keyArr: ['name', 'age', 'color', 'birthday', 'title'],
     },
+    searchA: {
+      targetTableKey: 'keeper',
+      keyArr: ['name', 'gender', 'age'],
+    },
   },
 
   tabs_table: {
@@ -344,14 +386,15 @@ const t03: TemplateModelProps['template'][string] = {
 const fakeTemplateModelProps: TemplateModelProps = {
   basic: basic,
   tables: tables,
+  additionalTables,
   template: {
     t03: t03,
   },
   localeDocSrc: 'zoo',
-  // locale: locale_tw as Locale_tamplateDoc,
-  // locale: locale_en as WholeLocale,
 };
 // ------------------------------------------------------------------------
+
+// MARK: fakeData
 
 const fakeData: TrawData = {
   id: 'uu-dfdas-f11212-ss12w1',
@@ -436,6 +479,27 @@ const fakeData: TrawData = {
     },
   ],
 };
+
+const fakeAdditionData2: TrawData_table = [
+  {
+    id: '001',
+    name: '阿呆',
+    gender: '男',
+    age: 87,
+  },
+  {
+    id: '002',
+    name: '阿瓜',
+    gender: '男',
+    age: 87,
+  },
+  {
+    id: '003',
+    name: '阿花',
+    gender: '女',
+    age: 66,
+  },
+];
 
 // =================================================================================
 // =================================================================================

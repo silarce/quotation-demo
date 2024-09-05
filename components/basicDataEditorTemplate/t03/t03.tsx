@@ -8,24 +8,40 @@ import { Tabs } from 'antd';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Row, { Cell } from 'components/global/gear/table/row';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 // scss
 import scss from './t03.module.scss';
 
 // type
-import { TemplateProps, Ttemplate_table } from 'components/basicDataEditorTemplate/types';
+import { TemplateProps, Ttemplate_table, TgetData } from 'components/basicDataEditorTemplate/types';
 // ===========================================================================
 
 type Tt03 = React.FC<TemplateProps>;
 
 // ===========================================================================
 const T03: Tt03 = ({ style, titles, sections, tables, tabs_table }) => {
-  const { tableA, tableB } = tables ?? {};
+  // ----------------------------------------------------------------------------
 
+  const onSearch = () => {
+    DragableModal.create({
+      handleText: tables?.searchA.title,
+      children: (
+        <Table
+          tableProps={tables?.searchA}
+          onClick={(data) => {
+            console.log(data);
+          }}
+        />
+      ),
+    });
+  };
+
+  // ----------------------------------------------------------------------------
   return (
     <div className={scss.t03}>
       <div>
-        <MyButton_v2 px="px22" py="py4">
+        <MyButton_v2 onClick={onSearch} px="px22" py="py4">
           搜尋
         </MyButton_v2>
       </div>
@@ -49,6 +65,7 @@ const T03: Tt03 = ({ style, titles, sections, tables, tabs_table }) => {
 
       {/*  */}
       <div></div>
+
       {/*  */}
       <div>
         <Tabs defaultActiveKey="1">
@@ -73,7 +90,14 @@ const T03: Tt03 = ({ style, titles, sections, tables, tabs_table }) => {
 
 // ===========================================================================
 
-const Table = ({ tableProps }: { tableProps: Ttemplate_table[string] | undefined }) => {
+const Table = ({
+  //
+  tableProps,
+  onClick,
+}: {
+  tableProps: Ttemplate_table[string] | undefined;
+  onClick?: (data: ReturnType<TgetData>) => void;
+}) => {
   if (!tableProps) {
     return null;
   }
@@ -106,7 +130,7 @@ const Table = ({ tableProps }: { tableProps: Ttemplate_table[string] | undefined
             key={index}
             className={classNames(scss.row)}
             onClick={() => {
-              console.log(getData());
+              onClick && onClick(getData());
             }}
           >
             {keyArr.map((key) => {

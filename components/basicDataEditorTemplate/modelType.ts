@@ -222,6 +222,7 @@ interface TemplateModelProps {
   // tables中還有columns的設定
   basic: InputSelItemDict; // 欄位資料
   tables?: Ttables_inputSelProps;
+  additionalTables?: Ttables_inputSelProps;
 
   //
   // 根據template決定用哪一個板

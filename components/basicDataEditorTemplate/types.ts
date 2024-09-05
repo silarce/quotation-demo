@@ -46,6 +46,8 @@ type TcellDict = {
   [key: string]: TinputSelProps_key;
 };
 
+type TgetData = () => { propertyName: string; state: unknown; body: unknown };
+
 interface Ttemplate_table {
   [tableTemplateName: string]: {
     title?: string | undefined | null;
@@ -63,11 +65,7 @@ interface Ttemplate_table {
     // };
     rowArr: {
       cellDict: TcellDict;
-      getData: () => {
-        propertyName: string;
-        state: unknown;
-        body: unknown;
-      };
+      getData: TgetData;
     }[];
   };
 }
@@ -104,4 +102,5 @@ export type {
   Ttemplate,
   TcellDict,
   Tstate_table,
+  TgetData,
 };
