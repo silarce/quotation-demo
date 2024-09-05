@@ -5,8 +5,8 @@ import { immer } from 'zustand/middleware/immer';
 // import { apiGetLocale } from '..........';等api完成
 
 // fake i18n
-import locale_tw from 'pages/accounting/bankManagement/locale_tw.json';
-import locale_en from 'pages/accounting/bankManagement/locale_en.json';
+import locale_tw from 'public/locale_tw.json';
+import locale_en from 'public/locale_en.json';
 
 // ===========================================================================
 interface Locale_tamplateDoc {
