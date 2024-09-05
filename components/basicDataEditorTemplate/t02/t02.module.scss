@@ -1,0 +1,36 @@
+@use "../template.module.scss";
+
+.t02 {
+  @extend .basic;
+}
+
+.ab {
+  width: 800px;
+  .title {
+    padding: 5px 10px;
+    margin: 0;
+    font-size: 20px;
+    background-color: theme("colors.bgc01");
+  }
+
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 10px 1fr;
+    gap: 20px;
+    padding: 30px 20px;
+
+    border: solid 1px theme("colors.border");
+
+    .a,
+    .b {
+      display: grid;
+      gap: 20px;
+      align-content: flex-start;
+    }
+
+    .pilar {
+      width: 1px;
+      background-color: theme("colors.border");
+    }
+  }
+}

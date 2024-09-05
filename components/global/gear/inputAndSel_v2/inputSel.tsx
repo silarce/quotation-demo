@@ -52,6 +52,7 @@ type TinputSelProps = {
   inputPropsAndSelectProps?: TinputPropsAndSelectProps;
   checkBoxProps_v2?: TcheckBoxProps_v2;
   radioProps?: TradioProps;
+  node?: React.ReactNode;
 
   //
   className?: string;
@@ -123,6 +124,7 @@ export default function InputSel({
   inputPropsAndSelectProps,
   checkBoxProps_v2,
   radioProps,
+  node,
   //
   className,
   wrapperPreStyle,
@@ -522,6 +524,8 @@ export default function InputSel({
             </div>
           );
         })()}
+
+      {node && <div className={classNames(scss.nodeBox, fontClassName)}>{node}</div>}
 
       {suffix && (
         <div className={classNames(fontClassName, scss.suffix, suffixClassName)}>
