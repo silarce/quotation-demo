@@ -70,7 +70,8 @@
   },
   "zoo": {
     "titles": {
-      "title01": "動物園"
+      "title01": "動物園",
+      "zooTitle": "動物園"
     },
     "basic": {
       "companyName": {

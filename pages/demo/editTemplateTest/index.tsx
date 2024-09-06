@@ -353,7 +353,7 @@ const additionalTables: TemplateModelProps['additionalTables'] = {
 
 const t03: TemplateModelProps['template'][string] = {
   titles: {
-    title01: '預設值-動物園',
+    title01: 'zooTitle',
   },
   sections: {
     a: ['companyName', 'taxNumber', 'tel', 'fax', 'creationDate', 'openStatus'],
@@ -384,6 +384,9 @@ const t03: TemplateModelProps['template'][string] = {
 };
 
 const fakeTemplateModelProps: TemplateModelProps = {
+  titles: {
+    zooTitle: '',
+  },
   basic: basic,
   tables: tables,
   additionalTables,

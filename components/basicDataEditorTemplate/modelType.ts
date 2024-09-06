@@ -216,6 +216,9 @@ interface InputSelItemDict {
 }
 
 interface TemplateModelProps {
+  titles?: {
+    [titleName: string]: '' | string | null;
+  };
   //
   // inputSelItemDict與tables
   // 放的是欄位的設定

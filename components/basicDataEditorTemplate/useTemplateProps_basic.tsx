@@ -1,9 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
-import moment, { Moment } from 'moment';
 
 // type
 import type { TemplateIngredients, InputSelItemDict, Locale_tamplateDoc } from './modelType';
-import type { TrawData_primitive, TrawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
+import type { TrawData_primitive, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
   createNode,
@@ -27,13 +26,13 @@ type TinputSelDict = {
 
 const useTemplateProps_basic = ({
   rowData_primitive,
-  templateIngredients,
+  templateIngredients_section: sections,
   basic: inputSelItemDict,
   locale,
   disabled,
 }: {
   rowData_primitive: TrawData_primitive | undefined | null;
-  templateIngredients: TemplateIngredients;
+  templateIngredients_section: TemplateIngredients['sections'];
   basic: InputSelItemDict;
   locale: Locale_tamplateDoc | undefined;
   disabled: boolean;
@@ -109,30 +108,14 @@ const useTemplateProps_basic = ({
   // ________________________________________________________________
 
   // MARK:templateProps
-  const templateProps: TemplateProps = useMemo(() => {
-    const {
-      //
-      titles = {},
-      sections = {},
-      tables, // 取出來，不要留在rest裡
-      ...rest
-    } = templateIngredients;
-
-    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale_tamplateDoc['titles']>;
-    Object.entries(titles).forEach(([key, title]) => {
-      titles[key] = titleArr_locale[key] || title;
-    });
-
-    // ________________________________________________________________
-    // ________________________________________________________________
-
+  const templateProps_sections: TemplateProps['sections'] = useMemo(() => {
     const sectionDict: {
       [
         blockCode: string // a, b, c, ...
       ]: TinputSelProps_key[];
     } = {};
 
-    Object.entries(sections).forEach(([key, indexArr]) => {
+    Object.entries(sections ?? {}).forEach(([key, indexArr]) => {
       const arr = indexArr.map((index) => {
         if (!inputSelDict[index]) {
           console.log(`key與inputSelItemDict不搭配，inputSelDict沒有${index}`);
@@ -150,16 +133,10 @@ const useTemplateProps_basic = ({
     // ________________________________________________________________
     // ________________________________________________________________
 
-    const templateProps: TemplateProps = {
-      ...rest,
-      titles,
-      sections: {
-        ...sectionDict,
-      },
-    };
+    const templateProps_sections: TemplateProps['sections'] = sectionDict;
 
-    return templateProps;
-  }, [templateIngredients, locale, inputSelDict]);
+    return templateProps_sections;
+  }, [sections, locale, inputSelDict]);
 
   // ----------------------------------------------------------------
 
@@ -186,7 +163,7 @@ const useTemplateProps_basic = ({
 
   // ----------------------------------------------------------------
   return {
-    templateProps_primitive: templateProps,
+    templateProps_sections: templateProps_sections,
     stateList_basic: stateList,
     getBody_basic: getBody,
   };

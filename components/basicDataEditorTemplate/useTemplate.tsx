@@ -3,13 +3,21 @@ import _ from 'lodash';
 
 import { useTemplateProps_basic } from './useTemplateProps_basic';
 import { useTemplateProps_table } from './useTemplateProps_tables';
+import { useTemplateProps_titles } from './useTemplateProps_titles';
 
 import { templateLookup } from 'components/basicDataEditorTemplate/templateLookup';
 
 // type
 import type { TemplateModelProps } from './modelType';
 
-import type { TrawData, TrawData_primitive, TrawDataItem, TrawData_table, TrawData_tableDict } from './types';
+import type {
+  TemplateProps,
+  TrawData,
+  TrawData_primitive,
+  TrawDataItem,
+  TrawData_table,
+  TrawData_tableDict,
+} from './types';
 
 // i18n
 import { useI18nEditTemplate } from 'hooks/globalState/useI18n_editTemplate';
@@ -83,9 +91,16 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
   // 原始值模板參數與狀態
-  const { templateProps_primitive, stateList_basic, getBody_basic } = useTemplateProps_basic({
+
+  const templateProps_titles: TemplateProps['titles'] = useTemplateProps_titles({
+    templateModelProps_titles: templateModelProps.titles,
+    templateIngredients_titles: templateIngredients.titles,
+    locale,
+  });
+
+  const { templateProps_sections, stateList_basic, getBody_basic } = useTemplateProps_basic({
     rowData_primitive,
-    templateIngredients,
+    templateIngredients_section: templateIngredients.sections,
     basic: templateModelProps.basic,
     locale,
     disabled,
@@ -121,9 +136,10 @@ const useTemplate = ({
 
   // --------------------------------------------------------------------
 
-  const templateProps = {
-    ...templateProps_primitive,
-    // tables: templateProps_tables,
+  const templateProps: TemplateProps = {
+    ...templateIngredients,
+    sections: templateProps_sections,
+    titles: templateProps_titles,
     tables: { ...templateProps_tables, ...templateProps_additionalTables },
   };
 
