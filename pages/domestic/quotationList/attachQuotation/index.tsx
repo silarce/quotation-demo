@@ -714,6 +714,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       county: state_profile.county ?? '',
       district: state_profile.district ?? '',
       address: state_profile.address ?? '',
+
+      designatedManufacturer: state_profile.designatedManufacturer ?? '',
+
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',
       quantity: prodQty ?? 0,

@@ -1,4 +1,11 @@
 {
   "languageName": "English",
-  "language": "Language"
+  "language": "Language",
+  "editTemplate": {
+    "name": "Name",
+    "age": "Age",
+    "gender": "Gender",
+    "species": "Species",
+    "description": "Description"
+  }
 }
