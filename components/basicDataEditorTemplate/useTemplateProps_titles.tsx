@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
 
 // type
-import type { TemplateModelProps, TemplateIngredients, Locale_tamplateDoc } from './modelType';
+import type { TemplateModelProps, TemplateIngredients, Locale } from './modelType';
 
 import type { TemplateProps } from './types';
+
+import { parseLocale } from 'components/basicDataEditorTemplate/library';
 
 const useTemplateProps_titles = ({
   //
@@ -13,7 +15,7 @@ const useTemplateProps_titles = ({
 }: {
   templateModelProps_titles: TemplateModelProps['titles'];
   templateIngredients_titles: TemplateIngredients['titles'];
-  locale: Locale_tamplateDoc | undefined;
+  locale: Locale | undefined;
 }) => {
   const templateProps_titles: TemplateProps['titles'] = useMemo(() => {
     if (!templateModelProps_titles) {
@@ -27,15 +29,9 @@ const useTemplateProps_titles = ({
     } = {};
 
     Object.entries(templateModelProps_titles).forEach(([key, src]) => {
-      let value = undefined;
+      const title_locale = parseLocale(key, src, locale);
 
-      if (src === null) {
-        value = null;
-      } else {
-        value = locale?.titles?.[key] ?? key;
-      }
-
-      list[key] = value;
+      list[key] = title_locale;
     });
 
     Object.entries(templateIngredients_titles ?? {}).forEach(([key, propertyName]) => {

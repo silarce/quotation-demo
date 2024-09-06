@@ -9,10 +9,11 @@ import {
   createDatePickerProps,
   rawToState,
   stateToBody,
+  parseLocale,
 } from 'components/basicDataEditorTemplate/library';
 
 // type
-import type { TemplateIngredients, Ttables_inputSelProps, Locale_tamplateDoc } from './modelType';
+import type { TemplateIngredients, Ttables_inputSelProps, Locale, Locale_tamplateDoc } from './modelType';
 
 import type {
   TrawData_primitive,
@@ -36,7 +37,7 @@ const useTemplateProps_tables = ({
   rawData_table: TrawData_tableDict | null;
   templateIngredients: TemplateIngredients;
   tables_inputSelProps: Ttables_inputSelProps | undefined | null;
-  locale: Locale_tamplateDoc | undefined;
+  locale: Locale | undefined;
   disabled?: boolean;
 }) => {
   // 這裡面有多個table，以key:value型式儲存
@@ -89,7 +90,7 @@ const useTemplateProps_tables = ({
           const {
             valueType,
             // key,
-            caption,
+            captionSrc: caption,
             span,
             input,
             textarea,
@@ -102,7 +103,7 @@ const useTemplateProps_tables = ({
             ...rest
           } = item;
 
-          const theCaption = caption === undefined ? undefined : locale?.basic?.[key]?.caption ?? caption ?? key;
+          const cpation_locale = parseLocale(key, caption, locale) ?? undefined;
 
           const node = span && createNode({ value, span });
 
@@ -129,7 +130,7 @@ const useTemplateProps_tables = ({
             ...rest,
 
             disabled,
-            caption: theCaption,
+            caption: cpation_locale,
             node,
             inputProps,
             selectProps,
@@ -151,23 +152,25 @@ const useTemplateProps_tables = ({
         };
       });
 
+      const columns: Ttemplate_table[string]['columns'] = {};
       const columns_locale = _.cloneDeep(tableProps.columns);
       Object.entries(columns_locale).forEach(([key, colSetting]) => {
-        let label = colSetting.label;
+        let label = colSetting.labelSrc;
 
-        if (label !== null) {
-          const path = `tables.${targetTableKey}.items.${key}.columnLabel`;
-          label = _.get(locale, path) ?? label ?? key;
-        }
+        label = parseLocale(key, colSetting.labelSrc, locale);
 
-        colSetting.label = label;
+        columns[key] = {
+          label: label,
+          width: colSetting.width,
+          flex: colSetting.flex,
+        };
       });
 
       const tableTitle_locale = (() => {
-        let title = tableProps.title;
+        let title = tableProps.titleSrc;
 
         if (title !== null) {
-          title = _.get(locale, `tables.${targetTableKey}.title`) ?? tableProps.title;
+          title = parseLocale(targetTableKey, title, locale) ?? title;
         }
 
         return title;
@@ -177,7 +180,7 @@ const useTemplateProps_tables = ({
         title: tableTitle_locale,
         rowArr: row,
         keyArr,
-        columns: columns_locale,
+        columns,
       };
       //
     });

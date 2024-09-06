@@ -12,9 +12,12 @@ import type { Locale_tamplateDoc, Locale } from 'hooks/globalState/useI18n_editT
 
 // ===============================================================================
 
-interface Titles {
-  [titleName: string]: string;
-}
+// 是null，就是沒有caption
+// 是undefined，就是直接用key作為localeSrc
+// 有值，就是用這個值作為localeSrc
+// 找不到值就是代入caption或key
+type TlocaleSrc = string | null | undefined;
+
 interface Sections {
   [sectionName: string]: string[]; // keyArr
 }
@@ -27,13 +30,11 @@ interface Table_template {
 
 type Ttables_inputSelProps = {
   [propertyName: string]: {
-    title?: string | null; // 預設值 // 若使用於tab，請確保title在經過i18n後有值，或設好預設值
+    titleSrc?: TlocaleSrc;
     inputSelItemDict: InputSelItemDict;
     columns: {
       [key: string]: {
-        // 預設值，若有值，找不到語系資料就會帶入預設值，
-        // 若是null就不顯示
-        label?: string | null;
+        labelSrc?: TlocaleSrc;
         width: string | number; // auto | 100px
         flex?: string; // "1" | "none" | "auto"
       };
@@ -46,7 +47,9 @@ interface TemplateIngredients {
   // [optionsForTemplate: string]: any; // 未來給特定模板的property
   style?: Tstyle;
   // titleArr?: string[]; // 預設值，會被locale替換
-  titles?: Titles; // 預設值，會被locale替換
+  titles?: {
+    [titleName: string]: string;
+  };
   sections?: Sections;
   tables?: Table_template;
   // tabs_table裡的string對應指定的Table_template[string]
@@ -58,8 +61,8 @@ interface TemplateIngredients {
 // _______________________________________________________________________
 interface Option {
   value: string;
-  label?: string; // 預設值，不給也不要緊，會被locale替換。若沒有預設值也沒有locale，就用value替代
-  [key: string]: string | number | boolean | undefined;
+  labelSrc?: TlocaleSrc; // 預設值，不給也不要緊，會被locale替換。若沒有預設值也沒有locale，就用value替代
+  [key: string]: string | number | boolean | undefined | null;
 }
 
 type Tstyle = {
@@ -139,10 +142,7 @@ interface InputSelItem {
   readonly nullable?: boolean;
   // readonly key: string; // 唯一值，對應要處理的資料 // 不可以放數字，會出問題
 
-  // 為undefined，視為沒有caption
-  // 為null，取i8n的值，若沒有值就取key (這個處理好像是多餘的)
-  // 為string，視為預設值，取i8n的值，若沒有值就取caption的值
-  caption?: string | null;
+  captionSrc?: TlocaleSrc;
 
   // wrapperPreStyle?: 'ps01';
   wrapperStyle?: { [property: string]: string }; // React.CSSProperties
@@ -217,7 +217,7 @@ interface InputSelItemDict {
 
 interface TemplateModelProps {
   titles?: {
-    [titleName: string]: '' | string | null;
+    [titleSrc: string]: TlocaleSrc;
   };
   //
   // inputSelItemDict與tables

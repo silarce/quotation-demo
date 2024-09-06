@@ -47,7 +47,8 @@ const useTemplate = ({
   // --------------------------------------------------------------------
   const templateModelProps = useMemo(() => _.cloneDeep(templateModelProps_ori), [templateModelProps_ori]);
 
-  const locale = useI18nEditTemplate((state) => state.getTemplateDoc(templateModelProps.localeDocSrc));
+  // const locale = useI18nEditTemplate((state) => state.getTemplateDoc(templateModelProps.localeDocSrc));
+  const locale = useI18nEditTemplate((state) => state.wholeLocale);
 
   // --------------------------------------------------------------------
 

@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 
 // type
-import type { TemplateIngredients, InputSelItemDict, Locale_tamplateDoc } from './modelType';
+import type { TemplateIngredients, InputSelItemDict, Locale, Locale_tamplateDoc } from './modelType';
 import type { TrawData_primitive, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
+  parseLocale,
   createNode,
   createInput,
   createSelect,
@@ -34,7 +35,7 @@ const useTemplateProps_basic = ({
   rowData_primitive: TrawData_primitive | undefined | null;
   templateIngredients_section: TemplateIngredients['sections'];
   basic: InputSelItemDict;
-  locale: Locale_tamplateDoc | undefined;
+  locale: Locale | undefined;
   disabled: boolean;
 }) => {
   // ----------------------------------------------------------------
@@ -58,7 +59,7 @@ const useTemplateProps_basic = ({
       const {
         valueType,
         // key,
-        caption,
+        captionSrc: caption,
 
         span,
         input,
@@ -72,7 +73,7 @@ const useTemplateProps_basic = ({
         ...rest
       } = item;
 
-      const theCaption = caption === undefined ? undefined : locale?.basic?.[key]?.caption ?? caption ?? key;
+      const caption_locale = parseLocale(key, caption, locale) ?? undefined;
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState: setStateList });
@@ -90,7 +91,7 @@ const useTemplateProps_basic = ({
         ...rest,
 
         disabled,
-        caption: theCaption,
+        caption: caption_locale,
         node,
         inputProps,
         selectProps,

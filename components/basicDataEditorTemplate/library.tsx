@@ -3,7 +3,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
-import type { InputSelItemDict, InputSelItem, Option, Locale_tamplateDoc } from './modelType';
+import type { InputSelItemDict, InputSelItem, Option, Locale, Locale_tamplateDoc } from './modelType';
 import type {
   //
   Tstate,
@@ -15,6 +15,28 @@ import type {
 
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Toption } from 'js/utils/options/options';
+
+// ==============================================================================
+
+const parseLocale = (
+  key: string, // 這個是property的key
+  localeSrc: string | undefined | null,
+  locale: Locale | undefined
+) => {
+  let string_locale: string | null = null;
+
+  if (localeSrc === null) {
+    string_locale = null;
+  } else if (localeSrc === undefined || localeSrc === '') {
+    const localeValue = locale?.[key] ?? key;
+    typeof localeValue !== 'object' && (string_locale = localeValue);
+  } else if (typeof localeSrc === 'string') {
+    const localeValue = _.get(locale, localeSrc) ?? localeSrc;
+    typeof localeValue !== 'object' && (string_locale = localeValue);
+  }
+
+  return string_locale;
+};
 
 // ==============================================================================
 
@@ -146,7 +168,7 @@ const createSelect = ({
   value: Tstate;
   select: NonNullable<InputSelItem['select']>;
   key: string;
-  locale_tamplateDoc: Locale_tamplateDoc | undefined;
+  locale_tamplateDoc: Locale | undefined;
   setState?: React.Dispatch<React.SetStateAction<TstateList>>;
   setStateKit_table?: {
     setState_table: React.Dispatch<React.SetStateAction<Tstate_table | undefined>>;
@@ -156,10 +178,8 @@ const createSelect = ({
 }): TinputSelProps['selectProps'] => {
   const options = (select.props?.options || []) as Toption[];
 
-  const optionDict_locale = locale_tamplateDoc?.basic?.[key]?.options;
-
   options?.forEach((option) => {
-    const localeLabel = optionDict_locale?.[option.value];
+    const localeLabel = parseLocale(option.label, option.label, locale_tamplateDoc);
     option.label = localeLabel || option.label || option.value;
   });
 
@@ -313,6 +333,8 @@ const createDatePickerProps = ({
 // ==============================================================================
 
 export {
+  parseLocale,
+  //
   rawToState,
   stateToBody,
   //
