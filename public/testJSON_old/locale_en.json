@@ -1,0 +1,183 @@
+{
+  "bankManagement": {
+    "titles": {
+      "title01": "Bank Management"
+    },
+    "basic": {
+      "accountName": {
+        "caption": "Account Name"
+      },
+      "account": {
+        "caption": "Account"
+      },
+      "bankName": {
+        "caption": "Bank",
+        "options": {
+          "喵喵銀行": "Meow Bank",
+          "汪汪銀行": "Woof Bank",
+          "咩咩銀行": "Baa Bank"
+        }
+      },
+      "bankCode": {
+        "caption": "Bank Code"
+      },
+      "note": {
+        "caption": "Note"
+      },
+      "visiteDate": {
+        "caption": "Visit Date"
+      },
+      "agentName": {
+        "caption": "Agent"
+      }
+    },
+    "tables": {
+      "abcd": {
+        "title": "ABCD",
+        "items": {
+          "a": {
+            "columnLabel": "A"
+          },
+          "b": {
+            "columnLabel": "B"
+          },
+          "c": {
+            "columnLabel": "C"
+          },
+          "d": {
+            "columnLabel": "D"
+          }
+        }
+      },
+      "efgh": {
+        "title": "EFGH",
+        "items": {
+          "e": {
+            "columnLabel": "E"
+          },
+          "f": {
+            "columnLabel": "F"
+          },
+          "g": {
+            "columnLabel": "G"
+          },
+          "h": {
+            "columnLabel": "H"
+          }
+        }
+      }
+    }
+  },
+  "zoo": {
+    "titles": {
+      "title01": "ZOO"
+    },
+    "basic": {
+      "companyName": {
+        "caption": "Company Name"
+      },
+      "taxNumber": {
+        "caption": "Tax Number"
+      },
+      "tel": {
+        "caption": "Tel"
+      },
+      "fax": {
+        "caption": "Fax"
+      },
+      "creationDate": {
+        "caption": "Creation Date"
+      },
+      "openStatus": {
+        "caption": "Open Status",
+        "options": {
+          "opened": "opened",
+          "closed": "closed",
+          "renovation": "renovation"
+        }
+      },
+      "note": {
+        "caption": "Note"
+      }
+    },
+    "tables": {
+      "dogArea": {
+        "title": "DOG",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "personality": {
+            "columnLabel": "Personality"
+          }
+        }
+      },
+      "catArea": {
+        "title": "CAT",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "killingCount": {
+            "columnLabel": "Killing Count"
+          },
+          "lifeCount": {
+            "columnLabel": "Life Count"
+          }
+        }
+      },
+      "birdArea": {
+        "title": "BIRD",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "color": {
+            "columnLabel": "Color"
+          },
+          "birthday": {
+            "columnLabel": "Birthday"
+          },
+          "title": {
+            "columnLabel": "Title"
+          }
+        }
+      },
+      "keeper": {
+        "title": "KEEPER",
+        "items": {
+          "name": {
+            "columnLabel": "Name"
+          },
+          "age": {
+            "columnLabel": "Age"
+          },
+          "gender": {
+            "columnLabel": "Gender"
+          }
+        }
+      }
+    }
+  }
+}

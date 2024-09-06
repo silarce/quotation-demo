@@ -1,8 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 const axi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  withCredentials: true,
+});
+
+const axi2 = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_NETCORE_URL,
   withCredentials: true,
 });
 
@@ -83,4 +88,5 @@ axi.interceptors.response.use(
   }
 );
 
-export { axi };
+export { axi, axi2 };
+export type { AxiosError };

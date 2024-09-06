@@ -157,6 +157,9 @@ type Tprofile = {
   faxNumber: string;
   trackProgress: string;
   projectProgress: string;
+
+  designatedManufacturer: string;
+
   isLost: boolean;
 };
 
@@ -663,6 +666,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
+    console.log('state_profile.designatedManufacturer', state_profile.designatedManufacturer);
+
     const body: TcreateQuotationContentDto = {
       // quotationDate: data_watch.quotationDate ?? '',
       // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
@@ -679,6 +684,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',
       faxNumber: state_profile.faxNumber ?? '',
+
+      designatedManufacturer: state_profile.designatedManufacturer ?? '',
+
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
@@ -1258,6 +1266,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: state_profile.faxNumber,
           onChange: (v) => changeProfile('faxNumber', v),
         },
+
+        designatedManufacturer: {
+          value: state_profile.designatedManufacturer,
+          onChange: (v) => {
+            changeProfile('designatedManufacturer', v);
+          },
+        },
+
         trackProgress: {
           value: state_profile.trackProgress,
 
@@ -2026,6 +2042,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       faxNumber: latestContent?.faxNumber ?? '',
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
+
+      designatedManufacturer: latestContent?.designatedManufacturer ?? '',
+
       isLost: latestContent?.isLost ?? false,
     });
   }, [quotationData, quotationContentData, disabled]);
@@ -2553,6 +2572,9 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
+
+  designatedManufacturer: '',
+
   isLost: false,
 });
 
