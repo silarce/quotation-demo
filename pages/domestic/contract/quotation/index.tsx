@@ -411,7 +411,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       customer: {
         value: content?.customer,
       },
-      designUnit : {
+      designUnit: {
         value: content?.designUnit,
       },
       itemList: {
@@ -448,6 +448,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
         faxNumber: {
           value: content?.faxNumber ?? '',
+          // onChange: (v) => changeProfile('faxNumber', v),
+        },
+        designatedManufacturer: {
+          value: content?.designatedManufacturer ?? '',
           // onChange: (v) => changeProfile('faxNumber', v),
         },
         trackProgress: {

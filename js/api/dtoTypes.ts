@@ -1798,6 +1798,9 @@ export type TquotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
+
+  designatedManufacturer: string | null; // 指定廠商
+
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
@@ -2212,6 +2215,8 @@ export type TcreateQuotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
+
+  designatedManufacturer: string | null; // 指定廠商
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
