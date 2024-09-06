@@ -73,6 +73,7 @@ type Tcontrol = {
     faxNumber: TcontrolItem; // 傳真號碼
     trackProgress: TcontrolItem;
     projectProgress: TcontrolItem;
+    designatedManufacturer: TcontrolItem;
   };
 
   isLost: {
@@ -118,6 +119,8 @@ export default function QuotationProfile({
     faxNumber,
     trackProgress,
     projectProgress,
+
+    designatedManufacturer,
   } = itemList;
 
   // ----------------------------------------------------------------
@@ -412,6 +415,23 @@ export default function QuotationProfile({
             },
           }}
         />
+
+        {/* <InputSel
+          caption="指定廠商"
+          captionClassName={scss.input02}
+          showBaseline="auto"
+          disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
+          {...inputSelProps}
+          textareaProps={{
+            allowNewLineByUser: true,
+            props: {
+              value: designatedManufacturer.value,
+              onChange: (e) => {
+                designatedManufacturer.onChange?.(e.target.value);
+              },
+            },
+          }}
+        /> */}
       </div>
 
       <div className={scss.time}>
@@ -518,6 +538,8 @@ type Tstate_profile = {
   trackProgress: string;
   projectProgress: string;
   isLost: boolean;
+
+  designatedManufacturer: string;
 };
 
 const creEmptyProfile = (): Tstate_profile => ({
@@ -531,6 +553,9 @@ const creEmptyProfile = (): Tstate_profile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
+
+  designatedManufacturer: '',
+
   isLost: false,
 });
 
@@ -652,6 +677,12 @@ const useProfile = ({
 
           // disabled: disabled,
         },
+        designatedManufacturer: {
+          value: state_profile.designatedManufacturer,
+          onChange: (v) => {
+            changeProfile('designatedManufacturer', v);
+          },
+        },
       },
     };
 
@@ -673,6 +704,9 @@ const useProfile = ({
         faxNumber: originContent?.faxNumber ?? '',
         trackProgress: originContent?.trackProgress ?? '',
         projectProgress: originContent?.projectProgress ?? '',
+
+        designatedManufacturer: originContent?.designatedManufacturer ?? '',
+
         isLost: originContent?.isLost ?? false,
       });
     }
@@ -692,6 +726,9 @@ const useProfile = ({
       faxNumber: originContent?.faxNumber ?? '',
       trackProgress: originContent?.trackProgress ?? '',
       projectProgress: originContent?.projectProgress ?? '',
+
+      designatedManufacturer: originContent?.designatedManufacturer ?? '',
+
       isLost: originContent?.isLost ?? false,
     });
   }, [originContent]);
