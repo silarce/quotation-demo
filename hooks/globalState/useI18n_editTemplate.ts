@@ -35,9 +35,14 @@ interface Locale_tamplateDoc {
   };
 }
 
-interface Locale {
-  [key: string]: Locale_tamplateDoc;
+interface NestedObject {
+  [key: string]: string | undefined | NestedObject;
 }
+
+// interface Locale {
+//   [key: string]: Locale_tamplateDoc;
+// }
+type Locale = NestedObject;
 
 interface I18nEditTemplate {
   localeCode: string;
@@ -62,6 +67,7 @@ const useI18nEditTemplate = create<I18nEditTemplate>()(
 
       return wholeLocale[src] as Locale_tamplateDoc | undefined;
     },
+
     switchLocale: (localeCode: string) => {
       let localeDoc: Locale | undefined = undefined;
 

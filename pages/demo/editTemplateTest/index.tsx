@@ -92,55 +92,55 @@ const basicCaptionWidth = '140px';
 const basic: TemplateModelProps['basic'] = {
   companyName: {
     valueType: 'string',
-    caption: '公司名稱',
+    // caption: '公司名稱',
     captionStyle: { width: basicCaptionWidth },
     showBaseline: 'invisible',
     span: {},
   },
   taxNumber: {
     valueType: 'string',
-    caption: '統一編號',
+    // caption: '統一編號',
     captionStyle: { width: basicCaptionWidth },
     showBaseline: 'invisible',
     span: {},
   },
   tel: {
     valueType: 'string',
-    caption: '電話',
+    // caption: '電話',
     captionStyle: { width: basicCaptionWidth },
     input: {},
   },
   fax: {
     valueType: 'string',
-    caption: '傳真',
+    // caption: '傳真',
     captionStyle: { width: basicCaptionWidth },
     input: {},
   },
   creationDate: {
     valueType: 'dateString',
-    caption: '創建日期',
+    // caption: '創建日期',
     captionStyle: { width: basicCaptionWidth },
     datePicker: {},
   },
 
   openStatus: {
     valueType: 'string',
-    caption: '開園狀態',
+    // caption: '開園狀態',
     captionStyle: { width: basicCaptionWidth },
     select: {
       props: {
         options: [
           {
             value: 'opened',
-            label: '開放',
+            // labelSrc: '開放',
           },
           {
             value: 'closed',
-            label: '閉園',
+            // labelSrc: '閉園',
           },
           {
             value: 'renovation',
-            label: '整修',
+            // labelSrc: '整修',
           },
         ],
       },
@@ -149,7 +149,7 @@ const basic: TemplateModelProps['basic'] = {
 
   note: {
     valueType: 'string',
-    caption: '備註',
+    // caption: '備註',
     captionStyle: { width: basicCaptionWidth },
     textarea: {},
   },
@@ -157,74 +157,84 @@ const basic: TemplateModelProps['basic'] = {
 
 const tables: TemplateModelProps['tables'] = {
   dogArea: {
-    title: '阿狗',
+    // title: '阿狗',
     inputSelItemDict: {
       name: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       age: {
         valueType: 'number',
+        captionSrc: null,
         input: {},
       },
       color: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       birthday: {
         valueType: 'dateString',
+        captionSrc: null,
         datePicker: {},
       },
       personality: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
     },
     columns: {
       name: {
-        label: '名稱',
+        // label: '名稱',
         width: '200px',
       },
       age: {
-        label: '年齡',
+        // label: '年齡',
         width: '200px',
       },
       color: {
-        label: '顏色',
+        // label: '顏色',
         width: '200px',
       },
       birthday: {
-        label: '生日',
+        // label: '生日',
         width: '200px',
       },
       personality: {
-        label: '個性',
+        // label: '個性',
         width: '200px',
       },
     },
   },
   //
   catArea: {
-    title: '阿貓',
+    // title: '阿貓',
     inputSelItemDict: {
       name: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       age: {
         valueType: 'number',
+        captionSrc: null,
         input: {},
       },
       color: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       birthday: {
         valueType: 'dateString',
+        captionSrc: null,
         datePicker: {},
       },
       killingCount: {
         valueType: 'string',
+        captionSrc: null,
         input: {
           props: {
             type: 'number',
@@ -233,6 +243,7 @@ const tables: TemplateModelProps['tables'] = {
       },
       lifeCount: {
         valueType: 'string',
+        captionSrc: null,
         input: {
           props: {
             type: 'number',
@@ -242,75 +253,80 @@ const tables: TemplateModelProps['tables'] = {
     },
     columns: {
       name: {
-        label: '名稱',
+        // label: '名稱',
         width: '200px',
       },
       age: {
-        label: '年齡',
+        // label: '年齡',
         width: '200px',
       },
       color: {
-        label: '顏色',
+        // label: '顏色',
         width: '200px',
       },
       birthday: {
-        label: '生日',
+        // label: '生日',
         width: '200px',
       },
       killingCount: {
-        label: '擊殺數',
+        // label: '擊殺數',
         width: '200px',
       },
       lifeCount: {
-        label: '餘命',
+        // label: '餘命',
         width: '200px',
       },
     },
   },
   //
   birdArea: {
-    title: '阿鳥',
+    // title: '阿鳥',
     inputSelItemDict: {
       name: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       age: {
         valueType: 'number',
+        captionSrc: null,
         input: {},
       },
       color: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
       birthday: {
         valueType: 'dateString',
+        captionSrc: null,
         datePicker: {},
       },
       title: {
         valueType: 'string',
+        captionSrc: null,
         input: {},
       },
     },
     columns: {
       name: {
-        label: '名稱',
+        // label: '名稱',
         width: '200px',
       },
       age: {
-        label: '年齡',
+        // label: '年齡',
         width: '200px',
       },
       color: {
-        label: '顏色',
+        // label: '顏色',
         width: '200px',
       },
       birthday: {
-        label: '生日',
+        // label: '生日',
         width: '200px',
       },
       title: {
-        label: '頭銜',
+        labelSrc: 'title_02',
         width: '200px',
       },
     },
@@ -319,7 +335,7 @@ const tables: TemplateModelProps['tables'] = {
 
 const additionalTables: TemplateModelProps['additionalTables'] = {
   keeper: {
-    title: '保育員',
+    // title: 'keeper',
     inputSelItemDict: {
       name: {
         valueType: 'string',
@@ -336,15 +352,15 @@ const additionalTables: TemplateModelProps['additionalTables'] = {
     },
     columns: {
       name: {
-        label: '姓名',
+        // label: '姓名',
         width: '100px',
       },
       gender: {
-        label: '性別',
+        // label: '性別',
         width: '100px',
       },
       age: {
-        label: '年齡',
+        // label: '年齡',
         width: '100px',
       },
     },
@@ -353,7 +369,7 @@ const additionalTables: TemplateModelProps['additionalTables'] = {
 
 const t03: TemplateModelProps['template'][string] = {
   titles: {
-    title01: '預設值-動物園',
+    title01: 'zoo',
   },
   sections: {
     a: ['companyName', 'taxNumber', 'tel', 'fax', 'creationDate', 'openStatus'],
@@ -384,6 +400,9 @@ const t03: TemplateModelProps['template'][string] = {
 };
 
 const fakeTemplateModelProps: TemplateModelProps = {
+  titles: {
+    zoo: '',
+  },
   basic: basic,
   tables: tables,
   additionalTables,

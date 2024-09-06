@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
-import moment, { Moment } from 'moment';
 
 // type
-import type { TemplateIngredients, InputSelItemDict, Locale_tamplateDoc } from './modelType';
-import type { TrawData_primitive, TrawDataItem, TinputSelProps_key, TemplateProps, TstateList } from './types';
+import type { TemplateIngredients, InputSelItemDict, Locale, Locale_tamplateDoc } from './modelType';
+import type { TrawData_primitive, TinputSelProps_key, TemplateProps, TstateList } from './types';
 
 import {
+  parseLocale,
   createNode,
   createInput,
   createSelect,
@@ -27,15 +27,15 @@ type TinputSelDict = {
 
 const useTemplateProps_basic = ({
   rowData_primitive,
-  templateIngredients,
+  templateIngredients_section: sections,
   basic: inputSelItemDict,
   locale,
   disabled,
 }: {
   rowData_primitive: TrawData_primitive | undefined | null;
-  templateIngredients: TemplateIngredients;
+  templateIngredients_section: TemplateIngredients['sections'];
   basic: InputSelItemDict;
-  locale: Locale_tamplateDoc | undefined;
+  locale: Locale | undefined;
   disabled: boolean;
 }) => {
   // ----------------------------------------------------------------
@@ -59,7 +59,7 @@ const useTemplateProps_basic = ({
       const {
         valueType,
         // key,
-        caption,
+        captionSrc: caption,
 
         span,
         input,
@@ -73,7 +73,7 @@ const useTemplateProps_basic = ({
         ...rest
       } = item;
 
-      const theCaption = caption === undefined ? undefined : locale?.basic?.[key]?.caption ?? caption ?? key;
+      const caption_locale = parseLocale(key, caption, locale) ?? undefined;
 
       const node = span && createNode({ value, span });
       const inputProps = input && createInput({ value, input, key, setState: setStateList });
@@ -91,7 +91,7 @@ const useTemplateProps_basic = ({
         ...rest,
 
         disabled,
-        caption: theCaption,
+        caption: caption_locale,
         node,
         inputProps,
         selectProps,
@@ -109,30 +109,14 @@ const useTemplateProps_basic = ({
   // ________________________________________________________________
 
   // MARK:templateProps
-  const templateProps: TemplateProps = useMemo(() => {
-    const {
-      //
-      titles = {},
-      sections = {},
-      tables, // 取出來，不要留在rest裡
-      ...rest
-    } = templateIngredients;
-
-    const titleArr_locale = (locale?.titles ?? {}) as NonNullable<Locale_tamplateDoc['titles']>;
-    Object.entries(titles).forEach(([key, title]) => {
-      titles[key] = titleArr_locale[key] || title;
-    });
-
-    // ________________________________________________________________
-    // ________________________________________________________________
-
+  const templateProps_sections: TemplateProps['sections'] = useMemo(() => {
     const sectionDict: {
       [
         blockCode: string // a, b, c, ...
       ]: TinputSelProps_key[];
     } = {};
 
-    Object.entries(sections).forEach(([key, indexArr]) => {
+    Object.entries(sections ?? {}).forEach(([key, indexArr]) => {
       const arr = indexArr.map((index) => {
         if (!inputSelDict[index]) {
           console.log(`key與inputSelItemDict不搭配，inputSelDict沒有${index}`);
@@ -150,16 +134,10 @@ const useTemplateProps_basic = ({
     // ________________________________________________________________
     // ________________________________________________________________
 
-    const templateProps: TemplateProps = {
-      ...rest,
-      titles,
-      sections: {
-        ...sectionDict,
-      },
-    };
+    const templateProps_sections: TemplateProps['sections'] = sectionDict;
 
-    return templateProps;
-  }, [templateIngredients, locale, inputSelDict]);
+    return templateProps_sections;
+  }, [sections, locale, inputSelDict]);
 
   // ----------------------------------------------------------------
 
@@ -186,7 +164,7 @@ const useTemplateProps_basic = ({
 
   // ----------------------------------------------------------------
   return {
-    templateProps_primitive: templateProps,
+    templateProps_sections: templateProps_sections,
     stateList_basic: stateList,
     getBody_basic: getBody,
   };

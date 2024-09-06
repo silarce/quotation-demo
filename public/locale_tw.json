@@ -1,183 +1,27 @@
 {
-  "bankManagement": {
-    "titles": {
-      "title01": "銀行管理"
-    },
-    "basic": {
-      "accountName": {
-        "caption": "帳戶名稱"
-      },
-      "account": {
-        "caption": "帳戶"
-      },
-      "bankName": {
-        "caption": "銀行",
-        "options": {
-          "喵喵銀行": "喵喵銀行",
-          "汪汪銀行": "汪汪銀行",
-          "咩咩銀行": "咩咩銀行"
-        }
-      },
-      "bankCode": {
-        "caption": "銀行代碼"
-      },
-      "note": {
-        "caption": "備註"
-      },
-      "visiteDate": {
-        "caption": "拜訪日期"
-      },
-      "agentName": {
-        "caption": "代理人"
-      }
-    },
-    "tables": {
-      "abcd": {
-        "title": "ㄟ逼西豬",
-        "items": {
-          "a": {
-            "columnLabel": "ㄟ"
-          },
-          "b": {
-            "columnLabel": "逼"
-          },
-          "c": {
-            "columnLabel": "西"
-          },
-          "d": {
-            "columnLabel": "豬"
-          }
-        }
-      },
-      "efgh": {
-        "title": "伊ㄟ夫基ㄟ取",
-        "items": {
-          "e": {
-            "columnLabel": "伊"
-          },
-          "f": {
-            "columnLabel": "ㄟ夫"
-          },
-          "g": {
-            "columnLabel": "基"
-          },
-          "h": {
-            "columnLabel": "ㄟ取"
-          }
-        }
-      }
-    }
-  },
-  "zoo": {
-    "titles": {
-      "title01": "動物園"
-    },
-    "basic": {
-      "companyName": {
-        "caption": "公司名稱"
-      },
-      "taxNumber": {
-        "caption": "統一編號"
-      },
-      "tel": {
-        "caption": "電話"
-      },
-      "fax": {
-        "caption": "傳真"
-      },
-      "creationDate": {
-        "caption": "創建日期"
-      },
-      "openStatus": {
-        "caption": "開園狀態",
-        "options": {
-          "opened": "開放",
-          "closed": "閉園",
-          "renovation": "整修"
-        }
-      },
-      "note": {
-        "caption": "備註"
-      }
-    },
-    "tables": {
-      "dogArea": {
-        "title": "阿狗",
-        "items": {
-          "name": {
-            "columnLabel": "名稱"
-          },
-          "age": {
-            "columnLabel": "年齡"
-          },
-          "color": {
-            "columnLabel": "顏色"
-          },
-          "birthday": {
-            "columnLabel": "生日"
-          },
-          "personality": {
-            "columnLabel": "個性"
-          }
-        }
-      },
-      "catArea": {
-        "title": "阿貓",
-        "items": {
-          "name": {
-            "columnLabel": "名稱"
-          },
-          "age": {
-            "columnLabel": "年齡"
-          },
-          "color": {
-            "columnLabel": "顏色"
-          },
-          "birthday": {
-            "columnLabel": "生日"
-          },
-          "killingCount": {
-            "columnLabel": "擊殺數"
-          },
-          "lifeCount": {
-            "columnLabel": "餘命"
-          }
-        }
-      },
-      "birdArea": {
-        "title": "阿鳥",
-        "items": {
-          "name": {
-            "columnLabel": "名稱"
-          },
-          "age": {
-            "columnLabel": "年齡"
-          },
-          "color": {
-            "columnLabel": "顏色"
-          },
-          "birthday": {
-            "columnLabel": "生日"
-          },
-          "title": {
-            "columnLabel": "頭銜"
-          }
-        }
-      },
-      "keeper": {
-        "title": "保育員",
-        "items": {
-          "name": {
-            "columnLabel": "名稱"
-          },
-          "age": {
-            "columnLabel": "年齡"
-          },
-          "gender": {
-            "columnLabel": "性別"
-          }
-        }
-      }
-    }
-  }
+  "zoo": "動物園",
+  "companyName": "公司名稱",
+  "taxNumber": "統一編號",
+  "tel": "電話",
+  "fax": "傳真",
+  "creationDate": "創建日期",
+  "openStatus": "開園狀態",
+  "opened": "開放",
+  "closed": "閉園",
+  "renovation": "整修",
+  "note": "備註",
+  "dogArea": "阿狗",
+  "catArea": "阿貓",
+  "birdArea": "阿鳥",
+  "keeper": "保育員",
+  "name": "名稱",
+  "age": "年齡",
+  "color": "顏色",
+  "birthday": "生日",
+  "personality": "個性",
+  "killingCount": "擊殺數",
+  "lifeCount": "餘命",
+  "title": "標題",
+  "title_02": "頭銜",
+  "gender": "性別"
 }
