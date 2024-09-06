@@ -231,19 +231,19 @@ export default function PurchaseOrderList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         // setOpen(true);
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseOrder`,
-        //             query: {
-        //                 type: 'AddPurchaseRequisition',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增採購單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addPurchaseOrder`,
+                    query: {
+                        type: 'AddPurchaseRequisition',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -1373,13 +1373,13 @@ export default function PurchaseOrderList() {
                                 </button>
                             </div>
                             <div>
-                                <span>
+                                {/* <span>
                                     <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPO() }} title="新增單據">
                                         <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                         新增
                                     </button>
                                 </span>
-                                &nbsp;
+                                &nbsp; */}
                                 <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />

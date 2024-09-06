@@ -226,19 +226,19 @@ export default function PurchaseRequisitionList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增請購單',
-        //     onClick: () => {
-        //         // setOpen(true);
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseRequisition`,
-        //             query: {
-        //                 type: 'AddPurchaseRequisition',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增請購單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addPurchaseRequisition`,
+                    query: {
+                        type: 'AddPurchaseRequisition',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -1547,10 +1547,10 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     駁回
                                 </button> */}
-                                <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPR() }} title="新增單據">
+                                {/* <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPR() }} title="新增單據">
                                     <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                     新增
-                                </button>
+                                </button> */}
                             </div>
                             <div></div>
                             <div>

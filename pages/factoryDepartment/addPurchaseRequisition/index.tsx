@@ -227,7 +227,7 @@ export default function AddPurchaseRequisition() {
             setIsLoading(true);
             const conditionModel = {
                 type: "未送出",
-                username:userInfo?.username
+                username: userInfo?.username
             };
 
             var inputModel = {
@@ -247,6 +247,7 @@ export default function AddPurchaseRequisition() {
 
 
             setSearchdata(data);
+            setPrdata(data);
 
         } catch (error: any) {
             setError(error.message);
@@ -291,6 +292,7 @@ export default function AddPurchaseRequisition() {
             // setData1(data);
 
             setData2(data);
+            console.log(data2);
 
 
         } catch (error: any) {
@@ -429,23 +431,22 @@ export default function AddPurchaseRequisition() {
         // return;
         try {
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
                 create_at: create_atin,
                 need_date: moment(need_date).format('YYYY-MM-DD'),
                 create_by: create_byin,
                 note: note,
-                data: data2
             };
 
 
-            
+
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-            
+
             console.log(JSON.stringify(conditionModel));
 
             const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseRequisition`, {
@@ -469,8 +470,9 @@ export default function AddPurchaseRequisition() {
             setData2([]);
             setPurchaserequisitionid(data[0].purchaserequisitionid);
             setPurchaserequisitionuuid(data[0].id);
-            setStatus("請購中");
+            setStatus("未送出");
             console.log(data);
+            getPurchaseRequisition();
 
             // getProduct();
 
@@ -483,6 +485,42 @@ export default function AddPurchaseRequisition() {
             setIsLoading(false);
         }
     };
+    const RemovePurchaseRequisitionDetail = async (id: any) => {
+        try {
+            //  console.log(userInfo);
+            setIsLoading(true);
+            const conditionModel = {
+                id: id
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/RemovePurchaseRequisitionDetail?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responseData = await response.json();
+
+            console.log(purchaserequisitionuuid);
+
+            getPurchaseRequisitionDetail(purchaserequisitionuuid);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
 
     //請購單申請
     const ClosePurchaseRequisition = async () => {
@@ -548,7 +586,7 @@ export default function AddPurchaseRequisition() {
             const newEntry = {
                 id: handinputproductuuid,
                 productid: handinputproductid,
-                productuuid:handinputproductuuid,
+                productuuid: handinputproductuuid,
                 name: handinputname,
                 spec: handinputspec,
                 quantity: handinputquantity,
@@ -630,10 +668,11 @@ export default function AddPurchaseRequisition() {
     };
 
     // 從口袋清單移除
-    const handleRemove = (index: number) => {
+    const handleRemove = (index: number, item: any) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-    };
+        RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
+    }; 
 
     // 改變數字口袋清單值
     const handleNumberChange = (index: any, target: any, value: any) => {
@@ -931,7 +970,7 @@ export default function AddPurchaseRequisition() {
                             await router.push({
                                 pathname: `/factoryDepartment/purchaseRequisitionList`,
                                 query: {
-                                    purchaserequisitionid:purchaserequisitionid
+                                    purchaserequisitionid: purchaserequisitionid
                                 },
                             });
                         }
@@ -1340,7 +1379,7 @@ export default function AddPurchaseRequisition() {
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
@@ -1355,7 +1394,7 @@ export default function AddPurchaseRequisition() {
                             ))}
 
 
-                            <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '請購中') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                            <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 <div></div>
                                 <div>
                                     <input
