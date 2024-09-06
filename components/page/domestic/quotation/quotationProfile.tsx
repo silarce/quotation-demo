@@ -121,12 +121,6 @@ export default function QuotationProfile({
   } = itemList;
 
   // ----------------------------------------------------------------
-  // 客戶資料
-  const theClientData = [
-    { key: 'contactPerson', label: '聯絡人', placeholder: '尚未選擇' },
-    { key: 'contactNumber', label: '聯絡電話', placeholder: '尚未選擇' },
-    { key: 'faxNumber', label: '傳真號碼', placeholder: '尚未選擇' },
-  ] as const;
 
   // 工程地點
 
@@ -317,63 +311,54 @@ export default function QuotationProfile({
           </div>
 
           <div>
-            {/* 聯絡人，連絡電話，傳真號碼 */}
-            {theClientData.map((item, index) => {
-              const { key, label, placeholder } = item;
-
-              return (
-                <InputSel
-                  key={index}
-                  caption={label}
-                  captionClassName={scss.input02}
-                  // disabled={true}
-                  showBaseline="auto"
-                  disabled={disabled}
-                  {...inputSelProps}
-                  inputProps={{
-                    props: {
-                      placeholder: placeholder,
-                      value: itemList[key].value,
-                      onChange: (e) => {
-                        itemList[key].onChange?.(e.target.value);
-                      },
-                    },
-                  }}
-                />
-              );
-            })}
-          </div>
-          <div>
             <InputSel
-              caption="追蹤狀態"
+              caption={'聯絡人'}
               captionClassName={scss.input02}
               showBaseline="auto"
-              disabled={trackProgress.disabled !== undefined ? trackProgress.disabled : disabled}
+              disabled={disabled}
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: trackProgress.value,
+                  placeholder: '尚未選擇',
+                  value: itemList['contactPerson'].value,
                   onChange: (e) => {
-                    trackProgress.onChange?.(e.target.value);
+                    itemList['contactPerson'].onChange?.(e.target.value);
                   },
-                  onClick: trackProgress.onClick,
                 },
               }}
             />
 
             <InputSel
-              caption="工地進度"
+              caption={'傳真號碼'}
               captionClassName={scss.input02}
               showBaseline="auto"
-              disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
+              disabled={disabled}
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: projectProgress.value,
+                  placeholder: '尚未選擇',
+                  value: itemList['faxNumber'].value,
                   onChange: (e) => {
-                    projectProgress.onChange?.(e.target.value);
+                    itemList['faxNumber'].onChange?.(e.target.value);
                   },
-                  onClick: projectProgress.onClick,
+                },
+              }}
+            />
+          </div>
+          <div>
+            <InputSel
+              caption={'聯絡電話'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  placeholder: '尚未選擇',
+                  value: itemList['contactNumber'].value,
+                  onChange: (e) => {
+                    itemList['contactNumber'].onChange?.(e.target.value);
+                  },
                 },
               }}
             />
@@ -389,6 +374,42 @@ export default function QuotationProfile({
             showBaseline: 'auto',
             captionStyle,
             wrapperStyle: { padding: wrapperStyle.padding, gap: wrapperStyle.gap },
+          }}
+        />
+
+        <InputSel
+          caption="追蹤狀態"
+          captionClassName={scss.input02}
+          showBaseline="auto"
+          disabled={trackProgress.disabled !== undefined ? trackProgress.disabled : disabled}
+          {...inputSelProps}
+          textareaProps={{
+            allowNewLineByUser: true,
+            props: {
+              value: trackProgress.value,
+              onChange: (e) => {
+                trackProgress.onChange?.(e.target.value);
+              },
+              onClick: trackProgress.onClick,
+            },
+          }}
+        />
+
+        <InputSel
+          caption="工地進度"
+          captionClassName={scss.input02}
+          showBaseline="auto"
+          disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
+          {...inputSelProps}
+          textareaProps={{
+            allowNewLineByUser: true,
+            props: {
+              value: projectProgress.value,
+              onChange: (e) => {
+                projectProgress.onChange?.(e.target.value);
+              },
+              onClick: projectProgress.onClick,
+            },
           }}
         />
       </div>
