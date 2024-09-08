@@ -665,14 +665,14 @@ const sidePathList: TsidePathList = {
           label: '單據管理',
           erpFeature: devPass,
           list: [
-            // {
-            //   label: '單據審核',
-            //   path: path01 + '/reviewList',
-            //   erpFeature: devPass,
-            // },
             {
               label: '請購申請',
               path: path01 + '/addPurchaseRequisition',
+              erpFeature: [fac],
+            },
+            {
+              label: '詢價管理',
+              path: path01 + '/quotereqList',
               erpFeature: [fac],
             },
             {

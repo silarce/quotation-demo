@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './addPurchaseOrder.module.scss';
+import scss from './quotereqList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -78,7 +78,7 @@ export default function AddPurchaseOrder() {
     const [searchbardata, setSearchBarData] = useState<any[]>([]);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [prdata, setPrdata] = useState<any[]>([]);
-    const [podata, setPodata] = useState<any[]>([]);
+    const [qodata, setQodata] = useState<any[]>([]);
     const [customerdata, setCustomerdata] = useState<any[]>([]);
     const [shippingdata, setShippingdata] = useState<any[]>([]);
 
@@ -214,8 +214,6 @@ export default function AddPurchaseOrder() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "未送出",
-                username: userInfo?.username
             };
 
             var inputModel = {
@@ -227,15 +225,15 @@ export default function AddPurchaseOrder() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereq?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
 
 
-            setPodata(data);
-            // console.log(data);
+            setQodata(data);
+            
             setSearchdata(data);
 
         } catch (error: any) {
@@ -1035,7 +1033,7 @@ export default function AddPurchaseOrder() {
             (!endDate || !endDate.isValid()) &&
             !requisitionId &&
             !status) {
-            setSearchdata(podata);
+            setSearchdata(qodata);
 
             return;
         }
@@ -1044,7 +1042,7 @@ export default function AddPurchaseOrder() {
 
 
         // 過濾資料
-        let filteredData = podata.filter(item => {
+        let filteredData = qodata.filter(item => {
             const createAt = moment(item.create_at);
             const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
                 ? true
@@ -1238,7 +1236,7 @@ export default function AddPurchaseOrder() {
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag='新增採購單' panelList={panelList} />
+            <PageHeader02 tag='詢價單' panelList={panelList} />
             {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
@@ -1393,7 +1391,7 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="送貨地址"
                                             disabled={status === "未儲存" ? false : true}
@@ -1405,7 +1403,7 @@ export default function AddPurchaseOrder() {
                                                     onChange: (e) => { handleShippingaddressChange(e) }
                                                 },
                                             }}
-                                        />
+                                        /> */}
 
                                     </div>
                                     <div>
@@ -2107,7 +2105,7 @@ export default function AddPurchaseOrder() {
                             // padding: '10px',
                             // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
-                            <Thead01 type={'PurchaseOrder'} />
+                            <Thead01 type={'Quotereq3'} />
                             {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                             {searchdata && (
                                 searchdata.map((_item: any, index: number) => (
@@ -2117,12 +2115,12 @@ export default function AddPurchaseOrder() {
                                             className={`${scss.row01} ${_item.purchaseorderid === selectedItemId ? scss.selectedRow : ''}`}
                                             onClick={() => { handlechangepo(_item) }}>
                                             <span>{index + 1}</span>
-                                            <span>{_item.purchaseorderid}</span>
+                                            <span>{_item.quotereqid}</span>
                                             <span>{getTaiwanDateStr(_item.create_at)}</span>
                                             {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                                            {/* <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
                                                 {_item.status}
-                                            </span>
+                                            </span> */}
                                             <span>{_item.suppliername}</span>
                                             {/* <span>{_item.create_by}</span> */}
                                             {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}

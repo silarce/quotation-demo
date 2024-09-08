@@ -266,12 +266,13 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
       <div className={style.thead17}>
         <span>序</span>
         <span>供應商</span>
-        <span>單價</span>
-        <span>總價</span>
-        <span>單位</span>
-        <span>出貨日</span>
+        <span>詢價日期</span>
+        <span>數量</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
         <span>備註</span>
-        <span>得標</span>
+        <span>選擇</span>
         <span></span>
       </div>
     )
@@ -499,24 +500,40 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-    //#region 新增採購單明細
-    else if (type === "AddPO_ReqList") {
-      return (
-        <div className={style.thead33}>
-          <span>序</span>
-          <span>料號</span>
-          <span>品名</span>
-          <span>規格</span>
-          <span>數量</span>
-          <span>單位</span>
-          <span>單價</span>
-          <span>金額</span>
-          <span>備註(用途說明)</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  //#region 新增採購單明細
+  else if (type === "AddPO_ReqList") {
+    return (
+      <div className={style.thead33}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>詢價</span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>備註(用途說明)</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 詢價單
+  else if (type === "Quotereq3") {
+    return (
+      <div className={style.thead34}>
+        <span>序</span>
+        <span>詢價單號</span>
+        <span>詢價日期</span>
+        {/* <span>總金額</span> */}
+        {/* <span>狀態</span> */}
+        <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

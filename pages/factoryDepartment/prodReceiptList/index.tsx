@@ -276,15 +276,14 @@ export default function ProdReceiptList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
+            
             const data = await response.json();
-
-            // if (data.length === 0) {
-            //     myAlert.warning({
-            //         title: "查詢結果",
-            //         content: "目前沒有單據資訊可以顯示"
-            //     });
-            //     return;
-            // }
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: '尚無單據'
+                })
+                return;
+            }
 
             setData(data);
             setDatarestore(data);

@@ -55,10 +55,8 @@ import icon_review from 'public/image/icon/review.svg';
 import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
 import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
+import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 
-type Tquery = {
-    wareHouseId: string | undefined;
-};
 
 export default function PurchaseRequisitionList() {
 
@@ -104,7 +102,6 @@ export default function PurchaseRequisitionList() {
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
@@ -158,11 +155,6 @@ export default function PurchaseRequisitionList() {
     }, [firstin]);
 
 
-
-
-    // const [open, setOpen] = useState(false);
-
-
     //#region 上方功能列
 
     //搜尋功能
@@ -172,13 +164,7 @@ export default function PurchaseRequisitionList() {
         }
     ];
 
-    //搜尋功能
-    // const doSearch = (valueArr: (string | Toption | null)[]) => {
-    //     const keywordWhpname = valueArr[0] as string;
-    //     const keywordMaterialnumber = valueArr[1] as string;
-    //     const keywordSpec = valueArr[2] as string;
-    //     searchData(keywordWhpname, keywordMaterialnumber, );
-    // };
+
 
     // 搜尋功能
     const searchGroup = {
@@ -267,6 +253,7 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+
 
 
             setData(data);
@@ -471,17 +458,7 @@ export default function PurchaseRequisitionList() {
 
             console.log(data2);
             setIsLoading(true);
-            const conditionModel: {
-                purchaserequisitionuuid: string | undefined,
-                purchaserequisitionid: string | undefined,
-                totalprice1: string | undefined,
-                taxprice1: string | undefined,
-                totalpayprice1: string | undefined,
-                username: string | undefined,
-                needdate: any,
-                data: any,
-                note: any
-            } = {
+            const conditionModel = {
                 purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid as string | undefined,
                 purchaserequisitionid: checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid as string | undefined,
                 totalprice1: totalprice1,
@@ -820,10 +797,12 @@ export default function PurchaseRequisitionList() {
     //得標廠商id，update回quotereqdetail
     const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
     const [selectedsupplier, setSelectedsupplier] = useState<string>("");
-
+    const [purchaserequisitiondetailuuid, setPurchaserequisitiondetailuuid] = useState<string>("");
 
     //打開詢價單modal
     const prQuotereqModalOpen = async (item: any) => {
+        setPurchaserequisitiondetailuuid(item.purchaserequisitiondetailuuid);
+        // return;
         //清空
         prquotereqadddata.quoterequuid = "";
         prquotereqadddata.quotereqid = "";
@@ -842,7 +821,8 @@ export default function PurchaseRequisitionList() {
         setQuotereqname(item.name);
         setQuotereqspec(item.spec);
         setQuotereqquantity(item.quantity);
-        getQuotereqDetail(item.quoterequuid);
+        // getQuotereqDetail(item.quoterequuid);
+        getQuotereqDetail(item.productid);
         setPrquotereqmodalopen(true);
         // setProductSearchmodalopen(true)
         setPrquotereqmodalopen(true);
@@ -851,16 +831,15 @@ export default function PurchaseRequisitionList() {
     //關閉詢價單modal
     const prQuotereqModalClose = async () => {
         setPrquotereqmodalopen(false);
+        setPrquotereqdata([]);
     }
 
     //取得對應詢價單主檔的詢價單明細檔
-    const getQuotereqDetail = async (quoterequuid: any) => {
+    const getQuotereqDetail = async (productid: any) => {
         try {
             // setIsLoading(true);
-            const conditionModel: {
-                quoterequuid: string | undefined
-            } = {
-                quoterequuid: quoterequuid as string | undefined,
+            const conditionModel = {
+                productid: productid as string | undefined,
             };
 
             var inputModel = {
@@ -898,11 +877,24 @@ export default function PurchaseRequisitionList() {
 
 
 
-    const updateQuotereqDetail = async (quotereqdetailid: string, lastquotereqdetailid: string) => {
+    const UpdatePurchaserequisitionDetail = async (item: any) => {
         try {
+            console.log(item);
+            // console.log(item.id);
+            // console.log(quotereqquantity);
+            // console.log((parseInt(item.unitprice) * parseInt(quotereqquantity)).toString());
+
+            // return;
+
             const conditionModel = {
-                lastquotereqdetailid: lastquotereqdetailid,
-                quotereqdetailid: quotereqdetailid
+                purchaserequisitiondetailuuid: purchaserequisitiondetailuuid,
+                unitprice: item.detail_unitprice,
+                totalprice: (parseInt(item.detail_unitprice) * parseInt(quotereqquantity)),
+                suppliername: item.detail_suppliername,
+                quotereqdetailuuid: item.detail_id,
+                suppliertaxid: item.main_suppliertaxid,
+                supplieraddress: item.main_supplieraddress,
+                supplierphone: item.main_supplierphone
             };
 
             var inputModel = {
@@ -912,7 +904,7 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/UpdateQuotereqDetailById`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaserequisitionDetail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -925,8 +917,8 @@ export default function PurchaseRequisitionList() {
             }
 
             const responseData = await response.json();
-            // console.log("Transfer response:", responseData);
-            // getQuotereqDetail(prquotereqadddata.quoterequuid);
+
+            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
 
         } catch (error: any) {
             // setError(error.message);
@@ -937,19 +929,20 @@ export default function PurchaseRequisitionList() {
         }
 
     };
-    useEffect(() => {
-        if (selectedsupplier) {
-            updateQuotereqDetail(selectedsupplier, lastselectedsupplier);
-        }
-    }, [selectedsupplier]);
+    // useEffect(() => {
+    //     if (selectedsupplier) {
+    //         // updateQuotereqDetail(selectedsupplier, lastselectedsupplier);
+    //         UpdatePurchaserequisitionDetail(purchaserequisitiondetailuuid);
+    //     }
+    // }, [selectedsupplier]);
 
 
     useEffect(() => {
         if (prquotereqdata && prquotereqdata.length > 0) {
-            const awardedItem = prquotereqdata.find((item: any) => item.awarded);
-            if (awardedItem) {
-                setSelectedsupplier(awardedItem.id);
-                setLastselectedsupplier(awardedItem.id);
+            const quotereqdetailuuid = data1.find((item: any) => item.quotereqdetailuuid);
+            if (quotereqdetailuuid) {
+                setSelectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
+                setLastselectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
             }
         }
     }, [prquotereqdata]);
@@ -1448,6 +1441,25 @@ export default function PurchaseRequisitionList() {
         });
     }
 
+    const handleCheckboxChange = (item: any) => {
+        console.log(item);
+        // return;
+        // 更新選中的供應商
+        setLastselectedsupplier(selectedsupplier);
+        setSelectedsupplier(item.detail_id);
+        UpdatePurchaserequisitionDetail(item);
+    };
+
+    const GoToQuotereq = async () => {
+        router.push({
+            pathname: `/factoryDepartment/quotereqList`,
+            query: {
+
+            },
+        });
+    }
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
@@ -1536,6 +1548,11 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { GoToQuotereq() }} title="詢價管理">
+                                    <img src={icon_fc_quotereq.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    詢價
+                                </button>
                             </div>
                             <div>
                                 {/* <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
@@ -1599,7 +1616,7 @@ export default function PurchaseRequisitionList() {
                                 </button>
 
                                 &nbsp;
-                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={()=>{handleGetReviewBack()}}>
+                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
@@ -1763,49 +1780,16 @@ export default function PurchaseRequisitionList() {
 
                         <div className={scss.head_foot2}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    請購紀錄
-                                </button> */}
-                                {/* <button className={scss.minibtn} onClick={() => { setProductSearchmodalopen(!productSearchmodalopen) }}> */}
-
-                                <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
-                                    {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                                {/* <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
                                     詢價紀錄
                                 </button>
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
-                                    {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                     詢價紀錄
-                                </button>
+                                </button> */}
                             </div>
-                            <div style={{ marginTop: '5px' }}>
-
-                            </div>
-                            <div>
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="詢價進度"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `${quotereqprogress}/${totalreqprogress}`
-                                        },
-                                    }}
-                                /> */}
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="已轉採購"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `${transpoprogress}/${totalreqprogress}`
-                                        },
-                                    }}
-                                /> */}
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
                         <div className={scss.body_content1}>
                             <Thead01 type={'PurchaseRequisitionDetail'} />
@@ -1820,7 +1804,21 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.quantity}</span>
                                             <span>{_item.unit}</span>
                                             {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
-                                            <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
+                                            <span>
+                                                {/* <IconDetail onClick={() => prQuotereqModalOpen(_item)} /> */}
+                                                {/* icon_fc_quotereq */}
+                                                <button
+                                                    onClick={() => {
+                                                        if (viewtype !== 'review') {
+                                                            prQuotereqModalOpen(_item);
+                                                        }
+                                                    }}
+                                                    disabled={_item.reviewtype === 'review'} // 如果 reviewtype 是 'review'，禁用按鈕
+                                                >
+                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+
+                                            </span>
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>{_item.suppliername}</span>
@@ -2049,7 +2047,7 @@ export default function PurchaseRequisitionList() {
 
                 {/* 隱藏的modal */}
                 {/* 詢價單檢視 */}
-                <Modal
+                {/* <Modal
                     visible={prquotereqmodalopen}
                     footer={null}
                     onCancel={prQuotereqModalClose}
@@ -2057,8 +2055,13 @@ export default function PurchaseRequisitionList() {
                     maskClosable={false}
                     // centered
                     style={{ top: 250 }}
-                >
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                > */}
+                <DragableModal
+                    handleText="詢價紀錄"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={prquotereqmodalopen}
+                    onCrossClick={prQuotereqModalClose}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
                         <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
@@ -2071,18 +2074,22 @@ export default function PurchaseRequisitionList() {
                                 <CellWithBar key={index} className={scss.panelHeader17}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
-                                        <span>{_item.suppliername}</span>
-                                        <span>{_item.unitprice}</span>
-                                        <span>{_item.totalprice}</span>
-                                        <span>{_item.unit}</span>
-                                        <span>{getTaiwanDateStr(_item.deliverydate)}</span>
-                                        <span>{_item.note}</span>
+                                        <span>{_item.detail_suppliername}</span>
+                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                        <span>{_item.detail_unit}</span>
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                        <span>{_item.detail_note}</span>
+                                        <span></span>
+                                        {/* <span></span> */}
                                         <span>
                                             <input
                                                 readOnly
                                                 className={scss.quotereqdetail_checkbox}
                                                 type='checkbox'
-                                                checked={selectedsupplier === _item.id}
+                                                checked={selectedsupplier === _item.detail_id}
+                                                onChange={() => handleCheckboxChange(_item)}
                                             />
                                         </span>
                                     </div>
@@ -2090,7 +2097,8 @@ export default function PurchaseRequisitionList() {
                             ))
                         )}
                     </div>
-                </Modal>
+                </DragableModal>
+                {/* </Modal> */}
 
                 <DragableModal
                     handleText="查找單據"

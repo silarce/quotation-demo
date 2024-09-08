@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { reverse, update } from 'lodash';
-
 import scss from './reviewList.module.scss';
 import Thead01 from '../../factoryDepartment/ui/table/thead01';
 import Tbody01 from '../../factoryDepartment/ui/table/tbody01';
@@ -48,7 +47,7 @@ import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 
 export default function ReviewList() {
 
-    //路由參數
+    // 路由參數
     const router = useRouter();
     const {
         firstin,
@@ -58,9 +57,9 @@ export default function ReviewList() {
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
 
-    //登入者資料
+    // 登入者資料
     const { userInfo } = useContext(AppContext);
-    //資料列宣告
+    // 資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
@@ -68,17 +67,14 @@ export default function ReviewList() {
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
 
-
-
-
+    // 變數宣告
     const [reviewtype, setReviewtype] = useState<string>("");
     const [memo, setMemo] = useState<string>("");
     const [currentreview_id, setCurrentreview_id] = useState<string>("");
     const [review_memo, setReview_memo] = useState<string>("");
     const [document_status, setDocument_status] = useState<string>("");
 
-
-    //搜尋
+    // 搜尋bar
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
@@ -92,6 +88,7 @@ export default function ReviewList() {
     const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
     const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
+    // 編輯功能
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
     const [editmain, setEditmain] = useState<boolean>(false);
@@ -99,9 +96,7 @@ export default function ReviewList() {
 
     const [itemQuery, setItemQuery] = useState<any>({});
 
-
-
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
+    //判斷是否第一次進入頁面
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
     useEffect(() => {
         if (firstin !== undefined) {
@@ -109,10 +104,9 @@ export default function ReviewList() {
         }
     }, [firstin]);
 
+
+
     //#region 上方功能列
-
-
-
 
 
     //新增按鈕
@@ -132,6 +126,11 @@ export default function ReviewList() {
         // },
     ];
     //#endregion
+
+
+
+
+
 
     //#region call api
     //取審核主檔
@@ -222,7 +221,6 @@ export default function ReviewList() {
             // setIsLoading(false);
         }
     };
-
     // 取審核完成主檔
     const GetReviewed = async () => {
         try {
@@ -275,17 +273,10 @@ export default function ReviewList() {
         }
     }, []);
 
-
-
-
+    // 取流程狀態
     const GetReviewStatus = async (item: any) => {
         handleRowClick(item.id);
         setCurrentreview_id(item.id);
-
-        // alert("in");
-        // GetDocument(item);
-        // setReviewtype("報價單");
-
         try {
             // setIsLoading(true);
             const conditionModel = {
@@ -309,9 +300,8 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData2(data);
-            setItemQuery(item);
             // 設定 itemQuery
-            // GetDocument(item);
+            setItemQuery(item);
             setReviewtype(item.document_type);
             setDocument_status(item.document_status);
         } catch (error: any) {

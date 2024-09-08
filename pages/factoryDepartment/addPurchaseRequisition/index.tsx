@@ -1173,7 +1173,7 @@ export default function AddPurchaseRequisition() {
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${status === "請購中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
