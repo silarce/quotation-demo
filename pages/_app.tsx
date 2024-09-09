@@ -25,7 +25,6 @@ import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // i18n
 import { useTranslation } from 'react-i18next';
-import { useI18nEditTemplate } from 'hooks/globalState/useI18n_editTemplate';
 
 // -----------------------------------------------------------------------------------
 // 全域 css
@@ -87,7 +86,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   useGlobalErrorCatcher();
 
-  const switchLocale = useI18nEditTemplate((state) => state.switchLocale);
   const { i18n } = useTranslation();
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
@@ -142,10 +140,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    switchLocale(i18n.language);
-  }, [i18n.language]);
 
   // -----------------------------------------------------------------------
   const appContextValue = {
