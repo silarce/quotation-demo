@@ -56,10 +56,10 @@ export default function BankManagement(): React.ReactElement {
 
   const post = async () => {
     await apiPostBankAccount({
-      accountName: '陳喵喵',
+      account_name: '王汪汪',
       account: '123-223-323',
-      bankCode: '45-678989-23',
-      bankName: '喵喵大銀行',
+      bank_code: '45-678989-23',
+      bank_name: '汪汪小銀行',
     });
   };
 
@@ -80,6 +80,9 @@ export default function BankManagement(): React.ReactElement {
 
       <div>
         <button onClick={post}>post</button>
+        <br />
+        <br />
+        <br />
       </div>
     </SubLayer>
   );

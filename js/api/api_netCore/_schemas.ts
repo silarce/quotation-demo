@@ -1,8 +1,8 @@
 interface TnetCoreapiBody {
-  typeName: string;
-  serviceName: string;
-  functionName: string;
-  filterConditions: string; // 將post或patch的body轉為JSON放進去
+  TypeName: string;
+  ServiceName: string;
+  FunctionName: string;
+  FilterConditions: string; // 將post或patch的body轉為JSON放進去
 }
 
 interface Tbase {
@@ -15,13 +15,13 @@ interface Tbase {
 
 interface TaccountantPresetDto extends Tbase {
   // 帳戶名稱
-  accountName: string;
+  account_name: string;
   // 帳號
   account: string;
   // 銀行代號
-  bankCode: string;
+  bank_code: string;
   // 銀行名稱
-  bankName: string;
+  bank_name: string;
 }
 
 type TcreateAccountantPresetDto = Omit<
