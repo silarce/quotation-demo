@@ -274,12 +274,12 @@ export default function PurchaseOrderList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: '尚無單據'
-                })
-                return;
-            }
+            // if (data.length === 0) {
+            //     myAlert.warning({
+            //         title: '尚無單據'
+            //     })
+            //     return;
+            // }
 
             setData(data);
             setData1Restore(data);

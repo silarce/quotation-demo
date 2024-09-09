@@ -825,7 +825,7 @@ export default function PurchaseRequisitionList() {
         getQuotereqDetail(item.productid);
         setPrquotereqmodalopen(true);
         // setProductSearchmodalopen(true)
-        setPrquotereqmodalopen(true);
+        // setPrquotereqmodalopen(true);
     }
 
     //關閉詢價單modal

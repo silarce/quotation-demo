@@ -41,7 +41,7 @@ import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_history from 'public/image/icon/fc_history.svg';
-
+import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -90,6 +90,7 @@ export default function AddPurchaseOrder() {
     const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -104,8 +105,11 @@ export default function AddPurchaseOrder() {
     const [status, setStatus] = useState<string>("");
     // const [purchaserequisitionid, setPurchaserequisitionid] = useState<string>("");
     // const [purchaserequisitionuuid, setPurchaserequisitionuuid] = useState<string>("");
-    const [purchaseorderid, setPurchaseorderid] = useState<string>("");
-    const [purchaseorderuuid, setPurchaseorderuuid] = useState<string>("");
+    // const [purchaseorderid, setPurchaseorderid] = useState<string>("");
+    // const [purchaseorderuuid, setPurchaseorderuuid] = useState<string>("");
+    const [quotereqid, setQuotereqid] = useState<string>("");
+    const [quoterequuid, setQuoterequuid] = useState<string>("");
+
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
@@ -113,6 +117,7 @@ export default function AddPurchaseOrder() {
     const [invoicein, setInvoicein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
+    const [supplieridin, setSupplieridin] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -129,13 +134,13 @@ export default function AddPurchaseOrder() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<string>("");
+    const [handinputquantity, setHandinputquantity] = useState<number>(0);
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
-    const [handinputunitprice, setHandinputunitprice] = useState<string>("");
-    const [handinputtotalprice, setHandinputtotalprice] = useState<string>("");
+    const [handinputunitprice, setHandinputunitprice] = useState<number>(0);
+    const [handinputtotalprice, setHandinputtotalprice] = useState<number>(0);
 
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
@@ -190,27 +195,27 @@ export default function AddPurchaseOrder() {
     //新增按鈕
     const panelList: TpanelList = [
         // { searchGroup },
-        {
-            type: 'myButton',
-            label: '返回',
-            onClick: () => {
-                myAlert.confirm({
-                    title: '確定要返回採購管理嗎?',
-                    content: <>
-                        <h1>未儲存的資料將不會保留</h1>
-                    </>,
-                    props: {
-                        onOk: () => {
-                            router.back();
-                        }
-                    }
-                });
-            },
-        },
+        // {
+        //     type: 'myButton',
+        //     label: '返回',
+        //     onClick: () => {
+        //         myAlert.confirm({
+        //             title: '確定要返回採購管理嗎?',
+        //             content: <>
+        //                 <h1>未儲存的資料將不會保留</h1>
+        //             </>,
+        //             props: {
+        //                 onOk: () => {
+        //                     router.back();
+        //                 }
+        //             }
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
-    const getPurchaseOrder = async () => {
+    const getQuotereq = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -233,7 +238,7 @@ export default function AddPurchaseOrder() {
 
 
             setQodata(data);
-            
+
             setSearchdata(data);
 
         } catch (error: any) {
@@ -247,18 +252,18 @@ export default function AddPurchaseOrder() {
 
     useEffect(() => {
         if (!hasFetchedData.current) {
-            getPurchaseOrder();
+            getQuotereq();
             getProduct();
             getCustomers();
             hasFetchedData.current = true;
         }
     }, []);
 
-    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
+    const getQuotereqDetail = async (quoterequuid: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaseorderuuid: purchaseorderuuid as string | undefined,
+                quoterequuid: quoterequuid as string | undefined,
             };
 
 
@@ -270,12 +275,14 @@ export default function AddPurchaseOrder() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
             // setData1(data);
+
+            console.log(data);
 
             setData2(data);
 
@@ -437,8 +444,8 @@ export default function AddPurchaseOrder() {
     //     }
     // }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
-    //採購單申請
-    const AddPurchaseOrder = async () => {
+    //詢價單申請
+    const AddQuotereq = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -451,6 +458,7 @@ export default function AddPurchaseOrder() {
                 suppliertaxid: suppliertaxidin,
                 supplieraddress: supplieraddressin,
                 shippingaddress: shippingaddressin,
+
             };
 
 
@@ -464,7 +472,7 @@ export default function AddPurchaseOrder() {
 
             console.log(JSON.stringify(conditionModel));
 
-            const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseOrder`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/AddQuotereq`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -479,14 +487,14 @@ export default function AddPurchaseOrder() {
             myAlert.info(
                 {
                     title: '單據新增成功',
-                    content: `採購單據號碼為:${data[0].purchaseorderid}`
+                    content: `詢價單據號碼為:${data[0].quotereqid}`
                 })
 
             setData2([]);
-            setPurchaseorderid(data[0].purchaseorderid);
-            setPurchaseorderuuid(data[0].id);
+            setQuotereqid(data[0].detail_id);
+            setQuoterequuid(data[0].id);
             setStatus("未送出");
-            getPurchaseOrder();
+            getQuotereq();
 
 
             setStatus("未送出");
@@ -528,7 +536,7 @@ export default function AddPurchaseOrder() {
             }
             const responseData = await response.json();
 
-            getPurchaseOrderDetail(purchaseorderuuid);
+            getQuotereqDetail(quoterequuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -542,44 +550,44 @@ export default function AddPurchaseOrder() {
     //請購單申請
     const ClosePurchaseRequisition = async () => {
 
-        console.log(data2);
-        // return;
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                purchaseorderid: any,
-                purchaseorderuuid: any
-            } = {
-                purchaseorderid: purchaseorderid,
-                purchaseorderuuid: purchaseorderuuid
-            };
+        // console.log(data2);
+        // // return;
+        // try {
+        //     setIsLoading(true);
+        //     const conditionModel: {
+        //         purchaseorderid: any,
+        //         purchaseorderuuid: any
+        //     } = {
+        //         purchaseorderid: purchaseorderid,
+        //         purchaseorderuuid: purchaseorderuuid
+        //     };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+        //     var inputModel = {
+        //         TypeName: 'ERP',
+        //         ServiceName: 'WareHouseService',
+        //         FunctionName: 'no',
+        //         FilterConditions: JSON.stringify(conditionModel),
+        //     };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/ClosePurchaseRequisition`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+        //     const response = await fetch(`${setting.apipath}/WareHouse/ClosePurchaseRequisition`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(inputModel)
+        //     });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
+        //     if (!response.ok) {
+        //         throw new Error('Failed to fetch data');
+        //     }
+        //     const data = await response.json();
 
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
+        // } catch (error: any) {
+        //     setError(error.message);
+        // }
+        // finally {
+        //     setIsLoading(false);
+        // }
     };
 
 
@@ -589,14 +597,15 @@ export default function AddPurchaseOrder() {
 
     // 送出按鈕
     function handleAdd() {
-        AddPurchaseOrder();
+        // AddPurchaseOrder();
+        AddQuotereq();
         // }
     }
 
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '' || handinputquantity === '') {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '' || handinputquantity === 0) {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -607,26 +616,31 @@ export default function AddPurchaseOrder() {
                 spec: handinputspec,
                 quantity: handinputquantity,
                 unit: handinputunit,
-                note: handinputnote
+                note: handinputnote,
+                unitprice: handinputunitprice,
+                totalprice: handinputtotalprice,
             };
 
             setHandinputproductuuid('');
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity('');
+            setHandinputquantity(0);
             setHandinputunit('');
             setHandinputnote('');
+            setHandinputunitprice(0);
+            setHandinputtotalprice(0);
 
             try {
                 setIsLoading(true);
-                const conditionModel: {
-                    purchaseorderid: any,
-                    purchaseorderuuid: any,
-                    data: any,
-                } = {
-                    purchaseorderid: purchaseorderid,
-                    purchaseorderuuid: purchaseorderuuid,
+                const conditionModel = {
+                    quotereqid: quotereqid,
+                    quoterequuid: quoterequuid,
+                    supplierid: supplieridin,
+                    suppliername: suppliernamein,
+                    supplieraddress: supplieraddressin,
+                    suppliertaxid: suppliertaxidin,
+                    supplierphone: supplierphonein,
                     data: newEntry
                 };
 
@@ -637,7 +651,7 @@ export default function AddPurchaseOrder() {
                     FilterConditions: JSON.stringify(conditionModel),
                 };
 
-                const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseOrderDetail`, {
+                const response = await fetch(`${setting.apipath}/WareHouse/AddQuotereqDetail`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -652,7 +666,7 @@ export default function AddPurchaseOrder() {
 
                 setData2(prevData2 => [...prevData2, data]);
 
-                getPurchaseOrderDetail(purchaseorderuuid);
+                getQuotereqDetail(quoterequuid);
 
 
 
@@ -871,8 +885,10 @@ export default function AddPurchaseOrder() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity('');
+        setHandinputquantity(0);
         setShowSuggestions(false);
+        setHandinputunitprice(0);
+        setHandinputtotalprice(0);
     }
 
 
@@ -907,7 +923,7 @@ export default function AddPurchaseOrder() {
         setInvoicein("");
         setSupplieraddressin("");
         setShippingaddressin("台中市霧峰區峰北路666號");
-        setPurchaseorderid("儲存後產生");
+        setQuotereqid("儲存後產生");
         setStatus("未儲存");
         setNote("");
     }
@@ -926,7 +942,7 @@ export default function AddPurchaseOrder() {
         setSupplieraddressin("");
         setShippingaddressin("");
         setEditmain(false);
-        setPurchaseorderid("");
+        setQuotereqid("");
         setStatus("");
         setData2([]);
         setNote("");
@@ -960,20 +976,20 @@ export default function AddPurchaseOrder() {
                     props: {
                         onOk: async () => {
                             ClosePurchaseRequisition();
-                            setPurchaseorderid("");
-                            setPurchaseorderuuid("");
+                            setQuotereqid("");
+                            setQuoterequuid("");
                             setCreate_atin(moment().format('YYYY-MM-DD') || '');
                             setNeed_date(moment().format('YYYY-MM-DD') || '');
                             setStatus("");
                             setNote("")
                             setData2([]);
 
-                            await router.push({
-                                pathname: `/factoryDepartment/purchaseOrderList`,
-                                query: {
-                                    purchaseorderid: purchaseorderid
-                                },
-                            });
+                            // await router.push({
+                            //     pathname: `/factoryDepartment/purchaseOrderList`,
+                            //     query: {
+                            //         purchaseorderid: purchaseorderid
+                            //     },
+                            // });
                         }
                     }
                 });
@@ -1086,10 +1102,11 @@ export default function AddPurchaseOrder() {
     }
 
     const handlechangepo = (item: any) => {
-        handleRowClick(item.purchaseorderid);
+        console.log(item);
+        handleRowClick(item.id);
         setData2([]);
-        setPurchaseorderid(item.purchaseorderid);
-        setPurchaseorderuuid(item.purchaseorderuuid);
+        setQuotereqid(item.quotereqid);
+        setQuoterequuid(item.id);
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
@@ -1099,7 +1116,7 @@ export default function AddPurchaseOrder() {
         setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
         setShippingaddressin(item.shippingaddress);
-        getPurchaseOrderDetail(item.purchaseorderuuid);
+        getQuotereqDetail(item.id);
     }
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -1154,7 +1171,7 @@ export default function AddPurchaseOrder() {
 
     const handleSelectCustomer = (item: any) => {
         customersisSelectingRef.current = true;
-
+        setSupplieridin(item?.customer_number);
         setSuppliernamein(item?.name);
         setSupplieraddressin(
             (item.county ? item.county : '') +
@@ -1228,10 +1245,68 @@ export default function AddPurchaseOrder() {
         alert(productname);
     }
 
+    const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
+    const prQuotereqModalOpen = async (item: any) => {
+        // return;
+        //清空
+        prquotereqadddata.quoterequuid = "";
+        prquotereqadddata.quotereqid = "";
+        prquotereqadddata.unitprice = "";
+        prquotereqadddata.totalprice = "";
+        prquotereqadddata.suppliername = "";
+        prquotereqadddata.deliverydate = moment();
+        prquotereqadddata.unit = "";
+        prquotereqadddata.note = "";
+        prquotereqadddata.awarded = false;
+        //預設詢價單主檔編號
+        prquotereqadddata.quoterequuid = item.quoterequuid;
+        prquotereqadddata.quotereqid = item.quotereqid;
 
 
+        // setQuotereqname(item.name);
+        // setQuotereqspec(item.spec);
+        // setQuotereqquantity(item.quantity);
+        getQuotereqDetailhistory(item);
+        setPrquotereqmodalopen(true);
+        setPrquotereqmodalopen(true);
+    }
 
+    //關閉詢價單modal
+    const prQuotereqModalClose = async () => {
+        setPrquotereqmodalopen(false);
+        setPrquotereqdata([]);
+    }
 
+    const getQuotereqDetailhistory = async (productid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                productid: productid as string | undefined,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setPrquotereqdata(data);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
@@ -1307,11 +1382,11 @@ export default function AddPurchaseOrder() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="採購單號"
+                                            caption="詢價單號"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: purchaseorderid || ' ',
+                                                    value: quotereqid || ' ',
                                                 },
                                             }}
                                         />
@@ -1319,7 +1394,7 @@ export default function AddPurchaseOrder() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="採購日期"
+                                            caption="詢價日期"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
@@ -1440,7 +1515,7 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption=""
                                             disabled={true}
@@ -1450,7 +1525,7 @@ export default function AddPurchaseOrder() {
                                                     value: `${status === "未儲存" ? "※可輸入公司名稱查詢地址" : ' '}`,
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                     <div>
                                         <InputSel
@@ -1464,7 +1539,7 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="發票號碼"
                                             disabled={status === "未儲存" ? false : true}
@@ -1474,7 +1549,7 @@ export default function AddPurchaseOrder() {
                                                     onChange: (e) => { setInvoicein(e.target.value) }
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                                 <div className={scss.head_content3}>
@@ -1590,6 +1665,17 @@ export default function AddPurchaseOrder() {
                                             },
                                         }}
                                     />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="詢價數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: data2.length,
+                                            },
+                                        }}
+                                    />
 
                                 </div>
                             </div>
@@ -1602,27 +1688,23 @@ export default function AddPurchaseOrder() {
                             </div>
                             <div style={{ marginTop: '5px' }}></div>
                             <div></div>
-                            <div>
-                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
-                                    總比數：
-                                    {data2.length}
-                                </span>
-                            </div>
+                            <div></div>
                         </div>
                         <div className={scss.body_content1}>
-                            <Thead01 type={'AddPO_ReqList'} />
+                            <Thead01 type={'AddQOList'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
+                                        <span>{_item.detail_productid}</span>
                                         <span>
                                             <input
                                                 ref={nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
-                                                value={_item.name !== undefined ? _item.name : ''}
+                                                value={_item.detail_name !== undefined ? _item.detail_name : ''}
+                                                readOnly
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
@@ -1633,10 +1715,12 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
-                                                value={_item.spec !== undefined ? _item.spec : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                value={_item.detail_spec !== undefined ? _item.detail_spec : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
                                                 }}
@@ -1646,11 +1730,12 @@ export default function AddPurchaseOrder() {
                                             <input
                                                 ref={quantityRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                value={_item.detail_quantity !== undefined ? _item.detail_quantity : 0}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleNumberChange(index, "quantity", e.target.value);
                                                 }}
@@ -1661,20 +1746,44 @@ export default function AddPurchaseOrder() {
                                                 ref={unitRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
-                                                value={_item.unit !== undefined ? _item.unit : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                value={_item.detail_unit !== undefined ? _item.detail_unit : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "unit", e.target.value);
                                                 }}
                                             />
                                         </span>
                                         <span>
+                                            <button
+                                                onClick={() => { prQuotereqModalOpen(_item.detail_productid) }}
+                                            >
+                                                <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                type="text"
+                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "unitprice", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            {_item.detail_totalprice}
+                                        </span>
+                                        <span>
                                             <input
                                                 ref={noteRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
-                                                value={_item.note !== undefined ? _item.note : ''}
+                                                value={_item.detail_note !== undefined ? _item.detail_note : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
@@ -1701,8 +1810,12 @@ export default function AddPurchaseOrder() {
                             ))}
 
 
-                            <div className={scss.addbar} style={{ display: `${(purchaseorderid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
-                                <div></div>
+                            <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                                <div>
+                                    <button onClick={() => { handleAddByHandKey() }}>
+                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                </div>
                                 <div>
                                     <input
                                         type="text"
@@ -1744,10 +1857,9 @@ export default function AddPurchaseOrder() {
                                         maxLength={5}
                                         value={handinputquantity}
                                         onChange={(e) => {
-                                            const value = e.target.value;
-                                            if (/^\d*$/.test(value)) { // 只允許數字
-                                                setHandinputquantity(value);
-                                            }
+                                            const quantity = parseInt(e.target.value) || 0;
+                                            setHandinputquantity(quantity);
+                                            setHandinputtotalprice(quantity * handinputunitprice); // 同時更新總金額
                                         }}
                                     />
                                 </div>
@@ -1760,14 +1872,22 @@ export default function AddPurchaseOrder() {
                                     />
                                 </div>
                                 <div>
-                                    <IconDetail onClick={() => getQuotereqDetailPrice(handinputname)} />
+                                    <button
+                                        onClick={() => { prQuotereqModalOpen(handinputproductid) }}
+                                    >
+                                        <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                    </button>
                                 </div>
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='單價'
                                         value={handinputunitprice}
-                                        onChange={(e) => setHandinputunitprice(e.target.value)}
+                                        onChange={(e) => {
+                                            const unitprice = parseInt(e.target.value) || 0;
+                                            setHandinputunitprice(unitprice);
+                                            setHandinputtotalprice(handinputquantity * unitprice); // 同時更新總金額
+                                        }}
                                     />
                                 </div>
                                 <div>
@@ -1775,9 +1895,10 @@ export default function AddPurchaseOrder() {
                                         type="text"
                                         placeholder='金額'
                                         value={handinputtotalprice}
-                                        onChange={(e) => setHandinputtotalprice(e.target.value)}
+                                        onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
                                     />
                                 </div>
+
                                 <div>
                                     <input
                                         type="text"
@@ -1787,12 +1908,8 @@ export default function AddPurchaseOrder() {
                                     />
                                 </div>
                                 <div>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <button onClick={() => { handleAddByHandKey() }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                    </button>
-                                    &nbsp;&nbsp;
-                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
+                                    &nbsp;&nbsp;&nbsp;
+                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote || handinputunitprice ? '' : 'none' }}>
                                         <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
@@ -2007,7 +2124,7 @@ export default function AddPurchaseOrder() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="採購單號"
+                                        caption="詢價單號"
                                         disabled={false}
                                         inputProps={{
                                             props: {
@@ -2112,7 +2229,7 @@ export default function AddPurchaseOrder() {
                                     <CellWithBar key={index} className={scss.panelHeader15}>
                                         <div
                                             key={index}
-                                            className={`${scss.row01} ${_item.purchaseorderid === selectedItemId ? scss.selectedRow : ''}`}
+                                            className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                             onClick={() => { handlechangepo(_item) }}>
                                             <span>{index + 1}</span>
                                             <span>{_item.quotereqid}</span>
@@ -2134,7 +2251,59 @@ export default function AddPurchaseOrder() {
                     {/* </Modal > */}
                 </DragableModal>
 
-
+                <DragableModal
+                    handleText="詢價紀錄"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={prquotereqmodalopen}
+                    onCrossClick={prQuotereqModalClose}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{handinputname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{handinputspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        {/* <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{handinputquantity}</span> */}
+                    </div>
+                    <hr />
+                    <div>
+                        <Thead01 type={'Quotereq'} />
+                        {prquotereqdata && (
+                            prquotereqdata.map((_item: any, index: number) => (
+                                <CellWithBar key={index} className={scss.panelHeader17}>
+                                    <div className={scss.row01}>
+                                        <span>{index + 1}</span>
+                                        <span>{_item.detail_suppliername}</span>
+                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                        {/* <span>
+                                            {new Date(_item.detail_create_at).toLocaleString('zh-TW', {
+                                                year: 'numeric',
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                                second: '2-digit',
+                                                hour12: false, // 24小時制
+                                            })}
+                                        </span> */}
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                        <span>{_item.detail_unit}</span>
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                        <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                        <span>{_item.detail_note}</span>
+                                        <span></span>
+                                        {/* <span></span> */}
+                                        <span>
+                                            {/* <input
+                                                readOnly
+                                                className={scss.quotereqdetail_checkbox}
+                                                type='checkbox'
+                                                checked={selectedsupplier === _item.detail_id}
+                                                onChange={() => handleCheckboxChange(_item)}
+                                            /> */}
+                                        </span>
+                                    </div>
+                                </CellWithBar>
+                            ))
+                        )}
+                    </div>
+                </DragableModal>
 
             </div>
         </SubLayer >

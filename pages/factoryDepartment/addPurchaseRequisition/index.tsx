@@ -114,7 +114,7 @@ export default function AddPurchaseRequisition() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<string>("");
+    const [handinputquantity, setHandinputquantity] = useState<number>(0);
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
@@ -580,7 +580,7 @@ export default function AddPurchaseRequisition() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '' || handinputquantity === '') {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '') {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -598,7 +598,7 @@ export default function AddPurchaseRequisition() {
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity('');
+            setHandinputquantity(0);
             setHandinputunit('');
             setHandinputnote('');
 
@@ -672,7 +672,7 @@ export default function AddPurchaseRequisition() {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
         RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
-    }; 
+    };
 
     // 改變數字口袋清單值
     const handleNumberChange = (index: any, target: any, value: any) => {
@@ -897,7 +897,7 @@ export default function AddPurchaseRequisition() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity('');
+        setHandinputquantity(0);
         setShowSuggestions(false);
     }
 
@@ -1395,7 +1395,11 @@ export default function AddPurchaseRequisition() {
 
 
                             <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
-                                <div></div>
+                                <div>
+                                    <button onClick={() => { handleAddByHandKey() }}>
+                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                </div>
                                 <div>
                                     <input
                                         type="text"
@@ -1436,12 +1440,7 @@ export default function AddPurchaseRequisition() {
                                         placeholder='數量'
                                         maxLength={5}
                                         value={handinputquantity}
-                                        onChange={(e) => {
-                                            const value = e.target.value;
-                                            if (/^\d*$/.test(value)) { // 只允許數字
-                                                setHandinputquantity(value);
-                                            }
-                                        }}
+                                        onChange={(e) => { setHandinputquantity(parseInt(e.target.value) || 0) }}
                                     />
                                 </div>
                                 <div>
@@ -1461,10 +1460,6 @@ export default function AddPurchaseRequisition() {
                                     />
                                 </div>
                                 <div>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <button onClick={() => { handleAddByHandKey() }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                    </button>
                                     &nbsp;&nbsp;
                                     <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
                                         <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />

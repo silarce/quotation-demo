@@ -278,12 +278,12 @@ export default function ProdReceiptList() {
             }
             
             const data = await response.json();
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: '尚無單據'
-                })
-                return;
-            }
+            // if (data.length === 0) {
+            //     myAlert.warning({
+            //         title: '尚無單據'
+            //     })
+            //     return;
+            // }
 
             setData(data);
             setDatarestore(data);
