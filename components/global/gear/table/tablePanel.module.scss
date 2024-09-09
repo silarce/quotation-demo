@@ -1,0 +1,19 @@
+.panel {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.check {
+  &.invisible {
+    visibility: hidden;
+  }
+}
+
+.edit.plus {
+  &:hover,
+  &.active {
+    color: red;
+  }
+}
