@@ -28,6 +28,9 @@ type TcreateAccountantPresetDto = Omit<
   TaccountantPresetDto,
   'id' | 'create_by' | 'created_at' | 'update_by' | 'updated_at'
 >;
+type TupdateAccountantPresetDto = Partial<TcreateAccountantPresetDto> & {
+  id: string;
+};
 
 export type {
   //
@@ -35,5 +38,6 @@ export type {
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
+  TupdateAccountantPresetDto,
   //
 };

@@ -6,7 +6,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
-import type { TaccountantPresetDto, TcreateAccountantPresetDto } from './_schemas';
+import type { TaccountantPresetDto, TcreateAccountantPresetDto, TupdateAccountantPresetDto } from './_schemas';
 
 // =================================================================================
 
@@ -52,8 +52,18 @@ const useGetBankAccount = () => {
 const apiPostBankAccount = async (data: TcreateAccountantPresetDto) => {
   const api = '/Accountant/AddBankAccount';
 
-  return axi2.post<TaccountantPresetDto>(api, data).catch((err: AxiosError) => {
+  return axi2.post<string>(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '新增銀行帳戶資料失敗', content: err.message });
+
+    return Promise.reject(err);
+  });
+};
+
+const apiPatchBankAccount = async (data: TupdateAccountantPresetDto) => {
+  const api = '/Accountant/UpdateBankAccount';
+
+  return axi2.post<string>(api, data).catch((err: AxiosError) => {
+    myAlert.err({ title: '更新銀行帳戶資料失敗', content: err.message });
 
     return Promise.reject(err);
   });
@@ -61,5 +71,5 @@ const apiPostBankAccount = async (data: TcreateAccountantPresetDto) => {
 
 // =================================================================================
 
-export { useGetBankAccount, apiPostBankAccount };
-export type { TaccountantPresetDto, TcreateAccountantPresetDto };
+export { useGetBankAccount, apiPostBankAccount, apiPatchBankAccount };
+export type { TaccountantPresetDto, TcreateAccountantPresetDto, TupdateAccountantPresetDto };

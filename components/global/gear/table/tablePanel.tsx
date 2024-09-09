@@ -23,7 +23,7 @@ const TablePanel_basic = ({
         className={classNames(scss.edit, scss.plus, !disabled && scss.active)}
         onClick={() => setDisabled((state) => !state)}
       />
-      <IconDelete01 className={classNames()} onClick={onDelete} />
+      {onDelete && <IconDelete01 className={classNames()} onClick={onDelete} />}
     </div>
   );
 };
