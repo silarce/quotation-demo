@@ -801,6 +801,9 @@ export default function PurchaseRequisitionList() {
 
     //打開詢價單modal
     const prQuotereqModalOpen = async (item: any) => {
+        console.log(item);
+        setSelectedsupplier(item.quotereqdetailuuid);
+        
         setPurchaserequisitiondetailuuid(item.purchaserequisitiondetailuuid);
         // return;
         //清空
@@ -937,15 +940,16 @@ export default function PurchaseRequisitionList() {
     // }, [selectedsupplier]);
 
 
-    useEffect(() => {
-        if (prquotereqdata && prquotereqdata.length > 0) {
-            const quotereqdetailuuid = data1.find((item: any) => item.quotereqdetailuuid);
-            if (quotereqdetailuuid) {
-                setSelectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
-                setLastselectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
-            }
-        }
-    }, [prquotereqdata]);
+    // useEffect(() => {
+    //     if (prquotereqdata && prquotereqdata.length > 0) {
+    //         const quotereqdetailuuid = data1.find((item: any) => item.quotereqdetailuuid);
+    //         if (quotereqdetailuuid) {
+    //             setSelectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
+    //             setLastselectedsupplier(quotereqdetailuuid.quotereqdetailuuid);
+    //             console.log(quotereqdetailuuid);
+    //         }
+    //     }
+    // }, [prquotereqdata]);
 
 
     const handleSubmit = (e: any) => {
@@ -2067,6 +2071,7 @@ export default function PurchaseRequisitionList() {
                         <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
                     </div>
                     <hr />
+                    {selectedsupplier}
                     <div>
                         <Thead01 type={'Quotereq'} />
                         {prquotereqdata && (
