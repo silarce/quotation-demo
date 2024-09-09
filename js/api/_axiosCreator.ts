@@ -11,7 +11,9 @@ const axi = axios.create({
 
 const axi2 = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_NETCORE_URL,
-  withCredentials: true,
+
+  // .netCore後端沒有登入的行為，沒有取得cookie，自然也不用帶cookie。帶了反而CORS
+  // withCredentials: true,
 });
 
 export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -20,7 +22,6 @@ export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 axi.interceptors.request.use(
   (config) => {
     // req攔截器
-
     return config;
   },
   (err) => {
@@ -98,16 +99,26 @@ axi2.interceptors.request.use(
   (config) => {
     // req攔截器
 
-    const { method, data } = config;
+    const { method, data, params } = config;
 
     if (method === 'post' || method === 'patch') {
       const body: TnetCoreapiBody = {
-        typeName: 'ERP',
-        serviceName: 'AccountService',
-        functionName: 'no',
-        filterConditions: JSON.stringify(data),
+        TypeName: 'ERP',
+        ServiceName: 'AccountService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(data),
       };
       config.data = body;
+    }
+
+    if (method === 'get') {
+      const input = {
+        TypeName: 'ERP',
+        ServiceName: 'AccountService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(params || {}),
+      };
+      config.params = { input: JSON.stringify(input) };
     }
 
     return config;
@@ -119,7 +130,9 @@ axi2.interceptors.request.use(
 );
 
 axi2.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    return res;
+  },
   (err) => {
     const { status } = err.response ?? {};
 
