@@ -59,7 +59,7 @@ type TinputSelProps = {
   wrapperPreStyle?: 'ps01';
   wrapperStyle?: CSSProperties;
   //
-  caption?: string;
+  caption?: React.ReactNode;
   captionClassName?: string;
   captionStyle?: React.CSSProperties;
   captionSize?: '14' | '16' | '18' | '20';

@@ -23,7 +23,7 @@
 // 報價單
 import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -157,10 +157,17 @@ type Tprofile = {
   faxNumber: string;
   trackProgress: string;
   projectProgress: string;
-
-  designatedManufacturer: string;
-
   isLost: boolean;
+
+  //
+  designatedBrand: string;
+  siteManager: string;
+  siteManagerNumber: string;
+  requiredDoorType: string;
+  requiredDoorQuantity: string;
+  estimatedDiscount: string; // number
+  scheduledProcurementOrBidDate: Moment | null;
+  type: string;
 };
 
 type Tquery = {
@@ -683,7 +690,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       contactNumber: state_profile.contactNumber ?? '',
       faxNumber: state_profile.faxNumber ?? '',
 
-      designatedManufacturer: state_profile.designatedManufacturer ?? '',
+      designatedBrand: state_profile.designatedBrand ?? '',
+      siteManager: state_profile.siteManager ?? '',
+      siteManagerNumber: state_profile.siteManagerNumber ?? '',
+      requiredDoorType: state_profile.requiredDoorType ?? '',
+      requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      estimatedDiscount: state_profile.estimatedDiscount || null,
+      scheduledProcurementOrBidDate:
+        state_profile.scheduledProcurementOrBidDate &&
+        moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+      type: state_profile.type ?? '',
 
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
@@ -1265,13 +1281,56 @@ function TheQuotation({ router }: { router: NextRouter }) {
           onChange: (v) => changeProfile('faxNumber', v),
         },
 
-        designatedManufacturer: {
-          value: state_profile.designatedManufacturer,
+        designatedBrand: {
+          value: state_profile.designatedBrand,
           onChange: (v) => {
-            changeProfile('designatedManufacturer', v);
+            changeProfile('designatedBrand', v);
+          },
+        },
+        siteManager: {
+          value: state_profile.siteManager,
+          onChange: (v) => {
+            changeProfile('siteManager', v);
+          },
+        },
+        siteManagerNumber: {
+          value: state_profile.siteManagerNumber,
+          onChange: (v) => {
+            changeProfile('siteManagerNumber', v);
+          },
+        },
+        requiredDoorType: {
+          value: state_profile.requiredDoorType,
+          onChange: (v) => {
+            changeProfile('requiredDoorType', v);
+          },
+        },
+        requiredDoorQuantity: {
+          value: state_profile.requiredDoorQuantity,
+          onChange: (v) => {
+            changeProfile('requiredDoorQuantity', v);
+          },
+        },
+        estimatedDiscount: {
+          value: state_profile.estimatedDiscount,
+          onChange: (v) => {
+            changeProfile('estimatedDiscount', v);
+          },
+        },
+        type: {
+          value: state_profile.type,
+          onChange: (v) => {
+            changeProfile('type', v);
+          },
+        },
+        scheduledProcurementOrBidDate: {
+          value: state_profile.scheduledProcurementOrBidDate,
+          onChange: (v) => {
+            setState_profile((state) => ({ ...state, scheduledProcurementOrBidDate: v }));
           },
         },
 
+        //
         trackProgress: {
           value: state_profile.trackProgress,
 
@@ -2040,10 +2099,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       faxNumber: latestContent?.faxNumber ?? '',
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
-
-      designatedManufacturer: latestContent?.designatedManufacturer ?? '',
-
       isLost: latestContent?.isLost ?? false,
+
+      designatedBrand: latestContent?.designatedBrand ?? '',
+      siteManager: latestContent?.siteManager ?? '',
+      siteManagerNumber: latestContent?.siteManagerNumber ?? '',
+      requiredDoorType: latestContent?.requiredDoorType ?? '',
+      requiredDoorQuantity: String(latestContent?.requiredDoorQuantity ?? ''),
+      estimatedDiscount: latestContent?.estimatedDiscount ?? '',
+      scheduledProcurementOrBidDate: latestContent?.scheduledProcurementOrBidDate
+        ? moment(latestContent.scheduledProcurementOrBidDate)
+        : null,
+      type: latestContent?.type ?? '',
     });
   }, [quotationData, quotationContentData, disabled]);
 
@@ -2570,10 +2637,16 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
-
-  designatedManufacturer: '',
-
   isLost: false,
+
+  designatedBrand: '',
+  siteManager: '',
+  siteManagerNumber: '',
+  requiredDoorType: '',
+  requiredDoorQuantity: '',
+  estimatedDiscount: '',
+  scheduledProcurementOrBidDate: null,
+  type: '',
 });
 
 // =============================================================================

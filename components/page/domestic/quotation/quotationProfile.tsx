@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -30,7 +30,7 @@ const wrapperStyle = {
   gap: '24px',
 };
 const captionStyle = {
-  width: '80px',
+  width: '120px',
 };
 
 const inputSelProps: TinputSelProps = {
@@ -40,9 +40,39 @@ const inputSelProps: TinputSelProps = {
 
 // -----------------------------------------------------------------------
 
+type Tstate_profile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+  isLost: boolean;
+
+  designatedBrand: string;
+  siteManager: string;
+  siteManagerNumber: string;
+  requiredDoorType: string;
+  requiredDoorQuantity: string;
+  estimatedDiscount: string;
+  scheduledProcurementOrBidDate: Moment | null;
+  type: string;
+};
+
 type TcontrolItem = {
   value: string;
   onChange?: (v: string) => void;
+  onClick?: () => void;
+  disabled?: boolean;
+};
+
+type TcontrolItem_date = {
+  value: Moment | null;
+  onChange?: (m: Moment | null) => void;
   onClick?: () => void;
   disabled?: boolean;
 };
@@ -73,7 +103,16 @@ type Tcontrol = {
     faxNumber: TcontrolItem; // 傳真號碼
     trackProgress: TcontrolItem;
     projectProgress: TcontrolItem;
-    designatedManufacturer: TcontrolItem;
+    //
+
+    designatedBrand: TcontrolItem;
+    siteManager: TcontrolItem;
+    siteManagerNumber: TcontrolItem;
+    requiredDoorType: TcontrolItem;
+    requiredDoorQuantity: TcontrolItem;
+    estimatedDiscount: TcontrolItem;
+    scheduledProcurementOrBidDate: TcontrolItem_date;
+    type: TcontrolItem;
   };
 
   isLost: {
@@ -120,7 +159,7 @@ export default function QuotationProfile({
     trackProgress,
     projectProgress,
 
-    designatedManufacturer,
+    designatedBrand,
   } = itemList;
 
   // ----------------------------------------------------------------
@@ -332,6 +371,23 @@ export default function QuotationProfile({
             />
 
             <InputSel
+              caption={'聯絡電話'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  placeholder: '尚未選擇',
+                  value: itemList['contactNumber'].value,
+                  onChange: (e) => {
+                    itemList['contactNumber'].onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+
+            <InputSel
               caption={'傳真號碼'}
               captionClassName={scss.input02}
               showBaseline="auto"
@@ -347,20 +403,116 @@ export default function QuotationProfile({
                 },
               }}
             />
-          </div>
-          <div>
+
             <InputSel
-              caption={'聯絡電話'}
+              caption={'工地主任'}
               captionClassName={scss.input02}
               showBaseline="auto"
               disabled={disabled}
               {...inputSelProps}
               inputProps={{
                 props: {
-                  placeholder: '尚未選擇',
-                  value: itemList['contactNumber'].value,
+                  value: itemList.siteManager.value,
                   onChange: (e) => {
-                    itemList['contactNumber'].onChange?.(e.target.value);
+                    itemList.siteManager.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption={'工地主任電話'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  value: itemList.siteManagerNumber.value,
+                  onChange: (e) => {
+                    itemList.siteManagerNumber.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+          </div>
+          <div>
+            <InputSel
+              caption={'需求門型'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  value: itemList.requiredDoorType.value,
+                  onChange: (e) => {
+                    itemList.requiredDoorType.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption={'需求門型數量'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  type: 'number',
+                  value: itemList.requiredDoorQuantity.value,
+                  onChange: (e) => {
+                    itemList.requiredDoorQuantity.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption={'預估折數'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  type: 'number',
+                  value: itemList.estimatedDiscount.value,
+                  onChange: (e) => {
+                    itemList.estimatedDiscount.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption={'類型'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              inputProps={{
+                props: {
+                  value: itemList.type.value,
+                  onChange: (e) => {
+                    itemList.type.onChange?.(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption={'預定採購日/投標日'}
+              captionClassName={scss.input02}
+              showBaseline="auto"
+              disabled={disabled}
+              {...inputSelProps}
+              captionStyle={{
+                ...inputSelProps.captionStyle,
+                width: '160px',
+              }}
+              datePickerProps={{
+                props: {
+                  value: itemList.scheduledProcurementOrBidDate.value,
+                  onChange: (date_m) => {
+                    itemList.scheduledProcurementOrBidDate.onChange?.(date_m);
                   },
                 },
               }}
@@ -416,8 +568,8 @@ export default function QuotationProfile({
           }}
         />
 
-        {/* <InputSel
-          caption="指定廠商"
+        <InputSel
+          caption="指定廠牌"
           captionClassName={scss.input02}
           showBaseline="auto"
           disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
@@ -425,13 +577,13 @@ export default function QuotationProfile({
           textareaProps={{
             allowNewLineByUser: true,
             props: {
-              value: designatedManufacturer.value,
+              value: designatedBrand.value,
               onChange: (e) => {
-                designatedManufacturer.onChange?.(e.target.value);
+                designatedBrand.onChange?.(e.target.value);
               },
             },
           }}
-        /> */}
+        />
       </div>
 
       <div className={scss.time}>
@@ -526,22 +678,6 @@ export default function QuotationProfile({
 
 // region HOOK
 
-type Tstate_profile = {
-  validityPeriod: string;
-  projectName: string;
-  county: string;
-  district: string;
-  address: string;
-  contactPerson: string;
-  contactNumber: string;
-  faxNumber: string;
-  trackProgress: string;
-  projectProgress: string;
-  isLost: boolean;
-
-  designatedManufacturer: string;
-};
-
 const creEmptyProfile = (): Tstate_profile => ({
   validityPeriod: '',
   projectName: '',
@@ -553,10 +689,16 @@ const creEmptyProfile = (): Tstate_profile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
-
-  designatedManufacturer: '',
-
   isLost: false,
+
+  designatedBrand: '',
+  siteManager: '',
+  siteManagerNumber: '',
+  requiredDoorType: '',
+  requiredDoorQuantity: '',
+  estimatedDiscount: '',
+  scheduledProcurementOrBidDate: null,
+  type: '',
 });
 
 const useProfile = ({
@@ -570,7 +712,10 @@ const useProfile = ({
   const [state_customer, setState_customer] = useState<TcustomerDto | undefined | null>();
   const [state_designUnit, setState_designUnit] = useState<TcustomerDto | undefined | null>();
 
-  const changeProfile = (key: keyof Omit<Tstate_profile, 'isLost'>, value: string | boolean) => {
+  const changeProfile = (
+    key: keyof Omit<Tstate_profile, 'isLost' | 'scheduledProcurementOrBidDate'>,
+    value: string | boolean
+  ) => {
     setState_profile((state) => {
       return {
         ...state,
@@ -677,10 +822,53 @@ const useProfile = ({
 
           // disabled: disabled,
         },
-        designatedManufacturer: {
-          value: state_profile.designatedManufacturer,
+
+        designatedBrand: {
+          value: state_profile.designatedBrand,
           onChange: (v) => {
-            changeProfile('designatedManufacturer', v);
+            changeProfile('designatedBrand', v);
+          },
+        },
+        siteManager: {
+          value: state_profile.siteManager,
+          onChange: (v) => {
+            changeProfile('siteManager', v);
+          },
+        },
+        siteManagerNumber: {
+          value: state_profile.siteManagerNumber,
+          onChange: (v) => {
+            changeProfile('siteManagerNumber', v);
+          },
+        },
+        requiredDoorType: {
+          value: state_profile.requiredDoorType,
+          onChange: (v) => {
+            changeProfile('requiredDoorType', v);
+          },
+        },
+        requiredDoorQuantity: {
+          value: state_profile.requiredDoorQuantity,
+          onChange: (v) => {
+            changeProfile('requiredDoorQuantity', v);
+          },
+        },
+        estimatedDiscount: {
+          value: state_profile.estimatedDiscount,
+          onChange: (v) => {
+            changeProfile('estimatedDiscount', v);
+          },
+        },
+        type: {
+          value: state_profile.type,
+          onChange: (v) => {
+            changeProfile('type', v);
+          },
+        },
+        scheduledProcurementOrBidDate: {
+          value: state_profile.scheduledProcurementOrBidDate,
+          onChange: (v) => {
+            setState_profile((state) => ({ ...state, scheduledProcurementOrBidDate: v }));
           },
         },
       },
@@ -704,10 +892,18 @@ const useProfile = ({
         faxNumber: originContent?.faxNumber ?? '',
         trackProgress: originContent?.trackProgress ?? '',
         projectProgress: originContent?.projectProgress ?? '',
-
-        designatedManufacturer: originContent?.designatedManufacturer ?? '',
-
         isLost: originContent?.isLost ?? false,
+
+        designatedBrand: originContent?.designatedBrand ?? '',
+        siteManager: originContent?.siteManager ?? '',
+        siteManagerNumber: originContent?.siteManagerNumber ?? '',
+        requiredDoorType: originContent?.requiredDoorType ?? '',
+        requiredDoorQuantity: String(originContent?.requiredDoorQuantity ?? ''),
+        estimatedDiscount: originContent?.estimatedDiscount ?? '',
+        scheduledProcurementOrBidDate: originContent?.scheduledProcurementOrBidDate
+          ? moment(originContent?.scheduledProcurementOrBidDate)
+          : null,
+        type: originContent?.type ?? '',
       });
     }
   }, [originContent, disabled]);
@@ -726,10 +922,18 @@ const useProfile = ({
       faxNumber: originContent?.faxNumber ?? '',
       trackProgress: originContent?.trackProgress ?? '',
       projectProgress: originContent?.projectProgress ?? '',
-
-      designatedManufacturer: originContent?.designatedManufacturer ?? '',
-
       isLost: originContent?.isLost ?? false,
+
+      designatedBrand: originContent?.designatedBrand ?? '',
+      siteManager: originContent?.siteManager ?? '',
+      siteManagerNumber: originContent?.siteManagerNumber ?? '',
+      requiredDoorType: originContent?.requiredDoorType ?? '',
+      requiredDoorQuantity: String(originContent?.requiredDoorQuantity ?? ''),
+      estimatedDiscount: originContent?.estimatedDiscount ?? '',
+      scheduledProcurementOrBidDate: originContent?.scheduledProcurementOrBidDate
+        ? moment(originContent?.scheduledProcurementOrBidDate)
+        : null,
+      type: originContent?.type ?? '',
     });
   }, [originContent]);
 
