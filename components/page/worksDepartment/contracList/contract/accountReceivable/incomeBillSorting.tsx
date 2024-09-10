@@ -112,11 +112,13 @@ export default function IncomeBillSorting({
   periodArr,
   incomeBillList_noInvoice,
   onConfirm,
+  readonly,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
   incomeBillList_noInvoice: TincomeBillSerialDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
+  readonly?: boolean;
 }) {
   const [disabled, setDisabled] = useState(true);
 
@@ -301,13 +303,13 @@ export default function IncomeBillSorting({
           新增折讓
         </MyButton_v2> */}
 
-        {disabled && (
+        {disabled && !readonly && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
             排序/編輯
           </MyButton_v2>
         )}
 
-        {!disabled && (
+        {!disabled && !readonly && (
           <>
             <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
               取消

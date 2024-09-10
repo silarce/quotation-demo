@@ -31,6 +31,7 @@ type Tprops = {
   accountReceivable: TaccountsReceivableDto;
   valueList?: TvalueList;
   reqPatchAccountReceivable: TreqPatchAccountReceivable;
+  readonly?: boolean;
 };
 
 type Tstate_payment = {
@@ -61,6 +62,7 @@ export default function TotalCalc({
   className,
   accountReceivable,
   reqPatchAccountReceivable,
+  readonly: readonly_static,
 }: Tprops) {
   // ---------------------------------------------------------------------------
 
@@ -225,10 +227,12 @@ export default function TotalCalc({
             }}
           />
         </div>
-        <div className={scss.btnBar}>
-          <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
-          <IconEdit className={classNames(!readOnly && scss.active)} onClick={switchReadOnly} />
-        </div>
+        {!readonly_static && (
+          <div className={scss.btnBar}>
+            <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
+            <IconEdit className={classNames(!readOnly && scss.active)} onClick={switchReadOnly} />
+          </div>
+        )}
       </div>
       {/*  */}
       <div className={scss.caption}>總計算</div>
