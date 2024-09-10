@@ -56,10 +56,12 @@ export default function IncomeBillDetails({
   className,
   incomeBillList,
   reqPatchIncomeBill_feeAndDeduction,
+  readonly,
 }: {
   className?: string;
   incomeBillList: TincomeBillSerialDto[];
   reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
+  readonly?: boolean;
 }) {
   const [disabled, setDisabled] = useState(true);
   const [state_incomeBillArr, setState_incomeBillArr] = useState<Tstate_incomeBill[]>([]);
@@ -188,13 +190,13 @@ export default function IncomeBillDetails({
           匯入收款
         </MyButton_v2> */}
 
-        {disabled && (
+        {disabled && !readonly && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
             編輯
           </MyButton_v2>
         )}
 
-        {!disabled && (
+        {!disabled && !readonly && (
           <>
             <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
               取消
@@ -281,12 +283,13 @@ export default function IncomeBillDetails({
               </div>
 
               <div className={scss.cell} style={configList['btn'].style}>
-                {!disabled && (
+                {(!disabled || readonly) && (
                   <EditDefunctionBtn
                     defaultStateArr={state_deduction}
                     onConfirm={({ state_deductionArr }) => {
                       handle_editDeduction(index_state, state_deductionArr);
                     }}
+                    forbidden={readonly}
                   />
                 )}
               </div>

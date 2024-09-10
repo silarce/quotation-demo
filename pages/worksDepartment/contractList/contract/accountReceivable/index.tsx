@@ -8,6 +8,7 @@ import _ from 'lodash';
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Profile, {
@@ -55,6 +56,10 @@ import { AxiosError } from 'axios';
 
 // ========================================================================
 
+type Tquery = {
+  contractId: string | undefined;
+};
+
 type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
 };
@@ -71,13 +76,20 @@ export const AccountReceivableContext = createContext<TaccountReceivableContext>
 
 // region START
 
-export default function AccountReceivable() {
+export default function AccountReceivable({
+  //
+  contractId: contractId_outside,
+  readonly = false,
+  showSubPageHeader = true,
+}: {
+  contractId?: string | undefined;
+  readonly?: boolean;
+  showSubPageHeader?: boolean;
+}) {
   const router = useRouter();
-  const { contractId } = router.query as { contractId: string | undefined };
+  const { contractId = contractId_outside } = router.query as Tquery;
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
-
-  let isFetching = false;
 
   // --------------------------------------------------------------------------
 
@@ -468,8 +480,6 @@ export default function AccountReceivable() {
     valueList: createValueList_profile_engineeringContact({ engineeringContact }),
   };
 
-  isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
-
   const panelList_01: TpanelList = [
     { type: 'myButton', label: '建立應收帳款明細', onClick: () => reqPostAccountReceivable() },
   ];
@@ -502,7 +512,7 @@ export default function AccountReceivable() {
 
   if (!accountReceivable) {
     return (
-      <SubLayer isLoading_all={isFetching}>
+      <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
         <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
         <EmptyMain />
       </SubLayer>
@@ -510,8 +520,9 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isFetching}>
-      <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
+    <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
+      {showSubPageHeader && <PageHeader contractNumber={engineeringContact?.contractNumber ?? '---'} />}
+      {!showSubPageHeader && <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? '---'}`} />}
 
       <div className={scss.main}>
         <Profile {...props_profile} />
@@ -521,6 +532,7 @@ export default function AccountReceivable() {
           className="mt-10"
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
+          readonly={readonly}
         />
 
         {/* 應收帳款管理 */}
@@ -529,6 +541,7 @@ export default function AccountReceivable() {
           periodArr={periodArr}
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
+          readonly={readonly}
         />
 
         {/* 已收款紀錄 */}
@@ -536,6 +549,7 @@ export default function AccountReceivable() {
           className="mt-10 "
           incomeBillList={incomeBillList}
           reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
+          readonly={readonly}
         />
 
         {/* 扣款明細 */}
@@ -551,6 +565,7 @@ export default function AccountReceivable() {
             reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
+            readonly={readonly}
           />
         </AccountReceivableContext.Provider>
       </div>
