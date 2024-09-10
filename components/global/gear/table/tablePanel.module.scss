@@ -6,9 +6,6 @@
 }
 
 .check {
-  &.invisible {
-    visibility: hidden;
-  }
 }
 
 .edit.plus {
@@ -16,4 +13,8 @@
   &.active {
     color: red;
   }
+}
+
+.invisible {
+  visibility: hidden;
 }
