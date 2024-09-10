@@ -236,7 +236,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         invoice: item.invoice,
         firstin: 1,
         status: item.status,
-        note: item.note
+        note: item.note,
+        shippingaddress:item.shippingaddress
       }
     })
   }
@@ -383,7 +384,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader}>
@@ -412,7 +413,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   } else if (type === "WHPosition") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader3}  >
@@ -445,7 +446,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   } else if (type === "Tray") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader2}>
@@ -472,7 +473,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   } else if (type === "materialList") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader4}>
@@ -493,7 +494,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   } else if (type === "GetMatWarehouseList") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader5}>
@@ -529,7 +530,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     // 領料單
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader6}>
@@ -551,7 +552,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     // 領料單.領料單明細
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader7}>
@@ -572,7 +573,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     // 領料明細單.開始領料
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader8}>
@@ -594,7 +595,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   } else if (type === "ProdEntry") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader9}>
@@ -622,7 +623,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "PurchaseOrder") {
     return (
       <div>
-        {error && <p>Error1: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader10}>
@@ -656,7 +657,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "PurchaseOrderDetail") {
     return (
       <div>
-        {error && <p>Error2: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader11}>
@@ -688,7 +689,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "ProdReceipt") {
     return (
       <div>
-        {error && <p>Error1: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader12}>
@@ -719,7 +720,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "ProdReceiptDetail") {
     return (
       <div>
-        {error && <p>Error2: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader14}>
@@ -745,7 +746,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "PurchaseRequisition") {
     return (
       <div>
-        {error && <p>Error1: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader15}>
@@ -779,7 +780,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   // else if (type === "Quotereq") {
   //   return (
   //     <div>
-  //       {error && <p>Error1: {error}</p>}
+  //       {/* {error && <p>Error: {error}</p>} */}
   //       {data && (
   //         data.map((_item: any, index: number) => (
   //           <CellWithBar key={index} className={scss.panelHeader17}>
@@ -812,7 +813,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   // else if (type === "AddPR_ReqList") {
   //   return (
   //     <div>
-  //       {error && <p>Error2: {error}</p>}
+  //       {/* {error && <p>Error: {error}</p>} */}
   //       {data && (
   //         data.map((_item: any, index: number) => (
   //           <CellWithBar key={index} className={scss.panelHeader20}>
@@ -834,7 +835,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   else if (type === "ProductList") {
     return (
       <div>
-        {error && <p>Error2: {error}</p>}
+        {/* {error && <p>Error: {error}</p>} */}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader21}>
