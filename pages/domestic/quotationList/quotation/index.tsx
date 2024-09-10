@@ -666,8 +666,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    console.log('state_profile.designatedManufacturer', state_profile.designatedManufacturer);
-
     const body: TcreateQuotationContentDto = {
       // quotationDate: data_watch.quotationDate ?? '',
       // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
