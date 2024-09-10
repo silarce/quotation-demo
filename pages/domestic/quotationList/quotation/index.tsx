@@ -1960,7 +1960,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const customeRight = [
     !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
       <Dropdown
-        key="1"
+        key="0"
         // placement="bottomRight"
         itemArr={[
           //
