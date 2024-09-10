@@ -1,7 +1,0 @@
-@use "../template.module.scss";
-
-.t01 {
-  @extend .basic;
-  display: grid;
-  gap: 20px;
-}

@@ -23,7 +23,7 @@
 }
 
 .left {
-  width: 360px;
+  flex: 80px;
   display: grid;
   grid-template-columns: 1fr;
   justify-content: space-between;
@@ -31,7 +31,48 @@
   border: 1px solid #c1c1c1;
   overflow-y: auto;
   // height: 712px;
-  // margin-right: 15px;
+  margin-right: 15px;
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  // height: 712px;
+}
+
+.content {
+  width: 100%;
+  overflow-y: auto;
+  top: 0;
+}
+
+.left_tite_main {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.searchform {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .searchbar {
@@ -40,11 +81,12 @@
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns: 30px 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 15px;
   width: auto;
   margin: 5px 20px;
   height: 41px;
+  // background-color: orange;
 
   div {
     border-bottom: 1px solid gray;
@@ -70,28 +112,43 @@
   }
 }
 
-
-.right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  border: 1px solid #c1c1c1;
-  overflow-y: auto;
-  overflow-x: hidden;
+.addbar {
   position: sticky;
   top: 0;
-  right: 0;
   z-index: 1000;
-  // height: 712px;
-}
+  display: grid;
+  // grid-template-columns: 45px 150px 415px 415px 65px 50px 300px 65px 70px ;
+  grid-template-columns: 45px 150px 415px 415px 65px 50px 50px 100px 100px 200px 70px;
+  // gap: 15px;
+  width: auto;
+  // margin: 5px 20px;
+  // height: 41px;
 
+  div {
+    // border-bottom: 1px solid gray;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    // width: 150px;
 
-.content {
-  width: 100%;
-  overflow-y: auto;
-  top: 0;
+    input {
+      // height: 32px;
+      font-size: 16px;
+      width: 100%;
+      // border:1px solid #c1c1c1;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    img {
+      width: 30px;
+      height: 20px;
+    }
+  }
 }
 
 .head_head1 {
@@ -106,7 +163,7 @@
   border-bottom: 1px solid rgb(214, 214, 214);
 
   div {
-    margin-right: 2px;
+      margin-right: 2px;
   }
 
   // background-color: gray;
@@ -122,13 +179,13 @@
   margin-right: 20px;
 
   div {
-    margin-right: 2px;
+      margin-right: 2px;
   }
 }
 
 .head_content2 {
   display: grid;
-  grid-template-columns: 600px 1fr 1fr;
+  grid-template-columns: 597px 1fr 1fr;
   // gap: 15px;
   width: auto;
   // margin-top: 5px;
@@ -136,21 +193,59 @@
   margin-right: 20px;
 
   div {
-    margin-right: 2px;
+      margin-right: 2px;
   }
 }
 
 .head_content3 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 600px 1fr 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
+  div {
+      margin-right: 2px;
+  }
+}
 
-  // background-color: gray;
+.head_content4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
+      margin-right: 2px;
+  }
+}
+
+.head_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+}
+
+.head_foot2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+  border-top: 1px solid #c1c1c1;
 }
 
 .addBtn {
@@ -163,12 +258,24 @@
 
 }
 
+.head_content3 {
+  display: grid;
+  grid-template-columns: 100px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  // background-color: gray;
+}
+
 .head_foot1 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   // gap: 15px;
   width: auto;
-  // margin-top: 5px;
+  margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 }
@@ -178,36 +285,11 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
   // gap: 15px;
   width: auto;
-  // margin-top: 5px;
+  margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 5px;
-  border-top: 1px solid #c1c1c1;
-}
-
-
-.content_main {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: auto;
-  margin-top: 0px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 10px;
-
-  // background-color: gray;
-}
-
-.content_main_btn {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  width: auto;
-  padding-top: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
-  // border-top:1px solid #c1c1c1;
-  margin-bottom: 10px;
+  border-top: 1px solid rgb(214, 214, 214);
 }
 
 .body_content1 {
@@ -232,88 +314,15 @@
   margin-left: 20px;
   margin-right: 20px;
   padding-right: 20px;
-  border-bottom: 1px solid #c1c1c1;
-  // background-color: gray;
-}
-
-.body_foot2 {
-  margin-top: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
-  padding-right: 20px;
-  border-bottom: 1px solid #c1c1c1;
-}
-
-
-.count_table {
-  font-size: 16px;
-  color: #1b2d5a;
-  text-align: right;
-
-  tr {
-    td {
-      // border: 1px solid gray;
-      text-align: right;
-      width: 80px;
-    }
-  }
-}
-
-.foot_head1 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  // gap: 15px;
-  width: auto;
-  margin-top: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 5px;
-  // div {
-  //     margin-right: 20px;
-  // }
-}
-
-.foot_content1 {
-  display: grid;
-  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-  gap: 0px;
-  width: auto;
-  // margin-top: 4px;
-  margin-left: 20px;
-  margin-right: 20px;
-  // border-top:1px solid rgb(168, 168, 168);
-  overflow-x: hidden;
   // background-color: gray;
 }
 
 
 
+// grid
+//物料明細
+div.panelHeader19 {
 
-
-
-
-.foot_foot1 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: auto;
-  margin-top: 0px;
-  margin-left: 20px;
-  margin-right: 20px;
-  padding-right: 20px;
-  // background-color: gray;
-}
-
-
-.mytitle {
-
-  font-size: 16px;
-  color: #1b2d5a;
-  text-align: left;
-}
-
-
-div.panelHeader21 {
   padding-left: 20px;
   border-bottom: solid 1px $colorBorder01;
 
@@ -332,19 +341,14 @@ div.panelHeader21 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 250px 60px;
+    grid-template-columns: 145px 300px 300px 40px 30px;
     gap: 5px;
   }
 }
 
-
-
-
-
-
-//#region 請購單明細
-div.panelHeader16 {
-  padding-left: 20px;
+//新增請購單明細
+div.panelHeader20 {
+  padding-left: 15px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -362,102 +366,17 @@ div.panelHeader16 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 200px;
+    grid-template-columns: 30px 150px 415px 415px 65px 50px 50px 100px 100px 200px 70px;
     // gap: 5px;
   }
 }
-
-//#endregion
-
-
-
-//#region 詢價單明細
-div.panelHeader17 {
-  padding-left: 20px;
-  border-bottom: solid 1px $colorBorder01;
-
-  .row01,
-  .row02 {
-    span {
-      font-weight: 400;
-      font-size: 16px;
-      // text-align: right;
-    }
-
-    .clientName,
-    .country {
-      color: $colorMain;
-    }
-  }
-
-  .row01 {
-    display: grid;
-    grid-template-columns:30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
-    gap: 5px;
-  }
-}
-
-/* 自定義 checkbox 外觀 */
-.quotereqdetail_checkbox {
-  position: relative;
-  width: 20px;
-  height: 20px;
-  appearance: none;
-  /* 隱藏原生 checkbox */
-  cursor: pointer;
-
-  /* 模擬 checkbox 外框 */
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px solid #14256a;
-    background-color: white;
-    border-radius: 3px;
-  }
-
-  /* 模擬 checkbox 打勾樣式 */
-  &:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 8px;
-    height: 14px;
-    transform: translate(-50%, -50%) rotate(45deg);
-    border-bottom: 4px solid #14256a;
-    /* 打勾的顏色 */
-    border-right: 4px solid #14256a;
-    /* 打勾的顏色 */
-    opacity: 0;
-    /* 初始不顯示 */
-  }
-
-  /* 控制 checkbox 打勾的顯示狀態 */
-  &:checked:after {
-    opacity: 1;
-    /* 顯示打勾 */
-  }
-
-  /* 點擊後 checkbox 的背景色 */
-  // &:hover:before {
-  //   background-color: #f0f0f0;
-  // }
-}
-
-
-//#endregion
-
 
 
 // 按鈕
 .greenbutton {
   height: 36px;
   // padding: 0px 40px;
-  border: solid 1px #2e9619;
+  border: solid 1px #86bd07;
   background-color: $bgc01;
   padding-left: 22px;
   padding-right: 22px;
@@ -465,17 +384,17 @@ div.panelHeader17 {
   padding-bottom: 4px;
   font-weight: 500;
   font-size: 16px;
-  color: #2e9619;
+  color: #86bd07;
   transform: translateY(2px);
 
   &:hover {
-    border: solid 1px #2e9619;
-    background-color: #2e96192c;
+    border: solid 1px #86bd07;
+    background-color: rgb(0, 105, 23, 0.267);
   }
 
   &:focus {
     background-color: $bgc01;
-    border: solid 1px #2e9619;
+    border: solid 1px #86bd07;
   }
 }
 
@@ -580,30 +499,6 @@ div.panelHeader17 {
   }
 }
 
-.disabledbtn {
-  height: 36px;
-  // padding: 0px 40px;
-  border: solid 1px #c1c1c1;
-  ;
-  background-color: $bgc01;
-  padding: 4px 22px;
-  // padding-top: 4px;
-  // padding-bottom: 4px;
-  font-weight: 500;
-  font-size: 16px;
-  color: #5b5a5ad6;
-  transform: translateY(2px);
-
-  &:hover {
-    background-repeat: no-repeat;
-    background-position: center right 10px;
-    /* 調整圖標位置 */
-    cursor: not-allowed;
-    /* 添加這行使滑鼠顯示禁止符號 */
-  }
-
-}
-
 .minibtn {
   height: 28.28px;
   // width: 36px;
@@ -621,7 +516,7 @@ div.panelHeader17 {
 
   &:hover {
     border: solid 1px #c1c1c1;
-    background-color: #c1c1c17c
+    background-color: #c1c1c121
   }
 
   &:focus {
@@ -630,17 +525,9 @@ div.panelHeader17 {
   }
 }
 
-// 隱藏popout
-.modal_search_bar {
-  display: grid;
-  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: 100%;
-  margin-top: 5px;
-  padding-bottom: 5px;
-  // border-bottom: 1px solid rgb(214, 214, 214);
-  // padding-right:10px;
-}
+
+
+
 
 .modal_container {
   display: flex;
@@ -648,61 +535,36 @@ div.panelHeader17 {
   align-items: center;
 }
 
-.minidisabledbtn {
-  height: 28.28px;
-  // width: 36px;
-  // padding: 0px 40px;
-  border: solid 1px #c1c1c1;
-  ;
-  background-color: $bgc01;
-  padding: 0px 8px;
-  // padding-top: 4px;
-  // padding-bottom: 4px;
-  font-weight: 500;
-  font-size: 16px;
-  color: #5b5a5ad6;
-  transform: translateY(2px);
 
-  &:hover {
-    background-repeat: no-repeat;
-    background-position: center right 10px;
-    /* 調整圖標位置 */
-    cursor: not-allowed;
-    /* 添加這行使滑鼠顯示禁止符號 */
-  }
+
+.customContainer {
+  display: flex;
+  align-items: center;
 }
 
-.modal_head_head1 {
-  display: grid;
-  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: auto;
-  // margin-top: 5px;
-  margin-left: 10px;
-  // margin-right: 20px;  
-
-
+.customLabel {
+  font-size: 18px;
+  color: #14256a;
+  vertical-align: top;
+  margin-right: 8px; // 調整 label 和 textarea 之間的距離
+  white-space: nowrap; // 確保文字不換行
 }
 
-.modal_head_content1 {
-  display: grid;
-  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: auto;
-  // margin-top: 5px;
-  // margin-left: 20px;
-  // margin-right: 20px;
-
-
+.customInput {
+  font-size: 18px;
+  border-bottom: 1px solid #14256a;
+  height: 30px;
+  width: 100%;
+  resize: none; // 禁用自由調整高度的功能
+  margin-left: 70px;
+  
 }
-
 
 .squarebtn {
   height: 50px;
   width: 50px;
   // padding: 0px 40px;
   border: solid 1px #c1c1c1;
-  ;
   background-color: $bgc01;
   padding: 0px 8px;
   // padding-top: 4px;
@@ -768,7 +630,7 @@ div.panelHeader17 {
     /* 調整圖標位置 */
     cursor: not-allowed;
     /* 添加這行使滑鼠顯示禁止符號 */
-  }
+}
 
   &:focus {
     background-color: $bgc01;
@@ -776,15 +638,78 @@ div.panelHeader17 {
   }
 }
 
-//判斷字串是否過長
-.truncate {
-  display: inline-block;
-  max-width: 200px; /* 設定你希望的最大寬度 */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: middle; /* 可選，根據需要對齊文本 */
+
+.modal_head_head1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 10px;
+  // margin-right: 20px;  
+
+
 }
+
+.modal_head_content1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+
+
+}
+
+.modal_search_bar {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: 100%;
+  margin-top: 5px;
+  padding-bottom: 5px;
+  // border-bottom: 1px solid rgb(214, 214, 214);
+  // padding-right:10px;
+}
+
+//#region 請購單
+div.panelHeader15 {
+
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    padding-left: 20px;
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 100px 100px 100px 200px 30px;
+    gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
+
+//#endregion
+
 
 .head_body {
   display: grid;
@@ -798,9 +723,78 @@ div.panelHeader17 {
 }
 
 
+//#region 詢價單明細
+div.panelHeader17 {
+  padding-left: 20px;
+  border-bottom: solid 1px $colorBorder01;
 
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+      // text-align: right;
+    }
 
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
 
+  .row01 {
+    display: grid;
+    grid-template-columns:30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
+    gap: 5px;
+  }
+}
 
+.quotereqdetail_checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  /* 隱藏原生 checkbox */
+  cursor: pointer;
 
+  /* 模擬 checkbox 外框 */
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #14256a;
+    background-color: white;
+    border-radius: 3px;
+  }
 
+  /* 模擬 checkbox 打勾樣式 */
+  &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 14px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-bottom: 4px solid #14256a;
+    /* 打勾的顏色 */
+    border-right: 4px solid #14256a;
+    /* 打勾的顏色 */
+    opacity: 0;
+    /* 初始不顯示 */
+  }
+
+  /* 控制 checkbox 打勾的顯示狀態 */
+  &:checked:after {
+    opacity: 1;
+    /* 顯示打勾 */
+  }
+
+  /* 點擊後 checkbox 的背景色 */
+  // &:hover:before {
+  //   background-color: #f0f0f0;
+  // }
+}
