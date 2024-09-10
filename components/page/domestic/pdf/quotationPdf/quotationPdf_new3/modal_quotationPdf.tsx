@@ -1041,7 +1041,6 @@ const quotationProdAndOther_ToProdArr = ({
       } = pro;
 
       const isSpecialDoor = checkIsSpecialDoor(doorModelName);
-      console.log(isSpecialDoor);
 
       let { quantity, totalPrice } = pro;
 

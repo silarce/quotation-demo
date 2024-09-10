@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { reverse, update } from 'lodash';
-
 import scss from './reviewList.module.scss';
 import Thead01 from '../../factoryDepartment/ui/table/thead01';
 import Tbody01 from '../../factoryDepartment/ui/table/tbody01';
@@ -48,7 +47,7 @@ import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 
 export default function ReviewList() {
 
-    //路由參數
+    // 路由參數
     const router = useRouter();
     const {
         firstin,
@@ -58,9 +57,9 @@ export default function ReviewList() {
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
 
-    //登入者資料
+    // 登入者資料
     const { userInfo } = useContext(AppContext);
-    //資料列宣告
+    // 資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
@@ -68,17 +67,14 @@ export default function ReviewList() {
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
 
-
-
-
+    // 變數宣告
     const [reviewtype, setReviewtype] = useState<string>("");
     const [memo, setMemo] = useState<string>("");
     const [currentreview_id, setCurrentreview_id] = useState<string>("");
     const [review_memo, setReview_memo] = useState<string>("");
     const [document_status, setDocument_status] = useState<string>("");
 
-
-    //搜尋
+    // 搜尋bar
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
@@ -92,6 +88,7 @@ export default function ReviewList() {
     const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
     const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
+    // 編輯功能
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
     const [editmain, setEditmain] = useState<boolean>(false);
@@ -99,9 +96,7 @@ export default function ReviewList() {
 
     const [itemQuery, setItemQuery] = useState<any>({});
 
-
-
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
+    //判斷是否第一次進入頁面
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
     useEffect(() => {
         if (firstin !== undefined) {
@@ -109,10 +104,9 @@ export default function ReviewList() {
         }
     }, [firstin]);
 
+
+
     //#region 上方功能列
-
-
-
 
 
     //新增按鈕
@@ -132,6 +126,11 @@ export default function ReviewList() {
         // },
     ];
     //#endregion
+
+
+
+
+
 
     //#region call api
     //取審核主檔
@@ -169,6 +168,7 @@ export default function ReviewList() {
             if (data.length > 0) {
 
                 setCurrentreview_id(data[0].id);
+                setReviewtype(data[0].document_type)
                 GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
 
 
@@ -208,13 +208,13 @@ export default function ReviewList() {
             setData3(data);
 
             // 檢查 data 是否有內容
-            if (data3.length > 0) {
+            // if (data3.length > 0) {
 
-                setCurrentreview_id(data3[0].id);
-                GetReviewStatus(data3[0]); // 只有當 data 有內容時才執行
-            } else {
-                // console.log('沒有撈到資料');
-            }
+            //     setCurrentreview_id(data3[0].id);
+            //     GetReviewStatus(data3[0]); // 只有當 data 有內容時才執行
+            // } else {
+            //     // console.log('沒有撈到資料');
+            // }
         } catch (error: any) {
             // setError("GetReview:" + error.message);
             console.log(error.message);
@@ -222,7 +222,6 @@ export default function ReviewList() {
             // setIsLoading(false);
         }
     };
-
     // 取審核完成主檔
     const GetReviewed = async () => {
         try {
@@ -249,13 +248,13 @@ export default function ReviewList() {
             setData4(data);
 
             // 檢查 data 是否有內容
-            if (data4.length > 0) {
-                // console.log(data4[0]);
-                setCurrentreview_id(data4[0].id);
-                GetReviewStatus(data4[0]); // 只有當 data 有內容時才執行
-            } else {
-                // console.log('沒有撈到資料');
-            }
+            // if (data4.length > 0) {
+            //     // console.log(data4[0]);
+            //     setCurrentreview_id(data4[0].id);
+            //     GetReviewStatus(data4[0]); // 只有當 data 有內容時才執行
+            // } else {
+            //     // console.log('沒有撈到資料');
+            // }
         } catch (error: any) {
             console.log(error.message);
         } finally {
@@ -275,17 +274,12 @@ export default function ReviewList() {
         }
     }, []);
 
-
-
-
+    // 取流程狀態
     const GetReviewStatus = async (item: any) => {
+        setReviewtype(item.document_type);
+        setItemQuery(item);
         handleRowClick(item.id);
         setCurrentreview_id(item.id);
-
-        // alert("in");
-        // GetDocument(item);
-        // setReviewtype("報價單");
-
         try {
             // setIsLoading(true);
             const conditionModel = {
@@ -309,10 +303,9 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData2(data);
-            setItemQuery(item);
             // 設定 itemQuery
-            // GetDocument(item);
-            setReviewtype(item.document_type);
+
+
             setDocument_status(item.document_status);
         } catch (error: any) {
             // setError("GetReviewStatus:" + error.message);
@@ -350,82 +343,84 @@ export default function ReviewList() {
     // }
 
 
+    const [isPageLoaded, setIsPageLoaded] = useState(false); // 設定頁面加載狀態
+
+    useEffect(() => {
+        // 當元件初次渲染完畢後，設定頁面已加載
+        setIsPageLoaded(true);
+    }, []);
 
 
 
     useEffect(() => {
-        if (reviewtype === "請購單") {
-            // 將 JSON 字串解析為 JavaScript 對象
-            const parsedQuery = JSON.parse(itemQuery.query);
+        if (isPageLoaded && itemQuery) {
+            if (reviewtype === "請購單") {
+                const parsedQuery = JSON.parse(itemQuery.query);
+                console.log(parsedQuery);
 
-            console.log(parsedQuery); // 檢查解析後的資料
-
-            // 使用 shallow 模式更新 query 而不進行頁面跳轉
-            router.replace({
-                query: {
-                    purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
-                    purchaserequisitionid: parsedQuery.purchaserequisitionid,
-                    create_at: getTaiwanDateStr(parsedQuery.create_at),
-                    create_by: parsedQuery.create_by,
-                    status: document_status,
-                    need_date: parsedQuery.need_date,
-                    note: parsedQuery.note,
-                    firstin: 1,
-                    viewtype: 'review'
-                },
-            }, undefined, { shallow: true });
-        } else if (reviewtype === "採購單") {
-            const parsedQuery = JSON.parse(itemQuery.query);
-
-            console.log(parsedQuery); // 檢查解析後的資料
-
-            // 使用 shallow 模式更新 query 而不進行頁面跳轉
-            router.replace({
-                query: {
-                    purchaseorderuuid: parsedQuery.purchaseorderuuid,
-                    purchaseorderid: parsedQuery.purchaseorderid,
-                    suppliername:parsedQuery.suppliername,
-                    suppliertaxid:parsedQuery.suppliertaxid,
-                    supplieraddress:parsedQuery.supplieraddress,
-                    supplierphone:parsedQuery.supplierphone,
-                    invoice:parsedQuery.invoice,
-                    create_at: getTaiwanDateStr(parsedQuery.create_at),
-                    create_by: parsedQuery.create_by,
-                    status: document_status,
-                    note: parsedQuery.note,
-                    firstin: 1,
-                    viewtype: 'review'
-                },
-            }, undefined, { shallow: true });
-        } else if (reviewtype === "進貨單") {
-            const parsedQuery = JSON.parse(itemQuery.query);
-
-            console.log(parsedQuery); // 檢查解析後的資料
-
-            // 使用 shallow 模式更新 query 而不進行頁面跳轉
-            router.replace({
-                query: {
-                    prodreceiptuuid: parsedQuery.prodreceiptuuid,
-                    prodreceiptid: parsedQuery.prodreceiptid,
-                    purchaseorderuuid:parsedQuery.purchaseorderuuid,
-                    purchaseorderid:parsedQuery.purchaseorderid,
-                    purchaseordercreate_at:getTaiwanDateStr(parsedQuery.purchaseordercreate_at),
-                    purchaseordercreate_by:parsedQuery.purchaseordercreate_by,
-                    suppliername:parsedQuery.suppliername,
-                    suppliertaxid:parsedQuery.suppliertaxid,
-                    supplieraddress:parsedQuery.supplieraddress,
-                    supplierphone:parsedQuery.supplierphone,
-                    invoice:parsedQuery.invoice,
-                    create_at: getTaiwanDateStr(parsedQuery.create_at),
-                    create_by: parsedQuery.create_by,
-                    status: document_status,
-                    note: parsedQuery.note,
-                    firstin: 1,
-                    viewtype: 'review'
-                },
-            }, undefined, { shallow: true });
+                router.replace({
+                    query: {
+                        purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
+                        purchaserequisitionid: parsedQuery.purchaserequisitionid,
+                        create_at: getTaiwanDateStr(parsedQuery.create_at),
+                        create_by: parsedQuery.create_by,
+                        status: `${document_status === "核准" ? "已核准" : document_status}`,
+                        need_date: parsedQuery.need_date,
+                        note: parsedQuery.note,
+                        firstin: 1,
+                        viewtype: 'review'
+                    },
+                }, undefined, { shallow: true });
+            }
+            else if (reviewtype === "採購單") {
+                const parsedQuery = JSON.parse(itemQuery.query);
+                console.log(parsedQuery);
+                router.replace({
+                    query: {
+                        purchaseorderuuid: parsedQuery.purchaseorderuuid,
+                        purchaseorderid: parsedQuery.purchaseorderid,
+                        suppliername: parsedQuery.suppliername,
+                        suppliertaxid: parsedQuery.suppliertaxid,
+                        supplieraddress: parsedQuery.supplieraddress,
+                        supplierphone: parsedQuery.supplierphone,
+                        invoice: parsedQuery.invoice,
+                        create_at: getTaiwanDateStr(parsedQuery.create_at),
+                        create_by: parsedQuery.create_by,
+                        status: `${document_status === "核准" ? "已核准" : document_status}`,
+                        note: parsedQuery.note,
+                        firstin: 1,
+                        shippingaddress: parsedQuery.shippingaddress,
+                        viewtype: 'review'
+                    },
+                }, undefined, { shallow: true });
+            }
+            else if (reviewtype === "進貨單") {
+                const parsedQuery = JSON.parse(itemQuery.query);
+                console.log(parsedQuery);
+                router.replace({
+                    query: {
+                        prodreceiptuuid: parsedQuery.prodreceiptuuid,
+                        prodreceiptid: parsedQuery.prodreceiptid,
+                        purchaseorderuuid: parsedQuery.purchaseorderuuid,
+                        purchaseorderid: parsedQuery.purchaseorderid,
+                        purchaseordercreate_at: getTaiwanDateStr(parsedQuery.purchaseordercreate_at),
+                        purchaseordercreate_by: parsedQuery.purchaseordercreate_by,
+                        suppliername: parsedQuery.suppliername,
+                        suppliertaxid: parsedQuery.suppliertaxid,
+                        supplieraddress: parsedQuery.supplieraddress,
+                        supplierphone: parsedQuery.supplierphone,
+                        invoice: parsedQuery.invoice,
+                        create_at: getTaiwanDateStr(parsedQuery.create_at),
+                        create_by: parsedQuery.create_by,
+                        status: `${document_status === "核准" ? "已核准" : document_status}`,
+                        note: parsedQuery.note,
+                        firstin: 1,
+                        viewtype: 'review'
+                    },
+                }, undefined, { shallow: true });
+            }
         }
-    }, [itemQuery]);
+    }, [isPageLoaded, itemQuery, reviewtype]);
 
 
 
@@ -652,6 +647,7 @@ export default function ReviewList() {
 
     const handleReviewConfirm = async () => {
         setReview_memo("");
+        setReviewtype("");
         setData2([]);
         try {
             setIsLoading(true);
@@ -994,10 +990,17 @@ export default function ReviewList() {
                         <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '30px 20px' }}>
                             <div className={scss.body_foot2}>
                                 <div>
-                                    {reviewtype === "請購單" && <PurchaseRequisitionList />}
-                                    {reviewtype === "採購單" && <PurchaseOrderList />}
-                                    {reviewtype === "進貨單" && <ProdReceiptList />}
-                                    {reviewtype === "報價單" && <Quotation />}
+                                    {/* 當頁面加載完成後顯示內容 */}
+                                    {isPageLoaded ? (
+                                        <div>
+                                            {reviewtype === "請購單" && <PurchaseRequisitionList />}
+                                            {reviewtype === "採購單" && <PurchaseOrderList />}
+                                            {reviewtype === "進貨單" && <ProdReceiptList />}
+                                            {reviewtype === "報價單" && <Quotation />}
+                                        </div>
+                                    ) : (
+                                        <p>頁面加載中...</p> // 可以顯示一個載入中的提示
+                                    )}
                                 </div>
                             </div>
                         </div>

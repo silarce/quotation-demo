@@ -78,8 +78,8 @@ type TincomeBill = {
   noteMaturityDate: React.ReactNode; // 票據到期日
 
   receiveDate: React.ReactNode;
-  receivablePayment: React.ReactNode;
-  receivablePayment_num: number;
+  receivablePaymentForAccountReceivable: React.ReactNode;
+  receivablePaymentForAccountReceivable_num: number;
 
   //
   isRelationedInvoiceChanged: boolean;
@@ -112,11 +112,13 @@ export default function IncomeBillSorting({
   periodArr,
   incomeBillList_noInvoice,
   onConfirm,
+  readonly,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
   incomeBillList_noInvoice: TincomeBillSerialDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
+  readonly?: boolean;
 }) {
   const [disabled, setDisabled] = useState(true);
 
@@ -169,11 +171,11 @@ export default function IncomeBillSorting({
     //
     total_invoice,
     total_invoice_num,
-    total_incomeBill,
+    total_incomeBill_receivablePaymentForAccountReceivable: total_incomeBill,
     amountNotCollected,
   } = useMemo(() => {
     let total_invoice_d = new Decimal(0);
-    let total_incomeBill_d = new Decimal(0);
+    let total_incomeBill_receivablePaymentForAccountReceivable_d = new Decimal(0);
 
     periodArr.forEach((period) => {
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
@@ -186,26 +188,36 @@ export default function IncomeBillSorting({
 
       const incomeBillList = invoice.incomeBillSerialList;
 
-      // const price = period.price || 0;
-      const price = invoice.actualPrice || 0;
+      const { actualPrice, allowance } = invoice;
 
-      total_invoice_d = total_invoice_d.add(price || 0);
+      total_invoice_d = total_invoice_d.add(actualPrice || 0).minus(allowance || 0);
 
       incomeBillList?.forEach((incomeBill) => {
-        total_incomeBill_d = total_incomeBill_d.add(incomeBill.receivablePayment || 0);
+        total_incomeBill_receivablePaymentForAccountReceivable_d =
+          total_incomeBill_receivablePaymentForAccountReceivable_d.add(
+            incomeBill.receivablePaymentForAccountReceivable || 0
+          );
       });
     }); // periodArr.forEach
 
     incomeBillList_noInvoice?.forEach((incomeBill) => {
-      total_incomeBill_d = total_incomeBill_d.add(incomeBill.receivablePayment || 0);
+      total_incomeBill_receivablePaymentForAccountReceivable_d =
+        total_incomeBill_receivablePaymentForAccountReceivable_d.add(
+          incomeBill.receivablePaymentForAccountReceivable || 0
+        );
     });
 
-    const amountNotCollected = new Decimal(total_invoice_d).minus(total_incomeBill_d).toNumber().toLocaleString();
+    const amountNotCollected = new Decimal(total_invoice_d)
+      .minus(total_incomeBill_receivablePaymentForAccountReceivable_d)
+      .toNumber()
+      .toLocaleString();
 
     return {
       total_invoice_num: total_invoice_d.toNumber(),
       total_invoice: total_invoice_d.toNumber().toLocaleString(),
-      total_incomeBill: total_incomeBill_d.toNumber().toLocaleString(),
+      total_incomeBill_receivablePaymentForAccountReceivable: total_incomeBill_receivablePaymentForAccountReceivable_d
+        .toNumber()
+        .toLocaleString(),
       amountNotCollected,
     };
   }, [periodArr, incomeBillList_noInvoice]);
@@ -256,6 +268,7 @@ export default function IncomeBillSorting({
           noteMaturityDate,
           receivablePayment,
           accountsReceivableDeduction,
+          receivablePaymentForAccountReceivable,
         } = incomeBill;
 
         return {
@@ -265,8 +278,8 @@ export default function IncomeBillSorting({
           importAccountingNumber: importAccountingNumber || '---',
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate) || '---',
           // price: price.toLocaleString(),
-          receivablePayment: receivablePayment?.toLocaleString(),
-          receivablePayment_num: receivablePayment || 0,
+          receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
+          receivablePaymentForAccountReceivable_num: receivablePaymentForAccountReceivable || 0,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
           raw: incomeBill,
@@ -302,13 +315,13 @@ export default function IncomeBillSorting({
           新增折讓
         </MyButton_v2> */}
 
-        {disabled && (
+        {disabled && !readonly && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
             排序/編輯
           </MyButton_v2>
         )}
 
-        {!disabled && (
+        {!disabled && !readonly && (
           <>
             <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
               取消
@@ -340,7 +353,7 @@ export default function IncomeBillSorting({
               <span>收款日期</span>
               <span>帳號/號碼</span>
               <span>到期日</span>
-              <span>收款金額</span>
+              <span>{'收款金額(含匯費)'}</span>
             </Row>
           </Right>
         </Group>
@@ -547,7 +560,7 @@ const Group_Dnd = ({
               receiveDate: insertDate,
               importAccountingNumber,
               noteMaturityDate,
-              receivablePayment: price,
+              receivablePaymentForAccountReceivable: price,
             } = incomeBill;
 
             return (
@@ -825,6 +838,7 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
       noteMaturityDate,
       receivablePayment,
       accountsReceivableDeduction,
+      receivablePaymentForAccountReceivable,
     } = incomeBill;
 
     return {
@@ -833,8 +847,8 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
       receiveDate: getTaiwanDateStr(receiveDate),
       importAccountingNumber,
       noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
-      receivablePayment: receivablePayment?.toLocaleString(),
-      receivablePayment_num: receivablePayment,
+      receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
+      receivablePaymentForAccountReceivable_num: receivablePaymentForAccountReceivable || 0,
       accountsReceivableDeduction,
       isRelationedInvoiceChanged: false,
       raw: incomeBill,

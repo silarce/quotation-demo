@@ -138,6 +138,7 @@ export default function PeriodTable({
   reqPatchInvoiceAllowance,
   reqDeleteInvoice,
   reqDeletePeriod,
+  readonly,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
@@ -146,6 +147,7 @@ export default function PeriodTable({
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
   reqDeleteInvoice: (invoiceId: string) => void;
   reqDeletePeriod: (periodId: string) => void;
+  readonly?: boolean;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
@@ -382,16 +384,19 @@ export default function PeriodTable({
       {/*  */}
 
       <TopBar caption="請款明細">
-        <MyButton_v2
-          px="px22"
-          py="py4"
-          onClick={() => {
-            setIsAddingNew((prev) => !prev);
-          }}
-        >
-          {!isAddingNew ? '新增' : '取消'}
-        </MyButton_v2>
-        {isAddingNew && (
+        {!readonly && (
+          <MyButton_v2
+            px="px22"
+            py="py4"
+            onClick={() => {
+              setIsAddingNew((prev) => !prev);
+            }}
+          >
+            {!isAddingNew ? '新增' : '取消'}
+          </MyButton_v2>
+        )}
+
+        {isAddingNew && !readonly && (
           <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handel_onConfirm}>
             確認
           </MyButton_v2>

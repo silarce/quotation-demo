@@ -1,0 +1,9 @@
+{
+  "bankManagement": {
+    "bankManagement": "Bank Management",
+    "bankName": "Bank Name",
+    "bankCode": "Bank Code",
+    "account": "Account",
+    "accountName": "Account Name"
+  }
+}

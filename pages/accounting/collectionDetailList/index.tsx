@@ -21,20 +21,7 @@ import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'j
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // api
-import {
-  Tparams,
-  // TcreateAccountantDto,
-  // TupdateAccountantDto,
-  // TupdateAccountReceivableDeductionDto,
-  //
-  // apiPostAccountant,
-  // apiPatchAccountant,
-  // deleteAccountant,
-
-  //
-  useGetAccountant,
-  // useGetAccountantPreset,
-} from 'js/api/api_accountant';
+import { Tparams, useGetAccountant } from 'js/api/api_accountant';
 import { apiGetAccountReceivable_id } from 'js/api/api_engineering';
 import { TapiError } from 'js/api/api_engineering';
 import { AxiosError } from 'axios';
@@ -266,6 +253,7 @@ export default function CollectionDetailList() {
                 >
                   {billSerialNumber}
                 </span>
+
                 <EditDefunctionBtn forbidden={true} className={'ml-2'} accountantId={accountantId} incomeBillId={id} />
               </div>
             );
@@ -341,7 +329,8 @@ const directToAccountReceivable = async (accountReceivableId: string | null | un
       const { contract } = AccountReceivable;
 
       const contractId = contract!.id;
-      const path = `/worksDepartment/contractList/contract/accountReceivable?contractId=${contractId}&version=1`;
+      // const path = `/worksDepartment/contractList/contract/accountReceivable?contractId=${contractId}&version=1`;
+      const path = `accountReceivable?contractId=${contractId}`;
       window.open(path, '_blank');
     })
     .catch((err: AxiosError<TapiError>) => {

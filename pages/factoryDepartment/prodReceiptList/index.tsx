@@ -276,13 +276,12 @@ export default function ProdReceiptList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
+            
             const data = await response.json();
-
             // if (data.length === 0) {
             //     myAlert.warning({
-            //         title: "查詢結果",
-            //         content: "目前沒有單據資訊可以顯示"
-            //     });
+            //         title: '尚無單據'
+            //     })
             //     return;
             // }
 
@@ -1246,6 +1245,55 @@ export default function ProdReceiptList() {
         setReviewbar(true);
         setDocumenttitle(`【進貨單】【${prodreceiptidin}】_${userInfo?.username}`)
     }
+
+    const handleGetReviewBack = () => {
+        myAlert.confirm({
+            title: '確定要抽單嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            document_uuid: prodreceiptuuidin,
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                        setReviewflowdata([]);
+                        setStatusin("進貨中");
+                        setReview_flow("");
+                        setValue(null);
+
+
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
+    }
+
     //#endregion
 
 
@@ -1344,13 +1392,13 @@ export default function ProdReceiptList() {
 
                             </div>
                             <div>
-                                <span style={{ display: `${statusin === "未結案" ? '' : 'none'}` }}>
+                                <span style={{ display: `${statusin === "進貨中" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
                                 </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                <span style={{ display: `${statusin === "已核准" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
                                         <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
@@ -1426,10 +1474,10 @@ export default function ProdReceiptList() {
                                     送審
                                 </button>
                                 &nbsp;
-                                {/* <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
+                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
-                                </button> */}
+                                </button>
 
                                 <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1794,9 +1842,9 @@ export default function ProdReceiptList() {
                                 <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) || data2.length > 0 ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增入庫</button>
                                 </span>
-                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>轉入庫中</button>
-                                </span>
+                                </span> */}
                                 {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) && entrystatusin === "已入庫" ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>入庫完畢</button>
                                 </span> */}
