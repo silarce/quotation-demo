@@ -1799,7 +1799,7 @@ export type TquotationContentDto = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
 
-  designatedManufacturer: string | null; // 指定廠商
+  designatedBrand: string | null; // 指定廠牌
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
@@ -2216,7 +2216,7 @@ export type TcreateQuotationContentDto = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
 
-  designatedManufacturer: string | null; // 指定廠商
+  designatedBrand: string | null; // 指定廠商
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註

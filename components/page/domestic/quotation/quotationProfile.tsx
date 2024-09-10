@@ -73,7 +73,7 @@ type Tcontrol = {
     faxNumber: TcontrolItem; // 傳真號碼
     trackProgress: TcontrolItem;
     projectProgress: TcontrolItem;
-    designatedManufacturer: TcontrolItem;
+    designatedBrand: TcontrolItem;
   };
 
   isLost: {
@@ -120,7 +120,7 @@ export default function QuotationProfile({
     trackProgress,
     projectProgress,
 
-    designatedManufacturer,
+    designatedBrand,
   } = itemList;
 
   // ----------------------------------------------------------------
@@ -425,9 +425,9 @@ export default function QuotationProfile({
           textareaProps={{
             allowNewLineByUser: true,
             props: {
-              value: designatedManufacturer.value,
+              value: designatedBrand.value,
               onChange: (e) => {
-                designatedManufacturer.onChange?.(e.target.value);
+                designatedBrand.onChange?.(e.target.value);
               },
             },
           }}
@@ -539,7 +539,7 @@ type Tstate_profile = {
   projectProgress: string;
   isLost: boolean;
 
-  designatedManufacturer: string;
+  designatedBrand: string;
 };
 
 const creEmptyProfile = (): Tstate_profile => ({
@@ -554,7 +554,7 @@ const creEmptyProfile = (): Tstate_profile => ({
   trackProgress: '',
   projectProgress: '',
 
-  designatedManufacturer: '',
+  designatedBrand: '',
 
   isLost: false,
 });
@@ -677,10 +677,10 @@ const useProfile = ({
 
           // disabled: disabled,
         },
-        designatedManufacturer: {
-          value: state_profile.designatedManufacturer,
+        designatedBrand: {
+          value: state_profile.designatedBrand,
           onChange: (v) => {
-            changeProfile('designatedManufacturer', v);
+            changeProfile('designatedBrand', v);
           },
         },
       },
@@ -705,7 +705,7 @@ const useProfile = ({
         trackProgress: originContent?.trackProgress ?? '',
         projectProgress: originContent?.projectProgress ?? '',
 
-        designatedManufacturer: originContent?.designatedManufacturer ?? '',
+        designatedBrand: originContent?.designatedBrand ?? '',
 
         isLost: originContent?.isLost ?? false,
       });
@@ -727,7 +727,7 @@ const useProfile = ({
       trackProgress: originContent?.trackProgress ?? '',
       projectProgress: originContent?.projectProgress ?? '',
 
-      designatedManufacturer: originContent?.designatedManufacturer ?? '',
+      designatedBrand: originContent?.designatedBrand ?? '',
 
       isLost: originContent?.isLost ?? false,
     });

@@ -715,7 +715,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       district: state_profile.district ?? '',
       address: state_profile.address ?? '',
 
-      designatedManufacturer: state_profile.designatedManufacturer ?? '',
+      designatedBrand: state_profile.designatedBrand ?? '',
 
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',

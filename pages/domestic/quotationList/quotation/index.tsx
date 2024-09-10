@@ -158,7 +158,7 @@ type Tprofile = {
   trackProgress: string;
   projectProgress: string;
 
-  designatedManufacturer: string;
+  designatedBrand: string;
 
   isLost: boolean;
 };
@@ -666,8 +666,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    console.log('state_profile.designatedManufacturer', state_profile.designatedManufacturer);
-
     const body: TcreateQuotationContentDto = {
       // quotationDate: data_watch.quotationDate ?? '',
       // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
@@ -685,7 +683,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       contactNumber: state_profile.contactNumber ?? '',
       faxNumber: state_profile.faxNumber ?? '',
 
-      designatedManufacturer: state_profile.designatedManufacturer ?? '',
+      designatedBrand: state_profile.designatedBrand ?? '',
 
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
@@ -1267,10 +1265,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
           onChange: (v) => changeProfile('faxNumber', v),
         },
 
-        designatedManufacturer: {
-          value: state_profile.designatedManufacturer,
+        designatedBrand: {
+          value: state_profile.designatedBrand,
           onChange: (v) => {
-            changeProfile('designatedManufacturer', v);
+            changeProfile('designatedBrand', v);
           },
         },
 
@@ -2043,7 +2041,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
 
-      designatedManufacturer: latestContent?.designatedManufacturer ?? '',
+      designatedBrand: latestContent?.designatedBrand ?? '',
 
       isLost: latestContent?.isLost ?? false,
     });
@@ -2573,7 +2571,7 @@ const creEmptyProfile = (): Tprofile => ({
   trackProgress: '',
   projectProgress: '',
 
-  designatedManufacturer: '',
+  designatedBrand: '',
 
   isLost: false,
 });

@@ -450,8 +450,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: content?.faxNumber ?? '',
           // onChange: (v) => changeProfile('faxNumber', v),
         },
-        designatedManufacturer: {
-          value: content?.designatedManufacturer ?? '',
+        designatedBrand: {
+          value: content?.designatedBrand ?? '',
           // onChange: (v) => changeProfile('faxNumber', v),
         },
         trackProgress: {
