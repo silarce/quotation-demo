@@ -9,6 +9,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import Row, { Cell } from 'components/global/gear/table/row';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { TablePanel_basic } from 'components/global/gear/table/tablePanel';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetBankAccount, apiPostBankAccount, apiPatchBankAccount } from 'js/api/api_netCore/api_accountant';
@@ -17,6 +18,10 @@ import type {
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
 } from 'js/api/api_netCore/api_accountant';
+
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+
+import scss from './index.module.scss';
 
 // =================================================================================
 
@@ -28,6 +33,8 @@ interface Tstate {
   readonly bank_code: string;
 }
 
+type TExtractRaw = Pick<TaccountantPresetDto, 'account_name' | 'account' | 'bank_name' | 'bank_code'> & { id?: string };
+
 // =================================================================================
 
 // MARK: START
@@ -35,57 +42,60 @@ interface Tstate {
 export default function BankManagement(): React.ReactElement {
   // --------------------------------------------------------------------
 
-  const { rawData_bankAccount = [], update_bankAccount, isFetching_bankAccount } = useGetBankAccount();
+  const [newBank, setNewBank] = useState<TExtractRaw>();
 
   // --------------------------------------------------------------------
 
-  // --------------------------------------------------------------------
-
-  // const panelList_disabled: TpanelList = [
-  //   {
-  //     type: 'myButton',
-  //     label: '編輯',
-  //     onClick: () => {
-  //       switchDisabled(false);
-  //     },
-  //   },
-  // ];
-
-  const panelList_abled: TpanelList = [
-    // {
-    //   type: 'redButton',
-    //   label: reqPost ? '確定新增' : reqPatch ? '確定更新' : '後端設定錯誤',
-    //   onClick: () => {
-    //     if (reqPost) {
-    //       reqPost();
-    //     } else if (reqPatch) {
-    //       reqPatch();
-    //     } else {
-    //       myAlert.err({ title: '後端設定錯誤' });
-    //     }
-    //   },
-    // },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => {
-        // switchDisabled(true);
-      },
-    },
-  ];
-
-  // const panelList = disabled ? panelList_disabled : panelList_abled;
+  const {
+    //
+    rawData_bankAccount = [],
+    update_bankAccount,
+    isFetching_bankAccount,
+  } = useGetBankAccount();
 
   // --------------------------------------------------------------------
 
-  // const post = async () => {
-  //   await apiPostBankAccount({
-  //     account_name: '王汪汪',
-  //     account: '123-223-323',
-  //     bank_code: '45-678989-23',
-  //     bank_name: '汪汪小銀行',
-  //   });
-  // };
+  // region REQ
+
+  const reqPost = async (state: Tstate) => {
+    const body = state as TcreateAccountantPresetDto;
+
+    const { account_name, account, bank_name, bank_code } = body;
+
+    if (!account_name || !account || !bank_name || !bank_code) {
+      myAlert.info({ title: '請填寫所有欄位' });
+
+      return Promise.reject();
+    }
+
+    await apiPostBankAccount(body).then(async () => {
+      await update_bankAccount();
+      setNewBank(undefined);
+    });
+  };
+
+  const reqPatch = async (state: Tstate) => {
+    const body = state as TupdateAccountantPresetDto;
+
+    await apiPatchBankAccount(body).then(async () => {
+      await update_bankAccount();
+    });
+  };
+
+  // --------------------------------------------------------------------
+
+  const addBank = () => {
+    setNewBank({
+      account_name: '',
+      account: '',
+      bank_name: '',
+      bank_code: '',
+    });
+  };
+
+  const clearAdd = () => {
+    setNewBank(undefined);
+  };
 
   // --------------------------------------------------------------------
 
@@ -97,14 +107,14 @@ export default function BankManagement(): React.ReactElement {
   // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader02
-        tag="銀行管理"
-        // panelList={panelList}
-      />
+      <PageHeader02 tag="銀行管理" />
 
-      <div>
-        <Row thead={true} className="px-5">
-          <Cell style={config.panel.style} />
+      <div className={scss.main}>
+        <Row thead={true} className={classNames(scss.row, scss.thead)}>
+          <Cell style={config.panel.style}>
+            {!newBank && <IconAddCircle className="h-[20px]" onClick={addBank} />}
+            {newBank && <IconRemoveCircle className="h-[20px]" onClick={clearAdd} />}
+          </Cell>
 
           {keyArr.map((key) => {
             const { label, style } = config[key];
@@ -116,8 +126,11 @@ export default function BankManagement(): React.ReactElement {
             );
           })}
         </Row>
+
+        {newBank && <BankRow rawData_bankAccount={newBank} onConfirm={reqPost} />}
+
         {rawData_bankAccount.map((raw) => {
-          return <BankRow key={raw.id} rawData_bankAccount={raw} update_bankAccount={update_bankAccount} />;
+          return <BankRow key={raw.id} rawData_bankAccount={raw} onConfirm={reqPatch} />;
         })}
       </div>
     </SubLayer>
@@ -131,53 +144,32 @@ export default function BankManagement(): React.ReactElement {
 // =================================================================================
 // =================================================================================
 
+// MARK: BankRow
+
 const BankRow = ({
   //
   rawData_bankAccount,
-  update_bankAccount,
+  onConfirm,
 }: {
-  rawData_bankAccount: TaccountantPresetDto;
-  update_bankAccount: () => void;
+  rawData_bankAccount: TExtractRaw;
+  onConfirm: (state: Tstate) => Promise<void>;
 }) => {
   const defaultState = useMemo(() => {
     return rawData_bankAccount;
   }, [rawData_bankAccount]);
 
   // ----------------------------------------------------------------------------
-
-  const [disabled, setDisabled] = useState(true);
-
   const [state, setState] = useState<Tstate>(defaultState);
-  // ----------------------------------------------------------------------------
+  const isNew = !state.id;
 
-  const reqPost = async (body: TcreateAccountantPresetDto) => {
-    await apiPostBankAccount(body)
-      .then(async () => {
-        await update_bankAccount();
-        setDisabled(true);
-      })
-      .catch(() => {});
-  };
-
-  const reqPatch = async (body: TupdateAccountantPresetDto) => {
-    await apiPatchBankAccount(body)
-      .then(async () => {
-        await update_bankAccount();
-        setDisabled(true);
-      })
-      .catch(() => {});
-  };
+  const [disabled, setDisabled] = useState(!isNew);
 
   // ----------------------------------------------------------------------------
 
-  const onConfifm = () => {
-    const body = state;
-
-    if (body.id) {
-      reqPatch(body as TupdateAccountantPresetDto);
-    } else {
-      reqPost(body as TcreateAccountantPresetDto);
-    }
+  const theOnConfifm = async () => {
+    await onConfirm(state).then(() => {
+      setDisabled(true);
+    });
   };
 
   // ----------------------------------------------------------------------------
@@ -186,13 +178,19 @@ const BankRow = ({
   }, [defaultState]);
 
   return (
-    <Row className="px-5">
+    <Row className={classNames(scss.row, isNew && scss.new)}>
       <Cell style={config.panel.style}>
-        <TablePanel_basic disabled={disabled} setDisabled={setDisabled} onConfirm={onConfifm} />
+        <TablePanel_basic
+          //
+          disabled={disabled}
+          setDisabled={setDisabled}
+          onConfirm={theOnConfifm}
+          showEdit={!isNew}
+        />
       </Cell>
 
       {keyArr.map((key) => {
-        const inputSelProps = inputSelPropsDict[key]({ state, setState });
+        const inputSelProps = inputSelPropsDict[key]({ state, setState, isNew });
 
         return (
           <Cell key={key} style={config[key].style}>
@@ -217,9 +215,11 @@ interface TinputSelPropsDict {
   [key: string]: ({
     state,
     setState,
+    isNew,
   }: {
     state: Tstate;
     setState: React.Dispatch<React.SetStateAction<Tstate>>;
+    isNew: boolean;
   }) => TinputSelProps;
 }
 
@@ -249,7 +249,7 @@ const inputSelPropsDict: TinputSelPropsDict = {
         props: {
           value: state.account_name,
           onChange: (e) => {
-            setState({ ...state, account_name: e.target.value });
+            setState({ ...state, account_name: e.target.value.trim() });
           },
         },
       },
@@ -257,32 +257,72 @@ const inputSelPropsDict: TinputSelPropsDict = {
 
     return inputSelProps;
   },
-  account: ({ state }) => {
-    const inputSelProps: TinputSelProps = {
+  account: ({ state, setState, isNew }) => {
+    const inputSelProps_old: TinputSelProps = {
       showBaseline: 'invisible',
       node: <div className="text-center">{state.account}</div>,
     };
 
+    const inputSelProps_new: TinputSelProps = {
+      showBaseline: 'auto',
+      inputProps: {
+        props: {
+          value: state.account,
+          onChange: (e) => {
+            setState({ ...state, account: e.target.value.trim() });
+          },
+        },
+      },
+    };
+
+    const inputSelProps = isNew ? inputSelProps_new : inputSelProps_old;
+
     return inputSelProps;
   },
-  bank_name: ({ state }) => {
-    const inputSelProps: TinputSelProps = {
+  bank_name: ({ state, setState, isNew }) => {
+    const inputSelProps_old: TinputSelProps = {
       showBaseline: 'invisible',
       node: <div className="text-center">{state.bank_name}</div>,
     };
 
+    const inputSelProps_new: TinputSelProps = {
+      showBaseline: 'auto',
+      inputProps: {
+        props: {
+          value: state.bank_name,
+          onChange: (e) => {
+            setState({ ...state, bank_name: e.target.value.trim() });
+          },
+        },
+      },
+    };
+
+    const inputSelProps = isNew ? inputSelProps_new : inputSelProps_old;
+
     return inputSelProps;
   },
-  bank_code: ({ state }) => {
-    const inputSelProps: TinputSelProps = {
+  bank_code: ({ state, setState, isNew }) => {
+    const inputSelProps_old: TinputSelProps = {
       showBaseline: 'invisible',
       node: <div className="text-center">{state.bank_code}</div>,
     };
+
+    const inputSelProps_new: TinputSelProps = {
+      showBaseline: 'auto',
+      inputProps: {
+        props: {
+          value: state.bank_code,
+          onChange: (e) => {
+            setState({ ...state, bank_code: e.target.value.trim() });
+          },
+        },
+      },
+    };
+
+    const inputSelProps = isNew ? inputSelProps_new : inputSelProps_old;
 
     return inputSelProps;
   },
 };
 
 // =================================================================================
-
-// // icon
