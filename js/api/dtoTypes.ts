@@ -1799,7 +1799,22 @@ export type TquotationContentDto = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
 
-  designatedBrand: string | null; // 指定廠牌
+  // 指定廠牌
+  designatedBrand: string | null;
+  // 工地主任
+  siteManager: string | null;
+  // 工地主任電話
+  siteManagerNumber: string | null;
+  // 需求門型
+  requiredDoorType: string | null;
+  // 需求門型數量
+  requiredDoorQuantity: number | null;
+  // 預估折數
+  estimatedDiscount: string | null;
+  // 預定採購日/投標日
+  scheduledProcurementOrBidDate: string | null; // 日期
+  // 類型
+  type: string | null;
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
@@ -2216,7 +2231,39 @@ export type TcreateQuotationContentDto = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
 
-  designatedBrand: string | null; // 指定廠商
+  // // 指定廠牌
+  // designatedBrand?: string | null;
+  // // 工地主任
+  // siteManager?: string | null;
+  // // 工地主任電話
+  // siteManagerNumber?: string | null;
+  // // 需求門型
+  // requiredDoorType?: string | null;
+  // // 需求門型數量
+  // requiredDoorQuantity?: number | null;
+  // // 預估折數
+  // estimatedDiscount?: string | null;
+  // // 預定採購日/投標日
+  // scheduledProcurementOrBidDate?: string | null; // 日期
+  // // 類型
+  // type?: string | null;
+
+  // 指定廠牌
+  designatedBrand?: string | null;
+  // 工地主任
+  siteManager?: string | null;
+  // 工地主任電話
+  siteManagerNumber?: string | null;
+  // 需求門型
+  requiredDoorType?: string | null;
+  // 需求門型數量
+  requiredDoorQuantity?: number | null;
+  // 預估折數
+  estimatedDiscount?: string | null;
+  // 預定採購日/投標日
+  scheduledProcurementOrBidDate?: string | null; // 日期
+  // 類型
+  type?: string | null;
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註

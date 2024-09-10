@@ -10,6 +10,7 @@ import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -417,43 +418,54 @@ function TheQuotation({ router }: { router: NextRouter }) {
       itemList: {
         validityPeriod: {
           value: content?.validityPeriod ?? '',
-          // onChange: (v) => changeProfile('validityPeriod', v),
         },
         projectName: {
           value: content?.projectName ?? '',
-          // onChange: (v) => changeProfile('projectName', v),
         },
         county: {
           value: content?.county ?? '',
-          // onChange: (v) => {
-          //   changeProfile('county', v);
-          //   changeProfile('district', '');
-          // },
         },
         district: {
           value: content?.district ?? '',
-          // onChange: (v) => changeProfile('district', v),
         },
         address: {
           value: content?.address ?? '',
-          // onChange: (v) => changeProfile('address', v),
         },
         contactPerson: {
           value: content?.contactPerson ?? '',
-          // onChange: (v) => changeProfile('contactPerson', v),
         },
         contactNumber: {
           value: content?.contactNumber ?? '',
-          // onChange: (v) => changeProfile('contactNumber', v),
         },
         faxNumber: {
           value: content?.faxNumber ?? '',
-          // onChange: (v) => changeProfile('faxNumber', v),
         },
+
         designatedBrand: {
           value: content?.designatedBrand ?? '',
-          // onChange: (v) => changeProfile('faxNumber', v),
         },
+        siteManager: {
+          value: content?.siteManager ?? '',
+        },
+        siteManagerNumber: {
+          value: content?.siteManagerNumber ?? '',
+        },
+        requiredDoorType: {
+          value: content?.requiredDoorType ?? '',
+        },
+        requiredDoorQuantity: {
+          value: String(content?.requiredDoorQuantity ?? ''),
+        },
+        estimatedDiscount: {
+          value: content?.estimatedDiscount ?? '',
+        },
+        type: {
+          value: content?.type ?? '',
+        },
+        scheduledProcurementOrBidDate: {
+          value: content?.estimatedDiscount ? moment(content.estimatedDiscount) : null,
+        },
+
         trackProgress: {
           value: content?.trackProgress ?? '',
 

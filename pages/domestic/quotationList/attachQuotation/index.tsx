@@ -716,6 +716,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       address: state_profile.address ?? '',
 
       designatedBrand: state_profile.designatedBrand ?? '',
+      siteManager: state_profile.siteManager ?? '',
+      siteManagerNumber: state_profile.siteManagerNumber ?? '',
+      requiredDoorType: state_profile.requiredDoorType ?? '',
+      requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      estimatedDiscount: state_profile.estimatedDiscount || null,
+      scheduledProcurementOrBidDate:
+        state_profile.scheduledProcurementOrBidDate &&
+        moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+      type: state_profile.type ?? '',
 
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',
