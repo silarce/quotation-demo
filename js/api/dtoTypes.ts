@@ -4576,20 +4576,6 @@ export type TupdateAccountantInvoiceBookDto = Pick<
   id: string;
 };
 
-// 名稱未定
-export interface TbankDto {
-  id: string;
-  createAt: string;
-  updateAt: string;
-  createBy: string;
-  updateBy: string;
-
-  accountName: string;
-  account: string;
-  bankCode: string;
-  bankName: string;
-}
-
 // MARK: /accountant_end
 // endregion /accountant
 
