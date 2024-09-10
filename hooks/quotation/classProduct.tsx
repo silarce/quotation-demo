@@ -3895,6 +3895,33 @@ class Class_product {
       arrForCreate?.map((key, index) => {
         const item = this.accessoriesList[key];
 
+        if (!item) {
+          const accessoriesArr = Object.values(this.accessoriesList).map((item) => item.body);
+
+          console.log('key', key);
+          console.log('itemName', this.itemName);
+          console.log('arrForCreate', arrForCreate);
+          console.log('accessoriesArr', accessoriesArr);
+          console.log('accessoriesVKeyArr', this.accessoriesVKeyArr);
+
+          const foo = {
+            key,
+            itemName: this.itemName,
+            arrForCreate,
+            accessoriesArr: accessoriesArr,
+            accessoriesVKeyArr: this.accessoriesVKeyArr,
+          };
+
+          myAlert.err({
+            title: `發生錯誤，項目 ${this.itemName} 發生問題， 請將以下文字複製給資訊部`,
+            content: JSON.stringify(foo),
+            props: {
+              width: 1000,
+              maskClosable: false,
+            },
+          });
+        }
+
         return {
           ...item.body,
           order: index,

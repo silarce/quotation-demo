@@ -666,8 +666,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    console.log('state_profile.designatedManufacturer', state_profile.designatedManufacturer);
-
     const body: TcreateQuotationContentDto = {
       // quotationDate: data_watch.quotationDate ?? '',
       // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
@@ -1960,7 +1958,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const customeRight = [
     !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
       <Dropdown
-        key="1"
+        key="0"
         // placement="bottomRight"
         itemArr={[
           //
