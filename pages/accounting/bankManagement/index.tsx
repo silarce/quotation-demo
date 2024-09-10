@@ -23,6 +23,8 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 
 import scss from './index.module.scss';
 
+import { useTranslation } from 'react-i18next';
+
 // =================================================================================
 
 interface Tstate {
@@ -40,6 +42,10 @@ type TExtractRaw = Pick<TaccountantPresetDto, 'account_name' | 'account' | 'bank
 // MARK: START
 
 export default function BankManagement(): React.ReactElement {
+  // --------------------------------------------------------------------
+  const { t } = useTranslation('accounting', { keyPrefix: 'bankManagement' });
+  const config = useConfig();
+
   // --------------------------------------------------------------------
 
   const [newBank, setNewBank] = useState<TExtractRaw>();
@@ -107,7 +113,7 @@ export default function BankManagement(): React.ReactElement {
   // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader02 tag="銀行管理" />
+      <PageHeader02 tag={t('bankManagement')} />
 
       <div className={scss.main}>
         <Row thead={true} className={classNames(scss.row, scss.thead)}>
@@ -154,6 +160,10 @@ const BankRow = ({
   rawData_bankAccount: TExtractRaw;
   onConfirm: (state: Tstate) => Promise<void>;
 }) => {
+  const config = useConfig();
+
+  // ----------------------------------------------------------------------------
+
   const defaultState = useMemo(() => {
     return rawData_bankAccount;
   }, [rawData_bankAccount]);
@@ -225,20 +235,26 @@ interface TinputSelPropsDict {
 
 const keyArr = ['account_name', 'account', 'bank_name', 'bank_code'];
 
-const config: Tconfig = {
-  panel: {
-    style: {
-      width: 50,
-    },
-  },
+const useConfig = () => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'bankManagement' });
 
-  account_name: {
-    label: '帳戶名',
-    style: { width: 200 },
-  },
-  account: { label: '帳戶', style: { width: 200 } },
-  bank_name: { label: '銀行', style: { width: 200 } },
-  bank_code: { label: '銀行代號', style: { width: 150 } },
+  const config: Tconfig = {
+    panel: {
+      style: {
+        width: 50,
+      },
+    },
+
+    account_name: {
+      label: t('accountName'),
+      style: { width: 200 },
+    },
+    account: { label: t('account'), style: { width: 200 } },
+    bank_name: { label: t('bankName'), style: { width: 200 } },
+    bank_code: { label: t('bankCode'), style: { width: 150 } },
+  };
+
+  return config;
 };
 
 const inputSelPropsDict: TinputSelPropsDict = {

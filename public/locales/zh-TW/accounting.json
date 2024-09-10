@@ -1,0 +1,9 @@
+{
+  "bankManagement": {
+    "bankManagement": "銀行管理",
+    "bankName": "銀行",
+    "bankCode": "銀行代號",
+    "account": "帳戶",
+    "accountName": "帳戶名"
+  }
+}
