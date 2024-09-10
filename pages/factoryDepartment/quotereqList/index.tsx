@@ -81,7 +81,7 @@ export default function AddPurchaseOrder() {
     const [qodata, setQodata] = useState<any[]>([]);
     const [customerdata, setCustomerdata] = useState<any[]>([]);
     const [shippingdata, setShippingdata] = useState<any[]>([]);
-
+    const [data1restore, setData1Restore] = useState<any[]>([]);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -123,6 +123,8 @@ export default function AddPurchaseOrder() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -130,6 +132,11 @@ export default function AddPurchaseOrder() {
     // 使用 Moment 類型作為狀態
     const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
     const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
+
+    // 詢價Modal
+    const [quotereqname, setQuotereqname] = useState<string>("");
+    const [quotereqspec, setQuotereqspec] = useState<string>("");
+    const [quotereqquantity, setQuotereqquantity] = useState<string>("");
 
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
@@ -238,7 +245,7 @@ export default function AddPurchaseOrder() {
 
 
             setQodata(data);
-
+            setData1Restore(data);
             setSearchdata(data);
 
         } catch (error: any) {
@@ -321,7 +328,7 @@ export default function AddPurchaseOrder() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData(data);
+            // setData(data);
             setModalData(data);
             setSearchBarData(data);
 
@@ -512,9 +519,8 @@ export default function AddPurchaseOrder() {
         }
     };
 
-    const RemovePurchaseOrderDetail = async (id: any) => {
+    const RemoveQuotereqDetail = async (id: any) => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
                 id: id
@@ -530,7 +536,7 @@ export default function AddPurchaseOrder() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/RemovePurchaseOrderDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/RemoveQuotereqDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -548,46 +554,41 @@ export default function AddPurchaseOrder() {
 
 
     //請購單申請
-    const ClosePurchaseRequisition = async () => {
+    const CloseQuotereq = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                quotereqid: quotereqid,
+                quoterequuid: quoterequuid
+            };
 
-        // console.log(data2);
-        // // return;
-        // try {
-        //     setIsLoading(true);
-        //     const conditionModel: {
-        //         purchaseorderid: any,
-        //         purchaseorderuuid: any
-        //     } = {
-        //         purchaseorderid: purchaseorderid,
-        //         purchaseorderuuid: purchaseorderuuid
-        //     };
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-        //     var inputModel = {
-        //         TypeName: 'ERP',
-        //         ServiceName: 'WareHouseService',
-        //         FunctionName: 'no',
-        //         FilterConditions: JSON.stringify(conditionModel),
-        //     };
+            const response = await fetch(`${setting.apipath}/WareHouse/CloseQuotereq`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
 
-        //     const response = await fetch(`${setting.apipath}/WareHouse/ClosePurchaseRequisition`, {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify(inputModel)
-        //     });
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
 
-        //     if (!response.ok) {
-        //         throw new Error('Failed to fetch data');
-        //     }
-        //     const data = await response.json();
-
-        // } catch (error: any) {
-        //     setError(error.message);
-        // }
-        // finally {
-        //     setIsLoading(false);
-        // }
+            getQuotereq();
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
 
 
@@ -667,6 +668,7 @@ export default function AddPurchaseOrder() {
                 setData2(prevData2 => [...prevData2, data]);
 
                 getQuotereqDetail(quoterequuid);
+                getQuotereqDetailhistory(handinputproductid);
 
 
 
@@ -703,7 +705,7 @@ export default function AddPurchaseOrder() {
     const handleRemove = (index: number, item: any) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-        RemovePurchaseOrderDetail(item.id);
+        RemoveQuotereqDetail(item.detail_id);
     };
 
     // 改變數字口袋清單值
@@ -955,10 +957,7 @@ export default function AddPurchaseOrder() {
         let createAtinObj = new Date(create_atin);
 
         if (data2.length === 0) {
-            myAlert.warning({ title: "尚未加入任何請購項目" });
-            return;
-        } else if (needDateObj < createAtinObj) {
-            myAlert.warning({ title: "需用日期不可小於今日" });
+            myAlert.warning({ title: "尚未加入任何詢價項目" });
             return;
         }
         else {
@@ -966,16 +965,16 @@ export default function AddPurchaseOrder() {
             const hasZeroQuantity = data2.some(item => item.quantity === 0 || item.quantity === '');
 
             if (hasZeroQuantity) {
-                myAlert.warning({ title: "請購項目中有數量為0的項目，請檢查並修正。" });
+                myAlert.warning({ title: "詢價項目中有數量為0的項目，請檢查並修正。" });
             } else {
                 myAlert.confirm({
-                    title: '確定要送出請購單嗎?',
+                    title: '確定要送出詢價單嗎?',
                     content: <>
                         <h1>請檢查品名、數量是否正確</h1>
                     </>,
                     props: {
                         onOk: async () => {
-                            ClosePurchaseRequisition();
+                            CloseQuotereq();
                             setQuotereqid("");
                             setQuoterequuid("");
                             setCreate_atin(moment().format('YYYY-MM-DD') || '');
@@ -1037,20 +1036,15 @@ export default function AddPurchaseOrder() {
         const endDate = keywordenddate;
         const requisitionId = keyword2.trim();
         const status = keyword3.trim();
-
-        console.log(startDate);
-        console.log(endDate);
-        console.log(requisitionId);
-        console.log(status);
-
+        const suppliername = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
             !requisitionId &&
-            !status) {
+            !status &&
+            !suppliername) {
             setSearchdata(qodata);
-
             return;
         }
 
@@ -1082,13 +1076,19 @@ export default function AddPurchaseOrder() {
             );
         }
 
+        if (suppliername) {
+            filteredData = filteredData.filter(item =>
+                item.suppliername.toString().includes(suppliername)
+            );
+        }
+
         setSearchdata(filteredData);
     };
 
     // 監聽條件變更
     useEffect(() => {
         filterData();
-    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+    }, [keywordstartdate, keywordenddate, keyword3, keyword2, keyword4]);
 
 
 
@@ -1097,8 +1097,9 @@ export default function AddPurchaseOrder() {
         setKeywordstartdate(null)
         setKeywordenddate(null);
         setKeyword2('');
-        setKeyword3('');
-        // setSearchdata(data);
+        // setKeyword3('');
+        setKeyword4('');
+        // setSearchdata(qodata);
     }
 
     const handlechangepo = (item: any) => {
@@ -1246,38 +1247,26 @@ export default function AddPurchaseOrder() {
     }
 
     const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
-    const prQuotereqModalOpen = async (item: any) => {
+    const [quotereqcanedit, setQuotereqcanedit] = useState<boolean>();
+    const prQuotereqModalOpen = async (type: any, item: any) => {
+
         // return;
-        //清空
-        prquotereqadddata.quoterequuid = "";
-        prquotereqadddata.quotereqid = "";
-        prquotereqadddata.unitprice = "";
-        prquotereqadddata.totalprice = "";
-        prquotereqadddata.suppliername = "";
-        prquotereqadddata.deliverydate = moment();
-        prquotereqadddata.unit = "";
-        prquotereqadddata.note = "";
-        prquotereqadddata.awarded = false;
-        //預設詢價單主檔編號
-        prquotereqadddata.quoterequuid = item.quoterequuid;
-        prquotereqadddata.quotereqid = item.quotereqid;
-
-
-        // setQuotereqname(item.name);
-        // setQuotereqspec(item.spec);
-        // setQuotereqquantity(item.quantity);
-        getQuotereqDetailhistory(item);
-        setPrquotereqmodalopen(true);
-        setPrquotereqmodalopen(true);
+        setQuotereqcanedit(Boolean(type));
+        setQuotereqname(type === true ? handinputname : item.detail_name);
+        setQuotereqspec(type === true ? handinputspec : item.detail_spec);
+        getQuotereqDetailhistory(type === true ? item : item.detail_productid);
+        setTimeout(() => setPrquotereqmodalopen(true), 500);
     }
 
     //關閉詢價單modal
     const prQuotereqModalClose = async () => {
         setPrquotereqmodalopen(false);
+        // setQuotereqcanedit(false)
         setPrquotereqdata([]);
     }
 
     const getQuotereqDetailhistory = async (productid: any) => {
+
         try {
             // setIsLoading(true);
             const conditionModel = {
@@ -1308,6 +1297,19 @@ export default function AddPurchaseOrder() {
         }
     };
 
+
+    const handleCheckboxChange = (item: any) => {
+        console.log(item);
+        // return;
+        // 更新選中的供應商
+        setLastselectedsupplier(selectedsupplier);
+        setSelectedsupplier(item.detail_id);
+        setHandinputunitprice(item.detail_unitprice);
+        setHandinputquantity(item.detail_quantity);
+        setHandinputtotalprice(handinputunitprice * handinputquantity);
+        // UpdatePurchaseOrderDetail(item);
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1326,12 +1328,12 @@ export default function AddPurchaseOrder() {
                             <div>
                                 <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    查詢
+                                    單據
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { "歷史單據查詢" }} title="歷史單據">
-                                    <img src={icon_history.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    歷史
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    品項
                                 </button>
                             </div>
                             <div>
@@ -1370,7 +1372,7 @@ export default function AddPurchaseOrder() {
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${status === "請購中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
@@ -1756,7 +1758,10 @@ export default function AddPurchaseOrder() {
                                         </span>
                                         <span>
                                             <button
-                                                onClick={() => { prQuotereqModalOpen(_item.detail_productid) }}
+                                                onClick={() => {
+                                                    setQuotereqcanedit(false);
+                                                    prQuotereqModalOpen(false, _item)
+                                                }}
                                             >
                                                 <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                             </button>
@@ -1795,7 +1800,7 @@ export default function AddPurchaseOrder() {
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                            <button style={{ display: (editstatus === false && status === '未送出') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
@@ -1873,7 +1878,9 @@ export default function AddPurchaseOrder() {
                                 </div>
                                 <div>
                                     <button
-                                        onClick={() => { prQuotereqModalOpen(handinputproductid) }}
+                                        onClick={() => {
+                                            prQuotereqModalOpen(true, handinputproductid)
+                                        }}
                                     >
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                     </button>
@@ -2051,24 +2058,6 @@ export default function AddPurchaseOrder() {
                     show={searchmodalopen}
                     onCrossClick={SearchModalClose}
                 >
-                    {/* <Modal
-                        visible={searchmodalopen}
-                        footer={null}
-                        onCancel={SearchModalClose}
-                        width="1000px"
-                        maskClosable={false}
-                        // title='單據查找'
-                        // title={
-                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                        //     <span>查詢條件</span>
-                        //     <span >筆數：共 {data.length} 筆</span>
-                        // </div>
-
-                        // }
-                        // centered
-                        style={{ top: 200 }}
-                    > */}
-
                     <div className={scss.modal_head_head1}>
                         <div>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
@@ -2152,12 +2141,12 @@ export default function AddPurchaseOrder() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
+                                        caption="廠商名稱"
+                                        disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: ' ',
+                                                value: keyword4 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
                                             },
                                         }}
                                     />
@@ -2218,9 +2207,6 @@ export default function AddPurchaseOrder() {
                             maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
-                            // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
-                            // padding: '10px',
-                            // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
                             <Thead01 type={'Quotereq3'} />
                             {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
@@ -2235,9 +2221,9 @@ export default function AddPurchaseOrder() {
                                             <span>{_item.quotereqid}</span>
                                             <span>{getTaiwanDateStr(_item.create_at)}</span>
                                             {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                                            {/* <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
                                                 {_item.status}
-                                            </span> */}
+                                            </span>
                                             <span>{_item.suppliername}</span>
                                             {/* <span>{_item.create_by}</span> */}
                                             {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
@@ -2257,8 +2243,8 @@ export default function AddPurchaseOrder() {
                     show={prquotereqmodalopen}
                     onCrossClick={prQuotereqModalClose}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{handinputname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{handinputspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         {/* <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{handinputquantity}</span> */}
                     </div>
                     <hr />
@@ -2290,13 +2276,15 @@ export default function AddPurchaseOrder() {
                                         <span></span>
                                         {/* <span></span> */}
                                         <span>
-                                            {/* <input
-                                                readOnly
+                                            <input
                                                 className={scss.quotereqdetail_checkbox}
                                                 type='checkbox'
                                                 checked={selectedsupplier === _item.detail_id}
-                                                onChange={() => handleCheckboxChange(_item)}
-                                            /> */}
+                                                onChange={() => {
+                                                    if (quotereqcanedit === false) return; // 如果 quotereqcanedit 為 false，則不執行後續操作
+                                                    handleCheckboxChange(_item);
+                                                }}
+                                            />
                                         </span>
                                     </div>
                                 </CellWithBar>

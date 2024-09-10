@@ -91,6 +91,8 @@ export default function AddPurchaseOrder() {
     const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -113,6 +115,7 @@ export default function AddPurchaseOrder() {
     const [purchaseorderdetailuuidin, setPurchaseorderdetailuuidin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
+    const [supplieridin, setSupplieridin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
 
     //搜尋
@@ -138,11 +141,19 @@ export default function AddPurchaseOrder() {
     const [handinputunitprice, setHandinputunitprice] = useState<number>(0);
     const [handinputtotalprice, setHandinputtotalprice] = useState<number>(0);
 
+    // 詢價Modal
+    const [quotereqname, setQuotereqname] = useState<string>("");
+    const [quotereqspec, setQuotereqspec] = useState<string>("");
+    const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
     const [editmain, setEditmain] = useState<boolean>(false);
-
+    // 計算金額
+    const [totalprice, setTotalPrice] = useState<string>("");
+    const [taxprice, setTaxPrice] = useState<string>("");
+    const [totalpayprice, setTotalPayPrice] = useState<string>("");
     // 保存原始值
     const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
     const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
@@ -281,6 +292,19 @@ export default function AddPurchaseOrder() {
             // setData1(data);
 
             setData2(data);
+
+
+            let totalprice = 0;
+            data.forEach((element: { totalprice: any; }) => {
+                totalprice += element.totalprice;
+            });
+            setTotalPrice(totalprice.toLocaleString());
+            const taxPrice = Math.round(totalprice * 0.05);
+            setTaxPrice(taxPrice.toLocaleString());
+            const totalPayPrice = totalprice + taxPrice;
+            setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            console.log(data2);
 
 
         } catch (error: any) {
@@ -453,6 +477,7 @@ export default function AddPurchaseOrder() {
                 supplierphone: supplierphonein,
                 suppliertaxid: suppliertaxidin,
                 supplieraddress: supplieraddressin,
+                supplierid: supplieridin,
                 shippingaddress: shippingaddressin,
             };
 
@@ -542,19 +567,18 @@ export default function AddPurchaseOrder() {
     };
 
 
-    //請購單申請
-    const ClosePurchaseRequisition = async () => {
+    //採購單申請
+    const ClosePurchaseOrder = async () => {
 
         console.log(data2);
         // return;
         try {
             setIsLoading(true);
-            const conditionModel: {
-                purchaseorderid: any,
-                purchaseorderuuid: any
-            } = {
+            const conditionModel = {
                 purchaseorderid: purchaseorderid,
-                purchaseorderuuid: purchaseorderuuid
+                purchaseorderuuid: purchaseorderuuid,
+                tax: taxprice,
+                totalprice: totalprice
             };
 
             var inputModel = {
@@ -564,7 +588,7 @@ export default function AddPurchaseOrder() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/ClosePurchaseRequisition`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/ClosePurchaseOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -599,8 +623,8 @@ export default function AddPurchaseOrder() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '') {
-            myAlert.warning({ title: '未輸入名稱、規格或數量' });
+        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '' || handinputunitprice === 0) {
+            myAlert.warning({ title: '請檢查欄位是否遺漏' });
         } else {
             const newEntry = {
                 id: handinputproductuuid,
@@ -878,6 +902,8 @@ export default function AddPurchaseOrder() {
         setHandinputunit('');
         setHandinputnote('');
         setHandinputquantity(0);
+        setHandinputunitprice(0);
+        setHandinputtotalprice(0);
         setShowSuggestions(false);
     }
 
@@ -926,6 +952,7 @@ export default function AddPurchaseOrder() {
         setPurchaseorderid("儲存後產生");
         setStatus("未儲存");
         setNote("");
+        setData2([]);
     }
 
     const handlecancelAddPR = () => {
@@ -949,13 +976,13 @@ export default function AddPurchaseOrder() {
         setNeed_date(moment().toString());
     }
 
-    const handlesaveAddPRDetail = () => {
+    const handlesaveAddDetail = () => {
 
         let needDateObj = new Date(need_date);
         let createAtinObj = new Date(create_atin);
 
         if (data2.length === 0) {
-            myAlert.warning({ title: "尚未加入任何請購項目" });
+            myAlert.warning({ title: "尚未加入任何採購項目" });
             return;
         } else if (needDateObj < createAtinObj) {
             myAlert.warning({ title: "需用日期不可小於今日" });
@@ -966,16 +993,16 @@ export default function AddPurchaseOrder() {
             const hasZeroQuantity = data2.some(item => item.quantity === 0 || item.quantity === '');
 
             if (hasZeroQuantity) {
-                myAlert.warning({ title: "請購項目中有數量為0的項目，請檢查並修正。" });
+                myAlert.warning({ title: "採購項目中有數量為0的項目，請檢查並修正。" });
             } else {
                 myAlert.confirm({
-                    title: '確定要送出請購單嗎?',
+                    title: '確定要送出採購單嗎?',
                     content: <>
                         <h1>請檢查品名、數量是否正確</h1>
                     </>,
                     props: {
                         onOk: async () => {
-                            ClosePurchaseRequisition();
+                            ClosePurchaseOrder();
                             setPurchaseorderid("");
                             setPurchaseorderuuid("");
                             setCreate_atin(moment().format('YYYY-MM-DD') || '');
@@ -1102,6 +1129,7 @@ export default function AddPurchaseOrder() {
     }
 
     const handlechangepo = (item: any) => {
+        console.log(item);
         handleRowClick(item.purchaseorderid);
         setData2([]);
         setPurchaseorderid(item.purchaseorderid);
@@ -1115,6 +1143,8 @@ export default function AddPurchaseOrder() {
         setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
         setShippingaddressin(item.shippingaddress);
+        setNeed_date(item.need_date);
+        // alert(item.need_date);
         getPurchaseOrderDetail(item.purchaseorderuuid);
     }
 
@@ -1179,6 +1209,7 @@ export default function AddPurchaseOrder() {
         );
         setSupplierphonein(item.phone ? item.phone : '');
         setSuppliertaxidin(item.tax_id ? item.tax_id : 'f');
+        setSupplieridin(item.customer_number);
 
 
         setcustomersShowSuggestions(false);
@@ -1245,32 +1276,19 @@ export default function AddPurchaseOrder() {
     }
 
     const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
-    const prQuotereqModalOpen = async (item: any) => {
-        // return;
-        //清空
-        prquotereqadddata.quoterequuid = "";
-        prquotereqadddata.quotereqid = "";
-        prquotereqadddata.unitprice = "";
-        prquotereqadddata.totalprice = "";
-        prquotereqadddata.suppliername = "";
-        prquotereqadddata.deliverydate = moment();
-        prquotereqadddata.unit = "";
-        prquotereqadddata.note = "";
-        prquotereqadddata.awarded = false;
-        //預設詢價單主檔編號
-        prquotereqadddata.quoterequuid = item.quoterequuid;
-        prquotereqadddata.quotereqid = item.quotereqid;
+    const [quotereqcanedit, setQuotereqcanedit] = useState<boolean>(false);
+    // const [quotereqModalwaitasecon, setQuotereqModalwaitasecon] = useState<boolean>(false)
+    const prQuotereqModalOpen = async (type: any, item: any) => {
 
-
-        // setQuotereqname(item.name);
-        // setQuotereqspec(item.spec);
-        // setQuotereqquantity(item.quantity);
-        getQuotereqDetailhistory(item);
-        setPrquotereqmodalopen(true);
-        setPrquotereqmodalopen(true);
+        setQuotereqcanedit(Boolean(type));
+        setQuotereqname(type === true ? handinputname : item.detail_name);
+        setQuotereqspec(type === true ? handinputspec : item.detail_spec);
+        getQuotereqDetailhistory(type === true ? item : item.detail_productid);
+        setTimeout(() => setPrquotereqmodalopen(true), 500);
     }
     const prQuotereqModalClose = async () => {
         setPrquotereqmodalopen(false);
+        setQuotereqcanedit(false)
         setPrquotereqdata([]);
     }
     const getQuotereqDetailhistory = async (productid: any) => {
@@ -1312,6 +1330,7 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         setHandinputquantity(item.detail_quantity);
+        setHandinputtotalprice(handinputunitprice * handinputquantity);
         // UpdatePurchaseOrderDetail(item);
     };
 
@@ -1434,7 +1453,7 @@ export default function AddPurchaseOrder() {
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${status === "請購中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddDetail() }} title="單據申請">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
@@ -1466,7 +1485,10 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
+
+                                    </div>
+                                    <div style={{ paddingRight: '20px' }}>
+                                        <InputSel
                                             caption="需用日期"
                                             className="global_tip_must"
                                             disabled={status === "未儲存" ? false : true}
@@ -1478,7 +1500,7 @@ export default function AddPurchaseOrder() {
                                                     onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                     </div>
                                     <div>
                                         <InputSel
@@ -1491,9 +1513,7 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-
                                     </div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1603,9 +1623,9 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         /> */}
-                                        <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
+                                        {/* <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                        </button>
+                                        </button> */}
                                         {/* <InputSel
                                             {...inputSelProps}
                                             caption="發票號碼"
@@ -1732,24 +1752,25 @@ export default function AddPurchaseOrder() {
                                             },
                                         }}
                                     />
-
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="品項數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: data2.length || 0,
+                                            },
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
-                            <div>
-                                {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
-                                    品項查詢
-                                </button> */}
-                            </div>
-                            <div style={{ marginTop: '5px' }}></div>
                             <div></div>
-                            <div>
-                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
-                                    總比數：
-                                    {data2.length}
-                                </span>
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
                         <div className={scss.body_content1}>
                             <Thead01 type={'AddPO_ReqList'} />
@@ -1762,10 +1783,11 @@ export default function AddPurchaseOrder() {
                                             <input
                                                 ref={nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
                                                 }}
@@ -1775,10 +1797,12 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.spec !== undefined ? _item.spec : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
                                                 }}
@@ -1788,7 +1812,7 @@ export default function AddPurchaseOrder() {
                                             <input
                                                 ref={quantityRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
@@ -1801,12 +1825,51 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={unitRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.unit !== undefined ? _item.unit : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "unit", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <button
+                                                onClick={() => {
+                                                    prQuotereqModalOpen(false, _item);
+                                                }}
+                                            >
+                                                <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={unitpriceRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                type="text"
+                                                value={_item.unitprice !== undefined ? _item.unitprice.toLocaleString() : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "unitprice", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={totalpriceRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                type="text"
+                                                value={_item.totalprice !== undefined ? _item.totalprice.toLocaleString() : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "totalprice", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -1814,10 +1877,11 @@ export default function AddPurchaseOrder() {
                                             <input
                                                 ref={noteRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
                                                 }}
@@ -1906,7 +1970,9 @@ export default function AddPurchaseOrder() {
                                 </div>
                                 <div>
                                     <button
-                                        onClick={() => { prQuotereqModalOpen(handinputproductid) }}
+                                        onClick={() => {
+                                            prQuotereqModalOpen(true,handinputproductid);
+                                        }}
                                     >
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                     </button>
@@ -1915,7 +1981,7 @@ export default function AddPurchaseOrder() {
                                     <input
                                         type="text"
                                         placeholder='單價'
-                                        value={handinputunitprice}
+                                        value={handinputunitprice.toLocaleString()}
                                         onChange={(e) => {
                                             const unitprice = parseInt(e.target.value) || 0;
                                             setHandinputunitprice(unitprice);
@@ -1927,7 +1993,7 @@ export default function AddPurchaseOrder() {
                                     <input
                                         type="text"
                                         placeholder='金額'
-                                        value={handinputtotalprice}
+                                        value={handinputtotalprice.toLocaleString()}
                                         onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
                                     />
                                 </div>
@@ -1995,6 +2061,36 @@ export default function AddPurchaseOrder() {
                             </div>
                             <div></div>
                             <div></div>
+                        </div>
+
+                        <div className={scss.body_foot2}>
+                            <div></div>
+                            <div></div>
+                            <div>
+                                <table className={scss.count_table}>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>小計</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>營業稅</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>應付金額</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2289,8 +2385,8 @@ export default function AddPurchaseOrder() {
                     show={prquotereqmodalopen}
                     onCrossClick={prQuotereqModalClose}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{handinputname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{handinputspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                         {/* <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{handinputquantity}</span> */}
                     </div>
                     <hr />
@@ -2323,11 +2419,13 @@ export default function AddPurchaseOrder() {
                                         {/* <span></span> */}
                                         <span>
                                             <input
-                                                readOnly
                                                 className={scss.quotereqdetail_checkbox}
                                                 type='checkbox'
                                                 checked={selectedsupplier === _item.detail_id}
-                                                onChange={() => handleCheckboxChange(_item)}
+                                                onChange={() => {
+                                                    if (quotereqcanedit === false) return; // 如果 quotereqcanedit 為 false，則不執行後續操作
+                                                    handleCheckboxChange(_item);
+                                                }}
                                             />
                                         </span>
                                     </div>

@@ -922,6 +922,7 @@ export default function AddPurchaseRequisition() {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
         setNote("");
+        setCreate_atin(moment().format('YYYY-MM-DD') || '');
     }
 
     const handlecancelAddPR = () => {
@@ -1313,9 +1314,10 @@ export default function AddPurchaseRequisition() {
                                             <input
                                                 ref={nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
+                                                readOnly
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
@@ -1326,10 +1328,11 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.spec !== undefined ? _item.spec : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
                                                 }}
@@ -1339,11 +1342,12 @@ export default function AddPurchaseRequisition() {
                                             <input
                                                 ref={quantityRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleNumberChange(index, "quantity", e.target.value);
                                                 }}
@@ -1352,10 +1356,10 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={unitRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.unit !== undefined ? _item.unit : ''}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "unit", e.target.value);
                                                 }}
@@ -1365,10 +1369,11 @@ export default function AddPurchaseRequisition() {
                                             <input
                                                 ref={noteRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
                                                 }}

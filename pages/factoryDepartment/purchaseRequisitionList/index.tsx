@@ -803,7 +803,7 @@ export default function PurchaseRequisitionList() {
     const prQuotereqModalOpen = async (item: any) => {
         console.log(item);
         setSelectedsupplier(item.quotereqdetailuuid);
-        
+
         setPurchaserequisitiondetailuuid(item.purchaserequisitiondetailuuid);
         // return;
         //清空
@@ -2090,12 +2090,13 @@ export default function PurchaseRequisitionList() {
                                         {/* <span></span> */}
                                         <span>
                                             <input
-                                                readOnly
+                                                disabled={['已核准', '審核中', '已結案'].includes(statusin)}
                                                 className={scss.quotereqdetail_checkbox}
                                                 type='checkbox'
                                                 checked={selectedsupplier === _item.detail_id}
                                                 onChange={() => handleCheckboxChange(_item)}
                                             />
+
                                         </span>
                                     </div>
                                 </CellWithBar>

@@ -1842,9 +1842,9 @@ export default function ProdReceiptList() {
                                 <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) || data2.length > 0 ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增入庫</button>
                                 </span>
-                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>轉入庫中</button>
-                                </span>
+                                </span> */}
                                 {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) && entrystatusin === "已入庫" ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>入庫完畢</button>
                                 </span> */}

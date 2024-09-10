@@ -647,6 +647,7 @@ export default function ReviewList() {
 
     const handleReviewConfirm = async () => {
         setReview_memo("");
+        setReviewtype("");
         setData2([]);
         try {
             setIsLoading(true);

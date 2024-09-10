@@ -163,7 +163,7 @@
   border-bottom: 1px solid rgb(214, 214, 214);
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 
   // background-color: gray;
@@ -179,7 +179,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -193,7 +193,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -207,7 +207,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -221,7 +221,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -317,8 +317,30 @@
   // background-color: gray;
 }
 
+.body_foot2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 0px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-right: 20px;
+  // background-color: gray;
+}
+.count_table {
+  font-size: 16px;
+  color: #1b2d5a;
+  text-align: right;
 
-
+  tr {
+      td {
+          // border: 1px solid gray;
+          text-align: right;
+          width: 80px;
+      }
+  }
+}
 // grid
 //物料明細
 div.panelHeader19 {
@@ -366,7 +388,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 415px 415px 65px 50px 300px 65px 70px ;
+    grid-template-columns: 30px 150px 415px 415px 65px 50px 50px 100px 100px 200px 70px;
     // gap: 5px;
   }
 }
@@ -557,7 +579,7 @@ div.panelHeader20 {
   width: 100%;
   resize: none; // 禁用自由調整高度的功能
   margin-left: 70px;
-  
+
 }
 
 .squarebtn {
@@ -630,7 +652,7 @@ div.panelHeader20 {
     /* 調整圖標位置 */
     cursor: not-allowed;
     /* 添加這行使滑鼠顯示禁止符號 */
-}
+  }
 
   &:focus {
     background-color: $bgc01;
@@ -682,6 +704,7 @@ div.panelHeader15 {
   .row01,
   .row02 {
     padding-left: 20px;
+
     span {
       font-weight: 400;
       font-size: 16px;
@@ -743,7 +766,57 @@ div.panelHeader17 {
 
   .row01 {
     display: grid;
-    grid-template-columns:30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
+    grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
     gap: 5px;
   }
+}
+
+.quotereqdetail_checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  /* 隱藏原生 checkbox */
+  cursor: pointer;
+
+  /* 模擬 checkbox 外框 */
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #14256a;
+    background-color: white;
+    border-radius: 3px;
+  }
+
+  /* 模擬 checkbox 打勾樣式 */
+  &:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 14px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    border-bottom: 4px solid #14256a;
+    /* 打勾的顏色 */
+    border-right: 4px solid #14256a;
+    /* 打勾的顏色 */
+    opacity: 0;
+    /* 初始不顯示 */
+  }
+
+  /* 控制 checkbox 打勾的顯示狀態 */
+  &:checked:after {
+    opacity: 1;
+    /* 顯示打勾 */
+  }
+
+  /* 點擊後 checkbox 的背景色 */
+  // &:hover:before {
+  //   background-color: #f0f0f0;
+  // }
 }
