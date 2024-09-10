@@ -108,8 +108,9 @@ export default function WareHouseList() {
     const searchData = async (keyword: string) => {
         try {
             // 傳給api的參數JSON
-            const conditionModel: { keyword: string | undefined; } = {
+            const conditionModel= {
                 keyword: keyword as string | undefined,
+
             };
 
 
