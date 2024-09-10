@@ -186,10 +186,9 @@ export default function IncomeBillSorting({
 
       const incomeBillList = invoice.incomeBillSerialList;
 
-      // const price = period.price || 0;
-      const price = invoice.actualPrice || 0;
+      const { actualPrice, allowance } = invoice;
 
-      total_invoice_d = total_invoice_d.add(price || 0);
+      total_invoice_d = total_invoice_d.add(actualPrice || 0).minus(allowance || 0);
 
       incomeBillList?.forEach((incomeBill) => {
         total_incomeBill_d = total_incomeBill_d.add(incomeBill.receivablePayment || 0);
