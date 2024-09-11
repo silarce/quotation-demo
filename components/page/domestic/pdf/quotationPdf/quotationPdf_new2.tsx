@@ -1085,7 +1085,7 @@ const PdfTypeA = ({
         let subTotal_page_Decimal = new Decimal(0);
         chunk.forEach((item) => {
           const priceTotal = item.priceTotal.replaceAll(',', '');
-          subTotal_page_Decimal = subTotal_page_Decimal.add(priceTotal);
+          subTotal_page_Decimal = subTotal_page_Decimal.add(priceTotal || 0);
         });
 
         const subTotal_page = subTotal_page_Decimal.toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -1176,10 +1176,10 @@ const PdfTypeB = ({
 
     quoteTypeSumObj[key].qtySum = quoteTypeSumObj[key].qtySum + parseInt(qty);
     quoteTypeSumObj[key].unitPriceSum = new Decimal(quoteTypeSumObj[key].unitPriceSum)
-      .plus(unitPrice.replaceAll(',', ''))
+      .plus(unitPrice.replaceAll(',', '') || 0)
       .toNumber();
     quoteTypeSumObj[key].priceTotleSum = new Decimal(quoteTypeSumObj[key].priceTotleSum)
-      .plus(priceTotal.replaceAll(',', ''))
+      .plus(priceTotal.replaceAll(',', '') || 0)
       .toNumber();
   });
 
@@ -1385,7 +1385,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
   return control_basicInfo;
 };
 
-// 專門給報價單使用的
+// 專門給報價單使用的 // 好像沒有在用
 const quotationProdToTableProdList = ({
   classProductArr,
   classOthersArr,
@@ -1395,7 +1395,7 @@ const quotationProdToTableProdList = ({
 }): Tcontrol_prodArr => {
   const productArr: TtableProdList_series = (() => {
     return classProductArr.map((prod) => {
-      const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
+      const { typhoonProtection, doorTrackSilencerStrip, doorType, doorTrack } = prod;
 
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
@@ -1412,13 +1412,21 @@ const quotationProdToTableProdList = ({
 
       let material = prod.material;
 
-      const doorRailForExcel =
-        doorType !== 'SJ-302'
-          ? ''
-          : findGuideRailUnicode({
-              isAntiTyphoon: typhoonProtection,
-              isSilencing: doorTrackSilencerStrip,
-            });
+      const doorRailForExcel = (() => {
+        const guideRailName = doorTrack?.replace('.svg', '').toUpperCase();
+        console.log('doorTrack', doorTrack);
+        console.log('guideRailName', guideRailName);
+
+        return guideRailName ? findGuideRailUnicode({ guideRail: guideRailName }) : '';
+      })();
+
+      // const doorRailForExcel =
+      //   doorType !== 'SJ-302'
+      //     ? ''
+      //     : findGuideRailUnicode({
+      //         isAntiTyphoon: typhoonProtection,
+      //         isSilencing: doorTrackSilencerStrip,
+      //       });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板

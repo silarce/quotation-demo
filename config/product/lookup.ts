@@ -63,50 +63,22 @@ export const lookup_horsePowerToNumber: { [key: string]: number | undefined } = 
 // 這些unicode是客製unicode，必須要安裝指定的字型才能看到
 // 該字型是天心系統附的，需要安裝的話找會計部怡君
 // 門軌unicode查找表
-export const lookup_guideRailUnicode = {
-  normal_silencing: '\uE011',
-  normal: '\uE010',
-  antiTyphoon: '\uE013',
-  antiTyphoon_silencing: '\uE016',
-  //
-  normal_silencing_thin: '\uE001',
-  normal_thin: '\uE000',
-  antiTyphoon_thin: '\uE003',
-  antiTyphoon_silencing_thin: '\uE016',
-  //
-  unknown01: '\uE002',
-  unknown02: '\uE004',
-  unknown03: '\uE005',
-  // unknown04: '\uE006',
-  // unknown05: '\uE007',
-  // unknown06: '\uE008',
-  // unknown07: '\uE009',
-  // unknown08: '\uE010',
-  // unknown09: '\uE011',
-  unknown10: '\uE012',
-  // unknown11: '\uE013',
-  // unknown12: '\uE014',
-  unknown13: '\uE015',
+export const lookup_guideRailUnicode: {
+  [guideRail: string]: string | undefined;
+} = {
+  // SJ-302
+  SJ302_30: '\uE010',
+  SJ302_75_30t: '\uE013',
+  SJ302_90_30t: '\uE013',
+  SJ302_95_30t: '\uE016',
+  SJ302_95_45t: '\uE016',
+  SJ302_60: '\uE011',
+  // SJ-312
+  SJ312_106_60t: '\uE014',
 };
 
-export const findGuideRailUnicode = ({
-  isAntiTyphoon,
-  isSilencing,
-}: {
-  isAntiTyphoon: boolean;
-  isSilencing: boolean;
-}) => {
-  let index: keyof typeof lookup_guideRailUnicode = 'normal';
-
-  if (isAntiTyphoon) {
-    index = 'antiTyphoon';
-  }
-
-  if (isSilencing) {
-    index = `${index}_silencing`;
-  }
-
-  return lookup_guideRailUnicode[index];
+export const findGuideRailUnicode = ({ guideRail }: { guideRail: string }) => {
+  return lookup_guideRailUnicode[guideRail] || '';
 };
 
 export const lookup_hpToGapAGapC = {
