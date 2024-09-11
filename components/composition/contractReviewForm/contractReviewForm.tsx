@@ -1126,7 +1126,7 @@ function ReviewForm({
                   <span>
                     是否註明收足
                     <InputBox
-                      className="w-[50px] "
+                      className="w-[60px] "
                       inputAttr={{
                         className: 'text-center',
                         disabled: disabled,
@@ -1135,6 +1135,7 @@ function ReviewForm({
                         onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                           const value = e.target.value;
 
+                          // 型別是int，所以限制為整數
                           if (!value.includes('.')) {
                             setValue('fireproofCertificatePercent', Number(value));
                           }
@@ -1178,7 +1179,7 @@ function ReviewForm({
                   <span>
                     是否註明收足
                     <InputBox
-                      className="w-[50px] "
+                      className="w-[60px] "
                       inputAttr={{
                         className: 'text-center',
                         disabled: disabled,
@@ -1187,6 +1188,7 @@ function ReviewForm({
                         onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                           const value = e.target.value;
 
+                          // 型別是int，所以限制為整數
                           if (!value.includes('.')) {
                             setValue('factoryCertificatePercent', Number(value));
                           }
@@ -1229,7 +1231,7 @@ function ReviewForm({
                   <span>
                     是否註明收足
                     <InputBox
-                      className="w-[50px] "
+                      className="w-[60px] "
                       inputAttr={{
                         className: 'text-center',
                         disabled: disabled,
@@ -1238,6 +1240,7 @@ function ReviewForm({
                         onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                           const value = e.target.value;
 
+                          // 型別是int，所以限制為整數
                           if (!value.includes('.')) {
                             setValue('warrantyPercent', Number(value));
                           }
