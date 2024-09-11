@@ -19,6 +19,7 @@ import { customerTypesLookup } from 'js/api/api_customer';
 import scss from './quotationProfile.module.scss';
 
 import { Toption } from 'js/utils/options/countryAndDistrict';
+import { optionsCreator_quotationType } from 'js/utils/options/options';
 
 // ====================================================
 import { TquotationContentDto, TcustomerDto } from 'js/api/dtoTypes';
@@ -403,7 +404,8 @@ export default function QuotationProfile({
                 },
               }}
             />
-
+          </div>
+          <div>
             <InputSel
               caption={'工地主任'}
               captionClassName={scss.input02}
@@ -434,8 +436,7 @@ export default function QuotationProfile({
                 },
               }}
             />
-          </div>
-          <div>
+            {/*             
             <InputSel
               caption={'需求門型'}
               captionClassName={scss.input02}
@@ -484,21 +485,6 @@ export default function QuotationProfile({
               }}
             />
             <InputSel
-              caption={'類型'}
-              captionClassName={scss.input02}
-              showBaseline="auto"
-              disabled={disabled}
-              {...inputSelProps}
-              inputProps={{
-                props: {
-                  value: itemList.type.value,
-                  onChange: (e) => {
-                    itemList.type.onChange?.(e.target.value);
-                  },
-                },
-              }}
-            />
-            <InputSel
               caption={'預定採購日/投標日'}
               captionClassName={scss.input02}
               showBaseline="auto"
@@ -516,7 +502,8 @@ export default function QuotationProfile({
                   },
                 },
               }}
-            />
+            /> 
+            */}
           </div>
         </div>
         {/* form02 */}
@@ -621,6 +608,7 @@ export default function QuotationProfile({
             }}
           />
         </div>
+
         <div>
           <InputSel
             disabled={true}
@@ -632,6 +620,25 @@ export default function QuotationProfile({
               props: {
                 value: quotationDate ?? '',
                 placeholder: '系統自動設定',
+              },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            caption={'類型'}
+            captionClassName={scss.caption}
+            captionStyle={{ width: '72px' }}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            showBaseline="auto"
+            disabled={disabled}
+            selectProps={{
+              props: {
+                options: optionsCreator_quotationType(),
+                value: { value: itemList.type.value, label: itemList.type.value },
+                onChange: (option) => {
+                  itemList.type.onChange?.(option?.value ?? '');
+                },
               },
             }}
           />

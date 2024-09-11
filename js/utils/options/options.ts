@@ -102,6 +102,21 @@ export const optionsCreator_taxDeductionCategory = (): Toption[] => [
 //     { value: "業主", label: "業主" },
 //   ]
 
+// 報價單類型
+export const optionsCreator_quotationType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+  const { haveEmpty } = props;
+  const arr = [
+    { value: '公共工程', label: '公共工程' },
+    { value: '私人案件', label: '私人案件' },
+  ];
+
+  if (haveEmpty) {
+    addEmpty(arr);
+  }
+
+  return arr;
+};
+
 // 類別
 export const optionsCreator_prodClass = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
