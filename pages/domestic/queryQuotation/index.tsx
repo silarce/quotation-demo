@@ -57,6 +57,8 @@ type Tquery = {
   isLost?: 'true' | 'false' | undefined;
   agentName: string | undefined;
   salesName: string | undefined;
+  //
+  reviewStatus: '未送審' | '審核中' | '審核完成' | undefined;
 };
 
 // ===========================================
@@ -86,6 +88,7 @@ export default function Budget() {
     isLost: isLost_str,
     agentName,
     salesName,
+    reviewStatus,
   } = query;
 
   const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
@@ -140,6 +143,7 @@ export default function Budget() {
       'latestContent.contactPerson': { $contains: contactPerson },
       'latestContent.products.doorModelName': { $eq: doorModel },
       'latestContent.products.materialName': { $eq: prodMaterial },
+      ...filter_reviewStatus(reviewStatus),
     },
     pageSize: 20,
   };
@@ -404,6 +408,7 @@ const usePopFormListCreator = () => {
     projectNumber,
     order,
     isLost,
+    reviewStatus,
   } = query;
 
   const popFormList = useMemo(() => {
@@ -436,9 +441,14 @@ const usePopFormListCreator = () => {
 
       status: {
         onConfirm: (list) => {
-          const { status, isLost: isLost_str } = list;
-          const isLost = isLost_str === 'undefined' ? undefined : isLost_str;
-          const theQuery = clearEmptyProperty({ ...query, status, isLost });
+          const { status, isLost, reviewStatus } = list;
+
+          const theQuery = clearEmptyProperty({
+            ...query,
+            status,
+            isLost: isLost === 'undefined' ? undefined : isLost,
+            reviewStatus: reviewStatus === 'undefined' ? undefined : reviewStatus,
+          });
           router.push({
             query: theQuery,
           });
@@ -464,18 +474,27 @@ const usePopFormListCreator = () => {
           {
             caption: '失件',
             name: 'isLost',
-            // checkBoxProps_v2: {
-            //   props: {
-            //     defaultValue: isLost ? ['isLost'] : undefined,
-            //     options: [{ label: '失件', value: 'isLost' }],
-            //   },
-            // },
             radioProps: {
               props: {
                 defaultValue: isLost || 'undefined',
                 options: [
                   { label: '是', value: 'true' },
                   { label: '否', value: 'false' },
+                  { label: '不拘', value: 'undefined' },
+                ],
+              },
+            },
+          },
+          {
+            caption: '審核狀態',
+            name: 'reviewStatus',
+            radioProps: {
+              props: {
+                defaultValue: reviewStatus || 'undefined',
+                options: [
+                  { label: '未送審', value: '未送審' },
+                  { label: '審核中', value: '審核中' },
+                  { label: '審核完成', value: '審核完成' },
                   { label: '不拘', value: 'undefined' },
                 ],
               },
@@ -620,4 +639,46 @@ const clearEmptyProperty = (obj: { [key: string]: any }) => {
   return _.omitBy(obj, (item) => {
     return item === undefined || item === '';
   });
+};
+
+const filter_reviewStatus = (reviewStatus: Tquery['reviewStatus']) => {
+  if (reviewStatus === '未送審') {
+    return {
+      'latestContent.toSalesAt': { $null: true },
+      'latestContent.toSupervisorAt': { $null: true },
+      'latestContent.toSalesManagerAt': { $null: true },
+      'latestContent.toWorkDirectorAt': { $null: true },
+      'latestContent.toCashierAt': { $null: true },
+      'latestContent.toManagerAt': { $null: true },
+    };
+  } else if (reviewStatus === '審核中') {
+    return {
+      $or: [
+        {
+          'latestContent.toSalesAt': { $notNull: true },
+        },
+        {
+          'latestContent.toSupervisorAt': { $notNull: true },
+        },
+        {
+          'latestContent.toSalesManagerAt': { $notNull: true },
+        },
+        {
+          'latestContent.toWorkDirectorAt': { $notNull: true },
+        },
+        {
+          'latestContent.toCashierAt': { $notNull: true },
+        },
+        {
+          'latestContent.toManagerAt': { $notNull: true },
+        },
+      ],
+    };
+  } else if (reviewStatus === '審核完成') {
+    return {
+      'latestContent.managerReviewedAt': { $notNull: true },
+    };
+  } else {
+    return undefined;
+  }
 };
