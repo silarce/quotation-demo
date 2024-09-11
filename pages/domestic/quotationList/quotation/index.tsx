@@ -74,6 +74,7 @@ import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import Dropdown from 'components/global/gear/dropdown/Dropdown';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -1083,6 +1084,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // avgDiscount,
     avgDiscount_withQty,
     //
+    doorModelSummary,
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
     // others: quotationData?.latestContent.others,
@@ -2284,6 +2286,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile_memo disabled={disabled} control={control_profile} editNotes={editNotes} />
+          <InputSel
+            className={'ml-[50px]'}
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<span className="whitespace-pre-wrap font-mono">{doorModelSummary}</span>}
+          />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>

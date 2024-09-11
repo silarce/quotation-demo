@@ -9,6 +9,7 @@ $gridTemplateColumns_panelBody: $G1 $G3;
 
 .container {
   padding: 4px;
+  // padding-top: 0;
   :global(.ant-collapse) {
     border: none;
   }
@@ -32,6 +33,18 @@ $gridTemplateColumns_panelBody: $G1 $G3;
 // ===============================================================
 
 .thead {
+  position: sticky;
+  top: 4px;
+  z-index: 2;
+  &::before {
+    content: "";
+    width: 100%;
+    height: 4px;
+    background-color: white;
+    position: absolute;
+    top: -4px;
+  }
+
   display: grid;
   grid-template-columns: $gridTemplateColumns;
   gap: 22px;

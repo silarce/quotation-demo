@@ -1149,6 +1149,97 @@ const useProductList = ({
 
   // ---------------------------------------------------------
 
+  const calcDoorSummary = () => {
+    const list01: {
+      [doorModelName: string]: {
+        qty: number;
+        discount: number;
+      }[];
+    } = {};
+
+    Object.values(productList).forEach((prod) => {
+      const doorModelName = prod.doorType;
+      const qty = Number(prod.quantity || 0);
+      const discount = Number(prod.discount || 0);
+
+      if (!list01[doorModelName]) {
+        list01[doorModelName] = [];
+      }
+
+      list01[doorModelName].push({ qty, discount });
+    });
+
+    const list02: {
+      [doorModelName: string]: {
+        totalQty: number;
+        avgDiscount: number | string;
+      };
+    } = {};
+
+    Object.entries(list01).forEach(([doorModelName, item]) => {
+      const { totalQty, totalDiscount } = item.reduce(
+        (result, item) => {
+          const { totalQty, totalDiscount } = result;
+
+          return {
+            totalQty: new Decimal(totalQty).add(item.qty).toNumber(),
+            totalDiscount: new Decimal(item.discount).mul(item.qty).add(totalDiscount).toNumber(),
+          };
+        },
+        {
+          totalQty: 0,
+          totalDiscount: 0,
+        }
+      );
+
+      const avgDiscount = totalQty ? new Decimal(totalDiscount).div(totalQty).toDecimalPlaces(2).toNumber() : '---';
+
+      list02[doorModelName] = {
+        totalQty,
+        avgDiscount,
+      };
+    });
+
+    return list02;
+  };
+
+  const calcDoorModelSummary = () => {
+    const doorInfoList = calcDoorSummary();
+
+    // w 注意，用這個做法的話，css要用等寬字型，不然不會對齊
+    const briefing = Object.entries(doorInfoList)
+      .map(([key, item]) => {
+        let theKey = key;
+        let theQty = String(item.totalQty);
+
+        if (theKey.length < 10) {
+          theKey = theKey + ' '.repeat(10 - theKey.length);
+        }
+
+        if (String(theQty).length < 3) {
+          theQty = ' '.repeat(3 - theQty.length) + theQty;
+        }
+
+        return `${theKey}${theQty}樘  平均折數: ${item.avgDiscount}`;
+      })
+      .join('\n');
+
+    return briefing;
+  };
+
+  const doorModelSummary = useMemo(() => {
+    return calcDoorModelSummary();
+  }, [
+    //
+    productList,
+    avgDiscount_withQty,
+    // averageDiscount,
+    // quotationDiscount,
+    // quotationDiscount_attach,
+  ]);
+
+  // ---------------------------------------------------------
+
   return {
     reRender,
     reset,
@@ -1208,6 +1299,7 @@ const useProductList = ({
     //   }
     // })(),
     avgDiscount_withQty: avgDiscount_withQty.toString(),
+    doorModelSummary,
   };
 };
 

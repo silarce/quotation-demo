@@ -1073,22 +1073,31 @@ const quotationProdAndOther_ToProdArr = ({
 
       let material = materialName;
 
-      const doorRailForExcel = isSpecialDoor
-        ? guideRail
-        : doorModelName === 'SJ-302'
-        ? findGuideRailUnicode({
-            isAntiTyphoon: !!isAntiTyphoon,
-            isSilencing: !!hasSilencingStrip,
-          })
-        : '';
+      // const doorRailForExcel = isSpecialDoor
+      //   ? guideRail
+      //   : doorModelName === 'SJ-302'
+      //   ? findGuideRailUnicode({
+      //       isAntiTyphoon: !!isAntiTyphoon,
+      //       isSilencing: !!hasSilencingStrip,
+      //     })
+      //   : '';
+      // const doorRailForExcel = isSpecialDoor
+      //   ? guideRail
+      //   : doorModelName === 'SJ-302'
+      //   ? findGuideRailUnicode({
+      //       guideRail,
+      //     })
+      //   : '';
 
-      // const doorRailForExcel =
-      //   doorModelName !== 'SJ-302'
-      //     ? ''
-      //     : findGuideRailUnicode({
-      //         isAntiTyphoon: !!isAntiTyphoon,
-      //         isSilencing: !!hasSilencingStrip,
-      //       });
+      const doorRailForExcel = (() => {
+        if (isSpecialDoor) {
+          return guideRail;
+        }
+
+        const guideRailName = guideRail?.replace('.svg', '');
+
+        return guideRailName ? findGuideRailUnicode({ guideRail: guideRailName }) : '';
+      })();
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
