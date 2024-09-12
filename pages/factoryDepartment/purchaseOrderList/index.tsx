@@ -47,6 +47,7 @@ import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
+import icon_export from 'public/image/icon/fc_export.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1289,6 +1290,58 @@ export default function PurchaseOrderList() {
         });
     }
 
+    const Excel = async (id: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1377,6 +1430,11 @@ export default function PurchaseOrderList() {
                                 <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin) }} title="列印">
+                                    <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    Excel
                                 </button>
                             </div>
                             <div>

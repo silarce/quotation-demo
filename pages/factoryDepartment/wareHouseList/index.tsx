@@ -23,9 +23,9 @@ type Tquery = {
 
 
 export const setting = {
-    apipath: 'https://new-erp-api.beta.san-jeou.com.tw', // 確保這裡包含正確的 API 路徑
+     apipath: 'https://new-erp-api.beta.san-jeou.com.tw', // 確保這裡包含正確的 API 路徑
     // apipath: 'https://localhost:44383', // 確保這裡包含正確的 API 路徑
-    env: 'prod'
+     env: 'prod'
     // env: 'local',
 };
 
