@@ -559,7 +559,8 @@ export default function QuotationProfile({
           caption="指定廠牌"
           captionClassName={scss.input02}
           showBaseline="auto"
-          disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
+          // disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
+          disabled={disabled}
           {...inputSelProps}
           textareaProps={{
             allowNewLineByUser: true,
