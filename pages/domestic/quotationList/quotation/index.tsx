@@ -70,7 +70,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
+
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
@@ -281,8 +281,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showPdf_part, setShowPdf_part] = useState(false);
 
   const [showMemoModal, setShowMemoModal] = useState(false);
-
-  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
 
   // __________________________________________________________
 
@@ -1351,10 +1349,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
             !isSendToReview || !disabled
               ? undefined
               : () => {
-                  setInputModalConfig({
-                    visible: true,
+                  const modal = myAlert.input({
                     title: '追蹤進度',
-                    placeholder: '請輸入追蹤進度',
+                    placeholder: '追蹤進度',
+                    defaultValue: state_profile.trackProgress,
+                    isTextArea: true,
+                    width: 656,
                     onConfirm: async (v) => {
                       const res = await reqPatchQuotationContent_id_progress({
                         trackProgress: v,
@@ -1363,11 +1363,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
                       if (res) {
                         const trackProgress = res.trackProgress;
                         changeProfile('trackProgress', trackProgress);
+                        modal.destroy();
                       }
-
-                      setInputModalConfig(undefined);
                     },
-                    onCancel: () => setInputModalConfig(undefined),
                   });
                 },
           disabled: isSendToReview ? false : undefined,
@@ -1387,10 +1385,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
             !isSendToReview || !disabled
               ? undefined
               : () => {
-                  setInputModalConfig({
-                    visible: true,
+                  const modal = myAlert.input({
                     title: '工程進度',
-                    placeholder: '請輸入工程進度',
+                    placeholder: '工程進度',
+                    defaultValue: state_profile.projectProgress,
+                    isTextArea: true,
+                    width: 656,
                     onConfirm: async (v) => {
                       const res = await reqPatchQuotationContent_id_progress({
                         projectProgress: v,
@@ -1399,11 +1399,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
                       if (res) {
                         const projectProgress = res.projectProgress;
                         changeProfile('projectProgress', projectProgress);
+                        modal.destroy();
                       }
-
-                      setInputModalConfig(undefined);
                     },
-                    onCancel: () => setInputModalConfig(undefined),
                   });
                 },
           disabled: isSendToReview ? false : undefined,
@@ -2563,13 +2561,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       />
       {/*  */}
 
-      <InputModal
-        visible={!!inputModalConfig?.visible}
-        onConfirm={inputModalConfig?.onConfirm}
-        onCancel={inputModalConfig?.onCancel}
-        title={inputModalConfig?.title ?? ''}
-        placeholder={inputModalConfig?.placeholder}
-      />
       {/* 審核人員選擇器 */}
       <EmployeeSelectorGroup
         showModal={showEmployeSelector}
