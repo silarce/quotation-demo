@@ -1338,67 +1338,74 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //
         trackProgress: {
           value: state_profile.trackProgress,
+          onChange: (v) => {
+            !disabled && changeProfile('trackProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('trackProgress', v);
+          //     },
 
-          onChange: isSendToReview
-            ? undefined
-            : (v) => {
-                !isSendToReview && changeProfile('trackProgress', v);
-              },
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  setInputModalConfig({
+                    visible: true,
+                    title: '追蹤進度',
+                    placeholder: '請輸入追蹤進度',
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        trackProgress: v,
+                      });
 
-          onClick: !isSendToReview
-            ? undefined
-            : () => {
-                setInputModalConfig({
-                  visible: true,
-                  title: '追蹤進度',
-                  placeholder: '請輸入追蹤進度',
-                  onConfirm: async (v) => {
-                    const res = await reqPatchQuotationContent_id_progress({
-                      trackProgress: v,
-                    });
+                      if (res) {
+                        const trackProgress = res.trackProgress;
+                        changeProfile('trackProgress', trackProgress);
+                      }
 
-                    if (res) {
-                      const trackProgress = res.trackProgress;
-                      changeProfile('trackProgress', trackProgress);
-                    }
-
-                    setInputModalConfig(undefined);
-                  },
-                  onCancel: () => setInputModalConfig(undefined),
-                });
-              },
+                      setInputModalConfig(undefined);
+                    },
+                    onCancel: () => setInputModalConfig(undefined),
+                  });
+                },
           disabled: isSendToReview ? false : undefined,
         },
         projectProgress: {
           value: state_profile.projectProgress,
-          // onChange: (v) => changeProfile('projectProgress', v),
-          onChange: isSendToReview
-            ? undefined
-            : (v) => {
-                !isSendToReview && changeProfile('projectProgress', v);
-              },
-          onClick: !isSendToReview
-            ? undefined
-            : () => {
-                setInputModalConfig({
-                  visible: true,
-                  title: '工程進度',
-                  placeholder: '請輸入工程進度',
-                  onConfirm: async (v) => {
-                    const res = await reqPatchQuotationContent_id_progress({
-                      projectProgress: v,
-                    });
 
-                    if (res) {
-                      const projectProgress = res.projectProgress;
-                      changeProfile('projectProgress', projectProgress);
-                    }
+          onChange: (v) => {
+            !disabled && changeProfile('projectProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('projectProgress', v);
+          //     },
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  setInputModalConfig({
+                    visible: true,
+                    title: '工程進度',
+                    placeholder: '請輸入工程進度',
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        projectProgress: v,
+                      });
 
-                    setInputModalConfig(undefined);
-                  },
-                  onCancel: () => setInputModalConfig(undefined),
-                });
-              },
+                      if (res) {
+                        const projectProgress = res.projectProgress;
+                        changeProfile('projectProgress', projectProgress);
+                      }
+
+                      setInputModalConfig(undefined);
+                    },
+                    onCancel: () => setInputModalConfig(undefined),
+                  });
+                },
           disabled: isSendToReview ? false : undefined,
         },
       },
