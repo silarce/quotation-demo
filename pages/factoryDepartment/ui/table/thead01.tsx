@@ -535,23 +535,23 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   }
   //#endregion
   // //#region 新增採購單明細
-  // else if (type === "AddQOList") {
-  //   return (
-  //     <div className={style.thead33}>
-  //       <span>序</span>
-  //       <span>料號</span>
-  //       <span>品名</span>
-  //       <span>規格</span>
-  //       <span>數量</span>
-  //       <span>單位</span>
-  //       <span></span>
-  //       <span>單價</span>
-  //       <span>金額</span>
-  //       <span>備註(用途說明)</span>
-  //       <span></span>
-  //     </div>
-  //   )
-  // }
+  else if (type === "AddQOList") {
+    return (
+      <div className={style.thead33}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span></span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>備註(用途說明)</span>
+        <span></span>
+      </div>
+    )
+  }
   // //#endregion
   //#region 詢價單明細
   else if (type === "Quotereq4") {

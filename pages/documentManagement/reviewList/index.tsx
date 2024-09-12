@@ -701,7 +701,29 @@ export default function ReviewList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'簽核清單'} panelList={panelList} />
+
+
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+            {/* {data.length > 0 && (
+                <button onClick={()=>{router.push( `/documentManagement/reviewList`)}}>
+                    <span style={{
+                        position: 'fixed', // 使用 fixed 讓元素懸浮在視窗
+                        top: '7%', // 距離視窗頂部 10px
+                        right: '14%', // 距離視窗右側 10px
+                        backgroundColor: '#ea1833',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                        textAlign: 'center',
+                        lineHeight: '24px',
+                        fontSize: '0.9rem',
+                        zIndex: '9999' // 確保它顯示在最上層
+                    }}>
+                        {data.length}
+                    </span>
+                </button>
+            )} */}
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
                         <div style={{
