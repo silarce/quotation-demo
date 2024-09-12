@@ -1805,14 +1805,16 @@ export type TquotationContentDto = {
   siteManager: string | null;
   // 工地主任電話
   siteManagerNumber: string | null;
-  // 需求門型
+  // 門型彙總
   requiredDoorType: string | null;
-  // 需求門型數量
+
+  // 需求門型數量 // 棄用
   requiredDoorQuantity: number | null;
-  // 預估折數
+  // 預估折數 // 棄用
   estimatedDiscount: string | null;
-  // 預定採購日/投標日
+  // 預定採購日/投標日 // 棄用
   scheduledProcurementOrBidDate: string | null; // 日期
+
   // 類型
   type: string | null;
 
@@ -2254,14 +2256,14 @@ export type TcreateQuotationContentDto = {
   siteManager?: string | null;
   // 工地主任電話
   siteManagerNumber?: string | null;
-  // 需求門型
+  // 門型彙總
   requiredDoorType?: string | null;
-  // 需求門型數量
-  requiredDoorQuantity?: number | null;
-  // 預估折數
-  estimatedDiscount?: string | null;
-  // 預定採購日/投標日
-  scheduledProcurementOrBidDate?: string | null; // 日期
+  // 需求門型數量 // 可以用，但是棄用
+  // requiredDoorQuantity?: number | null;
+  // 預估折數 // 可以用，但是棄用
+  // estimatedDiscount?: string | null;
+  // 預定採購日/投標日 // 可以用，但是棄用
+  // scheduledProcurementOrBidDate?: string | null; // 日期
   // 類型
   type?: string | null;
 

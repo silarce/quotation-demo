@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+
 import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -21,8 +21,6 @@ import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, em
 
 // type
 import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
-
-import { checkIsFloat } from 'js/utils/checkValue';
 
 // =======================================================================
 
@@ -1158,15 +1156,23 @@ const useProductList = ({
     } = {};
 
     Object.values(productList).forEach((prod) => {
-      const doorModelName = prod.doorType;
+      const { doorModelInfo } = prod;
+
+      const { quoteType, doorType, info } = doorModelInfo;
+      let name = (info?.name || doorType) as string;
+
+      if (quoteType === '捲門') {
+        name = doorType;
+      }
+
       const qty = Number(prod.quantity || 0);
       const discount = Number(prod.discount || 0);
 
-      if (!list01[doorModelName]) {
-        list01[doorModelName] = [];
+      if (!list01[name]) {
+        list01[name] = [];
       }
 
-      list01[doorModelName].push({ qty, discount });
+      list01[name].push({ qty, discount });
     });
 
     const list02: {
@@ -1206,21 +1212,20 @@ const useProductList = ({
   const calcDoorModelSummary = () => {
     const doorInfoList = calcDoorSummary();
 
-    // w 注意，用這個做法的話，css要用等寬字型，不然不會對齊
     const briefing = Object.entries(doorInfoList)
       .map(([key, item]) => {
-        let theKey = key;
-        let theQty = String(item.totalQty);
+        const theKey = key;
+        const theQty = String(item.totalQty);
 
-        if (theKey.length < 10) {
-          theKey = theKey + ' '.repeat(10 - theKey.length);
-        }
+        // key混入了中文，無法用等寬字型對齊了
+        // if (theKey.length < 10) {
+        //   theKey = theKey + ' '.repeat(10 - theKey.length);
+        // }
+        // if (String(theQty).length < 3) {
+        //   theQty = ' '.repeat(3 - theQty.length) + theQty;
+        // }
 
-        if (String(theQty).length < 3) {
-          theQty = ' '.repeat(3 - theQty.length) + theQty;
-        }
-
-        return `${theKey}${theQty}樘  平均折數: ${item.avgDiscount}`;
+        return `${theKey}_${theQty}樘_平均折數: ${item.avgDiscount}`;
       })
       .join('\n');
 
