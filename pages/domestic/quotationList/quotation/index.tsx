@@ -61,6 +61,7 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
+import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -694,12 +695,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       designatedBrand: state_profile.designatedBrand ?? '',
       siteManager: state_profile.siteManager ?? '',
       siteManagerNumber: state_profile.siteManagerNumber ?? '',
-      requiredDoorType: state_profile.requiredDoorType ?? '',
-      requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
-      estimatedDiscount: state_profile.estimatedDiscount || null,
-      scheduledProcurementOrBidDate:
-        state_profile.scheduledProcurementOrBidDate &&
-        moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+      requiredDoorType: doorModelSummary || null,
+
+      // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      // estimatedDiscount: state_profile.estimatedDiscount || null,
+      // scheduledProcurementOrBidDate:
+      //   state_profile.scheduledProcurementOrBidDate &&
+      //   moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+
       type: state_profile.type ?? '',
 
       quantity: prodQty ?? 0,
@@ -2292,7 +2295,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             showBaseline="invisible"
             captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
             wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-            node={<span className="whitespace-pre-wrap font-mono">{doorModelSummary}</span>}
+            node={<DoorSummary doorModelSummary={DoorSummary.format(doorModelSummary)} />}
           />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>

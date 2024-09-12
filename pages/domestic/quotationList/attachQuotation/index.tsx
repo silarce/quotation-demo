@@ -22,7 +22,6 @@ import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile, useProfile } from 'components/page/domestic/quotation/quotationProfile';
-
 import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
@@ -31,14 +30,13 @@ import QuotationSinature_3, {
 import QuotationPdf, {
   useModalQuotationPdf,
 } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
-
 import QuotationPdf_part, {
   TmainProduct,
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-
 import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -49,6 +47,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -569,6 +568,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     attachDivTotal,
     attachTotal,
     avgDiscount_withQty,
+    doorModelSummary,
   } = useProductList({
     productArr: contractProdArr,
     others: theContent?.others,
@@ -718,12 +718,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
       designatedBrand: state_profile.designatedBrand ?? '',
       siteManager: state_profile.siteManager ?? '',
       siteManagerNumber: state_profile.siteManagerNumber ?? '',
-      requiredDoorType: state_profile.requiredDoorType ?? '',
-      requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
-      estimatedDiscount: state_profile.estimatedDiscount || null,
-      scheduledProcurementOrBidDate:
-        state_profile.scheduledProcurementOrBidDate &&
-        moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+      requiredDoorType: doorModelSummary || null,
+
+      // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      // estimatedDiscount: state_profile.estimatedDiscount || null,
+      // scheduledProcurementOrBidDate:
+      //   state_profile.scheduledProcurementOrBidDate &&
+      //   moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
       type: state_profile.type ?? '',
 
       contactPerson: state_profile.contactPerson ?? '',
@@ -1532,7 +1533,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
-
+          <InputSel
+            className={'ml-[50px]'}
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary doorModelSummary={DoorSummary.format(doorModelSummary)} />}
+          />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>

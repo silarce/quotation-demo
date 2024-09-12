@@ -3843,6 +3843,14 @@ class Class_product {
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
+  get doorModelInfo() {
+    const { quoteType, options_doorType, doorType } = this;
+
+    const info = options_doorType.find((option) => option?.value === doorType);
+
+    return { quoteType, doorType, info };
+  }
+
   get isComponentOk() {
     const componentBodyArr = this.comBodyArr;
     let isComponentBreak = false;
