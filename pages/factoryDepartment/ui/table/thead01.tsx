@@ -527,32 +527,51 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>詢價單號</span>
         <span>詢價日期</span>
         {/* <span>總金額</span> */}
-        {/* <span>狀態</span> */}
+        <span>狀態</span>
         <span>廠商名稱</span>
         <span></span>
       </div>
     )
   }
   //#endregion
-    //#region 新增採購單明細
-    else if (type === "AddQOList") {
-      return (
-        <div className={style.thead33}>
-          <span>序</span>
-          <span>料號</span>
-          <span>品名</span>
-          <span>規格</span>
-          <span>數量</span>
-          <span>單位</span>
-          <span></span>
-          <span>單價</span>
-          <span>金額</span>
-          <span>備註(用途說明)</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  // //#region 新增採購單明細
+  // else if (type === "AddQOList") {
+  //   return (
+  //     <div className={style.thead33}>
+  //       <span>序</span>
+  //       <span>料號</span>
+  //       <span>品名</span>
+  //       <span>規格</span>
+  //       <span>數量</span>
+  //       <span>單位</span>
+  //       <span></span>
+  //       <span>單價</span>
+  //       <span>金額</span>
+  //       <span>備註(用途說明)</span>
+  //       <span></span>
+  //     </div>
+  //   )
+  // }
+  // //#endregion
+  //#region 詢價單明細
+  else if (type === "Quotereq4") {
+    return (
+      <div className={style.thead35}>
+        <span>序</span>
+        <span>物料編號</span>
+        <span>品項名稱</span>
+        <span>品項規格</span>
+        <span>詢價日期</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>數量</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
+        <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

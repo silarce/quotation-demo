@@ -663,6 +663,31 @@ div.panelHeader20 {
 
 }
 
+
+.modal_head_head2 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 10px;
+  // margin-right: 20px;  
+
+
+}
+.modal_head_content2 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+
+
+}
+
+
 .modal_search_bar {
   display: grid;
   grid-template-columns: 1fr; // 左右兩邊比例，可以調整
@@ -695,7 +720,7 @@ div.panelHeader15 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 100px 100px 100px 200px 30px;
+    grid-template-columns: 30px 100px 100px 50px  200px 30px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;
@@ -797,4 +822,39 @@ div.panelHeader17 {
   // &:hover:before {
   //   background-color: #f0f0f0;
   // }
+}
+
+
+
+div.panelHeader16 {
+
+  border-bottom: solid 1px $colorBorder01;
+  width: 1410px;
+  .row01,
+  .row02 {
+    padding-left: 20px;
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 20px 130px 250px 250px 80px 50px 50px 80px 80px 200px 30px;
+    gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
 }
