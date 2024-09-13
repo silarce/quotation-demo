@@ -38,12 +38,11 @@ import { optionsCreator_quotationStatus } from 'js/utils/options/options';
 import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
 import { findGuideRailUnicode } from 'config/product/lookup';
 import { companyInfo } from 'config/companyInfo';
+import { lookup_quoteType_doorModelName } from 'js/utils/options/productOptions';
 
 // utils
 import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
-
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
 import { dlExcel } from './dlExcel';
 import { dlPdf } from './dlPdf';
 
@@ -1040,6 +1039,14 @@ const quotationProdAndOther_ToProdArr = ({
         reduceQty,
       } = pro;
 
+      const name = (() => {
+        if (quoteType === '捲門') {
+          return doorModelName;
+        } else {
+          return (lookup_quoteType_doorModelName[quoteType]?.[doorModelName]?.name || doorModelName) as string;
+        }
+      })();
+
       const isSpecialDoor = checkIsSpecialDoor(doorModelName);
 
       let { quantity, totalPrice } = pro;
@@ -1110,7 +1117,7 @@ const quotationProdAndOther_ToProdArr = ({
       return {
         itemName,
         size,
-        doorModelName,
+        doorModelName: name,
         materialName: material,
         thickness: thickness_str,
         materialSurface: materialSurface ?? '',
