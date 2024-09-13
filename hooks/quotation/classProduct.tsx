@@ -2074,8 +2074,10 @@ class Class_product {
 
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
+      // WARNING W2判斷
+    } else if (this.isW2) {
+      this.options_horsepower = [];
     } else {
-      // this.options_horsepower = undefined;
       this.options_horsepower = optionsCreator_horsePower();
     }
 
