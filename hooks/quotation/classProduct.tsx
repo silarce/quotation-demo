@@ -505,7 +505,14 @@ class Class_product {
 
   comList: { [key in TcomponentKey]: Class_component } | undefined;
 
-  creComList({ dataList, isNew = true }: { dataList: { [key in TcomponentKey]: Tcomponent }; isNew?: boolean }) {
+  creComList({
+    //
+    dataList,
+    isNew = true,
+  }: {
+    dataList: { [key in TcomponentKey]?: Tcomponent };
+    isNew?: boolean;
+  }) {
     const keyArr = Object.keys(dataList) as TcomponentKey[];
 
     const list: { [key: string]: Class_component } = {};
@@ -1395,83 +1402,67 @@ class Class_product {
   // 裡面有呼叫callAllReq的機制
   // 裡面有呼叫callAllReq的機制
   retrieveCreProdCom() {
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
-
-    if (!this._availableComponents || !this.weight) {
-      return;
-    }
-
     const availableComponents = this._availableComponents;
+    let isGearNumberChanged = false;
 
-    let slat: Tcomponent | null = filter_slats({
-      //
-      dataArr: availableComponents.slats,
-      filterParams: { isAntiTyphoon: this.typhoonProtection },
-    });
+    if (this.isW2) {
+      const dataList = {
+        // slat: creEmptyCom(),
+        // roller: creEmptyCom(),
+        // headBox: creEmptyCom(),
+        // bottomBar: creEmptyCom(),
+        // guideRail: creEmptyCom(),
+        // motor: creEmptyCom(),
+        // motorAccessories: creEmptyCom(),
+        // sidePlate: creEmptyCom(),
 
-    let bottomBar: Tcomponent | null = filter_bottomBars({
-      dataArr: availableComponents.bottomBars,
-      filterParams: {
-        isAntiTyphoon: this.typhoonProtection,
-        isWaterProof: this.bottomBar === '止水型',
-        hasAluminumBarrier: this.bottomBar === '鋁障感型',
-      },
-    });
+        middlePillar: availableComponents?.middlePillar?.[0] || creEmptyCom(),
+        backBone: availableComponents?.backBone?.[0] || creEmptyCom(),
+      };
+      Object.values(dataList).forEach((item) => {
+        item.price = 0;
+      });
 
-    let guideRail: Tcomponent | null = filter_guideRails({
-      dataArr: availableComponents.guideRails,
-      filterParams: {
-        thickness: String(this.doorTrackThick),
-        isAntiTyphoon: this.typhoonProtection,
-        hasSilencingStrip: this.doorTrackSilencerStrip,
-        imageName: this.doorTrack,
-        isUL: this.isULGuideRail,
-      },
-    });
-
-    let motor: Tcomponent | null = filter_motors({
-      dataArr: availableComponents.motors,
-      filterParams: {
-        horsePower: this.horsepower,
-        gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
-        motorVendor: this.motor,
-        phase: Number(this.phase),
-        voltage: Number(this.voltage),
-        weight: this.weight,
-        hasSupportStand: this.motorSupport,
-      },
-    });
-
-    if (!motor) {
-      // ! 現在馬達欄位隱藏，不會給使用者操作，所以可以直接在這邊自動變更
-      // ! 以後若讓使用者操作馬達，就不能這樣直接變更
-      let motorVendor = this.motor;
-
-      if (motorVendor === '東元') {
-        motorVendor = '大同';
-      } else if (motorVendor === '大同') {
-        motorVendor = '東元';
+      this.creComList({
+        dataList,
+      });
+    } else {
+      if (!availableComponents || !this.weight) {
+        return;
       }
 
-      motor = filter_motors({
+      let slat: Tcomponent | null = filter_slats({
+        //
+        dataArr: availableComponents.slats,
+        filterParams: { isAntiTyphoon: this.typhoonProtection },
+      });
+
+      let bottomBar: Tcomponent | null = filter_bottomBars({
+        dataArr: availableComponents.bottomBars,
+        filterParams: {
+          isAntiTyphoon: this.typhoonProtection,
+          isWaterProof: this.bottomBar === '止水型',
+          hasAluminumBarrier: this.bottomBar === '鋁障感型',
+        },
+      });
+
+      let guideRail: Tcomponent | null = filter_guideRails({
+        dataArr: availableComponents.guideRails,
+        filterParams: {
+          thickness: String(this.doorTrackThick),
+          isAntiTyphoon: this.typhoonProtection,
+          hasSilencingStrip: this.doorTrackSilencerStrip,
+          imageName: this.doorTrack,
+          isUL: this.isULGuideRail,
+        },
+      });
+
+      let motor: Tcomponent | null = filter_motors({
         dataArr: availableComponents.motors,
         filterParams: {
           horsePower: this.horsepower,
           gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
-          // motorVendor: this.motor,
-          motorVendor: motorVendor,
+          motorVendor: this.motor,
           phase: Number(this.phase),
           voltage: Number(this.voltage),
           weight: this.weight,
@@ -1479,134 +1470,160 @@ class Class_product {
         },
       });
 
-      if (motor) {
-        this._prodData.motor = motorVendor;
+      if (!motor) {
+        // ! 現在馬達欄位隱藏，不會給使用者操作，所以可以直接在這邊自動變更
+        // ! 以後若讓使用者操作馬達，就不能這樣直接變更
+        let motorVendor = this.motor;
+
+        if (motorVendor === '東元') {
+          motorVendor = '大同';
+        } else if (motorVendor === '大同') {
+          motorVendor = '東元';
+        }
+
+        motor = filter_motors({
+          dataArr: availableComponents.motors,
+          filterParams: {
+            horsePower: this.horsepower,
+            gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
+            // motorVendor: this.motor,
+            motorVendor: motorVendor,
+            phase: Number(this.phase),
+            voltage: Number(this.voltage),
+            weight: this.weight,
+            hasSupportStand: this.motorSupport,
+          },
+        });
+
+        if (motor) {
+          this._prodData.motor = motorVendor;
+        }
       }
-    }
 
-    let sidePlate: Tcomponent | null = filter_sidePlates({
-      dataArr: availableComponents.sidePlates,
-      filterParams: {
-        bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
-        gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined',
-        isIntegrated: this.onePieceRollUpBox,
-        motorVendor: this.motor,
-        weight: this.weight,
-        // sizeB: this.boxB,
-        sizeB: Number(this.boxB_mm),
-      },
-    });
-
-    let roller: Tcomponent | null = filter_rollers({
-      dataArr: availableComponents.rollers,
-      filterParams: {
-        diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
-      },
-    });
-
-    let motorAccessories: Tcomponent | null = filter_motorAccessories({
-      dataArr: availableComponents.motorAccessories,
-      filterParams: {
-        //鍊條排數
-        chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
-        //軸承 // 從doorGeneralSpecs取資料
-        bearingType: this._doorGeneralSpecs?.bearingName || '',
-        gearNumber: this._doorGeneralSpecs?.gearNumber || '',
-      },
-    });
-
-    let headBox: Tcomponent | null = filter_headBoxes({
-      dataArr: availableComponents.headBoxes,
-      filterParams: {
-        thickness: this.rollUpBoxThick, // 捲箱厚度
-        //一體式捲箱
-        isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
-      },
-    });
-
-    const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
-
-    // get /products/door/available-components取得的金額不是正確的金額
-    // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
-
-    if (this.doorType === 'SJ-305D' && slat) {
-      const standardSlat_sj305D = availableComponents.slats.find((ac) => {
-        return ac.name.includes('標準');
+      let sidePlate: Tcomponent | null = filter_sidePlates({
+        dataArr: availableComponents.sidePlates,
+        filterParams: {
+          bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
+          gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined',
+          isIntegrated: this.onePieceRollUpBox,
+          motorVendor: this.motor,
+          weight: this.weight,
+          // sizeB: this.boxB,
+          sizeB: Number(this.boxB_mm),
+        },
       });
 
-      if (standardSlat_sj305D) {
-        slat = standardSlat_sj305D;
+      let roller: Tcomponent | null = filter_rollers({
+        dataArr: availableComponents.rollers,
+        filterParams: {
+          diameter: String(this._doorGeneralSpecs?.diameter ?? ''),
+        },
+      });
+
+      let motorAccessories: Tcomponent | null = filter_motorAccessories({
+        dataArr: availableComponents.motorAccessories,
+        filterParams: {
+          //鍊條排數
+          chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
+          //軸承 // 從doorGeneralSpecs取資料
+          bearingType: this._doorGeneralSpecs?.bearingName || '',
+          gearNumber: this._doorGeneralSpecs?.gearNumber || '',
+        },
+      });
+
+      let headBox: Tcomponent | null = filter_headBoxes({
+        dataArr: availableComponents.headBoxes,
+        filterParams: {
+          thickness: this.rollUpBoxThick, // 捲箱厚度
+          //一體式捲箱
+          isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
+        },
+      });
+
+      isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
+
+      // get /products/door/available-components取得的金額不是正確的金額
+      // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
+
+      if (this.doorType === 'SJ-305D' && slat) {
+        const standardSlat_sj305D = availableComponents.slats.find((ac) => {
+          return ac.name.includes('標準');
+        });
+
+        if (standardSlat_sj305D) {
+          slat = standardSlat_sj305D;
+        }
       }
-    }
 
-    slat = _.cloneDeep(slat);
-    roller = _.cloneDeep(roller);
-    headBox = _.cloneDeep(headBox);
-    bottomBar = _.cloneDeep(bottomBar);
-    guideRail = _.cloneDeep(guideRail);
-    motor = _.cloneDeep(motor);
-    motorAccessories = _.cloneDeep(motorAccessories);
-    sidePlate = _.cloneDeep(sidePlate);
+      slat = _.cloneDeep(slat);
+      roller = _.cloneDeep(roller);
+      headBox = _.cloneDeep(headBox);
+      bottomBar = _.cloneDeep(bottomBar);
+      guideRail = _.cloneDeep(guideRail);
+      motor = _.cloneDeep(motor);
+      motorAccessories = _.cloneDeep(motorAccessories);
+      sidePlate = _.cloneDeep(sidePlate);
 
-    [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
-      if (item) {
-        item.componentId = item.id;
-        item.id = '';
+      [slat, roller, headBox, bottomBar, guideRail, motor, motorAccessories, sidePlate].forEach((item) => {
+        if (item) {
+          item.componentId = item.id;
+          item.id = '';
+        }
+      });
+
+      if (!slat) {
+        myAlert.info({ title: '沒有符合規格的捲門片' });
       }
-    });
 
-    if (!slat) {
-      myAlert.info({ title: '沒有符合規格的捲門片' });
+      if (!roller) {
+        myAlert.info({ title: '沒有符合規格的捲軸' });
+      }
+
+      if (!headBox) {
+        myAlert.info({ title: '沒有符合規格的門箱' });
+      }
+
+      if (!bottomBar) {
+        myAlert.info({ title: '沒有符合規格的底座' });
+      }
+
+      if (!guideRail) {
+        myAlert.info({ title: '沒有符合規格的門軌' });
+      }
+
+      if (!motor) {
+        myAlert.info({ title: '沒有符合規格的馬達' });
+      }
+
+      if (!motorAccessories) {
+        myAlert.info({ title: '沒有符合規格的馬達配件' });
+      }
+
+      if (!sidePlate) {
+        myAlert.info({ title: '沒有符合規格的支板' });
+      }
+
+      const dataList = {
+        slat: slat || creEmptyCom(),
+        roller: roller || creEmptyCom(),
+        headBox: headBox || creEmptyCom(),
+        bottomBar: bottomBar || creEmptyCom(),
+        guideRail: guideRail || creEmptyCom(),
+        motor: motor || creEmptyCom(),
+        motorAccessories: motorAccessories || creEmptyCom(),
+        sidePlate: sidePlate || creEmptyCom(),
+      };
+      Object.values(dataList).forEach((item) => {
+        item.price = 0;
+      });
+
+      // 主產品的厚度就是門片厚度
+      dataList.slat.thickness = this.thickness;
+
+      this.creComList({
+        dataList,
+      });
     }
-
-    if (!roller) {
-      myAlert.info({ title: '沒有符合規格的捲軸' });
-    }
-
-    if (!headBox) {
-      myAlert.info({ title: '沒有符合規格的門箱' });
-    }
-
-    if (!bottomBar) {
-      myAlert.info({ title: '沒有符合規格的底座' });
-    }
-
-    if (!guideRail) {
-      myAlert.info({ title: '沒有符合規格的門軌' });
-    }
-
-    if (!motor) {
-      myAlert.info({ title: '沒有符合規格的馬達' });
-    }
-
-    if (!motorAccessories) {
-      myAlert.info({ title: '沒有符合規格的馬達配件' });
-    }
-
-    if (!sidePlate) {
-      myAlert.info({ title: '沒有符合規格的支板' });
-    }
-
-    const dataList = {
-      slat: slat || creEmptyCom(),
-      roller: roller || creEmptyCom(),
-      headBox: headBox || creEmptyCom(),
-      bottomBar: bottomBar || creEmptyCom(),
-      guideRail: guideRail || creEmptyCom(),
-      motor: motor || creEmptyCom(),
-      motorAccessories: motorAccessories || creEmptyCom(),
-      sidePlate: sidePlate || creEmptyCom(),
-    };
-    Object.values(dataList).forEach((item) => {
-      item.price = 0;
-    });
-
-    // 主產品的厚度就是門片厚度
-    dataList.slat.thickness = this.thickness;
-
-    this.creComList({
-      dataList,
-    });
 
     this.material = this.material;
 

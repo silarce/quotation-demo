@@ -1149,6 +1149,14 @@ const creDesc_headBoxes = (classCom: Class_component) => {
   return `${name ?? ''} ${material ?? ''}`;
 };
 
+const creDesc_middlePillar = (classCom: Class_component) => {
+  return '中柱';
+};
+
+const creDesc_backBone = (classCom: Class_component) => {
+  return '背骨';
+};
+
 const confomtTree = {
   //
   isAntiTyphoon: {
@@ -1200,7 +1208,17 @@ const confomtTree = {
 type Tkit = {
   typeName: string;
   // type是api要收的東西
-  type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
+  type:
+    | 'slat'
+    | 'bottomBar'
+    | 'guideRail'
+    | 'sidePlate'
+    | 'roller'
+    | 'motor'
+    | 'motorAccessories'
+    | 'headBox'
+    | 'middlePillar'
+    | 'backBone';
   creDesc: (classCom: Class_component, options?: Toption[]) => string;
   options: Toption[];
   hiddenKeyArr: string[];
@@ -1275,6 +1293,22 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     options: optionsCreator_componentMaterial_01(),
     hiddenKeyArr: ['surface', 'density'],
     unit: 'M',
+  },
+  middlePillar: {
+    typeName: '中柱',
+    type: 'middlePillar',
+    creDesc: creDesc_middlePillar,
+    options: [],
+    hiddenKeyArr: ['surface', 'density', 'material'],
+    unit: '支',
+  },
+  backBone: {
+    typeName: '背骨',
+    type: 'backBone',
+    creDesc: creDesc_backBone,
+    options: [],
+    hiddenKeyArr: ['surface', 'density', 'material'],
+    unit: '支',
   },
 };
 

@@ -2766,6 +2766,9 @@ export type TgenerateDoorProductBomDto = {
   motor: TgenerateDoorProductBomDto_ComponentInfo;
   motorAccessories: TgenerateDoorProductBomDto_ComponentInfo;
   headBox: TgenerateDoorProductBomDto_ComponentInfo;
+  //
+  middlePillar: TgenerateDoorProductBomDto_ComponentInfo;
+  backBone: TgenerateDoorProductBomDto_ComponentInfo;
 };
 
 export type TdoorBomDto_Component = {

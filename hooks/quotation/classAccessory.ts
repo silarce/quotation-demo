@@ -469,6 +469,14 @@ const creDesc_headBoxes = (classAcce: Class_accessory) => {
   return `${name} ${desc_thickness}`;
 };
 
+const creDesc_middlePillar = (classAcce: Class_accessory) => {
+  return `中柱`;
+};
+
+const creDesc_backBone = (classAcce: Class_accessory) => {
+  return `背骨`;
+};
+
 const confomtTree = {
   //
   isAntiTyphoon: {
@@ -537,6 +545,8 @@ const acceDescLookUp = {
   motors: creDesc_motors,
   motorAccessories: creDesc_motorAccessories,
   headBoxes: creDesc_headBoxes,
+  middlePillar: creDesc_middlePillar,
+  backBone: creDesc_backBone,
 };
 
 // ===========================================================
