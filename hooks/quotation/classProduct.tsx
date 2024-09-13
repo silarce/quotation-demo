@@ -938,7 +938,8 @@ class Class_product {
     });
     this._prodData.WG = new Decimal(theWG).div(1000).toString();
 
-    if (!this.doorTrack) {
+    // WARNING W2判斷
+    if (!this.doorTrack && !this.isW2) {
       // 必須要有門軌才會有guildRailG才能計算正確的W
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
     }
@@ -1024,16 +1025,33 @@ class Class_product {
   async req_getProdAvailableComponents() {
     const rollerDiameter = this._doorGeneralSpecs?.diameter;
 
-    if (!this.doorType || !this.weight || !rollerDiameter) {
-      return false;
+    // _________________________________________________________
+    // _________________________________________________________
+    let res: Awaited<ReturnType<typeof reqGetProdAvailableComponents>>;
+
+    // WARNING W2判斷
+    if (this.isW2) {
+      res = await reqGetProdAvailableComponents({
+        modelName: this.doorType as TpacParams['modelName'],
+        weight: 0,
+        isAntiTyphoon: false,
+        rollerDiameter: 0,
+      });
+    } else {
+      if (!this.doorType || !this.weight || !rollerDiameter) {
+        return false;
+      }
+
+      res = await reqGetProdAvailableComponents({
+        modelName: this.doorType as TpacParams['modelName'],
+        weight: this.weight,
+        isAntiTyphoon: this.typhoonProtection,
+        rollerDiameter: rollerDiameter,
+      });
     }
 
-    const res = await reqGetProdAvailableComponents({
-      modelName: this.doorType as TpacParams['modelName'],
-      weight: this.weight,
-      isAntiTyphoon: this.typhoonProtection,
-      rollerDiameter: rollerDiameter,
-    });
+    // _________________________________________________________
+    // _________________________________________________________
 
     if (res) {
       this._availableComponents = res;
@@ -1218,7 +1236,7 @@ class Class_product {
         res1 = await this.req_calcGeneralSpec();
       }
 
-      if (this.shouldCall_pac) {
+      if (this.shouldCall_pac || this.isW2) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
@@ -1377,6 +1395,20 @@ class Class_product {
   // 裡面有呼叫callAllReq的機制
   // 裡面有呼叫callAllReq的機制
   retrieveCreProdCom() {
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+    // 繼續做W2的繞過處理，下一個處理在callRetrieveCreProdCom
+
     if (!this._availableComponents || !this.weight) {
       return;
     }
@@ -2519,10 +2551,6 @@ class Class_product {
     //   return false;
     // }
 
-    if (this._prodData.doorType === 'W2') {
-      return true;
-    }
-
     if (
       Object.values(this._doorModelList).some((doorModel) => {
         return doorModel.name === this._prodData.doorType;
@@ -2532,6 +2560,10 @@ class Class_product {
     }
 
     return true;
+  }
+
+  get isW2() {
+    return this._prodData.doorType === 'W2';
   }
 
   get ignoreKeyArr_prod() {
