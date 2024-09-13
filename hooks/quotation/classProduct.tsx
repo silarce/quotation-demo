@@ -3930,7 +3930,12 @@ class Class_product {
     const componentBodyArr = this.comBodyArr;
     let isComponentBreak = false;
 
-    if (componentBodyArr.length !== 8 && !this.isSpecialProd) {
+    if (this.isSpecialProd) {
+      isComponentBreak = false;
+      // WARNING W2判斷
+    } else if (this.isW2 && componentBodyArr.length !== 5) {
+      isComponentBreak = true;
+    } else if (!this.isW2 && componentBodyArr.length !== 8) {
       isComponentBreak = true;
     }
 
