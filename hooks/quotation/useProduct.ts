@@ -1198,7 +1198,15 @@ const useProductList = ({
         }
       );
 
-      const avgDiscount = totalQty ? new Decimal(totalDiscount).div(totalQty).toDecimalPlaces(2).toNumber() : '---';
+      // const avgDiscount = totalQty ? new Decimal(totalDiscount).div(totalQty).toDecimalPlaces(2).toNumber() : '---';
+      const avgDiscount = totalQty
+        ? new Decimal(totalDiscount)
+            .div(totalQty)
+            .mul(quotationDiscount || 100)
+            .div(100)
+            .toDecimalPlaces(2)
+            .toNumber()
+        : '---';
 
       list02[doorModelName] = {
         totalQty,
@@ -1238,6 +1246,7 @@ const useProductList = ({
     //
     productList,
     avgDiscount_withQty,
+    quotationDiscount,
     // averageDiscount,
     // quotationDiscount,
     // quotationDiscount_attach,
