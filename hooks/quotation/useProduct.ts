@@ -34,7 +34,9 @@ type TcomponentKey =
   | 'roller'
   | 'motor'
   | 'motorAccessories'
-  | 'headBox';
+  | 'headBox'
+  | 'middlePillar'
+  | 'backBone';
 
 type TproductList = {
   [key: string]: Class_product;
