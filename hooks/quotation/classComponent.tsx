@@ -1154,7 +1154,7 @@ const creDesc_middlePillar = (classCom: Class_component) => {
 };
 
 const creDesc_backBone = (classCom: Class_component) => {
-  return '背骨';
+  return '背撐';
 };
 
 const confomtTree = {
@@ -1303,7 +1303,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     unit: '支',
   },
   backBone: {
-    typeName: '背骨',
+    typeName: '背撐',
     type: 'backBone',
     creDesc: creDesc_backBone,
     options: [],

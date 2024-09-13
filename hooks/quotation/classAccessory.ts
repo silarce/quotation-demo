@@ -474,7 +474,7 @@ const creDesc_middlePillar = (classAcce: Class_accessory) => {
 };
 
 const creDesc_backBone = (classAcce: Class_accessory) => {
-  return `背骨`;
+  return `背撐`;
 };
 
 const confomtTree = {

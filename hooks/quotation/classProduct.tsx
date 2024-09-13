@@ -962,7 +962,8 @@ class Class_product {
     // 內有預設boxB boxD 馬達廠商 馬力
     this.defaultMotorSpecs = defaultMotorSpecs;
 
-    if (!wasWgChanged || !this._prodData.boxB || !this.horsepower) {
+    // WARNING W2判斷
+    if (!this.isW2 && (!wasWgChanged || !this._prodData.boxB || !this.horsepower)) {
       this.horsepower = defaultMotorSpecs.hp;
 
       this.motor = defaultMotorVendor ?? '';
@@ -1003,6 +1004,7 @@ class Class_product {
     // ) {
     //   this.shouldCall_pac = true;
     // }
+
     this.shouldCall_pac = true;
 
     // 這個判斷幾乎沒有意義，改變寬度時部分欄位一定會改變
@@ -1095,8 +1097,8 @@ class Class_product {
       height: new Decimal(this.height).mul(1000).toNumber(),
       // B: Number(this.boxB) * 1000,
       // D: Number(this._prodData.boxD) * 1000,
-      B: new Decimal(this.boxB).mul(1000).toNumber(),
-      D: new Decimal(this._prodData.boxD).mul(1000).toNumber(),
+      B: new Decimal(this.boxB || 0).mul(1000).toNumber(),
+      D: new Decimal(this._prodData.boxD || 0).mul(1000).toNumber(),
       slatLength: this._doorGeneralSpecs.slatLength,
       guideRailLength: this._doorGeneralSpecs.guideRailLength,
       rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
@@ -1142,7 +1144,8 @@ class Class_product {
         materialSurface = undefined;
       }
 
-      if (!componentId || !material) {
+      // WARNING W2判斷
+      if (!this.isW2 && (!componentId || !material)) {
         console.log('reqProdGenerateDoorProductBom中斷，componentId或material為空');
         haveNull = true;
       }
@@ -1161,7 +1164,7 @@ class Class_product {
 
         generateBomObj_pre.guideRail.thickness = String(thickness);
       }
-    });
+    }); //  Object.values(comList).forEach
 
     if (haveNull) {
       return false;
@@ -1243,7 +1246,7 @@ class Class_product {
         res1 = await this.req_calcGeneralSpec();
       }
 
-      if (this.shouldCall_pac || this.isW2) {
+      if (this.shouldCall_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
@@ -1251,6 +1254,10 @@ class Class_product {
         res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
+      myAlert.err({
+        title: '意外的錯誤',
+      });
+      console.error(error);
     } finally {
       // this.isLoading = false;
 
@@ -1406,6 +1413,19 @@ class Class_product {
     let isGearNumberChanged = false;
 
     if (this.isW2) {
+      let middlePillar: Tcomponent = availableComponents?.middlePillar?.[0] || creEmptyCom();
+      let backBone: Tcomponent = availableComponents?.backBone?.[0] || creEmptyCom();
+
+      middlePillar = _.cloneDeep(middlePillar);
+      backBone = _.cloneDeep(backBone);
+
+      [middlePillar, backBone].forEach((item) => {
+        if (item) {
+          item.componentId = item.id;
+          item.id = '';
+        }
+      });
+
       const dataList = {
         // slat: creEmptyCom(),
         // roller: creEmptyCom(),
@@ -1416,8 +1436,8 @@ class Class_product {
         // motorAccessories: creEmptyCom(),
         // sidePlate: creEmptyCom(),
 
-        middlePillar: availableComponents?.middlePillar?.[0] || creEmptyCom(),
-        backBone: availableComponents?.backBone?.[0] || creEmptyCom(),
+        middlePillar: middlePillar || creEmptyCom(),
+        backBone: backBone || creEmptyCom(),
       };
       Object.values(dataList).forEach((item) => {
         item.price = 0;
