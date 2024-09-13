@@ -1412,14 +1412,25 @@ class Class_product {
     const availableComponents = this._availableComponents;
     let isGearNumberChanged = false;
 
+    // WARNING W2判斷
     if (this.isW2) {
+      if (!availableComponents) {
+        return;
+      }
+
       let middlePillar: Tcomponent = availableComponents?.middlePillar?.[0] || creEmptyCom();
       let backBone: Tcomponent = availableComponents?.backBone?.[0] || creEmptyCom();
+      let slat: Tcomponent = availableComponents?.slats?.[0] || creEmptyCom();
+      let guideRail: Tcomponent = availableComponents?.guideRails?.[0] || creEmptyCom();
+      let bottomBar: Tcomponent = availableComponents?.bottomBars?.[0] || creEmptyCom();
 
       middlePillar = _.cloneDeep(middlePillar);
       backBone = _.cloneDeep(backBone);
+      slat = _.cloneDeep(slat);
+      guideRail = _.cloneDeep(guideRail);
+      bottomBar = _.cloneDeep(bottomBar);
 
-      [middlePillar, backBone].forEach((item) => {
+      [middlePillar, backBone, slat, guideRail, bottomBar].forEach((item) => {
         if (item) {
           item.componentId = item.id;
           item.id = '';
@@ -1427,17 +1438,12 @@ class Class_product {
       });
 
       const dataList = {
-        // slat: creEmptyCom(),
-        // roller: creEmptyCom(),
-        // headBox: creEmptyCom(),
-        // bottomBar: creEmptyCom(),
-        // guideRail: creEmptyCom(),
-        // motor: creEmptyCom(),
-        // motorAccessories: creEmptyCom(),
-        // sidePlate: creEmptyCom(),
+        slat,
+        guideRail,
+        bottomBar,
 
-        middlePillar: middlePillar || creEmptyCom(),
-        backBone: backBone || creEmptyCom(),
+        middlePillar,
+        backBone,
       };
       Object.values(dataList).forEach((item) => {
         item.price = 0;
