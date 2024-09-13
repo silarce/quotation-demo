@@ -2085,7 +2085,7 @@ export default function PurchaseRequisitionList() {
                                         <span>{_item.detail_unit}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                        <span>{_item.detail_note}</span>
+                                        <span>{_item.main_quotereqid}</span>
                                         <span></span>
                                         {/* <span></span> */}
                                         <span>

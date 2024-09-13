@@ -163,7 +163,7 @@
   border-bottom: 1px solid rgb(214, 214, 214);
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 
   // background-color: gray;
@@ -179,8 +179,18 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
+}
+
+.head_tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  width: auto;
+  // margin-left: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .head_content2 {
@@ -193,7 +203,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -207,7 +217,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -221,13 +231,13 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
 .head_foot1 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   // gap: 15px;
   width: auto;
   margin-top: 5px;
@@ -268,16 +278,6 @@
   margin-right: 20px;
 
   // background-color: gray;
-}
-
-.head_foot1 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  // gap: 15px;
-  width: auto;
-  margin-top: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
 }
 
 .head_foot2 {
@@ -557,7 +557,7 @@ div.panelHeader20 {
   width: 100%;
   resize: none; // 禁用自由調整高度的功能
   margin-left: 70px;
-  
+
 }
 
 .squarebtn {
@@ -630,7 +630,7 @@ div.panelHeader20 {
     /* 調整圖標位置 */
     cursor: not-allowed;
     /* 添加這行使滑鼠顯示禁止符號 */
-}
+  }
 
   &:focus {
     background-color: $bgc01;
@@ -675,6 +675,7 @@ div.panelHeader20 {
 
 
 }
+
 .modal_head_content2 {
   display: grid;
   grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
@@ -707,6 +708,7 @@ div.panelHeader15 {
   .row01,
   .row02 {
     padding-left: 20px;
+
     span {
       font-weight: 400;
       font-size: 16px;
@@ -720,7 +722,7 @@ div.panelHeader15 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 100px 100px 50px  200px 30px;
+    grid-template-columns: 30px 100px 100px 50px 200px 30px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;
@@ -769,7 +771,7 @@ div.panelHeader17 {
 
   .row01 {
     display: grid;
-    grid-template-columns:30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
+    grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
     gap: 5px;
   }
 }
@@ -830,9 +832,11 @@ div.panelHeader16 {
 
   border-bottom: solid 1px $colorBorder01;
   width: 1410px;
+
   .row01,
   .row02 {
     padding-left: 20px;
+
     span {
       font-weight: 400;
       font-size: 16px;
@@ -857,4 +861,43 @@ div.panelHeader16 {
     background-color: #ecf1ff;
     /* 當前選擇項目的背景顏色 */
   }
+}
+
+.minitabbtn {
+  height: 39px;
+  // width: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  border-bottom: 0px;
+  // border-bottom: 0px;
+  background-color: #c1c1c17c;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 18px;
+  // color: #14256a;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+  width: 169px;
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    border-bottom: 0px;
+    color: #14256a;
+    background-color: #c1c1c17c
+  }
+}
+
+.tabbody {
+  display: grid;
+  grid-template-columns: 1fr;
+  // gap: 15px;
+  width: auto;
+  // margin-top: 10px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+  // padding-right: 20px;
+  // background-color: gray;
+  
 }

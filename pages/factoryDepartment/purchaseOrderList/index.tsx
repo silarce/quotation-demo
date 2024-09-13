@@ -1295,6 +1295,7 @@ export default function PurchaseOrderList() {
             setIsLoading(true);
             const conditionModel = {
                 id: id,
+                type: 'purchaseorder'
             };
 
             const inputModel = {

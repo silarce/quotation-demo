@@ -271,7 +271,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
-        <span>備註</span>
+        <span>單號</span>
         <span>選擇</span>
         <span></span>
       </div>
@@ -547,7 +547,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         <span>單價</span>
         <span>金額</span>
-        <span>備註(用途說明)</span>
+        <span>廠商</span>
         <span></span>
       </div>
     )
