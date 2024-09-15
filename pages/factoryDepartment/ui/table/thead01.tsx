@@ -572,6 +572,21 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+  //#region 請購單明細
+  else if (type === "ReviewHistory") {
+    return (
+      <div className={style.thead36}>
+        <span>序</span>
+        <span>審核日期</span>
+        <span>審核狀態</span>
+        <span>審核關卡</span>
+        <span>審核人員</span>
+        <span>審核意見</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

@@ -696,6 +696,57 @@ export default function ReviewList() {
         }
     }
 
+    const handleReviewRejected = async () => {
+        setReview_memo("");
+        setReviewtype("");
+        setData2([]);
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username,
+                review_memo: review_memo,
+                review_id: currentreview_id
+            };
+
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/ReviewRejected`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            GetReview();
+            GetReviewing();
+            GetReviewed();
+
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
 
 
     return (
@@ -993,7 +1044,7 @@ export default function ReviewList() {
                                     </button>
                                 </div>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回"
+                                    <button className={scss.longsquarebtn} onClick={() => {handleReviewRejected() }} title="駁回"
                                         style={{ color: `${(tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? '#5b5a5ad6' : '#14256a'}` }}>
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回

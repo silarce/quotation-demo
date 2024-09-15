@@ -271,7 +271,7 @@ export default function PurchaseRequisitionList() {
                 setNeed_datein(data[0].need_date);
                 setNotein(data[0].note);
                 GetReviewById(data[0].purchaserequisitionuuid);//審核
-
+                GetReviewHistory(data[0].purchaserequisitionid);
             }
         } catch (error: any) {
             // console.log(error.message);
@@ -330,6 +330,7 @@ export default function PurchaseRequisitionList() {
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
             GetReviewFlow();//審核
+            // GetReviewHistory();//審核歷程
             hasFetchedData.current = true;
         }
     }, []);
@@ -416,6 +417,7 @@ export default function PurchaseRequisitionList() {
             setNeed_datein(need_date as string);
             setNotein(note as string);
             GetReviewById(purchaserequisitionuuid);
+            GetReviewHistory(purchaserequisitionid as string);
         }
     }, [purchaserequisitionuuid]);
 
@@ -513,143 +515,6 @@ export default function PurchaseRequisitionList() {
             setIsLoading(false);
         }
     };
-
-    //送出審核
-    // const sentToReview = async (type: any) => {
-
-    //     // alert("送出審核");
-
-
-    //     if (review_flow === "") {
-    //         setReviewbar(true);
-    //     }
-    //     else {
-    //         alert("yo");
-    //         const review_query = {
-    //             purchaserequisitionuuid: purchaserequisitionuuidin,
-    //             purchaserequisitionid: purchaserequisitionidin,
-    //             create_at: create_atin,
-    //             create_by: create_byin,
-    //             status: '詢價中',
-    //             need_date: need_datein,
-    //             note: notein,
-    //             firstin: 1,
-    //         };
-
-    //         console.log(JSON.stringify(review_query));
-
-    //         // return;
-    //         const conditionModel = {
-    //             document_id: purchaserequisitionid,
-    //             document_uuid: purchaserequisitionuuid,
-    //             document_type: "請購單",
-    //             review_id: review_flow,
-    //             query: review_query,
-    //             username: userInfo?.username
-    //         };
-
-    //         var inputModel = {
-    //             TypeName: 'ERP',
-    //             ServiceName: 'ReviewService',
-    //             FunctionName: 'no',
-    //             FilterConditions: JSON.stringify(conditionModel),
-    //         };
-
-
-    //         const response = await fetch(`${setting.apipath}/Review/AddReview`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(inputModel)
-    //         });
-
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch data');
-    //         }
-    //         const data = await response.json();
-    //         await new Promise(resolve => setTimeout(resolve, 500));
-
-
-
-
-
-
-    //     }
-
-
-
-
-    //     return;
-
-
-
-    //     try {
-    //         setIsLoading(true);
-    //         const conditionModel: {
-    //             type: string | undefined,
-    //             purchaserequisitionuuid: string | undefined,
-    //             username: string | undefined
-    //         } = {
-    //             type: type,
-    //             purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
-    //             username: userInfo?.username as string | undefined
-    //         };
-
-
-    //         var inputModel = {
-    //             TypeName: 'ERP',
-    //             ServiceName: 'WareHouseService',
-    //             FunctionName: 'no',
-    //             FilterConditions: JSON.stringify(conditionModel),
-    //         };
-
-    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-    //         const response = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch data');
-    //         }
-    //         const data = await response.json();
-    //         // setData(data);
-    //         await new Promise(resolve => setTimeout(resolve, 500));
-    //         getPurchaseRequisition();
-    //         getPurchaseRequisitionDetail(purchaserequisitionuuidin);
-    //         await new Promise(resolve => setTimeout(resolve, 500));
-
-
-
-    //         let status = '';
-    //         switch (type) {
-    //             case '請購':
-    //                 status = '詢價中';
-    //                 break;
-    //             case '詢價':
-    //                 status = '審核中';
-    //                 break;
-    //             case '核准':
-    //                 status = '已核准';
-    //                 break;
-    //             case '駁回':
-    //                 status = '已駁回';
-    //                 break;
-    //             case '結案':
-    //                 status = '已結案';
-    //                 break;
-    //             default:
-    //                 status = '未知狀態'; // 或者你可以選擇其他合適的默認值
-    //                 break;
-    //         }
-
-    //         setStatusin(status);
-    //     } catch (error: any) {
-    //         setError(error.message);
-    //     }
-    //     finally {
-    //         setIsLoading(false);
-    //     }
-    // }
-
 
 
     //#endregion
@@ -1180,6 +1045,7 @@ export default function PurchaseRequisitionList() {
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
     const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
 
     //取全部的自訂流程
     const GetReviewFlow = async () => {
@@ -1434,6 +1300,49 @@ export default function PurchaseRequisitionList() {
             }
         });
     }
+
+    const GetReviewHistory = async (id: any) => {
+        try {
+            setIsLoading(true);
+            // alert(purchaserequisitionidin);
+            const conditionModel = {
+                // username: userInfo?.username
+                id: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
     //#endregion
 
     const handleGoToAddPR = () => {
@@ -1462,6 +1371,24 @@ export default function PurchaseRequisitionList() {
             },
         });
     }
+
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("單據明細");
+    const [tabshow, setTabshow] = useState<string>("單據明細");
+
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName); // 設置當前 tab 值
+        setTabshow(tabName);
+        // 直接使用 tabName 而不是 tabnow
+    };
+
+    //#endregion
 
 
     return (
@@ -1782,7 +1709,7 @@ export default function PurchaseRequisitionList() {
                             </div>
                         </div>
 
-                        <div className={scss.head_foot2}>
+                        <div className={scss.head_tab}>
                             <div>
                                 {/* <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
                                     詢價紀錄
@@ -1790,57 +1717,101 @@ export default function PurchaseRequisitionList() {
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
                                     詢價紀錄
                                 </button> */}
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('單據明細')}
+                                        style={getButtonStyle('單據明細')}
+                                    >
+                                        單據明細
+                                    </button>
+                                </span>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('審核明細')}
+                                        style={getButtonStyle('審核明細')}
+                                    >
+                                        審核明細
+                                    </button>
+                                </span>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
                         </div>
-                        <div className={scss.body_content1}>
-                            <Thead01 type={'PurchaseRequisitionDetail'} />
-                            {data1 && (
-                                data1.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader16} >
-                                        <div className={scss.row01}>
-                                            <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.quantity}</span>
-                                            <span>{_item.unit}</span>
-                                            {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
-                                            <span>
-                                                {/* <IconDetail onClick={() => prQuotereqModalOpen(_item)} /> */}
-                                                {/* icon_fc_quotereq */}
-                                                <button
-                                                    onClick={() => {
-                                                        if (viewtype !== 'review') {
-                                                            prQuotereqModalOpen(_item);
-                                                        }
-                                                    }}
-                                                    disabled={_item.reviewtype === 'review'} // 如果 reviewtype 是 'review'，禁用按鈕
-                                                >
-                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
-                                                </button>
+                        <div className={scss.tabbody}>
+                            <div>
+                                <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                        <div>
+                                            <Thead01 type={'PurchaseRequisitionDetail'} />
+                                            {data1 && (
+                                                data1.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader16} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.productid}</span>
+                                                            <span>{_item.name}</span>
+                                                            <span>{_item.spec}</span>
+                                                            <span>{_item.quantity}</span>
+                                                            <span>{_item.unit}</span>
+                                                            {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
+                                                            <span>
+                                                                {/* <IconDetail onClick={() => prQuotereqModalOpen(_item)} /> */}
+                                                                {/* icon_fc_quotereq */}
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (viewtype !== 'review') {
+                                                                            prQuotereqModalOpen(_item);
+                                                                        }
+                                                                    }}
+                                                                    disabled={_item.reviewtype === 'review'} // 如果 reviewtype 是 'review'，禁用按鈕
+                                                                >
+                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
 
-                                            </span>
-                                            <span>{_item.unitprice.toLocaleString()}</span>
-                                            <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span>{_item.suppliername}</span>
-                                            <span>
-                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
-                                                    <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
-                                                </button>
-                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? 'none' : ''}` }}>
-                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                            </span>
+                                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                                            <span>{_item.suppliername}</span>
+                                                            <span>
+                                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+                                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? 'none' : ''}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+                                                            </span>
+                                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
                                         </div>
-                                    </CellWithBar>
-                                ))
-                            )}
+                                    </div>
+                                </div>
+                                <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                        <div>
+                                            <Thead01 type={'ReviewHistory'} />
+                                            {reviewhistroydata && (
+                                                reviewhistroydata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader18} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.document_status}</span>
+                                                            <span>{_item.current_stage}</span>
+                                                            <span>{_item.review_person}</span>
+                                                            <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
                         <div className={scss.body_foot1}>
                             <div>
                                 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
