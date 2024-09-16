@@ -56,7 +56,7 @@ import icon_flow_gray from 'public/image/icon/fc_flow_gray.svg';
 import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
-
+import icon_export from 'public/image/icon/fc_export.svg';
 
 export default function PurchaseRequisitionList() {
 
@@ -1289,6 +1289,7 @@ export default function PurchaseRequisitionList() {
                         setStatusin("詢價中");
                         setReview_flow("");
                         setValue(null);
+                        GetReviewHistory(purchaserequisitionidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1391,6 +1392,7 @@ export default function PurchaseRequisitionList() {
     //#endregion
 
 
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
@@ -1475,15 +1477,17 @@ export default function PurchaseRequisitionList() {
                                     查詢
                                 </button>
                                 &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { GoToQuotereq() }} title="詢價管理">
+                                    <img src={icon_fc_quotereq.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    詢價
+                                </button>
+                                &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { GoToQuotereq() }} title="詢價管理">
-                                    <img src={icon_fc_quotereq.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    詢價
-                                </button>
+
                             </div>
                             <div>
                                 {/* <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
@@ -2109,6 +2113,26 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setKeyword3(e.target.value)}
+                                        disabled={false} // 根據需求設置是否禁用
+                                        style={{
+                                            // padding: '8px', // 調整樣式
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option> {/* 預設選項 */}
+                                        <option value="詢價中">詢價中</option>
+                                        <option value="已核准">已核准</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+
+                                </div>
+                                <br />
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
@@ -2120,6 +2144,7 @@ export default function PurchaseRequisitionList() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -2134,6 +2159,7 @@ export default function PurchaseRequisitionList() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -2148,21 +2174,6 @@ export default function PurchaseRequisitionList() {
                                             },
                                         }}
                                     />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-
                                 </div>
                                 <br />
                                 <div>

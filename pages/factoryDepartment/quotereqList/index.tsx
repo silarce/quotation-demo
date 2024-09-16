@@ -1141,7 +1141,7 @@ export default function AddPurchaseOrder() {
         // 模糊查詢單號
         if (requisitionId) {
             filteredData = filteredData.filter(item =>
-                item?.purchaseorderid?.toString().includes(requisitionId)
+                item?.quotereqid?.toString().includes(requisitionId)
             );
         }
 
@@ -1803,7 +1803,7 @@ export default function AddPurchaseOrder() {
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { setProductSearchmodalopen(!productSearchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    品項
+                                    價格
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="列印">
@@ -1846,13 +1846,13 @@ export default function AddPurchaseOrder() {
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { DeleteQuotereq(quoterequuid) }} title="單據申請">
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { DeleteQuotereq(quoterequuid) }} title="單據刪除">
                                     <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     刪除
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據送出">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
@@ -2461,6 +2461,7 @@ export default function AddPurchaseOrder() {
 
 
                             <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                            {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />

@@ -738,14 +738,11 @@ export default function PurchaseOrderList() {
                         console.log(data);
                         // return;
 
-                        const conditionModel: {
-                            purchaseorderuuid: any,
-                            data: any,
-                            note: any
-                        } = {
+                        const conditionModel = {
                             purchaseorderuuid: purchaseorderuuidin,
                             data: data,
-                            note: notein
+                            note: notein,
+                            data1: data1
                         };
 
 
@@ -1295,7 +1292,8 @@ export default function PurchaseOrderList() {
             setIsLoading(true);
             const conditionModel = {
                 id: id,
-                type: 'purchaseorder'
+                type: 'purchaseorder',
+                type2: 'quotereq'
             };
 
             const inputModel = {
@@ -1433,9 +1431,14 @@ export default function PurchaseOrderList() {
                                     列印
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin) }} title="列印">
-                                    <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    Excel
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin) }} title="單據Excel">
+                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    單據
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin,) }} title="比價Excel">
+                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    比價
                                 </button>
                             </div>
                             <div>
@@ -1446,7 +1449,7 @@ export default function PurchaseOrderList() {
                                     </button>
                                 </span>
                                 &nbsp; */}
-                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
+                                <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
@@ -1786,9 +1789,52 @@ export default function PurchaseOrderList() {
                                             <span>{_item.name}</span>
                                             <span>{_item.spec}</span>
                                             <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                            <span>{_item.quantity}</span>
+                                            {/* <span>{_item.quantity}</span> */}
+                                            <span>
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '60px' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    maxLength={9}
+                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data1];
+                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: newQuantity * newData[index].unitprice
+                                                        };
+                                                        setData1(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
                                             <span>{_item.unit}</span>
-                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
+                                            <span>
+                                                <input
+                                                    ref={unitpriceRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '80px' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
+                                                    type="text"
+                                                    maxLength={8}
+                                                    value={_item.unitprice.toLocaleString()}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...data1];
+                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: newUnitPrice,
+                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                        };
+                                                        setData1(newData);
+                                                    }}
+                                                />
+                                            </span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>
                                                 <button
@@ -2050,6 +2096,26 @@ export default function PurchaseOrderList() {
                                     />
                                 </div>
                                 <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setKeyword3(e.target.value)}
+                                        disabled={false} // 根據需求設置是否禁用
+                                        style={{
+                                            // padding: '8px', // 調整樣式
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option> {/* 預設選項 */}
+                                        <option value="採購中">採購中</option>
+                                        <option value="已核准">已核准</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+
+                                </div>
+                                <br />
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
@@ -2086,20 +2152,6 @@ export default function PurchaseOrderList() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
