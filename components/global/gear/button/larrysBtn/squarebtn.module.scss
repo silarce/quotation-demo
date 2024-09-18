@@ -1,0 +1,80 @@
+@mixin basic {
+  display: inline-block;
+  min-height: 50px;
+  min-width: 50px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  background-color: theme("colors.bgc01");
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: theme("colors.main");
+  transform: translateY(2px);
+  vertical-align: top;
+  > svg {
+    width: 20px;
+    height: 20px;
+    margin: auto;
+  }
+  > span {
+    color: inherit;
+  }
+  &:not(.defaultIconColor) {
+    > svg {
+      color: inherit;
+    }
+  }
+}
+
+@mixin basicEvent {
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c17c;
+  }
+
+  &:focus {
+    background-color: theme("colors.bgc01");
+    border: solid 1px #c1c1c1;
+  }
+}
+
+// =======================================================================
+// sharp
+
+.basic {
+  @include basic;
+  @include basicEvent;
+}
+
+.long {
+  @include basic;
+  @include basicEvent;
+  min-height: 39px;
+  min-width: 139px;
+}
+// =======================================================================
+
+// theme
+
+.danger {
+  color: theme("colors.danger");
+}
+// =======================================================================
+
+.disabled {
+  color: #5b5a5ad6;
+  &:hover {
+    background-repeat: no-repeat;
+    background-position: center right 10px;
+    /* 調整圖標位置 */
+    cursor: not-allowed;
+    /* 添加這行使滑鼠顯示禁止符號 */
+  }
+
+  &:focus {
+    background-color: theme("colors.bgc01");
+    border: solid 1px #c1c1c1;
+  }
+}
