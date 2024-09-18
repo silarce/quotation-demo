@@ -3,7 +3,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 import scss from './index.module.scss';
 
-export default function AccountsPayable() {
+export default function PaymentApplication() {
   return (
     <SubLayer>
       <PageHeader02 tag="應付帳款" />
