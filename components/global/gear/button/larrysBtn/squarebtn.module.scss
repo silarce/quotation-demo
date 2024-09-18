@@ -1,0 +1,98 @@
+@mixin basic {
+  height: 50px;
+  width: 50px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  background-color: theme("colors.bgc01");
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: theme("colors.main");
+
+  transform: translateY(2px);
+
+  > svg {
+    width: 20px;
+    height: 20px;
+    margin: auto;
+  }
+  &:not(.defaultIconColor) {
+    > svg {
+      color: inherit;
+    }
+  }
+}
+
+@mixin disabled {
+  color: #5b5a5ad6;
+  &:hover {
+    background-repeat: no-repeat;
+    background-position: center right 10px;
+    /* 調整圖標位置 */
+    cursor: not-allowed;
+    /* 添加這行使滑鼠顯示禁止符號 */
+  }
+
+  &:focus {
+    background-color: theme("colors.bgc01");
+    border: solid 1px #c1c1c1;
+  }
+}
+
+@mixin basicEvent {
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c17c;
+  }
+
+  &:focus {
+    background-color: theme("colors.bgc01");
+    border: solid 1px #c1c1c1;
+  }
+}
+
+.basic {
+  @include basic;
+  @include basicEvent;
+  &.disabled {
+    @include disabled;
+  }
+}
+
+.danger {
+  @include basic;
+  @include basicEvent;
+  color: theme("colors.danger");
+  &.disabled {
+    @include disabled;
+  }
+}
+
+.long {
+  @include basic;
+  @include basicEvent;
+  height: 39px;
+  width: 139px;
+  &.disabled {
+    @include disabled;
+  }
+}
+
+// .disabled {
+//   // @include basic;
+//   color: #5b5a5ad6;
+//   &:hover {
+//     background-repeat: no-repeat;
+//     background-position: center right 10px;
+//     /* 調整圖標位置 */
+//     cursor: not-allowed;
+//     /* 添加這行使滑鼠顯示禁止符號 */
+//   }
+
+//   &:focus {
+//     background-color: theme("colors.bgc01");
+//     border: solid 1px #c1c1c1;
+//   }
+// }
