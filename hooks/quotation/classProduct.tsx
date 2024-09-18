@@ -2596,6 +2596,10 @@ class Class_product {
     //   return false;
     // }
 
+    if (this._prodData.doorType === 'W2') {
+      return true;
+    }
+
     if (
       Object.values(this._doorModelList).some((doorModel) => {
         return doorModel.name === this._prodData.doorType;
@@ -2608,7 +2612,8 @@ class Class_product {
   }
 
   get isW2() {
-    return this._prodData.doorType === 'W2';
+    return false;
+    // return this._prodData.doorType === 'W2';
   }
 
   get ignoreKeyArr_prod() {
