@@ -21,3 +21,7 @@ A1.
 inputSel_v2的input元件有做blurOnWheel，避免在滾動滾輪時意外的改變了值
 components/global/gear/inputAndSel_v2/cog/input.tsx
 
+Q2.
+為什麼我新增了語系文件卻沒有效果?
+A2.
+還需要去 hooks/i18n.ts 引入、設置語系文件
