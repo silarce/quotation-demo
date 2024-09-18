@@ -1,3 +1,9 @@
 {
-  "add": "ADD"
+  "add": "ADD",
+  "cancel": "CANCEL",
+  "delete": "DELETE",
+  "edit": "EDIT",
+  "export": "EXPORT",
+  "save": "SAVE",
+  "search": "SEARCH"
 }

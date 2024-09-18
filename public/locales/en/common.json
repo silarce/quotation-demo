@@ -7,5 +7,7 @@
     "gender": "Gender",
     "species": "Species",
     "description": "Description"
-  }
+  },
+  "receipt": "Receipt",
+  "item": "Item"
 }

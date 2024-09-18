@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 
@@ -5,21 +6,65 @@ import scss from './squarebtn.module.scss';
 
 // ======================================================================
 
-import { Icon_fc_add2 } from '../../svgIcon/fcIcon';
+import * as Icons from '../../svgIcon/fcIcon';
+
+import { btnLookup } from './btnLookup';
 
 // ======================================================================
 type Tprops = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  content: string;
-  theme?: 'basic' | 'danger' | 'long';
+  content?: keyof typeof btnLookup;
+  label?: string | null;
+  sharp?: 'basic' | 'long';
+  theme?: 'danger';
   disabled?: boolean;
   defaultIconColor?: boolean;
+  attr_icon?: React.SVGProps<SVGSVGElement>;
+  attr_label?: React.HTMLAttributes<HTMLSpanElement>;
 };
 
 // ======================================================================
 const SquareBtn = (props: Tprops) => {
   const { t } = useTranslation('larrysBtn');
 
-  const { children, content, theme = 'basic', className, disabled, defaultIconColor, ...btnAttr } = props;
+  const {
+    //
+    children,
+    content,
+    label,
+    sharp = 'basic',
+    theme,
+    defaultIconColor,
+
+    className,
+    attr_icon,
+    attr_label,
+
+    disabled,
+    ...btnAttr
+  } = props;
+
+  const { Icon, i18nKey } = useMemo(() => {
+    if (content) {
+      return btnLookup[content];
+    }
+
+    return {
+      Icon: null,
+      i18nKey: null,
+    };
+  }, [content]);
+
+  const theLabel = (() => {
+    if (label !== null && label !== undefined) {
+      return label;
+    }
+
+    if (label === null) {
+      return null;
+    }
+
+    return i18nKey && t(i18nKey);
+  })();
 
   return (
     <button
@@ -27,17 +72,20 @@ const SquareBtn = (props: Tprops) => {
       title="查尋單據"
       {...btnAttr}
       className={classNames(
-        scss[theme],
+        scss[sharp],
+        theme && scss[theme],
         disabled && scss.disabled,
         defaultIconColor && scss.defaultIconColor,
         className
       )}
     >
-      <Icon_fc_add2 />
-      {t('add')}
+      {Icon && <Icon {...attr_icon} />}
+      {theLabel !== null && theLabel !== undefined && <span {...attr_label}>{theLabel}</span>}
       {children}
     </button>
   );
 };
 
 export default SquareBtn;
+
+// ======================================================================
