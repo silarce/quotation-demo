@@ -1,0 +1,13 @@
+.title {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  > span {
+    font-size: 18px;
+    font-weight: 500;
+    color: theme("colors.main");
+  }
+}
+
+.table {
+}
