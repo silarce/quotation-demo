@@ -463,7 +463,13 @@ const sidePathList: TsidePathList = {
 
         {
           label: '收入作業',
-          erpFeature: [incomeBill],
+          erpFeature: [
+            incomeBill,
+            worksDepartment,
+            accountsReceivable,
+            worksDepartment_worksheet,
+            worksDepartment_deliveryList,
+          ],
           list: [
             {
               label: '會計收款管理',

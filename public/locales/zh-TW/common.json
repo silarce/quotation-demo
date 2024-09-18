@@ -7,5 +7,7 @@
     "gender": "性別",
     "species": "物種",
     "description": "描述"
-  }
+  },
+  "receipt": "單據",
+  "item": "品項"
 }
