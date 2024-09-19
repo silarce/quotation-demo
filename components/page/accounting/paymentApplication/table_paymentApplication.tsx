@@ -134,7 +134,13 @@ const DataRow = ({ indexNumber }: { indexNumber: React.ReactNode }) => {
   return (
     <Row>
       <Cell style={config_cell.panel.style}>
-        <TablePanel_basic disabled={disabled} setDisabled={setDisabled} onDelete={() => {}} />
+        <TablePanel_basic
+          disabled={disabled}
+          onEdit={() => {
+            setDisabled((prev) => !prev);
+          }}
+          onDelete={() => {}}
+        />
       </Cell>
       <Cell style={config_cell.indexNumber.style}>
         {config_cell.panel.label}

@@ -193,7 +193,8 @@ const BankRow = ({
         <TablePanel_basic
           //
           disabled={disabled}
-          setDisabled={setDisabled}
+          // setDisabled={setDisabled}
+          onEdit={() => setDisabled((prev) => !prev)}
           onConfirm={theOnConfifm}
           showEdit={!isNew}
         />
