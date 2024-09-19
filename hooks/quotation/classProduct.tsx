@@ -4827,6 +4827,12 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
   // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
 
   const defaultMotorSpecs = motors[defaultMotorIndex];
+
+  // 待W2的defaultMotorSpecs.hp改為''後，把這個判斷拿掉
+  if (defaultMotorSpecs.hp === 'N/A') {
+    defaultMotorSpecs.hp = '';
+  }
+
   const defaultMotorBox: TdoorGeneralSpecsMotorBoxDto | undefined = defaultMotorSpecs.box;
 
   let defaultMotorVendor: string | undefined | null;
