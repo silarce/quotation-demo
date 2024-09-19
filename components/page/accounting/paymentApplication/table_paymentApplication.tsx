@@ -75,7 +75,7 @@ export default function Table_paymentApplication({ className }: { className?: st
         <SquareBtn label="查詢應付帳款" sharp="long" />
       </div>
       <div className={scss.table}>
-        <Row className={scss.thead} thead={true}>
+        <Row className={scss.thead} thead={true} preStyle="style01">
           <Cell style={config_cell.panel.style}></Cell>
           <Cell style={config_cell.indexNumber.style}></Cell>
 
@@ -132,13 +132,14 @@ const DataRow = ({ indexNumber }: { indexNumber: React.ReactNode }) => {
   }, [disabled]);
 
   return (
-    <Row>
+    <Row preStyle="style01">
       <Cell style={config_cell.panel.style}>
         <TablePanel_basic
           disabled={disabled}
           onEdit={() => {
             setDisabled((prev) => !prev);
           }}
+          onConfirm={() => {}}
           onDelete={() => {}}
         />
       </Cell>
@@ -252,7 +253,7 @@ const config_inputSel: Tconfig_inputSel = {
   立帳單號: ({ state, setState, disabled }) => {
     const props: TinputSelProps = {
       showBaseline: 'invisible',
-      node: state.立帳單號,
+      node: <div className="text-center">{state.立帳單號}</div>,
     };
 
     return props;
@@ -261,7 +262,7 @@ const config_inputSel: Tconfig_inputSel = {
   來源單號: ({ state, setState, disabled }) => {
     const props: TinputSelProps = {
       showBaseline: 'invisible',
-      node: state.來源單號,
+      node: <div className="text-center">{state.來源單號}</div>,
     };
 
     return props;
@@ -288,6 +289,7 @@ const config_inputSel: Tconfig_inputSel = {
     const props: TinputSelProps = {
       inputProps: {
         props: {
+          className: 'text-right',
           type,
           value,
           onChange: (e) => {
@@ -306,6 +308,7 @@ const config_inputSel: Tconfig_inputSel = {
     const props: TinputSelProps = {
       inputProps: {
         props: {
+          className: 'text-right',
           type,
           value,
           onChange: (e) => {
@@ -321,7 +324,7 @@ const config_inputSel: Tconfig_inputSel = {
   發票號碼: ({ state, setState, disabled }) => {
     const props: TinputSelProps = {
       showBaseline: 'invisible',
-      node: state.發票號碼,
+      node: <div className="text-center">{state.發票號碼}</div>,
     };
 
     return props;
@@ -333,6 +336,7 @@ const config_inputSel: Tconfig_inputSel = {
     const props: TinputSelProps = {
       inputProps: {
         props: {
+          className: 'text-right',
           type,
           value,
           onChange: (e) => {
@@ -347,9 +351,8 @@ const config_inputSel: Tconfig_inputSel = {
 
   摘要說明: ({ state, setState, disabled }) => {
     const props: TinputSelProps = {
-      inputProps: {
+      textareaProps: {
         props: {
-          type: 'text',
           value: state.摘要說明,
           onChange: (e) => {
             setState((state) => ({ ...state, 摘要說明: e.target.value }));

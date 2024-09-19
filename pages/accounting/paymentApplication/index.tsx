@@ -36,7 +36,7 @@ const BtnBar = ({ className }: { className?: string }) => {
       <div>
         <SquareBtn content="search" />
       </div>
-      <div>
+      <div className="flex gap-1">
         <SquareBtn content="save" />
         <SquareBtn content="cancel" />
       </div>
