@@ -1415,7 +1415,7 @@ const quotationProductToProd = ({ quotationProduct }: { quotationProduct: Tquota
     voltage: String(quotationProduct.motorVoltage),
     motorSupport: quotationProduct.hasMotorSupportStand ?? false,
     doorTrackThick: String(quotationProduct.guideRailThickness),
-    rollUpBoxThick: String(quotationProduct.headBoxThickness),
+    rollUpBoxThick: String(quotationProduct.headBoxThickness || 0),
     // 取得時是mm，要轉成m
     WG: String(Number(quotationProduct.WG) / 1000),
     fullWidth: String(Number(quotationProduct.fullWidth) / 1000),
