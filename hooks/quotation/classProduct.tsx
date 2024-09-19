@@ -723,7 +723,12 @@ class Class_product {
       isNew,
     });
 
-    this.subComList = { distributionBox, installationFee };
+    if (this.isW2) {
+      this.subComList = { distributionBox };
+    } else {
+      this.subComList = { distributionBox, installationFee };
+    }
+
     this.reRender();
   } // creSubComList
 
@@ -2190,9 +2195,14 @@ class Class_product {
   }
 
   toGetInstallationFee() {
+    const installationFee_class = this.subComList.installationFee;
+
+    if (!installationFee_class) {
+      return '0';
+    }
+
     const m2 = Number(this.subComList.installationFee?.quantity || '0');
     const doorType = this.doorType;
-    const installationFee_class = this.subComList.installationFee;
     const fee = getInstallationFee({
       doorModel: doorType,
       m2,
@@ -4070,10 +4080,10 @@ class Class_product {
       distributionBoxTotalPrice: Number(this.subComList.distributionBox?.totalPrice ?? 0),
 
       installationFeePrice: Number(this.subComList.installationFee?.price) ?? 0,
-      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? 0,
-      installationFeeQuantity: this.subComList.installationFee?.quantity ?? 0,
+      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? '0',
+      installationFeeQuantity: this.subComList.installationFee?.quantity ?? '0',
       installationFeeUnitPrice: Number(this.subComList.installationFee?.unitPrice ?? 0),
-      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? 0,
+      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? '0',
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
 
