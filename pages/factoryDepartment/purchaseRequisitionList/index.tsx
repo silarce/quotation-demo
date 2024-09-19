@@ -666,11 +666,9 @@ export default function PurchaseRequisitionList() {
 
     //打開詢價單modal
     const prQuotereqModalOpen = async (item: any) => {
-        console.log(item);
         setSelectedsupplier(item.quotereqdetailuuid);
-
         setPurchaserequisitiondetailuuid(item.purchaserequisitiondetailuuid);
-        // return;
+
         //清空
         prquotereqadddata.quoterequuid = "";
         prquotereqadddata.quotereqid = "";
@@ -685,15 +683,11 @@ export default function PurchaseRequisitionList() {
         prquotereqadddata.quoterequuid = item.quoterequuid;
         prquotereqadddata.quotereqid = item.quotereqid;
 
-
         setQuotereqname(item.name);
         setQuotereqspec(item.spec);
         setQuotereqquantity(item.quantity);
-        // getQuotereqDetail(item.quoterequuid);
         getQuotereqDetail(item.productid);
         setPrquotereqmodalopen(true);
-        // setProductSearchmodalopen(true)
-        // setPrquotereqmodalopen(true);
     }
 
     //關閉詢價單modal
@@ -747,13 +741,6 @@ export default function PurchaseRequisitionList() {
 
     const UpdatePurchaserequisitionDetail = async (item: any) => {
         try {
-            console.log(item);
-            // console.log(item.id);
-            // console.log(quotereqquantity);
-            // console.log((parseInt(item.unitprice) * parseInt(quotereqquantity)).toString());
-
-            // return;
-
             const conditionModel = {
                 purchaserequisitiondetailuuid: purchaserequisitiondetailuuid,
                 unitprice: item.detail_unitprice,
@@ -1095,7 +1082,7 @@ export default function PurchaseRequisitionList() {
         try {
             setReviewflowdata([]);
             setReviewflowdata2([]);
-            setIsLoading(true);
+            // setIsLoading(true);
 
             const conditionModel = {
                 document_uuid: document_uuid
@@ -1139,7 +1126,7 @@ export default function PurchaseRequisitionList() {
         } catch (error: any) {
             setError(error.message);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -1304,7 +1291,7 @@ export default function PurchaseRequisitionList() {
 
     const GetReviewHistory = async (id: any) => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             // alert(purchaserequisitionidin);
             const conditionModel = {
                 // username: userInfo?.username
@@ -1341,7 +1328,7 @@ export default function PurchaseRequisitionList() {
             console.log(error);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     }
     //#endregion
@@ -1356,8 +1343,6 @@ export default function PurchaseRequisitionList() {
     }
 
     const handleCheckboxChange = (item: any) => {
-        console.log(item);
-        // return;
         // 更新選中的供應商
         setLastselectedsupplier(selectedsupplier);
         setSelectedsupplier(item.detail_id);
@@ -1384,14 +1369,41 @@ export default function PurchaseRequisitionList() {
     };
 
     const tabChosed = (tabName: string) => {
-        setTabnow(tabName); // 設置當前 tab 值
+        setTabnow(tabName);
         setTabshow(tabName);
-        // 直接使用 tabName 而不是 tabnow
     };
 
     //#endregion
 
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
+
+    const handleChangePurchaseRequisition = (item: any) => {
+        handleRowClick(item.purchaserequisitionid);
+        getPurchaseRequisitionDetail(item.purchaserequisitionuuid);
+        setPurchaserequisitionidin(item.purchaserequisitionid as string);
+        setPurchaserequisitionuuidin(item.purchaserequisitionuuid as string);
+        setCreate_atin(item.create_at as string);
+        setCreate_byin(item.create_by as string);
+        setApprovedin(item.approved as string);
+        setStatusin(item.status as string);
+        setData2([]);
+        setNeed_datein(item.need_date as string);
+        setNotein(item.note as string);
+        GetReviewById(item.purchaserequisitionuuid);
+        GetReviewHistory(item.purchaserequisitionid as string);
+
+    }
+
+    const handleChangePurchaseRequisition2 = (item: any, event: React.MouseEvent) => {
+        event.stopPropagation();
+        setSearchmodalopen(false);
+    }
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1414,7 +1426,6 @@ export default function PurchaseRequisitionList() {
                                         caption="請購日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
                                                 value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
@@ -2244,7 +2255,27 @@ export default function PurchaseRequisitionList() {
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
-                            <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {searchdata && (
+                                searchdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader15}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => { setTimeout(() => { handleChangePurchaseRequisition(_item) }, 200); }}
+                                            onDoubleClick={(event) => { handleChangePurchaseRequisition2(_item, event) }}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.purchaserequisitionid}</span>
+                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                                                {_item.status}
+                                            </span>
+                                            <span>{_item.note}</span> </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+
+
                         </div>
 
                     </div>

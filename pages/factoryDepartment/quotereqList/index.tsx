@@ -1264,6 +1264,49 @@ export default function AddPurchaseOrder() {
 
     const handlechangepo = (item: any) => {
         console.log(item);
+        // handleRowClick(item.id);
+        setData2([]);
+        setQuotereqid(item.quotereqid);
+        setQuoterequuid(item.id);
+        setStatus(item.status);
+        setNote(item.note);
+        setCreate_atin(item.create_at);
+        setNeed_date(item.need_date);
+        setSuppliernamein(item.suppliername);
+        setSupplierphonein(item.supplierphone);
+        setSuppliertaxidin(item.suppliertaxid);
+        setSupplieraddressin(item.supplieraddress);
+        setShippingaddressin(item.shippingaddress);
+        setSuppliername2in(item.suppliername2);
+        setSupplierphone2in(item.supplierphone2);
+        setSuppliertaxid2in(item.suppliertaxid2);
+        setSupplieraddress2in(item.supplieraddress2);
+        setSuppliername3in(item.suppliername3);
+        setSupplierphone3in(item.supplierphone3);
+        setSuppliertaxid3in(item.suppliertaxid3);
+        setSupplieraddress3in(item.supplieraddress3);
+        switch (tabnow) {
+            case "廠商1":
+                setHandinputsuppliername(item.suppliername);
+                break;
+            case "廠商2":
+                setHandinputsuppliername(item.suppliername2);
+                break;
+            case "廠商3":
+                setHandinputsuppliername(item.suppliername3);
+                break;
+            default:
+                break;
+        }
+
+
+        getQuotereqDetail(item.id);
+        setSearchmodalopen(false);
+
+    }
+
+    const handlechangepo2 = (item: any) => {
+        console.log(item);
         handleRowClick(item.id);
         setData2([]);
         setQuotereqid(item.quotereqid);
@@ -1301,8 +1344,9 @@ export default function AddPurchaseOrder() {
 
 
         getQuotereqDetail(item.id);
-
     }
+
+
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const handleRowClick = (itemId: string) => {
@@ -1806,9 +1850,9 @@ export default function AddPurchaseOrder() {
                                     價格
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="列印">
+                                <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="Excel">
                                     <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    Excel
+                                    詢價
                                 </button>
                             </div>
                             <div>
@@ -2441,6 +2485,19 @@ export default function AddPurchaseOrder() {
                                             />
                                         </span>
                                         <span>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                type="text"
+                                                value={_item.detail_note !== undefined ? _item.detail_note : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "note", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
                                             &nbsp;&nbsp;&nbsp;
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
@@ -2461,7 +2518,7 @@ export default function AddPurchaseOrder() {
 
 
                             <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
-                            {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
+                                {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
@@ -2551,21 +2608,20 @@ export default function AddPurchaseOrder() {
                                         onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
                                     />
                                 </div>
-
-                                {/* <div>
-                                    <input
-                                        type="text"
-                                        placeholder='備註'
-                                        value={handinputnote}
-                                        onChange={(e) => setHandinputnote(e.target.value)}
-                                    />
-                                </div> */}
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='廠商'
                                         value={handinputsuppliername}
                                     // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='備註'
+                                        value={handinputnote}
+                                        onChange={(e) => setHandinputnote(e.target.value)}
                                     />
                                 </div>
                                 <div>
@@ -2864,7 +2920,7 @@ export default function AddPurchaseOrder() {
                                             color: '#14256a'
                                         }}
                                     >
-                                        <option value="">請選擇單據狀態</option> {/* 預設選項 */}
+                                        <option value="">全部</option> {/* 預設選項 */}
                                         <option value="已結案">已結案</option>
                                         <option value="未送出">未送出</option>
                                     </select>
@@ -2990,7 +3046,8 @@ export default function AddPurchaseOrder() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                            onClick={() => { handlechangepo(_item) }}>
+                                            onDoubleClick={() => { handlechangepo(_item) }}
+                                            onClick={() => { handlechangepo2(_item) }}>
                                             <span>{index + 1}</span>
                                             <span>{_item.quotereqid}</span>
                                             <span>{getTaiwanDateStr(_item.create_at)}</span>

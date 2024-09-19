@@ -377,9 +377,6 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   const handleRowClick = (itemId: string) => {
     setSelectedItemId(itemId);
   };
-
-
-
   if (type === "WareHouse") {
 
     return (

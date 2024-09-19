@@ -672,3 +672,37 @@ div.panelHeader13 {
     margin-right: 20px;
     margin-bottom: 5px;
 }
+
+//#region 採購單
+div.panelHeader10 {
+    border-bottom: solid 1px $colorBorder01;
+    
+    .row01,
+    .row02 {
+      padding-left: 20px;
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+  
+      .clientName,
+      .country {
+        color: $colorMain;
+      }
+    }
+  
+    .row01 {
+      display: grid;
+      grid-template-columns: 30px 100px 80px 50px 200px;
+      gap: 15px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+  
+    .selectedRow {
+      background-color: #ecf1ff;
+      /* 當前選擇項目的背景顏色 */
+    }
+  }
+  
+  //#endregion

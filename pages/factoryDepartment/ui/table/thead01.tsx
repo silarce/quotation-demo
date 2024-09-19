@@ -548,6 +548,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單價</span>
         <span>金額</span>
         <span>廠商</span>
+        <span>備註</span>
         <span></span>
       </div>
     )
