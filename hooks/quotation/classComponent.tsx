@@ -1218,6 +1218,8 @@ type Tkit = {
     | 'motorAccessories'
     | 'headBox'
     | 'middlePillar'
+    | 'backBone'
+    | 'middlePillar'
     | 'backBone';
   creDesc: (classCom: Class_component, options?: Toption[]) => string;
   options: Toption[];
@@ -1321,6 +1323,8 @@ const comTypeLookUp = {
   motor: 'motor',
   motorAccessories: 'motorAccessories',
   headBox: 'headBox',
+  middlePillar: 'middlePillar',
+  backBone: 'backBone',
 } as const;
 
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {

@@ -4573,6 +4573,8 @@ const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
     'motor',
     'motorAccessories',
     'sidePlate',
+    'middlePillar',
+    'backBone',
   ] as const;
 
   comArr.forEach((item) => {
