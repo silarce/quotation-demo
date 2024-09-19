@@ -771,6 +771,8 @@ class Class_product {
       //
       typhoonProtection: this._prodData.typhoonProtection,
       notes: this._prodData.notes,
+
+      close: this._prodData.close,
     };
 
     this._quantity = String(this._prodData.quantity);
