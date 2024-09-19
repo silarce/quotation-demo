@@ -2390,7 +2390,7 @@ class Class_product {
       options = options_surface;
     }
 
-    if (!isGalvanized && this.doorType !== 'SJ-305D') {
+    if (!isGalvanized && this.doorType !== 'SJ-305D' && !this.isW2) {
       options = options.filter((item) => {
         return item.value !== '無烤漆';
       });
