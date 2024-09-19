@@ -203,6 +203,10 @@ class Class_component {
   // ---------------------------------------------------------
 
   get options_material() {
+    if (this._prod.doorType === 'W2') {
+      return _.cloneDeep(this._prod.options_material ?? []);
+    }
+
     if (this.key === 'slat') {
       const copy = _.cloneDeep(this._prod.options_material ?? []);
 
