@@ -75,7 +75,7 @@ export default function Table_paymentApplication({ className }: { className?: st
         <SquareBtn label="查詢應付帳款" sharp="long" />
       </div>
       <div className={scss.table}>
-        <Row thead={true}>
+        <Row className={scss.thead} thead={true}>
           <Cell style={config_cell.panel.style}></Cell>
           <Cell style={config_cell.indexNumber.style}></Cell>
 
@@ -91,7 +91,7 @@ export default function Table_paymentApplication({ className }: { className?: st
         </Row>
 
         {Array.from({ length: 10 }).map((_, index) => {
-          return <DataRow key={index} />;
+          return <DataRow key={index} indexNumber={index + 1} />;
         })}
       </div>
     </div>
@@ -100,7 +100,7 @@ export default function Table_paymentApplication({ className }: { className?: st
 
 // ==============================================================================
 
-const DataRow = () => {
+const DataRow = ({ indexNumber }: { indexNumber: React.ReactNode }) => {
   const [disabled, setDisabled] = useState(true);
 
   const defaultState = useMemo(() => {
@@ -134,9 +134,12 @@ const DataRow = () => {
   return (
     <Row>
       <Cell style={config_cell.panel.style}>
-        <TablePanel_basic disabled={disabled} setDisabled={setDisabled} />
+        <TablePanel_basic disabled={disabled} setDisabled={setDisabled} onDelete={() => {}} />
       </Cell>
-      <Cell style={config_cell.indexNumber.style}>{config_cell.panel.label}</Cell>
+      <Cell style={config_cell.indexNumber.style}>
+        {config_cell.panel.label}
+        {indexNumber}
+      </Cell>
 
       {cellKeyArr.map((key) => {
         const { style } = config_cell[key];
@@ -171,11 +174,11 @@ const config_cell: Tconfig_cell = {
     style: { width: 80 },
   },
   indexNumber: {
-    style: { width: 50 },
+    style: { width: 30 },
   },
   沖銷: {
     label: '沖銷',
-    style: { width: 100 },
+    style: { width: 40 },
   },
   立帳單號: {
     label: '立帳單號',
@@ -215,7 +218,27 @@ const config_inputSel: Tconfig_inputSel = {
   panel: () => ({}),
   indexNumber: () => ({}),
   沖銷: ({ state, setState, disabled }) => {
-    const props: TinputSelProps = {};
+    const props: TinputSelProps = {
+      showBaseline: 'invisible',
+      wrapperStyle: {
+        width: 'fit-content',
+      },
+      checkBoxProps_v2: {
+        props: {},
+        checkBoxPropsArr: [
+          {
+            checked: state.沖銷,
+            onChange: (e) => {
+              const checked = e.target.checked;
+              setState((state) => ({
+                ...state,
+                沖銷: checked,
+              }));
+            },
+          },
+        ],
+      },
+    };
 
     return props;
   },
