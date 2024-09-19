@@ -7,10 +7,11 @@ const Row_pre = (
   props: React.HTMLAttributes<HTMLDivElement> & {
     thead?: boolean;
     fullWidth?: boolean;
+    preStyle?: 'style01';
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
-  const { thead, fullWidth } = props;
+  const { thead, fullWidth, preStyle } = props;
 
   const attributes = {
     ...props,
@@ -26,6 +27,7 @@ const Row_pre = (
       className={classNames(
         //
         scss.row,
+        preStyle && scss[preStyle],
         thead && scss.thead,
         fullWidth && scss.fullWidth,
         props.className
