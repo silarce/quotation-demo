@@ -115,7 +115,7 @@ function Table<Dto extends Tdto>({
   return (
     <div className={scss.table}>
       {/*  */}
-      <Row thead={true}>
+      <Row thead={true} className={scss.thead}>
         {keyArr.map((key) => {
           const { label, style } = config[key];
 
