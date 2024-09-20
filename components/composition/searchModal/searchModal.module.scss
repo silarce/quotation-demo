@@ -37,7 +37,8 @@
   }
 
   .btnBar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     justify-content: center;
   }
@@ -48,5 +49,14 @@
   .thead {
     position: sticky;
     top: 0;
+  }
+  .row {
+    cursor: pointer;
+    &:hover {
+      background-color: theme("colors.hoverBgc");
+    }
+    &.seleted {
+      background-color: theme("colors.chosenBgc");
+    }
   }
 }

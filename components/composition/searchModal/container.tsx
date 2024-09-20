@@ -1,24 +1,39 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import moment, { Moment } from 'moment';
+import { useState } from 'react';
+import classNames from 'classnames';
 
 // antd
 import { Spin } from 'antd';
 
+// gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import Row, { Cell } from 'components/global/gear/table/row';
 
-import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
-
+// hook
 import { useTranslation } from 'react-i18next';
 
 import scss from './searchModal.module.scss';
 
-import { useSearchModal_customer } from './useSearchModal_customer';
+import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig } from './types';
 
-import type { Tstate, Tconfig_filter, Tdto, Tconfig } from './types';
+// ============================================================================
 
-export default function Container() {
+interface TdtoDirc<Dto extends Tdto> {
+  [id: string]: Dto;
+}
+
+// ============================================================================
+export default function Container<Dto extends Tdto>({
+  useSearchModal,
+  onRowClick,
+  onConfirm,
+}: {
+  useSearchModal: () => TuseSearchModal<Dto>;
+  onRowClick?: (dto: Dto) => void;
+  onConfirm?: (dtoDirc: TdtoDirc<Dto>) => void;
+}) {
+  const [dtoDirc, setDtoDirc] = useState<TdtoDirc<Dto>>({});
+
   const {
     inputSelPropsArr,
     clearFilter,
@@ -30,9 +45,33 @@ export default function Container() {
     isLoading,
     dataConfig,
     dataKeyArr,
-  } = useSearchModal_customer();
+  } = useSearchModal();
 
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
+
+  const onSelect = (dto: Dto) => {
+    const id = dto.id;
+
+    setDtoDirc((prev) => {
+      const copy = { ...prev };
+
+      if (id in copy) {
+        delete copy[id];
+      } else {
+        copy[id] = dto;
+      }
+
+      return copy;
+    });
+  };
+
+  const checkSelected = (dto: Dto) => {
+    return dto.id in dtoDirc;
+  };
+
+  const onSelectedConfirm = () => {
+    onConfirm?.(dtoDirc);
+  };
 
   return (
     <div className={scss.container}>
@@ -45,7 +84,12 @@ export default function Container() {
         </span>
       </div>
       <div className={scss.left}>
-        <Filter inputSelPropsArr={inputSelPropsArr} onConfirm={confirmFilter} onClear={clearFilter} />
+        <Filter
+          inputSelPropsArr={inputSelPropsArr}
+          onSearch={confirmFilter}
+          onClear={clearFilter}
+          onSelectedConfirm={onSelectedConfirm}
+        />
       </div>
       <div className={scss.right}>
         <Spin spinning={isLoading} delay={300}>
@@ -54,9 +98,11 @@ export default function Container() {
             viewRef={viewRef}
             keyArr={dataKeyArr}
             config={dataConfig}
-            onDoubleClick={(dto) => {
-              console.log(dto);
+            onRowClick={(dto) => {
+              onRowClick?.(dto);
+              onSelect(dto);
             }}
+            checkSelected={checkSelected}
           />
         </Spin>
       </div>
@@ -68,14 +114,16 @@ export default function Container() {
 
 const Filter = ({
   inputSelPropsArr,
-  onConfirm,
+  onSearch,
   onClear,
+  onSelectedConfirm,
 }: {
   inputSelPropsArr: TinputSelProps[];
-  onConfirm: () => void;
+  onSearch: () => void;
   onClear: () => void;
+  onSelectedConfirm: () => void;
 }) => {
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
 
   return (
     <div className={scss.filter}>
@@ -87,7 +135,17 @@ const Filter = ({
 
       <div className={scss.btnBar}>
         <SquareBtn label={t('clearConditions')} sharp="long" type="button" onClick={onClear} />
-        <SquareBtn label={t('search')} sharp="long" type="submit" onClick={onConfirm} />
+        <SquareBtn label={t('search')} sharp="long" type="submit" onClick={onSearch} />
+
+        {onSelectedConfirm && (
+          <SquareBtn
+            className={'col-span-2'}
+            label={t('confirm')}
+            sharp="long"
+            type="submit"
+            onClick={onSelectedConfirm}
+          />
+        )}
       </div>
     </div>
   );
@@ -102,7 +160,9 @@ function Table<Dto extends Tdto>({
   keyArr,
   config,
   //
-  onDoubleClick,
+  onRowClick: onClick,
+  //
+  checkSelected,
 }: {
   dataArr: Dto[];
   viewRef?: (node?: Element | null) => void;
@@ -110,7 +170,9 @@ function Table<Dto extends Tdto>({
   keyArr: (keyof Tconfig<Dto>)[];
   config: Tconfig<Dto>;
   //
-  onDoubleClick: (dto: Dto) => void;
+  onRowClick?: (dto: Dto) => void;
+  //
+  checkSelected: (dto: Dto) => boolean;
 }) {
   return (
     <div className={scss.table}>
@@ -130,10 +192,19 @@ function Table<Dto extends Tdto>({
       {dataArr.map((data, index) => {
         const { id } = data;
 
-        const ref = index === dataArr.length - 5 ? viewRef : undefined;
+        const ref = index === dataArr.length - 6 ? viewRef : undefined;
+
+        const isSelected = checkSelected(data);
 
         return (
-          <Row key={id} ref={ref} onDoubleClick={() => onDoubleClick(data)}>
+          <Row
+            key={id ?? index}
+            ref={ref}
+            className={classNames(scss.row, isSelected && scss.seleted)}
+            onClick={() => {
+              onClick?.(data);
+            }}
+          >
             {keyArr.map((key) => {
               let value = data[key] as string | number | null | undefined | React.ReactNode;
               const { style, reducer } = config[key];

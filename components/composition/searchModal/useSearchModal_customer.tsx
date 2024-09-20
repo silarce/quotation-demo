@@ -190,3 +190,4 @@ const useConfig_filter = () => {
 // ============================================================================
 
 export { useSearchModal_customer };
+export type { TcustomerDto };
