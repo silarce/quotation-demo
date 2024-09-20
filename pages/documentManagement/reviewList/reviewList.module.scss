@@ -99,36 +99,21 @@
     grid-template-columns: 500px 400px 500px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
-    margin-top: 5px;
+    // margin-top: 5px;
     //   margin-left: 20px;
     //   margin-right: 20px;
-    padding-bottom: 5px;
+    // padding-bottom: 5px;
     // border-bottom: 1px solid rgb(214, 214, 214);
 
     div {
         margin-right: 20px;
     }
-
-    // background-color: gray;
 }
 
 .head_content1 {
-    // display: grid;
-    // grid-template-columns: 1fr 1fr 1fr 1fr;
-    // width: auto;
-    // margin-top: 5px;
-    // margin-left: 20px;
-    // margin-right: 20px;
-
-    // div {
-    //     margin-right: 20px;
-    // }
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-
     width: auto;
-    // margin-left: 20px;
     margin-right: 20px;
     padding-right: 20px;
 }

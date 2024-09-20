@@ -615,9 +615,6 @@ export default function ReviewList() {
         }
         setTabnow(tabName);
         setTabshow(tabName);
-
-
-
         setReviewtype('');
         setSelectedItemId('');
         setData2([]);
@@ -642,7 +639,6 @@ export default function ReviewList() {
         setKeyword2('');
         setKeyword3('');
         setKeyword4('');
-
     }
 
     const handleReviewConfirm = async () => {
@@ -656,9 +652,6 @@ export default function ReviewList() {
                 review_memo: review_memo,
                 review_id: currentreview_id
             };
-
-
-
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
@@ -755,7 +748,7 @@ export default function ReviewList() {
 
 
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-            {/* {data.length > 0 && (
+                {/* {data.length > 0 && (
                 <button onClick={()=>{router.push( `/documentManagement/reviewList`)}}>
                     <span style={{
                         position: 'fixed', // 使用 fixed 讓元素懸浮在視窗
@@ -792,11 +785,9 @@ export default function ReviewList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                        <div>
                             <div className={scss.head_head1}>
-                                <div>
-                                    審核id:{currentreview_id}
-                                </div>
+                                <div></div>
                                 <div></div>
                                 <div></div>
                                 <div></div>
@@ -1044,7 +1035,7 @@ export default function ReviewList() {
                                     </button>
                                 </div>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => {handleReviewRejected() }} title="駁回"
+                                    <button className={scss.longsquarebtn} onClick={() => { handleReviewRejected() }} title="駁回"
                                         style={{ color: `${(tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? '#5b5a5ad6' : '#14256a'}` }}>
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回

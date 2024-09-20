@@ -238,6 +238,7 @@ export default function PurchaseOrderList() {
                 setShippingaddressin(data[0].shippingaddress);
                 setQuoterequuidin(data[0].quoterequuid);
                 GetReviewById(data[0].purchaseorderuuid);
+                GetReviewHistory(data[0].purchaseorderuuid);
             }
         } catch (error: any) {
             setError(error.message);
@@ -880,6 +881,7 @@ export default function PurchaseOrderList() {
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
     const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
 
     //取全部的自訂流程
     const GetReviewFlow = async () => {
@@ -1131,6 +1133,45 @@ export default function PurchaseOrderList() {
             }
         });
     }
+
+    const GetReviewHistory = async (id: any) => {
+        try {
+            const conditionModel = {
+                id: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
     //#endregion
 
     const handleGoToAddPO = () => {
@@ -1148,7 +1189,8 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 id: id,
                 type: 'purchaseorder',
-                type2: type2
+                type2: type2,
+                quoterequuid: quoterequuidin
             };
 
             const inputModel = {
@@ -1215,6 +1257,7 @@ export default function PurchaseOrderList() {
         setStatusin(item.status as string);
         setShippingaddressin(item.shippingaddress as string);
         GetReviewById(item.purchaseorderuuid);
+        GetReviewHistory(item.purchaseorderuuid);
     }
 
     const handleChangePurchaseOrder2 = (item: any, event: React.MouseEvent) => {
@@ -1229,6 +1272,23 @@ export default function PurchaseOrderList() {
         setSelectedItemId(itemId);
     };
 
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("單據明細");
+    const [tabshow, setTabshow] = useState<string>("單據明細");
+
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName);
+        setTabshow(tabName);
+    };
+
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1412,7 +1472,6 @@ export default function PurchaseOrderList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1511,22 +1570,6 @@ export default function PurchaseOrderList() {
                                         />
                                     </div>
                                 </div>
-                                <div className={scss.head_content3}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_content4}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_foot1}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
                             </div>
                             <div>
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
@@ -1566,91 +1609,135 @@ export default function PurchaseOrderList() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className={scss.head_foot2}>
+                        <div className={scss.head_tab}>
+                            <div>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('單據明細')}
+                                        style={getButtonStyle('單據明細')}
+                                    >
+                                        單據明細
+                                    </button>
+                                </span>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('審核明細')}
+                                        style={getButtonStyle('審核明細')}
+                                    >
+                                        審核明細
+                                    </button>
+                                </span>
+                            </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}></div>
                         </div>
-                        <div className={scss.body_content1}>
-                            <Thead01 type={'PurchaseOrderDetail'} />
-                            {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {data1 && (
-                                data1.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader11}>
-                                        <div className={scss.row01}>
-                                            <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                            {/* <span>{_item.quantity}</span> */}
-                                            <span>
-                                                <input
-                                                    ref={quantityRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '60px' }}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                    type="text"
-                                                    maxLength={9}
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        const newData = [...data1];
-                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                        newData[index] = {
-                                                            ...newData[index],
-                                                            quantity: newQuantity,
-                                                            totalprice: newQuantity * newData[index].unitprice
-                                                        };
-                                                        setData1(newData);
-                                                        // handleChange(index, "quantity", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>{_item.unit}</span>
-                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
-                                            <span>
-                                                <input
-                                                    ref={unitpriceRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '80px' }}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
-                                                    type="text"
-                                                    maxLength={8}
-                                                    value={_item.unitprice.toLocaleString()}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        const newData = [...data1];
-                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                        newData[index] = {
-                                                            ...newData[index],
-                                                            unitprice: newUnitPrice,
-                                                            totalprice: newUnitPrice * newData[index].quantity
-                                                        };
-                                                        setData1(newData);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span>
-                                                <button
-                                                    style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
-                                                    onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
-                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
-                                                </button>
-                                                <button
-                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
-                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                </button>
-
-
-                                            </span>
-                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                        <div className={scss.tabbody}>
+                            <div >
+                                <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                        <div >
+                                            <Thead01 type={'PurchaseOrderDetail'} />
+                                            {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                                            {data1 && (
+                                                data1.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader11}>
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.productid}</span>
+                                                            <span>{_item.name}</span>
+                                                            <span>{_item.spec}</span>
+                                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                                            {/* <span>{_item.quantity}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '60px' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    maxLength={9}
+                                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            quantity: newQuantity,
+                                                                            totalprice: newQuantity * newData[index].unitprice
+                                                                        };
+                                                                        setData1(newData);
+                                                                        // handleChange(index, "quantity", e.target.value);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.unit}</span>
+                                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '80px' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
+                                                                    type="text"
+                                                                    maxLength={8}
+                                                                    value={_item.unitprice.toLocaleString()}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            unitprice: newUnitPrice,
+                                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                                            <span>
+                                                                <button
+                                                                    style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
+                                                                    onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
+                                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+                                                                <button
+                                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+                                                            </span>
+                                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
                                         </div>
-                                    </CellWithBar>
-                                ))
-                            )}
+                                    </div>
+                                </div>
+                                <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ReviewHistory'} />
+                                            {reviewhistroydata && (
+                                                reviewhistroydata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader18} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.document_status}</span>
+                                                            <span>{_item.current_stage}</span>
+                                                            <span>{_item.review_person}</span>
+                                                            <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <br />
                         <div className={scss.body_foot1}>
                             <div>

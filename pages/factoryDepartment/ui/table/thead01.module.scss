@@ -481,7 +481,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 250px 30px;
+  grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 300px 30px;
   // gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -491,9 +491,9 @@
     margin: auto;
     margin-left: 0;
 
-    &:nth-last-of-type(1) {
-      margin-left: auto;
-    }
+    // &:nth-last-of-type(1) {
+    //   margin-left: auto;
+    // }
   }
 
   >span {

@@ -238,7 +238,6 @@ export default function PurchaseRequisitionList() {
                 username: userInfo?.username
             };
 
-
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
@@ -253,9 +252,6 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-
-
-
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
@@ -1365,7 +1361,8 @@ export default function PurchaseRequisitionList() {
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
-        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
     };
 
     const tabChosed = (tabName: string) => {
@@ -1409,80 +1406,10 @@ export default function PurchaseRequisitionList() {
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === false ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1000
-                        }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="請購日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購單號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
-                                </div>
-                                <div>
-                                    <Thead01 type={'PurchaseRequisition'} />
-                                </div>
-                            </form>
-
-                        </div>
-                        {/* <hr /> */}
-                        <div>
-                            {/* <Thead01 type={'PurchaseRequisition'} /> */}
-                            <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                        </div>
-                    </div>
-                </div>
-
                 <div className={scss.right}>
-
                     <div className={scss.content}>
                         <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button> */}
                                 <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     查詢
@@ -1498,23 +1425,8 @@ export default function PurchaseRequisitionList() {
                                     列印
                                 </button>
                                 &nbsp;
-
                             </div>
-                            <div>
-                                {/* <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("核准") }} title="單據核准">
-                                    <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    核准
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentToReview("駁回") }} title="單據核准">
-                                    <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    駁回
-                                </button> */}
-                                {/* <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPR() }} title="新增單據">
-                                    <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button> */}
-                            </div>
+                            <div></div>
                             <div></div>
                             <div>
                                 <button
@@ -1631,8 +1543,6 @@ export default function PurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        {/* {review_flow}
-                                        {statusin} */}
                                     </div>
                                     <div></div>
                                 </div>
@@ -1651,38 +1561,6 @@ export default function PurchaseRequisitionList() {
                                     </div>
                                     <div></div>
                                     <div></div>
-                                </div>
-                                <div className={scss.head_content3}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_foot1}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div style={{ textAlign: 'right' }}>
-
-                                        {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
-                                </span>
-                                <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
-                                    <button className={scss.disabledbtn} onClick={() => { myAlert.warning({ title: '詢價尚未完成' }) }}>送出審核</button>
-                                </span>
-                                <span style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { sentPRToReview("核准") }}>核准</button>
-                                </span>
-                                &nbsp;
-                                <span style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}>
-                                    <button className={scss.greenbutton} onClick={() => { sentPRToReview("駁回") }}>駁回</button>
-                                </span>
-                                <span style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { sentPRToReview("結案") }}>結案</button>
-                                </span>
-                                <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>已結案</button>
-                                </span> */}
-                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -1726,12 +1604,6 @@ export default function PurchaseRequisitionList() {
 
                         <div className={scss.head_tab}>
                             <div>
-                                {/* <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
-                                    詢價紀錄
-                                </button>
-                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
-                                    詢價紀錄
-                                </button> */}
                                 <span>
                                     <button
                                         className={scss.detailminitabbtn}
@@ -1756,7 +1628,7 @@ export default function PurchaseRequisitionList() {
                         <div className={scss.tabbody}>
                             <div>
                                 <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
-                                    <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                                         <div>
                                             <Thead01 type={'PurchaseRequisitionDetail'} />
                                             {data1 && (
@@ -1769,17 +1641,14 @@ export default function PurchaseRequisitionList() {
                                                             <span>{_item.spec}</span>
                                                             <span>{_item.quantity}</span>
                                                             <span>{_item.unit}</span>
-                                                            {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
                                                             <span>
-                                                                {/* <IconDetail onClick={() => prQuotereqModalOpen(_item)} /> */}
-                                                                {/* icon_fc_quotereq */}
                                                                 <button
                                                                     onClick={() => {
                                                                         if (viewtype !== 'review') {
                                                                             prQuotereqModalOpen(_item);
                                                                         }
                                                                     }}
-                                                                    disabled={_item.reviewtype === 'review'} // 如果 reviewtype 是 'review'，禁用按鈕
+                                                                    disabled={_item.reviewtype === 'review'}
                                                                 >
                                                                     <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                                                 </button>
@@ -1796,7 +1665,7 @@ export default function PurchaseRequisitionList() {
                                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                                 </button>
                                                             </span>
-                                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                            <span title={_item.note}>{_item.note}</span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))
@@ -1805,8 +1674,8 @@ export default function PurchaseRequisitionList() {
                                     </div>
                                 </div>
                                 <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
-                                    <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
-                                        <div>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
                                             <Thead01 type={'ReviewHistory'} />
                                             {reviewhistroydata && (
                                                 reviewhistroydata.map((_item: any, index: number) => (

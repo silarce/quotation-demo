@@ -1710,31 +1710,27 @@ export default function AddPurchaseOrder() {
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
-        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
     };
 
     const tabChosed = (tabName: string) => {
         setTabnow(tabName); // 設置當前 tab 值
         setTabshow(tabName);
-        // 直接使用 tabName 而不是 tabnow
         switch (tabName) {
             case "廠商1":
                 setHandinputsuppliername(suppliernamein);
-                // alert(suppliernamein);
                 break;
             case "廠商2":
                 setHandinputsuppliername(suppliername2in);
-                // alert(suppliername2in);
                 break;
             case "廠商3":
                 setHandinputsuppliername(suppliername3in);
-                // alert(suppliername3in); // 應該改成 suppliername3in
                 break;
             default:
                 break;
         }
 
-        setSelectedItemId(''); // 清空已選項目 ID
+        setSelectedItemId('');
     };
 
     //#endregion
@@ -1826,16 +1822,8 @@ export default function AddPurchaseOrder() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag='詢價單' panelList={panelList} />
-            {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
-                    <div></div>
-                    <div className={scss.content}>
-                        <div></div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
@@ -1856,10 +1844,6 @@ export default function AddPurchaseOrder() {
                                 </button>
                             </div>
                             <div>
-                                {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
-                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button> */}
                                 <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPO() }} title="新增單據">
                                     <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                     新增
@@ -1918,16 +1902,6 @@ export default function AddPurchaseOrder() {
                                         />
                                     </div>
                                     <div>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="詢價日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || ' ',
-                                                },
-                                            }}
-                                        /> */}
                                         <InputSel
                                             caption="詢價日期"
                                             className="global_tip_must"
@@ -2008,7 +1982,7 @@ export default function AddPurchaseOrder() {
                                     <div>
                                         <div style={{ display: `${tabshow === "廠商1" ? '' : 'none'}` }}>
                                             <div>
-                                                <div className={scss.head_content2} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
                                                     <div >
                                                         <InputSel
                                                             {...inputSelProps}
@@ -2086,7 +2060,7 @@ export default function AddPurchaseOrder() {
                                         </div>
                                         <div style={{ display: `${tabshow === "廠商2" ? '' : 'none'}` }}>
                                             <div>
-                                                <div className={scss.head_content2} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
                                                     <div >
                                                         <InputSel
                                                             {...inputSelProps}
@@ -2164,7 +2138,7 @@ export default function AddPurchaseOrder() {
                                         </div>
                                         <div style={{ display: `${tabshow === "廠商3" ? '' : 'none'}` }}>
                                             <div>
-                                                <div className={scss.head_content2} style={{ border: '1px solid #c1c1c1', padding: '0px 10px' }}>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
                                                     <div >
                                                         <InputSel
                                                             {...inputSelProps}
@@ -2567,7 +2541,7 @@ export default function AddPurchaseOrder() {
                                         onChange={(e) => {
                                             const quantity = parseInt(e.target.value) || 0;
                                             setHandinputquantity(quantity);
-                                            setHandinputtotalprice(quantity * handinputunitprice); // 同時更新總金額
+                                            setHandinputtotalprice(quantity * handinputunitprice);
                                         }}
                                     />
                                 </div>
@@ -2835,9 +2809,6 @@ export default function AddPurchaseOrder() {
                                     <span>
                                         <button className={scss.minibtn} onClick={(e) => { clearFilterData2(e) }}>清除條件</button>
                                     </span>
-                                    {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
                                 </div>
                             </form>
                         </div>
@@ -2864,17 +2835,13 @@ export default function AddPurchaseOrder() {
                                             <span>{_item.detail_unit}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                            <span>{_item.detail_suppliername}</span>
-                                            {/* <span>{_item.create_by}</span> */}
-                                            {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
-                                        </div>
+                                            <span>{_item.detail_suppliername}</span>                                        </div>
                                     </CellWithBar>
                                 ))
                             )}
                         </div>
 
                     </div>
-                    {/* </Modal> */}
                 </DragableModal>
 
                 <DragableModal
