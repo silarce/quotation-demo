@@ -9,5 +9,22 @@
     "description": "描述"
   },
   "receipt": "單據",
-  "item": "品項"
+  "item": "品項",
+  "customerNumber": "客戶編號",
+  "name": "姓名",
+  "name02": "名稱",
+  "nickname": "暱稱",
+  "type": "類型",
+  "type02": "類別",
+  "construction": "營造",
+  "firm": "協力廠商",
+  "propertyOwner": "業主",
+  "contractor": "事務所",
+  "indexNumber": "序號",
+  "indexNumber02": "序",
+  "createdAt": "建立時間",
+  "clearConditions": "清除條件",
+  "search": "搜尋",
+  "searchCriteria": "查找條件",
+  "count": "筆數"
 }

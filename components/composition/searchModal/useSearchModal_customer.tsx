@@ -43,6 +43,9 @@ const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
 const useData = (filter: Tstate) => {
   const params: Tparams = useMemo(() => {
     return {
+      pageSize: 20,
+      sort: 'customerNumber',
+      order: 'ASC',
       filter: {
         name: {
           $contains: filter.name,
@@ -50,6 +53,16 @@ const useData = (filter: Tstate) => {
         customerNumber: {
           $contains: filter.customerNumber,
         },
+        createdAt: (() => {
+          if (!filter.createdAt) {
+            return undefined;
+          } else {
+            return {
+              $gte: moment(filter.createdAt).startOf('day').toISOString(),
+              $lte: moment(filter.createdAt).endOf('day').toISOString(),
+            };
+          }
+        })(),
       },
     };
   }, [filter]);
@@ -72,12 +85,12 @@ const useData = (filter: Tstate) => {
 
 // =============================================================================
 const useConfig_data = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('common');
 
   const dataConfig = useMemo(() => {
     const config: Tconfig<TcustomerDto> = {
       indexNumber: {
-        label: '序',
+        label: t('indexNumber02'),
         style: {
           width: '50px',
         },
@@ -86,21 +99,44 @@ const useConfig_data = () => {
         },
       },
       customerNumber: {
-        label: '編號',
+        label: t('customerNumber'),
         style: {
           width: '200px',
         },
       },
       name: {
-        label: '名稱',
+        label: t('name02'),
         style: {
           width: '300px',
         },
       },
       nickname: {
-        label: '暱稱',
+        label: t('nickname'),
         style: {
           width: '200px',
+        },
+      },
+      type: {
+        label: t('type02'),
+        style: {
+          width: '200px',
+        },
+        reducer: ({ data }) => {
+          const types = data.types;
+          const arr = types.map(({ name }) => t(name));
+
+          const str = arr.join(', ');
+
+          return str;
+        },
+      },
+      createdAt: {
+        label: t('createdAt'),
+        style: {
+          width: '100px',
+        },
+        reducer: ({ data }) => {
+          return moment(data.createdAt).format('YYYY-MM-DD');
         },
       },
     };
@@ -108,57 +144,43 @@ const useConfig_data = () => {
     return config;
   }, [i18n.language]);
 
-  const dataKeyArr: string[] = ['indexNumber', 'customerNumber', 'name', 'nickname'];
+  const dataKeyArr: string[] = ['indexNumber', 'customerNumber', 'name', 'nickname', 'type', 'createdAt'];
 
   return { dataConfig, dataKeyArr };
 };
 
 // =============================================================================
 const useConfig_filter = () => {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation('common');
 
   return useMemo(() => {
     const config_filter: Tconfig_filter = [
       {
-        caption: '編號',
+        caption: t('customerNumber'),
         key: 'customerNumber',
         type: 'input',
       },
       {
-        caption: '名稱',
+        caption: t('name02'),
         key: 'name',
         type: 'input',
       },
-      // {
-      //   caption: 'T01',
-      //   key: 'T01',
-      //   type: 'input',
-      // },
-      // {
-      //   caption: 'T02',
-      //   key: 'T02',
-      //   type: 'input',
-      // },
-      // {
-      //   caption: 'T03',
-      //   key: 'T03',
-      //   type: 'input',
-      // },
-      // {
-      //   caption: 'T04',
-      //   key: 'T04',
-      //   type: 'select',
-      //   selectOptions: [
-      //     { value: '1', label: '1' },
-      //     { value: '2', label: '2' },
-      //     { value: '3', label: '3' },
-      //   ],
-      // },
-      // {
-      //   caption: 'T05',
-      //   key: 'T05',
-      //   type: 'date',
-      // },
+      {
+        caption: t('type02'),
+        key: 'type',
+        type: 'select',
+        selectOptions: [
+          { value: 'construction', label: t('construction') },
+          { value: 'firm', label: t('firm') },
+          { value: 'propertyOwner', label: t('propertyOwner') },
+          { value: 'contractor', label: t('contractor') },
+        ],
+      },
+      {
+        caption: t('createdAt'),
+        key: 'createdAt',
+        type: 'date',
+      },
     ];
 
     return config_filter;

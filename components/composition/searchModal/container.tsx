@@ -10,6 +10,8 @@ import Row, { Cell } from 'components/global/gear/table/row';
 
 import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
 
+import { useTranslation } from 'react-i18next';
+
 import scss from './searchModal.module.scss';
 
 import { useSearchModal_customer } from './useSearchModal_customer';
@@ -30,13 +32,17 @@ export default function Container() {
     dataKeyArr,
   } = useSearchModal_customer();
 
+  const { t, i18n } = useTranslation('common');
+
   return (
     <div className={scss.container}>
       <div>
-        <span>查找條件 : </span>
+        <span>{t('searchCriteria')} : </span>
       </div>
       <div>
-        <span>筆數 : 共{qty}筆</span>
+        <span>
+          {t('count')} : {qty}
+        </span>
       </div>
       <div className={scss.left}>
         <Filter inputSelPropsArr={inputSelPropsArr} onConfirm={confirmFilter} onClear={clearFilter} />
@@ -69,7 +75,7 @@ const Filter = ({
   onConfirm: () => void;
   onClear: () => void;
 }) => {
-  // -----------------------------------------------------------------------
+  const { t, i18n } = useTranslation('common');
 
   return (
     <div className={scss.filter}>
@@ -80,8 +86,8 @@ const Filter = ({
       </div>
 
       <div className={scss.btnBar}>
-        <SquareBtn label="清除條件" sharp="long" type="button" onClick={onClear} />
-        <SquareBtn label="搜尋" sharp="long" type="submit" onClick={onConfirm} />
+        <SquareBtn label={t('clearConditions')} sharp="long" type="button" onClick={onClear} />
+        <SquareBtn label={t('search')} sharp="long" type="submit" onClick={onConfirm} />
       </div>
     </div>
   );
