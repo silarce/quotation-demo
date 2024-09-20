@@ -110,7 +110,7 @@ const apiGetCustomers = (params?: Tparams) => {
   const api = '/customers';
 
   return axi
-    .get(api, { params })
+    .get<TgetCustomers>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
