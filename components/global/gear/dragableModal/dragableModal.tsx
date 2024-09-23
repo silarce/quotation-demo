@@ -171,7 +171,8 @@ const DragableModal = ({
         style={hanDleStyle}
       >
         {/* <span className={scss.text}>{handleText}</span> */}
-        {handleText}
+        <span>{handleText}</span>
+
         {showCross && (
           <Image
             //
