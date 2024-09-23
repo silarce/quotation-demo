@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import classNames from 'classnames';
+import { useState } from 'react';
 
 // antd
 import { Spin } from 'antd';
@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import scss from './searchModal.module.scss';
 
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig } from './types';
+import type { Tconfig, Tdto, TuseSearchModal } from './types';
 
 // ============================================================================
 
@@ -22,16 +22,37 @@ interface TdtoDirc<Dto extends Tdto> {
   [id: string]: Dto;
 }
 
-// ============================================================================
-export default function Container<Dto extends Tdto>({
-  useSearchModal,
-  onRowClick,
-  onConfirm,
-}: {
+interface Tprops<Dto extends Tdto = Tdto> {
   useSearchModal: () => TuseSearchModal<Dto>;
   onRowClick?: (dto: Dto) => void;
-  onConfirm?: (dtoDirc: TdtoDirc<Dto>) => void;
-}) {
+  // 在處理好防抖前，先不做doubleClick
+  // onRowDoubleClick?: (dto: Dto) => void;
+  onConfirm?: (dtoDirc: TdtoDirc<Dto>) => void; // 若為undefined，不會有確認按鈕
+  //
+  className?: string;
+  style?: React.CSSProperties;
+  className_filter?: string;
+  style_filter?: React.CSSProperties;
+  className_table?: string;
+  style_table?: React.CSSProperties;
+}
+
+type Tprops_refine<Dto extends Tdto = Tdto> = Omit<Tprops<Dto>, 'useSearchModal'>;
+
+// ============================================================================
+export default function SearchModal<Dto extends Tdto>({
+  useSearchModal,
+  onRowClick,
+  // onRowDoubleClick,
+  onConfirm,
+  //
+  className,
+  style,
+  className_filter,
+  style_filter,
+  className_table,
+  style_table,
+}: Tprops<Dto>) {
   const [dtoDirc, setDtoDirc] = useState<TdtoDirc<Dto>>({});
 
   const {
@@ -69,12 +90,14 @@ export default function Container<Dto extends Tdto>({
     return dto.id in dtoDirc;
   };
 
-  const onSelectedConfirm = () => {
-    onConfirm?.(dtoDirc);
-  };
+  const onSelectedConfirm = onConfirm
+    ? () => {
+        onConfirm(dtoDirc);
+      }
+    : undefined;
 
   return (
-    <div className={scss.container}>
+    <div className={classNames(scss.container, className)} style={style}>
       <div>
         <span>{t('searchCriteria')} : </span>
       </div>
@@ -89,6 +112,8 @@ export default function Container<Dto extends Tdto>({
           onSearch={confirmFilter}
           onClear={clearFilter}
           onSelectedConfirm={onSelectedConfirm}
+          className={className_filter}
+          style={style_filter}
         />
       </div>
       <div className={scss.right}>
@@ -102,7 +127,12 @@ export default function Container<Dto extends Tdto>({
               onRowClick?.(dto);
               onSelect(dto);
             }}
+            // onRowDoubleClick={(dto) => {
+            //   onRowDoubleClick?.(dto);
+            // }}
             checkSelected={checkSelected}
+            className={className_table}
+            style={style_table}
           />
         </Spin>
       </div>
@@ -117,16 +147,20 @@ const Filter = ({
   onSearch,
   onClear,
   onSelectedConfirm,
+  className,
+  style,
 }: {
   inputSelPropsArr: TinputSelProps[];
   onSearch: () => void;
   onClear: () => void;
-  onSelectedConfirm: () => void;
+  onSelectedConfirm: (() => void) | undefined;
+  className?: string;
+  style?: React.CSSProperties;
 }) => {
   const { t } = useTranslation('common');
 
   return (
-    <div className={scss.filter}>
+    <div className={classNames(scss.filter, className)} style={style}>
       <div className={scss.inputPanel}>
         {inputSelPropsArr.map((inputSelProps, index) => {
           return <InputSel key={index} {...inputSelProps} />;
@@ -160,22 +194,33 @@ function Table<Dto extends Tdto>({
   keyArr,
   config,
   //
-  onRowClick: onClick,
+  onRowClick,
+  onRowDoubleClick,
   //
   checkSelected,
+  //
+  className,
+  style,
 }: {
   dataArr: Dto[];
-  viewRef?: (node?: Element | null) => void;
+  // viewRef是react-intersection-observer的useInView的ref，可以不給
+  // 預期與createUseInfinite系列的hook搭配使用
+  // 如果api一次就取得所有的資料，那viewRef就沒有用處
+  viewRef?: (node?: Element | null) => void; // react-intersection-observer
   //
   keyArr: (keyof Tconfig<Dto>)[];
   config: Tconfig<Dto>;
   //
   onRowClick?: (dto: Dto) => void;
+  onRowDoubleClick?: (dto: Dto) => void;
   //
   checkSelected: (dto: Dto) => boolean;
+  //
+  className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
-    <div className={scss.table}>
+    <div className={classNames(scss.table, className)} style={style}>
       {/*  */}
       <Row thead={true} className={scss.thead}>
         {keyArr.map((key) => {
@@ -202,7 +247,10 @@ function Table<Dto extends Tdto>({
             ref={ref}
             className={classNames(scss.row, isSelected && scss.seleted)}
             onClick={() => {
-              onClick?.(data);
+              onRowClick?.(data);
+            }}
+            onDoubleClick={() => {
+              onRowDoubleClick?.(data);
             }}
           >
             {keyArr.map((key) => {
@@ -224,3 +272,7 @@ function Table<Dto extends Tdto>({
     </div>
   );
 }
+
+// =========================================================================
+
+export type { Tprops, Tprops_refine as Tprops_refine };

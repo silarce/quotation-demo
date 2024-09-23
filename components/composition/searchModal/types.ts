@@ -36,4 +36,11 @@ type Tconfig<Dto extends Tdto = Tdto> = {
   };
 };
 
-export type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig };
+type TmodalData<Dto extends Tdto = Tdto> = {
+  dataArr: Dto[];
+  qty: number | string;
+  viewRef?: ((node?: Element | null) => void) | undefined;
+  isLoading?: boolean;
+};
+
+export type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData };

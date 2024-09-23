@@ -1,9 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import moment from 'moment';
 
-import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig } from './types';
+import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -11,10 +9,19 @@ import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
 
 import type { Tparams } from 'js/api/dtoTypes';
 
-import { useFilter } from './useFilter';
-import { useInputSelProps } from './useInputSelProps';
+import { useFilter } from '../useFilter';
+import { useInputSelProps } from '../useInputSelProps';
+
+import SearchModal, { Tprops_refine } from '..';
 
 // =====================================================================================
+
+// 由五個部分組成
+// useConfig_filter: 設定左側filter的欄位
+// useConfig_data: 設定table的欄位
+// useFilter: 處理filter的狀態
+// useInputSelProps: 將config_filter與狀態送入，建立inputSelProps
+// useData: 將filter送進去，取得資料
 
 const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
   const config_filter = useConfig_filter();
@@ -22,7 +29,7 @@ const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
-  const { dataArr, viewRef_bottom, isLoadingPage1, qty } = useData(filter);
+  const { dataArr, viewRef, isLoading, qty } = useData(filter);
 
   return {
     inputSelPropsArr,
@@ -31,8 +38,8 @@ const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
     //
     dataArr,
     qty,
-    viewRef: viewRef_bottom,
-    isLoading: isLoadingPage1,
+    viewRef,
+    isLoading,
     dataConfig,
     dataKeyArr,
   };
@@ -40,7 +47,9 @@ const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
 }; // useSearchModal_customer
 
 // =============================================================================
-const useData = (filter: Tstate) => {
+// 將filter送進來，給取得資料的api hook
+// useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
+const useData = (filter: Tstate): TmodalData<TcustomerDto> => {
   const params: Tparams = useMemo(() => {
     return {
       pageSize: 20,
@@ -78,12 +87,14 @@ const useData = (filter: Tstate) => {
   return {
     dataArr,
     qty: meta?.itemCount || '',
-    viewRef_bottom,
-    isLoadingPage1,
+    viewRef: viewRef_bottom,
+    isLoading: isLoadingPage1,
   };
 };
 
 // =============================================================================
+
+// 要做i18n的處理，因此設定不能抽出hook
 const useConfig_data = () => {
   const { t, i18n } = useTranslation('common');
 
@@ -150,6 +161,8 @@ const useConfig_data = () => {
 };
 
 // =============================================================================
+
+// 要做i18n的處理，因此設定不能抽出hook
 const useConfig_filter = () => {
   const { t, i18n } = useTranslation('common');
 
@@ -189,5 +202,11 @@ const useConfig_filter = () => {
 
 // ============================================================================
 
-export { useSearchModal_customer };
+const SearchModal_customer = (props: Tprops_refine<TcustomerDto>) => {
+  return <SearchModal {...props} useSearchModal={useSearchModal_customer} />;
+};
+
+// ============================================================================
+
+export { useSearchModal_customer, SearchModal_customer };
 export type { TcustomerDto };
