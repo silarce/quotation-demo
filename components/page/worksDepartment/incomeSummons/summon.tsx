@@ -1322,9 +1322,12 @@ const cellPropsList_summon: TcellPropsList_summon = {
     style: { width: 150 },
     className: 'text-right',
     createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      let exchangeBenefits = Number(state_incomeBillSerial.exchangeBenefits ?? '0');
+      exchangeBenefits = new Decimal(exchangeBenefits).toDecimalPlaces(0).toNumber();
+
       const { type, value } = reducer_input({
         disabled: true,
-        value: state_incomeBillSerial.exchangeBenefits ?? '',
+        value: exchangeBenefits,
       });
 
       const inputSelProps: TinputSelProps = {
@@ -1400,7 +1403,10 @@ const cellPropsList_summon: TcellPropsList_summon = {
       // const { type, value } = reducer_input({
       //   disabled,
       //   value: state_incomeBillSerial.currencyFee ?? '',
-      // });
+      // });\\
+
+      let foreignFee: string | number = Number(state_incomeBillSerial.foreignFee ?? '0');
+      foreignFee = new Decimal(foreignFee).toDecimalPlaces(0).toNumber().toLocaleString();
 
       const inputSelProps: TinputSelProps = {
         disabled: true,
@@ -1409,7 +1415,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
           props: {
             className: 'text-right',
             type: 'text',
-            value: state_incomeBillSerial.foreignFee ?? '',
+            value: foreignFee,
             onChange: (e) => {
               // setState_incomeBillSerial((state) => ({
               //   ...state,
@@ -1604,7 +1610,7 @@ const calc_twToForeign = ({
   exchangeRate: `${number}`;
   twPayment: number | `${number}`;
 }) => {
-  return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(2).toNumber();
+  return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(0).toNumber();
 };
 
 const calc_foreignToTw = ({

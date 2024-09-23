@@ -6,15 +6,13 @@ import scss from './squarebtn.module.scss';
 
 // ======================================================================
 
-import * as Icons from '../../svgIcon/fcIcon';
-
 import { btnLookup } from './btnLookup';
 
 // ======================================================================
 type Tprops = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   content?: keyof typeof btnLookup;
   label?: string | null;
-  sharp?: 'basic' | 'long';
+  sharp?: 'basic' | 'long' | 'mini';
   theme?: 'danger';
   disabled?: boolean;
   defaultIconColor?: boolean;
@@ -69,7 +67,6 @@ const SquareBtn = (props: Tprops) => {
   return (
     <button
       //
-      title="查尋單據"
       {...btnAttr}
       className={classNames(
         scss[sharp],

@@ -11,6 +11,10 @@ $borderColor: theme("colors.border");
   // background-color: theme("colors.bgc01");
   background-color: white;
   border: solid 1px $borderColor;
+
+  &.boxShadow {
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.5);
+  }
 }
 
 .handle {

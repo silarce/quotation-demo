@@ -8,6 +8,9 @@ import scss from '../inputSel.module.scss';
 
 // ===================================================================
 
+// 忘記怎麼用就看這邊的"布局"
+// https://4x.ant.design/components/checkbox-cn/
+
 type TcheckBoxProps_v2 = {
   // props.options與checkBoxPropsArr只能擇一 (似乎有例外，條件不確定)
   props: CheckboxGroupProps;
@@ -36,7 +39,15 @@ export default function CheckBox_v2({
       style={wrapperStyle}
       onClick={onClick}
     >
-      <Checkbox.Group {...props} className={classNames(scss.checkBox, props.className)}>
+      <Checkbox.Group
+        {...props}
+        className={classNames(
+          //
+          scss.checkBox,
+          scss.plus,
+          props.className
+        )}
+      >
         {checkBoxPropsArr.map((item, index) => {
           return (
             <Checkbox key={index} name={props.name} {...item}>

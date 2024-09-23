@@ -23,6 +23,7 @@ export default function SubLayer({
   scrollToTopTrigger,
   bodyOverflowY,
   style,
+  bodyPreStyle,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -33,10 +34,11 @@ export default function SubLayer({
   scrollToTopTrigger?: unknown;
   bodyOverflowY?: 'hidden' | 'auto' | 'scroll';
   style?: React.CSSProperties;
+  bodyPreStyle?: 'style01';
 }) {
   const ref_body = useRef<HTMLDivElement>(null!);
 
-  const childredArr = React.Children.toArray(children);
+  const [firstChild, secondChild, ...restChildren] = React.Children.toArray(children);
 
   useEffect(() => {
     ref_body.current.scrollTo(0, 0);
@@ -44,14 +46,20 @@ export default function SubLayer({
 
   return (
     <div className={classNames(scss.container, className)} style={style}>
-      {childredArr[0]}
+      {firstChild}
       <div
         ref={ref_body}
-        className={classNames(scss.body, bodyClassName, bodyOverflowY && scss[`overflow_${bodyOverflowY}`])}
+        className={classNames(
+          //
+          scss.body,
+          bodyPreStyle && scss[bodyPreStyle],
+          bodyOverflowY && scss[`overflow_${bodyOverflowY}`],
+          bodyClassName
+        )}
       >
-        {childredArr[1]}
+        {secondChild}
         {/*把剩下的childredArr的item放進來*/}
-        {childredArr.slice(2)}
+        {restChildren}
         <LoadingCover01 isLoading={isLoading_subLayer} />
       </div>
       {containerChildren}

@@ -1,0 +1,14 @@
+{
+  "accountsReceivableInvoice": {
+    "invoiceNumber": "發票號碼",
+    "invoiceDate": "日期",
+    "actualPrice": "實際發票金額",
+    "note": "備註",
+    "allowance": "折讓",
+    "nameOfBusinessEntity": "買受人",
+    "businessIdNumber": "統一編號",
+    "contractNumber": "合約編號",
+    "contractProjectName": "工程名稱",
+    "contractContractor": "承包商"
+  }
+}
