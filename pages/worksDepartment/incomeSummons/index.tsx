@@ -335,10 +335,7 @@ export default function IncomeSummons() {
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
             <SummonsRow className={scss.thead}>
-              <div
-                style={cellPropsList_summon.btnPanel.style}
-                className={cellPropsList_summon.btnPanel.className}
-              ></div>
+              <div style={cellPropsList_summon.btnPanel.style} className={cellPropsList_summon.btnPanel.className} />
               {keyArr.map((key) => {
                 const { label, style, className } = cellPropsList_summon[key];
 

@@ -649,6 +649,17 @@ const sidePathList: TsidePathList = {
           path: path01 + '/bankManagement',
           erpFeature: [accountingDepartment],
         },
+        {
+          label: '應付帳款',
+          erpFeature: [accountsReceivable],
+          list: [
+            {
+              label: '付款申請',
+              path: path01 + '/paymentApplication',
+              erpFeature: [accountsReceivable],
+            },
+          ],
+        },
         // {
         //   label: 'foo',
         //   erpFeature: devPass,

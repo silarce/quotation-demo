@@ -1,0 +1,15 @@
+.btnBar {
+  display: grid;
+  grid-template-columns: 1fr 5fr 1fr;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  border-bottom: solid 1px theme("colors.border");
+}
+
+.profile {
+  display: grid;
+  grid-template-columns: 400px repeat(2, 300px);
+  gap: 20px;
+  padding: 20px;
+  border: solid 1px theme("colors.border");
+}
