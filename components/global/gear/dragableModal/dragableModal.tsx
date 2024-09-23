@@ -10,6 +10,7 @@ import crossRed from 'public/image/icon/cross_red.svg';
 
 type Tprops = {
   show: boolean;
+  boxShadow?: boolean;
 
   handleText?: React.ReactNode;
   children?: React.ReactNode;
@@ -31,6 +32,7 @@ type Tprops_call = Omit<Tprops, 'show'>;
 // =====================================================================
 const DragableModal = ({
   show,
+  boxShadow = true,
 
   handleText,
   children,
@@ -153,6 +155,7 @@ const DragableModal = ({
       className={classNames(
         //
         scss.modal,
+        boxShadow && scss.boxShadow,
         !isReady && 'invisible',
         className
       )}
