@@ -1,0 +1,5 @@
+參考
+components/composition/searchModal/useSearchModal/useSearchModal_customer.tsx
+建立各項hook就可以使用了
+
+未來有時間(應該是沒有)再做較完整的說明

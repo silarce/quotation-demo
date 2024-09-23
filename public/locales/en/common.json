@@ -9,5 +9,23 @@
     "description": "Description"
   },
   "receipt": "Receipt",
-  "item": "Item"
+  "item": "Item",
+  "customerNumber": "Customer Number",
+  "name": "Name",
+  "name02": "Name",
+  "nickname": "Nickname",
+  "type": "Type",
+  "type02": "Type",
+  "construction": "Construction",
+  "firm": "Firm",
+  "propertyOwner": "Property Owner",
+  "contractor": "Contractor",
+  "indexNumber": "Index",
+  "indexNumber02": "Index",
+  "createdAt": "Created At",
+  "clearConditions": "Clear Conditions",
+  "search": "Search",
+  "searchCriteria": "Search Criteria",
+  "count": "Count",
+  "confirm": "Confirm"
 }

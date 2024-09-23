@@ -723,7 +723,12 @@ class Class_product {
       isNew,
     });
 
-    this.subComList = { distributionBox, installationFee };
+    if (this.isW2) {
+      this.subComList = { distributionBox };
+    } else {
+      this.subComList = { distributionBox, installationFee };
+    }
+
     this.reRender();
   } // creSubComList
 
@@ -766,6 +771,8 @@ class Class_product {
       //
       typhoonProtection: this._prodData.typhoonProtection,
       notes: this._prodData.notes,
+
+      close: this._prodData.close,
     };
 
     this._quantity = String(this._prodData.quantity);
@@ -2190,9 +2197,14 @@ class Class_product {
   }
 
   toGetInstallationFee() {
+    const installationFee_class = this.subComList.installationFee;
+
+    if (!installationFee_class) {
+      return '0';
+    }
+
     const m2 = Number(this.subComList.installationFee?.quantity || '0');
     const doorType = this.doorType;
-    const installationFee_class = this.subComList.installationFee;
     const fee = getInstallationFee({
       doorModel: doorType,
       m2,
@@ -2378,7 +2390,7 @@ class Class_product {
       options = options_surface;
     }
 
-    if (!isGalvanized && this.doorType !== 'SJ-305D') {
+    if (!isGalvanized && this.doorType !== 'SJ-305D' && !this.isW2) {
       options = options.filter((item) => {
         return item.value !== '無烤漆';
       });
@@ -2596,10 +2608,6 @@ class Class_product {
     //   return false;
     // }
 
-    if (this._prodData.doorType === 'W2') {
-      return true;
-    }
-
     if (
       Object.values(this._doorModelList).some((doorModel) => {
         return doorModel.name === this._prodData.doorType;
@@ -2612,8 +2620,7 @@ class Class_product {
   }
 
   get isW2() {
-    return false;
-    // return this._prodData.doorType === 'W2';
+    return this._prodData.doorType === 'W2';
   }
 
   get ignoreKeyArr_prod() {
@@ -4075,10 +4082,10 @@ class Class_product {
       distributionBoxTotalPrice: Number(this.subComList.distributionBox?.totalPrice ?? 0),
 
       installationFeePrice: Number(this.subComList.installationFee?.price) ?? 0,
-      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? 0,
-      installationFeeQuantity: this.subComList.installationFee?.quantity ?? 0,
+      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? '0',
+      installationFeeQuantity: this.subComList.installationFee?.quantity ?? '0',
       installationFeeUnitPrice: Number(this.subComList.installationFee?.unitPrice ?? 0),
-      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? 0,
+      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? '0',
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
 
@@ -4160,6 +4167,10 @@ class Class_product {
         hasMotorSupportStand: null,
         components: [],
       };
+    }
+
+    if (this.isW2) {
+      body.headBoxThickness = body.headBoxThickness || null;
     }
 
     if ('items' in body) {
@@ -4574,6 +4585,8 @@ const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
     'motor',
     'motorAccessories',
     'sidePlate',
+    'middlePillar',
+    'backBone',
   ] as const;
 
   comArr.forEach((item) => {
@@ -4816,6 +4829,12 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
   // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
 
   const defaultMotorSpecs = motors[defaultMotorIndex];
+
+  // 待W2的defaultMotorSpecs.hp改為''後，把這個判斷拿掉
+  if (defaultMotorSpecs.hp === 'N/A') {
+    defaultMotorSpecs.hp = '';
+  }
+
   const defaultMotorBox: TdoorGeneralSpecsMotorBoxDto | undefined = defaultMotorSpecs.box;
 
   let defaultMotorVendor: string | undefined | null;
