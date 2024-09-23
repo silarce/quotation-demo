@@ -1,0 +1,22 @@
+.title {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  > span {
+    font-size: 18px;
+    font-weight: 500;
+    color: theme("colors.main");
+  }
+}
+
+.table {
+  width: fit-content;
+  height: 380px;
+  overflow: auto;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

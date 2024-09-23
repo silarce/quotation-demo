@@ -257,7 +257,7 @@ function Table<Dto extends Tdto>({
               let value = data[key] as string | number | null | undefined | React.ReactNode;
               const { style, reducer } = config[key];
 
-              reducer && (value = reducer({ data, index }));
+              reducer && (value = reducer(data, { index }));
 
               return (
                 <Cell key={key} style={style}>

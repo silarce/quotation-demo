@@ -7,7 +7,7 @@ import { IconCheck02, IconEdit, IconDelete01 } from 'public/image/icon/svgCompon
 const TablePanel_basic = ({
   //
   disabled,
-  setDisabled,
+  onEdit,
   onConfirm,
   onDelete,
   showEdit = true,
@@ -15,7 +15,7 @@ const TablePanel_basic = ({
   showConfirm = true,
 }: {
   disabled: boolean;
-  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  onEdit?: (disabled: boolean) => void;
   onConfirm?: () => void;
   onDelete?: () => void;
   showEdit?: boolean;
@@ -24,14 +24,18 @@ const TablePanel_basic = ({
 }) => {
   return (
     <div className={scss.panel}>
-      <IconCheck02
-        className={classNames(scss.check, disabled && scss.invisible, !showConfirm && scss.invisible)}
-        onClick={onConfirm}
-      />
-      <IconEdit
-        className={classNames(scss.edit, scss.plus, !disabled && scss.active, !showEdit && scss.invisible)}
-        onClick={() => setDisabled((state) => !state)}
-      />
+      {onConfirm && (
+        <IconCheck02
+          className={classNames(scss.check, disabled && scss.invisible, !showConfirm && scss.invisible)}
+          onClick={onConfirm}
+        />
+      )}
+      {onEdit && (
+        <IconEdit
+          className={classNames(scss.edit, scss.plus, !disabled && scss.active, !showEdit && scss.invisible)}
+          onClick={() => onEdit(disabled)}
+        />
+      )}
       {onDelete && <IconDelete01 className={classNames(!showDelete && scss.invisible)} onClick={onDelete} />}
     </div>
   );

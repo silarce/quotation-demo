@@ -40,6 +40,7 @@ type TinputSelProps = {
   key?: React.Key;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent) => void;
+  htmlFor?: string;
   //
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -110,6 +111,7 @@ export type {
 
 export default function InputSel({
   disabled,
+  htmlFor,
   //
   onClick,
   //
@@ -203,6 +205,7 @@ export default function InputSel({
 
         onClick?.(e);
       }}
+      htmlFor={htmlFor}
     >
       {caption && (
         <div

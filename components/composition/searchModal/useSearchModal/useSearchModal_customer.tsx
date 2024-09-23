@@ -105,7 +105,7 @@ const useConfig_data = () => {
         style: {
           width: '50px',
         },
-        reducer: ({ index }) => {
+        reducer: (_, { index }) => {
           return index + 1;
         },
       },
@@ -132,7 +132,7 @@ const useConfig_data = () => {
         style: {
           width: '200px',
         },
-        reducer: ({ data }) => {
+        reducer: (data) => {
           const types = data.types;
           const arr = types.map(({ name }) => t(name));
 
@@ -146,7 +146,7 @@ const useConfig_data = () => {
         style: {
           width: '100px',
         },
-        reducer: ({ data }) => {
+        reducer: (data) => {
           return moment(data.createdAt).format('YYYY-MM-DD');
         },
       },

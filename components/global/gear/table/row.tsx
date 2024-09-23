@@ -1,19 +1,17 @@
 import { forwardRef } from 'react';
-
 import classNames from 'classnames';
-
 import scss from './row.module.scss';
 
+// ========================================================================
 const Row_pre = (
-  //
   props: React.HTMLAttributes<HTMLDivElement> & {
-    //
     thead?: boolean;
     fullWidth?: boolean;
+    preStyle?: 'style01';
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
-  const { thead, fullWidth } = props;
+  const { thead, fullWidth, preStyle } = props;
 
   const attributes = {
     ...props,
@@ -29,6 +27,7 @@ const Row_pre = (
       className={classNames(
         //
         scss.row,
+        preStyle && scss[preStyle],
         thead && scss.thead,
         fullWidth && scss.fullWidth,
         props.className
@@ -39,10 +38,7 @@ const Row_pre = (
   );
 };
 
-const Row = forwardRef(Row_pre);
-
 const Cell = (
-  //
   props: React.HTMLAttributes<HTMLDivElement> & {
     preBuilt?: 'flex' | 'block' | 'unset';
     bgc?: 'gray' | 'white';
@@ -57,5 +53,16 @@ const Cell = (
   );
 };
 
+// ===================================================================
+
+const Row = forwardRef(Row_pre);
+
+// ===================================================================
+
+type Tprops_row = Parameters<typeof Row>[0];
+type Tprops_cell = Parameters<typeof Cell>[0];
+
+// ===================================================================
 export default Row;
 export { Cell };
+export type { Tprops_row, Tprops_cell };

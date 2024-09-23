@@ -32,7 +32,7 @@ type Tconfig<Dto extends Tdto = Tdto> = {
   [key in string]: {
     label: string;
     style: React.CSSProperties;
-    reducer?: (props: { data: Dto; index: number }) => React.ReactNode;
+    reducer?: (data: Dto, optional: { index: number }) => React.ReactNode;
   };
 };
 
