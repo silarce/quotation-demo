@@ -49,7 +49,7 @@ interface state {
 // interface TinputSelPr
 
 // =========================================================================
-export default function PaymentApplication() {
+export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   const defaultState = useDefaultState(fakeData);
 
   const [disabled, setDisabled] = useState(true);
@@ -78,6 +78,19 @@ export default function PaymentApplication() {
   }, [defaultState, disabled]);
 
   // --------------------------------------------------------------------------
+
+  if (!isAdmin) {
+    return (
+      <SubLayer bodyPreStyle="style01">
+        <PageHeader02 tag="付款申請" />
+
+        <div>
+          <h1 className="text-5xl">施工中</h1>
+        </div>
+      </SubLayer>
+    );
+  }
+
   return (
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag="付款申請" />
