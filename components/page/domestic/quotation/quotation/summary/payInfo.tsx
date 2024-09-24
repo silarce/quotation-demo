@@ -57,6 +57,14 @@ export type Tcontrol = {
     }[];
     addMethod: (v: string) => void;
   };
+  //
+  exchangeRate: {
+    value: string;
+    onChange?: (v: string) => void;
+  };
+  usd: {
+    value: string;
+  };
 };
 
 export default function PayInfo({
@@ -213,6 +221,32 @@ export default function PayInfo({
             </div>
           );
         })}
+
+        <hr />
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className="relative">{'匯率(美金兌新台幣)'}</span>
+          <div>
+            <input
+              type="number"
+              onWheel={blurOnWheel}
+              className={classNames('bg-transparent', disabled && scss.noBaseLine)}
+              value={control.exchangeRate.value}
+              onChange={(e) => control.exchangeRate.onChange?.(e.target.value)}
+              readOnly={disabled}
+            />
+          </div>
+        </div>
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className="relative">美金計價</span>
+          <div>
+            <input
+              type="text"
+              className={classNames('bg-transparent', scss.noBaseLine)}
+              value={control.usd.value}
+              readOnly={true}
+            />
+          </div>
+        </div>
       </div>
 
       <hr className={scss.grayHr} />

@@ -1910,6 +1910,9 @@ export type TquotationContentDto = {
   //
   designUnitId: string | null;
   designUnit?: TcustomerDto;
+  //
+  exchangeRate: `${number}` | null;
+  usd: `${number}` | null;
 };
 
 export type TquotationDto = {
@@ -2071,6 +2074,7 @@ export type TcreateQuotationProductDto = {
   accessories: TcreateQuotationProductAccessoryDto[];
   // 來源產品
   attachedToProductId?: string | null;
+  //
 };
 
 export type TupdateQuotationProductDto = TcreateQuotationProductDto & {
@@ -2301,6 +2305,9 @@ export type TcreateQuotationContentDto = {
   isLost: boolean;
   //
   designUnitId: string | null;
+  //
+  exchangeRate: string | null;
+  usd: string | null;
 };
 
 /**合約 */

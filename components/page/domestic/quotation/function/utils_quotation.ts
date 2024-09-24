@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 // 這個函式是為了統一報價單與追加追減報價單的變數
 const init_variable = (): {
   reviewSalesEmployeeId: string | undefined;
@@ -115,4 +117,12 @@ const init_variable = (): {
   };
 };
 
-export { init_variable };
+const calcNTDToUSD = ({ NTD, USDtoNTD }: { NTD: number | `${number}`; USDtoNTD: number | `${number}` }) => {
+  if (Number(USDtoNTD) === 0) {
+    return 0;
+  }
+
+  return new Decimal(NTD).div(USDtoNTD).toDecimalPlaces(2).toNumber();
+};
+
+export { init_variable, calcNTDToUSD };

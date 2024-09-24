@@ -89,7 +89,9 @@ import {
   useQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { Class_product, useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 import Summary, {
   TsummaryControl,
@@ -103,7 +105,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
-import { init_variable } from 'components/page/domestic/quotation/function/utils_quotation';
+import { init_variable, calcNTDToUSD } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -182,6 +184,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isCashier,
     isSupervisor,
     //
+    // eslint-disable-next-line prefer-const
     isSalesManagerEmployee,
     //
     isManager,
@@ -233,23 +236,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
-  const [state_summary, setState_Summary] = useState<{
-    discountRate: string;
-    tuneTotal: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
+
+  // const [state_summary, setState_Summary] = useState<{
+  //   discountRate: string;
+  //   tuneTotal: string;
+  //   subTotal: string;
+  //   salesTax: string;
+  //   total: string;
+  //   deliveryLocation: string;
+  //   deliveryDate: string;
+  //   exchangeRate: string;
+  //   usd: string;
+  // }>({
+  //   discountRate: '100',
+  //   tuneTotal: '',
+  //   subTotal: '',
+  //   salesTax: '',
+  //   total: '',
+  //   deliveryLocation: '',
+  //   deliveryDate: '',
+  //   exchangeRate: '',
+  //   usd: '',
+  // });
 
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
@@ -755,6 +764,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: paymentMethod,
+      exchangeRate: state_summary.exchangeRate,
+      usd: state_summary.usd.replaceAll(',', ''),
       //
       //
       // products: [...prodArr, ...attachProdArr],
@@ -1049,7 +1060,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: state_summary.discountRate,
           onChange: (e) => {
             let v = e.target.value;
-            setState_Summary((state) => {
+            setState_summary((state) => {
               const copy = { ...state };
 
               if ((v as string) === '') {
@@ -1082,7 +1093,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               return;
             }
 
-            setState_Summary((state) => ({
+            setState_summary((state) => ({
               ...state,
               tuneTotal: e.target.value,
             }));
@@ -1113,7 +1124,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: {
         value: state_summary.deliveryLocation,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryLocation = v;
 
@@ -1124,7 +1135,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: {
         value: state_summary.deliveryDate,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryDate = v;
 
@@ -1175,6 +1186,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return copy;
         });
       },
+    },
+    exchangeRate: {
+      value: state_summary.exchangeRate,
+      onChange: (v) => {
+        setState_summary((state) => {
+          const copy = { ...state };
+          copy.exchangeRate = v;
+
+          const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+          copy.usd = calcNTDToUSD({
+            NTD: total_num,
+            USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
+          }).toLocaleString();
+
+          return copy;
+        });
+      },
+    },
+    usd: {
+      value: state_summary.usd,
     },
   };
 
@@ -1458,13 +1490,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods,
       annotations,
       quotationRanges,
+      exchangeRate,
+      usd,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
     setPaymentMethod(paymentMethods);
 
-    setState_Summary({
+    setState_summary({
       discountRate: discount,
       tuneTotal,
       subTotal: String(subTotal),
@@ -1472,6 +1506,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       total: String(total),
       deliveryLocation,
       deliveryDate,
+      exchangeRate: exchangeRate || '',
+      usd: usd || '',
     });
   }, [theContent]);
 
@@ -1485,12 +1521,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       prodSubTotal: attachTotal,
     });
 
-    setState_Summary((state) => {
+    const usd = calcNTDToUSD({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      USDtoNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
+    setState_summary((state) => {
       return {
         ...state,
         subTotal,
         salesTax,
         total,
+        usd,
       };
     });
   }, [
@@ -1681,7 +1723,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   return;
                 }
 
-                setState_Summary((state) => {
+                setState_summary((state) => {
                   return {
                     ...state,
                     discountRate: v,

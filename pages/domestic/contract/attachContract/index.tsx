@@ -47,7 +47,10 @@ import {
   TquotationContractDto,
 } from 'js/api/api_quotation';
 import { TuserDto, TcustomerDto } from 'js/api/dtoTypes';
+
+// hook
 import { Class_product } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -59,15 +62,6 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 // ===========================================================================
 
 type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
-type Tstate_summary = {
-  discountRate: string;
-  tuneTotal: string;
-  subTotal: string;
-  salesTax: string;
-  total: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-};
 
 // ===========================================================================
 
@@ -98,15 +92,7 @@ export default function AttachContract({
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
 
-  const [state_summary, setState_Summary] = useState<Tstate_summary>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
 
   const [state_paymentMethod, setState_paymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
     []
@@ -294,7 +280,7 @@ export default function AttachContract({
           disabled: true,
           value: state_summary.discountRate ?? '',
           onChange: (e) => {
-            setState_Summary((state) => ({
+            setState_summary((state) => ({
               ...state,
               discountRate: e.target.value,
             }));
@@ -332,14 +318,14 @@ export default function AttachContract({
         // value: data_contract?.deliveryLocation ?? '',
         value: state_summary.deliveryLocation ?? '',
         onChange: (v) => {
-          setState_Summary({ ...state_summary, deliveryLocation: v });
+          setState_summary({ ...state_summary, deliveryLocation: v });
         },
       },
       deliveryDate: {
         // value: data_contract?.deliveryDate ?? '',
         value: state_summary.deliveryDate ?? '',
         onChange: (v) => {
-          setState_Summary({ ...state_summary, deliveryDate: v });
+          setState_summary({ ...state_summary, deliveryDate: v });
         },
       },
     },
@@ -386,6 +372,24 @@ export default function AttachContract({
           return copy;
         });
       },
+    },
+    exchangeRate: {
+      value: state_summary.exchangeRate,
+      onChange: (v) => {
+        // setState_summary((state) => {
+        //   const copy = { ...state };
+        //   copy.exchangeRate = v;
+        //   const total_num = copy.total.replaceAll(',', '') as `${number}`;
+        //   copy.usd = calcNTDToUSD({
+        //     NTD: total_num,
+        //     USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
+        //   }).toLocaleString();
+        //   return copy;
+        // });
+      },
+    },
+    usd: {
+      value: state_summary.usd,
     },
   };
 
@@ -485,13 +489,15 @@ export default function AttachContract({
       paymentMethods,
       annotations,
       quotationRanges,
+      exchangeRate,
+      usd,
     } = data_contract?.content;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
     setState_paymentMethod(_.cloneDeep(paymentMethods));
 
-    setState_Summary({
+    setState_summary({
       discountRate: discount,
       tuneTotal,
       subTotal: String(subTotal),
@@ -499,6 +505,8 @@ export default function AttachContract({
       total: String(total),
       deliveryLocation,
       deliveryDate,
+      exchangeRate: exchangeRate || '',
+      usd: usd || '',
     });
   }, [data_contract?.content]);
 
@@ -633,7 +641,7 @@ export default function AttachContract({
                 //   return;
                 // }
 
-                setState_Summary((state) => {
+                setState_summary((state) => {
                   // changeAllProdQuotationDiscount(Number(v));
                   // changeAllProductDiscount(Number(v));
                   return {

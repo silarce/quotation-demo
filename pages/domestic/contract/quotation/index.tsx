@@ -614,6 +614,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }) ?? [],
       addMethod: () => {},
     },
+    exchangeRate: {
+      // 不確定TquotationContractDto下會不會有exchangeRate
+      // 若有，從totalInfo下手
+      // FIXME exchangeRate
+      value: '',
+      onChange: (v) => {},
+    },
+    usd: {
+      // 不確定TquotationContractDto下會不會有usd
+      // 若有，從totalInfo下手
+      // value: state_summary.usd,
+      // FIXME usd
+      value: '---',
+    },
   };
 
   const { control_signature } = useMemo(() => {
