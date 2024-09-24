@@ -6,7 +6,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
-import ExcelJs, { TableProperties } from 'exceljs';
+import ExcelJs from 'exceljs';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -188,8 +188,6 @@ export default function CollectionDetailList() {
   ];
   // ________________________________________________________________
   // ________________________________________________________________
-
-  console.log(data_accountant);
 
   // --------------------------------------------------------------
   // MARK: RENDER
@@ -475,6 +473,11 @@ const dlExcel = async ({
   year: `${number}` | number;
   month: string;
 }) => {
+  const twYear = Number(year) - 1911;
+  month = month.padStart(2, '0');
+
+  // ---------------------------------------------------------------------------
+
   const workbook = new ExcelJs.Workbook();
   const sheet = workbook.addWorksheet();
 
@@ -484,17 +487,6 @@ const dlExcel = async ({
   };
 
   // ---------------------------------------------------------------------------
-  // insertDate
-  // vendorName
-  // importAccountingNumber
-  // price
-  // notes
-  // noteNumber
-  // noteMaturityDate
-  // invoiceNumber
-  // billSerialNumber
-  // totalFee
-  // totalDeduction
 
   const colSetting_insertDate = {
     label: '收款日期',
@@ -509,7 +501,7 @@ const dlExcel = async ({
   const colSetting_importAccountingNumber = {
     label: '銀行帳號',
     key: 'importAccountingNumber',
-    width: 12,
+    width: 14,
   };
   const colSetting_price = {
     label: '收款金額',
@@ -519,12 +511,12 @@ const dlExcel = async ({
   const colSetting_notes = {
     label: '備註',
     key: 'notes',
-    width: 20,
+    width: 25,
   };
   const colSetting_noteNumber = {
     label: '票據號碼',
     key: 'noteNumber',
-    width: 12,
+    width: 14,
   };
   const colSetting_noteMaturityDate = {
     label: '到期日',
@@ -534,12 +526,12 @@ const dlExcel = async ({
   const colSetting_invoiceNumber = {
     label: '發票號碼',
     key: 'invoiceNumber',
-    width: 12,
+    width: 14,
   };
   const colSetting_billSerialNumber = {
     label: '收入傳票序號',
     key: 'billSerialNumber',
-    width: 12,
+    width: 15,
   };
   const colSetting_totalFee = {
     label: '匯費',
@@ -551,6 +543,11 @@ const dlExcel = async ({
     key: 'totalDeduction',
     width: 12,
   };
+  const colSetting_deductionDetail = {
+    label: '扣款明細',
+    key: 'deductionDetail',
+    width: 20,
+  };
 
   // ---------------------------------------------------------------------------
 
@@ -559,13 +556,14 @@ const dlExcel = async ({
     colSetting_vendorName,
     colSetting_importAccountingNumber,
     colSetting_price,
-    colSetting_notes,
     colSetting_noteNumber,
     colSetting_noteMaturityDate,
     colSetting_invoiceNumber,
-    colSetting_billSerialNumber,
     colSetting_totalFee,
     colSetting_totalDeduction,
+    colSetting_deductionDetail,
+    colSetting_billSerialNumber,
+    colSetting_notes,
   ];
 
   // ---------------------------------------------------------------------------
@@ -581,15 +579,23 @@ const dlExcel = async ({
   const col_billSerialNumber = sheet.getColumn(colSetting_billSerialNumber.key);
   const col_totalFee = sheet.getColumn(colSetting_totalFee.key);
   const col_totalDeduction = sheet.getColumn(colSetting_totalDeduction.key);
+  const col_deductionDetail = sheet.getColumn(colSetting_deductionDetail.key);
 
   let row_title: ExcelJs.Row;
   let row_subTitle: ExcelJs.Row;
   let row_caption: ExcelJs.Row;
+  let rowArr_data: ExcelJs.Row[] = [];
+  let row_totalPrice: ExcelJs.Row;
+
+  // ---------------------------------------------------------------------------
+
+  let totalPrice = 0;
 
   // ---------------------------------------------------------------------------
 
   row_title = sheet.addRow(['三　久　建　材　股　份　有　限　公　司']);
-  row_subTitle = sheet.addRow([`民國${Number(year) - 1911}年${month}月`]);
+  row_subTitle = sheet.addRow([`民國${twYear}年${month}月`]);
+  sheet.addRow({});
 
   row_caption = sheet.addRow({
     insertDate: colSetting_insertDate.label,
@@ -603,6 +609,7 @@ const dlExcel = async ({
     billSerialNumber: colSetting_billSerialNumber.label,
     totalFee: colSetting_totalFee.label,
     totalDeduction: colSetting_totalDeduction.label,
+    deductionDetail: colSetting_deductionDetail.label,
   });
 
   // ---------------------------------------------------------------------------
@@ -618,12 +625,35 @@ const dlExcel = async ({
       noteMaturityDate,
       invoices,
       incomeBill,
-      billSerialNumber,
+      // billSerialNumber,
     } = accountant;
+
+    totalPrice = new Decimal(totalPrice).add(price || 0).toNumber();
 
     const { totalFee, totalDeduction } = calcTotalFeeAndTotalDefuction(incomeBill);
 
-    sheet.addRow({
+    const billSerialNumber = _.sortBy(incomeBill, 'billSerialNumber')
+      .map((incomeBill) => {
+        return incomeBill.billSerialNumber;
+      })
+      .join('\n');
+
+    const accountsReceivableDeductionArr = incomeBill.flatMap((bill) => bill.accountsReceivableDeduction ?? []);
+    const accountsReceivableDeductionDict = accountsReceivableDeductionArr.reduce((target, deduction) => {
+      const { itemName, detailedAmount } = deduction;
+      !target[itemName] && (target[itemName] = 0);
+      target[itemName] = new Decimal(target[itemName]).add(detailedAmount || 0).toNumber();
+
+      return target;
+    }, {} as { [key: string]: number });
+
+    const accountsReceivableDeductionStr = Object.entries(accountsReceivableDeductionDict)
+      .map(([key, item]) => {
+        return `${key}: ${item.toLocaleString()}`;
+      })
+      .join('\n');
+
+    const thisRow = sheet.addRow({
       insertDate: getTaiwanDateStr(insertDate),
       vendorName,
       importAccountingNumber,
@@ -632,10 +662,39 @@ const dlExcel = async ({
       noteNumber,
       noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
       invoiceNumber: invoices?.[0]?.invoiceNumber,
-      // billSerialNumber: billSerialNumber.join('\n'),
+      billSerialNumber,
       totalFee,
       totalDeduction,
+      deductionDetail: accountsReceivableDeductionStr,
     });
+    rowArr_data.push(thisRow);
+  });
+
+  // ---------------------------------------------------------------------------
+  sheet.addRow({});
+  row_totalPrice = sheet.addRow({
+    importAccountingNumber: '收款金額總計',
+    price: totalPrice,
+  });
+
+  // ---------------------------------------------------------------------------
+
+  row_title.font = { size: 20, bold: true };
+  row_subTitle.font = { size: 16, bold: true };
+  row_caption.font = { bold: true };
+  // __________________________________________________________________________
+  // __________________________________________________________________________
+  col_price.numFmt = '#,##0';
+  col_totalFee.numFmt = '#,##0';
+  col_totalDeduction.numFmt = '#,##0';
+  // __________________________________________________________________________
+  // __________________________________________________________________________
+  rowArr_data.forEach((row) => {
+    const cell_billSerialNumber = row.getCell(col_billSerialNumber.key!);
+    cell_billSerialNumber.alignment = { wrapText: true };
+
+    const cell_deductionDetail = row.getCell(col_deductionDetail.key!);
+    cell_deductionDetail.alignment = { wrapText: true };
   });
 
   // ---------------------------------------------------------------------------
@@ -647,7 +706,7 @@ const dlExcel = async ({
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    link.download = `${excelName}.xlsx`;
+    link.download = `${excelName}_${twYear}${month}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();
     link.remove();
