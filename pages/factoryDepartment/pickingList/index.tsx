@@ -732,7 +732,7 @@ export default function AddPurchaseRequisition() {
         setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
     }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
 
-    
+
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
         setHandinputproductid(e.target.value);
@@ -2757,6 +2757,28 @@ export default function AddPurchaseRequisition() {
                                     />
                                 </div>
                                 <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
+                                        disabled={false} // 根據需求設置是否禁用
+                                        style={{
+                                            // padding: '8px', // 調整樣式
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option> {/* 預設選項 */}
+                                        <option value="領料中">領料中</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+
+                                </div>
+                                <br />
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
@@ -2768,6 +2790,7 @@ export default function AddPurchaseRequisition() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -2782,6 +2805,7 @@ export default function AddPurchaseRequisition() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -2793,20 +2817,6 @@ export default function AddPurchaseRequisition() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />

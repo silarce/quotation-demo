@@ -620,15 +620,15 @@ export default function ReviewList() {
         setData2([]);
         if (tabName === "待審核") {
             if (data.length > 0) {
-                GetReviewStatus(data[0]);
+                // GetReviewStatus(data[0]);
             }
         } else if (tabName === "審核中") {
             if (data3.length > 0) {
-                GetReviewStatus(data3[0]);
+                // GetReviewStatus(data3[0]);
             }
         } else if (tabName === "審核完成") {
             if (data4.length > 0) {
-                GetReviewStatus(data4[0]);
+                // GetReviewStatus(data4[0]);
             }
         }
 
