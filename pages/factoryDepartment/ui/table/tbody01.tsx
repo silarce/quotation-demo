@@ -221,7 +221,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   async function GetPurchaseOrder(item: any) {
     handleRowClick(item.purchaseorderid)
-    alert(getTaiwanDateStr(item.need_date));
+    // alert(getTaiwanDateStr(item.need_date));
     router.push({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
