@@ -73,6 +73,7 @@ export default function PurchaseOrderList() {
         note,
         status,
         shippingaddress,
+        need_date,
         viewtype
     } = router.query;
 
@@ -307,33 +308,34 @@ export default function PurchaseOrderList() {
 
     //#region 收
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
-    // useEffect(() => {
-    //     if (purchaseorderuuid) {
-    //         if (purchaseorderuuidin != purchaseorderuuid) {
-    //             setData2([]);
-    //         }
-    //         getPurchaseOrderDetail(purchaseorderuuid);
-    //         if (purchaseorderdetailuuid) {
-    //             GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
-    //         }
-    //         setPurchaseorderidin(purchaseorderid as string);
-    //         setPurchaseorderuuidin(purchaseorderuuid as string);
-    //         // setCreate_atin((create_at != null ? create_at : "") as string);
-    //         // alert(create_at)
-    //         setCreate_atin(create_at as string);
-    //         setCreate_byin(create_by as string);
-    //         setSuppliernamein(suppliername as string);
-    //         setSuppliertaxidin(suppliertaxid as string);
-    //         setReceiptedin(receipted as string);
-    //         setSupplieraddressin(supplieraddress as string);
-    //         setInvoicein(invoice as string);
-    //         setSupplierphonein(supplierphone as string);
-    //         setNotein(note as string);
-    //         setStatusin(status as string);
-    //         setShippingaddressin(shippingaddress as string);
-    //         GetReviewById(purchaseorderuuid);
-    //     }
-    // }, [purchaseorderuuid, purchaseorderdetailuuid]);
+    useEffect(() => {
+        if (purchaseorderuuid) {
+            if (purchaseorderuuidin != purchaseorderuuid) {
+                setData2([]);
+            }
+            getPurchaseOrderDetail(purchaseorderuuid);
+            if (purchaseorderdetailuuid) {
+                GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
+            }
+            setPurchaseorderidin(purchaseorderid as string);
+            setPurchaseorderuuidin(purchaseorderuuid as string);
+            // setCreate_atin((create_at != null ? create_at : "") as string);
+            // alert(create_at)
+            setCreate_atin(create_at as string);
+            setCreate_byin(create_by as string);
+            setSuppliernamein(suppliername as string);
+            setSuppliertaxidin(suppliertaxid as string);
+            setReceiptedin(receipted as string);
+            setSupplieraddressin(supplieraddress as string);
+            setInvoicein(invoice as string);
+            setSupplierphonein(supplierphone as string);
+            setNotein(note as string);
+            setStatusin(status as string);
+            setShippingaddressin(shippingaddress as string);
+            setNeed_datein(need_date as string);
+            GetReviewById(purchaseorderuuid);
+        }
+    }, [purchaseorderuuid, purchaseorderdetailuuid]);
     //#endregion
 
     // 取該筆採購單的進貨單
@@ -1002,6 +1004,7 @@ export default function PurchaseOrderList() {
                     supplierphone: supplierphonein,
                     invoice: invoicein,
                     create_at: create_atin,
+                    need_date: need_datein,
                     create_by: create_byin,
                     status: '採購中',
                     note: notein,
@@ -1493,7 +1496,6 @@ export default function PurchaseOrderList() {
                                                 },
                                             }}
                                         /> */}
-
                                         <InputSel
                                             caption="需用日期"
                                             disabled={!editmain}
@@ -1501,8 +1503,8 @@ export default function PurchaseOrderList() {
                                             datePickerProps={{
                                                 props: {
                                                     value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
-                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
-                                                },
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).toString() : '') }
+                                               },
                                             }}
                                         />
                                     </div>
@@ -2159,8 +2161,8 @@ export default function PurchaseOrderList() {
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'PurchaseOrder'} />
-                            {/* <Tbody01 type={'PurchaseOrder'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {searchdata && (
+                            <Tbody01 type={'PurchaseOrder'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* {searchdata && (
                                 searchdata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader10}>
                                         <div
@@ -2181,7 +2183,7 @@ export default function PurchaseOrderList() {
                                     </CellWithBar>
                                 ))
                             )
-                            }
+                            } */}
                         </div>
 
                     </div>

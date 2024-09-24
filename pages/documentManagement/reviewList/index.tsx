@@ -167,9 +167,9 @@ export default function ReviewList() {
             // 檢查 data 是否有內容
             if (data.length > 0) {
 
-                setCurrentreview_id(data[0].id);
-                setReviewtype(data[0].document_type)
-                GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
+                // setCurrentreview_id(data[0].id);
+                // setReviewtype(data[0].document_type)
+                // GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
 
 
             } else {
@@ -374,7 +374,7 @@ export default function ReviewList() {
             }
             else if (reviewtype === "採購單") {
                 const parsedQuery = JSON.parse(itemQuery.query);
-                console.log(parsedQuery);
+                console.log(parsedQuery.need_date);
                 router.replace({
                     query: {
                         purchaseorderuuid: parsedQuery.purchaseorderuuid,
@@ -388,6 +388,7 @@ export default function ReviewList() {
                         create_by: parsedQuery.create_by,
                         status: `${document_status === "核准" ? "已核准" : document_status}`,
                         note: parsedQuery.note,
+                        need_date:parsedQuery.need_date,
                         firstin: 1,
                         shippingaddress: parsedQuery.shippingaddress,
                         viewtype: 'review'
@@ -620,15 +621,15 @@ export default function ReviewList() {
         setData2([]);
         if (tabName === "待審核") {
             if (data.length > 0) {
-                // GetReviewStatus(data[0]);
+                GetReviewStatus(data[0]);
             }
         } else if (tabName === "審核中") {
             if (data3.length > 0) {
-                // GetReviewStatus(data3[0]);
+                GetReviewStatus(data3[0]);
             }
         } else if (tabName === "審核完成") {
             if (data4.length > 0) {
-                // GetReviewStatus(data4[0]);
+                GetReviewStatus(data4[0]);
             }
         }
 

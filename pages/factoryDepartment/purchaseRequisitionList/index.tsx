@@ -2123,8 +2123,8 @@ export default function PurchaseRequisitionList() {
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
-                            {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {searchdata && (
+                            <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* {searchdata && (
                                 searchdata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader15}>
                                         <div
@@ -2141,7 +2141,7 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.note}</span> </div>
                                     </CellWithBar>
                                 ))
-                            )}
+                            )} */}
 
 
                         </div>
