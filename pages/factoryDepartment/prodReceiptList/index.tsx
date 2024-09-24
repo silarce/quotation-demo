@@ -43,7 +43,8 @@ import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
-
+import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
+import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -312,6 +313,7 @@ export default function ProdReceiptList() {
                 setPaystatusin(data[0].pay_status);
                 setNotein(data[0].note);
                 GetReviewById(data[0].prodreceiptuuid);//審核
+                GetReviewHistory(data[0].prodreceiptid)
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
@@ -428,6 +430,7 @@ export default function ProdReceiptList() {
             setPaystatusin(paystatus as string);
             setNotein(note as string);
             GetReviewById(prodreceiptuuid);//審核
+            GetReviewHistory(prodreceiptid as string);
         }
     }, [prodreceiptuuid]);
 
@@ -1012,7 +1015,8 @@ export default function ProdReceiptList() {
             const data = await response.json();
 
             getProdReceipt();
-            getProdReceiptDetail(prodreceiptidin);
+            getProdReceiptDetail(prodreceiptuuidin);
+            setStatusin("已結案");
 
         } catch (error: any) {
             console.log(error.message);
@@ -1282,6 +1286,7 @@ export default function ProdReceiptList() {
                         setStatusin("進貨中");
                         setReview_flow("");
                         setValue(null);
+                        GetReviewHistory(prodreceiptidin);
 
 
                     } catch (error: any) {
@@ -1898,12 +1903,24 @@ export default function ProdReceiptList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
-                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
+
+
+                                {/* <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
                                 </span>
                                 <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) || data2.length > 0 ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增入庫</button>
-                                </span>
+                                </span> */}
+
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增入庫">
+                                        <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增入庫">
+                                        <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        新增
+                                    </button>
+
                                 {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>轉入庫中</button>
                                 </span> */}

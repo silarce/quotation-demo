@@ -917,7 +917,7 @@ export default function AddPurchaseRequisition() {
         };
     }, []);
 
-    
+
     const handlePreAddPR = () => {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
@@ -1154,16 +1154,7 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: getTaiwanDateStr(create_atin || '') || '',
-                                        },
-                                    }}
-                                />
+
                                 {/* <InputSel
                                     {...inputSelProps}
                                     caption="請購部門"
@@ -1187,6 +1178,19 @@ export default function AddPurchaseRequisition() {
                             </div>
                             <div>
                                 <InputSel
+                                    {...inputSelProps}
+                                    caption="請購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: getTaiwanDateStr(create_atin || '') || '',
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div>
+                                <InputSel
                                     caption="需用日期"
                                     className="global_tip_must"
                                     // disabled={status === "未儲存" ? false : true}
@@ -1200,7 +1204,6 @@ export default function AddPurchaseRequisition() {
                                     }}
                                 />
                             </div>
-                            <div></div>
                             <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                 <InputSel
                                     {...inputSelProps}

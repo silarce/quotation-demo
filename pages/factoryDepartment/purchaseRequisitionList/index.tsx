@@ -589,19 +589,13 @@ export default function PurchaseRequisitionList() {
     }
 
     const handleAddToList = (item: any) => {
-        console.log(item);
-
-        // 檢查 suppliername 是否存在
         if (item.suppliername === null || item.suppliername === undefined || item.suppliername === '') {
             myAlert.warning({ title: '尚未詢價', content: '請確認是否詢價完畢，並確認供應商' });
         } else {
-            // 檢查是否有不同供應商
             if (data2.length > 0 && data2[0].suppliername !== item.suppliername) {
                 myAlert.warning({ title: '不同供應商', content: '不同供應商不能放在同一個清單中採購' });
             } else {
-                // 檢查是否已經存在於列表中
                 if (!data2.find(existingItem => existingItem.purchaserequisitiondetailuuid === item.purchaserequisitiondetailuuid)) {
-                    // 將 item 加入到 data2 中
                     setData2(prevData2 => [...prevData2, item]);
                 }
             }
@@ -1507,16 +1501,6 @@ export default function PurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="需用日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
-                                                },
-                                            }}
-                                        />
                                     </div>
                                     <div>
                                         <InputSel
@@ -1535,6 +1519,19 @@ export default function PurchaseRequisitionList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="需用日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
+                                                },
+                                            }}
+                                        />
+
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="請購人員"
                                             disabled={true}
                                             inputProps={{
@@ -1544,7 +1541,6 @@ export default function PurchaseRequisitionList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
