@@ -167,9 +167,9 @@ export default function ReviewList() {
             // 檢查 data 是否有內容
             if (data.length > 0) {
 
-                setCurrentreview_id(data[0].id);
-                setReviewtype(data[0].document_type)
-                GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
+                // setCurrentreview_id(data[0].id);
+                // setReviewtype(data[0].document_type)
+                // GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
 
 
             } else {
@@ -374,7 +374,7 @@ export default function ReviewList() {
             }
             else if (reviewtype === "採購單") {
                 const parsedQuery = JSON.parse(itemQuery.query);
-                console.log(parsedQuery);
+                console.log(parsedQuery.need_date);
                 router.replace({
                     query: {
                         purchaseorderuuid: parsedQuery.purchaseorderuuid,
@@ -388,6 +388,7 @@ export default function ReviewList() {
                         create_by: parsedQuery.create_by,
                         status: `${document_status === "核准" ? "已核准" : document_status}`,
                         note: parsedQuery.note,
+                        need_date:parsedQuery.need_date,
                         firstin: 1,
                         shippingaddress: parsedQuery.shippingaddress,
                         viewtype: 'review'
@@ -590,7 +591,7 @@ export default function ReviewList() {
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
-        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
     };
 
     const tabChosed = (tabName: string) => {
@@ -615,9 +616,6 @@ export default function ReviewList() {
         }
         setTabnow(tabName);
         setTabshow(tabName);
-
-
-
         setReviewtype('');
         setSelectedItemId('');
         setData2([]);
@@ -642,7 +640,6 @@ export default function ReviewList() {
         setKeyword2('');
         setKeyword3('');
         setKeyword4('');
-
     }
 
     const handleReviewConfirm = async () => {
@@ -656,9 +653,6 @@ export default function ReviewList() {
                 review_memo: review_memo,
                 review_id: currentreview_id
             };
-
-
-
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
@@ -696,39 +690,68 @@ export default function ReviewList() {
         }
     }
 
+    const handleReviewRejected = async () => {
+        setReview_memo("");
+        setReviewtype("");
+        setData2([]);
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                username: userInfo?.username,
+                review_memo: review_memo,
+                review_id: currentreview_id
+            };
+
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/ReviewRejected`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            GetReview();
+            GetReviewing();
+            GetReviewed();
+
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
 
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'簽核清單'} panelList={panelList} />
+
+
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1000,
-                        }}>
-                        </div>
-                        <div></div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-                            <div className={scss.head_head1}>
-                                <div>
-                                    審核id:{currentreview_id}
-                                </div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                            </div>
+                        <div>
                             <div className={scss.head_content1}>
                                 <div>
                                     <span>
@@ -795,7 +818,7 @@ export default function ReviewList() {
                                         >
                                             審核完成
                                             &nbsp;
-                                            {data4.length > 0 && (
+                                            {/* {data4.length > 0 && (
                                                 <span style={{
                                                     display: 'inline-block',
                                                     backgroundColor: '#5b5a5ad6',
@@ -809,7 +832,7 @@ export default function ReviewList() {
                                                 }}>
                                                     {data4.length}
                                                 </span>
-                                            )}
+                                            )} */}
 
                                         </button>
                                     </span>
@@ -971,7 +994,7 @@ export default function ReviewList() {
                                     </button>
                                 </div>
                                 <div>
-                                    <button className={scss.longsquarebtn} onClick={() => { alert("噢~噢~") }} title="駁回"
+                                    <button className={scss.longsquarebtn} onClick={() => { handleReviewRejected() }} title="駁回"
                                         style={{ color: `${(tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? '#5b5a5ad6' : '#14256a'}` }}>
                                         {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                         駁回
