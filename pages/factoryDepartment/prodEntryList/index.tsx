@@ -187,6 +187,13 @@ export default function ProdEntryList() {
     const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>("");
     const [nowprodentrydetailuuid, setNowprodentrydetailuuid] = useState<string>("");
 
+    //入庫總數
+    const [totalentryprogress, setTotalentryprogress] = useState<string>("");
+    //入庫進度
+    const [entryprogress, setEntryprogress] = useState<string>("");
+
+
+
 
 
     //#region  儲位入庫modal
@@ -397,6 +404,20 @@ export default function ProdEntryList() {
             setTaxPrice(taxPrice.toLocaleString());
             const totalPayPrice = totalprice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            // 入庫進度
+            let totalentry = data.length;
+            let alreadyentry = 0;
+            
+            data.forEach((element: { entry_qty: any, quantity: any }) => {
+                if (element.entry_qty === element.quantity) {
+                    alreadyentry += 1;
+                }
+            });
+            setTotalentryprogress(totalentry);
+            setEntryprogress(`${alreadyentry}`);
+
+
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
         }
@@ -1460,75 +1481,44 @@ export default function ProdEntryList() {
     }, []); // 空依賴陣列確保只在掛載和卸載時運行
 
 
+    const closeDoc = async (type: any) => {
+        try {
+            const conditionModel = {
+                prodentryuuid: prodentryuuidin,
+                type: type,
+                username: userInfo?.username,
+            };
 
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPEToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getProdEntry();
+            getProdEntryDetail(prodentryuuidin);
+            setStatusin("已結案");
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'入庫單'} panelList={panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1002
-                        }}>
-                            {/*    <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="入庫日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="入庫單號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
-                                </div>
-                                <div>
-                                </div>
-                            </form>*/}
-                        </div>
-
-                        <div>
-                            <Thead01 type={'ProdEntry'} />
-                            <Tbody01 type={'ProdEntry'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                        </div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
@@ -1546,11 +1536,11 @@ export default function ProdEntryList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
+                                {/* <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
                                     <img src={icon_wh.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     儲位
                                 </button>
-                                &nbsp;
+                                &nbsp; */}
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="print" style={{ height: '20px', width: '20px' }} />
                                     列印
@@ -1583,9 +1573,18 @@ export default function ProdEntryList() {
                             </div>
                             <div></div>
                             <div>
-                                <button className={scss.squarebtn} title="單據結案">
-                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                <button style={{ display: `${parseInt(entryprogress) === parseInt(totalentryprogress) && statusin != '已結案' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
+                                </button>
+                                <button style={{ display: `${parseInt(entryprogress) != parseInt(totalentryprogress) ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    已結
                                 </button>
                             </div>
                         </div>
@@ -1782,12 +1781,12 @@ export default function ProdEntryList() {
                                     />
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="排版用"
+                                        caption="入庫進度"
                                         disabled={true}
-                                        className='invisible'
                                         inputProps={{
                                             props: {
-                                                value: ' ',
+                                                style: { color: 'red' },
+                                                value: `${entryprogress}/${totalentryprogress}`,
                                             },
                                         }}
                                     />
@@ -2415,6 +2414,28 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
+                                <select
+                                    value={keyword3 || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                        setKeyword3(e.target.value);
+                                        e.target.blur(); // 讓 select 失去焦點
+                                    }}
+                                    disabled={false} // 根據需求設置是否禁用
+                                    style={{
+                                        // padding: '8px', // 調整樣式
+                                        fontSize: '18px',
+                                        borderBottom: '1px solid #14256a',
+                                        color: '#14256a'
+                                    }}
+                                >
+                                    <option value="">全部</option> {/* 預設選項 */}
+                                    <option value="入庫中">入庫中</option>
+                                    <option value="已結案">已結案</option>
+                                </select>
+
+                            </div>
+                            <br />
+                            <div>
                                 <InputSel
                                     caption="起始日期"
                                     disabled={false}
@@ -2426,6 +2447,7 @@ export default function ProdEntryList() {
                                         }
                                     }}
                                 />
+
                             </div>
                             <br />
                             <div>
@@ -2440,6 +2462,7 @@ export default function ProdEntryList() {
                                         }
                                     }}
                                 />
+
                             </div>
                             <br />
                             <div>
@@ -2451,20 +2474,6 @@ export default function ProdEntryList() {
                                         props: {
                                             value: keyword2 || ' ',
                                             onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <br />
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: keyword3 || ' ',
-                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                         },
                                     }}
                                 />

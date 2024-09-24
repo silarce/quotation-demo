@@ -73,6 +73,7 @@ export default function PurchaseOrderList() {
         note,
         status,
         shippingaddress,
+        need_date,
         viewtype
     } = router.query;
 
@@ -83,7 +84,6 @@ export default function PurchaseOrderList() {
         return param;
     };
 
-    const purchaseorderuuidStr = getQueryParam(purchaseorderuuid);
 
 
 
@@ -118,6 +118,8 @@ export default function PurchaseOrderList() {
     const [notein, setNotein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
+    const [quoterequuidin, setQuoterequuidin] = useState<string>("");
+    const [need_datein, setNeed_datein] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -164,73 +166,7 @@ export default function PurchaseOrderList() {
 
 
     //#region 上方功能列
-
-    //搜尋功能
-    const searchTargetList = [
-        {
-            placeholder: '採購單號',
-        },
-        {
-            placeholder: '採購日期',
-        },
-        {
-            placeholder: '採購人員',
-        },
-    ];
-
-    //搜尋功能
-    const doSearch = (valueArr: (string | Toption | null)[]) => {
-        const keywordWhpname = valueArr[0] as string;
-        const keywordMaterialnumber = valueArr[1] as string;
-        const keywordSpec = valueArr[2] as string;
-        searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
-    };
-
-    // 搜尋功能
-    const searchGroup = {
-        searchTargetList,
-        doSearch,
-    };
-
-    const searchData = async (keyword1: string, keyword2: string, keyword3: string) => {
-        try {
-            if (keyword1 === "" && keyword2 === "" && keyword3 === "") {
-                setData(data1restore);
-                return;
-            }
-            // keywordSpec
-            const conditionModel: { keyword1: string | undefined, keyword2: string | undefined, keyword3: string | undefined } = {
-                keyword1: getTaiwanDateStr(keyword1) as string | undefined,
-                keyword2: keyword2 as string | undefined,
-                keyword3: keyword3 as string | undefined
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            //erpAPI
-            const response = await fetch(`${setting.apipath}/WareHouse/SearchPurchaseOrderById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            let data = await response.json();
-            setData(data);
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
-
-
-
-    //新增按鈕
+    // 新增按鈕
     const panelList: TpanelList = [
         {
             type: 'addButton',
@@ -248,18 +184,25 @@ export default function PurchaseOrderList() {
     ];
     //#endregion
 
-    //#region call api
-    //取領料單清單
+    // pageLoad 頁面載入
+    const hasFetchedData = useRef(false);
+
+    useEffect(() => {
+        if (!hasFetchedData.current) {
+            getPurchaseOrder();
+            GetReviewFlow();
+            hasFetchedData.current = true;
+        }
+    }, []);
+
+    // 取領料單清單
     const getPurchaseOrder = async () => {
         try {
-            // console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
                 type: '採購中',
                 username: userInfo?.username
-                // keyword: "search" as string | undefined,
             };
-            console.log(userInfo?.username);
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -275,25 +218,13 @@ export default function PurchaseOrderList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            // if (data.length === 0) {
-            //     myAlert.warning({
-            //         title: '尚無單據'
-            //     })
-            //     return;
-            // }
-
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
-            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            console.log(data.length);
-            console.log(checkfirstin);
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0].receipted);
                 getPurchaseOrderDetail(data[0].purchaseorderuuid);
-                // GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaseorderuuidin(data[0].purchaseorderuuid);
                 setPurchaseorderidin(data[0].purchaseorderid);
@@ -307,7 +238,10 @@ export default function PurchaseOrderList() {
                 setNotein(data[0].note);
                 setStatusin(data[0].status);
                 setShippingaddressin(data[0].shippingaddress);
-                GetReviewById(data[0].purchaseorderuuid);//審核
+                setNeed_datein(data[0].need_date);
+                setQuoterequuidin(data[0].quoterequuid);
+                GetReviewById(data[0].purchaseorderuuid);
+                GetReviewHistory(data[0].purchaseorderid);
             }
         } catch (error: any) {
             setError(error.message);
@@ -317,29 +251,13 @@ export default function PurchaseOrderList() {
         }
     };
 
-    const hasFetchedData = useRef(false);
-
-    useEffect(() => {
-        if (!hasFetchedData.current) {
-            getPurchaseOrder();
-            GetReviewFlow();//審核
-            hasFetchedData.current = true;
-        }
-    }, []);
-
-
-
-    //取對應的採購明細
+    // 取對應的採購明細
     const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
         try {
-            // alert(purchaseorderuuid)
-            setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined
-            } = {
+            // setIsLoading(true);
+            const conditionModel = {
                 purchaseorderuuid: purchaseorderuuid as string | undefined,
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -355,10 +273,6 @@ export default function PurchaseOrderList() {
             }
             const data = await response.json();
             setData1(data);
-
-            // setData2(data);
-
-            console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
@@ -370,14 +284,11 @@ export default function PurchaseOrderList() {
             setTotalPayPrice(totalPayPrice.toLocaleString());
 
             // 進貨進度
-            let totalreq = data.length; // 總數量
-            let completereq = 0; // 完成數量
-
+            let totalreq = data.length;
+            let completereq = 0;
             data.forEach((element: any) => {
-                // 將 alreadyinquantity 和 quantity 轉換為整數
                 const alreadyInQuantity = parseInt(element.alreadyinquantity, 10);
                 const quantity = parseInt(element.quantity, 10);
-
                 if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity >= quantity) {
                     completereq += 1;
                 }
@@ -391,10 +302,11 @@ export default function PurchaseOrderList() {
             setError(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
+    //#region 收
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
         if (purchaseorderuuid) {
@@ -420,26 +332,20 @@ export default function PurchaseOrderList() {
             setNotein(note as string);
             setStatusin(status as string);
             setShippingaddressin(shippingaddress as string);
+            setNeed_datein(need_date as string);
             GetReviewById(purchaseorderuuid);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
+    //#endregion
 
-
-    //取該筆採購單的進貨單
+    // 取該筆採購單的進貨單
     const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any, purchaseorderdetailuuid: any) => {
         try {
-            // alert("ss" + purchaseorderdetailuuid);
-            // alert(purchaseorderuuid);
-
-            setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined,
-                purchaseorderdetailuuid: string | undefined
-            } = {
+            // setIsLoading(true);
+            const conditionModel = {
                 purchaseorderuuid: purchaseorderuuid as string | undefined,
                 purchaseorderdetailuuid: purchaseorderdetailuuid as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -456,33 +362,25 @@ export default function PurchaseOrderList() {
             const data = await response.json();
             console.log(data);
             setData2(prevData2 => {
-                // 创建一个 Set 来存储现有 ID
                 const existingIds = new Set(prevData2.map(item => item.id));
-
-                // 过滤掉重复项
                 const newItems = data.filter((item: { id: string }) => !existingIds.has(item.id));
-
-                // 将非重复的新项添加到 prevData2 中
                 return [...prevData2, ...newItems];
             });
-            // setData2(prevData2 => [...prevData2, ...data]);
             console.log(data2);
 
         } catch (error: any) {
             setError(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
-
+    // 單據轉換
     const TransferPurchaseOrderToProductReceipt = async () => {
         console.log(data2);
         try {
-            setIsLoading(true);
-
-
+            // setIsLoading(true);
             const conditionModel = {
                 purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
                 data: data2,
@@ -496,10 +394,6 @@ export default function PurchaseOrderList() {
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-
-
-
-
 
             const response = await fetch(`${setting.apipath}/WareHouse/TransferPurchaseOrderToProductReceipt`, {
                 method: 'POST',
@@ -521,36 +415,24 @@ export default function PurchaseOrderList() {
                 })
 
             setData2([]);
-
-            // 更新數據和其它操作
             getPurchaseOrder();
             getPurchaseOrderDetail(purchaseorderuuidin);
-            // GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuidin, purchaseorderdetailuuidin);
-
         } catch (error: any) {
-            setError(error.message);
             console.error('Transfer failed:', error);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
-
-
-    //結案
+    // 結案
     const sentPOToReview = async (type: any) => {
         try {
-            setIsLoading(true);
-            const conditionModel: {
-                type: any,
-                purchaseorderuuid: string | undefined,
-                username: any
-            } = {
+            // setIsLoading(true);
+            const conditionModel = {
                 type: type,
                 purchaseorderuuid: purchaseorderuuidin,
                 username: userInfo?.username,
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -570,13 +452,11 @@ export default function PurchaseOrderList() {
             getPurchaseOrderDetail(purchaseorderuuidin);
             await new Promise(resolve => setTimeout(resolve, 500));
             setStatusin(setStatus(type));
-
-            // alert(type);
         } catch (error: any) {
             setError(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -610,11 +490,8 @@ export default function PurchaseOrderList() {
     //#endregion
     // 轉為進貨單，開始驗收
     function handleTransfer() {
-        // TransferPurchaseOrderToProductReceipt();
         if (editstatus === true) {
             myAlert.warning({ title: "請先結束編輯狀態" });
-            // } else if (invoicein === "" || invoicein === undefined || invoicein === null) {
-            //     myAlert.warning({ title: "發票號碼尚未輸入" });
         } else if (editmain === true) {
             myAlert.warning({ title: "尚未儲存或取消編輯" });
         }
@@ -723,6 +600,8 @@ export default function PurchaseOrderList() {
             content: null,
             props: {
                 onOk: async () => {
+                    console.log(create_atin);
+                    console.log(need_datein);
                     try {
                         // 建立要傳送的數據
                         const data = {
@@ -738,14 +617,13 @@ export default function PurchaseOrderList() {
                         console.log(data);
                         // return;
 
-                        const conditionModel: {
-                            purchaseorderuuid: any,
-                            data: any,
-                            note: any
-                        } = {
+                        const conditionModel = {
                             purchaseorderuuid: purchaseorderuuidin,
                             data: data,
-                            note: notein
+                            create_at: create_atin,
+                            need_date: need_datein,
+                            note: notein,
+                            data1: data1
                         };
 
 
@@ -790,14 +668,6 @@ export default function PurchaseOrderList() {
             }
         });
     };
-
-    const handleSubmit = (e: any) => {
-
-        e.preventDefault();
-        searchData(keyword1, keyword2, keyword3);
-
-    };
-
 
     // 採購單查詢
     const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
@@ -1019,6 +889,7 @@ export default function PurchaseOrderList() {
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
     const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
 
     //取全部的自訂流程
     const GetReviewFlow = async () => {
@@ -1068,7 +939,7 @@ export default function PurchaseOrderList() {
         try {
             setReviewflowdata([]);
             setReviewflowdata2([]);
-            setIsLoading(true);
+            // setIsLoading(true);
 
             const conditionModel = {
                 document_uuid: document_uuid
@@ -1082,27 +953,17 @@ export default function PurchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
             const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
 
-            // 檢查響應狀態
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-
-            // 檢查響應內容是否為空
             const text = await response.text();
             if (text.trim() === '') {
-                // console.log('No data returned');
                 return;
             }
-
-            // 解析 JSON
             const data = JSON.parse(text);
-
             console.log(data);
-
-            // 檢查資料是否存在且有效
             if (data && data.length > 0) {
                 setReviewflowdata(data);
             } else {
@@ -1110,9 +971,10 @@ export default function PurchaseOrderList() {
             }
 
         } catch (error: any) {
-            setError(error.message);
+            // setError(error.message);
+            console.error(error.message);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -1142,6 +1004,7 @@ export default function PurchaseOrderList() {
                     supplierphone: supplierphonein,
                     invoice: invoicein,
                     create_at: create_atin,
+                    need_date: need_datein,
                     create_by: create_byin,
                     status: '採購中',
                     note: notein,
@@ -1268,6 +1131,7 @@ export default function PurchaseOrderList() {
                         setStatusin("採購中");
                         setReview_flow("");
                         setValue(null);
+                        GetReviewHistory(purchaseorderidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1278,6 +1142,45 @@ export default function PurchaseOrderList() {
                 }
             }
         });
+    }
+
+    const GetReviewHistory = async (id: any) => {
+        try {
+            const conditionModel = {
+                id: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            // setIsLoading(false);
+        }
     }
     //#endregion
 
@@ -1290,11 +1193,15 @@ export default function PurchaseOrderList() {
         });
     }
 
-    const Excel = async (id: any) => {
+    const Excel = async (id: any, type2: any) => {
         try {
+
             setIsLoading(true);
             const conditionModel = {
                 id: id,
+                type: 'purchaseorder',
+                type2: type2,
+                quoterequuid: quoterequuidin
             };
 
             const inputModel = {
@@ -1342,79 +1249,65 @@ export default function PurchaseOrderList() {
         }
     };
 
+    const handleChangePurchaseOrder = (item: any) => {
+        handleRowClick(item.purchaseorderid);
+        setData2([]);
+        GetProdReceiptDetailByPurchaseOrderId(item.purchaseorderuuid, item.purchaseorderdetailuuid);
+        getPurchaseOrderDetail(item.purchaseorderuuid);
+        setPurchaseorderidin(item.purchaseorderid as string);
+        setPurchaseorderuuidin(item.purchaseorderuuid as string);
+        setCreate_atin(item.create_at as string);
+        setCreate_byin(item.create_by as string);
+        setSuppliernamein(item.suppliername as string);
+        setSuppliertaxidin(item.suppliertaxid as string);
+        setReceiptedin(item.receipted as string);
+        setSupplieraddressin(item.supplieraddress as string);
+        setInvoicein(item.invoice as string);
+        setSupplierphonein(item.supplierphone as string);
+        setNotein(item.note as string);
+        setStatusin(item.status as string);
+        setNeed_datein(item.need_date as string);
+        setShippingaddressin(item.shippingaddress as string);
+        setQuoterequuidin(item.quoterequuid as string);
+        GetReviewById(item.purchaseorderuuid);
+        GetReviewHistory(item.purchaseorderid as string);
+    }
+
+    const handleChangePurchaseOrder2 = (item: any, event: React.MouseEvent) => {
+        event.stopPropagation();  // 阻止冒泡
+        setSearchmodalopen(false);
+    }
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("單據明細");
+    const [tabshow, setTabshow] = useState<string>("單據明細");
+
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName);
+        setTabshow(tabName);
+    };
+
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag={'採購單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === false ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1000,
-
-                        }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="採購日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="採購單號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
-                                </div>
-                                <div>
-                                    <Thead01 type={'PurchaseOrder'} />
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* <hr /> */}
-
-                        <div>
-                            <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                        </div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
@@ -1432,9 +1325,14 @@ export default function PurchaseOrderList() {
                                     列印
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin) }} title="列印">
-                                    <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    Excel
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po") }} title="單據Excel">
+                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    單據
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "pc") }} title="比價Excel">
+                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    比價
                                 </button>
                             </div>
                             <div>
@@ -1445,7 +1343,7 @@ export default function PurchaseOrderList() {
                                     </button>
                                 </span>
                                 &nbsp; */}
-                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
+                                <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
@@ -1546,7 +1444,6 @@ export default function PurchaseOrderList() {
                                     <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     已結
                                 </button>
-
                             </div>
                         </div>
                         <div className={scss.head_body}>
@@ -1565,17 +1462,51 @@ export default function PurchaseOrderList() {
                                         />
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="採購日期"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_atin) || ' ',
+                                                },
+                                            }}
+                                        /> */}
+                                        <InputSel
+                                            caption="採購日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />
 
+                                    </div>
+                                    <div>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="需用日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein)?.toString() : need_datein) || ' ',
+                                                },
+                                            }}
+                                        /> */}
+                                        <InputSel
+                                            caption="需用日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).toString() : '') }
+                                               },
+                                            }}
+                                        />
                                     </div>
                                     <div>
                                         <InputSel
@@ -1588,10 +1519,7 @@ export default function PurchaseOrderList() {
                                                 },
                                             }}
                                         />
-
-
                                     </div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1690,36 +1618,8 @@ export default function PurchaseOrderList() {
                                         />
                                     </div>
                                 </div>
-                                <div className={scss.head_content3}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_content4}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_foot1}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        {/* <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
-                                    <button className={scss.redbtn} onClick={() => { handleClosePO("結案") }}>結案</button>
-                                </span>
-                                <span style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} onClick={() => { myAlert.warning({ title: '尚未達到需求數量' }) }}>
-                                    <button className={scss.disabledbtn}>結案</button>
-                                </span>
-                                <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>已結案</button>
-                                </span> */}
-                                    </div>
-                                </div>
-
                             </div>
                             <div>
-
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                     <InputSel
                                         {...inputSelProps}
@@ -1755,59 +1655,154 @@ export default function PurchaseOrderList() {
                                         }}
                                     />
                                 </div>
-
                             </div>
                         </div>
-
-                        <div className={scss.head_foot2}>
+                        <div className={scss.head_tab}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
-                                    進貨紀錄
-                                </button> */}
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('單據明細')}
+                                        style={getButtonStyle('單據明細')}
+                                    >
+                                        單據明細
+                                    </button>
+                                </span>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('審核明細')}
+                                        style={getButtonStyle('審核明細')}
+                                    >
+                                        審核明細
+                                    </button>
+                                </span>
                             </div>
-                            <div>
-
-                            </div>
-                            <div>
-
-                            </div>
-                            <div style={{ textAlign: 'right' }}></div>
+                            <div></div>
                         </div>
-                        <div className={scss.body_content1}>
-                            <Thead01 type={'PurchaseOrderDetail'} />
-                            {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {data1 && (
-                                data1.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader11}>
-                                        <div className={scss.row01}>
-                                            <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                            <span>{_item.quantity}</span>
-                                            <span>{_item.unit}</span>
-                                            <span>{_item.unitprice.toLocaleString()}</span>
-                                            <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span>
-                                                <button
-                                                    style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
-                                                    onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
-                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
-                                                </button>
-                                                <button
-                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
-                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                </button>
-
-
-                                            </span>
-                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                        <div className={scss.tabbody}>
+                            <div >
+                                <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                        <div >
+                                            <Thead01 type={'PurchaseOrderDetail'} />
+                                            {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                                            {data1 && (
+                                                data1.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader11}>
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.productid}</span>
+                                                            <span>{_item.name}</span>
+                                                            <span>{_item.spec}</span>
+                                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                                            {/* <span>{_item.quantity}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '60px' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    maxLength={9}
+                                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            quantity: newQuantity,
+                                                                            totalprice: newQuantity * newData[index].unitprice
+                                                                        };
+                                                                        setData1(newData);
+                                                                        // handleChange(index, "quantity", e.target.value);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.unit}</span>
+                                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '80px' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
+                                                                    type="text"
+                                                                    maxLength={8}
+                                                                    value={_item.unitprice.toLocaleString()}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            unitprice: newUnitPrice,
+                                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                                            <span>
+                                                                <button
+                                                                    style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
+                                                                    onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
+                                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+                                                                <button
+                                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={noteRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    type="text"
+                                                                    value={_item.note}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newNote = e.target.value
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            note: newNote
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
                                         </div>
-                                    </CellWithBar>
-                                ))
-                            )}
+                                    </div>
+                                </div>
+                                <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ReviewHistory'} />
+                                            {reviewhistroydata && (
+                                                reviewhistroydata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader18} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.document_status}</span>
+                                                            <span>{_item.current_stage}</span>
+                                                            <span>{_item.review_person}</span>
+                                                            <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <br />
                         <div className={scss.body_foot1}>
                             <div>
@@ -2000,24 +1995,6 @@ export default function PurchaseOrderList() {
                     </div>
                 </div>
 
-                {/* <Modal
-                    visible={searchmodalopen}
-                    footer={null}
-                    onCancel={SearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    // title={
-                    //     <div className={scss.modal_head_head1}>
-                    //         <div>
-                    //             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
-                    //         </div>
-                    //         <div>
-                    //             <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
-                    //         </div>
-                    //     </div>
-                    // }
-                    style={{ top: 200 }}
-                > */}
                 <DragableModal
                     handleText="查找單據"
                     style={{ zIndex: '1001', width: '1000px' }}
@@ -2048,6 +2025,29 @@ export default function PurchaseOrderList() {
                                         }}
                                     />
                                 </div>
+                                <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
+                                        disabled={false}
+                                        style={{
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option>
+                                        <option value="採購中">採購中</option>
+                                        <option value="審核中">審核中</option>
+                                        <option value="已核准">已核准</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+
+                                </div>
+                                <br />
                                 <div>
                                     <InputSel
                                         caption="起始日期"
@@ -2085,20 +2085,6 @@ export default function PurchaseOrderList() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -2176,6 +2162,28 @@ export default function PurchaseOrderList() {
                         }}>
                             <Thead01 type={'PurchaseOrder'} />
                             <Tbody01 type={'PurchaseOrder'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* {searchdata && (
+                                searchdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader10}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.purchaseorderid === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => { setTimeout(() => { handleChangePurchaseOrder(_item) }, 200) }}
+                                            onDoubleClick={(event) => { handleChangePurchaseOrder2(_item, event) }}
+                                        >
+                                            <span>{index + 1}</span>
+                                            <span>{_item.purchaseorderid}</span>
+                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "採購中" ? '#28a745' : '#ea1833' }}>
+                                                {_item.status}
+                                            </span>
+                                            <span>{_item.suppliername}</span>
+
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )
+                            } */}
                         </div>
 
                     </div>
