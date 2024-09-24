@@ -42,6 +42,8 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_history from 'public/image/icon/fc_history.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
+import icon_export from 'public/image/icon/fc_export.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -123,6 +125,16 @@ export default function AddPurchaseOrder() {
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
     const [supplieridin, setSupplieridin] = useState<string>("");
 
+    const [suppliername2in, setSuppliername2in] = useState<string>("");
+    const [suppliertaxid2in, setSuppliertaxid2in] = useState<string>("");
+    const [supplieraddress2in, setSupplieraddress2in] = useState<string>("");
+    const [supplierphone2in, setSupplierphone2in] = useState<string>("");
+
+    const [suppliername3in, setSuppliername3in] = useState<string>("");
+    const [suppliertaxid3in, setSuppliertaxid3in] = useState<string>("");
+    const [supplieraddress3in, setSupplieraddress3in] = useState<string>("");
+    const [supplierphone3in, setSupplierphone3in] = useState<string>("");
+
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
@@ -159,6 +171,7 @@ export default function AddPurchaseOrder() {
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
     const [handinputunitprice, setHandinputunitprice] = useState<number>(0);
     const [handinputtotalprice, setHandinputtotalprice] = useState<number>(0);
+    const [handinputsuppliername, setHandinputsuppliername] = useState<string>("");
 
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
@@ -185,12 +198,6 @@ export default function AddPurchaseOrder() {
     const searchTargetList = [
         {
             placeholder: '物料號碼',
-        },
-        {
-            placeholder: '物料名稱',
-        },
-        {
-            placeholder: '物料規格',
         },
     ];
 
@@ -390,16 +397,13 @@ export default function AddPurchaseOrder() {
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         setCreate_byin(userInfo?.username.toString() || '');
-        setNeed_date(moment().format('YYYY-MM-DD') || '');
     }, []);
 
     //取所有物料，for查詢代入用
     const getProductById = async (productuuid: any) => {
         try {
             // setIsLoading(true);
-            const conditionModel: {
-                productuuid: string | undefined
-            } = {
+            const conditionModel= {
                 productuuid: productuuid as string | undefined,
             };
 
@@ -475,6 +479,14 @@ export default function AddPurchaseOrder() {
                 suppliertaxid: suppliertaxidin,
                 supplieraddress: supplieraddressin,
                 shippingaddress: shippingaddressin,
+                suppliername2: suppliername2in,
+                supplierphone2: supplierphone2in,
+                suppliertaxid2: suppliertaxid2in,
+                supplieraddress2: supplieraddress2in,
+                suppliername3: suppliername3in,
+                supplierphone3: supplierphone3in,
+                suppliertaxid3: suppliertaxid3in,
+                supplieraddress3: supplieraddress3in,
 
             };
 
@@ -508,13 +520,13 @@ export default function AddPurchaseOrder() {
                 })
 
             setData2([]);
-            setQuotereqid(data[0].detail_id);
+            setQuotereqid(data[0].quotereqid);
             setQuoterequuid(data[0].id);
-            setStatus("未送出");
+            setStatus("未結案");
             getQuotereq();
 
 
-            setStatus("未送出");
+            setStatus("未結案");
             console.log(data);
 
             // getProduct();
@@ -630,6 +642,7 @@ export default function AddPurchaseOrder() {
                 note: handinputnote,
                 unitprice: handinputunitprice,
                 totalprice: handinputtotalprice,
+                suppliername: handinputsuppliername
             };
 
             setHandinputproductuuid('');
@@ -972,6 +985,16 @@ export default function AddPurchaseOrder() {
         setQuotereqid("儲存後產生");
         setStatus("未儲存");
         setNote("");
+
+        setSuppliername2in("");
+        setSupplierphone2in("");
+        setSuppliertaxid2in("");
+        setSupplieraddress2in("");
+
+        setSuppliername3in("");
+        setSupplierphone3in("");
+        setSuppliertaxid3in("");
+        setSupplieraddress3in("");
         setData2([]);
     }
 
@@ -1110,7 +1133,7 @@ export default function AddPurchaseOrder() {
         // 模糊查詢單號
         if (requisitionId) {
             filteredData = filteredData.filter(item =>
-                item?.purchaseorderid?.toString().includes(requisitionId)
+                item?.quotereqid?.toString().includes(requisitionId)
             );
         }
 
@@ -1168,7 +1191,7 @@ export default function AddPurchaseOrder() {
             return;
         }
 
-        
+
 
 
         // 過濾資料
@@ -1215,7 +1238,7 @@ export default function AddPurchaseOrder() {
         filterData2();
     }, [keywordstartdate2, keywordenddate2, keyword5, keyword6, keyword7, keyword8]);
 
-    const clearFilterData2= (e: any) => {
+    const clearFilterData2 = (e: any) => {
         e.preventDefault();
         setKeywordstartdate2(null)
         setKeywordenddate2(null);
@@ -1233,6 +1256,49 @@ export default function AddPurchaseOrder() {
 
     const handlechangepo = (item: any) => {
         console.log(item);
+        // handleRowClick(item.id);
+        setData2([]);
+        setQuotereqid(item.quotereqid);
+        setQuoterequuid(item.id);
+        setStatus(item.status);
+        setNote(item.note);
+        setCreate_atin(item.create_at);
+        setNeed_date(item.need_date);
+        setSuppliernamein(item.suppliername);
+        setSupplierphonein(item.supplierphone);
+        setSuppliertaxidin(item.suppliertaxid);
+        setSupplieraddressin(item.supplieraddress);
+        setShippingaddressin(item.shippingaddress);
+        setSuppliername2in(item.suppliername2);
+        setSupplierphone2in(item.supplierphone2);
+        setSuppliertaxid2in(item.suppliertaxid2);
+        setSupplieraddress2in(item.supplieraddress2);
+        setSuppliername3in(item.suppliername3);
+        setSupplierphone3in(item.supplierphone3);
+        setSuppliertaxid3in(item.suppliertaxid3);
+        setSupplieraddress3in(item.supplieraddress3);
+        switch (tabnow) {
+            case "廠商1":
+                setHandinputsuppliername(item.suppliername);
+                break;
+            case "廠商2":
+                setHandinputsuppliername(item.suppliername2);
+                break;
+            case "廠商3":
+                setHandinputsuppliername(item.suppliername3);
+                break;
+            default:
+                break;
+        }
+
+
+        getQuotereqDetail(item.id);
+        setSearchmodalopen(false);
+
+    }
+
+    const handlechangepo2 = (item: any) => {
+        console.log(item);
         handleRowClick(item.id);
         setData2([]);
         setQuotereqid(item.quotereqid);
@@ -1246,8 +1312,33 @@ export default function AddPurchaseOrder() {
         setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
         setShippingaddressin(item.shippingaddress);
+        setSuppliername2in(item.suppliername2);
+        setSupplierphone2in(item.supplierphone2);
+        setSuppliertaxid2in(item.suppliertaxid2);
+        setSupplieraddress2in(item.supplieraddress2);
+        setSuppliername3in(item.suppliername3);
+        setSupplierphone3in(item.supplierphone3);
+        setSuppliertaxid3in(item.suppliertaxid3);
+        setSupplieraddress3in(item.supplieraddress3);
+        switch (tabnow) {
+            case "廠商1":
+                setHandinputsuppliername(item.suppliername);
+                break;
+            case "廠商2":
+                setHandinputsuppliername(item.suppliername2);
+                break;
+            case "廠商3":
+                setHandinputsuppliername(item.suppliername3);
+                break;
+            default:
+                break;
+        }
+
+
         getQuotereqDetail(item.id);
     }
+
+
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const handleRowClick = (itemId: string) => {
@@ -1265,9 +1356,28 @@ export default function AddPurchaseOrder() {
 
     useEffect(() => {
         if (customersisSelectingRef.current) return;
+        let supnameFilter: string | undefined;
+        let supaddressFilter: string | undefined;
 
-        const supnameFilter = suppliernamein?.trim();
-        const supaddressFilter = supplieraddressin?.trim();
+        switch (tabnow) {
+            case "廠商1":
+                supnameFilter = suppliernamein?.trim();
+                supaddressFilter = supplieraddressin?.trim();
+                break;
+            case "廠商2":
+                supnameFilter = suppliername2in?.trim();
+                supaddressFilter = supplieraddress2in?.trim();
+                break;
+            case "廠商3":
+                supnameFilter = suppliername3in?.trim();
+                supaddressFilter = supplieraddress3in?.trim();
+                break;
+            default:
+                // 可以設置為預設值或處理其他情況
+                supnameFilter = undefined;
+                supaddressFilter = undefined;
+                break;
+        }
 
 
         if (supnameFilter !== "" || supaddressFilter !== "") {
@@ -1287,30 +1397,53 @@ export default function AddPurchaseOrder() {
         }
 
 
-    }, [suppliernamein, supplieraddressin, shippingaddressin]);
+    }, [suppliernamein, supplieraddressin, shippingaddressin, suppliername2in, supplieraddress2in, suppliername3in, supplieraddress3in]);
 
-    const handleSuppliernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        customersisSelectingRef.current = false;
-        setSuppliernamein(e.target.value);
-    };
 
-    const handleSupplieraddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        customersisSelectingRef.current = false;
-        setSupplieraddressin(e.target.value);
-    };
+
+
 
     const handleSelectCustomer = (item: any) => {
         customersisSelectingRef.current = true;
-        setSupplieridin(item?.customer_number);
-        setSuppliernamein(item?.name);
-        setSupplieraddressin(
-            (item.county ? item.county : '') +
-            (item.district ? item.district : '') +
-            (item.address ? item.address : '')
-        );
-        setSupplierphonein(item.phone ? item.phone : '');
-        setSuppliertaxidin(item.tax_id ? item.tax_id : 'f');
 
+
+        switch (tabnow) {
+            case "廠商1":
+                setSupplieridin(item?.customer_number);
+                setSuppliernamein(item?.name);
+                setSupplieraddressin(
+                    (item.county ? item.county : '') +
+                    (item.district ? item.district : '') +
+                    (item.address ? item.address : '')
+                );
+                setSupplierphonein(item.phone ? item.phone : '');
+                setSuppliertaxidin(item.tax_id ? item.tax_id : '');
+                break;
+            case "廠商2":
+                // setSupplierid2in(item?.customer_number);
+                setSuppliername2in(item?.name);
+                setSupplieraddress2in(
+                    (item.county ? item.county : '') +
+                    (item.district ? item.district : '') +
+                    (item.address ? item.address : '')
+                );
+                setSupplierphone2in(item.phone ? item.phone : '');
+                setSuppliertaxid2in(item.tax_id ? item.tax_id : '');
+                break;
+            case "廠商3":
+
+                setSuppliername3in(item?.name);
+                setSupplieraddress3in(
+                    (item.county ? item.county : '') +
+                    (item.district ? item.district : '') +
+                    (item.address ? item.address : '')
+                );
+                setSupplierphone3in(item.phone ? item.phone : '');
+                setSuppliertaxid3in(item.tax_id ? item.tax_id : '');
+                break;
+            default:
+                break;
+        }
 
         setcustomersShowSuggestions(false);
     };
@@ -1439,18 +1572,250 @@ export default function AddPurchaseOrder() {
         // UpdatePurchaseOrderDetail(item);
     };
 
+    const DeleteQuotereq = async (id: any) => {
+
+        myAlert.confirm({
+            title: '確定要刪除這筆單據嗎?',
+            content: <>
+                <h1>刪除後將無法復原</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            id: id
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/DeleteQuotereq?${queryParams}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const responseData = await response.text();
+
+                        myAlert.success({ title: '刪除成功' });
+
+                        getQuotereq();
+
+                        setQuotereqid('');
+                        setCreate_atin('');
+                        setSuppliernamein('');
+                        setSupplieraddressin('');
+                        setSupplierphonein('');
+                        setSuppliertaxidin('');
+                        setSuppliername2in('');
+                        setSupplieraddress2in('');
+                        setSupplierphone2in('');
+                        setSuppliertaxid2in('');
+                        setSuppliername3in('');
+                        setSupplieraddress3in('');
+                        setSupplierphone3in('');
+                        setSuppliertaxid3in('');
+                        setNote('');
+                        setCreate_byin('');
+                        setStatus('');
+                        setData2([]);
+                        setKeyword3('');
+
+
+
+                    } catch (error: any) {
+                        setError(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+
+                }
+            }
+        })
+    };
+
+    const Excel = async (id: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+                type: 'quotereq'
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_詢比價表_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("廠商1");
+    const [tabshow, setTabshow] = useState<string>("廠商1");
+
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName); // 設置當前 tab 值
+        setTabshow(tabName);
+        switch (tabName) {
+            case "廠商1":
+                setHandinputsuppliername(suppliernamein);
+                break;
+            case "廠商2":
+                setHandinputsuppliername(suppliername2in);
+                break;
+            case "廠商3":
+                setHandinputsuppliername(suppliername3in);
+                break;
+            default:
+                break;
+        }
+
+        setSelectedItemId('');
+    };
+
+    //#endregion
+
+
+    const handleSuppliernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        customersisSelectingRef.current = false;
+        switch (tabnow) {
+            case "廠商1":
+                setSuppliernamein(e.target.value);
+                break;
+            case "廠商2":
+                setSuppliername2in(e.target.value);
+                break;
+            case "廠商3":
+                setSuppliername3in(e.target.value);
+                break;
+            default:
+                break;
+        }
+    };
+    const handleSupplieraddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        customersisSelectingRef.current = false;
+        switch (tabnow) {
+            case "廠商1":
+                setSupplieraddressin(e.target.value);
+                break;
+            case "廠商2":
+                setSupplieraddress2in(e.target.value);
+                break;
+            case "廠商3":
+                setSupplieraddress3in(e.target.value);
+                break;
+            default:
+                break;
+        }
+    };
+    const handleSupplierphoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        customersisSelectingRef.current = false;
+        switch (tabnow) {
+            case "廠商1":
+                setSupplierphonein(e.target.value);
+                break;
+            case "廠商2":
+                setSupplierphone2in(e.target.value);
+                break;
+            case "廠商3":
+                setSupplierphone3in(e.target.value);
+                break;
+            default:
+                break;
+        }
+    };
+    const handleSuppliertaxidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        customersisSelectingRef.current = false;
+        switch (tabnow) {
+            case "廠商1":
+                setSuppliertaxidin(e.target.value);
+                break;
+            case "廠商2":
+                setSuppliertaxid2in(e.target.value);
+                break;
+            case "廠商3":
+                setSuppliertaxid3in(e.target.value);
+                break;
+            default:
+                break;
+        }
+    };
+
+    const handleSuppliernow = async () => {
+
+        switch (tabnow) {
+            case "廠商1":
+                setHandinputsuppliername(suppliernamein)
+                break;
+            case "廠商2":
+                setSuppliertaxid2in(suppliername2in);
+                break;
+            case "廠商3":
+                setSuppliertaxid3in(suppliername3in);
+                break;
+            default:
+                break;
+        }
+
+
+    }
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag='詢價單' panelList={panelList} />
-            {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
-                    <div></div>
-                    <div className={scss.content}>
-                        <div></div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
@@ -1462,14 +1827,15 @@ export default function AddPurchaseOrder() {
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { setProductSearchmodalopen(!productSearchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    品項
+                                    價格
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="Excel">
+                                    <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    詢價
                                 </button>
                             </div>
                             <div>
-                                {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
-                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button> */}
                                 <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPO() }} title="新增單據">
                                     <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                     新增
@@ -1499,9 +1865,14 @@ export default function AddPurchaseOrder() {
                                     取消
                                 </button>
                             </div>
-                            <div></div>
                             <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
+                                <button style={{ display: `${status === "未結案" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { DeleteQuotereq(quoterequuid) }} title="單據刪除">
+                                    <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    刪除
+                                </button>
+                            </div>
+                            <div>
+                                <button style={{ display: `${status === "未結案" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據送出">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
@@ -1524,28 +1895,17 @@ export default function AddPurchaseOrder() {
                                     </div>
                                     <div>
                                         <InputSel
-                                            {...inputSelProps}
                                             caption="詢價日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || ' ',
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
-                                            caption="需用日期"
                                             className="global_tip_must"
                                             disabled={status === "未儲存" ? false : true}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                            // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
-                                                    onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin((e?.toString() || '') || '') }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                     </div>
                                     <div>
                                         <InputSel
@@ -1562,30 +1922,8 @@ export default function AddPurchaseOrder() {
                                     </div>
                                     <div></div>
                                 </div>
-                                <div className={scss.head_content2}>
+                                <div className={scss.head_foot1}>
                                     <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商名稱"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliernamein ? suppliernamein : ' ',
-                                                    onChange: (e) => { handleSuppliernameChange(e) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商地址"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieraddressin ? supplieraddressin : ' ',
-                                                    onChange: (e) => { handleSupplieraddressChange(e) }
-                                                },
-                                            }}
-                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
@@ -1597,92 +1935,280 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="送貨地址"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    // value: shippingaddressin ? shippingaddressin : ' ',
-                                                    value: shippingaddressin ? shippingaddressin : ' ',
-                                                    // onChange: (e) => { setShippingaddressin(e.target.value) }
-                                                    onChange: (e) => { handleShippingaddressChange(e) }
-                                                },
-                                            }}
-                                        /> */}
-
                                     </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_tab}>
                                     <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="聯絡電話"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierphonein ? supplierphonein : ' ',
-                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="統一編號"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption=""
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { color: '#ea1833' },
-                                                    value: `${status === "未儲存" ? "※可輸入公司名稱查詢地址" : ' '}`,
-                                                },
-                                            }}
-                                        /> */}
+                                        <span>
+                                            <button
+                                                className={scss.minitabbtn}
+                                                onClick={() => tabChosed('廠商1')}
+                                                style={getButtonStyle('廠商1')}
+                                            >
+                                                廠商1
+                                            </button>
+                                        </span>
+                                        <span>
+                                            <button
+                                                className={scss.minitabbtn}
+                                                onClick={() => tabChosed('廠商2')}
+                                                style={getButtonStyle('廠商2')}
+                                            >
+                                                廠商2
+                                            </button>
+                                        </span>
+                                        <span>
+                                            <button
+                                                className={scss.minitabbtn}
+                                                onClick={() => tabChosed('廠商3')}
+                                                style={getButtonStyle('廠商3')}
+                                            >
+                                                廠商3
+                                            </button>
+                                        </span>
                                     </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.tabbody}>
                                     <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="發票號碼"
-                                            disabled={status === "未儲存" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: invoicein ? invoicein : ' ',
-                                                    onChange: (e) => { setInvoicein(e.target.value) }
-                                                },
-                                            }}
-                                        /> */}
+                                        <div style={{ display: `${tabshow === "廠商1" ? '' : 'none'}` }}>
+                                            <div>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
+                                                    <div >
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商名稱"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliernamein ? suppliernamein : ' ',
+                                                                    onChange: (e) => { handleSuppliernameChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商地址"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplieraddressin ? supplieraddressin : ' ',
+                                                                    onChange: (e) => { handleSupplieraddressChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="聯絡電話"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplierphonein ? supplierphonein : ' ',
+                                                                    onChange: (e) => { handleSupplierphoneChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="統一編號"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
+                                                                    onChange: (e) => { handleSuppliertaxidChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: `${tabshow === "廠商2" ? '' : 'none'}` }}>
+                                            <div>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
+                                                    <div >
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商名稱"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliername2in ? suppliername2in : ' ',
+                                                                    onChange: (e) => { handleSuppliernameChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商地址"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplieraddress2in ? supplieraddress2in : ' ',
+                                                                    onChange: (e) => { handleSupplieraddressChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="聯絡電話"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplierphone2in ? supplierphone2in : ' ',
+                                                                    onChange: (e) => { handleSupplierphoneChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="統一編號"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliertaxid2in ? suppliertaxid2in : ' ',
+                                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: `${tabshow === "廠商3" ? '' : 'none'}` }}>
+                                            <div>
+                                                <div className={scss.head_content2} style={{ padding: '0px 10px' }}>
+                                                    <div >
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商名稱"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliername3in ? suppliername3in : ' ',
+                                                                    onChange: (e) => { handleSuppliernameChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="廠商地址"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplieraddress3in ? supplieraddress3in : ' ',
+                                                                    onChange: (e) => { handleSupplieraddressChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="聯絡電話"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: supplierphone3in ? supplierphone3in : ' ',
+                                                                    onChange: (e) => { handleSupplierphoneChange(e) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="統一編號"
+                                                            disabled={status === "未儲存" ? false : true}
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: suppliertaxid3in ? suppliertaxid3in : ' ',
+                                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                                },
+                                                            }}
+                                                        />
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <InputSel
+                                                            {...inputSelProps}
+                                                            caption="排版用"
+                                                            disabled={true}
+                                                            className='invisible'
+                                                            inputProps={{
+                                                                props: {
+                                                                    value: ' ',
+                                                                },
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div className={scss.head_content3}>
                                     <div style={{ marginRight: '20px' }}>
                                         {customersfilteredData.length > 0 && (
@@ -1770,18 +2296,7 @@ export default function AddPurchaseOrder() {
                                     </div>
                                     <div></div>
                                 </div>
-                                <div className={scss.head_foot1}>
-                                    <div>
 
-                                    </div>
-                                    <div></div>
-                                    <div></div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        {/* <span>
-                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
-                                </span> */}
-                                    </div>
-                                </div>
                             </div>
                             <div>
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
@@ -1813,12 +2328,23 @@ export default function AddPurchaseOrder() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
-                                    品項查詢
-                                </button> */}
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>
+                                    廠商1：
+                                    {suppliernamein}
+                                </span>
                             </div>
-                            <div style={{ marginTop: '5px' }}></div>
-                            <div></div>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>
+                                    廠商2：
+                                    {suppliername2in}
+                                </span>
+                            </div>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>
+                                    廠商3：
+                                    {suppliername3in}
+                                </span>
+                            </div>
                             <div></div>
                         </div>
                         <div className={scss.body_content1}>
@@ -1864,7 +2390,7 @@ export default function AddPurchaseOrder() {
                                                 style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
-                                                value={_item.detail_quantity !== undefined ? _item.detail_quantity : 0}
+                                                value={_item.detail_quantity !== undefined ? _item.detail_quantity.toLocaleString() : 0}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 readOnly
                                                 onChange={(e) => {
@@ -1900,7 +2426,7 @@ export default function AddPurchaseOrder() {
                                                 ref={unitpriceRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
-                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice : ''}
+                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice.toLocaleString() : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 readOnly
                                                 onChange={(e) => {
@@ -1909,7 +2435,20 @@ export default function AddPurchaseOrder() {
                                             />
                                         </span>
                                         <span>
-                                            {_item.detail_totalprice}
+                                            {_item.detail_totalprice.toLocaleString()}
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                type="text"
+                                                value={_item.detail_suppliername !== undefined ? _item.detail_suppliername : ''}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "suppliername", e.target.value);
+                                                }}
+                                            />
                                         </span>
                                         <span>
                                             <input
@@ -1929,7 +2468,7 @@ export default function AddPurchaseOrder() {
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false && status === '未送出') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                            <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
@@ -1944,7 +2483,8 @@ export default function AddPurchaseOrder() {
                             ))}
 
 
-                            <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                            <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未結案') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                                {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
@@ -1993,7 +2533,7 @@ export default function AddPurchaseOrder() {
                                         onChange={(e) => {
                                             const quantity = parseInt(e.target.value) || 0;
                                             setHandinputquantity(quantity);
-                                            setHandinputtotalprice(quantity * handinputunitprice); // 同時更新總金額
+                                            setHandinputtotalprice(quantity * handinputunitprice);
                                         }}
                                     />
                                 </div>
@@ -2034,7 +2574,14 @@ export default function AddPurchaseOrder() {
                                         onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
                                     />
                                 </div>
-
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商'
+                                        value={handinputsuppliername}
+                                    // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
                                 <div>
                                     <input
                                         type="text"
@@ -2254,9 +2801,6 @@ export default function AddPurchaseOrder() {
                                     <span>
                                         <button className={scss.minibtn} onClick={(e) => { clearFilterData2(e) }}>清除條件</button>
                                     </span>
-                                    {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
                                 </div>
                             </form>
                         </div>
@@ -2283,17 +2827,13 @@ export default function AddPurchaseOrder() {
                                             <span>{_item.detail_unit}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                            <span>{_item.detail_suppliername}</span>
-                                            {/* <span>{_item.create_by}</span> */}
-                                            {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
-                                        </div>
+                                            <span>{_item.detail_suppliername}</span>                                        </div>
                                     </CellWithBar>
                                 ))
                             )}
                         </div>
 
                     </div>
-                    {/* </Modal> */}
                 </DragableModal>
 
                 <DragableModal
@@ -2326,6 +2866,28 @@ export default function AddPurchaseOrder() {
                                         }}
                                     />
                                 </div>
+                                <br />
+                                <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
+                                        disabled={false} // 根據需求設置是否禁用
+                                        style={{
+                                            // padding: '8px', // 調整樣式
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option> {/* 預設選項 */}
+                                        <option value="已結案">已結案</option>
+                                        <option value="未結案">未結案</option>
+                                    </select>
+                                </div>
+                                <br />
                                 <div>
                                     <InputSel
                                         caption="起始日期"
@@ -2363,20 +2925,6 @@ export default function AddPurchaseOrder() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -2460,7 +3008,8 @@ export default function AddPurchaseOrder() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                            onClick={() => { handlechangepo(_item) }}>
+                                            onDoubleClick={() => { handlechangepo(_item) }}
+                                            onClick={() => { handlechangepo2(_item) }}>
                                             <span>{index + 1}</span>
                                             <span>{_item.quotereqid}</span>
                                             <span>{getTaiwanDateStr(_item.create_at)}</span>

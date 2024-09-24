@@ -853,13 +853,13 @@ export default function ProductList() {
         }
 
         if (keyword3) {
-            filteredData = searchdata.filter(item =>
+            filteredData = filteredData.filter(item =>
                 item.name.toString().includes(keyword3.trim())
             );
         }
 
         if (keyword4) {
-            filteredData = searchdata.filter(item =>
+            filteredData = filteredData.filter(item =>
                 item.spec && item.spec.toString().includes(keyword4.trim())
             );
         }
@@ -946,7 +946,7 @@ export default function ProductList() {
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
-        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
     };
 
     const tabChosed = (tabName: string) => {
@@ -1109,22 +1109,8 @@ export default function ProductList() {
                     <div className={scss.content}>
                         <div
                             style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-
-
                             <div className={scss.head_head1}>
-                                <div>
-                                    {/* <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                        <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
-                                    </button>
-                                    &nbsp; */}
-                                    {/* <button className={scss.squarebtn} onClick={() => { setAddmodalopen(!addmodalopen) }} title="新增物料">
-                                        <img src={icon_autoadd.src} alt="addProduct" style={{ height: '30px', width: '30px' }} />
-                                    </button>
-                                    &nbsp; */}
-                                    <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="匯出">
-                                        <img src={icon_export.src} alt="export" style={{ height: '30px', width: '30px' }} />
-                                    </button>
-                                </div>
+                                <div></div>
                                 <div></div>
                                 <div></div>
                                 <div></div>
@@ -1233,7 +1219,7 @@ export default function ProductList() {
                                         onClick={() => tabChosed('編輯')}
                                         style={getButtonStyle('編輯')}
                                     >
-                                        <img src={icon_edit.src} alt="edit" style={{ height: '20px', width: '20px' }} title="編輯物料" />
+                                        編輯
                                     </button>
                                 </span>
                                 <span>
@@ -1242,7 +1228,7 @@ export default function ProductList() {
                                         onClick={() => tabChosed('新增')}
                                         style={getButtonStyle('新增')}
                                     >
-                                        <img src={icon_autoadd.src} alt="add" style={{ height: '20px', width: '20px' }} title="新增物料" />
+                                        新增
                                     </button>
                                 </span>
                             </div>
@@ -1251,7 +1237,7 @@ export default function ProductList() {
                             </div>
                             <div></div>
                         </div>
-                        <div style={{ border: '1px solid #c1c1c1', margin: '0px 20px' }}>
+                        <div >
 
                             <div style={{ display: `${tabshow === "編輯" ? '' : 'none'}` }}>
                                 <br />

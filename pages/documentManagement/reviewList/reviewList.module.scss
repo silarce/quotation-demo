@@ -76,7 +76,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    border: 1px solid #c1c1c1;
+    // border: 1px solid #c1c1c1;
     overflow-y: auto;
     overflow-x: hidden;
     position: sticky;
@@ -99,38 +99,24 @@
     grid-template-columns: 500px 400px 500px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
-    margin-top: 5px;
+    // margin-top: 5px;
     //   margin-left: 20px;
     //   margin-right: 20px;
-    padding-bottom: 5px;
+    // padding-bottom: 5px;
     // border-bottom: 1px solid rgb(214, 214, 214);
 
     div {
         margin-right: 20px;
     }
-
-    // background-color: gray;
 }
 
 .head_content1 {
-    // display: grid;
-    // grid-template-columns: 1fr 1fr 1fr 1fr;
-    // width: auto;
-    // margin-top: 5px;
-    // margin-left: 20px;
-    // margin-right: 20px;
-
-    // div {
-    //     margin-right: 20px;
-    // }
-
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-
     width: auto;
-    // margin-left: 20px;
     margin-right: 20px;
     padding-right: 20px;
+    padding-bottom: 2px;
 }
 
 
@@ -469,29 +455,29 @@ div.panelHeader13 {
 }
 
 .minitabbtn {
-    height: 39px;
+    height: 58px;
     // width: 36px;
     // padding: 0px 40px;
-    border: solid 1px #c1c1c1;
-    border-bottom: 0px;
+    // border: solid 1px #c1c1c1;
     // border-bottom: 0px;
-    background-color: #c1c1c17c;
-    padding: 0px 8px;
+    // border-bottom: 0px;
+    background-color: #f5f5f5;
+    // padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
-    font-weight: 500;
+    font-weight: 400;
     font-size: 18px;
     // color: #14256a;
-    color: #5b5a5ad6;
+    color: #14256a;
     transform: translateY(2px);
-    width: 169px;
+    width: 124px;
 
-    &:hover {
-        border: solid 1px #c1c1c1;
-        border-bottom: 0px;
-        color: #14256a;
-        background-color: #c1c1c17c
-    }
+    // &:hover {
+    //     border: solid 1px #c1c1c1;
+    //     border-bottom: 0px;
+    //     color: #14256a;
+    //     background-color: #c1c1c17c
+    // }
     
 
     // &:focus {
