@@ -226,7 +226,7 @@ export default function InputSel({
         </div>
       )}
       {prefix && (
-        <div className={classNames(fontClassName, scss.suffix, prefixClassName)}>
+        <div className={classNames(fontClassName, scss.prefix, prefixClassName)}>
           <span>{prefix}</span>
         </div>
       )}
