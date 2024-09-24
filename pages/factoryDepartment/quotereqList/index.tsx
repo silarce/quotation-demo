@@ -199,12 +199,6 @@ export default function AddPurchaseOrder() {
         {
             placeholder: '物料號碼',
         },
-        {
-            placeholder: '物料名稱',
-        },
-        {
-            placeholder: '物料規格',
-        },
     ];
 
     //搜尋功能
@@ -409,9 +403,7 @@ export default function AddPurchaseOrder() {
     const getProductById = async (productuuid: any) => {
         try {
             // setIsLoading(true);
-            const conditionModel: {
-                productuuid: string | undefined
-            } = {
+            const conditionModel= {
                 productuuid: productuuid as string | undefined,
             };
 
@@ -530,11 +522,11 @@ export default function AddPurchaseOrder() {
             setData2([]);
             setQuotereqid(data[0].quotereqid);
             setQuoterequuid(data[0].id);
-            setStatus("未送出");
+            setStatus("未結案");
             getQuotereq();
 
 
-            setStatus("未送出");
+            setStatus("未結案");
             console.log(data);
 
             // getProduct();
@@ -1874,13 +1866,13 @@ export default function AddPurchaseOrder() {
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { DeleteQuotereq(quoterequuid) }} title="單據刪除">
+                                <button style={{ display: `${status === "未結案" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { DeleteQuotereq(quoterequuid) }} title="單據刪除">
                                     <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     刪除
                                 </button>
                             </div>
                             <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據送出">
+                                <button style={{ display: `${status === "未結案" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據送出">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     送出
                                 </button>
@@ -2398,7 +2390,7 @@ export default function AddPurchaseOrder() {
                                                 style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
-                                                value={_item.detail_quantity !== undefined ? _item.detail_quantity : 0}
+                                                value={_item.detail_quantity !== undefined ? _item.detail_quantity.toLocaleString() : 0}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 readOnly
                                                 onChange={(e) => {
@@ -2434,7 +2426,7 @@ export default function AddPurchaseOrder() {
                                                 ref={unitpriceRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
-                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice : ''}
+                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice.toLocaleString() : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 readOnly
                                                 onChange={(e) => {
@@ -2443,7 +2435,7 @@ export default function AddPurchaseOrder() {
                                             />
                                         </span>
                                         <span>
-                                            {_item.detail_totalprice}
+                                            {_item.detail_totalprice.toLocaleString()}
                                         </span>
                                         <span>
                                             <input
@@ -2476,7 +2468,7 @@ export default function AddPurchaseOrder() {
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false && status === '未送出') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                            <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
@@ -2491,7 +2483,7 @@ export default function AddPurchaseOrder() {
                             ))}
 
 
-                            <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
+                            <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未結案') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
@@ -2878,7 +2870,10 @@ export default function AddPurchaseOrder() {
                                 <div>
                                     <select
                                         value={keyword3 || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setKeyword3(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
                                         disabled={false} // 根據需求設置是否禁用
                                         style={{
                                             // padding: '8px', // 調整樣式
@@ -2889,7 +2884,7 @@ export default function AddPurchaseOrder() {
                                     >
                                         <option value="">全部</option> {/* 預設選項 */}
                                         <option value="已結案">已結案</option>
-                                        <option value="未送出">未送出</option>
+                                        <option value="未結案">未結案</option>
                                     </select>
                                 </div>
                                 <br />

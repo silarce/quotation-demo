@@ -1546,11 +1546,11 @@ export default function ProdEntryList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
+                                {/* <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
                                     <img src={icon_wh.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     儲位
                                 </button>
-                                &nbsp;
+                                &nbsp; */}
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="print" style={{ height: '20px', width: '20px' }} />
                                     列印
@@ -2415,7 +2415,29 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
+                                <select
+                                    value={keyword3 || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                        setKeyword3(e.target.value);
+                                        e.target.blur(); // 讓 select 失去焦點
+                                    }}
+                                    disabled={false} // 根據需求設置是否禁用
+                                    style={{
+                                        // padding: '8px', // 調整樣式
+                                        fontSize: '18px',
+                                        borderBottom: '1px solid #14256a',
+                                        color: '#14256a'
+                                    }}
+                                >
+                                    <option value="">全部</option> {/* 預設選項 */}
+                                    <option value="入庫中">入庫中</option>
+                                    <option value="已結案">已結案</option>
+                                </select>
+
+                            </div>
+                            <br />
+                            <div>
+                            <InputSel
                                     caption="起始日期"
                                     disabled={false}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
@@ -2426,10 +2448,11 @@ export default function ProdEntryList() {
                                         }
                                     }}
                                 />
+
                             </div>
                             <br />
                             <div>
-                                <InputSel
+                            <InputSel
                                     caption="截止日期"
                                     disabled={false}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
@@ -2440,10 +2463,11 @@ export default function ProdEntryList() {
                                         }
                                     }}
                                 />
+
                             </div>
                             <br />
                             <div>
-                                <InputSel
+                            <InputSel
                                     {...inputSelProps}
                                     caption="進貨單號"
                                     disabled={false}
@@ -2451,20 +2475,6 @@ export default function ProdEntryList() {
                                         props: {
                                             value: keyword2 || ' ',
                                             onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <br />
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: keyword3 || ' ',
-                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                         },
                                     }}
                                 />

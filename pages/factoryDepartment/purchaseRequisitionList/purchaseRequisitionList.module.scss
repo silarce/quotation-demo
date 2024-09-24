@@ -214,7 +214,7 @@
   display: grid;
   grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   gap: 0px;
-  width: 100%;
+  width: auto;
   margin-top: 2px;
   margin-left: 20px;
   margin-right: 20px;
@@ -333,7 +333,7 @@ div.panelHeader21 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 250px 60px;
+    grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 450px 60px;
     gap: 5px;
   }
 }
@@ -816,7 +816,7 @@ div.panelHeader17 {
   font-weight: 400;
   font-size: 16px;
   // color: #14256a;
-  color: #5b5a5ad6;
+  color: #14256a;
   transform: translateY(2px);
   width: 100px;
 
@@ -830,12 +830,12 @@ div.panelHeader17 {
 
 
 
-.tabbody {
-  display: grid;
-  grid-template-columns: 1fr;
-  width: auto;
+// .tabbody {
+//   display: grid;
+//   grid-template-columns: 1fr;
+//   width: auto;
 
-}
+// }
 
 .head_tab {
   display: grid;

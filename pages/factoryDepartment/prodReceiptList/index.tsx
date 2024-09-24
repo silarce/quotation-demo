@@ -276,7 +276,7 @@ export default function ProdReceiptList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            
+
             const data = await response.json();
             // if (data.length === 0) {
             //     myAlert.warning({
@@ -1029,6 +1029,7 @@ export default function ProdReceiptList() {
     const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
     const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
     const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
 
     //取全部的自訂流程
     const GetReviewFlow = async () => {
@@ -1146,15 +1147,15 @@ export default function ProdReceiptList() {
                 const review_query = {
                     prodreceiptuuid: prodreceiptuuidin,
                     prodreceiptid: prodreceiptidin,
-                    purchaseorderuuid:purchaseorderuuidin,
-                    purchaseorderid:purchaseorderidin,
-                    purchaseordercreate_at:purchaseordercreate_atin,
-                    purchaseordercreate_by:purchaseordercreate_byin,
-                    suppliername:suppliernamein,
-                    suppliertaxid:suppliertaxidin,
-                    supplieraddress:supplieraddressin,
-                    supplierphone:supplierphonein,
-                    invoice:invoicein,
+                    purchaseorderuuid: purchaseorderuuidin,
+                    purchaseorderid: purchaseorderidin,
+                    purchaseordercreate_at: purchaseordercreate_atin,
+                    purchaseordercreate_by: purchaseordercreate_byin,
+                    suppliername: suppliernamein,
+                    suppliertaxid: suppliertaxidin,
+                    supplieraddress: supplieraddressin,
+                    supplierphone: supplierphonein,
+                    invoice: invoicein,
                     create_at: create_atin,
                     create_by: create_byin,
                     status: '進貨中',
@@ -1294,9 +1295,63 @@ export default function ProdReceiptList() {
         });
     }
 
+    const GetReviewHistory = async (id: any) => {
+        try {
+            const conditionModel = {
+                id: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
     //#endregion
 
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("單據明細");
+    const [tabshow, setTabshow] = useState<string>("單據明細");
 
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName);
+        setTabshow(tabName);
+    };
+
+    //#endregion
 
 
     return (
@@ -1565,7 +1620,7 @@ export default function ProdReceiptList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
+
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1658,22 +1713,6 @@ export default function ProdReceiptList() {
                                     <div></div>
                                     <div></div>
                                 </div>
-                                <div className={scss.head_foot1}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div style={{ textAlign: "right" }}>
-                                        {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
-                                            <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
-                                        </span>
-                                        <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
-                                            <button className={scss.disabledbtn}>未結案</button>
-                                        </span>
-                                        <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
-                                            <button className={scss.disabledbtn} >已結案</button>
-                                        </span> */}
-                                    </div>
-                                </div>
                             </div>
                             <div>
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
@@ -1688,28 +1727,6 @@ export default function ProdReceiptList() {
                                             },
                                         }}
                                     />
-                                    {/* <InputSel
-                                        {...inputSelProps}
-                                        caption="入庫狀態"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: entrystatusin || ' ',
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="付款狀態"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: paystatusin || ' ',
-                                            },
-                                        }}
-                                    /> */}
                                     <InputSel
                                         {...inputSelProps}
                                         caption="入庫進度"
@@ -1724,46 +1741,91 @@ export default function ProdReceiptList() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className={scss.head_foot2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                        <div className={scss.head_tab}>
+                            <div>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('單據明細')}
+                                        style={getButtonStyle('單據明細')}
+                                    >
+                                        單據明細
+                                    </button>
+                                </span>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('審核明細')}
+                                        style={getButtonStyle('審核明細')}
+                                    >
+                                        審核明細
+                                    </button>
+                                </span>
+                            </div>
                             <div></div>
                         </div>
-                        <div className={scss.body_content1}>
-                            <Thead01 type={'ProdReceiptDetail'} />
-                            {/* <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {data1 && (
-                                data1.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader14}>
-                                        <div className={scss.row01}>
-                                            <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                            <span>{_item.quantity}</span>
-                                            <span>{_item.unit}</span>
-                                            <span>{_item.unitprice.toLocaleString()}</span>
-                                            <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span>
-                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }} style={{display:`${statusin==="已核准"?'':'none'}`}} >
-                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
-                                                </button>
-                                                {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
+                        <div className={scss.tabbody}>
+                            <div>
+                                <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                        <div>
+                                            <Thead01 type={'ProdReceiptDetail'} />
+                                            {/* <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                                            {data1 && (
+                                                data1.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader14}>
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.productid}</span>
+                                                            <span>{_item.name}</span>
+                                                            <span>{_item.spec}</span>
+                                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                                            <span>{_item.quantity}</span>
+                                                            <span>{_item.unit}</span>
+                                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                                            <span>
+                                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }} style={{ display: `${statusin === "已核准" ? '' : 'none'}` }} >
+                                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+                                                                {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                                                 </button> */}
-                                                <button
-                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
-                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                                <button
+                                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+                                                            </span>
+                                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
                                         </div>
-                                    </CellWithBar>
-                                ))
-                            )}
+                                    </div>
+                                </div>
+                                <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ReviewHistory'} />
+                                            {reviewhistroydata && (
+                                                reviewhistroydata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader18} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.document_status}</span>
+                                                            <span>{_item.current_stage}</span>
+                                                            <span>{_item.review_person}</span>
+                                                            <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <br />
                         <div className={scss.body_foot1}>
@@ -2014,6 +2076,28 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
+                                        disabled={false}
+                                        style={{
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option>
+                                        <option value="進貨中">進貨中</option>
+                                        <option value="審核中">審核中</option>
+                                        <option value="已核准">已核准</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+                                </div>
+                                <br />
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
@@ -2050,20 +2134,6 @@ export default function ProdReceiptList() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />

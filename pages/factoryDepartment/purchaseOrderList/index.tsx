@@ -118,6 +118,7 @@ export default function PurchaseOrderList() {
     const [statusin, setStatusin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
     const [quoterequuidin, setQuoterequuidin] = useState<string>("");
+    const [need_datein, setNeed_datein] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -236,9 +237,10 @@ export default function PurchaseOrderList() {
                 setNotein(data[0].note);
                 setStatusin(data[0].status);
                 setShippingaddressin(data[0].shippingaddress);
+                setNeed_datein(data[0].need_date);
                 setQuoterequuidin(data[0].quoterequuid);
                 GetReviewById(data[0].purchaseorderuuid);
-                GetReviewHistory(data[0].purchaseorderuuid);
+                GetReviewHistory(data[0].purchaseorderid);
             }
         } catch (error: any) {
             setError(error.message);
@@ -596,6 +598,8 @@ export default function PurchaseOrderList() {
             content: null,
             props: {
                 onOk: async () => {
+                    console.log(create_atin);
+                    console.log(need_datein);
                     try {
                         // 建立要傳送的數據
                         const data = {
@@ -614,6 +618,8 @@ export default function PurchaseOrderList() {
                         const conditionModel = {
                             purchaseorderuuid: purchaseorderuuidin,
                             data: data,
+                            create_at: create_atin,
+                            need_date: need_datein,
                             note: notein,
                             data1: data1
                         };
@@ -1122,6 +1128,7 @@ export default function PurchaseOrderList() {
                         setStatusin("採購中");
                         setReview_flow("");
                         setValue(null);
+                        GetReviewHistory(purchaseorderidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1185,6 +1192,7 @@ export default function PurchaseOrderList() {
 
     const Excel = async (id: any, type2: any) => {
         try {
+
             setIsLoading(true);
             const conditionModel = {
                 id: id,
@@ -1255,9 +1263,11 @@ export default function PurchaseOrderList() {
         setSupplierphonein(item.supplierphone as string);
         setNotein(item.note as string);
         setStatusin(item.status as string);
+        setNeed_datein(item.need_date as string);
         setShippingaddressin(item.shippingaddress as string);
+        setQuoterequuidin(item.quoterequuid as string);
         GetReviewById(item.purchaseorderuuid);
-        GetReviewHistory(item.purchaseorderuuid);
+        GetReviewHistory(item.purchaseorderid as string);
     }
 
     const handleChangePurchaseOrder2 = (item: any, event: React.MouseEvent) => {
@@ -1449,13 +1459,49 @@ export default function PurchaseOrderList() {
                                         />
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="採購日期"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_atin) || ' ',
+                                                },
+                                            }}
+                                        /> */}
+                                        <InputSel
+                                            caption="採購日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
+                                        />
+
+                                    </div>
+                                    <div>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="需用日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein)?.toString() : need_datein) || ' ',
+                                                },
+                                            }}
+                                        /> */}
+
+                                        <InputSel
+                                            caption="需用日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />
@@ -1706,7 +1752,24 @@ export default function PurchaseOrderList() {
                                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                                 </button>
                                                             </span>
-                                                            <span className="truncate" title={_item.note}>{_item.note}</span>
+                                                            <span>
+                                                                <input
+                                                                    ref={noteRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    type="text"
+                                                                    value={_item.note}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newNote = e.target.value
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            note: newNote
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))
@@ -1963,7 +2026,10 @@ export default function PurchaseOrderList() {
                                 <div>
                                     <select
                                         value={keyword3 || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setKeyword3(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
                                         disabled={false}
                                         style={{
                                             fontSize: '18px',
@@ -1973,6 +2039,7 @@ export default function PurchaseOrderList() {
                                     >
                                         <option value="">全部</option>
                                         <option value="採購中">採購中</option>
+                                        <option value="審核中">審核中</option>
                                         <option value="已核准">已核准</option>
                                         <option value="已結案">已結案</option>
                                     </select>

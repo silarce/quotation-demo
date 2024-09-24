@@ -710,19 +710,19 @@ export default function AddPurchaseRequisition() {
             );
         }
         if (handinputproductid) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.productid.includes(handinputproductid)
             );
         }
 
         if (handinputname) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.name.includes(handinputname)
             );
         }
 
         if (handinputspec) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.spec && item.spec.includes(handinputspec)
             );
         }
@@ -732,6 +732,7 @@ export default function AddPurchaseRequisition() {
         setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
     }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
 
+    
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
         setHandinputproductid(e.target.value);
@@ -1914,7 +1915,7 @@ export default function AddPurchaseRequisition() {
                                             },
                                         }}
                                     />
-                                                                        <InputSel
+                                    <InputSel
                                         {...inputSelProps}
                                         caption="總比數"
                                         disabled={true}
@@ -1925,8 +1926,8 @@ export default function AddPurchaseRequisition() {
                                             },
                                         }}
                                     />
-                                    
-                                    
+
+
                                 </div>
                             </div>
                         </div>
@@ -2065,7 +2066,11 @@ export default function AddPurchaseRequisition() {
 
 
                             <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1', display: `${(pickinglistid != '' && status === '領料中') ? '' : 'none'}` }}>
-                                <div></div>
+                                <div>
+                                    <button onClick={() => { handleAddByHandKey() }}>
+                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                </div>
                                 <div>
                                     <input
                                         type="text"
@@ -2149,10 +2154,6 @@ export default function AddPurchaseRequisition() {
                                 </div>
                                 <div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <button onClick={() => { handleAddByHandKey() }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                    </button>
-                                    &nbsp;&nbsp;
                                     <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote || handinputpickingby ? '' : 'none' }}>
                                         <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                     </button>

@@ -309,14 +309,6 @@ export default function AddTray() {
             label: '返回',
             onClick: () => {
                 router.back();
-                // router.push({
-                //     pathname: `/factoryDepartment/trayList`,
-                //     query: {
-                //         type: 'WareHouse',
-                //         whid: whid,
-                //         whname: whname
-                //     }
-                // });
             },
         },
     ];

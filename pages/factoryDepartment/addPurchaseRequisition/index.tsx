@@ -471,7 +471,6 @@ export default function AddPurchaseRequisition() {
             setPurchaserequisitionid(data[0].purchaserequisitionid);
             setPurchaserequisitionuuid(data[0].id);
             setStatus("未送出");
-            console.log(data);
             getPurchaseRequisition();
 
             // getProduct();
@@ -572,9 +571,7 @@ export default function AddPurchaseRequisition() {
 
     // 送出按鈕
     function handleAddPR() {
-
         AddPurchaseRequisition();
-        // }
     }
 
 
@@ -797,19 +794,19 @@ export default function AddPurchaseRequisition() {
             );
         }
         if (handinputproductid) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.productid.includes(handinputproductid)
             );
         }
 
         if (handinputname) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.name.includes(handinputname)
             );
         }
 
         if (handinputspec) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.spec && item.spec.includes(handinputspec)
             );
         }
@@ -903,6 +900,8 @@ export default function AddPurchaseRequisition() {
 
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
+
+
     useEffect(() => {
         // 定義事件處理器
         const handleResize = () => {
@@ -916,13 +915,16 @@ export default function AddPurchaseRequisition() {
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, []); // 空依賴陣列確保只在掛載和卸載時運行
+    }, []);
 
+    
     const handlePreAddPR = () => {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
         setNote("");
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
+        setNeed_date(moment().format('YYYY-MM-DD') || '');
+        setData2([]);
     }
 
     const handlecancelAddPR = () => {
@@ -1089,46 +1091,6 @@ export default function AddPurchaseRequisition() {
             <PageHeader02 tag='新增請購單' panelList={panelList} />
             {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
-                    <div>
-                        <form onSubmit={handleSubmit}>
-                            <div className={scss.searchbar}>
-                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                    <input
-                                        type="text"
-                                        placeholder='物料號碼'
-                                        value={keyword1}
-                                        onChange={(e) => setKeyword1(e.target.value)}
-                                    />
-                                </div>
-                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                    <input
-                                        type="text"
-                                        placeholder='物料名稱'
-                                        value={keyword2}
-                                        onChange={(e) => setKeyword2(e.target.value)}
-                                    />
-                                </div>
-                                <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
-                                    <input
-                                        type="text"
-                                        placeholder='物料規格'
-                                        value={keyword3}
-                                        onChange={(e) => setKeyword3(e.target.value)}
-                                    />
-                                    <button type="submit">
-                                        <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '30px' }} />
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div className={scss.content}>
-                        <div>
-                            <Thead01 type={'AddPR_GetProduct'} />
-                        </div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
@@ -1227,7 +1189,7 @@ export default function AddPurchaseRequisition() {
                                 <InputSel
                                     caption="需用日期"
                                     className="global_tip_must"
-                                    disabled={status === "未儲存" ? false : true}
+                                    // disabled={status === "未儲存" ? false : true}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                     // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                     datePickerProps={{
@@ -1656,6 +1618,27 @@ export default function AddPurchaseRequisition() {
                                     />
                                 </div>
                                 <div>
+                                    <select
+                                        value={keyword3 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
+                                        disabled={false}
+                                        style={{
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
+                                        }}
+                                    >
+                                        <option value="">全部</option>
+                                        <option value="未送出">未送出</option>
+                                        <option value="已結案">已結案</option>
+                                    </select>
+
+                                </div>
+                                <br />
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
@@ -1667,6 +1650,7 @@ export default function AddPurchaseRequisition() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -1681,6 +1665,7 @@ export default function AddPurchaseRequisition() {
                                             }
                                         }}
                                     />
+
                                 </div>
                                 <br />
                                 <div>
@@ -1692,20 +1677,6 @@ export default function AddPurchaseRequisition() {
                                             props: {
                                                 value: keyword2 || ' ',
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />

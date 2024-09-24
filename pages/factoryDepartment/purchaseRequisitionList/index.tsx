@@ -1415,11 +1415,11 @@ export default function PurchaseRequisitionList() {
                                     查詢
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { GoToQuotereq() }} title="詢價管理">
+                                {/* <button className={scss.squarebtn} onClick={() => { GoToQuotereq() }} title="詢價管理">
                                     <img src={icon_fc_quotereq.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     詢價
                                 </button>
-                                &nbsp;
+                                &nbsp; */}
                                 <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     列印
@@ -1474,7 +1474,7 @@ export default function PurchaseRequisitionList() {
                                 </button>
 
                                 &nbsp;
-                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
+                                <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據抽回" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
@@ -1834,7 +1834,7 @@ export default function PurchaseRequisitionList() {
                                                 <input
                                                     ref={noteRefs.current[index]}
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '100%' }}
                                                     type="text"
                                                     value={_item.note}
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
@@ -1926,7 +1926,7 @@ export default function PurchaseRequisitionList() {
                         <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
                     </div>
                     <hr />
-                    {selectedsupplier}
+                    {/* {selectedsupplier} */}
                     <div>
                         <Thead01 type={'Quotereq'} />
                         {prquotereqdata && (
@@ -1995,7 +1995,10 @@ export default function PurchaseRequisitionList() {
                                 <div>
                                     <select
                                         value={keyword3 || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setKeyword3(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword3(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
+                                        }}
                                         disabled={false} // 根據需求設置是否禁用
                                         style={{
                                             // padding: '8px', // 調整樣式

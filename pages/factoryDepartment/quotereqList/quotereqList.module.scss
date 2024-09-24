@@ -172,7 +172,7 @@
 .head_content1 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
+  gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
@@ -570,7 +570,7 @@ div.panelHeader20 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -595,7 +595,7 @@ div.panelHeader20 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -620,7 +620,7 @@ div.panelHeader20 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #5b5a5ad6;
   transform: translateY(2px);

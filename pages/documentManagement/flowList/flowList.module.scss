@@ -61,7 +61,7 @@
 
 .head_head1 {
     display: grid;
-    grid-template-columns: 500px 400px 500px 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -615,33 +615,6 @@ div.panelHeader13 {
 }
 
 
-
-.squarebtn {
-    height: 39px;
-    width: 39px;
-    // padding: 0px 40px;
-    border: solid 1px #c1c1c1;
-    ;
-    background-color: $bgc01;
-    padding: 0px 8px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #14256a;
-    transform: translateY(2px);
-
-    &:hover {
-        border: solid 1px #c1c1c1;
-        background-color: #c1c1c17c
-    }
-
-    &:focus {
-        background-color: $bgc01;
-        border: solid 1px #c1c1c1;
-    }
-}
-
 .modal_container {
     display: flex;
     justify-content: space-between;
@@ -772,32 +745,6 @@ div.panelHeader14 {
     }
 }
 
-.squarebtn {
-    height: 39px;
-    width: 39px;
-    // padding: 0px 40px;
-    border: solid 1px #c1c1c1;
-    ;
-    background-color: $bgc01;
-    padding: 0px 8px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #14256a;
-    transform: translateY(2px);
-
-    &:hover {
-        border: solid 1px #c1c1c1;
-        background-color: #c1c1c17c
-    }
-
-    &:focus {
-        background-color: $bgc01;
-        border: solid 1px #c1c1c1;
-    }
-}
-
 //#region 審核
 div.panelHeader21 {
     border-bottom: solid 1px $colorBorder01;
@@ -843,8 +790,8 @@ div.panelHeader21 {
     padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: 400;
+    font-size: 0.9rem;
     color: #14256a;
     transform: translateY(2px);
 
@@ -868,8 +815,8 @@ div.panelHeader21 {
     padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: 400;
+    font-size: 0.9rem;
     color: #14256a;
     transform: translateY(2px);
 
@@ -893,8 +840,8 @@ div.panelHeader21 {
     padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: 400;
+    font-size: 0.9rem;
     color: #5b5a5ad6;
     transform: translateY(2px);
 
@@ -982,7 +929,7 @@ div.panelHeader22 {
     // margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 5px;
-    padding-top:20px;
+    // padding-top:20px;
 }
 
 

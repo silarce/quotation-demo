@@ -590,7 +590,7 @@ export default function ReviewList() {
 
     // 根據當前選中的 tab 設置按鈕的樣式
     const getButtonStyle = (tabName: string) => {
-        return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
     };
 
     const tabChosed = (tabName: string) => {
@@ -748,51 +748,9 @@ export default function ReviewList() {
 
 
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                {/* {data.length > 0 && (
-                <button onClick={()=>{router.push( `/documentManagement/reviewList`)}}>
-                    <span style={{
-                        position: 'fixed', // 使用 fixed 讓元素懸浮在視窗
-                        top: '7%', // 距離視窗頂部 10px
-                        right: '14%', // 距離視窗右側 10px
-                        backgroundColor: '#ea1833',
-                        color: 'white',
-                        borderRadius: '50%',
-                        width: '24px',
-                        height: '24px',
-                        textAlign: 'center',
-                        lineHeight: '24px',
-                        fontSize: '0.9rem',
-                        zIndex: '9999' // 確保它顯示在最上層
-                    }}>
-                        {data.length}
-                    </span>
-                </button>
-            )} */}
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1000,
-                        }}>
-                        </div>
-                        <div></div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div>
-                            <div className={scss.head_head1}>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                            </div>
                             <div className={scss.head_content1}>
                                 <div>
                                     <span>
@@ -859,7 +817,7 @@ export default function ReviewList() {
                                         >
                                             審核完成
                                             &nbsp;
-                                            {data4.length > 0 && (
+                                            {/* {data4.length > 0 && (
                                                 <span style={{
                                                     display: 'inline-block',
                                                     backgroundColor: '#5b5a5ad6',
@@ -873,7 +831,7 @@ export default function ReviewList() {
                                                 }}>
                                                     {data4.length}
                                                 </span>
-                                            )}
+                                            )} */}
 
                                         </button>
                                     </span>

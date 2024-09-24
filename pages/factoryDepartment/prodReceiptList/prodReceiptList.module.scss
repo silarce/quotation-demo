@@ -76,7 +76,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  border: 1px solid #c1c1c1;
+  // border: 1px solid #c1c1c1;
   overflow-y: auto;
   overflow-x: hidden;
   position: sticky;
@@ -114,22 +114,22 @@
 
 .head_content1 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
+  grid-template-columns: 597px 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
   div {
-    margin-right: 2px;
+      margin-right: 2px;
   }
 }
 
 .head_content2 {
   display: grid;
   grid-template-columns: 597px 1fr 1fr;
-  // gap: 15px;
+  gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
@@ -187,7 +187,7 @@
   grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   gap: 0px;
   width: auto;
-  // margin-top: 4px;
+  margin-top: 2px;
   margin-left: 20px;
   margin-right: 20px;
   // border-top:1px solid rgb(168, 168, 168);
@@ -645,7 +645,7 @@ div.panelHeader14 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -670,7 +670,7 @@ div.panelHeader14 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -695,7 +695,7 @@ div.panelHeader14 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #5b5a5ad6;
   transform: translateY(2px);
@@ -736,3 +736,46 @@ div.panelHeader14 {
   margin-right: 20px;
   margin-bottom: 5px;
 }
+
+  // #region 明細頁籤
+
+  .head_tab {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  
+    width: auto;
+    // margin-left: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    div {
+      margin-right: 2px;
+    }
+  }
+.detailminitabbtn {
+    height: 30px;
+    // width: 36px;
+    // padding: 0px 40px;
+    // border: solid 1px #c1c1c1;
+    border-bottom: 0px;
+    // border-bottom: 0px;
+    background-color: #f5f5f5;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 400;
+    font-size: 16px;
+    // color: #14256a;
+    color: #5b5a5ad6;
+    transform: translateY(2px);
+    width: 100px;
+  
+    // &:hover {
+    //   border: solid 1px #c1c1c1;
+    //   border-bottom: 0px;
+    //   color: #14256a;
+    //   background-color: #c1c1c17c
+    // }
+  }
+
+
+  // #endregion
