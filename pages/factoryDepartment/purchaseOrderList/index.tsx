@@ -1343,18 +1343,18 @@ export default function PurchaseOrderList() {
                                     </button>
                                 </span>
                                 &nbsp; */}
-                                <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}> */}
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                {/* </span> */}
+                                {/* <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}> */}
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
                                         <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
-                                </span>
+                                {/* </span> */}
                                 <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
                                     <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     儲存
