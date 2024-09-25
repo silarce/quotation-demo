@@ -362,11 +362,11 @@ export default function PurchaseRequisitionList() {
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
             });
-            setTotalPrice(totalprice.toLocaleString());
+            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             const taxPrice = Math.round(totalprice * 0.05);
-            setTaxPrice(taxPrice.toLocaleString());
+            setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             const totalPayPrice = totalprice + taxPrice;
-            setTotalPayPrice(totalPayPrice.toLocaleString());
+            setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
             // 詢價進度
             let totalquotereq = data.length;
@@ -604,17 +604,35 @@ export default function PurchaseRequisitionList() {
 
 
     useEffect(() => {
+        console.log(data1);
         // 每次 data2 更新時，重新計算總價和稅金
         let totalprice = 0;
         data2.forEach((element) => {
-            totalprice += element.totalprice;
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string' 
+                ? parseFloat(element.totalprice.replace(/,/g, '')) 
+                : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
+            console.log(price);  // 顯示正確的數字格式
+            totalprice += price;  // 將其加總
         });
-        setTotalPrice1(totalprice.toLocaleString());
-        const taxPrice = Math.round(totalprice * 0.05);
-        setTaxPrice1(taxPrice.toLocaleString());
-        const totalPayPrice = totalprice + taxPrice;
-        setTotalPayPrice1(totalPayPrice.toLocaleString());
+        console.log(totalprice); // 應顯示正確的加總結果
+    
+        // 計算總價後，四捨五入到兩位小數，然後再格式化
+        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    
+        // 計算稅金，四捨五入到最接近的整數
+        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    
+        // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
+        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     }, [data2]);
+    
+    
+
+
 
 
 
@@ -734,7 +752,8 @@ export default function PurchaseRequisitionList() {
             const conditionModel = {
                 purchaserequisitiondetailuuid: purchaserequisitiondetailuuid,
                 unitprice: item.detail_unitprice,
-                totalprice: (parseInt(item.detail_unitprice) * parseInt(quotereqquantity)),
+                // totalprice: (parseFloat(item.detail_unitprice) * parseFloat(quotereqquantity)),
+                totalprice: (parseFloat(item.detail_unitprice) * parseFloat(quotereqquantity)).toFixed(2),
                 suppliername: item.detail_suppliername,
                 quotereqdetailuuid: item.detail_id,
                 suppliertaxid: item.main_suppliertaxid,
@@ -1631,11 +1650,19 @@ export default function PurchaseRequisitionList() {
                                                 data1.map((_item: any, index: number) => (
                                                     <CellWithBar key={index} className={scss.panelHeader16} >
                                                         <div className={scss.row01}>
+                                                            <span>
+                                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+                                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? 'none' : ''}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+                                                            </span>
                                                             <span>{index + 1}</span>
                                                             <span>{_item.productid}</span>
                                                             <span>{_item.name}</span>
                                                             <span>{_item.spec}</span>
-                                                            <span>{_item.quantity}</span>
+                                                            <span>{_item.quantity.toLocaleString()}</span>
                                                             <span>{_item.unit}</span>
                                                             <span>
                                                                 <button
@@ -1650,17 +1677,10 @@ export default function PurchaseRequisitionList() {
                                                                 </button>
 
                                                             </span>
-                                                            <span>{_item.unitprice.toLocaleString()}</span>
-                                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                                            <span>{_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                            <span>{_item.totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                             <span>{_item.suppliername}</span>
-                                                            <span>
-                                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
-                                                                    <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
-                                                                </button>
-                                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? 'none' : ''}` }}>
-                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                                </button>
-                                                            </span>
+
                                                             <span title={_item.note}>{_item.note}</span>
                                                         </div>
                                                     </CellWithBar>
@@ -1706,7 +1726,7 @@ export default function PurchaseRequisitionList() {
                                         <td></td>
                                         <td></td>
                                         <td>小計</td>
-                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : ''}</td>
                                     </tr>
                                 </table>
                             </div>
@@ -1773,6 +1793,12 @@ export default function PurchaseRequisitionList() {
                                 {data2.map((_item, index) => (
                                     <CellWithBar key={index} className={scss.panelHeader21}>
                                         <div className={scss.row01}>
+                                            <span>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                            </span>
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
@@ -1785,15 +1811,15 @@ export default function PurchaseRequisitionList() {
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
                                                     style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
                                                     type="text"
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        const newQuantity = e.target.value;
                                                         newData[index] = {
                                                             ...newData[index],
-                                                            quantity: newQuantity,
-                                                            totalprice: newQuantity * newData[index].unitprice
+                                                            quantity: newQuantity.toString(),
+                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
                                                         };
                                                         setData2(newData);
                                                     }}
@@ -1810,18 +1836,18 @@ export default function PurchaseRequisitionList() {
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        const newUnitPrice = e.target.value;
                                                         newData[index] = {
                                                             ...newData[index],
-                                                            unitprice: newUnitPrice,
-                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                            unitprice: newUnitPrice.toString(),
+                                                            totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
                                                         };
                                                         setData2(newData);
                                                     }}
                                                 />
                                             </span>
                                             <span>
-                                                {_item.totalprice.toLocaleString()}
+                                                {_item.totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                             </span>
                                             <span>
                                                 {_item.suppliername}
@@ -1836,7 +1862,7 @@ export default function PurchaseRequisitionList() {
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newNote = e.target.value;
+                                                        const newNote = e.target.value || '';
                                                         newData[index] = {
                                                             ...newData[index],
                                                             note: newNote
@@ -1845,21 +1871,7 @@ export default function PurchaseRequisitionList() {
                                                     }}
                                                 />
                                             </span>
-                                            <span>
-                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
-                                                </button>
-                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
-                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
-                                                <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
+
                                         </div>
                                     </CellWithBar>
                                 ))}
@@ -1875,21 +1887,21 @@ export default function PurchaseRequisitionList() {
                                             <td></td>
                                             <td></td>
                                             <td>小計</td>
-                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : '0'}</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice1 ? totalprice1 : ''}</td>
                                         </tr>
                                         <tr>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                             <td>營業稅</td>
-                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : '0'}</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice1 ? taxprice1 : ''}</td>
                                         </tr>
                                         <tr>
                                             <td></td>
                                             <td></td>
                                             <td></td>
                                             <td>應付金額</td>
-                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : '0'}</td>
+                                            <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice1 ? totalpayprice1 : ''}</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -1900,17 +1912,9 @@ export default function PurchaseRequisitionList() {
 
 
 
-                {/* 隱藏的modal */}
-                {/* 詢價單檢視 */}
-                {/* <Modal
-                    visible={prquotereqmodalopen}
-                    footer={null}
-                    onCancel={prQuotereqModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    // centered
-                    style={{ top: 250 }}
-                > */}
+
+
+
                 <DragableModal
                     handleText="詢價紀錄"
                     style={{ zIndex: '1001', width: '1000px' }}
@@ -1955,7 +1959,6 @@ export default function PurchaseRequisitionList() {
                         )}
                     </div>
                 </DragableModal>
-                {/* </Modal> */}
 
                 <DragableModal
                     handleText="查找單據"
@@ -2149,9 +2152,6 @@ export default function PurchaseRequisitionList() {
                     </div>
                     {/* </Modal > */}
                 </DragableModal>
-
-
-
 
                 {/* 審核 */}
                 <DragableModal

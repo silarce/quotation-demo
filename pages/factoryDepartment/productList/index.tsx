@@ -1258,7 +1258,7 @@ export default function ProductList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料編號"
+                                            caption="編號"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
@@ -1288,7 +1288,7 @@ export default function ProductList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料名稱"
+                                            caption="名稱"
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1299,7 +1299,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料規格"
+                                            caption="規格"
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1310,7 +1310,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料單位"
+                                            caption="單位"
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1321,7 +1321,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料材質"
+                                            caption="材質"
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1332,7 +1332,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料表面"
+                                            caption="表面"
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1431,7 +1431,7 @@ export default function ProductList() {
                                         /> */}
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料編號"
+                                            caption="編號"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1451,7 +1451,7 @@ export default function ProductList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料名稱"
+                                            caption="名稱"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1462,7 +1462,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料規格"
+                                            caption="規格"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1473,7 +1473,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料單位"
+                                            caption="單位"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1484,7 +1484,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料材質"
+                                            caption="材質"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1495,7 +1495,7 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="物料表面"
+                                            caption="表面"
                                             disabled={false}
                                             inputProps={{
                                                 props: {

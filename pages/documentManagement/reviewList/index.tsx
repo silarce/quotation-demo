@@ -388,7 +388,7 @@ export default function ReviewList() {
                         create_by: parsedQuery.create_by,
                         status: `${document_status === "核准" ? "已核准" : document_status}`,
                         note: parsedQuery.note,
-                        need_date:parsedQuery.need_date,
+                        need_date: parsedQuery.need_date,
                         firstin: 1,
                         shippingaddress: parsedQuery.shippingaddress,
                         viewtype: 'review'
@@ -983,7 +983,8 @@ export default function ReviewList() {
                             </div>
 
                         </div>
-                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
+
+                        <div style={{ display: tabnow === "待審核" ? '' : 'none', position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1002, padding: '5px 20px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
                             <div className={scss.body_foot1} style={{ pointerEvents: (tabshow === "審核中" || tabshow === "審核完成" || data.length === 0) ? 'none' : 'auto' }}>
 
                                 <div>

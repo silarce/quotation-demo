@@ -149,7 +149,7 @@ export default function PurchaseOrderList() {
     const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
     const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
     const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
-
+    const [originaldata1, setOriginaldata1] = useState<any[]>([]);
 
     //進貨總數
     const [totalreq, setTotalreq] = useState<string>("");
@@ -277,11 +277,11 @@ export default function PurchaseOrderList() {
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
             });
-            setTotalPrice(totalprice.toLocaleString());
+            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             const taxPrice = Math.round(totalprice * 0.05);
-            setTaxPrice(taxPrice.toLocaleString());
+            setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             const totalPayPrice = totalprice + taxPrice;
-            setTotalPayPrice(totalPayPrice.toLocaleString());
+            setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
             // 進貨進度
             let totalreq = data.length;
@@ -569,6 +569,7 @@ export default function PurchaseOrderList() {
         setOriginalInvoicein(invoicein);
         setOriginalSupplieraddressin(supplieraddressin);
         setOriginalShippingaddressin(shippingaddressin);
+        setOriginaldata1(data1);
         setEditmain(true);
     };
 
@@ -587,6 +588,7 @@ export default function PurchaseOrderList() {
                     setInvoicein(originalInvoicein);
                     setSupplieraddressin(originalSupplieraddressin);
                     setShippingaddressin(originalShippingaddressin);
+                    setData1(originaldata1);
                     setEditmain(false);
                 }
             }
@@ -1303,6 +1305,35 @@ export default function PurchaseOrderList() {
 
     //#endregion
 
+
+    useEffect(() => {
+        console.log(data1);
+        // 每次 data2 更新時，重新計算總價和稅金
+        let totalprice = 0;
+        data1.forEach((element) => {
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
+                : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
+            console.log(price);  // 顯示正確的數字格式
+            totalprice += price;  // 將其加總
+        });
+        console.log(totalprice); // 應顯示正確的加總結果
+
+        // 計算總價後，四捨五入到兩位小數，然後再格式化
+        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算稅金，四捨五入到最接近的整數
+        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
+        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    }, [data1]);
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1343,18 +1374,18 @@ export default function PurchaseOrderList() {
                                     </button>
                                 </span>
                                 &nbsp; */}
-                                {/* <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}> */}
+                                <span style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
-                                {/* </span> */}
-                                {/* <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}> */}
+                                </span>
+                                <span style={{ display: `${(statusin === "已結案" || statusin === "已核准" || statusin === "審核中") ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
                                         <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
-                                {/* </span> */}
+                                </span>
                                 <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
                                     <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     儲存
@@ -1503,8 +1534,8 @@ export default function PurchaseOrderList() {
                                             datePickerProps={{
                                                 props: {
                                                     value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
-                                                    onChange: (e) => { setNeed_datein(e ? moment(e).toString() : '') }
-                                               },
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
                                             }}
                                         />
                                     </div>
@@ -1691,58 +1722,6 @@ export default function PurchaseOrderList() {
                                                 data1.map((_item: any, index: number) => (
                                                     <CellWithBar key={index} className={scss.panelHeader11}>
                                                         <div className={scss.row01}>
-                                                            <span>{index + 1}</span>
-                                                            <span>{_item.productid}</span>
-                                                            <span>{_item.name}</span>
-                                                            <span>{_item.spec}</span>
-                                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                                            {/* <span>{_item.quantity}</span> */}
-                                                            <span>
-                                                                <input
-                                                                    ref={quantityRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '60px' }}
-                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                                    type="text"
-                                                                    maxLength={9}
-                                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                                    onChange={(e) => {
-                                                                        const newData = [...data1];
-                                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                                        newData[index] = {
-                                                                            ...newData[index],
-                                                                            quantity: newQuantity,
-                                                                            totalprice: newQuantity * newData[index].unitprice
-                                                                        };
-                                                                        setData1(newData);
-                                                                        // handleChange(index, "quantity", e.target.value);
-                                                                    }}
-                                                                />
-                                                            </span>
-                                                            <span>{_item.unit}</span>
-                                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
-                                                            <span>
-                                                                <input
-                                                                    ref={unitpriceRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '80px' }}
-                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
-                                                                    type="text"
-                                                                    maxLength={8}
-                                                                    value={_item.unitprice.toLocaleString()}
-                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                                    onChange={(e) => {
-                                                                        const newData = [...data1];
-                                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                                        newData[index] = {
-                                                                            ...newData[index],
-                                                                            unitprice: newUnitPrice,
-                                                                            totalprice: newUnitPrice * newData[index].quantity
-                                                                        };
-                                                                        setData1(newData);
-                                                                    }}
-                                                                />
-                                                            </span>
-                                                            <span>{_item.totalprice.toLocaleString()}</span>
                                                             <span>
                                                                 <button
                                                                     style={{ display: `${(statusin === "已核准") ? '' : 'none'}` }}
@@ -1754,6 +1733,58 @@ export default function PurchaseOrderList() {
                                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                                 </button>
                                                             </span>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.productid}</span>
+                                                            <span>{_item.name}</span>
+                                                            <span>{_item.spec}</span>
+                                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity.toLocaleString()}</span>
+                                                            {/* <span>{_item.quantity}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newQuantity = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            quantity: newQuantity,
+                                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+
+                                                                        };
+                                                                        setData1(newData);
+                                                                        // handleChange(index, "quantity", e.target.value);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.unit}</span>
+                                                            {/* <span>{_item.unitprice.toLocaleString()}</span> */}
+                                                            <span>
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
+                                                                    type="text"
+                                                                    // maxLength={8}
+                                                                    value={_item.unitprice.toLocaleString()}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newUnitPrice = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            unitprice: newUnitPrice,
+                                                                            totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                            <span>{_item.totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                             <span>
                                                                 <input
                                                                     ref={noteRefs.current[index]}
@@ -1901,11 +1932,17 @@ export default function PurchaseOrderList() {
                                 {data2.map((_item, index) => (
                                     <CellWithBar key={index} className={scss.panelHeader13}>
                                         <div className={scss.row01}>
+                                            <span>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
                                             <span style={{ color: '#ea1833' }}>
-                                                {_item.alreadyinquantity}
+                                                {_item.alreadyinquantity.toLocaleString()}
                                             </span>
                                             <span>
                                                 <input
@@ -1914,15 +1951,15 @@ export default function PurchaseOrderList() {
                                                     style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
                                                     type="text"
                                                     maxLength={9}
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        const newQuantity = e.target.value;
                                                         newData[index] = {
                                                             ...newData[index],
-                                                            quantity: newQuantity,
-                                                            totalprice: newQuantity * newData[index].unitprice
+                                                            quantity: newQuantity.toString(),
+                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
                                                         };
                                                         setData2(newData);
                                                         // handleChange(index, "quantity", e.target.value);
@@ -1941,11 +1978,11 @@ export default function PurchaseOrderList() {
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                        const newUnitPrice = e.target.value;
                                                         newData[index] = {
                                                             ...newData[index],
-                                                            unitprice: newUnitPrice,
-                                                            totalprice: newUnitPrice * newData[index].quantity
+                                                            unitprice: newUnitPrice.toString(),
+                                                            totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
                                                         };
                                                         setData2(newData);
                                                     }}
@@ -1964,7 +2001,7 @@ export default function PurchaseOrderList() {
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     onChange={(e) => {
                                                         const newData = [...data2];
-                                                        const newNote = e.target.value;
+                                                        const newNote = e.target.value || '';
                                                         newData[index] = {
                                                             ...newData[index],
                                                             note: newNote
@@ -1973,20 +2010,7 @@ export default function PurchaseOrderList() {
                                                     }}
                                                 />
                                             </span>
-                                            <span>
-                                                &nbsp;&nbsp;
-                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                                {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
-                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            </span>
+
                                         </div>
                                     </CellWithBar>
                                 ))}
