@@ -105,7 +105,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
-import { init_variable, calcNTDToUSD } from 'components/page/domestic/quotation/function/utils_quotation';
+import { init_variable, calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -1196,9 +1196,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           const total_num = copy.total.replaceAll(',', '') as `${number}`;
 
-          copy.foreignTotal = calcNTDToUSD({
+          copy.foreignTotal = calcNTDToForeignCurrency({
             NTD: total_num,
-            USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
+            foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
           }).toLocaleString();
 
           return copy;
@@ -1491,7 +1491,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       annotations,
       quotationRanges,
       exchangeRate,
-      foreignTotal: usd,
+      foreignTotal,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
@@ -1507,7 +1507,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation,
       deliveryDate,
       exchangeRate: exchangeRate || '',
-      foreignTotal: usd || '',
+      foreignTotal: foreignTotal || '',
     });
   }, [theContent]);
 
@@ -1521,9 +1521,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       prodSubTotal: attachTotal,
     });
 
-    const foreignTotal = calcNTDToUSD({
+    const foreignTotal = calcNTDToForeignCurrency({
       NTD: total.replaceAll(',', '') as `${number}`,
-      USDtoNTD: (state_summary.exchangeRate || '0') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
     }).toLocaleString();
 
     setState_summary((state) => {

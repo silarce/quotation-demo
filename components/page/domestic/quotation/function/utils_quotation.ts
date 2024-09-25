@@ -117,12 +117,19 @@ const init_variable = (): {
   };
 };
 
-const calcNTDToUSD = ({ NTD, USDtoNTD }: { NTD: number | `${number}`; USDtoNTD: number | `${number}` }) => {
-  if (Number(USDtoNTD) === 0) {
+const calcNTDToForeignCurrency = ({
+  NTD,
+  foreignCurrencyToNTD,
+}: {
+  NTD: number | `${number}`;
+  // 外幣兌台幣，也就是1外幣等於多少台幣
+  foreignCurrencyToNTD: number | `${number}`;
+}) => {
+  if (!Number(foreignCurrencyToNTD)) {
     return 0;
   }
 
-  return new Decimal(NTD).div(USDtoNTD).toDecimalPlaces(2).toNumber();
+  return new Decimal(NTD).div(foreignCurrencyToNTD).toDecimalPlaces(2).toNumber();
 };
 
-export { init_variable, calcNTDToUSD };
+export { init_variable, calcNTDToForeignCurrency };

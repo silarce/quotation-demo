@@ -90,7 +90,7 @@ import { AppContext } from 'pages/_app';
 
 // utils
 import { urlToFile } from 'js/utils/helpers/urlToFile';
-import { init_variable, calcNTDToUSD } from 'components/page/domestic/quotation/function/utils_quotation';
+import { init_variable, calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -1606,9 +1606,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
             const total_num = copy.total.replaceAll(',', '') as `${number}`;
 
-            copy.foreignTotal = calcNTDToUSD({
+            copy.foreignTotal = calcNTDToForeignCurrency({
               NTD: total_num,
-              USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
+              foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
             }).toLocaleString();
 
             return copy;
@@ -2238,9 +2238,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       taxRate,
     });
 
-    const foreignTotal = calcNTDToUSD({
+    const foreignTotal = calcNTDToForeignCurrency({
       NTD: total.replaceAll(',', '') as `${number}`,
-      USDtoNTD: (state_summary.exchangeRate || '0') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
     }).toLocaleString();
 
     setState_summary((state) => {
