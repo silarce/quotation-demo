@@ -271,7 +271,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
-        <span>備註</span>
+        <span>單號</span>
         <span>選擇</span>
         <span></span>
       </div>
@@ -535,23 +535,24 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   }
   //#endregion
   // //#region 新增採購單明細
-  // else if (type === "AddQOList") {
-  //   return (
-  //     <div className={style.thead33}>
-  //       <span>序</span>
-  //       <span>料號</span>
-  //       <span>品名</span>
-  //       <span>規格</span>
-  //       <span>數量</span>
-  //       <span>單位</span>
-  //       <span></span>
-  //       <span>單價</span>
-  //       <span>金額</span>
-  //       <span>備註(用途說明)</span>
-  //       <span></span>
-  //     </div>
-  //   )
-  // }
+  else if (type === "AddQOList") {
+    return (
+      <div className={style.thead33}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span></span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>廠商</span>
+        <span>備註</span>
+        <span></span>
+      </div>
+    )
+  }
   // //#endregion
   //#region 詢價單明細
   else if (type === "Quotereq4") {
@@ -567,6 +568,21 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
         <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 請購單明細
+  else if (type === "ReviewHistory") {
+    return (
+      <div className={style.thead36}>
+        <span>序</span>
+        <span>審核日期</span>
+        <span>審核狀態</span>
+        <span>審核關卡</span>
+        <span>審核人員</span>
+        <span>審核意見</span>
         <span></span>
       </div>
     )

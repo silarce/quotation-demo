@@ -215,12 +215,13 @@
   grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   gap: 0px;
   width: auto;
-  // margin-top: 4px;
+  margin-top: 2px;
   margin-left: 20px;
   margin-right: 20px;
   // border-top:1px solid rgb(168, 168, 168);
-  overflow-x: hidden;
+  // overflow-x: auto;
   // background-color: gray;
+  
 }
 
 .body_foot1 {
@@ -332,7 +333,7 @@ div.panelHeader21 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 250px 60px;
+    grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 450px 60px;
     gap: 5px;
   }
 }
@@ -362,7 +363,7 @@ div.panelHeader16 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 200px;
+    grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 300px;
     // gap: 5px;
   }
 }
@@ -707,7 +708,7 @@ div.panelHeader17 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -732,7 +733,7 @@ div.panelHeader17 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #14256a;
   transform: translateY(2px);
@@ -757,7 +758,7 @@ div.panelHeader17 {
   padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 0.9rem;
   color: #5b5a5ad6;
   transform: translateY(2px);
@@ -777,14 +778,14 @@ div.panelHeader17 {
 }
 
 //判斷字串是否過長
-.truncate {
-  display: inline-block;
-  max-width: 200px; /* 設定你希望的最大寬度 */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  vertical-align: middle; /* 可選，根據需要對齊文本 */
-}
+// .truncate {
+//   display: inline-block;
+//   max-width: 200px; /* 設定你希望的最大寬度 */
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+//   vertical-align: middle; /* 可選，根據需要對齊文本 */
+// }
 
 .head_body {
   display: grid;
@@ -800,7 +801,114 @@ div.panelHeader17 {
 
 
 
+//明細頁籤
+.detailminitabbtn {
+  height: 30px;
+  // width: 36px;
+  // padding: 0px 40px;
+  // border: solid 1px #c1c1c1;
+  border-bottom: 0px;
+  // border-bottom: 0px;
+  background-color: #f5f5f5;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 400;
+  font-size: 16px;
+  // color: #14256a;
+  color: #14256a;
+  transform: translateY(2px);
+  width: 100px;
+
+  // &:hover {
+  //   border: solid 1px #c1c1c1;
+  //   border-bottom: 0px;
+  //   color: #14256a;
+  //   background-color: #c1c1c17c
+  // }
+}
 
 
 
+// .tabbody {
+//   display: grid;
+//   grid-template-columns: 1fr;
+//   width: auto;
 
+// }
+
+.head_tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  width: auto;
+  // margin-left: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  div {
+    margin-right: 2px;
+  }
+}
+
+//#region 請購單明細
+div.panelHeader18 {
+  padding-left: 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 150px 150px 150px 150px 450px 450px;
+    // gap: 5px;
+  }
+}
+
+//#endregion
+
+//#region 請購單
+div.panelHeader15 {
+
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    padding-left: 20px;
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 100px 80px 50px 200px;
+    gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
+
+//#endregion

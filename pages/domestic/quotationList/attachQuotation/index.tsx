@@ -325,6 +325,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
+  // 20240924 審核經理被排除在審核鏈之外
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -334,23 +335,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
-      if (salesReviewedAt && supervisorReviewedAt) {
-        isSalesManagerEmployee = true;
-        isReviewer = true;
-      }
     } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (
-        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
-        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
-        // 代表這個content是在SalesManager這個property被加進來之前的content
-        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
-      ) {
+      if ((salesReviewedAt && supervisorReviewedAt) || (salesReviewedAt && supervisorReviewedAt)) {
         isWorkDirector = true;
         isReviewer = true;
       }
     } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
+      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
         isCashier = true;
         isReviewer = true;
       }
@@ -362,14 +353,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
-      } else if (
-        //
-        salesReviewedAt &&
-        supervisorReviewedAt &&
-        salesManagerReviewedAt &&
-        workDirectorReviewedAt &&
-        cashierReviewedAt
-      ) {
+      } else if (salesReviewedAt && supervisorReviewedAt && workDirectorReviewedAt && cashierReviewedAt) {
         isManager = true;
         isReviewer = true;
       }

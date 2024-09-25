@@ -80,7 +80,9 @@ type TinputSelProps = {
   isMustPreStyle?: 'minimal';
   mustTipClassName?: string;
   //
-  // suffix?: string;
+
+  prefix?: React.ReactNode;
+  prefixClassName?: string;
   suffix?: React.ReactNode;
   suffixClassName?: string;
   //
@@ -151,6 +153,8 @@ export default function InputSel({
   isMustPreStyle,
   mustTipClassName,
   //
+  prefix,
+  prefixClassName,
   suffix,
   suffixClassName,
   //
@@ -219,6 +223,11 @@ export default function InputSel({
         >
           <span>{caption}</span>
           {isMust && <MustTip_simple className={mustTipClassName} preStyle={isMustPreStyle} />}
+        </div>
+      )}
+      {prefix && (
+        <div className={classNames(fontClassName, scss.prefix, prefixClassName)}>
+          <span>{prefix}</span>
         </div>
       )}
 

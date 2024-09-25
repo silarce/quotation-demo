@@ -326,7 +326,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 415px 415px 50px 50px 40px 60px 80px 30px 250px 30px;
+  grid-template-columns: 30px 150px 415px 415px 50px 50px 40px 80px 80px 30px 250px 30px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -481,7 +481,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 250px 30px;
+  grid-template-columns: 30px 150px 415px 415px 50px 40px 40px 60px 80px 200px 30px 300px 30px;
   // gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -491,9 +491,9 @@
     margin: auto;
     margin-left: 0;
 
-    &:nth-last-of-type(1) {
-      margin-left: auto;
-    }
+    // &:nth-last-of-type(1) {
+    //   margin-left: auto;
+    // }
   }
 
   >span {
@@ -511,7 +511,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 250px 60px;
+  grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 450px 60px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -1006,7 +1006,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 415px 415px 65px 50px 30px 100px 100px 200px 70px;
+  grid-template-columns: 30px 150px 415px 415px 65px 50px 50px 100px 100px 200px 200px 70px;
   // gap: 5px;
   height: 30px;
   padding: 0 15px;
@@ -1114,6 +1114,37 @@
   >span {
     font-weight: 400;
     font-size: 16px;
+    color: #979797;
+  }
+}
+
+//#endregion
+
+//#region 請購單明細
+.thead36 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 150px 150px 150px 150px 450px;
+  // gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
     color: #979797;
   }
 }
