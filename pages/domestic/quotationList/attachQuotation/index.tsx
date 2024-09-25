@@ -182,6 +182,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isCashier,
     isSupervisor,
     //
+    // eslint-disable-next-line prefer-const
     isSalesManagerEmployee,
     //
     isManager,
@@ -307,12 +308,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSendToReview = !!(
     toSalesAt ||
     toSupervisorAt ||
-    toSalesManagerAt ||
+    // toSalesManagerAt ||
     toWorkDirectorAt ||
     toCashierAt ||
     toManagerAt
   );
-  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
@@ -813,7 +820,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -831,8 +838,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         !reviewSalesEmployeeId ||
         !reviewWorkDirectorEmployeeId ||
         !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId ||
-        !reviewSalesManagerEmployeeId
+        !reviewSupervisorEmployeeId
+        // ||
+        // !reviewSalesManagerEmployeeId
       ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
@@ -844,9 +852,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
+    }
+    // else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // }
+    else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isCashier && cashierReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });

@@ -75,7 +75,7 @@ export default function CollectionDetailList() {
             },
           },
           {
-            importAccountingNumber: {
+            accountingNumber: {
               $contains: keyword,
             },
           },
@@ -224,7 +224,7 @@ export default function CollectionDetailList() {
             id,
             insertDate,
             vendorName,
-            importAccountingNumber,
+            accountingNumber,
             price,
             notes,
             noteNumber,
@@ -261,7 +261,7 @@ export default function CollectionDetailList() {
           const list = {
             insertDate: getTaiwanDateStr(insertDate),
             vendorName,
-            importAccountingNumber,
+            accountingNumber,
             price: price.toLocaleString(),
             notes,
             noteNumber,
@@ -293,7 +293,7 @@ export default function CollectionDetailList() {
         <Row className={scss.bottom} fullWidth={true}>
           <Cell preBuilt="block" className={scss.totalCell} style={config.insertDate.style} />
           <Cell preBuilt="block" className={scss.totalCell} style={config.vendorName.style} />
-          <Cell preBuilt="block" className={scss.totalCell} style={config.importAccountingNumber.style}>
+          <Cell preBuilt="block" className={scss.totalCell} style={config.accountingNumber.style}>
             總計
           </Cell>
           <Cell preBuilt="block" style={config.price.style}>
@@ -358,7 +358,7 @@ const calcTotalFeeAndTotalDefuction = (incomeBill: TincomeBillSerialDto[]) => {
 type Tkey =
   | 'insertDate'
   | 'vendorName'
-  | 'importAccountingNumber'
+  | 'accountingNumber'
   | 'price'
   | 'notes'
   | 'noteNumber'
@@ -371,7 +371,7 @@ type Tkey =
 const keyArr: Tkey[] = [
   'insertDate',
   'vendorName',
-  'importAccountingNumber',
+  'accountingNumber',
   'price',
   'noteNumber',
   'noteMaturityDate',
@@ -404,9 +404,9 @@ const config: Tconfig = {
     style: { width: 200 },
     className: undefined,
   },
-  importAccountingNumber: {
-    label: '銀行帳號',
-    style: { width: 120 },
+  accountingNumber: {
+    label: '存入帳號',
+    style: { width: 170 },
     className: undefined,
   },
   price: {
@@ -498,10 +498,10 @@ const dlExcel = async ({
     key: 'vendorName',
     width: 20,
   };
-  const colSetting_importAccountingNumber = {
-    label: '銀行帳號',
-    key: 'importAccountingNumber',
-    width: 14,
+  const colSetting_accountingNumber = {
+    label: '存入帳號',
+    key: 'accountingNumber',
+    width: 25,
   };
   const colSetting_price = {
     label: '收款金額',
@@ -554,7 +554,7 @@ const dlExcel = async ({
   sheet.columns = [
     colSetting_insertDate,
     colSetting_vendorName,
-    colSetting_importAccountingNumber,
+    colSetting_accountingNumber,
     colSetting_price,
     colSetting_noteNumber,
     colSetting_noteMaturityDate,
@@ -570,7 +570,7 @@ const dlExcel = async ({
 
   const col_insertDate = sheet.getColumn(colSetting_insertDate.key);
   const col_vendorName = sheet.getColumn(colSetting_vendorName.key);
-  const col_importAccountingNumber = sheet.getColumn(colSetting_importAccountingNumber.key);
+  const col_accountingNumber = sheet.getColumn(colSetting_accountingNumber.key);
   const col_price = sheet.getColumn(colSetting_price.key);
   const col_notes = sheet.getColumn(colSetting_notes.key);
   const col_noteNumber = sheet.getColumn(colSetting_noteNumber.key);
@@ -600,7 +600,7 @@ const dlExcel = async ({
   row_caption = sheet.addRow({
     insertDate: colSetting_insertDate.label,
     vendorName: colSetting_vendorName.label,
-    importAccountingNumber: colSetting_importAccountingNumber.label,
+    accountingNumber: colSetting_accountingNumber.label,
     price: colSetting_price.label,
     notes: colSetting_notes.label,
     noteNumber: colSetting_noteNumber.label,
@@ -618,7 +618,7 @@ const dlExcel = async ({
     const {
       insertDate,
       vendorName,
-      importAccountingNumber,
+      accountingNumber,
       price,
       notes,
       noteNumber,
@@ -656,7 +656,7 @@ const dlExcel = async ({
     const thisRow = sheet.addRow({
       insertDate: getTaiwanDateStr(insertDate),
       vendorName,
-      importAccountingNumber,
+      accountingNumber,
       price,
       notes,
       noteNumber,
@@ -673,7 +673,7 @@ const dlExcel = async ({
   // ---------------------------------------------------------------------------
   sheet.addRow({});
   row_totalPrice = sheet.addRow({
-    importAccountingNumber: '收款金額總計',
+    accountingNumber: '收款金額總計',
     price: totalPrice,
   });
 
