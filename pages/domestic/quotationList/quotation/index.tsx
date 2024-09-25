@@ -396,12 +396,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSendToReview = !!(
     toSalesAt ||
     toSupervisorAt ||
-    toSalesManagerAt ||
+    // toSalesManagerAt ||
     toWorkDirectorAt ||
     toCashierAt ||
     toManagerAt
   );
-  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
   version = latestContent?.version;
   editNotes = latestContent?.editNotes;
@@ -838,12 +844,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
       reviewResult: isPass,
     };
+
+    if (userId === '01f55698-49bb-4501-b432-1157a5109554') {
+      body.reviewSupervisorEmployeeId = null;
+      body.reviewManagerEmployeeId = userId;
+    }
 
     if (status === 'Pending' && !verifyForm) {
       if (isPass) {
@@ -856,26 +867,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
         !reviewSalesEmployeeId ||
         !reviewWorkDirectorEmployeeId ||
         !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId ||
-        !reviewSalesManagerEmployeeId
+        !reviewSupervisorEmployeeId
+        // ||        !reviewSalesManagerEmployeeId
       ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
     }
 
-    if (isSales && salesReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
+    // if (isSales && salesReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // }
+    // //  else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
+    // //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // // }
+    // else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isCashier && cashierReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isManager && managerReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // }
 
     try {
       setIsLoading(true);
@@ -1674,12 +1687,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         style: { width: '180px' },
         isReviewed: !!quotationData?.latestContent.workDirectorReviewedAt,
       },
-      {
-        label: '業務經理',
-        value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
-      },
+      // {
+      //   label: '業務經理',
+      //   value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
+      //   style: { width: '180px' },
+      //   isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
+      // },
       {
         label: '業務主管',
         value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
