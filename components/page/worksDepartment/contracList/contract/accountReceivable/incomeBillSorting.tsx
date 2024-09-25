@@ -6,6 +6,7 @@ import Decimal from 'decimal.js';
 // gear
 import TopBar from './ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './incomeBillSorting.module.scss';
 
@@ -113,12 +114,14 @@ export default function IncomeBillSorting({
   incomeBillList_noInvoice,
   onConfirm,
   readonly,
+  currency,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
   incomeBillList_noInvoice: TincomeBillSerialDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
   readonly?: boolean;
+  currency: string;
 }) {
   const [disabled, setDisabled] = useState(true);
 
@@ -392,6 +395,8 @@ export default function IncomeBillSorting({
                   //
                   activeIncomeBillId={activeIncomeBill?.id}
                   handle_editAllowance={handle_editAllowance}
+                  //
+                  currency={currency}
                 />
               );
             })}
@@ -416,7 +421,14 @@ export default function IncomeBillSorting({
             <Row>
               <span></span>
               <span>合計</span>
-              <span>{total_invoice}</span>
+              {/* <span>{total_invoice}</span> */}
+              <InputSel
+                {...defaultInputSelProps_02}
+                // prefix={currency}
+                showBaseline="invisible"
+                className={'mr-3'}
+                node={<div className="text-right">{total_invoice}</div>}
+              />
             </Row>
           </Left>
           <Right>
@@ -424,7 +436,14 @@ export default function IncomeBillSorting({
               <span></span>
               <span></span>
               <span>合計</span>
-              <span>{total_incomeBill}</span>
+              {/* <span>{total_incomeBill}</span> */}
+              <InputSel
+                {...defaultInputSelProps_02}
+                prefix={currency}
+                showBaseline="invisible"
+                className={'mr-3'}
+                node={<div className="text-right">{total_incomeBill}</div>}
+              />
             </Row>
           </Right>
         </Group>
@@ -438,7 +457,14 @@ export default function IncomeBillSorting({
               <span></span>
               <span></span>
               <span>合計</span>
-              <span>{amountNotCollected}</span>
+              {/* <span>{amountNotCollected}</span> */}
+              <InputSel
+                {...defaultInputSelProps_02}
+                // prefix={currency}
+                showBaseline="invisible"
+                className={'mr-3'}
+                node={<div className="text-right">{amountNotCollected}</div>}
+              />
             </Row>
           </Right>
         </Group>
@@ -489,11 +515,13 @@ const Group_Dnd = ({
   disabled,
   activeIncomeBillId,
   handle_editAllowance,
+  currency,
 }: {
   state: Tstate;
   disabled: boolean;
   activeIncomeBillId?: UniqueIdentifier | undefined;
   handle_editAllowance: (invoiceId: string, value: string) => void;
+  currency: string;
 }) => {
   const { invoice, incomeBillArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
@@ -521,20 +549,36 @@ const Group_Dnd = ({
         <Row>
           <span>{invoiceNumber}</span>
           <span>{invoiceDate}</span>
-          <span className="justify-self-end mr-5">{price}</span>
+          <InputSel
+            {...defaultInputSelProps}
+            className="justify-self-end"
+            prefix="NTD"
+            showBaseline="invisible"
+            node={<div className="text-right">{price}</div>}
+          />
         </Row>
 
         <Row className={classNames(scss.allowance, scss.plus, (disabled || isNoInvoice) && scss.disabled)}>
           <div></div>
           <p>折讓</p>
-          <input
-            className="justify-self-end mr-5"
-            placeholder="無折讓"
-            readOnly={disabled || isNoInvoice}
-            type={disabled ? 'text' : 'number'}
-            value={allowance}
-            onChange={(e) => {
-              handle_editAllowance(String(invoice.id), e.target.value);
+
+          <InputSel
+            {...defaultInputSelProps}
+            className="justify-self-end "
+            showBaseline="auto"
+            disabled={disabled || isNoInvoice}
+            prefix={currency}
+            inputProps={{
+              props: {
+                placeholder: '無折讓',
+                value: allowance,
+                readOnly: disabled || isNoInvoice,
+                disabled: false,
+                type: disabled ? 'text' : 'number',
+                onChange: (e) => {
+                  handle_editAllowance(String(invoice.id), e.target.value);
+                },
+              },
             }}
           />
         </Row>
@@ -574,7 +618,13 @@ const Group_Dnd = ({
                 <span>{insertDate}</span>
                 <span>{importAccountingNumber}</span>
                 <span>{noteMaturityDate}</span>
-                <span>{price}</span>
+                {/* <span>{price}</span> */}
+                <InputSel
+                  {...defaultInputSelProps}
+                  showBaseline="invisible"
+                  prefix={currency}
+                  node={<div className="text-right mr-3">{price}</div>}
+                />
               </Row_Dnd>
             );
           })}
@@ -862,4 +912,19 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
     invoice: virtualInvoice,
     incomeBillArr,
   };
+};
+
+// ================================================================================
+const defaultInputSelProps: TinputSelProps = {
+  wrapperStyle: {
+    // gap: '10px',
+    width: '140px',
+  },
+};
+
+const defaultInputSelProps_02: TinputSelProps = {
+  wrapperStyle: {
+    // gap: '10px',
+    width: '150px',
+  },
 };

@@ -545,6 +545,7 @@ export default function AccountReceivable({
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
           readonly={readonly}
+          currency={currency}
         />
 
         {/* 已收款紀錄 */}
