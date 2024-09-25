@@ -766,6 +766,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: paymentMethod,
       exchangeRate: state_summary.exchangeRate,
       foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
+      currency: state_summary.currency,
       //
       //
       // products: [...prodArr, ...attachProdArr],
@@ -1208,6 +1209,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     foreignTotal: {
       value: state_summary.foreignTotal,
     },
+    currency: {
+      value: state_summary.currency,
+      onChange: (v) => {
+        setState_summary((state) => {
+          const copy = { ...state };
+          copy.currency = v;
+
+          return copy;
+        });
+      },
+    },
   };
 
   const pdfPartPropsArr = useMemo(() => {
@@ -1492,6 +1504,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quotationRanges,
       exchangeRate,
       foreignTotal,
+      currency,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
@@ -1508,6 +1521,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate,
       exchangeRate: exchangeRate || '',
       foreignTotal: foreignTotal || '',
+      currency,
     });
   }, [theContent]);
 

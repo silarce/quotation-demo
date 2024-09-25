@@ -375,21 +375,24 @@ export default function AttachContract({
     },
     exchangeRate: {
       value: state_summary.exchangeRate,
-      onChange: (v) => {
-        // setState_summary((state) => {
-        //   const copy = { ...state };
-        //   copy.exchangeRate = v;
-        //   const total_num = copy.total.replaceAll(',', '') as `${number}`;
-        //   copy.usd = calcNTDToUSD({
-        //     NTD: total_num,
-        //     USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
-        //   }).toLocaleString();
-        //   return copy;
-        // });
-      },
+      // onChange: (v) => {
+      //   // setState_summary((state) => {
+      //   //   const copy = { ...state };
+      //   //   copy.exchangeRate = v;
+      //   //   const total_num = copy.total.replaceAll(',', '') as `${number}`;
+      //   //   copy.usd = calcNTDToUSD({
+      //   //     NTD: total_num,
+      //   //     USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
+      //   //   }).toLocaleString();
+      //   //   return copy;
+      //   // });
+      // },
     },
     foreignTotal: {
       value: state_summary.foreignTotal,
+    },
+    currency: {
+      value: state_summary.currency,
     },
   };
 
@@ -491,6 +494,7 @@ export default function AttachContract({
       quotationRanges,
       exchangeRate,
       foreignTotal,
+      currency,
     } = data_contract?.content;
 
     // setAnnotation(annotations ?? []);
@@ -507,6 +511,7 @@ export default function AttachContract({
       deliveryDate,
       exchangeRate: exchangeRate || '',
       foreignTotal: foreignTotal || '',
+      currency: currency || 'TWD 新臺幣',
     });
   }, [data_contract?.content]);
 

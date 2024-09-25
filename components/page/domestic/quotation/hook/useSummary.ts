@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { Tcurrency } from 'js/api/dtoTypes';
+
 type Tstate_summary = {
   discountRate: string;
   tuneTotal: string;
@@ -10,6 +12,7 @@ type Tstate_summary = {
   deliveryDate: string;
   exchangeRate: string;
   foreignTotal: string;
+  currency: Tcurrency;
 };
 
 const useSummary = () => {
@@ -36,7 +39,8 @@ const emptySummary = (): Tstate_summary => ({
   deliveryDate: '',
   exchangeRate: '',
   foreignTotal: '',
+  currency: 'TWD 新臺幣',
 });
 
 export { useSummary };
-export type { Tstate_summary };
+export type { Tstate_summary, Tcurrency };

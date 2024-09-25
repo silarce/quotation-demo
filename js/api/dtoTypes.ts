@@ -1913,6 +1913,7 @@ export type TquotationContentDto = {
   //
   exchangeRate: `${number}` | null;
   foreignTotal: `${number}` | null;
+  currency: Tcurrency;
 };
 
 export type TquotationDto = {
@@ -2308,6 +2309,7 @@ export type TcreateQuotationContentDto = {
   //
   exchangeRate: string | null;
   foreignTotal: string | null;
+  currency: Tcurrency;
 };
 
 /**合約 */

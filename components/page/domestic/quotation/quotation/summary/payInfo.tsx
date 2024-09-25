@@ -14,10 +14,14 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal';
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
+import { optionsCreator_currency } from 'js/utils/options/options';
+
 // css
 import scss from './payInfo.module.scss';
 
 import { blurOnWheel } from 'js/utils/helpers/blurOnWheel';
+
+import type { Tstate_summary } from '../../hook/useSummary';
 
 type TinputCell = {
   inputAttr: React.InputHTMLAttributes<HTMLInputElement>;
@@ -64,6 +68,10 @@ export type Tcontrol = {
   };
   foreignTotal: {
     value: string;
+  };
+  currency: {
+    value: Tstate_summary['currency'];
+    onChange?: (v: Tstate_summary['currency']) => void;
   };
 };
 
@@ -224,7 +232,33 @@ export default function PayInfo({
 
         <hr />
         <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">{'匯率(美金兌新台幣)'}</span>
+          <span className="relative">{'幣別'}</span>
+          <div>
+            <InputSel
+              wrapperStyle={{ width: 150 }}
+              showBaseline="auto"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  placeholder: '',
+                  value: { value: control.currency.value, label: control.currency.value },
+                  options: optionsCreator_currency(),
+                  onChange(option) {
+                    if (option) {
+                      control.currency.onChange?.(option.value as Tstate_summary['currency']);
+                    }
+                  },
+                  classNames: {
+                    singleValue: () => 'text-right',
+                    option: () => 'text-right',
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className="relative">{'匯率(外幣兌新台幣)'}</span>
           <div>
             <input
               type="number"
@@ -237,7 +271,7 @@ export default function PayInfo({
           </div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">美金計價</span>
+          <span className="relative">外幣計價</span>
           <div>
             <input
               type="text"

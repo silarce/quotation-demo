@@ -628,6 +628,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // FIXME usd
       value: '---',
     },
+    currency: {
+      // FIXME currency
+      value: '---' as 'TWD 新臺幣',
+    },
   };
 
   const { control_signature } = useMemo(() => {

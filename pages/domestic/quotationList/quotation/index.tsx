@@ -725,6 +725,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods: state_paymentMethod,
       exchangeRate: state_summary.exchangeRate,
       foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
+      currency: state_summary.currency,
 
       //
       products: prodArr,
@@ -1618,6 +1619,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       foreignTotal: {
         value: state_summary.foreignTotal,
       },
+      currency: {
+        value: state_summary.currency,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.currency = v;
+
+            return copy;
+          });
+        },
+      },
     };
 
     return payInfoControl;
@@ -2167,6 +2179,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //
         exchangeRate,
         foreignTotal,
+        currency,
       } = latestContent;
 
       const haveTax = !!salesTax;
@@ -2185,6 +2198,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryDate,
         exchangeRate: exchangeRate || '',
         foreignTotal: foreignTotal || '',
+        currency: currency,
       });
 
       setTaxRate(haveTax ? 0.05 : 0);
