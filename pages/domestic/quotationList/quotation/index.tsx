@@ -851,6 +851,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewResult: isPass,
     };
 
+    if (userId === '01f55698-49bb-4501-b432-1157a5109554') {
+      body.reviewSupervisorEmployeeId = null;
+      body.reviewManagerEmployeeId = userId;
+    }
+
     if (status === 'Pending' && !verifyForm) {
       if (isPass) {
         return myAlert.warning({ title: '請先送出合約審核表' });
@@ -869,21 +874,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    if (isSales && salesReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
-    //  else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
+    // if (isSales && salesReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
     //   return myAlert.warning({ title: '您已經審核過此報價單' });
     // }
-    else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
+    // //  else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
+    // //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // // }
+    // else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isCashier && cashierReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // } else if (isManager && managerReviewedAt && body.reviewResult) {
+    //   return myAlert.warning({ title: '您已經審核過此報價單' });
+    // }
 
     try {
       setIsLoading(true);
