@@ -72,10 +72,10 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
       label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
       dotColor: dotColor_supervisor,
     },
-    {
-      label: `業務經理 ${reviewSalesManagerEmployee?.chName ?? ''}`,
-      dotColor: dotColor_salesManager,
-    },
+    // {
+    //   label: `業務經理 ${reviewSalesManagerEmployee?.chName ?? ''}`,
+    //   dotColor: dotColor_salesManager,
+    // },
     {
       label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
       dotColor: dotColor_workDirector,
@@ -90,7 +90,7 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
     },
   ];
 
-  (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(4, 2);
+  (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 2);
   // status === 'Pending' && processChain.shift();
 
   return processChain;
