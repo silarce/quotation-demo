@@ -91,6 +91,8 @@ export default function AccountReceivable({
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
 
+  const currency = 'NTD';
+
   // --------------------------------------------------------------------------
 
   // region get data
@@ -533,6 +535,7 @@ export default function AccountReceivable({
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
           readonly={readonly}
+          currency={currency}
         />
 
         {/* 應收帳款管理 */}
