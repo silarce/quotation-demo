@@ -724,7 +724,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
       exchangeRate: state_summary.exchangeRate,
-      usd: state_summary.usd.replaceAll(',', ''),
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
 
       //
       products: prodArr,
@@ -1606,7 +1606,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
             const total_num = copy.total.replaceAll(',', '') as `${number}`;
 
-            copy.usd = calcNTDToUSD({
+            copy.foreignTotal = calcNTDToUSD({
               NTD: total_num,
               USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
             }).toLocaleString();
@@ -1615,8 +1615,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           });
         },
       },
-      usd: {
-        value: state_summary.usd,
+      foreignTotal: {
+        value: state_summary.foreignTotal,
       },
     };
 
@@ -2166,7 +2166,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationRanges,
         //
         exchangeRate,
-        usd,
+        foreignTotal,
       } = latestContent;
 
       const haveTax = !!salesTax;
@@ -2184,7 +2184,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryLocation,
         deliveryDate,
         exchangeRate: exchangeRate || '',
-        usd: usd || '',
+        foreignTotal: foreignTotal || '',
       });
 
       setTaxRate(haveTax ? 0.05 : 0);
@@ -2238,7 +2238,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       taxRate,
     });
 
-    const usd = calcNTDToUSD({
+    const foreignTotal = calcNTDToUSD({
       NTD: total.replaceAll(',', '') as `${number}`,
       USDtoNTD: (state_summary.exchangeRate || '0') as `${number}`,
     }).toLocaleString();
@@ -2249,7 +2249,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         subTotal,
         salesTax,
         total,
-        usd,
+        foreignTotal,
       };
     });
 

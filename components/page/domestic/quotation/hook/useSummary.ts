@@ -9,7 +9,7 @@ type Tstate_summary = {
   deliveryLocation: string;
   deliveryDate: string;
   exchangeRate: string;
-  usd: string;
+  foreignTotal: string;
 };
 
 const useSummary = () => {
@@ -26,7 +26,7 @@ const useSummary = () => {
   };
 };
 
-const emptySummary = () => ({
+const emptySummary = (): Tstate_summary => ({
   discountRate: '100',
   tuneTotal: '',
   subTotal: '',
@@ -35,7 +35,7 @@ const emptySummary = () => ({
   deliveryLocation: '',
   deliveryDate: '',
   exchangeRate: '',
-  usd: '',
+  foreignTotal: '',
 });
 
 export { useSummary };

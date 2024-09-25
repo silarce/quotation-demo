@@ -1912,7 +1912,7 @@ export type TquotationContentDto = {
   designUnit?: TcustomerDto;
   //
   exchangeRate: `${number}` | null;
-  usd: `${number}` | null;
+  foreignTotal: `${number}` | null;
 };
 
 export type TquotationDto = {
@@ -2307,7 +2307,7 @@ export type TcreateQuotationContentDto = {
   designUnitId: string | null;
   //
   exchangeRate: string | null;
-  usd: string | null;
+  foreignTotal: string | null;
 };
 
 /**合約 */

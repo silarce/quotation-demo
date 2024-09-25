@@ -765,7 +765,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: paymentMethod,
       exchangeRate: state_summary.exchangeRate,
-      usd: state_summary.usd.replaceAll(',', ''),
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
       //
       //
       // products: [...prodArr, ...attachProdArr],
@@ -1196,7 +1196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           const total_num = copy.total.replaceAll(',', '') as `${number}`;
 
-          copy.usd = calcNTDToUSD({
+          copy.foreignTotal = calcNTDToUSD({
             NTD: total_num,
             USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
           }).toLocaleString();
@@ -1205,8 +1205,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         });
       },
     },
-    usd: {
-      value: state_summary.usd,
+    foreignTotal: {
+      value: state_summary.foreignTotal,
     },
   };
 
@@ -1491,7 +1491,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       annotations,
       quotationRanges,
       exchangeRate,
-      usd,
+      foreignTotal: usd,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
@@ -1507,7 +1507,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation,
       deliveryDate,
       exchangeRate: exchangeRate || '',
-      usd: usd || '',
+      foreignTotal: usd || '',
     });
   }, [theContent]);
 
@@ -1521,7 +1521,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       prodSubTotal: attachTotal,
     });
 
-    const usd = calcNTDToUSD({
+    const foreignTotal = calcNTDToUSD({
       NTD: total.replaceAll(',', '') as `${number}`,
       USDtoNTD: (state_summary.exchangeRate || '0') as `${number}`,
     }).toLocaleString();
@@ -1532,7 +1532,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         subTotal,
         salesTax,
         total,
-        usd,
+        foreignTotal: foreignTotal,
       };
     });
   }, [

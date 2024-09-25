@@ -388,8 +388,8 @@ export default function AttachContract({
         // });
       },
     },
-    usd: {
-      value: state_summary.usd,
+    foreignTotal: {
+      value: state_summary.foreignTotal,
     },
   };
 
@@ -490,7 +490,7 @@ export default function AttachContract({
       annotations,
       quotationRanges,
       exchangeRate,
-      usd,
+      foreignTotal,
     } = data_contract?.content;
 
     // setAnnotation(annotations ?? []);
@@ -506,7 +506,7 @@ export default function AttachContract({
       deliveryLocation,
       deliveryDate,
       exchangeRate: exchangeRate || '',
-      usd: usd || '',
+      foreignTotal: foreignTotal || '',
     });
   }, [data_contract?.content]);
 

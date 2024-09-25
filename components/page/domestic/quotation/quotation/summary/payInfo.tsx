@@ -62,7 +62,7 @@ export type Tcontrol = {
     value: string;
     onChange?: (v: string) => void;
   };
-  usd: {
+  foreignTotal: {
     value: string;
   };
 };
@@ -242,7 +242,7 @@ export default function PayInfo({
             <input
               type="text"
               className={classNames('bg-transparent', scss.noBaseLine)}
-              value={control.usd.value}
+              value={control.foreignTotal.value}
               readOnly={true}
             />
           </div>

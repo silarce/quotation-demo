@@ -621,7 +621,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       value: '',
       onChange: (v) => {},
     },
-    usd: {
+    foreignTotal: {
       // 不確定TquotationContractDto下會不會有usd
       // 若有，從totalInfo下手
       // value: state_summary.usd,
