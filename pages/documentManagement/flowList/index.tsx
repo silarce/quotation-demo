@@ -641,7 +641,6 @@ export default function FlowList() {
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
-                            <div></div>
                             <div>
                                 <button
                                     className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn}
@@ -771,16 +770,6 @@ export default function FlowList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="建立日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
                                             caption="名稱"
                                             className="global_tip_must"
                                             disabled={status != "" ? false : true}
@@ -792,7 +781,18 @@ export default function FlowList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="建立日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') || '',
+                                                },
+                                            }}
+                                        />
+                                    </div>
                                     <div></div>
                                 </div>
                             </div>

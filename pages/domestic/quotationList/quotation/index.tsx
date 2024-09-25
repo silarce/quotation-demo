@@ -245,6 +245,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isWorkDirector,
     isCashier,
     isSupervisor,
+    // eslint-disable-next-line prefer-const
     isSalesManagerEmployee,
     isManager,
     salesReviewedAt,
@@ -415,6 +416,57 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
+  // if (userId) {
+  //   if (userId === reviewSalesEmployeeId && toSalesAt) {
+  //     isSales = true;
+  //     isReviewer = true;
+  //   } else if (userId === reviewSupervisorEmployeeId && toSupervisorAt) {
+  //     if (salesReviewedAt) {
+  //       isSupervisor = true;
+  //       isReviewer = true;
+  //     }
+  //   } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
+  //     if (salesReviewedAt && supervisorReviewedAt) {
+  //       isSalesManagerEmployee = true;
+  //       isReviewer = true;
+  //     }
+  //   } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
+  //     if (
+  //       (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
+  //       // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
+  //       // 代表這個content是在SalesManager這個property被加進來之前的content
+  //       (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
+  //     ) {
+  //       isWorkDirector = true;
+  //       isReviewer = true;
+  //     }
+  //   } else if (userId === reviewCashierEmployeeId && toCashierAt) {
+  //     if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
+  //       isCashier = true;
+  //       isReviewer = true;
+  //     }
+  //   } else if (
+  //     userId === reviewManagerEmployeeId ||
+  //     // 總經理ID
+  //     userId === '01f55698-49bb-4501-b432-1157a5109554'
+  //   ) {
+  //     if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
+  //       isManager = true;
+  //       isReviewer = true;
+  //     } else if (
+  //       salesReviewedAt &&
+  //       supervisorReviewedAt &&
+  //       salesManagerReviewedAt &&
+  //       workDirectorReviewedAt &&
+  //       cashierReviewedAt
+  //     ) {
+  //       isManager = true;
+  //       isReviewer = true;
+  //     }
+  //   }
+  // }
+
+  // 20240924 審核經理被排除在審核鏈之外
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -424,23 +476,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
-      if (salesReviewedAt && supervisorReviewedAt) {
-        isSalesManagerEmployee = true;
-        isReviewer = true;
-      }
     } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (
-        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
-        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
-        // 代表這個content是在SalesManager這個property被加進來之前的content
-        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
-      ) {
+      if ((salesReviewedAt && supervisorReviewedAt) || (salesReviewedAt && supervisorReviewedAt)) {
         isWorkDirector = true;
         isReviewer = true;
       }
     } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
+      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
         isCashier = true;
         isReviewer = true;
       }
@@ -452,13 +494,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
-      } else if (
-        salesReviewedAt &&
-        supervisorReviewedAt &&
-        salesManagerReviewedAt &&
-        workDirectorReviewedAt &&
-        cashierReviewedAt
-      ) {
+      } else if (salesReviewedAt && supervisorReviewedAt && workDirectorReviewedAt && cashierReviewedAt) {
         isManager = true;
         isReviewer = true;
       }

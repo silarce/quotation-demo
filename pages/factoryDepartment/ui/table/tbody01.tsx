@@ -221,12 +221,13 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   async function GetPurchaseOrder(item: any) {
     handleRowClick(item.purchaseorderid)
+    // alert(getTaiwanDateStr(item.need_date));
     router.push({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
         purchaseorderuuid: item.purchaseorderuuid,
         purchaseorderid: item.purchaseorderid,
-        create_at: getTaiwanDateStr(item.create_at),
+        create_at: item.create_at,
         create_by: item.create_by,
         receipted: item.receipted,
         suppliername: item.suppliername,
@@ -237,7 +238,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         firstin: 1,
         status: item.status,
         note: item.note,
-        shippingaddress:item.shippingaddress
+        shippingaddress: item.shippingaddress,
+        need_date: item.need_date
       }
     })
   }
@@ -377,9 +379,6 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   const handleRowClick = (itemId: string) => {
     setSelectedItemId(itemId);
   };
-
-
-
   if (type === "WareHouse") {
 
     return (
@@ -639,7 +638,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span> */}
                 <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "採購中" ? '#28a745' : '#ea1833' }}>
-                {_item.status}
+                  {_item.status}
                 </span>
                 <span>{_item.suppliername}</span>
                 {/* <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span> */}
