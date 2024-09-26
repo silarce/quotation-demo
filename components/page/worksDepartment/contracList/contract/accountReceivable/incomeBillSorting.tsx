@@ -10,7 +10,9 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 
 import scss from './incomeBillSorting.module.scss';
 
+// utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 import type {
   TaccountsReceivablePeriodDto,
@@ -18,6 +20,7 @@ import type {
   TaccountsReceivableInvoiceDto,
   TincomeBillSerialDto,
 } from 'js/api/dtoTypes';
+import type { Tcurrency } from 'js/api/dtoTypes';
 
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -107,6 +110,11 @@ type TdndData_group = {
 export type { TstateList as Tstate_incomeBillSorting };
 
 // ================================================================================
+
+const theCurrency: Tcurrency = 'TWD 新臺幣';
+const currency_tw = cutCurrency(theCurrency);
+
+// ================================================================================
 // region START
 export default function IncomeBillSorting({
   className,
@@ -123,6 +131,10 @@ export default function IncomeBillSorting({
   readonly?: boolean;
   currency: string;
 }) {
+  // 幣別一樣時才需要計算amountNotCollected
+  // 因為算一算其實不會怎麼樣，所以簡單處理，隱藏就好
+  const showAmountNotCollected = currency === currency_tw;
+
   const [disabled, setDisabled] = useState(true);
 
   const [stateList, setStateList] = useState<TstateList>({});
@@ -427,6 +439,7 @@ export default function IncomeBillSorting({
                 // prefix={currency}
                 showBaseline="invisible"
                 className={'mr-3'}
+                prefix={currency_tw}
                 node={<div className="text-right">{total_invoice}</div>}
               />
             </Row>
@@ -448,26 +461,29 @@ export default function IncomeBillSorting({
           </Right>
         </Group>
 
-        <div className={scss.footCaption}>已開立發票未收款項</div>
-
-        <Group className={scss['total']}>
-          <Left></Left>
-          <Right>
-            <Row>
-              <span></span>
-              <span></span>
-              <span>合計</span>
-              {/* <span>{amountNotCollected}</span> */}
-              <InputSel
-                {...defaultInputSelProps_02}
-                // prefix={currency}
-                showBaseline="invisible"
-                className={'mr-3'}
-                node={<div className="text-right">{amountNotCollected}</div>}
-              />
-            </Row>
-          </Right>
-        </Group>
+        {showAmountNotCollected && (
+          <>
+            <div className={scss.footCaption}>已開立發票未收款項</div>
+            <Group className={scss['total']}>
+              <Left></Left>
+              <Right>
+                <Row>
+                  <span></span>
+                  <span></span>
+                  <span>合計</span>
+                  {/* <span>{amountNotCollected}</span> */}
+                  <InputSel
+                    {...defaultInputSelProps_02}
+                    // prefix={currency}
+                    showBaseline="invisible"
+                    className={'mr-3'}
+                    node={<div className="text-right">{amountNotCollected}</div>}
+                  />
+                </Row>
+              </Right>
+            </Group>
+          </>
+        )}
       </div>
     </div>
   );
@@ -552,7 +568,7 @@ const Group_Dnd = ({
           <InputSel
             {...defaultInputSelProps}
             className="justify-self-end"
-            prefix="NTD"
+            prefix={currency_tw}
             showBaseline="invisible"
             node={<div className="text-right">{price}</div>}
           />
@@ -567,7 +583,7 @@ const Group_Dnd = ({
             className="justify-self-end "
             showBaseline="auto"
             disabled={disabled || isNoInvoice}
-            prefix={currency}
+            prefix={currency_tw}
             inputProps={{
               props: {
                 placeholder: '無折讓',

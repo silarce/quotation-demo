@@ -54,6 +54,8 @@ import type { TcustomerDto, TincomeBillSerialDto, TupdateAccountReceivableDeduct
 import scss from './index.module.scss';
 import { AxiosError } from 'axios';
 
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
+
 // ========================================================================
 
 type Tquery = {
@@ -91,8 +93,6 @@ export default function AccountReceivable({
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
 
-  const currency = 'NTD';
-
   // --------------------------------------------------------------------------
 
   // region get data
@@ -121,6 +121,9 @@ export default function AccountReceivable({
   });
 
   const { engineeringContact, accountReceivable } = contract ?? {};
+
+  // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
+  const currency = cutCurrency(accountReceivable?.currency ?? ('currency currency' as Tcurrency));
 
   const {
     data: data_finalProdcut = [],

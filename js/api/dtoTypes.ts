@@ -4103,6 +4103,9 @@ export type TaccountsReceivableDto = {
   // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
   // accountantList?: TaccountantDto[];
   incomeBillList?: TincomeBillSerialDto[];
+
+  currency: Tcurrency;
+  exchangeRate: string | null;
 };
 
 export type TupdateAccountReceivableDto = Partial<
