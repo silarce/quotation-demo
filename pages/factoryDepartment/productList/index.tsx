@@ -127,6 +127,7 @@ export default function ProductList() {
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
+
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -969,7 +970,7 @@ export default function ProductList() {
             myAlert.warning({ title: '物料編號或物料名稱不可為空' })
             return;
         }
-        if(isDuplicate){
+        if (isDuplicate) {
             myAlert.warning({ title: '物料編號已經存在' })
             return;
         }
@@ -1077,8 +1078,8 @@ export default function ProductList() {
     const [isDuplicate, setIsDuplicate] = useState(false);
 
     useEffect(() => {
-      const exists = filteredData.some(item => item.productid === addproductid);
-      setIsDuplicate(exists);
+        const exists = filteredData.some(item => item.productid === addproductid);
+        setIsDuplicate(exists);
     }, [addproductid, filteredData]);
 
 
@@ -1123,7 +1124,7 @@ export default function ProductList() {
                                 <div></div>
                             </div>
                             <div className={scss.head_foot2}>
-                                <div>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </div>
                                 <div>
@@ -1131,7 +1132,7 @@ export default function ProductList() {
                                         type="text"
                                         placeholder='請輸入料號'
                                         value={keyword2}
-                                        style={{ padding: '0px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                        style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                         onChange={(e) => setKeyword2(e.target.value)}
                                     />
 
@@ -1141,7 +1142,7 @@ export default function ProductList() {
                                         type="text"
                                         placeholder='請輸入名稱'
                                         value={keyword3}
-                                        style={{ padding: '0px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                         onChange={(e) => setKeyword3(e.target.value)}
                                     />
                                 </div>
@@ -1150,7 +1151,7 @@ export default function ProductList() {
                                         type="text"
                                         placeholder='請輸入規格'
                                         value={keyword4}
-                                        style={{ padding: '0px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                         onChange={(e) => setKeyword4(e.target.value)}
                                     />
                                 </div>
@@ -1159,10 +1160,10 @@ export default function ProductList() {
                                         <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     </button>
                                 </div>
-                                <div style={{ padding: '0px 5px', textAlign: 'right' }}>
+                                <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                                     <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
                                 </div>
-                                <div style={{ padding: '0px 5px', textAlign: 'right' }}>
+                                <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                                     <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p>
                                     {/* <InputSel
                                         {...inputSelProps}
@@ -1442,7 +1443,7 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                    {isDuplicate && <p style={{ fontSize:'16px', color: 'red' }}>物料編號已存在！</p>}
+                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>物料編號已存在！</p>}
                                     </div>
                                     <div></div>
                                     <div></div>
