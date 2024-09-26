@@ -114,7 +114,7 @@ export default function AddPurchaseRequisition() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<number>(0);
+    const [handinputquantity, setHandinputquantity] = useState<string>("");
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
@@ -577,7 +577,7 @@ export default function AddPurchaseRequisition() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '') {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '') {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -595,7 +595,7 @@ export default function AddPurchaseRequisition() {
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity(0);
+            setHandinputquantity('');
             setHandinputunit('');
             setHandinputnote('');
 
@@ -894,7 +894,7 @@ export default function AddPurchaseRequisition() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity(0);
+        setHandinputquantity('');
         setShowSuggestions(false);
     }
 
@@ -942,9 +942,6 @@ export default function AddPurchaseRequisition() {
 
         if (data2.length === 0) {
             myAlert.warning({ title: "尚未加入任何請購項目" });
-            return;
-        } else if (needDateObj < createAtinObj) {
-            myAlert.warning({ title: "需用日期不可小於今日" });
             return;
         }
         else {
@@ -1404,14 +1401,20 @@ export default function AddPurchaseRequisition() {
                                     />
                                 </div>
                                 <div>
-                                    <input
+                                <input
                                         style={{ backgroundColor: 'transparent', width: '50px' }}
                                         type="text"
                                         placeholder='數量'
-                                        maxLength={5}
                                         value={handinputquantity}
-                                        onChange={(e) => { setHandinputquantity(parseInt(e.target.value) || 0) }}
+                                        onChange={(e) => {
+                                            const quantity = e.target.value;
+                                            // 若為無效數字或空字串，將 quantity 設為 0
+                                            
+                                            setHandinputquantity(quantity);
+                                        }}
                                     />
+
+
                                 </div>
                                 <div>
                                     <input
