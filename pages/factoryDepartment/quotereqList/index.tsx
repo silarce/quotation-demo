@@ -403,7 +403,7 @@ export default function AddPurchaseOrder() {
     const getProductById = async (productuuid: any) => {
         try {
             // setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
                 productuuid: productuuid as string | undefined,
             };
 
@@ -877,38 +877,49 @@ export default function AddPurchaseOrder() {
     //     // 你的資料項目
     // ];
 
+
+
+
     useEffect(() => {
         if (isSelectingRef.current) return;
 
         let filtered = searchbardata;
+        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
+            if (handinputproductuuid) {
+                filtered = searchbardata.filter(item =>
+                    item.id.includes(handinputproductuuid)
+                );
+            }
+            if (handinputproductid) {
+                filtered = filtered.filter(item =>
+                    item.productid.includes(handinputproductid)
+                );
+            }
 
-        if (handinputproductuuid) {
-            filtered = searchbardata.filter(item =>
-                item.id.includes(handinputproductuuid)
-            );
+            if (handinputname) {
+                filtered = filtered.filter(item =>
+                    item.name.includes(handinputname)
+                );
+            }
+
+            if (handinputspec) {
+                filtered = filtered.filter(item =>
+                    item.spec && item.spec.includes(handinputspec)
+                );
+            }
+
+
+            setFilteredData(filtered);
+            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
         }
-        if (handinputproductid) {
-            filtered = searchbardata.filter(item =>
-                item.productid.includes(handinputproductid)
-            );
+        else {
+            setHandinputproductuuid('');
+            setFilteredData([]);
+            setShowSuggestions(false);
         }
 
-        if (handinputname) {
-            filtered = filtered.filter(item =>
-                item.name.includes(handinputname)
-            );
-        }
-
-        if (handinputspec) {
-            filtered = filtered.filter(item =>
-                item.spec && item.spec.includes(handinputspec)
-            );
-        }
-
-        setFilteredData(filtered);
-        // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
-        setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
-    }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
+    }, [handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -934,6 +945,7 @@ export default function AddPurchaseOrder() {
         setHandinputspec(item.spec || "");
         setHandinputunit(item.unit);
         setShowSuggestions(false);
+        // setFilteredData(searchbardata);
     };
 
 
@@ -1568,7 +1580,7 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         setHandinputquantity(item.detail_quantity);
-        setHandinputtotalprice((parseFloat(handinputunitprice||'0') * parseFloat(handinputquantity||'0')).toString());
+        setHandinputtotalprice((parseFloat(handinputunitprice || '0') * parseFloat(handinputquantity || '0')).toString());
         // UpdatePurchaseOrderDetail(item);
     };
 
@@ -2347,11 +2359,24 @@ export default function AddPurchaseOrder() {
                             </div>
                             <div></div>
                         </div>
-                        <div className={scss.body_content1}>
+                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                             <Thead01 type={'AddQOList'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
+                                        <span>
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                            <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
+                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                        </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.detail_productid}</span>
                                         <span>
@@ -2435,7 +2460,10 @@ export default function AddPurchaseOrder() {
                                             />
                                         </span>
                                         <span>
-                                            {_item.detail_totalprice.toLocaleString()}
+                                            {/* {_item.detail_totalprice.toLocaleString()} */}
+                                            <span>
+                                                {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()}
+                                            </span>
                                         </span>
                                         <span>
                                             <input
@@ -2463,21 +2491,6 @@ export default function AddPurchaseOrder() {
                                                 }}
                                             />
                                         </span>
-                                        <span>
-                                            &nbsp;&nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                        </span>
-
                                     </div>
                                 </CellWithBar>
                             ))}
@@ -2486,7 +2499,8 @@ export default function AddPurchaseOrder() {
                             <div className={scss.addbar} style={{ display: `${(quotereqid != '' && status === '未結案') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
-                                    <button onClick={() => { handleAddByHandKey() }}>
+
+                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '10px' }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
@@ -2571,9 +2585,9 @@ export default function AddPurchaseOrder() {
                                             setHandinputunitprice(unitprice);
                                             // 根據數量和單價計算總金額
                                             const totalPrice = ((parseFloat(handinputquantity) || 0) * parsedUnitPrice).toFixed(2);
-                                            
+
                                             setHandinputtotalprice(totalPrice.toString());
-                                          }}
+                                        }}
                                     />
                                 </div>
                                 <div>
@@ -2603,11 +2617,12 @@ export default function AddPurchaseOrder() {
                                     />
                                 </div>
                                 <div>
-                                    &nbsp;&nbsp;&nbsp;
+                                    {/* &nbsp;&nbsp;&nbsp;
                                     <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote || handinputunitprice ? '' : 'none' }}>
                                         <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                    </button>
+                                    </button> */}
                                 </div>
+
                             </div>
                         </div>
 
