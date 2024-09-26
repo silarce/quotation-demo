@@ -59,39 +59,8 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
   toManagerAt && (dotColor_manager = 'red');
   managerReviewedAt && (dotColor_manager = 'green');
 
-  // const processChain: TprocessChain = [
-  //   {
-  //     label: `經辦 ${agentEmployee?.chName ?? 'fooo'}`,
-  //     dotColor: 'green',
-  //   },
-  //   {
-  //     label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-  //     dotColor: dotColor_sales,
-  //   },
-  //   {
-  //     label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
-  //     dotColor: dotColor_supervisor,
-  //   },
-  //   // {
-  //   //   label: `業務經理 ${reviewSalesManagerEmployee?.chName ?? ''}`,
-  //   //   dotColor: dotColor_salesManager,
-  //   // },
-  //   {
-  //     label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
-  //     dotColor: dotColor_workDirector,
-  //   },
-  //   {
-  //     label: `應收帳款 ${reviewCashierEmployee?.chName ?? ''}`,
-  //     dotColor: dotColor_cashier,
-  //   },
-  //   {
-  //     label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
-  //     dotColor: dotColor_manager,
-  //   },
-  // ];
-
   const process_agent: TprocessChain[number] = {
-    label: `經辦 ${agentEmployee?.chName ?? 'fooo'}`,
+    label: `經辦 ${agentEmployee?.chName ?? ''}`,
     dotColor: 'green',
   };
   const process_sales: TprocessChain[number] = {
