@@ -311,6 +311,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "AddPR_ReqList") {
     return (
       <div className={style.thead20}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -437,7 +438,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span>單位</span>
         <span></span>
-        <span>備註(用途說明)</span>
+        <span>備註</span>
         <span>領料人員</span>
         <span></span>
       </div>
@@ -507,6 +508,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "AddPO_ReqList") {
     return (
       <div className={style.thead33}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -516,7 +518,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         <span>單價</span>
         <span>金額</span>
-        <span>備註(用途說明)</span>
+        <span>備註</span>
         <span></span>
       </div>
     )
@@ -540,7 +542,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   // //#region 新增採購單明細
   else if (type === "AddQOList") {
     return (
-      <div className={style.thead33}>
+      <div className={style.thead37}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
