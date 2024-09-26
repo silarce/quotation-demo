@@ -1,0 +1,106 @@
+@use "styles/theme01" as *;
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    border: 1px solid #c1c1c1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    // height: 712px;
+}
+
+.content {
+    width: 100%;
+    overflow-y: auto;
+    top: 0;
+}
+
+
+
+//#region 列樣式
+.head_head1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 5px;
+      margin-left: 20px;
+      margin-right: 20px;
+    padding-bottom: 5px;
+    // border-bottom: 1px solid rgb(214, 214, 214);
+
+    div {
+        margin-right: 20px;
+    }
+
+    // background-color: gray;
+}
+
+.head_foot2 {
+    display: grid;
+    grid-template-columns:30px 200px 350px 350px 60px 1fr 1fr;
+    // gap: 15px;
+    width: auto;
+    //   margin-top: 5px;
+    // margin-left: 20px;
+    // margin-right: 20px;
+    //   margin-bottom: 5px;
+    //   border-top: 1px solid #c1c1c1;
+}
+
+.body_content1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0px;
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-x: hidden;
+    max-height: 350px; // 最大高度設定為300px
+}
+//#endregion
+
+
+//#region 表格樣式
+
+div.panelHeader21 {
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        padding-left: 20px;
+
+        span {
+            font-weight: 400;
+            font-size: 16px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns: 30px 150px 300px 400px 100px 100px 30px 50px 100px 100px 30px;
+        gap: 15px;
+        // border-bottom: 1px solid #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .selectedRow {
+        background-color: #ecf1ff;
+        /* 當前選擇項目的背景顏色 */
+    }
+}
+
+//#endregion

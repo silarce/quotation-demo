@@ -135,6 +135,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseOrderDetail") {
     return (
       <div className={style.thead11}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -144,7 +145,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
-        <span></span>
         <span>備註</span>
         <span></span>
       </div>
@@ -172,6 +172,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdReceiptDetail") {
     return (
       <div className={style.thead14}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -181,7 +182,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
-        <span></span>
         <span>備註</span>
         <span></span>
       </div>
@@ -192,6 +192,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseOrderDetail2") {
     return (
       <div className={style.thead13}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -200,6 +201,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
+        <span>備註</span>
         <span></span>
       </div>
     )
@@ -224,6 +226,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseRequisitionDetail") {
     return (
       <div className={style.thead16}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -234,7 +237,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單價</span>
         <span>金額</span>
         <span>廠商</span>
-        <span></span>
         <span>備註</span>
         <span></span>
       </div>
@@ -245,6 +247,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseRequisitionDetail2") {
     return (
       <div className={style.thead21}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -271,7 +274,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
-        <span>單號</span>
+        <span>備註</span>
         <span>選擇</span>
         <span></span>
       </div>
@@ -355,6 +358,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdReceiptDetail2") {
     return (
       <div className={style.thead24}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -365,7 +369,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>金額</span>
         <span>備註</span>
         <span></span>
-        <span></span>
       </div>
     )
   }
@@ -374,6 +377,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdEntryDetail") {
     return (
       <div className={style.thead25}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -381,7 +385,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>已入</span>
         <span>數量</span>
         <span>單位</span>
-        <span></span>
         <span>庫存</span>
         <span>備註</span>
         <span></span>
