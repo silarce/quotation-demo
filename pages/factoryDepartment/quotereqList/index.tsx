@@ -164,13 +164,13 @@ export default function AddPurchaseOrder() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<number>(0);
+    const [handinputquantity, setHandinputquantity] = useState<string>("");
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
-    const [handinputunitprice, setHandinputunitprice] = useState<number>(0);
-    const [handinputtotalprice, setHandinputtotalprice] = useState<number>(0);
+    const [handinputunitprice, setHandinputunitprice] = useState<string>("");
+    const [handinputtotalprice, setHandinputtotalprice] = useState<string>("");
     const [handinputsuppliername, setHandinputsuppliername] = useState<string>("");
 
 
@@ -628,7 +628,7 @@ export default function AddPurchaseOrder() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '' || handinputquantity === 0) {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '' || handinputquantity === '') {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -649,11 +649,11 @@ export default function AddPurchaseOrder() {
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity(0);
+            setHandinputquantity('');
             setHandinputunit('');
             setHandinputnote('');
-            setHandinputunitprice(0);
-            setHandinputtotalprice(0);
+            setHandinputunitprice('');
+            setHandinputtotalprice('');
 
             try {
                 setIsLoading(true);
@@ -894,13 +894,13 @@ export default function AddPurchaseOrder() {
         }
 
         if (handinputname) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.name.includes(handinputname)
             );
         }
 
         if (handinputspec) {
-            filtered = searchbardata.filter(item =>
+            filtered = filtered.filter(item =>
                 item.spec && item.spec.includes(handinputspec)
             );
         }
@@ -944,10 +944,10 @@ export default function AddPurchaseOrder() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity(0);
+        setHandinputquantity('');
         setShowSuggestions(false);
-        setHandinputunitprice(0);
-        setHandinputtotalprice(0);
+        setHandinputunitprice('');
+        setHandinputtotalprice('');
     }
 
 
@@ -1568,7 +1568,7 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         setHandinputquantity(item.detail_quantity);
-        setHandinputtotalprice(handinputunitprice * handinputquantity);
+        setHandinputtotalprice((parseFloat(handinputunitprice||'0') * parseFloat(handinputquantity||'0')).toString());
         // UpdatePurchaseOrderDetail(item);
     };
 
@@ -2528,12 +2528,17 @@ export default function AddPurchaseOrder() {
                                         style={{ backgroundColor: 'transparent', width: '50px' }}
                                         type="text"
                                         placeholder='數量'
-                                        maxLength={5}
+                                        // maxLength={5}
                                         value={handinputquantity}
                                         onChange={(e) => {
-                                            const quantity = parseInt(e.target.value) || 0;
+                                            const quantity = e.target.value;
+                                            // 若為無效數字或空字串，將 quantity 設為 0
+                                            const parsedQuantity = quantity === '' ? 0 : parseFloat(quantity) || 0;
                                             setHandinputquantity(quantity);
-                                            setHandinputtotalprice(quantity * handinputunitprice);
+                                            // 根據數量和單價計算總金額
+                                            const totalPrice = (parsedQuantity * (parseFloat(handinputunitprice) || 0)).toFixed(2);
+                                            // const totalPrice=(parsedQuantity * (parseFloat(handinputunitprice) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).toString()
+                                            setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
                                 </div>
@@ -2560,10 +2565,15 @@ export default function AddPurchaseOrder() {
                                         placeholder='單價'
                                         value={handinputunitprice}
                                         onChange={(e) => {
-                                            const unitprice = parseInt(e.target.value) || 0;
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
                                             setHandinputunitprice(unitprice);
-                                            setHandinputtotalprice(handinputquantity * unitprice); // 同時更新總金額
-                                        }}
+                                            // 根據數量和單價計算總金額
+                                            const totalPrice = ((parseFloat(handinputquantity) || 0) * parsedUnitPrice).toFixed(2);
+                                            
+                                            setHandinputtotalprice(totalPrice.toString());
+                                          }}
                                     />
                                 </div>
                                 <div>
@@ -2571,7 +2581,9 @@ export default function AddPurchaseOrder() {
                                         type="text"
                                         placeholder='金額'
                                         value={handinputtotalprice}
-                                        onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
+                                        onChange={(e) => {
+                                            setHandinputtotalprice(e.target.value.toString())
+                                        }}
                                     />
                                 </div>
                                 <div>
