@@ -114,7 +114,7 @@ export default function AddPurchaseRequisition() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<number>(0);
+    const [handinputquantity, setHandinputquantity] = useState<string>("");
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
@@ -577,7 +577,7 @@ export default function AddPurchaseRequisition() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '') {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '') {
             myAlert.warning({ title: '未輸入名稱、規格或數量' });
         } else {
             const newEntry = {
@@ -595,7 +595,7 @@ export default function AddPurchaseRequisition() {
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity(0);
+            setHandinputquantity('');
             setHandinputunit('');
             setHandinputnote('');
 
@@ -787,34 +787,43 @@ export default function AddPurchaseRequisition() {
         if (isSelectingRef.current) return;
 
         let filtered = searchbardata;
+        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
+            if (handinputproductuuid) {
+                filtered = searchbardata.filter(item =>
+                    item.id.includes(handinputproductuuid)
+                );
+            }
+            if (handinputproductid) {
+                filtered = filtered.filter(item =>
+                    item.productid.includes(handinputproductid)
+                );
+            }
 
-        if (handinputproductuuid) {
-            filtered = searchbardata.filter(item =>
-                item.id.includes(handinputproductuuid)
-            );
+            if (handinputname) {
+                filtered = filtered.filter(item =>
+                    item.name.includes(handinputname)
+                );
+            }
+
+            if (handinputspec) {
+                filtered = filtered.filter(item =>
+                    item.spec && item.spec.includes(handinputspec)
+                );
+            }
+
+            setFilteredData(filtered);
+            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+
         }
-        if (handinputproductid) {
-            filtered = filtered.filter(item =>
-                item.productid.includes(handinputproductid)
-            );
+        else {
+            setHandinputproductuuid('');
+            setFilteredData([]);
+            setShowSuggestions(false);
         }
 
-        if (handinputname) {
-            filtered = filtered.filter(item =>
-                item.name.includes(handinputname)
-            );
-        }
 
-        if (handinputspec) {
-            filtered = filtered.filter(item =>
-                item.spec && item.spec.includes(handinputspec)
-            );
-        }
-
-        setFilteredData(filtered);
-        // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
-        setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
-    }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
+    }, [handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -894,7 +903,7 @@ export default function AddPurchaseRequisition() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity(0);
+        setHandinputquantity('');
         setShowSuggestions(false);
     }
 
@@ -942,9 +951,6 @@ export default function AddPurchaseRequisition() {
 
         if (data2.length === 0) {
             myAlert.warning({ title: "尚未加入任何請購項目" });
-            return;
-        } else if (needDateObj < createAtinObj) {
-            myAlert.warning({ title: "需用日期不可小於今日" });
             return;
         }
         else {
@@ -1268,11 +1274,24 @@ export default function AddPurchaseRequisition() {
                                 </span>
                             </div>
                         </div>
-                        <div className={scss.body_content1}>
+                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                             <Thead01 type={'AddPR_ReqList'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
+                                        <span>
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
+                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                        </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>
@@ -1344,20 +1363,7 @@ export default function AddPurchaseRequisition() {
                                                 }}
                                             />
                                         </span>
-                                        <span>
-                                            &nbsp;&nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                        </span>
+
 
                                     </div>
                                 </CellWithBar>
@@ -1366,7 +1372,7 @@ export default function AddPurchaseRequisition() {
 
                             <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 <div>
-                                    <button onClick={() => { handleAddByHandKey() }}>
+                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '15px' }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
@@ -1408,10 +1414,16 @@ export default function AddPurchaseRequisition() {
                                         style={{ backgroundColor: 'transparent', width: '50px' }}
                                         type="text"
                                         placeholder='數量'
-                                        maxLength={5}
                                         value={handinputquantity}
-                                        onChange={(e) => { setHandinputquantity(parseInt(e.target.value) || 0) }}
+                                        onChange={(e) => {
+                                            const quantity = e.target.value;
+                                            // 若為無效數字或空字串，將 quantity 設為 0
+
+                                            setHandinputquantity(quantity);
+                                        }}
                                     />
+
+
                                 </div>
                                 <div>
                                     <input
