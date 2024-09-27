@@ -340,7 +340,7 @@ export default function IncomeBillDetails({
           );
         })}
 
-        {true && <Tfoot {...totals} />}
+        {showTotals && <Tfoot {...totals} />}
       </div>
 
       {/*  */}
