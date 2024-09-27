@@ -20,6 +20,7 @@ import type {
   TquotationProductDto,
   TcompletedProductDto,
   TretainageType,
+  TquotationContractDto,
 } from 'js/api/dtoTypes';
 
 // api
@@ -107,6 +108,7 @@ type Tstate_period = {
   isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
   isOlderInvoice: boolean;
   //
+  contractArr: TquotationContractDto[];
 };
 
 type Tleft = {
@@ -140,6 +142,7 @@ export default function PeriodTable({
   reqDeletePeriod,
   readonly,
   currency,
+  contractId,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
@@ -150,6 +153,7 @@ export default function PeriodTable({
   reqDeletePeriod: (periodId: string) => void;
   readonly?: boolean;
   currency: string;
+  contractId: string | undefined;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
@@ -409,7 +413,14 @@ export default function PeriodTable({
       <div className={scss.table}>
         <Left node_left={node_left} currency={currency} />
 
-        {isAddingNew && <PeriodPanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} currency={currency} />}
+        {isAddingNew && (
+          <PeriodPanel
+            ref={ref_newInvoicePanel}
+            finalProdArr={finalProdArr}
+            currency={currency}
+            contractId={contractId}
+          />
+        )}
 
         {periodArr_sorted.map((data_invoice, index) => {
           return (

@@ -8,7 +8,7 @@ $fontWeight: 500;
 $rowGap: 10px;
 // $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
 $invoiceHeight: fit-content;
-$tfootHeight: 800px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
+$tfootHeight: 900px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 $deleteBarHeight: 36px;
 // $tfootHeight: fit-content; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 
@@ -184,6 +184,7 @@ $deleteBarHeight: 36px;
   // font-size: $fontSize;
   font-weight: $fontWeight;
   height: $tfootHeight;
+  align-content: flex-start;
   .row {
     justify-items: flex-end;
   }
@@ -259,4 +260,29 @@ $deleteBarHeight: 36px;
   // > input {
   //   @extend .theInput;
   // }
+}
+
+.contractRow.plus {
+  grid-template-columns: 1fr;
+  justify-items: flex-start;
+  gap: 5px;
+  .placeholder {
+    color: theme("colors.border");
+  }
+  .contractList {
+    display: grid;
+    gap: 10px;
+    cursor: pointer;
+    width: 100%;
+    min-height: 26px;
+    width: 100%;
+    border: solid 1px theme("colors.border");
+    overflow: auto;
+    max-height: 100%;
+    .contract {
+      display: grid;
+      grid-template-columns: 100px auto;
+      font-size: 14px;
+    }
+  }
 }

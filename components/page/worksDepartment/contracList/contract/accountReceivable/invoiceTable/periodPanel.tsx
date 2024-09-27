@@ -72,7 +72,7 @@ export type { Tcenter, TimperativeHandle_panel };
 
 // ==========================================================================
 
-const Selector = selectModalCreator_multi<['invoiceBook']>({
+const Selector_invoiceBook = selectModalCreator_multi<['invoiceBook']>({
   selectorArr: [
     {
       key: 'invoiceBook',
@@ -85,6 +85,23 @@ const Selector = selectModalCreator_multi<['invoiceBook']>({
     },
   ],
 });
+
+const useSelector_contract = (thisContractId: string | undefined) => {
+  const Selector_contract = useMemo(() => {
+    return selectModalCreator_multi<['contract']>({
+      selectorArr: [
+        {
+          key: 'contract',
+          caption: '請選擇同屬合約',
+          tip: '不選擇即可清空',
+          forbiddenCheck_dataList: (data) => !data.accountReceivableId || thisContractId === data.id,
+        },
+      ],
+    });
+  }, [thisContractId]);
+
+  return Selector_contract;
+};
 
 // ==========================================================================
 
@@ -100,6 +117,7 @@ function PeriodPanel_pre(
     reqDeleteInvoice,
     reqDeletePeriod,
     currency,
+    contractId,
   }: {
     data_period?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
@@ -114,9 +132,13 @@ function PeriodPanel_pre(
     reqDeleteInvoice?: (invoiceId: string) => void;
     reqDeletePeriod?: (periodId: string) => void;
     currency: string;
+    contractId?: string;
   },
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
+  const Selector_contract = useSelector_contract(contractId);
+
+  // --------------------------------------------------------------------------
   const isTotal = !!totalsTotal;
 
   const { defaultState, isNew } = useDefaultState({
@@ -130,7 +152,8 @@ function PeriodPanel_pre(
   const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
 
-  const [showSelector, setShowSelector] = useState(false);
+  const [showSelector_invoiceBook, setShowSelector_invoiceBook] = useState(false);
+  const [showSelector_contract, setShowSelector_contract] = useState(false);
 
   // --------------------------------------------------------------------------
 
@@ -451,7 +474,8 @@ function PeriodPanel_pre(
         isTotal={isTotal}
         onConfirm_allowance={handle_confirm_allowance}
         resetDefault={resetDefault}
-        setShowSelector={setShowSelector}
+        setShowSelector={setShowSelector_invoiceBook}
+        setShowSelector_contract={setShowSelector_contract}
         currency={currency}
       />
 
@@ -485,9 +509,8 @@ function PeriodPanel_pre(
         )}
       </div>
 
-      <Selector
-        //
-        showModal={showSelector}
+      <Selector_invoiceBook
+        showModal={showSelector_invoiceBook}
         onConfirm={([invoiceBookArr]) => {
           const invoiceBook = invoiceBookArr[0] as TaccountantInvoiceBookDto | undefined;
 
@@ -497,7 +520,20 @@ function PeriodPanel_pre(
             other.invoiceBook = null;
           }
         }}
-        onCancel={() => setShowSelector(false)}
+        onCancel={() => setShowSelector_invoiceBook(false)}
+      />
+
+      <Selector_contract
+        showModal={showSelector_contract}
+        defaultSeletedDataArrArr={[[...other.contractArr]]}
+        onConfirm={(theArr) => {
+          const contractArr = theArr[0];
+
+          other.contractArr = contractArr;
+        }}
+        onCancel={() => {
+          setShowSelector_contract(false);
+        }}
       />
     </div>
   );
@@ -600,6 +636,7 @@ const Tfoot = ({
   onConfirm_allowance: onConfirm_allowance,
   resetDefault,
   setShowSelector,
+  setShowSelector_contract,
   currency,
 }: {
   readOnly: boolean;
@@ -608,6 +645,7 @@ const Tfoot = ({
   onConfirm_allowance: () => void;
   resetDefault: () => void;
   setShowSelector: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSelector_contract: React.Dispatch<React.SetStateAction<boolean>>;
   currency: string;
 }) => {
   const {
@@ -1058,6 +1096,36 @@ const Tfoot = ({
           readOnly={readOnly}
         />
       </div>
+
+      <div
+        className={classNames(
+          //
+          scss.row,
+          scss.contractRow,
+          scss.plus,
+          (class_other.id || isTotal) && 'invisible'
+        )}
+      >
+        <span>同屬合約</span>
+        <div className={scss.contractList} onClick={() => setShowSelector_contract(true)}>
+          {class_other.contractArr.length === 0 && <span className={scss.placeholder}>點擊新增</span>}
+
+          {class_other.contractArr.map((contract) => {
+            const {
+              id,
+              contractNumber,
+              content: { projectName },
+            } = contract;
+
+            return (
+              <div key={id} className={scss.contract}>
+                <span>{contractNumber}</span>
+                <span>{projectName}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
@@ -1312,6 +1380,8 @@ const useDefaultState = ({
       businessIdNumber: (isNew ? customer?.taxId : businessIdNumber) ?? '',
       isOriginalCustomer,
       isOlderInvoice,
+      //
+      contractArr: [],
     };
 
     return { defaultState, isNew };
@@ -1343,6 +1413,11 @@ class Class_OtherNode {
   readonly setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
 
   // --------------------------------------------------------------------------
+
+  get id() {
+    return this.state_period.id;
+  }
+
   get price() {
     const price = this.state_period.price;
 
@@ -1572,6 +1647,16 @@ class Class_OtherNode {
     this.setState_period((period) => ({
       ...period,
       isOriginalCustomer: bool,
+    }));
+  }
+
+  get contractArr() {
+    return this.state_period.contractArr;
+  }
+  set contractArr(arr) {
+    this.setState_period((period) => ({
+      ...period,
+      contractArr: arr,
     }));
   }
 

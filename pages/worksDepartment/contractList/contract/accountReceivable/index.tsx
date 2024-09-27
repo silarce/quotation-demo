@@ -246,6 +246,8 @@ export default function AccountReceivable({
       businessIdNumber,
       isOriginalCustomer,
       isOlderInvoice,
+
+      contractArr,
     } = state_invoice;
 
     if (!isOlderInvoice && (accountantInvoiceBook || actualPrice)) {
@@ -295,6 +297,10 @@ export default function AccountReceivable({
       isOriginalCustomer,
       retainagePercent: retainagePercent || null,
       isOlderInvoice,
+
+      // 在選擇器已經剔除accountReceivableId為null的合約
+
+      otherAccountReceivableIds: contractArr.map((item) => item.accountReceivableId!),
     };
 
     try {
@@ -576,6 +582,7 @@ export default function AccountReceivable({
             reqDeletePeriod={reqDeletePeriod}
             readonly={readonly}
             currency={currency}
+            contractId={contractId}
           />
         </AccountReceivableContext.Provider>
       </div>
