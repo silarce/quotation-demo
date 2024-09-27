@@ -125,7 +125,7 @@ export default function AccountReceivable({
   const { engineeringContact, accountReceivable } = contract ?? {};
 
   // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
-  const currency = cutCurrency(accountReceivable?.currency ?? ('---' as Tcurrency));
+  const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
 
   const {
     data: data_finalProdcut = [],
