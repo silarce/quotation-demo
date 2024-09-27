@@ -215,6 +215,8 @@ function PeriodPanel_pre(
 
   const handle_confirm_allowance = async () => {
     if (!state_period.firstInvoiceId) {
+      myAlert.err({ title: '本期未綁定發票' });
+
       return;
     }
 
