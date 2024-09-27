@@ -8,14 +8,17 @@ import EditDefunctionBtn from './accountantDeductionEditor';
 // gear
 import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // css
 import scss from './incomeBillDetails.module.scss';
 
 // type
-import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tcurrency, TincomeBillSerialDto } from 'js/api/dtoTypes';
 
+// utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 // ============================================================================
 
@@ -27,6 +30,8 @@ type Tstate_deduction = {
 
 type Tstate_incomeBill = {
   id: string;
+  receivableCurrency: string;
+
   receiveDate: string | null;
   paymentType: string;
   importAccountingNumber: string;
@@ -63,6 +68,8 @@ export default function IncomeBillDetails({
   reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
   readonly?: boolean;
 }) {
+  // ---------------------------------------------------------------------------
+
   const [disabled, setDisabled] = useState(true);
   const [state_incomeBillArr, setState_incomeBillArr] = useState<Tstate_incomeBill[]>([]);
 
@@ -135,6 +142,7 @@ export default function IncomeBillDetails({
     const stateArr: Tstate_incomeBill[] = incomeBillList.map((incomeBill) => {
       const {
         id,
+        receivableCurrency,
         receiveDate: insertDate = '',
         accountant: { paymentType = '' },
         importAccountingNumber,
@@ -162,6 +170,8 @@ export default function IncomeBillDetails({
 
       const state: Tstate_incomeBill = {
         id,
+        receivableCurrency: cutCurrency((receivableCurrency || '--- ---') as Tcurrency),
+
         receiveDate: insertDate,
         paymentType,
         importAccountingNumber: importAccountingNumber ?? '',
@@ -224,6 +234,8 @@ export default function IncomeBillDetails({
         {state_incomeBillArr.map((incomeBill, index_state) => {
           const {
             id,
+            receivableCurrency,
+
             receiveDate,
             paymentType,
             importAccountingNumber,
@@ -259,16 +271,27 @@ export default function IncomeBillDetails({
               </div>
 
               <div className={classNames(scss.cell, scss.price)} style={configList['receivablePayment'].style}>
-                {receivablePayment.toLocaleString()}
+                <InputSel
+                  showBaseline="invisible"
+                  prefix={receivableCurrency}
+                  node={receivablePayment.toLocaleString()}
+                />
               </div>
 
               <div className={scss.cell} style={configList['fee'].style}>
-                <input
-                  className={classNames(scss.fee, disabled && scss.disabled)}
-                  type={disabled ? 'text' : 'number'}
-                  value={disabled ? Number(fee).toLocaleString() : fee}
-                  onChange={(e) => editFee(index_state, e.target.value)}
-                  readOnly={disabled}
+                <InputSel
+                  showBaseline="auto"
+                  disabled={disabled}
+                  inputProps={{
+                    props: {
+                      className: 'text-right',
+                      type: disabled ? 'text' : 'number',
+                      value: disabled ? Number(fee).toLocaleString() : fee,
+                      onChange: (e) => editFee(index_state, e.target.value),
+                      disabled: false,
+                      readOnly: disabled,
+                    },
+                  }}
                 />
               </div>
 
@@ -279,7 +302,11 @@ export default function IncomeBillDetails({
                 {billSerialNumber}
               </div>
               <div className={scss.cell} style={configList['deductionTotal'].style}>
-                {deductionTotal}
+                <InputSel
+                  showBaseline="invisible"
+                  prefix={receivableCurrency}
+                  node={<div className="text-right">{deductionTotal.toLocaleString()}</div>}
+                />
               </div>
 
               <div className={scss.cell} style={configList['btn'].style}>
@@ -430,7 +457,7 @@ const configList: TconfigList = {
   },
   receivablePayment: {
     label: '金額',
-    style: { width: '100px' },
+    style: { width: '150px' },
   },
   noteNumber: {
     label: '票據編號',
@@ -453,7 +480,7 @@ const configList: TconfigList = {
   },
   deductionTotal: {
     label: '扣款總額',
-    style: { width: '100px' },
+    style: { width: '150px' },
   },
   btn: {
     label: '',
