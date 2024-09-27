@@ -284,6 +284,7 @@ export default function IncomeBillDetails({
                 <InputSel
                   showBaseline="auto"
                   disabled={disabled}
+                  prefix={receivableCurrency}
                   inputProps={{
                     props: {
                       className: 'text-right',
@@ -472,7 +473,7 @@ const configList: TconfigList = {
   fee: {
     label: '匯費',
     style: {
-      width: '100px',
+      width: '130px',
     },
   },
   billSerialNumber: {
