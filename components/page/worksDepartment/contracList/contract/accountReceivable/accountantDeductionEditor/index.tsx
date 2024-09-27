@@ -21,6 +21,7 @@ import scss from './index.module.scss';
 
 import {
   TupdateAccountantDeductionDto,
+  TaccountantDto,
   //
   useGetAccountant_id,
   //
@@ -123,6 +124,10 @@ function EditDeductionPanel({
 
   // --------------------------------------------------------------------
 
+  const { defaultState, receivableCurrency } = useDefault({ data_accountant, defaultStateArr, incomeBillId });
+
+  // --------------------------------------------------------------------
+
   // region FUNCTION
 
   const handle_edit = (index: number, key: 'itemName' | 'detailedAmount', value: string) => {
@@ -133,7 +138,7 @@ function EditDeductionPanel({
   };
 
   const handle_Add = () => {
-    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '', currency: '' }]);
+    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '', currency: receivableCurrency }]);
   };
 
   const handle_Remove = (index: number) => {
@@ -209,48 +214,6 @@ function EditDeductionPanel({
 
   // MARK: useEffect
 
-  const defaultState = useMemo(() => {
-    let receivableCurrency = '--- ---';
-
-    const deductionArr = (() => {
-      let deductionArr;
-
-      if (!data_accountant) {
-        deductionArr = defaultStateArr;
-      } else {
-        const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
-
-        if (incomeBill) {
-          incomeBill.receivableCurrency && (receivableCurrency = incomeBill.receivableCurrency);
-          deductionArr = incomeBill?.accountsReceivableDeduction;
-        }
-      }
-
-      return deductionArr || [];
-    })();
-
-    const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
-      let currency: string;
-
-      if ('currency' in deduction) {
-        currency = deduction.currency || '--- ---';
-      } else {
-        currency = receivableCurrency;
-      }
-
-      currency = cutCurrency(currency as Tcurrency);
-
-      return {
-        id: deduction.id,
-        itemName: deduction.itemName,
-        detailedAmount: String(deduction.detailedAmount),
-        currency,
-      };
-    });
-
-    return state_deductionArr;
-  }, [data_accountant, defaultStateArr]);
-
   useEffect(() => {
     setState_deductionArr(_.cloneDeep(defaultState));
   }, [defaultState, readonly]);
@@ -308,7 +271,9 @@ function EditDeductionPanel({
                 prefix={currency}
                 inputProps={{
                   props: {
-                    value: detailedAmount,
+                    className: 'text-right',
+                    type: readonly ? 'text' : 'number',
+                    value: readonly ? Number(detailedAmount || 0).toLocaleString() : detailedAmount,
                     onChange: (e) => {
                       handle_edit(index, 'detailedAmount', e.target.value);
                     },
@@ -399,6 +364,61 @@ const EditDefunctionBtn = ({
       }}
     />
   );
+};
+
+// ====================================================================
+
+const useDefault = ({
+  data_accountant,
+  defaultStateArr,
+  incomeBillId,
+}: {
+  data_accountant: TaccountantDto | undefined;
+  defaultStateArr: Tstate_deduction[] | undefined;
+  incomeBillId: string | null | undefined;
+}) => {
+  return useMemo(() => {
+    let receivableCurrency = '--- ---';
+
+    const deductionArr = (() => {
+      let deductionArr;
+
+      if (!data_accountant) {
+        deductionArr = defaultStateArr;
+      } else {
+        const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
+
+        if (incomeBill) {
+          incomeBill.receivableCurrency && (receivableCurrency = incomeBill.receivableCurrency);
+          deductionArr = incomeBill?.accountsReceivableDeduction;
+        }
+      }
+
+      return deductionArr || [];
+    })();
+
+    const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
+      let currency: string;
+
+      if ('currency' in deduction) {
+        currency = deduction.currency || '--- ---';
+        receivableCurrency = currency;
+      } else {
+        currency = receivableCurrency;
+      }
+
+      currency = cutCurrency(currency as Tcurrency);
+
+      return {
+        id: deduction.id,
+        itemName: deduction.itemName,
+        detailedAmount: String(deduction.detailedAmount),
+        currency,
+      };
+    });
+
+    return { defaultState: state_deductionArr, receivableCurrency };
+  }, [data_accountant, defaultStateArr]);
 };
 
 // ====================================================================
