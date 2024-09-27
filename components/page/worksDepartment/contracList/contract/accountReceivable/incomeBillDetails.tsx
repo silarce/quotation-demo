@@ -177,7 +177,7 @@ export default function IncomeBillDetails({
           id,
           itemName,
           detailedAmount: String(detailedAmount),
-          currency: cutCurrency((receivableCurrency || '--- ---') as Tcurrency),
+          currency: cutCurrency((receivableCurrency || 'TWD') as Tcurrency),
         };
 
         return state;
@@ -185,7 +185,7 @@ export default function IncomeBillDetails({
 
       const state: Tstate_incomeBill = {
         id,
-        receivableCurrency: cutCurrency((receivableCurrency || '--- ---') as Tcurrency),
+        receivableCurrency: cutCurrency((receivableCurrency || 'TWD') as Tcurrency),
 
         receiveDate: insertDate,
         paymentType,
@@ -340,7 +340,7 @@ export default function IncomeBillDetails({
           );
         })}
 
-        {showTotals && <Tfoot {...totals} />}
+        {true && <Tfoot {...totals} />}
       </div>
 
       {/*  */}
@@ -395,15 +395,27 @@ const Tfoot = ({
         合計
       </div>
       <div className={classNames(scss.cell, scss.price)} style={configList['receivablePayment'].style}>
-        <InputSel showBaseline="invisible" prefix={currency} node={price.toLocaleString()} />
+        <InputSel
+          showBaseline="invisible"
+          prefix={currency}
+          node={<div className="text-right">{price.toLocaleString()}</div>}
+        />
       </div>
       <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
-        <InputSel showBaseline="invisible" prefix={currency} node={fee.toLocaleString()} />
+        <InputSel
+          showBaseline="invisible"
+          prefix={currency}
+          node={<div className="text-right">{fee.toLocaleString()}</div>}
+        />
       </div>
 
       <div className={scss.cell} style={configList['billSerialNumber'].style} />
       <div className={scss.cell} style={configList['deductionTotal'].style}>
-        <InputSel showBaseline="invisible" prefix={currency} node={deductionTotal.toLocaleString()} />
+        <InputSel
+          showBaseline="invisible"
+          prefix={currency}
+          node={<div className="text-right">{deductionTotal.toLocaleString()}</div>}
+        />
       </div>
       <div className={scss.cell} style={configList['btn'].style} />
     </Row>
