@@ -26,6 +26,7 @@ type Tstate_deduction = {
   id?: string;
   itemName: string; // 扣款項目
   detailedAmount: string; // 扣款金額
+  currency: string;
 };
 
 type Tstate_incomeBill = {
@@ -163,6 +164,7 @@ export default function IncomeBillDetails({
           id,
           itemName,
           detailedAmount: String(detailedAmount),
+          currency: cutCurrency((receivableCurrency || '--- ---') as Tcurrency),
         };
 
         return state;

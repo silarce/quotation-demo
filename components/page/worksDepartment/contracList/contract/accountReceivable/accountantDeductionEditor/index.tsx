@@ -29,7 +29,12 @@ import {
 
 import { TupdateIncomeBillSerialDto, apiPatchIncomeBill } from 'js/api/api_engineering';
 
+// type
+import type { Tcurrency } from 'js/utils/currency/cutCurrency';
+
+// utils
 import { calcIncomeBillUnpaidPayment } from 'js/utils/calc/calcIncomeBill';
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 // ===============================================================]
 
@@ -37,6 +42,7 @@ type Tstate_deduction = {
   id?: string;
   itemName: string; // 扣款項目
   detailedAmount: string; // 扣款金額
+  currency: string;
 };
 
 type Tprops = {
@@ -127,7 +133,7 @@ function EditDeductionPanel({
   };
 
   const handle_Add = () => {
-    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '' }]);
+    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '', currency: '' }]);
   };
 
   const handle_Remove = (index: number) => {
@@ -204,6 +210,8 @@ function EditDeductionPanel({
   // MARK: useEffect
 
   const defaultState = useMemo(() => {
+    let receivableCurrency = '--- ---';
+
     const deductionArr = (() => {
       let deductionArr;
 
@@ -213,6 +221,7 @@ function EditDeductionPanel({
         const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
 
         if (incomeBill) {
+          incomeBill.receivableCurrency && (receivableCurrency = incomeBill.receivableCurrency);
           deductionArr = incomeBill?.accountsReceivableDeduction;
         }
       }
@@ -221,10 +230,21 @@ function EditDeductionPanel({
     })();
 
     const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
+      let currency: string;
+
+      if ('currency' in deduction) {
+        currency = deduction.currency || '--- ---';
+      } else {
+        currency = receivableCurrency;
+      }
+
+      currency = cutCurrency(currency as Tcurrency);
+
       return {
         id: deduction.id,
         itemName: deduction.itemName,
         detailedAmount: String(deduction.detailedAmount),
+        currency,
       };
     });
 
@@ -252,7 +272,7 @@ function EditDeductionPanel({
         </div>
         {/*  */}
         {state_deductionArr.map((deduction, index) => {
-          const { itemName, detailedAmount } = deduction;
+          const { itemName, detailedAmount, currency } = deduction;
 
           const value_itemName = itemName ? { value: itemName, label: itemName } : null;
 
@@ -285,6 +305,7 @@ function EditDeductionPanel({
               <InputSel
                 disabled={readonly}
                 showBaseline="auto"
+                prefix={currency}
                 inputProps={{
                   props: {
                     value: detailedAmount,
