@@ -101,29 +101,42 @@ export default function IncomeBillDetails({
 
   // ---------------------------------------------------------------------------
 
-  const totals = useMemo(() => {
-    const total = state_incomeBillArr.reduce(
+  const { totals, showTotals } = useMemo(() => {
+    let showTotals = true;
+
+    const totals = state_incomeBillArr.reduce(
       (acc, cur) => {
-        const { receivablePayment: price, fee, deductionTotal } = cur;
+        const { receivablePayment: price, fee, deductionTotal, receivableCurrency } = cur;
 
         const acc_priceNum = new Decimal(price || 0).add(acc.price).toNumber();
         const acc_feeNum = new Decimal(fee || 0).add(acc.fee).toNumber();
         const acc_deductionTotalNum = new Decimal(deductionTotal).add(acc.deductionTotal).toNumber();
+        const acc_currency = acc.currency;
+
+        if (acc_currency) {
+          if (acc_currency !== receivableCurrency) {
+            showTotals = false;
+          }
+        }
 
         return {
           price: acc_priceNum,
           fee: acc_feeNum,
           deductionTotal: acc_deductionTotalNum,
+          currency: receivableCurrency,
         };
       },
       {
         price: 0,
         fee: 0,
         deductionTotal: 0,
+        currency: '',
       }
     );
 
-    return total;
+    totals.currency = cutCurrency(totals.currency as Tcurrency);
+
+    return { totals, showTotals };
   }, [state_incomeBillArr]);
 
   const handle_confirm = async () => {
@@ -327,7 +340,7 @@ export default function IncomeBillDetails({
           );
         })}
 
-        <Tfoot {...totals} />
+        {showTotals && <Tfoot {...totals} />}
       </div>
 
       {/*  */}
@@ -364,11 +377,13 @@ const Tfoot = ({
   price,
   fee,
   deductionTotal,
+  currency,
 }: {
   className?: string;
   price: number;
   fee: number;
   deductionTotal: number;
+  currency: string;
 }) => {
   return (
     <Row className={classNames(scss.tfoot, className)}>
@@ -380,15 +395,15 @@ const Tfoot = ({
         合計
       </div>
       <div className={classNames(scss.cell, scss.price)} style={configList['receivablePayment'].style}>
-        {price.toLocaleString()}
+        <InputSel showBaseline="invisible" prefix={currency} node={price.toLocaleString()} />
       </div>
       <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
-        {fee.toLocaleString()}
+        <InputSel showBaseline="invisible" prefix={currency} node={fee.toLocaleString()} />
       </div>
 
       <div className={scss.cell} style={configList['billSerialNumber'].style} />
       <div className={scss.cell} style={configList['deductionTotal'].style}>
-        {deductionTotal.toLocaleString()}
+        <InputSel showBaseline="invisible" prefix={currency} node={deductionTotal.toLocaleString()} />
       </div>
       <div className={scss.cell} style={configList['btn'].style} />
     </Row>
