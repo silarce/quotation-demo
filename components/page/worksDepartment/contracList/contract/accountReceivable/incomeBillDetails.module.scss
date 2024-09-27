@@ -48,16 +48,16 @@
   border-top: solid 1px theme("colors.border");
 }
 
-.fee {
-  width: 100%;
-  text-align: right;
-  border-bottom: solid 1px black;
-  background-color: transparent;
+// .fee {
+//   width: 100%;
+//   text-align: right;
+//   border-bottom: solid 1px black;
+//   background-color: transparent;
 
-  &.disabled {
-    border-color: transparent;
-  }
-}
+//   &.disabled {
+//     border-color: transparent;
+//   }
+// }
 
 .price {
   text-align: right;
