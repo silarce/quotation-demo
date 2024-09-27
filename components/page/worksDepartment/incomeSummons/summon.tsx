@@ -64,7 +64,7 @@ type Tstate_incomeBillSerial = {
 
   //
   // readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
-  state_deduction: Tstate_deduction[];
+  state_deduction: Tstate_deduction_summon[];
   //
   //
   isCashierSeen: boolean | null;
@@ -96,10 +96,11 @@ type Tstate_incomeBillSerial = {
   exchangeBenefits: string | null;
 };
 
-type Tstate_deduction = {
+type Tstate_deduction_summon = {
   id?: string;
   itemName: string; // 扣款項目
   detailedAmount: string; // 扣款金額
+  currency: string; // 幣別
 };
 
 type TconfigItem = {
@@ -1696,6 +1697,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
         id: item.id,
         itemName: item.itemName,
         detailedAmount: String(item.detailedAmount),
+        currency: receivableCurrency || '---',
       };
     });
 
