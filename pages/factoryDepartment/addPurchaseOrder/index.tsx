@@ -891,6 +891,7 @@ export default function AddPurchaseOrder() {
         let filtered = searchbardata;
         if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
             if (handinputproductuuid) {
+                let filtered = searchbardata;
                 filtered = searchbardata.filter(item =>
                     item.id.includes(handinputproductuuid)
                 );

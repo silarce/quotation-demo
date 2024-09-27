@@ -886,6 +886,7 @@ export default function AddPurchaseOrder() {
         let filtered = searchbardata;
         if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
             if (handinputproductuuid) {
+                let filtered = searchbardata;
                 filtered = searchbardata.filter(item =>
                     item.id.includes(handinputproductuuid)
                 );
@@ -1332,6 +1333,7 @@ export default function AddPurchaseOrder() {
         setSupplierphone3in(item.supplierphone3);
         setSuppliertaxid3in(item.suppliertaxid3);
         setSupplieraddress3in(item.supplieraddress3);
+        setCreate_byin(item.create_by);
         switch (tabnow) {
             case "廠商1":
                 setHandinputsuppliername(item.suppliername);
@@ -1922,11 +1924,11 @@ export default function AddPurchaseOrder() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="採購人員"
+                                            caption="詢價人員"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                    value: (checkfirstin === 0 ? create_byin : create_byin) || ' ',
                                                 },
                                             }}
                                         />

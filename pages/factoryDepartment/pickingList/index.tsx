@@ -703,34 +703,41 @@ export default function AddPurchaseRequisition() {
         if (isSelectingRef.current) return;
 
         let filtered = searchbardata;
+        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
+            if (handinputproductuuid) {
+                let filtered = searchbardata;
+                filtered = searchbardata.filter(item =>
+                    item.id.includes(handinputproductuuid)
+                );
+            }
+            if (handinputproductid) {
+                filtered = filtered.filter(item =>
+                    item.productid.includes(handinputproductid)
+                );
+            }
 
-        if (handinputproductuuid) {
-            filtered = searchbardata.filter(item =>
-                item.id.includes(handinputproductuuid)
-            );
-        }
-        if (handinputproductid) {
-            filtered = filtered.filter(item =>
-                item.productid.includes(handinputproductid)
-            );
-        }
+            if (handinputname) {
+                filtered = filtered.filter(item =>
+                    item.name.includes(handinputname)
+                );
+            }
 
-        if (handinputname) {
-            filtered = filtered.filter(item =>
-                item.name.includes(handinputname)
-            );
-        }
+            if (handinputspec) {
+                filtered = filtered.filter(item =>
+                    item.spec && item.spec.includes(handinputspec)
+                );
+            }
 
-        if (handinputspec) {
-            filtered = filtered.filter(item =>
-                item.spec && item.spec.includes(handinputspec)
-            );
+            setFilteredData(filtered);
+            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
         }
-
-        setFilteredData(filtered);
-        // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
-        setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
-    }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
+        else {
+            setHandinputproductuuid('');
+            setFilteredData([]);
+            setShowSuggestions(false);
+        }
+    }, [handinputproductid, handinputname, handinputspec]);
 
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
