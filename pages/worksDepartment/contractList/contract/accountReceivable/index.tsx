@@ -125,7 +125,7 @@ export default function AccountReceivable({
   const { engineeringContact, accountReceivable } = contract ?? {};
 
   // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
-  const currency = cutCurrency(accountReceivable?.currency ?? ('--- ---' as Tcurrency));
+  const currency = cutCurrency(accountReceivable?.currency ?? ('---' as Tcurrency));
 
   const {
     data: data_finalProdcut = [],
@@ -562,7 +562,7 @@ export default function AccountReceivable({
         />
 
         {/* 扣款明細 */}
-        <DeductionDetail className="mt-10 " periodArr={periodArr} />
+        <DeductionDetail className="mt-10 " periodArr={periodArr} currency={currency} />
 
         {/* 請款明細 */}
         <AccountReceivableContext.Provider value={contextValue}>

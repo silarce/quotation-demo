@@ -177,7 +177,7 @@ export default function IncomeBillDetails({
           id,
           itemName,
           detailedAmount: String(detailedAmount),
-          currency: cutCurrency((receivableCurrency || 'TWD') as Tcurrency),
+          currency: cutCurrency((receivableCurrency || '---') as Tcurrency),
         };
 
         return state;
@@ -185,7 +185,7 @@ export default function IncomeBillDetails({
 
       const state: Tstate_incomeBill = {
         id,
-        receivableCurrency: cutCurrency((receivableCurrency || 'TWD') as Tcurrency),
+        receivableCurrency: cutCurrency((receivableCurrency || '---') as Tcurrency),
 
         receiveDate: insertDate,
         paymentType,

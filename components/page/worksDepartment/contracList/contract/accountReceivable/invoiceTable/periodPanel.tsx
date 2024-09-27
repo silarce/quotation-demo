@@ -1084,6 +1084,7 @@ const CurrencyBox = ({
   );
 };
 
+// MARK: TheInput
 const TheInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
   const { className, ...rest } = props;
 

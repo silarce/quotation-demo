@@ -31,9 +31,11 @@ const defaultKeyArr = optionsCreator_deduction().map((option) => option.value);
 export default function DeductionDetail({
   className,
   periodArr,
+  currency,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
+  currency: string;
 }) {
   const ref_table = useRef<HTMLDivElement>(null);
 
@@ -134,9 +136,15 @@ export default function DeductionDetail({
             <Row key={index}>
               <div>{period}</div>
               {deductionKeyArr.map((key) => {
-                return <div key={key}>{deductionList[key]}</div>;
+                return (
+                  <div key={key}>
+                    <CurrencyBox currency={currency}>{deductionList[key]}</CurrencyBox>
+                  </div>
+                );
               })}
-              <div>{total}</div>
+              <div>
+                <CurrencyBox currency={currency}>{total}</CurrencyBox>
+              </div>
             </Row>
           );
         })}
@@ -159,9 +167,15 @@ export default function DeductionDetail({
             <Row key={index}>
               <div>{period}</div>
               {deductionKeyArr.map((key) => {
-                return <div key={key}>{deductionList[key]}</div>;
+                return (
+                  <div key={key}>
+                    <CurrencyBox currency={currency}>{deductionList[key]}</CurrencyBox>
+                  </div>
+                );
               })}
-              <div>{total}</div>
+              <div>
+                <CurrencyBox currency={currency}>{total}</CurrencyBox>
+              </div>
             </Row>
           );
         })}
@@ -179,4 +193,13 @@ export default function DeductionDetail({
 
 const Row = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return <div className={classNames(scss.row, className)}>{children}</div>;
+};
+
+const CurrencyBox = ({ currency, children }: { currency: string; children: React.ReactNode }) => {
+  return (
+    <div className={scss.currencyBox}>
+      <span>{currency}</span>
+      {children}
+    </div>
+  );
 };
