@@ -1780,27 +1780,28 @@ export default function ProdReceiptList() {
                                                 data1.map((_item: any, index: number) => (
                                                     <CellWithBar key={index} className={scss.panelHeader14}>
                                                         <div className={scss.row01}>
+                                                            <span>
+                                                                <button
+                                                                    onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }}
+                                                                    style={{ display: `${(statusin === "已核准" && completeentry < parseInt(totalentry)) ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                                </button>
+
+                                                                <button
+                                                                    style={{ display: `${(statusin === "已核准" && completeentry === parseInt(totalentry)) || statusin === "進貨中" || statusin === "已結案" ? '' : 'none'}` }}>
+                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                                </button>
+
+                                                            </span>
                                                             <span>{index + 1}</span>
                                                             <span>{_item.productid}</span>
                                                             <span>{_item.name}</span>
                                                             <span>{_item.spec}</span>
                                                             <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
-                                                            <span>{_item.quantity}</span>
+                                                            <span>{_item.quantity.toLocaleString()}</span>
                                                             <span>{_item.unit}</span>
                                                             <span>{_item.unitprice.toLocaleString()}</span>
                                                             <span>{_item.totalprice.toLocaleString()}</span>
-                                                            <span>
-                                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }} style={{ display: `${statusin === "已核准" ? '' : 'none'}` }} >
-                                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
-                                                                </button>
-                                                                {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
-                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
-                                                </button> */}
-                                                                <button
-                                                                    style={{ display: `${(statusin !== "已核准" && statusin !== "已結案") ? '' : 'none'}` }}>
-                                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
-                                                                </button>
-                                                            </span>
                                                             <span className="truncate" title={_item.note}>{_item.note}</span>
                                                         </div>
                                                     </CellWithBar>
@@ -1912,14 +1913,14 @@ export default function ProdReceiptList() {
                                     <button className={scss.disabledbtn}>新增入庫</button>
                                 </span> */}
 
-                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增入庫">
-                                        <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        新增
-                                    </button>
-                                    <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增入庫">
-                                        <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        新增
-                                    </button>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增入庫">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增入庫">
+                                    <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
 
                                 {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>轉入庫中</button>
@@ -1949,6 +1950,12 @@ export default function ProdReceiptList() {
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader13}>
                                     <div className={scss.row01}>
+                                        <span>
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                        </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>{_item.name}</span>
@@ -1965,7 +1972,7 @@ export default function ProdReceiptList() {
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
-                                                    let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    let newQuantity = e.target.value;
                                                     // 如果新數量超過最大數量，設置為最大數量
                                                     if (newQuantity > _item.maxquantity) {
                                                         newQuantity = _item.maxquantity;
@@ -1973,7 +1980,7 @@ export default function ProdReceiptList() {
                                                     newData[index] = {
                                                         ...newData[index],
                                                         quantity: newQuantity,
-                                                        totalprice: newQuantity * newData[index].unitprice
+                                                        totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
                                                     };
                                                     setData2(newData);
                                                 }}
@@ -2023,21 +2030,7 @@ export default function ProdReceiptList() {
                                             />
                                         </span>
 
-                                        <span>
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
-                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                        </span>
+
                                     </div>
                                 </CellWithBar>
                             ))}

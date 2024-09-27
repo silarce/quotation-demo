@@ -111,12 +111,14 @@ export default function AccountReceivable({
       // 'accountReceivable.periods.invoices.incomeBillList',
       // 'accountReceivable.periods.invoices.incomeBillSerialList',
       'accountReceivable.periods.invoices.incomeBillSerialList.invoices',
+      'accountReceivable.periods.invoices.incomeBillSerialList.accountsReceivableDeduction',
 
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
-      'accountReceivable.accountantList.accountsReceivableDeduction',
+      // 'accountReceivable.accountantList', // 棄用
       'accountReceivable.incomeBillList.accountant',
       'accountReceivable.incomeBillList.invoices',
+      'accountReceivable.incomeBillList.accountsReceivableDeduction',
     ],
   });
 

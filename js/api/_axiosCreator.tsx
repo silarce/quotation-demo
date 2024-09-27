@@ -3,6 +3,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { TnetCoreapiBody } from './api_netCore/_schemas';
 
+import Error429 from 'components/wholePage/error429';
+
 // =================================================================================
 const axi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
@@ -19,9 +21,20 @@ const axi2 = axios.create({
 export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // =================================================================================
+
+let is429ing = false;
+
+// =================================================================================
 axi.interceptors.request.use(
   (config) => {
+    const { url } = config;
+    const isUrlAuthMe = url === '/auth/me';
+
     // req攔截器
+    if (is429ing && !isUrlAuthMe) {
+      return Promise.reject();
+    }
+
     return config;
   },
   (err) => {
@@ -68,11 +81,28 @@ axi.interceptors.response.use(
         case 429:
           // myAlert.warning({ title: '短時間內呼叫太多次請求', content: '請兩分鐘後再次嘗試' });
 
-          const pathname = window.location.pathname;
-          const origin = window.location.origin;
+          // const pathname = window.location.pathname;
+          // const origin = window.location.origin;
 
-          if (pathname !== '/errorProcess/429') {
-            window.location.href = `${origin}/errorProcess/429`;
+          // if (pathname !== '/errorProcess/429') {
+          //   window.location.href = `${origin}/errorProcess/429`;
+          // }
+
+          if (!is429ing) {
+            is429ing = true;
+            const modal = myAlert.clear({
+              maskClosable: false,
+            });
+            modal.update({
+              content: (
+                <Error429
+                  onClose={() => {
+                    modal.destroy();
+                    is429ing = false;
+                  }}
+                />
+              ),
+            });
           }
 
           break;
