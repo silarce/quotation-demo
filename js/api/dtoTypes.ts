@@ -4103,6 +4103,9 @@ export type TaccountsReceivableDto = {
   // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
   // accountantList?: TaccountantDto[];
   incomeBillList?: TincomeBillSerialDto[];
+
+  currency: Tcurrency;
+  exchangeRate: string | null;
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -4221,6 +4224,8 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   businessIdNumber: string | null; // 統一編號
   isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
   isOlderInvoice: boolean; // 是否為舊的手key發票
+
+  otherAccountReceivableIds: string[]; // 同屬合約
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;

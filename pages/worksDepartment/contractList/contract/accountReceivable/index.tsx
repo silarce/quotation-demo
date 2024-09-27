@@ -54,6 +54,8 @@ import type { TcustomerDto, TincomeBillSerialDto, TupdateAccountReceivableDeduct
 import scss from './index.module.scss';
 import { AxiosError } from 'axios';
 
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
+
 // ========================================================================
 
 type Tquery = {
@@ -121,6 +123,9 @@ export default function AccountReceivable({
   });
 
   const { engineeringContact, accountReceivable } = contract ?? {};
+
+  // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
+  const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
 
   const {
     data: data_finalProdcut = [],
@@ -241,6 +246,8 @@ export default function AccountReceivable({
       businessIdNumber,
       isOriginalCustomer,
       isOlderInvoice,
+
+      contractArr,
     } = state_invoice;
 
     if (!isOlderInvoice && (accountantInvoiceBook || actualPrice)) {
@@ -290,6 +297,10 @@ export default function AccountReceivable({
       isOriginalCustomer,
       retainagePercent: retainagePercent || null,
       isOlderInvoice,
+
+      // 在選擇器已經剔除accountReceivableId為null的合約
+
+      otherAccountReceivableIds: contractArr.map((item) => item.accountReceivableId!),
     };
 
     try {
@@ -535,6 +546,7 @@ export default function AccountReceivable({
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
           readonly={readonly}
+          currency={currency}
         />
 
         {/* 應收帳款管理 */}
@@ -544,6 +556,7 @@ export default function AccountReceivable({
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
           readonly={readonly}
+          currency={currency}
         />
 
         {/* 已收款紀錄 */}
@@ -555,7 +568,7 @@ export default function AccountReceivable({
         />
 
         {/* 扣款明細 */}
-        <DeductionDetail className="mt-10 " periodArr={periodArr} />
+        <DeductionDetail className="mt-10 " periodArr={periodArr} currency={currency} />
 
         {/* 請款明細 */}
         <AccountReceivableContext.Provider value={contextValue}>
@@ -568,6 +581,8 @@ export default function AccountReceivable({
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
             readonly={readonly}
+            currency={currency}
+            contractId={contractId}
           />
         </AccountReceivableContext.Provider>
       </div>
