@@ -8,7 +8,7 @@ import React, {
   useContext,
 } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
+import _, { divide } from 'lodash';
 import Decimal from 'decimal.js';
 import moment, { Moment } from 'moment';
 
@@ -99,6 +99,7 @@ function PeriodPanel_pre(
     reqPatchInvoiceAllowance,
     reqDeleteInvoice,
     reqDeletePeriod,
+    currency,
   }: {
     data_period?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
@@ -112,6 +113,7 @@ function PeriodPanel_pre(
     reqPatchInvoiceAllowance?: (invoiceId: string, allowance: number) => void;
     reqDeleteInvoice?: (invoiceId: string) => void;
     reqDeletePeriod?: (periodId: string) => void;
+    currency: string;
   },
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
@@ -402,7 +404,7 @@ function PeriodPanel_pre(
         </div>
       </Thead>
 
-      <Tbody totals={totals}>
+      <Tbody totals={totals} currency={currency}>
         {rowArr.map((row, index) => {
           const {
             itemName,
@@ -419,20 +421,24 @@ function PeriodPanel_pre(
 
           return (
             <div key={index} className={classNames(scss.row)}>
-              <input
+              <TheInput
                 className={classNames(disabled && scss.readyOnly)}
                 value={doneQty}
                 onChange={(e) => onDoneQtyChange(e.target.value)}
                 readOnly={disabled}
                 type={inputType}
               />
-              <input
-                className={classNames(disabled && scss.readyOnly)}
-                value={donePrice}
-                onChange={(e) => onDonePriceChange(e.target.value)}
-                readOnly={disabled}
-                type={inputType}
-              />
+              <CurrencyBox currency={currency}>
+                <TheInput
+                  className={classNames(disabled && scss.readyOnly)}
+                  value={donePrice}
+                  onChange={(e) => onDonePriceChange(e.target.value)}
+                  readOnly={disabled}
+                  type={inputType}
+                />
+              </CurrencyBox>
+
+              {/* 不記得為什麼會加這個了 */}
               <span className={scss.test}>{itemName}</span>
             </div>
           );
@@ -446,6 +452,7 @@ function PeriodPanel_pre(
         onConfirm_allowance={handle_confirm_allowance}
         resetDefault={resetDefault}
         setShowSelector={setShowSelector}
+        currency={currency}
       />
 
       {/* <br />
@@ -551,23 +558,33 @@ const Tbody = ({
   children,
   totals: { subTotal, tax, contractTotal },
   isConrtract,
+  currency,
 }: {
   children: React.ReactNode;
   totals: Tcenter['totals'];
   isConrtract?: boolean;
+  currency: string;
 }) => {
   return (
     <div className={scss.tbody}>
       <div>{children}</div>
       <div className={classNames(scss.totals)}>
         <span>{isConrtract ? '合約合計' : '本期合計'}</span>
-        <span>{subTotal}</span>
+        <CurrencyBox currency={currency} width="120px">
+          {subTotal}
+        </CurrencyBox>
+
         <span>營業稅5%</span>
-        <span>{tax}</span>
+        <CurrencyBox currency={currency} width="120px">
+          {tax}
+        </CurrencyBox>
+
         <span>
           <span>{isConrtract ? '合約總計' : '本期總計'}</span>
         </span>
-        <span>{contractTotal}</span>
+        <CurrencyBox currency={currency} width="120px">
+          {contractTotal}
+        </CurrencyBox>
       </div>
     </div>
   );
@@ -582,16 +599,16 @@ const Tfoot = ({
   isTotal,
   onConfirm_allowance: onConfirm_allowance,
   resetDefault,
-
   setShowSelector,
+  currency,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
   isTotal: boolean;
   onConfirm_allowance: () => void;
   resetDefault: () => void;
-
   setShowSelector: React.Dispatch<React.SetStateAction<boolean>>;
+  currency: string;
 }) => {
   const {
     invoiceNumber,
@@ -693,37 +710,45 @@ const Tfoot = ({
           </Popover>
           保留款
         </div>
-        <input
-          className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
-          value={retainage}
-          onChange={(e) => {
-            class_other.retainage = e.target.value;
-          }}
-          readOnly={readOnly || class_other.isRetainageLocked}
-          type={inputType}
-        />
+
+        <CurrencyBox currency={currency}>
+          <TheInput
+            className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
+            value={retainage}
+            onChange={(e) => {
+              class_other.retainage = e.target.value;
+            }}
+            readOnly={readOnly || class_other.isRetainageLocked}
+            type={inputType}
+          />
+        </CurrencyBox>
       </div>
 
       <div className={classNames(scss.row)}>
         <span>扣款</span>
-        <input
-          className={classNames((readOnly || !allowEditDeduction) && scss.readyOnly)}
-          value={deduction}
-          onChange={(e) => (class_other.deduction = e.target.value)}
-          readOnly={readOnly || !allowEditDeduction}
-          type={inputType}
-        />
+
+        <CurrencyBox currency={currency}>
+          <TheInput
+            className={classNames((readOnly || !allowEditDeduction) && scss.readyOnly)}
+            value={deduction}
+            onChange={(e) => (class_other.deduction = e.target.value)}
+            readOnly={readOnly || !allowEditDeduction}
+            type={inputType}
+          />
+        </CurrencyBox>
       </div>
 
       <div className={classNames(scss.row)}>
         <span>沖訂金</span>
-        <input
-          className={classNames(readOnly && scss.readyOnly)}
-          value={writeOffDeposit}
-          onChange={(e) => (class_other.writeOffDeposit = e.target.value)}
-          readOnly={readOnly}
-          type={inputType}
-        />
+        <CurrencyBox currency={currency}>
+          <TheInput
+            className={classNames(readOnly && scss.readyOnly)}
+            value={writeOffDeposit}
+            onChange={(e) => (class_other.writeOffDeposit = e.target.value)}
+            readOnly={readOnly}
+            type={inputType}
+          />
+        </CurrencyBox>
       </div>
 
       <div className={classNames(isTotal && 'invisible')}>
@@ -803,7 +828,9 @@ const Tfoot = ({
           </Popover>
           金額總計
         </div>
-        <span>{price}</span>
+        <CurrencyBox currency={currency}>
+          <span>{price}</span>
+        </CurrencyBox>
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
@@ -868,14 +895,15 @@ const Tfoot = ({
           </Popover>
           發票實際金額
         </div>
-
-        <input
-          className={classNames(readOnly && scss.readyOnly)}
-          value={actualPrice}
-          onChange={(e) => (class_other.actualPrice = e.target.value)}
-          readOnly={readOnly}
-          type={inputType}
-        />
+        <CurrencyBox currency={<span className="font-bold">TWD</span>}>
+          <TheInput
+            className={classNames(readOnly && scss.readyOnly)}
+            value={actualPrice}
+            onChange={(e) => (class_other.actualPrice = e.target.value)}
+            readOnly={readOnly}
+            type={inputType}
+          />
+        </CurrencyBox>
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
@@ -980,7 +1008,7 @@ const Tfoot = ({
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票統一編號</span>
-        <input
+        <TheInput
           className={classNames(readOnly && scss.readyOnly)}
           value={class_other.businessIdNumber}
           onChange={(e) => (class_other.businessIdNumber = e.target.value)}
@@ -1008,20 +1036,22 @@ const Tfoot = ({
           </span>
           <span>折讓</span>
         </div>
-        <input
-          readOnly={readOnly === false ? false : disabled_allowance}
-          className={classNames(readOnly === false ? false : disabled_allowance && scss.readyOnly)}
-          type="number"
-          value={allowance}
-          onChange={(e) => (class_other.allowance = e.target.value)}
-        />
+        <CurrencyBox currency={<span className="font-bold">TWD</span>}>
+          <TheInput
+            readOnly={readOnly === false ? false : disabled_allowance}
+            className={classNames(readOnly === false ? false : disabled_allowance && scss.readyOnly)}
+            type="number"
+            value={allowance}
+            onChange={(e) => (class_other.allowance = e.target.value)}
+          />
+        </CurrencyBox>
       </div>
       {/*  */}
       {/*  */}
       {/*  */}
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>備註</span>
-        <input
+        <TheInput
           className={classNames(readOnly && scss.readyOnly)}
           value={note}
           onChange={(e) => (class_other.note = e.target.value)}
@@ -1030,6 +1060,34 @@ const Tfoot = ({
       </div>
     </div>
   );
+};
+
+// MARK: CurrencyBox
+const CurrencyBox = ({
+  className,
+  currency,
+  children,
+  width,
+}: {
+  className?: string;
+  currency: React.ReactNode;
+  children: React.ReactNode;
+  width?: React.CSSProperties['width'];
+}) => {
+  // const { className, currency, children } = props;
+
+  return (
+    <span className={classNames(scss.currencyInput, className, !width && 'w-full', width && `w-[${width}]`)}>
+      <span>{currency}</span>
+      {children}
+    </span>
+  );
+};
+
+const TheInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
+  const { className, ...rest } = props;
+
+  return <input {...rest} className={classNames(scss.theInput, className)} />;
 };
 
 // ==========================================================================

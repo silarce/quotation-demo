@@ -575,6 +575,7 @@ export default function AccountReceivable({
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
             readonly={readonly}
+            currency={currency}
           />
         </AccountReceivableContext.Provider>
       </div>

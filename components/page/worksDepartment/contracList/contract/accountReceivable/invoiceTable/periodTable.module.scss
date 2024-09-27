@@ -1,8 +1,8 @@
 $invoicePadding: 10px 20px;
 $gridWidth_itemName: 80px;
 $gridTemplateColumns_left: $gridWidth_itemName 150px 50px 100px;
-$gridTemplateColumns_center: 130px 130px;
-$gridTemplateColumns_center_row: 130px 130px $gridWidth_itemName;
+$gridTemplateColumns_center: 130px 150px;
+$gridTemplateColumns_center_row: 130px 150px $gridWidth_itemName;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
@@ -11,6 +11,19 @@ $invoiceHeight: fit-content;
 $tfootHeight: 800px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 $deleteBarHeight: 36px;
 // $tfootHeight: fit-content; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
+
+.theInput {
+  width: 100%;
+  text-align: center;
+  // border-bottom: solid 1px theme("colors.border");
+  border-bottom: solid 1px theme("colors.sub");
+  &.readyOnly {
+    border-color: transparent;
+  }
+  &:nth-child(2n) {
+    text-align: right;
+  }
+}
 
 .invoiceTable {
   // width: fit-content;
@@ -124,23 +137,26 @@ $deleteBarHeight: 36px;
   .row {
     // grid-template-columns: $gridTemplateColumns_center;
     grid-template-columns: $gridTemplateColumns_center_row;
-    width: 272px;
+    // width: 272px;
+    // width: 312px;
+    width: 292px;
     overflow: hidden;
     align-items: flex-start;
     > span {
       border-bottom: solid 1px transparent;
     }
     > input {
-      width: 100%;
-      text-align: center;
-      // border-bottom: solid 1px theme("colors.border");
-      border-bottom: solid 1px theme("colors.sub");
-      &.readyOnly {
-        border-color: transparent;
-      }
-      &:nth-child(2n) {
-        text-align: right;
-      }
+      // @extend .theInput;
+      // width: 100%;
+      // text-align: center;
+      // // border-bottom: solid 1px theme("colors.border");
+      // border-bottom: solid 1px theme("colors.sub");
+      // &.readyOnly {
+      //   border-color: transparent;
+      // }
+      // &:nth-child(2n) {
+      //   text-align: right;
+      // }
     }
   }
 }
@@ -231,5 +247,16 @@ $deleteBarHeight: 36px;
   // input {
   //   background-color: pink !important;
   //   width: 30px;
+  // }
+}
+
+.currencyInput {
+  display: inline-grid;
+  grid-template-columns: max-content auto;
+  gap: 5px;
+  justify-content: space-between;
+  // width: 100%;
+  // > input {
+  //   @extend .theInput;
   // }
 }
