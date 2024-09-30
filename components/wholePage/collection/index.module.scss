@@ -46,7 +46,7 @@ $height_thead: 44px;
 
 .row {
   display: flex;
-  gap: 10px;
+  gap: 20px;
   width: fit-content;
   border-bottom: solid 1px theme("colors.border");
   background: white;
@@ -146,4 +146,9 @@ $height_thead: 44px;
   left: 0;
   z-index: 1;
   background-color: inherit;
+}
+
+.memoStr {
+  font-family: monospace;
+  white-space: pre-wrap;
 }
