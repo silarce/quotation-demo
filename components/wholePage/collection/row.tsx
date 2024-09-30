@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
-import Decimal from 'decimal.js';
 
 // component
 import { ExportToIncomeBill } from './exportToIncomeBill';
@@ -204,7 +203,6 @@ const Row = ({
       importAccountingNumber,
       noteNumber,
       accountingNumber,
-      vendorName,
       price,
       billSerialNumber,
       notes,
@@ -217,6 +215,9 @@ const Row = ({
       //
       splitPayment,
       //
+      vendorName,
+      vendorCustomerId,
+      vendorCustomer,
     } = data_accountant;
 
     // 在IDE裡型別為TaccountsReceivableDeductionDto[]，
@@ -233,7 +234,6 @@ const Row = ({
       importAccountingNumber: importAccountingNumber ?? '',
       noteNumber: noteNumber ?? '',
       accountingNumber: accountingNumber ?? ' ',
-      vendorName: vendorName ?? '',
       price: String(price),
       billSerialNumber: billSerialNumber ?? [],
       notes: notes ?? '',
@@ -247,6 +247,10 @@ const Row = ({
       currencyValue: String(currencyValue || ''),
 
       splitPayment: splitPayment ?? [],
+      //
+      vendorName: vendorName ?? '',
+      vendorCustomerId,
+      vendorCustomer,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -335,7 +339,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   importAccountingNumber: '',
   noteNumber: '',
   accountingNumber: '',
-  vendorName: '',
   price: '',
   billSerialNumber: [],
   notes: '',
@@ -349,6 +352,10 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   currencyValue: '', // 金額
 
   splitPayment: [],
+  //
+  vendorName: '',
+  vendorCustomerId: null,
+  vendorCustomer: undefined,
 });
 
 const determineCondition = ({
