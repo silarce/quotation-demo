@@ -52,6 +52,8 @@ import {
 
 import { Tcurrency } from 'js/api/dtoTypes';
 
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
+
 // ______________________________________________________________
 // ______________________________________________________________
 
@@ -345,9 +347,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const handle_import = ({
     accountReceivableId,
     accountantWillImport,
+    currency,
   }: {
     accountReceivableId: string;
     accountantWillImport: TaccountantDto;
+    currency: string;
   }) => {
     const quota = calcQuota(accountantWillImport);
 
@@ -360,8 +364,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)
           }
           onCancel={modal.destroy}
-          // defaultPayment={accountantWillImport.price}
           quota={quota}
+          currency={currency}
         />
       ),
     });
@@ -467,8 +471,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         <ContractSelector
           showModal={!!accountantWillImport}
           onConfirm={(arr) => {
-            const contractArr = arr[0];
-            const accountReceivableId: string | undefined | null = contractArr[0]?.accountReceivableId;
+            const contract = arr[0][0];
+            const accountReceivableId: string | undefined | null = contract?.accountReceivableId;
+
+            const accountantCurrency = accountantWillImport?.currency || ('TWD' as Tcurrency);
+            const contractCurrency = contract.currency;
 
             if (accountReceivableId === null) {
               myAlert.info({ title: '該合約尚未建立應收帳款' });
@@ -478,7 +485,18 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               handle_import({
                 accountReceivableId,
                 accountantWillImport: accountantWillImport!,
+                currency: cutCurrency(accountantCurrency),
               });
+
+              if (contractCurrency !== accountantCurrency) {
+                myAlert.warning({
+                  props: {
+                    title: (
+                      <span className="whitespace-pre-wrap">{`注意\n收款幣別(${accountantCurrency})\n合約幣別(${contractCurrency})\n幣別不一致`}</span>
+                    ),
+                  },
+                });
+              }
             }
           }}
           onCancel={() => {

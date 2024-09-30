@@ -20,11 +20,13 @@ const ExportToIncomeBill = ({
   onCancel,
   // defaultPayment,
   quota,
+  currency,
 }: {
   onConfirm: TonConfirm;
   onCancel: () => void;
   // defaultPayment: number;
   quota: number;
+  currency: string;
 }) => {
   const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
   const [state_splitPayment, setState_splitPayment] = useState<number>(quota);
@@ -70,6 +72,7 @@ const ExportToIncomeBill = ({
       <InputSel
         className="mt-3"
         caption="分出金額"
+        prefix={currency}
         inputProps={{
           props: {
             type: 'number',
