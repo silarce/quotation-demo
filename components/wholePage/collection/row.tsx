@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
-import Decimal from 'decimal.js';
 
 // component
 import { ExportToIncomeBill } from './exportToIncomeBill';
@@ -30,6 +29,8 @@ import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
 import { calcQuota } from './function';
+
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 // ============================================================================
 const Cell_span = ({
@@ -122,15 +123,6 @@ const Row = ({
 
   // 匯入發票匯入紙本時的額度
   const quota = data_accountant ? calcQuota(data_accountant) : 0;
-  // const quota = (() => {
-  //   const { price, splitPayment } = data_accountant ?? {};
-
-  //   const paymentTotal_d = (splitPayment ?? []).reduce((total, payment) => {
-  //     return total.add(payment);
-  //   }, new Decimal(0));
-
-  //   return new Decimal(price || 0).minus(paymentTotal_d).toNumber();
-  // })();
 
   // ---------------------------------------------------
 
@@ -181,8 +173,8 @@ const Row = ({
               reqPatchIsImported(data_accountant.id, isoString, separatePayment)
             }
             onCancel={modal.destroy}
-            // defaultPayment={Number(state_accountant.price)}
             quota={quota}
+            currency={cutCurrency(state_accountant.currency)}
           />
         ),
       });
@@ -211,7 +203,6 @@ const Row = ({
       importAccountingNumber,
       noteNumber,
       accountingNumber,
-      vendorName,
       price,
       billSerialNumber,
       notes,
@@ -224,6 +215,9 @@ const Row = ({
       //
       splitPayment,
       //
+      vendorName,
+      vendorCustomerId,
+      vendorCustomer,
     } = data_accountant;
 
     // 在IDE裡型別為TaccountsReceivableDeductionDto[]，
@@ -240,7 +234,6 @@ const Row = ({
       importAccountingNumber: importAccountingNumber ?? '',
       noteNumber: noteNumber ?? '',
       accountingNumber: accountingNumber ?? ' ',
-      vendorName: vendorName ?? '',
       price: String(price),
       billSerialNumber: billSerialNumber ?? [],
       notes: notes ?? '',
@@ -254,6 +247,10 @@ const Row = ({
       currencyValue: String(currencyValue || ''),
 
       splitPayment: splitPayment ?? [],
+      //
+      vendorName: vendorName ?? '',
+      vendorCustomerId,
+      vendorCustomer,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -299,7 +296,7 @@ const Row = ({
 
         const config = rowCellPropsList[key];
 
-        const { reactNode, ...props } =
+        const { node: reactNode, ...props } =
           config?.inputSelPropsCreator({
             disabled,
             bankAccountOptionArr,
@@ -342,7 +339,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   importAccountingNumber: '',
   noteNumber: '',
   accountingNumber: '',
-  vendorName: '',
   price: '',
   billSerialNumber: [],
   notes: '',
@@ -356,6 +352,10 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   currencyValue: '', // 金額
 
   splitPayment: [],
+  //
+  vendorName: '',
+  vendorCustomerId: null,
+  vendorCustomer: undefined,
 });
 
 const determineCondition = ({
