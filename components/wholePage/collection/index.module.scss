@@ -50,6 +50,7 @@ $height_thead: 44px;
   width: fit-content;
   border-bottom: solid 1px theme("colors.border");
   background: white;
+  min-height: 53px;
   > * {
     flex: none;
   }
