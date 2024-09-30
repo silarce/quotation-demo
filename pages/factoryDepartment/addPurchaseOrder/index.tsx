@@ -1519,7 +1519,7 @@ export default function AddPurchaseOrder() {
                                 </button>
 
                                 <button
-                                    style={{ display: `${(status === "未儲存" || status === " " || editmain) ? '' : 'none'}` }}
+                                    style={{ display: `${(status === "未儲存" || status === "" || editmain) ? '' : 'none'}` }}
                                     className={scss.disablesquarebtn} >
                                     <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     編輯
@@ -1619,7 +1619,7 @@ export default function AddPurchaseOrder() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || '',
                                                 },
                                             }}
                                         />
@@ -1633,7 +1633,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliernamein ? suppliernamein : ' ',
+                                                    value: suppliernamein ? suppliernamein : '',
                                                     onChange: (e) => { handleSuppliernameChange(e) }
                                                 },
                                             }}
@@ -1644,7 +1644,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: supplieraddressin ? supplieraddressin : ' ',
+                                                    value: supplieraddressin ? supplieraddressin : '',
                                                     onChange: (e) => { handleSupplieraddressChange(e) }
                                                 },
                                             }}
@@ -1655,7 +1655,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: note || ' ',
+                                                    value: note || '',
                                                     onChange: (e) => { setNote(e.target.value) }
                                                 },
                                             }}
@@ -1667,7 +1667,7 @@ export default function AddPurchaseOrder() {
                                             inputProps={{
                                                 props: {
                                                     // value: shippingaddressin ? shippingaddressin : ' ',
-                                                    value: shippingaddressin ? shippingaddressin : ' ',
+                                                    value: shippingaddressin ? shippingaddressin : '',
                                                     // onChange: (e) => { setShippingaddressin(e.target.value) }
                                                     onChange: (e) => { handleShippingaddressChange(e) }
                                                 },
@@ -1682,7 +1682,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: supplierphonein ? supplierphonein : ' ',
+                                                    value: supplierphonein ? supplierphonein : '',
                                                     onChange: (e) => { setSupplierphonein(e.target.value) }
                                                 },
                                             }}
@@ -1693,7 +1693,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
+                                                    value: suppliertaxidin ? suppliertaxidin : '',
                                                     onChange: (e) => { setSuppliertaxidin(e.target.value) }
                                                 },
                                             }}
@@ -1716,7 +1716,7 @@ export default function AddPurchaseOrder() {
                                             inputProps={{
                                                 props: {
                                                     style: { color: '#ea1833' },
-                                                    value: `${status === "未儲存" ? "※可輸入公司名稱查詢地址" : ' '}`,
+                                                    value: `${shippingaddressin === "" ? "※可輸入公司名稱查詢地址" : ' '}`,
                                                 },
                                             }}
                                         />

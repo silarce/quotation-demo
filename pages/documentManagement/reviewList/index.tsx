@@ -764,7 +764,7 @@ export default function ReviewList() {
                                             &nbsp;
                                             {data.length > 0 && (
                                                 <span style={{
-                                                    position: 'absolute',
+                                                    position: 'sticky',
                                                     display: 'inline-block',
                                                     backgroundColor: '#ea1833',
                                                     color: 'white',
@@ -793,7 +793,7 @@ export default function ReviewList() {
                                             &nbsp;
                                             {data3.length > 0 && (
                                                 <span style={{
-                                                    position: 'absolute',
+                                                    position: 'sticky',
                                                     display: 'inline-block',
                                                     backgroundColor: '#007bff',
                                                     color: 'white',
