@@ -53,8 +53,6 @@ export type { TreqPatch };
 
 // ==============================================================================
 
-// ==============================================================================
-
 // MARK:START
 
 export default function IncomeSummons() {
@@ -71,12 +69,10 @@ export default function IncomeSummons() {
 
   const month_whole = month.padStart(2, '0');
   const yearMonth_m = moment(`${year}-${month_whole}`);
-  // const isoDate = yearMonth_m.toISOString();
 
   // -----------------------------------------------------------------------------
 
   const [showTable, setShowTable] = useState(false);
-  // const { activePanelKeyArr, changeActive } = useActiveKey(); // 棄用
 
   // -----------------------------------------------------------------------------
 
@@ -84,8 +80,11 @@ export default function IncomeSummons() {
     return {
       sort: 'billSerialNumber',
       pageSize: 999999,
-      // populate: ['accountant'],
-      populate: ['accountant', 'accountsReceivableDeduction'],
+      populate: [
+        'accountant',
+        'accountsReceivableDeduction',
+        // 'vendorCustomer'
+      ],
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
@@ -163,6 +162,7 @@ export default function IncomeSummons() {
       foreignCurrencyFee,
       exchangeBenefits,
       vendorName,
+      vendorCustomerId,
     } = state_incomeBillSerial;
 
     const incomeBillDeduction = state_deduction.map((item) => {
@@ -206,6 +206,7 @@ export default function IncomeSummons() {
       exchangeBenefits,
       //
       vendorName,
+      vendorCustomerId,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
