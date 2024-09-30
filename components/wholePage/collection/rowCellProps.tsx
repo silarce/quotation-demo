@@ -17,6 +17,8 @@ import { Tcurrency } from 'js/api/dtoTypes';
 // css
 import scss from './index.module.scss';
 
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
+
 // =======================================================================
 type TaccountantKey = keyof Tstate_accountant | 'btn' | 'isImported';
 
@@ -31,22 +33,15 @@ type TrowCellProps = {
   // selectProps?:
   inputSelPropsCreator: (props: {
     //
-    disabled?: boolean;
-    bankAccountOptionArr?: Toption[];
-    limitedDate?: Moment;
+    disabled: boolean;
+    bankAccountOptionArr: Toption[];
+    limitedDate: Moment | undefined;
     // value: string | Moment | null | boolean;
     state_accountant: Tstate_accountant;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
     handle_checkIsImported: () => void;
     // isAllowToEditIsImported?: boolean;
-  }) => {
-    inputProps?: TinputProps;
-    textareaProps?: TtextareaProps;
-    selectProps?: TselectProps;
-    datePickerProps?: TdatePickerProps;
-    checkBoxProps_v2?: TcheckBoxProps_v2;
-    reactNode?: React.ReactNode;
-  };
+  }) => TinputSelProps;
 };
 
 type TconfigList = {
@@ -359,7 +354,7 @@ const rowCellPropsList: TconfigList = {
   price: {
     label: '新臺幣',
     style: {
-      width: 100,
+      width: 130,
       justifyContent: 'flex-end',
     },
     className: '',
@@ -386,7 +381,13 @@ const rowCellPropsList: TconfigList = {
         },
       };
 
-      return { inputProps };
+      return {
+        wrapperStyle: {
+          gap: '5px',
+        },
+        prefix: 'TWD',
+        inputProps,
+      };
     },
   },
   billSerialNumber: {
@@ -400,9 +401,9 @@ const rowCellPropsList: TconfigList = {
       const value_Arr = state_accountant.billSerialNumber || [];
       const value = value_Arr.join('\n');
 
-      const reactNode = <span className="whitespace-pre-wrap">{value}</span>;
+      const reactNode = <span className={scss.memoStr}>{value}</span>;
 
-      return { reactNode };
+      return { node: reactNode };
     },
   },
   notes: {
@@ -533,7 +534,7 @@ const rowCellPropsList: TconfigList = {
   currencyValue: {
     label: '金額',
     style: {
-      width: 100,
+      width: 130,
       justifyContent: 'flex-end',
     },
     className: '',
@@ -561,6 +562,10 @@ const rowCellPropsList: TconfigList = {
       };
 
       return {
+        wrapperStyle: {
+          gap: '5px',
+        },
+        prefix: cutCurrency(state_accountant.currency),
         inputProps,
       };
     },
@@ -568,17 +573,23 @@ const rowCellPropsList: TconfigList = {
   splitPayment: {
     label: '已分出金額',
     style: {
-      width: 100,
+      width: 180,
     },
     className: '',
     inputSelPropsCreator({ state_accountant }) {
-      const strArr = state_accountant.splitPayment.map((payment) => payment.toLocaleString());
+      const strArr = state_accountant.splitPayment.map((payment) => {
+        let paymentStr = payment.toLocaleString();
+        paymentStr = paymentStr.padStart(12, ' ');
+        paymentStr = cutCurrency(state_accountant.currency) + paymentStr;
+
+        return paymentStr;
+      });
       const str = strArr.join('\n');
 
-      const reactNode = <span className="whitespace-pre-wrap break-words">{str}</span>;
+      const reactNode = <span className={scss.memoStr}>{str}</span>;
 
       return {
-        reactNode,
+        node: reactNode,
       };
     },
   },

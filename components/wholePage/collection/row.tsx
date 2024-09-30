@@ -31,6 +31,8 @@ import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dto
 
 import { calcQuota } from './function';
 
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
+
 // ============================================================================
 const Cell_span = ({
   //
@@ -122,15 +124,6 @@ const Row = ({
 
   // 匯入發票匯入紙本時的額度
   const quota = data_accountant ? calcQuota(data_accountant) : 0;
-  // const quota = (() => {
-  //   const { price, splitPayment } = data_accountant ?? {};
-
-  //   const paymentTotal_d = (splitPayment ?? []).reduce((total, payment) => {
-  //     return total.add(payment);
-  //   }, new Decimal(0));
-
-  //   return new Decimal(price || 0).minus(paymentTotal_d).toNumber();
-  // })();
 
   // ---------------------------------------------------
 
@@ -181,8 +174,8 @@ const Row = ({
               reqPatchIsImported(data_accountant.id, isoString, separatePayment)
             }
             onCancel={modal.destroy}
-            // defaultPayment={Number(state_accountant.price)}
             quota={quota}
+            currency={cutCurrency(state_accountant.currency)}
           />
         ),
       });
@@ -299,7 +292,7 @@ const Row = ({
 
         const config = rowCellPropsList[key];
 
-        const { reactNode, ...props } =
+        const { node: reactNode, ...props } =
           config?.inputSelPropsCreator({
             disabled,
             bankAccountOptionArr,

@@ -118,7 +118,7 @@
   z-index: 1000;
   display: grid;
   // grid-template-columns: 45px 150px 415px 415px 65px 50px 300px 65px 70px ;
-  grid-template-columns: 45px 150px 415px 415px 65px 50px 50px 100px 100px 200px 70px;
+  grid-template-columns: 75px 150px 410px 410px 100px 40px 30px 100px 100px 200px 70px;
   // gap: 15px;
   width: auto;
   // margin: 5px 20px;
@@ -388,7 +388,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 415px 415px 65px 50px 50px 100px 100px 200px 70px;
+    grid-template-columns:30px 30px 150px 410px 410px 100px 40px 30px 100px 100px 200px ;
     // gap: 5px;
   }
 }

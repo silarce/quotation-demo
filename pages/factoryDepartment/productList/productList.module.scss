@@ -103,7 +103,7 @@
     //   margin-left: 20px;
     //   margin-right: 20px;
     padding-bottom: 5px;
-    border-bottom: 1px solid rgb(214, 214, 214);
+    // border-bottom: 1px solid rgb(214, 214, 214);
 
     div {
         margin-right: 20px;
@@ -218,6 +218,7 @@
     margin-right: 20px;
     padding-right: 20px;
     // background-color: gray;
+    border-bottom: 1px solid #ccc;
 }
 
 
@@ -440,7 +441,7 @@ div.panelHeader13 {
     font-weight: 500;
     font-size: 16px;
     // color: #14256a;
-    color: #5b5a5ad6;
+    color: #14256a;
     transform: translateY(2px);
     width:100px;
 

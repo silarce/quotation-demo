@@ -1,21 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
+
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import Dotdotdot from 'components/global/gear/animation/dotdotdot';
 
 import { apiAuthMe } from 'js/api/api_auth';
 
-export default function Error429() {
+export default function Error429({ onClose }: { onClose: () => void }) {
   const [isOk, setIsOk] = useState(false);
 
-  const returnLatestPate = () => {
-    window.history.back();
-  };
-
-  const tryApi = async () => {
-    if (isOk) {
-      return;
-    }
+  const tryApi = useCallback(async () => {
+    // if (isOk) {
+    //   return;
+    // }
 
     setTimeout(async () => {
       try {
@@ -23,29 +21,34 @@ export default function Error429() {
 
         if (res) {
           setIsOk(true);
+
+          onClose();
         }
       } catch (error) {
         tryApi();
       }
     }, 10000);
-  };
+  }, []);
 
   useEffect(() => {
     tryApi();
   }, []);
 
   return (
-    <div>
+    <div className="w-[600px] h-[500px]">
       <Coffe className="m-auto mt-[100px]" />
 
       <Dotdotdot className="translate-x-[-25px]" />
 
-      {!isOk && <h1 className="text-4xl text-center w-fit m-auto mt-[50px]">請稍待片刻</h1>}
-
+      <br />
+      {!isOk && <h1 className="text-4xl text-center w-fit m-auto mt-[50px]">網路請求太過頻繁，請稍待約一分鐘</h1>}
       {isOk && (
-        <h1 onClick={returnLatestPate} className="text-4xl text-center w-fit m-auto mt-[50px] cursor-pointer">
-          返回上一頁
-        </h1>
+        <div className="text-center mt-[50px]">
+          <h1 className="text-4xl text-center w-fit m-auto mb-5">可以繼續操作了</h1>
+          <MyButton_v2 onClick={onClose}>
+            <span>關閉</span>
+          </MyButton_v2>
+        </div>
       )}
     </div>
   );
@@ -62,7 +65,7 @@ const Coffe = ({ className }: { className: string }) => {
       width="300px"
       height="300px"
       viewBox="0 0 32 32"
-      enable-background="new 0 0 32 32"
+      enableBackground="new 0 0 32 32"
       className={classNames(className)}
       // xml:space="preserve"
     >

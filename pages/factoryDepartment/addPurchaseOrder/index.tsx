@@ -133,13 +133,13 @@ export default function AddPurchaseOrder() {
     //手key
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<number>(0);
+    const [handinputquantity, setHandinputquantity] = useState<string>("");
     const [handinputunit, setHandinputunit] = useState<string>("");
     const [handinputnote, setHandinputnote] = useState<string>("");
     const [handinputproductid, setHandinputproductid] = useState<string>("");
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
-    const [handinputunitprice, setHandinputunitprice] = useState<number>(0);
-    const [handinputtotalprice, setHandinputtotalprice] = useState<number>(0);
+    const [handinputunitprice, setHandinputunitprice] = useState<string>("");
+    const [handinputtotalprice, setHandinputtotalprice] = useState<string>("");
 
     // 詢價Modal
     const [quotereqname, setQuotereqname] = useState<string>("");
@@ -677,7 +677,7 @@ export default function AddPurchaseOrder() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === 0 || handinputunit === '' || handinputunitprice === 0) {
+        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '' || handinputunitprice === '') {
             myAlert.warning({ title: '請檢查欄位是否遺漏' });
         } else {
             const newEntry = {
@@ -697,11 +697,11 @@ export default function AddPurchaseOrder() {
             setHandinputproductid('');
             setHandinputname('');
             setHandinputspec('');
-            setHandinputquantity(0);
+            setHandinputquantity('');
             setHandinputunit('');
             setHandinputnote('');
-            setHandinputunitprice(0);
-            setHandinputtotalprice(0);
+            setHandinputunitprice('');
+            setHandinputtotalprice('');
             try {
                 setIsLoading(true);
                 const conditionModel = {
@@ -889,34 +889,41 @@ export default function AddPurchaseOrder() {
         if (isSelectingRef.current) return;
 
         let filtered = searchbardata;
+        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
+            if (handinputproductuuid) {
+                filtered = searchbardata.filter(item =>
+                    item.id.includes(handinputproductuuid)
+                );
+            }
+            if (handinputproductid) {
+                filtered = filtered.filter(item =>
+                    item.productid.includes(handinputproductid)
+                );
+            }
 
-        if (handinputproductuuid) {
-            filtered = searchbardata.filter(item =>
-                item.id.includes(handinputproductuuid)
-            );
+            if (handinputname) {
+                filtered = filtered.filter(item =>
+                    item.name.includes(handinputname)
+                );
+            }
+
+            if (handinputspec) {
+                filtered = filtered.filter(item =>
+                    item.spec && item.spec.includes(handinputspec)
+                );
+            }
+
+            setFilteredData(filtered);
+            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
         }
-        if (handinputproductid) {
-            filtered = filtered.filter(item =>
-                item.productid.includes(handinputproductid)
-            );
+        else {
+            setHandinputproductuuid('');
+            setFilteredData([]);
+            setShowSuggestions(false);
         }
 
-        if (handinputname) {
-            filtered = filtered.filter(item =>
-                item.name.includes(handinputname)
-            );
-        }
-
-        if (handinputspec) {
-            filtered = filtered.filter(item =>
-                item.spec && item.spec.includes(handinputspec)
-            );
-        }
-
-        setFilteredData(filtered);
-        // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
-        setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
-    }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
+    }, [handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -952,9 +959,9 @@ export default function AddPurchaseOrder() {
         setHandinputspec('');
         setHandinputunit('');
         setHandinputnote('');
-        setHandinputquantity(0);
-        setHandinputunitprice(0);
-        setHandinputtotalprice(0);
+        setHandinputquantity('');
+        setHandinputunitprice('');
+        setHandinputtotalprice('');
         setShowSuggestions(false);
     }
 
@@ -1392,15 +1399,15 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         // setHandinputquantity(item.detail_quantity);
-        setHandinputtotalprice(handinputunitprice * handinputquantity);
+        setHandinputtotalprice((parseFloat(handinputunitprice || '0') * parseFloat(handinputquantity || '0')).toString());
         setQuoterequuid(item.main_id);
         // UpdatePurchaseOrderDetail(item);
     };
 
 
-    useEffect(() => {
-        setHandinputtotalprice(handinputquantity * handinputunitprice);
-    }, [handinputunitprice]);
+    // useEffect(() => {
+    //     setHandinputtotalprice((parseFloat(handinputunitprice) * parseFloat(handinputquantity)).toString());
+    // }, [handinputunitprice]);
 
     const UpdatePurchaseOrderDetail = async (item: any) => {
         try {
@@ -1414,7 +1421,7 @@ export default function AddPurchaseOrder() {
             const conditionModel = {
                 purchaseorderdetailuuid: purchaseorderdetailuuid,
                 unitprice: item.detail_unitprice,
-                totalprice: (parseInt(item.detail_unitprice) * handinputquantity),
+                totalprice: (parseFloat(item.detail_unitprice) * parseFloat(handinputquantity)),
                 suppliername: item.detail_suppliername,
                 quotereqdetailuuid: item.detail_id,
                 suppliertaxid: item.main_suppliertaxid,
@@ -1868,6 +1875,19 @@ export default function AddPurchaseOrder() {
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
+                                        <span>
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
+                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                        </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>
@@ -1978,20 +1998,7 @@ export default function AddPurchaseOrder() {
                                                 }}
                                             />
                                         </span>
-                                        <span>
-                                            &nbsp;&nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                        </span>
+
 
                                     </div>
                                 </CellWithBar>
@@ -2000,7 +2007,7 @@ export default function AddPurchaseOrder() {
 
                             <div className={scss.addbar} style={{ display: `${(purchaseorderid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 <div>
-                                    <button onClick={() => { handleAddByHandKey() }}>
+                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '15px' }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
@@ -2039,15 +2046,19 @@ export default function AddPurchaseOrder() {
                                 </div>
                                 <div>
                                     <input
-                                        style={{ backgroundColor: 'transparent', width: '50px' }}
+                                        style={{ backgroundColor: 'transparent', width: '100%' }}
                                         type="text"
                                         placeholder='數量'
-                                        maxLength={5}
                                         value={handinputquantity}
                                         onChange={(e) => {
-                                            const quantity = parseInt(e.target.value) || 0;
+                                            const quantity = e.target.value;
+                                            // 若為無效數字或空字串，將 quantity 設為 0
+                                            const parsedQuantity = quantity === '' ? 0 : parseFloat(quantity) || 0;
                                             setHandinputquantity(quantity);
-                                            setHandinputtotalprice(quantity * handinputunitprice);
+                                            // 根據數量和單價計算總金額
+                                            const totalPrice = (parsedQuantity * (parseFloat(handinputunitprice) || 0)).toFixed(2);
+                                            // const totalPrice=(parsedQuantity * (parseFloat(handinputunitprice) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).toString()
+                                            setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
                                 </div>
@@ -2069,7 +2080,7 @@ export default function AddPurchaseOrder() {
                                     </button>
                                 </div>
                                 <div>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         placeholder='單價'
                                         value={handinputunitprice.toLocaleString()}
@@ -2078,14 +2089,32 @@ export default function AddPurchaseOrder() {
                                             setHandinputunitprice(unitprice);
                                             setHandinputtotalprice(handinputquantity * unitprice); // 同時更新總金額
                                         }}
+                                    /> */}
+                                    <input
+                                        type="text"
+                                        placeholder='單價'
+                                        value={handinputunitprice}  // 預設為 0
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputunitprice(unitprice);
+                                            // 根據數量和單價計算總金額
+                                            const totalPrice = ((parseFloat(handinputquantity) || 0) * parsedUnitPrice).toFixed(2);
+
+                                            setHandinputtotalprice(totalPrice.toString());
+                                        }}
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='金額'
-                                        value={handinputtotalprice.toLocaleString()}
-                                        onChange={(e) => { setHandinputtotalprice(parseInt(e.target.value) || 0) }}
+                                        // value={handinputtotalprice}
+                                        value={handinputtotalprice}
+                                        onChange={(e) => {
+                                            setHandinputtotalprice(e.target.value.toString())
+                                        }}
                                     />
                                 </div>
                                 <div>

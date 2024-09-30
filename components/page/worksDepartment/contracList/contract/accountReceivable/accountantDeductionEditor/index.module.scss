@@ -10,9 +10,9 @@
 
 .row {
   display: grid;
-  grid-template-columns: 30px 200px 200px;
+  grid-template-columns: 30px 200px 130px;
   gap: 30px;
-  padding: 20px 20px;
+  padding: 20px 40px;
   border-bottom: solid 1px theme("colors.border");
   justify-items: flex-start;
   // &:nth-last-of-type(1) {

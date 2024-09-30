@@ -105,7 +105,11 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
-import { init_variable, calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
+import {
+  init_variable,
+  calcNTDToForeignCurrency,
+  checkIsReviewer,
+} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -316,12 +320,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSendToReview = !!(
     toSalesAt ||
     toSupervisorAt ||
-    toSalesManagerAt ||
+    // toSalesManagerAt ||
     toWorkDirectorAt ||
     toCashierAt ||
     toManagerAt
   );
-  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
@@ -334,40 +344,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
-  // 20240924 審核經理被排除在審核鏈之外
-  if (userId) {
-    if (userId === reviewSalesEmployeeId && toSalesAt) {
-      isSales = true;
-      isReviewer = true;
-    } else if (userId === reviewSupervisorEmployeeId && toSupervisorAt) {
-      if (salesReviewedAt) {
-        isSupervisor = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if ((salesReviewedAt && supervisorReviewedAt) || (salesReviewedAt && supervisorReviewedAt)) {
-        isWorkDirector = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
-        isCashier = true;
-        isReviewer = true;
-      }
-    } else if (
-      userId === reviewManagerEmployeeId ||
-      // 總經理ID
-      userId === '01f55698-49bb-4501-b432-1157a5109554'
-    ) {
-      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
-        isManager = true;
-        isReviewer = true;
-      } else if (salesReviewedAt && supervisorReviewedAt && workDirectorReviewedAt && cashierReviewedAt) {
-        isManager = true;
-        isReviewer = true;
-      }
-    }
-  }
+  const checkReviewerResult = checkIsReviewer({
+    userId,
+
+    status,
+
+    reviewSalesEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewManagerEmployeeId,
+
+    salesReviewedAt,
+    supervisorReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+
+    toSalesAt,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+  });
+
+  isReviewer = checkReviewerResult.isReviewer;
+
+  isSales = checkReviewerResult.isSales;
+  isSupervisor = checkReviewerResult.isSupervisor;
+  isWorkDirector = checkReviewerResult.isWorkDirector;
+  isCashier = checkReviewerResult.isCashier;
+  isManager = checkReviewerResult.isManager;
 
   // 如果是準合約，如果業務與業務主管為同一人，視為業務主管
   // 因為在準合約時業務預設為已審核過(salesReviewedAt不為null)所以可以這樣處理
@@ -825,7 +832,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -843,28 +850,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         !reviewSalesEmployeeId ||
         !reviewWorkDirectorEmployeeId ||
         !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId ||
-        !reviewSalesManagerEmployeeId
+        !reviewSupervisorEmployeeId
+        // ||
+        // !reviewSalesManagerEmployeeId
       ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
     }
 
     const shouldDirect = isManager && status === 'Pending';
-
-    if (isSales && salesReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
 
     try {
       setIsLoading(true);
@@ -921,6 +915,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新審核人員失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reqPatchReviewer_pending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(quotationId, {});
+      await update_quotation();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '送審失敗', content: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -1363,24 +1374,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
           type: 'myButton',
           label: '送審',
           onClick: () => {
-            if (status === 'Pending' && !verifyForm) {
-              return myAlert.warning({ title: '請先送出合約審核表' });
+            if (status === 'Pending') {
+              if (!verifyForm) {
+                return myAlert.warning({ title: '請先送出合約審核表' });
+              }
+
+              if (toCashierAt) {
+                myAlert.info({ title: '此報價單已經送審' });
+
+                return;
+              }
+
+              myAlert.confirm({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+              });
+
+              return;
             }
 
-            if (status === 'Pending' && toSupervisorAt) {
-              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
-            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+            if (toSalesAt || toSupervisorAt) {
               myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
               setShowEmployeSelector(true);
-            }
-
-            if (status === 'Pending') {
-              myAlert.info({
-                title: '送審後合約審核表將被鎖定',
-                content: '建議先確認合約審核表是否正確',
-                props: { width: 450 },
-              });
             }
           }, // onClick close
         }

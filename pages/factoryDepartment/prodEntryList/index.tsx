@@ -408,7 +408,7 @@ export default function ProdEntryList() {
             // 入庫進度
             let totalentry = data.length;
             let alreadyentry = 0;
-            
+
             data.forEach((element: { entry_qty: any, quantity: any }) => {
                 if (element.entry_qty === element.quantity) {
                     alreadyentry += 1;
@@ -1818,6 +1818,11 @@ export default function ProdEntryList() {
                                 data1.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader14}>
                                         <div className={scss.row01}>
+                                            <span>
+                                                <button onClick={() => { handleinbox(_item) }}>
+                                                    <img src={icon_tray_in.src} alt="tray" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
@@ -1826,11 +1831,6 @@ export default function ProdEntryList() {
                                             <span style={{ color: '#ea1833' }}>{_item.entry_qty}</span>
                                             <span>{_item.quantity}</span>
                                             <span>{_item.unit}</span>
-                                            <span>
-                                                <button onClick={() => { handleinbox(_item) }}>
-                                                    <img src={icon_tray_in.src} alt="tray" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
                                             <span>{_item.total_quantity}</span>
                                             <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
