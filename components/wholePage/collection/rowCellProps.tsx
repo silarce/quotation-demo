@@ -10,12 +10,17 @@ import {
   TcheckBoxProps_v2,
   TinputSelProps,
 } from 'components/global/gear/inputAndSel_v2/inputSel';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 import { TpaymentType, Tstate_accountant } from '.';
 import { Tcurrency } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
+
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 // =======================================================================
 type TaccountantKey = keyof Tstate_accountant | 'btn' | 'isImported';
@@ -31,22 +36,15 @@ type TrowCellProps = {
   // selectProps?:
   inputSelPropsCreator: (props: {
     //
-    disabled?: boolean;
-    bankAccountOptionArr?: Toption[];
-    limitedDate?: Moment;
+    disabled: boolean;
+    bankAccountOptionArr: Toption[];
+    limitedDate: Moment | undefined;
     // value: string | Moment | null | boolean;
     state_accountant: Tstate_accountant;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
     handle_checkIsImported: () => void;
     // isAllowToEditIsImported?: boolean;
-  }) => {
-    inputProps?: TinputProps;
-    textareaProps?: TtextareaProps;
-    selectProps?: TselectProps;
-    datePickerProps?: TdatePickerProps;
-    checkBoxProps_v2?: TcheckBoxProps_v2;
-    reactNode?: React.ReactNode;
-  };
+  }) => TinputSelProps;
 };
 
 type TconfigList = {
@@ -336,30 +334,70 @@ const rowCellPropsList: TconfigList = {
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: 100,
+      width: 280,
     },
     className: '',
-    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
-      const value_str = state_accountant.vendorName || '';
+    inputSelPropsCreator: ({ disabled, state_accountant, setState_accountant }) => {
+      const onBtnClick = () => {
+        const modal = myAlert.clear();
 
-      const inputProps: TinputProps = {
-        props: {
-          placeholder: '請輸入',
-          type: 'text',
-          value: value_str,
-          onChange: (e) => {
-            setState_accountant((state) => ({ ...state, ['vendorName']: e.target.value }));
-          },
-        },
+        modal.update({
+          content: (
+            <SearchModal_customer
+              onRowClick={(customer) => {
+                setState_accountant((state) => {
+                  const copy = { ...state };
+                  copy.vendorCustomer = customer;
+                  copy.vendorCustomerId = customer.id;
+                  copy.vendorName = customer.name;
+
+                  return copy;
+                });
+
+                modal.destroy();
+              }}
+            />
+          ),
+        });
       };
 
-      return { inputProps };
+      const suffix = disabled ? undefined : (
+        <SquareBtn
+          //
+          className="mb-1"
+          sharp="mini"
+          disabled={disabled}
+          onClick={disabled ? undefined : onBtnClick}
+        >
+          選擇廠商
+        </SquareBtn>
+      );
+
+      const inputSelProps: TinputSelProps = {
+        textareaProps: {
+          props: {
+            placeholder: '請輸入',
+            value: state_accountant.vendorName || '',
+            onChange: (e) => {
+              setState_accountant((state) => ({
+                ...state,
+                ['vendorName']: e.target.value,
+                ['vendorCustomerId']: null,
+                ['vendorCustomer']: undefined,
+              }));
+            },
+          },
+        },
+        suffix,
+      };
+
+      return inputSelProps;
     },
   },
   price: {
     label: '新臺幣',
     style: {
-      width: 100,
+      width: 130,
       justifyContent: 'flex-end',
     },
     className: '',
@@ -386,7 +424,13 @@ const rowCellPropsList: TconfigList = {
         },
       };
 
-      return { inputProps };
+      return {
+        wrapperStyle: {
+          gap: '5px',
+        },
+        prefix: 'TWD',
+        inputProps,
+      };
     },
   },
   billSerialNumber: {
@@ -400,9 +444,9 @@ const rowCellPropsList: TconfigList = {
       const value_Arr = state_accountant.billSerialNumber || [];
       const value = value_Arr.join('\n');
 
-      const reactNode = <span className="whitespace-pre-wrap">{value}</span>;
+      const reactNode = <span className={scss.memoStr}>{value}</span>;
 
-      return { reactNode };
+      return { node: reactNode };
     },
   },
   notes: {
@@ -533,7 +577,7 @@ const rowCellPropsList: TconfigList = {
   currencyValue: {
     label: '金額',
     style: {
-      width: 100,
+      width: 130,
       justifyContent: 'flex-end',
     },
     className: '',
@@ -561,6 +605,10 @@ const rowCellPropsList: TconfigList = {
       };
 
       return {
+        wrapperStyle: {
+          gap: '5px',
+        },
+        prefix: cutCurrency(state_accountant.currency),
         inputProps,
       };
     },
@@ -568,17 +616,23 @@ const rowCellPropsList: TconfigList = {
   splitPayment: {
     label: '已分出金額',
     style: {
-      width: 100,
+      width: 180,
     },
     className: '',
     inputSelPropsCreator({ state_accountant }) {
-      const strArr = state_accountant.splitPayment.map((payment) => payment.toLocaleString());
+      const strArr = state_accountant.splitPayment.map((payment) => {
+        let paymentStr = payment.toLocaleString();
+        paymentStr = paymentStr.padStart(12, ' ');
+        paymentStr = cutCurrency(state_accountant.currency) + paymentStr;
+
+        return paymentStr;
+      });
       const str = strArr.join('\n');
 
-      const reactNode = <span className="whitespace-pre-wrap break-words">{str}</span>;
+      const reactNode = <span className={scss.memoStr}>{str}</span>;
 
       return {
-        reactNode,
+        node: reactNode,
       };
     },
   },

@@ -2354,6 +2354,13 @@ export type TquotationContractDto = {
   //
   unReviewPicture: number;
   unReviewWorkSheet: number;
+  //
+  // '幣別'
+  currency: Tcurrency;
+  // '美金價格'
+  foreignTotal: string | null;
+  // '匯率'
+  exchangeRate: string | null;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -3823,6 +3830,8 @@ export type TincomeBillSerialDto = {
   note: string | null;
   // '廠商名稱'
   vendorName: string | null;
+  vendorCustomerId: string | null;
+  vendorCustomer?: TcustomerDto;
   // '扣款明細'
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
   // '手續費'
@@ -3898,6 +3907,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   exchangeBenefits: string | null;
 } & {
   vendorName?: string | null;
+  vendorCustomerId?: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {
@@ -4297,6 +4307,8 @@ export type TaccountantDto = {
   insertDate: string | null;
   // 廠商名稱
   vendorName: string | null;
+  vendorCustomerId: string | null;
+  vendorCustomer?: TcustomerDto;
   // 金額 // 新臺幣
   price: number;
   // 備註
@@ -4373,6 +4385,7 @@ export type TcreateAccountantDto = Pick<
   noteMaturityDate?: string | null; // 票據到期日
   // receiptCollectionDate?: string | null; // 託收日
   // receiptEstimatedDate?: string | null; // 預兌日
+  vendorCustomerId?: string | null;
 };
 
 export type TupdateAccountantDto = Partial<

@@ -62,16 +62,6 @@ const useData = (filter: Tstate): TmodalData<TcustomerDto> => {
         customerNumber: {
           $contains: filter.customerNumber,
         },
-        createdAt: (() => {
-          if (!filter.createdAt) {
-            return undefined;
-          } else {
-            return {
-              $gte: moment(filter.createdAt).startOf('day').toISOString(),
-              $lte: moment(filter.createdAt).endOf('day').toISOString(),
-            };
-          }
-        })(),
       },
     };
   }, [filter]);
@@ -141,21 +131,12 @@ const useConfig_data = () => {
           return str;
         },
       },
-      createdAt: {
-        label: t('createdAt'),
-        style: {
-          width: '100px',
-        },
-        reducer: (data) => {
-          return moment(data.createdAt).format('YYYY-MM-DD');
-        },
-      },
     };
 
     return config;
   }, [i18n.language]);
 
-  const dataKeyArr: string[] = ['indexNumber', 'customerNumber', 'name', 'nickname', 'type', 'createdAt'];
+  const dataKeyArr: string[] = ['indexNumber', 'customerNumber', 'name', 'nickname', 'type'];
 
   return { dataConfig, dataKeyArr };
 };
@@ -188,11 +169,6 @@ const useConfig_filter = () => {
           { value: 'propertyOwner', label: t('propertyOwner') },
           { value: 'contractor', label: t('contractor') },
         ],
-      },
-      {
-        caption: t('createdAt'),
-        key: 'createdAt',
-        type: 'date',
       },
     ];
 
