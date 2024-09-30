@@ -2354,6 +2354,13 @@ export type TquotationContractDto = {
   //
   unReviewPicture: number;
   unReviewWorkSheet: number;
+  //
+  // '幣別'
+  currency: Tcurrency;
+  // '美金價格'
+  foreignTotal: string | null;
+  // '匯率'
+  exchangeRate: string | null;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
