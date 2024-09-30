@@ -65,7 +65,7 @@ type Tstate_incomeBillSerial = {
   note: string;
   vendorName: string;
   vendorCustomerId: string | null;
-  vendorCustomer?: TcustomerDto | undefined;
+  vendorCustomer: TcustomerDto | undefined;
 
   //
   // readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
@@ -1578,6 +1578,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       exchangeBenefits,
       vendorName,
       vendorCustomerId,
+      vendorCustomer,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -1613,6 +1614,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       note: note ?? '',
       vendorName: vendorName ?? '',
       vendorCustomerId,
+      vendorCustomer,
 
       state_deduction: state_deduction,
       //
