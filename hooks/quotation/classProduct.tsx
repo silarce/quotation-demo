@@ -1246,16 +1246,22 @@ class Class_product {
   } // reqProdGenerateDoorProductBom
 
   // 取得細部規格(取得slatCount)
+  abortController_reqGetProdCalcDetailSpec: AbortController = new AbortController();
   async reqGetDetailSpec() {
     if (!this.doorType || this.isSpecialProd) {
       return;
     }
 
-    const res = await reqGetProdCalcDetailSpec({
-      modelName: this.doorType as TpcgsPrams['modelName'],
-      height: Number(this.height_mm),
-      B: Number(this.boxB_mm),
-    });
+    this.abortController_reqGetProdCalcDetailSpec.abort();
+    this.abortController_reqGetProdCalcDetailSpec = new AbortController();
+    const res = await reqGetProdCalcDetailSpec(
+      {
+        modelName: this.doorType as TpcgsPrams['modelName'],
+        height: Number(this.height_mm),
+        B: Number(this.boxB_mm),
+      },
+      this.abortController_reqGetProdCalcDetailSpec.signal
+    );
 
     this._detailSpecs = res || undefined;
     this._prodData.slatCount = String(this._detailSpecs?.slatCount ?? 0);
@@ -1327,6 +1333,7 @@ class Class_product {
       //     this.takeDefaultDynaValue();
       //   }
       // }
+      await this.reqGetDetailSpec();
     }
 
     this.shouldCall_cgs = false;
@@ -2755,6 +2762,7 @@ class Class_product {
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.reRender();
+    // this.reqGetDetailSpec();
   }
 
   // 全寬
@@ -2917,6 +2925,7 @@ class Class_product {
     // this.callAllReq();
 
     this.reRender();
+    // this.reqGetDetailSpec();
   }
   get height_mm() {
     // return String(Number(this._prodData.height) * 1000);
@@ -2994,6 +3003,7 @@ class Class_product {
     };
 
     setBoxB();
+    // this.reqGetDetailSpec();
   }
 
   set boxB_noCall(v: string) {
@@ -3044,6 +3054,7 @@ class Class_product {
     };
 
     setBoxB();
+    // this.reqGetDetailSpec();
   }
 
   get boxB_mm() {
@@ -4814,19 +4825,22 @@ const reqGetProdAvailableComponents = async (body: {
   }
 };
 
-const reqGetProdCalcDetailSpec = async (body: {
-  //
-  modelName: TdoorModelInfoDto['name'];
-  height: number;
-  B: number;
-}) => {
+const reqGetProdCalcDetailSpec = async (
+  body: {
+    //
+    modelName: TdoorModelInfoDto['name'];
+    height: number;
+    B: number;
+  },
+  signal: AbortSignal
+) => {
   try {
     const theBody = {
       ...body,
       modelName: body.modelName as TdoorModelInfoDto['name'],
     };
 
-    const res = await apiGetProdCalcDetailSpec(theBody);
+    const res = await apiGetProdCalcDetailSpec(theBody, signal);
 
     if (res) {
       return res;
