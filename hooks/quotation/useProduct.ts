@@ -11,6 +11,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
 import { apiGetAnnotation, apiGetQuotationRanges } from 'js/api/api_workSheet';
+import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // class
 import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
@@ -57,7 +58,14 @@ type TothersList = {
   [key: string]: Class_other;
 };
 
+interface TprodDict {
+  [id: string]: TquotationProductDto;
+}
+
 // =======================================================================
+
+// MARK:useProductList
+
 const useProductList = ({
   productArr,
   others,
@@ -89,29 +97,31 @@ const useProductList = ({
   isAttach?: boolean;
 }) => {
   const doorModelList = useModelList();
+
+  const prodDict = useProdArrToProdDict({ productArr });
+
+  // 沒用到了?
   const { annoArr, qrArr, setAnnoArr, setQrArr, onClassDoorTypeChange } = useAnnoQr({ onDoorTypeChange });
 
   // ---------------------------------------------------------
-  // const [render, setRender] = useState(0);
-
-  // const reRender: TreRender = () => setRender((state) => ++state);
 
   const [calcTrigger, setCalcTrigger] = useState(0);
-
-  const callCalcSubTotal = () => {
-    setCalcTrigger((state) => ++state);
-  };
-
-  const { avgDiscount_withQty, setAvgDiscount_withQty } = useAvgDiscount_withQty({
-    averageDiscount: (averageDiscount || '0') as `${number}`,
-  });
-
   // ---------------------------------------------------------
   const [subTotal, setSubTotal] = useState('');
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
   // 追加追減
   const [productList_attach] = useState<TproductList>({});
+
+  // ---------------------------------------------------------
+  const callCalcSubTotal = () => {
+    setCalcTrigger((state) => ++state);
+  };
+
+  // ---------------------------------------------------------
+  const { avgDiscount_withQty, setAvgDiscount_withQty } = useAvgDiscount_withQty({
+    averageDiscount: (averageDiscount || '0') as `${number}`,
+  });
 
   // ---------------------------------------------------------
   // product
@@ -142,7 +152,6 @@ const useProductList = ({
     copySelf_prod,
   } = useClassProdList({
     classProdList,
-    resetTrigger,
     doorModelList,
     discount_fromData,
     calcQuotationAvgDiscount,
@@ -150,6 +159,7 @@ const useProductList = ({
     onClassDoorTypeChange,
     quotationDiscount,
     productArr,
+    // prodDict,
   });
 
   const { comKeyArr, comVKeyArr, changeComKeyArr } = useComKey();
@@ -163,11 +173,7 @@ const useProductList = ({
     callCalcSubTotal,
   });
 
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-  // ---------------------------------------------------------
-
-  // ---------------------------------------------------------
+  // ----------------------------------------------------------------------
 
   const calcSubTotalPrice = useCallback(() => {
     let subTotal = new Decimal(0);
@@ -214,15 +220,6 @@ const useProductList = ({
     Object.values(attachProdList).forEach((prod) => {
       prod.quotationDiscount = discount_attach;
     });
-  };
-
-  // ---------------------------------------------------------
-  // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
-
-  const reset = () => {
-    createProdList();
-    createOthersList();
-    setSubTotal('');
   };
 
   // ---------------------------------------------------------
@@ -274,6 +271,15 @@ const useProductList = ({
       discount_attach: quotationDiscount_attach,
     });
   }, [quotationDiscount, quotationDiscount_attach]);
+
+  // ---------------------------------------------------------
+
+  // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
+  const reset = () => {
+    createProdList();
+    createOthersList();
+    setSubTotal('');
+  };
 
   // ---------------------------------------------------------
 
@@ -432,6 +438,7 @@ const getQr = async ({
 const quotationProductToProd = ({ quotationProduct }: { quotationProduct: TquotationProductDto }): Tprod => {
   const prodData: Tprod = {
     ...quotationProduct,
+    raw: quotationProduct,
     phase: quotationProduct.motorPhase ?? -1,
     voltage: String(quotationProduct.motorVoltage),
     motorSupport: quotationProduct.hasMotorSupportStand ?? false,
@@ -560,6 +567,8 @@ const quotationProductToProd = ({ quotationProduct }: { quotationProduct: Tquota
 
   return prodData;
 };
+
+// MARK:END
 
 export { useProductList, prodCellConfig };
 export type {
@@ -942,7 +951,7 @@ const useCalcDiscount = ({
 // MARK:useClassProdList
 const useClassProdList = ({
   classProdList,
-  resetTrigger,
+
   doorModelList,
   discount_fromData,
   calcQuotationAvgDiscount,
@@ -950,10 +959,10 @@ const useClassProdList = ({
   onClassDoorTypeChange,
   quotationDiscount,
   productArr,
-}: //
+}: // prodDict,
 {
   classProdList: TproductList;
-  resetTrigger: any;
+
   doorModelList:
     | Readonly<{
         [key: string]: TdoorModelInfoDto;
@@ -971,6 +980,7 @@ const useClassProdList = ({
   }) => Promise<void>;
   quotationDiscount: number;
   productArr: TquotationProductDto[] | undefined;
+  // prodDict: TprodDict;
   //
 }) => {
   const [render, setRender] = useState(0);
@@ -1044,11 +1054,12 @@ const useClassProdList = ({
     // 每次上傳前會將prod的order依照當時的排序重新設定
     // 所以理論上order不會重複
     sortedProdArr.forEach((prod) => {
-      let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+      // let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+      const key = prod.id || nanoid();
 
-      if (key in classProdList) {
-        key = nanoid();
-      }
+      // if (key in classProdList) {
+      //   key = nanoid();
+      // }
 
       const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
 
@@ -1070,25 +1081,14 @@ const useClassProdList = ({
         quotationDiscount: discount_fromData,
         onDiscountChange: calcQuotationAvgDiscount,
         onQtyChange: calcQuotationAvgDiscount,
+        //
+        // isComplete: false,
       });
     });
 
     calcQuotationAvgDiscount();
     setProductList(classProdList);
-  }, [
-    classProdList,
-    // calcDiscount_two,
-
-    // // resetTrigger,
-    // // doorModelList,
-    // // discount_fromData,
-
-    // productArr,
-
-    // copySelf_prod,
-    // delSelf_prod,
-    // onClassDoorTypeChange,
-  ]);
+  }, [classProdList]);
 
   const changeProdKeyArr = (v: TprodKey[]) => {
     setProdKeyArr(v);
@@ -1101,7 +1101,11 @@ const useClassProdList = ({
     reRender();
   };
 
-  const copySelf_prod = (list: TproductList, copyKey: string, shouldKeepId?: boolean) => {
+  const copySelf_prod = (
+    list: TproductList,
+    copyKey: string
+    // shouldKeepId?: boolean
+  ) => {
     if (!doorModelList) {
       myAlert.info({ title: '尚未取得門型資料' });
 
@@ -1111,6 +1115,7 @@ const useClassProdList = ({
     const newKey = nanoid();
 
     const copy = _.cloneDeep(list[copyKey]);
+    copy.replaceId(copyKey);
     // copy.rootProductId = undefined;
 
     copy.delSelf = () => {
@@ -1123,9 +1128,9 @@ const useClassProdList = ({
       calcQuotationAvgDiscount();
     };
 
-    if (!shouldKeepId) {
-      copy.clearId();
-    }
+    // if (!shouldKeepId) {
+    //   copy.clearId();
+    // }
 
     copy.attachId = newKey;
 
@@ -1366,7 +1371,11 @@ const useProd_attach = ({
   calcQuotationAvgDiscount: () => void;
 
   delSelf_prod: (list: TproductList, key: string) => void;
-  copySelf_prod: (list: TproductList, copyKey: string, shouldKeepId?: boolean) => void;
+  copySelf_prod: (
+    list: TproductList,
+    copyKey: string
+    // shouldKeepId?: boolean
+  ) => void;
   //
   callCalcSubTotal: () => void;
   onClassDoorTypeChange: ({
@@ -1424,11 +1433,12 @@ const useProd_attach = ({
       productArr_attach.forEach((prod, index) => {
         // w 注意 order不是唯一值，若有多個prod的order一樣，後者會蓋掉前者
         // const key = prod.order !== undefined ? `${prod.order}` : nanoid();
-        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        // let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        const key = prod.id || nanoid();
 
-        if (keyArr.includes(key)) {
-          key = `${key}-${index}`;
-        }
+        // if (keyArr.includes(key)) {
+        //   key = `${key}-${index}`;
+        // }
 
         keyArr.push(key);
 
@@ -1639,5 +1649,20 @@ const useDoorSummary = ({
 
 // ============================================================================
 // ============================================================================
+
+const useProdArrToProdDict = ({ productArr }: { productArr: TquotationProductDto[] | undefined }) => {
+  return useMemo(() => {
+    const prodDict: TprodDict = {};
+
+    productArr?.forEach((prod) => {
+      prodDict[prod.id] = prod;
+    });
+
+    return prodDict;
+  }, [productArr]);
+};
+
 // ============================================================================
 // ============================================================================
+
+export { quotationProductToProd };

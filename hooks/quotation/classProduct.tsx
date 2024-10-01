@@ -125,6 +125,7 @@ import {
 
 import { checkIsFloat } from 'js/utils/checkValue';
 
+import { quotationProductToProd } from './useProduct';
 // =============================================================================
 // type
 import type {
@@ -155,6 +156,8 @@ import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_pr
 // =============================================================================
 
 type Tprod = {
+  raw?: TquotationProductDto;
+
   id?: string;
   // order?: string;
   // discount: `${number}`;
@@ -304,6 +307,7 @@ class Class_product {
     //
     // 報價單折數，也就是TquotationContentDto[discount]
     quotationDiscount: number;
+    //
   }) {
     this.reRender_ori = reRender;
 
@@ -317,7 +321,10 @@ class Class_product {
     };
 
     // this.setIsLoading = setIsLoading;
-    this._prodData = _.cloneDeep(prodData);
+    // this._prodData = _.cloneDeep(prodData);
+
+    // this.init(_.cloneDeep(prodData));
+
     this.delSelf = delSelf;
     this.copySelf = copySelf;
     this.callCalcSubTotal = callCalcSubTotal;
@@ -331,14 +338,14 @@ class Class_product {
     // 來自/products/door/models // 在useProduct取得 // 目前只有用來生成下拉式選單的樣子
     this._doorModelList = doorModelList;
     //
-    this._quantity = String(this._prodData.quantity);
+    // this._quantity = String(this._prodData.quantity);
 
-    this._price = String(this._prodData.price);
-    this._dualPrice = String(this._prodData.dualPrice);
-    this._unitPrice = String(this._prodData.unitPrice);
-    this._totalPrice = String(this._prodData.totalPrice);
+    // this._price = String(this._prodData.price);
+    // this._dualPrice = String(this._prodData.dualPrice);
+    // this._unitPrice = String(this._prodData.unitPrice);
+    // this._totalPrice = String(this._prodData.totalPrice);
 
-    this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
+    // this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
 
     this.parentProd = parentProd;
 
@@ -349,36 +356,52 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     this._quotationDiscount = quotationDiscount;
 
-    if (!this._prodData.material && !this.isSpecialProd) {
-      this._prodData.material = 'SST#304';
-      this._prodData.surface = '2B';
-    }
+    // if (!this._prodData.material && !this.isSpecialProd) {
+    //   this._prodData.material = 'SST#304';
+    //   this._prodData.surface = '2B';
+    // }
 
-    // __________________________________________________________;
+    // _____________________________________________________________________________________
+    // _____________________________________________________________________________________
 
-    // 建立材料配件
-    if (!this.isSpecialProd) {
-      const sortedComList = sortComponent(this._prodData.components);
-      this.creComList({
-        dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
-        isNew: false,
-      });
-    }
+    // this._quantity = String(this._prodData.quantity);
+    // this._price = String(this._prodData.price);
+    // this._dualPrice = String(this._prodData.dualPrice);
+    // this._unitPrice = String(this._prodData.unitPrice);
+    // this._totalPrice = String(this._prodData.totalPrice);
+    // this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
 
-    // ___________________________________________________________
-    // 建立選配設定
-    this.creAcceList();
+    // if (!this._prodData.material && !this.isSpecialProd) {
+    //   this._prodData.material = 'SST#304';
+    //   this._prodData.surface = '2B';
+    // }
 
-    //建立 配電箱與按裝費
-    if (!this.isSpecialProd) {
-      this.creSubComList({ isNew: false });
-    }
+    // if (this._prodData.reduceQty) {
+    //   this.reduceQty = String(this._prodData.reduceQty);
+    // }
 
-    // ___________________________________________________________
-    if (this._prodData.reduceQty) {
-      this.reduceQty = String(this._prodData.reduceQty);
-    }
-    // ___________________________________________________________
+    // // 建立材料配件
+    // if (!this.isSpecialProd) {
+    //   const sortedComList = sortComponent(this._prodData.components);
+    //   this.creComList({
+    //     dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
+    //     isNew: false,
+    //   });
+    // }
+
+    // // 建立選配設定
+    // this.creAcceList();
+
+    // //建立 配電箱與按裝費
+    // if (!this.isSpecialProd) {
+    //   this.creSubComList({ isNew: false });
+    // }
+
+    // _____________________________________________________________________________________
+    // _____________________________________________________________________________________
+
+    this._prodData = _.cloneDeep(prodData); // 為避免型別錯誤，必須在這邊執行一次這行
+    this.init(_.cloneDeep(this._prodData));
 
     this.resetDoorGeneralSpacs();
   } //  constructor close ===========================================================
@@ -414,14 +437,14 @@ class Class_product {
   private _defaultBoxB = '';
   // private _boxB: number | undefined;
   //
-  private _prodData;
-  private _quantity;
-  private _price;
-  private _dualPrice;
-  private _unitPrice;
-  private _totalPrice;
+  private _prodData: Tprod;
+  private _quantity = '';
+  private _price = '';
+  private _dualPrice = '';
+  private _unitPrice = '';
+  private _totalPrice = '';
 
-  private _bounceDoorWidth;
+  private _bounceDoorWidth = '';
 
   private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
@@ -436,6 +459,14 @@ class Class_product {
   private isDontClearProd = false;
 
   private isEditW_noGapA = false;
+
+  get isComplete() {
+    if (!this._prodData.raw) {
+      return true;
+    } else {
+      return !!this._prodData.raw.items;
+    }
+  }
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -2580,6 +2611,10 @@ class Class_product {
     return this._prodData.id;
   }
 
+  replaceId(id: string) {
+    this._prodData.id = id;
+  }
+
   get itemName() {
     return this._prodData.itemName;
   }
@@ -4356,6 +4391,72 @@ class Class_product {
   } // callSideEffect
 
   //-----------------------------------------
+
+  init(prodData: Tprod) {
+    this._prodData = prodData;
+    this._quantity = String(this._prodData.quantity);
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+    this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
+
+    if (!this._prodData.material && !this.isSpecialProd) {
+      this._prodData.material = 'SST#304';
+      this._prodData.surface = '2B';
+    }
+
+    if (this._prodData.reduceQty) {
+      this.reduceQty = String(this._prodData.reduceQty);
+    }
+
+    // 建立材料配件
+    if (!this.isSpecialProd) {
+      const sortedComList = sortComponent(this._prodData.components);
+      this.creComList({
+        dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
+        isNew: false,
+      });
+    }
+
+    //建立 配電箱與按裝費
+    if (!this.isSpecialProd) {
+      this.creSubComList({ isNew: false });
+    }
+  }
+
+  // updateWholeProd renewWholeProd quotationProductToProd
+  // 這三個方法留著，以備未來可能的需求
+  // 這三個方法的功能是取得完整的主產品資料並替換掉原本的資料
+
+  async updateWholeProd() {
+    if (this.isComplete) {
+      return;
+    }
+
+    if (!this._prodData.id) {
+      myAlert.err({ title: 'updateWholeProd中斷', content: '無id' });
+
+      return;
+    }
+
+    const wholeProd = await apiGetQuotationProducts(this._prodData.id);
+    this.init(quotationProductToProd({ quotationProduct: wholeProd }));
+
+    return wholeProd;
+  }
+
+  renewWholeProd(wholeProd: Tprod) {
+    this.init(wholeProd);
+
+    return this;
+  }
+
+  get quotationProductToProd() {
+    return quotationProductToProd;
+  }
+
+  //-----------------------------------------
 } // Class_product close
 
 // ===========================================================
@@ -4713,7 +4814,12 @@ const reqGetProdAvailableComponents = async (body: {
   }
 };
 
-const reqGetProdCalcDetailSpec = async (body: { modelName: TdoorModelInfoDto['name']; height: number; B: number }) => {
+const reqGetProdCalcDetailSpec = async (body: {
+  //
+  modelName: TdoorModelInfoDto['name'];
+  height: number;
+  B: number;
+}) => {
   try {
     const theBody = {
       ...body,
