@@ -43,6 +43,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_history from 'public/image/icon/fc_history.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -671,7 +673,23 @@ export default function AddPurchaseOrder() {
 
     // 送出按鈕
     function handleAdd() {
-        AddPurchaseOrder();
+        if (suppliernamein === '' || supplieraddressin === '' || shippingaddressin === '') {
+            myAlert.warning({ title: '請確認欄位是否填寫完整' })
+            return;
+        }
+        myAlert.confirm({
+            title: '確定要新增單據嗎?',
+            content: <>
+                <h1>請檢查資料是否填寫完整</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    AddPurchaseOrder();
+
+                }
+            }
+        })
+
     }
 
 
@@ -891,6 +909,7 @@ export default function AddPurchaseOrder() {
         let filtered = searchbardata;
         if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
             if (handinputproductuuid) {
+                let filtered = searchbardata;
                 filtered = searchbardata.filter(item =>
                     item.id.includes(handinputproductuuid)
                 );
@@ -1518,7 +1537,7 @@ export default function AddPurchaseOrder() {
                                 </button>
 
                                 <button
-                                    style={{ display: `${(status === "未儲存" || status === " " || editmain) ? '' : 'none'}` }}
+                                    style={{ display: `${(status === "未儲存" || status === "" || editmain) ? '' : 'none'}` }}
                                     className={scss.disablesquarebtn} >
                                     <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     編輯
@@ -1618,7 +1637,7 @@ export default function AddPurchaseOrder() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
+                                                    value: (checkfirstin === 0 ? create_byin : create_by) || '',
                                                 },
                                             }}
                                         />
@@ -1632,7 +1651,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliernamein ? suppliernamein : ' ',
+                                                    value: suppliernamein ? suppliernamein : '',
                                                     onChange: (e) => { handleSuppliernameChange(e) }
                                                 },
                                             }}
@@ -1643,7 +1662,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: supplieraddressin ? supplieraddressin : ' ',
+                                                    value: supplieraddressin ? supplieraddressin : '',
                                                     onChange: (e) => { handleSupplieraddressChange(e) }
                                                 },
                                             }}
@@ -1654,7 +1673,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: note || ' ',
+                                                    value: note || '',
                                                     onChange: (e) => { setNote(e.target.value) }
                                                 },
                                             }}
@@ -1666,7 +1685,7 @@ export default function AddPurchaseOrder() {
                                             inputProps={{
                                                 props: {
                                                     // value: shippingaddressin ? shippingaddressin : ' ',
-                                                    value: shippingaddressin ? shippingaddressin : ' ',
+                                                    value: shippingaddressin ? shippingaddressin : '',
                                                     // onChange: (e) => { setShippingaddressin(e.target.value) }
                                                     onChange: (e) => { handleShippingaddressChange(e) }
                                                 },
@@ -1681,7 +1700,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: supplierphonein ? supplierphonein : ' ',
+                                                    value: supplierphonein ? supplierphonein : '',
                                                     onChange: (e) => { setSupplierphonein(e.target.value) }
                                                 },
                                             }}
@@ -1692,7 +1711,7 @@ export default function AddPurchaseOrder() {
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin ? suppliertaxidin : ' ',
+                                                    value: suppliertaxidin ? suppliertaxidin : '',
                                                     onChange: (e) => { setSuppliertaxidin(e.target.value) }
                                                 },
                                             }}
@@ -1715,7 +1734,7 @@ export default function AddPurchaseOrder() {
                                             inputProps={{
                                                 props: {
                                                     style: { color: '#ea1833' },
-                                                    value: `${status === "未儲存" ? "※可輸入公司名稱查詢地址" : ' '}`,
+                                                    value: `${shippingaddressin === "" ? "※可輸入公司名稱查詢地址" : ' '}`,
                                                 },
                                             }}
                                         />
@@ -1881,7 +1900,7 @@ export default function AddPurchaseOrder() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>

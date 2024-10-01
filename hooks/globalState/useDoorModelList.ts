@@ -28,6 +28,7 @@ const useDoorModelList = create<TdoorModelList>()(
   immer<TdoorModelList>(
     (set, get) => {
       // 我完全不知道(好啦，可能知道，這大概是建構函式)為什麼const doorModelList這一行之前程式碼只執行一次
+
       apiGetProdDoorModels().then((data) => {
         const list: TdoorModelDir = data.reduce((acc, item) => {
           acc[item.name] = item;

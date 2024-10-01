@@ -19,7 +19,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 
 // type
 import type { Toption } from 'js/utils/options/options';
-import type { TaccountantDto } from 'js/api/dtoTypes';
+import type { TaccountantDto, TcustomerDto } from 'js/api/dtoTypes';
 import type { AxiosError } from 'axios';
 
 // icon
@@ -78,7 +78,6 @@ type Tstate_accountant = {
   importAccountingNumber: string;
   noteNumber: string;
   accountingNumber: string;
-  vendorName: string;
   billSerialNumber: string[];
   notes: string;
 
@@ -98,6 +97,10 @@ type Tstate_accountant = {
 
   // 已分出金額
   readonly splitPayment: number[];
+  //
+  vendorName: string;
+  vendorCustomerId: string | null;
+  vendorCustomer: TcustomerDto | undefined;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -172,7 +175,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
-        populate: ['incomeBill.accountsReceivableDeduction'],
+        populate: ['incomeBill.accountsReceivableDeduction', 'vendorCustomer'],
         sort: 'insertDate',
         pageSize: 999999,
         filter: {
@@ -218,26 +221,28 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return;
     }
 
-    if (!state_accountant.insertDate) {
+    const { vendorCustomer, ...preBody } = state_accountant;
+
+    if (!preBody.insertDate) {
       myAlert.info({ title: '請選擇日期' });
 
       return;
     }
 
     const body: TcreateAccountantDto = {
-      ...state_accountant,
-      insertDate: state_accountant.insertDate.toISOString(true),
+      ...preBody,
+      insertDate: preBody.insertDate.toISOString(true),
       paymentType,
-      price: Number(state_accountant.price),
+      price: Number(preBody.price),
       fee: 0,
-      noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
-      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      noteMaturityDate: preBody.noteMaturityDate?.toISOString(true),
+      receiptCollectionDate: preBody.receiptCollectionDate?.toISOString(true) ?? null,
       // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
-      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
-      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
-      currency: state_accountant.currency,
-      exchangeRate: state_accountant.exchangeRate ? (state_accountant.exchangeRate as `${number}`) : '0',
-      currencyValue: state_accountant.currencyValue ? (state_accountant.currencyValue as `${number}`) : '0',
+      receiptEstimatedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: preBody.currency,
+      exchangeRate: preBody.exchangeRate ? (preBody.exchangeRate as `${number}`) : '0',
+      currencyValue: preBody.currencyValue ? (preBody.currencyValue as `${number}`) : '0',
     };
 
     await apiPostAccountant({ body });
@@ -262,6 +267,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       // ...state_accountant,
       accountingNumber: state_accountant.accountingNumber,
       vendorName: state_accountant.vendorName,
+      vendorCustomerId: state_accountant.vendorCustomerId,
       notes: state_accountant.notes,
       importAccountingNumber: state_accountant.importAccountingNumber,
       noteNumber: state_accountant.noteNumber,

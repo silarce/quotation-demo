@@ -10,6 +10,9 @@ import {
   TcheckBoxProps_v2,
   TinputSelProps,
 } from 'components/global/gear/inputAndSel_v2/inputSel';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 import { TpaymentType, Tstate_accountant } from '.';
 import { Tcurrency } from 'js/api/dtoTypes';
@@ -331,24 +334,64 @@ const rowCellPropsList: TconfigList = {
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: 100,
+      width: 280,
     },
     className: '',
-    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
-      const value_str = state_accountant.vendorName || '';
+    inputSelPropsCreator: ({ disabled, state_accountant, setState_accountant }) => {
+      const onBtnClick = () => {
+        const modal = myAlert.clear();
 
-      const inputProps: TinputProps = {
-        props: {
-          placeholder: '請輸入',
-          type: 'text',
-          value: value_str,
-          onChange: (e) => {
-            setState_accountant((state) => ({ ...state, ['vendorName']: e.target.value }));
-          },
-        },
+        modal.update({
+          content: (
+            <SearchModal_customer
+              onRowClick={(customer) => {
+                setState_accountant((state) => {
+                  const copy = { ...state };
+                  copy.vendorCustomer = customer;
+                  copy.vendorCustomerId = customer.id;
+                  copy.vendorName = customer.name;
+
+                  return copy;
+                });
+
+                modal.destroy();
+              }}
+            />
+          ),
+        });
       };
 
-      return { inputProps };
+      const suffix = disabled ? undefined : (
+        <SquareBtn
+          //
+          className="mb-1"
+          sharp="mini"
+          disabled={disabled}
+          onClick={disabled ? undefined : onBtnClick}
+        >
+          選擇廠商
+        </SquareBtn>
+      );
+
+      const inputSelProps: TinputSelProps = {
+        textareaProps: {
+          props: {
+            placeholder: '請輸入',
+            value: state_accountant.vendorName || '',
+            onChange: (e) => {
+              setState_accountant((state) => ({
+                ...state,
+                ['vendorName']: e.target.value,
+                ['vendorCustomerId']: null,
+                ['vendorCustomer']: undefined,
+              }));
+            },
+          },
+        },
+        suffix,
+      };
+
+      return inputSelProps;
     },
   },
   price: {

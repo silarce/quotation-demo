@@ -651,11 +651,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
         style: { width: '170px' },
       },
-      {
-        label: '業務經理',
-        value: contract?.content?.reviewSalesManagerEmployee?.chName ?? '',
-        style: { width: '170px' },
-      },
+      // {
+      //   label: '業務經理',
+      //   value: contract?.content?.reviewSalesManagerEmployee?.chName ?? '',
+      //   style: { width: '170px' },
+      // },
       {
         label: '業務主管',
         value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',

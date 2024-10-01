@@ -15,9 +15,12 @@ import EditDefunctionBtn, {
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import Tip from 'components/global/myAntd/popover/tip';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 // type
-import type { Tcurrency, TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tcurrency, TincomeBillSerialDto, TcustomerDto } from 'js/api/dtoTypes';
 import { TreqPatch } from 'pages/worksDepartment/incomeSummons';
 
 // icon
@@ -61,6 +64,8 @@ type Tstate_incomeBillSerial = {
   //
   note: string;
   vendorName: string;
+  vendorCustomerId: string | null;
+  vendorCustomer: TcustomerDto | undefined;
 
   //
   // readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
@@ -335,41 +340,6 @@ const Summons = forwardRef(Summons_pre);
 // ============================================================================
 
 // region PROPSLIST
-
-// const keyArr_ori: TconfigKey[] = [
-//   'billSerialNumber', // 收入傳票序號
-//   'contractNumber', // 合約編號
-//   'receiveDate', // 日期
-//   'projectName', // 工程名稱
-//   'vendorName', // 廠商名稱
-//   'contractPayment', // 承攬價
-//   'periodPayment', // 本期計價
-//   'noteNumber', // 票據號碼
-//   'importAccountingNumber', // 票據/匯入帳號
-//   'noteMaturityDate', // 票據日期
-
-//   'declarationCurrency', // 外銷 出口報單幣別
-//   'declarationExchangeRate', // 外銷 出口報單匯率
-//   'declarationCurrencyPayment', // 外銷 出口報單外幣金額
-//   'declarationPayment', // 外銷 出口報單台幣金額
-
-//   'priorPeriodPayment', // 前期已收
-
-//   'receivableCurrency', // 外銷 收款幣別
-//   'receivableExchangeRate', // 外銷 收款匯率
-//   'receivableCurrencyPayment', // 外銷 收款外幣金額
-//   'receivablePayment', // w 收款金額 新臺幣
-
-//   'fee', // 匯費
-//   'foreignCurrencyFee', // 外銷 國外匯費_外幣
-//   'foreignFee', // 外銷 國外匯費_新台幣
-
-//   'exchangeBenefits', // 外銷 兌換利益
-
-//   'deductionPayment', // 扣款金額
-//   'unpaidPayment', // 餘額
-//   'note', // 備註
-// ];
 
 const keyArr_domain: TconfigKey[] = [
   'billSerialNumber', // 收入傳票序號
@@ -999,13 +969,48 @@ const cellPropsList_summon: TcellPropsList_summon = {
 
   vendorName: {
     label: '廠商名稱',
-    style: { width: 150 },
+    style: { width: 280 },
     // className: 'text-center',
     createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const onBtnClick = () => {
+        const modal = myAlert.clear();
+
+        modal.update({
+          content: (
+            <SearchModal_customer
+              onRowClick={(customer) => {
+                setState_incomeBillSerial((state) => {
+                  const copy = { ...state };
+                  copy.vendorCustomer = customer;
+                  copy.vendorCustomerId = customer.id;
+                  copy.vendorName = customer.name;
+
+                  return copy;
+                });
+
+                modal.destroy();
+              }}
+            />
+          ),
+        });
+      };
+
+      const suffix = disabled ? undefined : (
+        <SquareBtn
+          //
+          className="mb-1"
+          sharp="mini"
+          disabled={disabled}
+          onClick={disabled ? undefined : onBtnClick}
+        >
+          選擇廠商
+        </SquareBtn>
+      );
+
       const inputSelProps: TinputSelProps = {
         disabled: disabled,
         showBaseline: 'auto',
-        inputProps: {
+        textareaProps: {
           props: {
             // className: 'text-center',
             value: state_incomeBillSerial.vendorName,
@@ -1014,11 +1019,14 @@ const cellPropsList_summon: TcellPropsList_summon = {
                 return {
                   ...prev,
                   vendorName: e.target.value,
+                  vendorCustomerId: null,
+                  vendorCustomer: undefined,
                 };
               });
             },
           },
-        },
+        }, // inputProps
+        suffix,
       };
 
       return inputSelProps;
@@ -1430,82 +1438,6 @@ const cellPropsList_summon: TcellPropsList_summon = {
       return inputSelProps;
     },
   },
-
-  // internalUnderestimationPayment: {
-  //   label: '不足預估之收款',
-  //   style: { width: 150 },
-  //   className: 'text-right',
-
-  //   createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
-  //     const { type, value } = reducer_input({
-  //       disabled,
-  //       value: state_incomeBillSerial.internalUnderestimationPayment ?? '',
-  //     });
-
-  //     const inputSelProps: TinputSelProps = {
-  //       disabled,
-  //       showBaseline: 'auto',
-  //       inputProps: {
-  //         props: {
-  //           className: 'text-right',
-  //           type,
-  //           value,
-  //           onChange: (e) => {
-  //             setState_incomeBillSerial((state) => {
-  //               const copy = { ...state };
-  //               copy.internalUnderestimationPayment = e.target.value;
-
-  //               return copy;
-  //             });
-  //           }, // onChange
-  //           //
-  //         },
-  //       },
-  //     };
-
-  //     return inputSelProps;
-  //   },
-  // },
-
-  // foreignUnderestimationPayment: {
-  //   label: '不足預估之收款(外銷)',
-  //   style: { width: 150 },
-  //   className: 'text-right',
-
-  //   createInputSelProps: ({ disabled, isPaperImported, state_incomeBillSerial, setState_incomeBillSerial }) => {
-  //     const { type, value } = reducer_input({
-  //       disabled,
-  //       value: state_incomeBillSerial.foreignUnderestimationPayment ?? '',
-  //     });
-
-  //     const inputSelProps: TinputSelProps = {
-  //       disabled,
-  //       showBaseline: 'auto',
-  //       inputProps: {
-  //         props: {
-  //           className: 'text-right',
-  //           type,
-  //           value,
-  //           onChange: (e) => {
-  //             setState_incomeBillSerial((state) => {
-  //               const copy = { ...state };
-  //               copy.foreignUnderestimationPayment = e.target.value;
-
-  //               return copy;
-  //             });
-  //           }, // onChange
-  //           //
-  //         },
-  //       },
-  //     };
-
-  //     return inputSelProps;
-  //   },
-  // },
-
-  //
-  //
-  //
 }; // cellPropsList_summon END
 
 // ============================================================================
@@ -1572,38 +1504,6 @@ const calcExchangeBebefits = (state_incomeBillSerial: Tstate_incomeBillSerial) =
   return exchangeBenefits.toString();
 };
 
-// const calceCurrencyPayment = ({
-//   exchangeRate, // tw to foreign
-//   twPayment,
-//   foreignPayment,
-// }:
-//   | {
-//       exchangeRate: number;
-//     } & (
-//       | {
-//           twPayment: number;
-//           foreignPayment?: undefined;
-//         }
-//       | {
-//           twPayment?: undefined;
-//           foreignPayment: number;
-//         }
-//     )) => {
-//   if (twPayment) {
-//     foreignPayment = new Decimal(twPayment).div(exchangeRate).toNumber();
-//   }
-
-//   if (foreignPayment) {
-//     twPayment = new Decimal(foreignPayment).times(exchangeRate).toNumber();
-//   }
-
-//   return {
-//     exchangeRate,
-//     twPayment: twPayment as number,
-//     foreignPayment: foreignPayment as number,
-//   };
-// };
-
 const calc_twToForeign = ({
   exchangeRate,
   twPayment,
@@ -1623,16 +1523,6 @@ const calc_foreignToTw = ({
 }) => {
   return new Decimal(foreignPayment).times(exchangeRate).toDecimalPlaces(2).toNumber();
 };
-
-// const calc_exchangeRate = ({
-//   foreignPayment,
-//   twPayment,
-// }: {
-//   foreignPayment: number | `${number}`;
-//   twPayment: number | `${number}`;
-// }) => {
-//   return new Decimal(foreignPayment).div(twPayment).toNumber();
-// };
 
 const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
   let keyArr: TconfigKey[] = keyArr_domain;
@@ -1687,6 +1577,8 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       foreignCurrencyFee,
       exchangeBenefits,
       vendorName,
+      vendorCustomerId,
+      vendorCustomer,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -1721,6 +1613,8 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       //
       note: note ?? '',
       vendorName: vendorName ?? '',
+      vendorCustomerId,
+      vendorCustomer,
 
       state_deduction: state_deduction,
       //
