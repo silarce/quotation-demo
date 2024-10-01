@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _, { sortBy } from 'lodash';
+import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
@@ -277,16 +277,18 @@ export const useGetQuotation_id_2 = (
       const res = await apiGetQuotation_id_2(id, theParams);
 
       if (getProductItems) {
-        // 伺服器撐得住，不用批次呼叫
-        const productArr = await Promise.all(
-          res.latestContent.products.map(async (prod) => {
-            const productId = prod.id;
+        const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+        const chunk = _.chunk(prodIdArr, 20);
 
-            return await apiGetQuotationProducts(productId);
-          })
-        );
+        for (const chunkIndex in chunk) {
+          const idArr = chunk[chunkIndex];
+          const times = Number(chunkIndex);
 
-        res.latestContent.products = productArr;
+          const wholeProdArr = await apiGetQuotationMultiProducts(idArr);
+          wholeProdArr.forEach((wholeProd, index) => {
+            res.latestContent.products[index + times * 20] = wholeProd;
+          });
+        }
       }
 
       setIsLoading(true);
@@ -304,11 +306,112 @@ export const useGetQuotation_id_2 = (
     }
   };
 
+  const renewProd = (wholeProd: TquotationProductDto) => {
+    setRes((res) => {
+      if (!res) {
+        return res;
+      }
+
+      const copy = { ...res };
+
+      const index = copy.latestContent.products.findIndex((prod) => wholeProd.id === prod.id);
+      copy.latestContent.products[index] = wholeProd;
+
+      return copy;
+    });
+  };
+
+  const updateSingleProd_noRender = async (prodId: string) => {
+    const wholdProd = await apiGetQuotationProducts(prodId);
+
+    // renewProd(wholdProd);
+    if (!res) {
+      return;
+    }
+
+    const products = res.latestContent.products;
+    const index = products.findIndex((prod) => prod.id === prodId);
+    products[index] = wholdProd;
+
+    return wholdProd;
+  };
+
+  const updateAllWholdProd_noRender = async ({
+    stopToken,
+    onSingleSuceess,
+  }: {
+    stopToken: { stop: boolean };
+    onSingleSuceess?: (wholdProd: TquotationProductDto) => void;
+  }) => {
+    if (!res) {
+      return;
+    }
+
+    const products = res.latestContent.products;
+
+    for (const index in products) {
+      if (stopToken.stop) {
+        break;
+      }
+
+      const prod = products[index];
+      const isWhole = !!prod.items;
+
+      if (isWhole) {
+        continue;
+      }
+
+      await new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          const wholeProd = await apiGetQuotationProducts(prod.id);
+          // renewProd(wholeProd);
+          products[index] = wholeProd;
+          onSingleSuceess?.(wholeProd);
+          resolve(wholeProd);
+        }, 100);
+      });
+    }
+  };
+
+  const updateAllWholeProd_batch_noRender = async ({
+    stopToken,
+    onBatchSuceess,
+  }: {
+    stopToken: { stop: boolean };
+    onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
+  }) => {
+    if (!res) {
+      return;
+    }
+
+    const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+    const chunk = _.chunk(prodIdArr, 20);
+
+    for (const chunkIndex in chunk) {
+      if (stopToken.stop) {
+        break;
+      }
+
+      const idArr = chunk[chunkIndex];
+      const times = Number(chunkIndex);
+
+      const wholeProdArr = await apiGetQuotationMultiProducts(idArr);
+      wholeProdArr.forEach((wholeProd, index) => {
+        res.latestContent.products[index + times * 20] = wholeProd;
+      });
+      onBatchSuceess?.(wholeProdArr);
+    }
+  };
+
   return {
     data: res,
     isLoading,
     update,
     setData: setRes,
+    renewProd,
+    updateAllWholdProd_noRender,
+    updateSingleProd_noRender,
+    updateAllWholeProd_batch_noRender,
   };
 };
 
@@ -1017,6 +1120,17 @@ export const apiGetQuotationProducts = async (productId: string) => {
 
   return axi
     .get<TquotationProductDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 取得多筆主產品
+// GET  quotation/multiProducts/:productIds
+export const apiGetQuotationMultiProducts = async (productIds: string[]) => {
+  const api = `/quotation/multiProducts/${productIds.join(',')}`;
+
+  return axi
+    .get<TquotationProductDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
