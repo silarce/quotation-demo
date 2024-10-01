@@ -209,11 +209,11 @@ type TpcdsPrams = {
   B: number;
 };
 
-export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams) => {
+export const apiGetProdCalcDetailSpec = async (params: TpcdsPrams, signal?: AbortSignal) => {
   const api = '/products/door/calc-detail-spec';
 
   return axi
-    .get<{ slatCount: number }>(api, { params })
+    .get<{ slatCount: number }>(api, { params, signal })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
