@@ -452,9 +452,9 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>序</span>
         <span>送審日期</span>
         <span>類別</span>
+        <span>單號</span>
         <span>主旨</span>
-        {/* <span>單號</span>
-        <span>人員</span> */}
+        <span>人員</span> 
         <span></span>
       </div>
     )

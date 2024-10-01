@@ -1,7 +1,7 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import scss from './bomList.module.scss';
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { setting } from '../wareHouseList/index';
 import { useRouter } from "next/router";
 import { content } from "html2canvas/dist/types/css/property-descriptors/content";
@@ -17,6 +17,12 @@ import { inputSelProps } from "components/page/worksDepartment/ui/wrapper_inpuSe
 import icon_fc_add from 'public/image/icon/fc_add.svg';
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
+import icon_fc_check from 'public/image/icon/fc_check.svg';
+import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
+import { AppContext } from "pages/_app";
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
+
 
 export default function BomList() {
 
@@ -29,6 +35,9 @@ export default function BomList() {
     //#region =============【變數宣告】===============================================================================
     // Loading
     const [isLoading, setIsLoading] = useState(false);
+
+    //登入者資料
+    const { userInfo } = useContext(AppContext);
 
     // 資料列
     const [data, setData] = useState<any[]>([]); // 物料data
@@ -141,6 +150,7 @@ export default function BomList() {
             setData(responsedata);
             setSearchdata(responsedata);
             setFilteredData(responsedata);
+            setSearchBarData(responsedata);
 
             console.log(responsedata);
 
@@ -154,7 +164,7 @@ export default function BomList() {
 
     const GetBom = async (parentid: any) => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 parent_product: parentid
             };
@@ -180,25 +190,70 @@ export default function BomList() {
             console.log(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
+    const RemoveBomDetail = async (id: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                id: id
+            };
 
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/RemovePurchaseOrderDetail?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responseData = await response.json();
+
+            GetBom(parent_product);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
 
     //#endregion
 
     //#region =============【方法入口】===============================================================================
     //#region  點擊物料
-    const HandleChoseProduct = (item: any) => {
-        // alert(item.name);
-        handleRowClick(item.id);
-        setProductid(item.productid);
-        setProductname(item.name);
-        setProductspec(item.spec);
-        setProductmaterial(item.material);
-        setProductsurface(item.surface);
-        setParent_product(item.id);
-        GetBom(item.id);
+    const handleChoseProduct = (item: any) => {
+        if (edithandkey) {
+            console.log(item);
+            setHandinputproductuuid(item.id);
+            setHandinputproductid(item.productid);
+            setHandinputname(item.name);
+            setHandinputspec(item.spec);
+            setHandinputmaterial(item.material);
+            setHandinputsurface(item.surface);
+            setHandinputunit(item.unit);
+            // GetBom(item.id);
+        } else {
+            // alert(item.name);
+            handleRowClick(item.id);
+            setProductid(item.productid);
+            setProductname(item.name);
+            setProductspec(item.spec);
+            setProductmaterial(item.material);
+            setProductsurface(item.surface);
+            setParent_product(item.id);
+            GetBom(item.id);
+        }
+
     }
 
     //#region 點擊物料focus
@@ -221,77 +276,99 @@ export default function BomList() {
     //#endregion
 
     //#region 手key
+
+    // 手key編輯狀態
+    const [edithandkey, setEdithandkey] = useState<boolean>(false);
+    const handleEditByHandKey = async () => {
+        setEdithandkey(!edithandkey);
+        setHandinputproductuuid('');
+        setHandinputproductid('');
+        setHandinputname('');
+        setHandinputspec('');
+        setHandinputmaterial('');
+        setHandinputsurface('');
+        setHandinputunit('');
+        setHandinputnote('');
+        setHandinputquantity('');
+    };
+
     //手key加入
     const handleAddByHandKey = async () => {
-        if (handinputname === '' || handinputspec === '' || handinputquantity === '' || handinputunit === '') {
-            myAlert.warning({ title: '未輸入名稱、規格或數量' });
-        } else {
-            const newEntry = {
-                id: handinputproductuuid,
+        if (handinputproductid === '' || handinputname === '') {
+            myAlert.warning({ title: '料號與名稱不可為空' });
+            return;
+        } else if (handinputquantity === '' || handinputquantity === undefined) {
+            myAlert.warning({ title: '請確認數量是否正確' });
+            return;
+        }
+
+        try {
+            const data = {
+                parent_product: parent_product,
                 productid: handinputproductid,
-                productuuid: handinputproductuuid,
-                name: handinputname,
-                spec: handinputspec,
                 quantity: handinputquantity,
                 unit: handinputunit,
-                note: handinputnote
+                spec: handinputspec,
+                create_by: userInfo?.username,
             };
 
-            setHandinputproductuuid('');
-            setHandinputproductid('');
-            setHandinputname('');
-            setHandinputspec('');
-            setHandinputquantity('');
-            setHandinputunit('');
-            setHandinputnote('');
+            const conditionModel = {
+                data: data
+            };
 
-            try {
-                setIsLoading(true);
-                const conditionModel = {
-                    // purchaserequisitionid: purchaserequisitionid,
-                    // purchaserequisitionuuid: purchaserequisitionuuid,
-                    data: newEntry
-                };
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-                var inputModel = {
-                    TypeName: 'ERP',
-                    ServiceName: 'WareHouseService',
-                    FunctionName: 'no',
-                    FilterConditions: JSON.stringify(conditionModel),
-                };
+            // 發送數據到 API
+            const response = await fetch(`${setting.apipath}/WareHouse/AddBomDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
 
-                const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseRequisitionDetail`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(inputModel)
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const data = await response.json();
-
-                // setData2(prevData2 => [...prevData2, data]);
-
-                // getPurchaseRequisitionDetail(purchaserequisitionuuid);
-
-
-            } catch (error: any) {
-                console.log(error.message);
+            if (!response.ok) {
+                myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` });
+                return;
             }
-            finally {
-                setIsLoading(false);
+
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: '成功', content: result.message });
+                // setEdithandkey(!edithandkey);
+                GetBom(parent_product); // 更新狀態或刷新數據
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
             }
+
+            console.log(result);
+        } catch (error: any) {
+            // 顯示錯誤信息
+            myAlert.err({ title: 'FunctionError', content: error.message });
         }
     };
+
+
+
     //手key清除
     const handleClearHandKey = () => {
         setHandinputproductuuid('');
         setHandinputproductid('');
         setHandinputname('');
         setHandinputspec('');
+        setHandinputmaterial('');
+        setHandinputsurface('');
         setHandinputunit('');
         setHandinputnote('');
         setHandinputquantity('');
@@ -342,7 +419,6 @@ export default function BomList() {
             }
 
             setFilteredData2(filtered);
-            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
             setShowSuggestions2(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
 
         }
@@ -361,7 +437,6 @@ export default function BomList() {
     };
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // setFilteredData(data);
         isSelectingRef.current = false;
         setHandinputname(e.target.value);
     };
@@ -385,10 +460,37 @@ export default function BomList() {
     const handleRemove = (index: number, item: any) => {
         const updatedData = bomdata.filter((_, i) => i !== index);
         setBomdata(updatedData);
-        // RemovePurchaseOrderDetail(item.id);
+        RemoveBomDetail(item.id);
     };
 
+    // 手Key物料查詢
+    const dropdownRef = useRef<HTMLUListElement | null>(null);
 
+    useEffect(() => {
+        // 按下 ESC 鍵關閉下拉選單
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
+                setFilteredData([]);
+                if (dropdownRef.current) {
+                    dropdownRef.current.style.display = 'none';
+                }
+            }
+        };
+        // 為整個 document 添加事件監聽器
+        document.addEventListener('keydown', handleKeyDown);
+
+        // 清理事件監聽器
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+
+
+    //#endregion
+
+    //#region 編輯Bomdetail
+    // const [editbomdetail, setEditbomdetail] = useState<boolean>(false);
     //#endregion
 
 
@@ -397,7 +499,7 @@ export default function BomList() {
     //#region =============【方法邏輯】===============================================================================
 
     //#region 物料查詢
-    const [filteredData, setFilteredData] = useState<any[]>([]);
+    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
     const isSelectingRef = useRef(false);
     useEffect(() => {
         if (isSelectingRef.current) return;
@@ -453,7 +555,8 @@ export default function BomList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'BOM維護'} panelList={panelList} />
+            {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
+            <PageHeader02 tag={'BOM維護'} panelList={undefined} />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
@@ -525,7 +628,7 @@ export default function BomList() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                            onClick={() => { HandleChoseProduct(_item) }}
+                                            onClick={() => { handleChoseProduct(_item) }}
                                         >
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
@@ -556,13 +659,13 @@ export default function BomList() {
                                 </button>
                             </span>
                             <span>
-                                <button
+                                {/* <button
                                     className={scss.minitabbtn}
                                     onClick={() => tabChosed('新增')}
                                     style={getButtonStyle('新增')}
                                 >
                                     樹狀
-                                </button>
+                                </button> */}
                             </span>
                         </div>
                         <div></div>
@@ -578,6 +681,7 @@ export default function BomList() {
                     </div>
                     <div className={scss.foot_head1}>
                         <div>
+                            {/* {parent_product} */}
                             <InputSel
                                 {...inputSelProps}
                                 caption="料號"
@@ -642,7 +746,9 @@ export default function BomList() {
                         <div>
                             <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>組件</span>
                         </div>
-                        <div></div>
+                        <div>
+                            {/* {(edithandkey).toString()} */}
+                        </div>
                         <div></div>
                         <div></div>
                     </div>
@@ -656,9 +762,11 @@ export default function BomList() {
                                     <CellWithBar key={index} className={scss.panelHeader11}>
                                         <div className={scss.row01}>
                                             <span>
-                                                <button onClick={() => { handleRemove(index, _item) }}>
-                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                    <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                {/* <button onClick={() => { alert("OK") }}>
+                                                    <img src={icon_edit.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button> */}
+                                                <button onClick={() => { handleRemove(index, _item) }} style={{ display: '' }}>
+                                                    <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
                                             <span>{index + 1}</span>
@@ -681,8 +789,15 @@ export default function BomList() {
 
                             <div className={scss.addbar}>
                                 <div>
-                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '15px' }}>
+                                    <button onClick={() => { handleEditByHandKey() }} style={{ paddingLeft: '15px', display: `${edithandkey ? 'none' : ''}` }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                    <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
+                                        <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+                                    &nbsp;
+                                    <button onClick={() => { handleAddByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
+                                        <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
                                 <div>
@@ -691,7 +806,7 @@ export default function BomList() {
                                         placeholder="請輸入料號"
                                         value={handinputproductid}
                                         onChange={handleProductidChange}
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
                                 </div>
                                 <div>
@@ -700,7 +815,7 @@ export default function BomList() {
                                         placeholder="請輸入品項名稱"
                                         value={handinputname}
                                         onChange={handleNameChange}
-                                        style={{ width: '100%' }}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
 
                                 </div>
@@ -710,52 +825,103 @@ export default function BomList() {
                                         placeholder="請輸入品項規格"
                                         value={handinputspec}
                                         onChange={handleSpecChange}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
                                 </div>
                                 <div>
                                     <input
-                                        style={{ backgroundColor: 'transparent', width: '50px' }}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                         type="text"
                                         placeholder='材質'
-                                        value={handinputquantity}
+                                        value={handinputmaterial}
                                         onChange={(e) => {
-                                            const quantity = e.target.value;
-                                            setHandinputmaterial(quantity);
+                                            setHandinputmaterial(e.target.value);
                                         }}
+
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='表面'
-                                        value={handinputunit}
-                                        onChange={(e) => setHandinputunit(e.target.value)}
+                                        value={handinputsurface}
+                                        onChange={(e) => setHandinputsurface(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='數量'
-                                        value={handinputnote}
-                                        onChange={(e) => setHandinputnote(e.target.value)}
+                                        value={handinputquantity}
+                                        onChange={(e) => setHandinputquantity(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
                                         placeholder='單位'
-                                        value={handinputnote}
-                                        onChange={(e) => setHandinputnote(e.target.value)}
+                                        value={handinputunit}
+                                        onChange={(e) => setHandinputunit(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                     />
                                 </div>
                                 <div>
-                                    &nbsp;&nbsp;
+                                    {/* &nbsp;&nbsp;
                                     <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
                                         <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
 
+                        </div>
+                        <div className={scss.body_foot1}>
+                            <div>
+                                {/* {filteredData2.length > 0 && (
+                                    <ul ref={dropdownRef}
+                                        style={{
+                                            border: '1px solid #c1c1c1',
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            marginTop: '0px',
+                                            left: '20px',
+                                            position: 'absolute',
+                                            width: '1000px',
+                                            backgroundColor: 'white',
+                                            zIndex: 1004,
+                                            display: `${showSuggestions2 ? '' : 'none'}`
+                                        }}>
+                                        {filteredData2.map(item => (
+                                            <li
+                                                key={item.id}
+                                                onClick={() => handleSelect(item)}
+                                                style={{
+                                                    fontSize: '16px',
+                                                    cursor: 'pointer',
+                                                    padding: '8px',
+                                                    border: '1px solid #c1c1c1',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <span style={{ flex: '1 1 20%' }}>
+                                                    {item.productid}
+                                                </span>
+                                                <span style={{ flex: '1 1 47%' }}>
+                                                    {item.name}
+                                                </span>
+                                                <span style={{ flex: '1 1 30%' }}>
+                                                    {item.spec}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )} */}
+                            </div>
+                            <div></div>
+                            <div></div>
                         </div>
                     </div>
                 </div>

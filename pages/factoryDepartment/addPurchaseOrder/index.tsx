@@ -43,6 +43,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_history from 'public/image/icon/fc_history.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -671,7 +673,23 @@ export default function AddPurchaseOrder() {
 
     // 送出按鈕
     function handleAdd() {
-        AddPurchaseOrder();
+        if (suppliernamein === '' || supplieraddressin === '' || shippingaddressin === '') {
+            myAlert.warning({ title: '請確認欄位是否填寫完整' })
+            return;
+        }
+        myAlert.confirm({
+            title: '確定要新增單據嗎?',
+            content: <>
+                <h1>請檢查資料是否填寫完整</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    AddPurchaseOrder();
+
+                }
+            }
+        })
+
     }
 
 
@@ -1882,7 +1900,7 @@ export default function AddPurchaseOrder() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>

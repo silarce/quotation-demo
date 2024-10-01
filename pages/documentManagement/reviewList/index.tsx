@@ -66,6 +66,8 @@ export default function ReviewList() {
     const [data4, setData4] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [searchdata3, setSearchdata3] = useState<any[]>([]);
+    const [searchdata4, setSearchdata4] = useState<any[]>([]);
 
     // 變數宣告
     const [reviewtype, setReviewtype] = useState<string>("");
@@ -106,25 +108,39 @@ export default function ReviewList() {
 
 
 
-    //#region 上方功能列
+    //#region =============【上功能列】===============================================================================
+    //搜尋功能
+    const searchTargetList = [
+        {
+            placeholder: '單號',
+        },
+        {
+            placeholder: '主旨',
+        },
+    ];
+    //搜尋功能
+    const doSearch = (valueArr: (string | Toption | null)[]) => {
 
+    };
 
+    // 搜尋功能
+    const searchGroup = {
+        searchTargetList,
+        doSearch: (arr: any) => {
+            const arrkeyword2 = arr[0] as string;
+            const arrkeyword3 = arr[1] as string;
+            const arrkeyword4 = arr[2] as string;
+            setKeyword2(arrkeyword2);
+            setKeyword3(arrkeyword3);
+            setKeyword4(arrkeyword4);
+        },
+    };
     //新增按鈕
     const panelList: TpanelList = [
-        // { searchGroup },
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseOrder`,
-        //             query: {
-        //                 type: 'Tray',
-        //             },
-        //         });
-        //     },
-        // },
+        { searchGroup },
     ];
+
+
     //#endregion
 
 
@@ -162,6 +178,7 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData(data);
+            setSearchdata(data);
             console.log(data);
 
             // 檢查 data 是否有內容
@@ -206,7 +223,7 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData3(data);
-
+            setSearchdata3(data);
             // 檢查 data 是否有內容
             // if (data3.length > 0) {
 
@@ -246,7 +263,7 @@ export default function ReviewList() {
             const data = await response.json();
 
             setData4(data);
-
+            setSearchdata4(data);
             // 檢查 data 是否有內容
             // if (data4.length > 0) {
             //     // console.log(data4[0]);
@@ -465,15 +482,16 @@ export default function ReviewList() {
         const endDate = keywordenddate;
         const requisitionId = keyword2.trim();
         const name = keyword3.trim();
-        const spec = keyword4.trim();
+        // const spec = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if (
             // (!startDate || !startDate.isValid()) &&
             // (!endDate || !endDate.isValid()) &&
             !requisitionId &&
-            !name &&
-            !spec) {
+            !name
+            // && !spec
+        ) {
             setSearchdata(data);
             return;
         }
@@ -492,11 +510,11 @@ export default function ReviewList() {
                 item.name.toString().includes(name)
             );
         }
-        if (spec) {
-            filteredData = filteredData.filter(item =>
-                item.spec && item.spec.toString().includes(spec)
-            );
-        }
+        // if (spec) {
+        //     filteredData = filteredData.filter(item =>
+        //         item.spec && item.spec.toString().includes(spec)
+        //     );
+        // }
 
 
         // setSearchdata(filteredData);
@@ -509,31 +527,73 @@ export default function ReviewList() {
     const isSelectingRef = useRef(false);
     // 監聽條件變更
     useEffect(() => {
-        // filterData();
-        if (isSelectingRef.current) return;
-        let filteredData = searchdata;
+        // alert(keyword2);
+        // 初始化 filteredData 根據 tabnow 的值選擇不同的數據
+        let filteredData = [];
 
+        if (tabnow === "待審核") {
+            filteredData = searchdata;
+        } else if (tabnow === "審核中") {
+            filteredData = searchdata3;
+        } else {
+            filteredData = searchdata4;
+        }
+
+        // 如果正在進行選擇，則返回不繼續篩選
+        if (isSelectingRef.current) return;
+
+        console.log(filteredData);
+
+        // 當 keyword2 和 keyword3 都為空時，恢復原始資料
+        if (!keyword2 && !keyword3) {
+            if (tabnow === "待審核") {
+                setData(searchdata); // 恢復 data
+            } else if (tabnow === "審核中") {
+                setData3(searchdata3); // 恢復 data3
+            } else {
+                setData4(searchdata4); // 恢復 data4
+            }
+            // setFilteredData(filteredData); // 更新已篩選資料
+            return; // 直接結束函數，不需要進行後續篩選
+        }
+
+        // 根據 keyword2 篩選 document_id
         if (keyword2) {
             filteredData = filteredData.filter(item =>
-                item.productid.toString().includes(keyword2.trim())
+                item.document_id.toString().includes(keyword2.trim())
             );
         }
 
+        // 根據 keyword3 篩選 document_title
         if (keyword3) {
-            filteredData = searchdata.filter(item =>
-                item.name.toString().includes(keyword3.trim())
+            filteredData = filteredData.filter(item =>
+                item.document_title.toString().includes(keyword3.trim())
             );
         }
 
-        if (keyword4) {
-            filteredData = searchdata.filter(item =>
-                item.spec && item.spec.toString().includes(keyword4.trim())
-            );
+        // 如果需要，解開這個篩選條件，增加對 keyword4 的處理
+        // if (keyword4) {
+        //     filteredData = filteredData.filter(item =>
+        //         item.spec && item.spec.toString().includes(keyword4.trim())
+        //     );
+        // }
+
+        // 根據 tabnow 更新對應的資料
+        if (tabnow === "待審核") {
+            setData(filteredData);
+        } else if (tabnow === "審核中") {
+            setData3(filteredData);
+        } else {
+            setData4(filteredData);
         }
 
+        // console.log(filteredData);
 
+        // 更新篩選結果
         setFilteredData(filteredData);
-    }, [keyword2, keyword3, keyword4]);
+    }, [keyword2, keyword3]); // 加入 tabnow 依賴，確保切換 tab 時更新資料
+
+
 
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -745,7 +805,7 @@ export default function ReviewList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'簽核清單'} panelList={panelList} />
+            <PageHeader02 tag={'審核清單'} panelList={panelList} />
 
 
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -839,7 +899,6 @@ export default function ReviewList() {
                                 </div>
                                 <div></div>
                                 <div></div>
-                                <div></div>
                             </div>
                             <div className={scss.tabbody}>
                                 <div>
@@ -861,9 +920,9 @@ export default function ReviewList() {
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                                         <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_id}</span>
                                                                         <span>{_item.document_title}</span>
-                                                                        {/* <span>{_item.document_id}</span>
-                                                                        <span>{_item.create_by}</span> */}
+                                                                        <span>{_item.create_by}</span> 
 
                                                                     </div>
                                                                 </CellWithBar>
@@ -892,9 +951,9 @@ export default function ReviewList() {
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                                         <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_id}</span>
                                                                         <span>{_item.document_title}</span>
-                                                                        {/* <span>{_item.document_id}</span>
-                                                                        <span>{_item.create_by}</span> */}
+                                                                        <span>{_item.create_by}</span>
 
                                                                     </div>
                                                                 </CellWithBar>
@@ -923,9 +982,9 @@ export default function ReviewList() {
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                                         <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_id}</span>
                                                                         <span>{_item.document_title}</span>
-                                                                        {/* <span>{_item.document_id}</span>
-                                                                        <span>{_item.create_by}</span> */}
+                                                                        <span>{_item.create_by}</span>
 
                                                                     </div>
                                                                 </CellWithBar>

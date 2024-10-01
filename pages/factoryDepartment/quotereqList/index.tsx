@@ -621,8 +621,22 @@ export default function AddPurchaseOrder() {
     // 送出按鈕
     function handleAdd() {
         // AddPurchaseOrder();
-        AddQuotereq();
-        // }
+        if (suppliernamein === '' || supplieraddressin === '') {
+            myAlert.warning({ title: '請確認欄位是否填寫完整' })
+            return;
+        }
+        myAlert.confirm({
+            title: '確定要新增單據嗎?',
+            content: <>
+                <h1>請檢查資料是否填寫完整</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    AddQuotereq();
+
+                }
+            }
+        })
     }
 
 

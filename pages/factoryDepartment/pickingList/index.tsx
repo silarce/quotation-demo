@@ -1257,9 +1257,9 @@ export default function AddPurchaseRequisition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (nowwhname === "101") ? "https://192.168.1.8/sjwms/" :
-                    (nowwhname === "102") ? "https://192.168.1.9/sjwms/" :
-                        (nowwhname === "103") ? "https://192.168.1.10/sjwms/" : ""
+                (nowwhname === "101") ? `https://${setting.warehouse1}/sjwms/` :
+                    (nowwhname === "102") ? `https://${setting.warehouse2}/sjwms/` :
+                        (nowwhname === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -1333,9 +1333,9 @@ export default function AddPurchaseRequisition() {
             const traynumber = traynamecalled;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whnamecalled === "101") ? "https://192.168.1.8/sjwms/" :
-                    (whnamecalled === "102") ? "https://192.168.1.9/sjwms/" :
-                        (whnamecalled === "103") ? "https://192.168.1.10/sjwms/" : ""
+                (whnamecalled === "101") ? `https://${setting.warehouse1}/sjwms/` :
+                    (whnamecalled === "102") ? `https://${setting.warehouse2}/sjwms/` :
+                        (whnamecalled === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數

@@ -429,8 +429,8 @@ export default function ProdReceiptList() {
             setEntrystatusin(entrystatus as string);
             setPaystatusin(paystatus as string);
             setNotein(note as string);
-            GetReviewById(prodreceiptuuid);//審核
-            GetReviewHistory(prodreceiptid as string);
+            // GetReviewById(prodreceiptuuid);//審核
+            // GetReviewHistory(prodreceiptid as string);
         }
     }, [prodreceiptuuid]);
 
@@ -1478,19 +1478,7 @@ export default function ProdReceiptList() {
                             </div>
                             <div></div>
                             <div>
-                                {/* <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
-                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    結案
-                                </button>
-                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }} title="單據未結">
-                                    <img src={icon_task_open_gray.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    未結
-                                </button>
-                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }} title="單據結案">
-                                    <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    已結
-                                </button> */}
-                                <button
+                                {/*   <button
                                     className={scss.squarebtn}
                                     onClick={() => { handleChoseflow() }}
                                     title="單據送審"
@@ -1542,7 +1530,7 @@ export default function ProdReceiptList() {
                                 <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
-                                </button>
+                                </button> */}
                                 <button style={{ display: `${completeentry != parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
                                     <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     未結
@@ -1758,13 +1746,13 @@ export default function ProdReceiptList() {
                                     </button>
                                 </span>
                                 <span>
-                                    <button
+                                    {/* <button
                                         className={scss.detailminitabbtn}
                                         onClick={() => tabChosed('審核明細')}
                                         style={getButtonStyle('審核明細')}
                                     >
                                         審核明細
-                                    </button>
+                                    </button> */}
                                 </span>
                             </div>
                             <div></div>
@@ -1783,12 +1771,12 @@ export default function ProdReceiptList() {
                                                             <span>
                                                                 <button
                                                                     onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }}
-                                                                    style={{ display: `${(statusin === "已核准" && completeentry < parseInt(totalentry)) ? '' : 'none'}` }}>
+                                                                    style={{ display: `${(completeentry < parseInt(totalentry)) ? '' : 'none'}` }}>
                                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                                                                 </button>
 
                                                                 <button
-                                                                    style={{ display: `${(statusin === "已核准" && completeentry === parseInt(totalentry)) || statusin === "進貨中" || statusin === "已結案" ? '' : 'none'}` }}>
+                                                                    style={{ display: `${(completeentry === parseInt(totalentry)) && statusin === "進貨中" || statusin === "已結案" ? '' : 'none'}` }}>
                                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                                 </button>
 
@@ -1913,11 +1901,11 @@ export default function ProdReceiptList() {
                                     <button className={scss.disabledbtn}>新增入庫</button>
                                 </span> */}
 
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增入庫">
+                                <button style={{ display: `${data2.length > 0 ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleTransfer() }} title="新增入庫">
                                     <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     新增
                                 </button>
-                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="新增入庫">
+                                <button style={{ display: `${data2.length === 0 ? '' : 'none'}` }} className={scss.disablesquarebtn} title="新增入庫">
                                     <img src={icon_add2_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     新增
                                 </button>
