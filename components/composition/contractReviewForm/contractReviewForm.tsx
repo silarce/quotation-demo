@@ -289,7 +289,14 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  const { isReviewer, isManager, isWorkDirector, isCashier, isSalesManager, isSupervisor } = checkIsReviewer({
+  const {
+    isReviewer,
+    isManager,
+    isWorkDirector,
+    isCashier,
+    // isSalesManager,
+    isSupervisor,
+  } = checkIsReviewer({
     userInfo,
     quotationContent,
   });
@@ -425,9 +432,9 @@ function ReviewForm({
       ? (body.reviewWorkDirectorEmployeeId = userId)
       : isCashier
       ? (body.reviewCashierEmployeeId = userId)
-      : isSalesManager
-      ? (body.reviewSalesManagerEmployeeId = userId)
-      : isSupervisor
+      : // : isSalesManager
+      // ? (body.reviewSalesManagerEmployeeId = userId)
+      isSupervisor
       ? (body.reviewSupervisorEmployeeId = userId)
       : null;
 
@@ -575,11 +582,11 @@ function ReviewForm({
         value: workDirector.reviewer?.chName ?? '',
         isReviewed: workDirector.reviewedAt ? true : false,
       },
-      {
-        label: '業務經理',
-        value: salesManager.reviewer?.chName ?? '',
-        isReviewed: salesManager.reviewedAt ? true : false,
-      },
+      // {
+      //   label: '業務經理',
+      //   value: salesManager.reviewer?.chName ?? '',
+      //   isReviewed: salesManager.reviewedAt ? true : false,
+      // },
       {
         label: '業務主管',
         value: supervisor.reviewer?.chName ?? '',
@@ -1771,15 +1778,15 @@ const checkIsReviewer = ({
     reviewCashierEmployee,
     toCashierAt,
 
-    reviewSalesManagerEmployee,
-    salesManagerReviewedAt,
+    // reviewSalesManagerEmployee,
+    // salesManagerReviewedAt,
 
     reviewSupervisorEmployee,
     supervisorReviewedAt,
   } = quotationContent ?? {};
 
   let isSupervisor = reviewSupervisorEmployee && reviewSupervisorEmployee?.id === userInfo?.employee?.id;
-  let isSalesManager = reviewSalesManagerEmployee && reviewSalesManagerEmployee?.id === userInfo?.employee?.id;
+  // let isSalesManager = reviewSalesManagerEmployee && reviewSalesManagerEmployee?.id === userInfo?.employee?.id;
   let isWorkDirector = reviewWorkDirectorEmployee && reviewWorkDirectorEmployee?.id === userInfo?.employee?.id;
   let isCashier = reviewCashierEmployee && reviewCashierEmployee?.id === userInfo?.employee?.id;
   let isManager = reviewManagerEmployee && reviewManagerEmployee?.id === userInfo?.employee?.id;
@@ -1788,31 +1795,33 @@ const checkIsReviewer = ({
 
   if (!supervisorReviewedAt) {
     isSupervisor && (isReviewer = true);
-    isSalesManager = false;
+    // isSalesManager = false;
     isWorkDirector = false;
     isCashier = false;
     isManager = false;
-  } else if (!salesManagerReviewedAt) {
-    isSalesManager && (isReviewer = true);
-    isSupervisor = false;
-    isWorkDirector = false;
-    isCashier = false;
-    isManager = false;
-  } else if (!workDirectorReviewedAt) {
+  }
+  // else if (!salesManagerReviewedAt) {
+  //   isSalesManager && (isReviewer = true);
+  //   isSupervisor = false;
+  //   isWorkDirector = false;
+  //   isCashier = false;
+  //   isManager = false;
+  // }
+  else if (!workDirectorReviewedAt) {
     isWorkDirector && (isReviewer = true);
-    isSalesManager = false;
+    // isSalesManager = false;
     isSupervisor = false;
     isCashier = false;
     isManager = false;
   } else if (toCashierAt) {
     isCashier && (isReviewer = true);
-    isSalesManager = false;
+    // isSalesManager = false;
     isSupervisor = false;
     isWorkDirector = false;
     isManager = false;
   } else if (!managerReviewedAt) {
     isManager && (isReviewer = true);
-    isSalesManager = false;
+    // isSalesManager = false;
     isSupervisor = false;
     isWorkDirector = false;
     isCashier = false;
@@ -1827,7 +1836,7 @@ const checkIsReviewer = ({
     isWorkDirector,
     isCashier,
     isSupervisor,
-    isSalesManager,
+    // isSalesManager,
   };
 };
 
