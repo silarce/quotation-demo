@@ -1117,12 +1117,6 @@ export default function ProductList() {
                                 <div></div>
                                 <div></div>
                             </div>
-                            <div className={scss.head_content1}>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                            </div>
                             <div className={scss.head_foot2}>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1259,7 +1253,7 @@ export default function ProductList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="編號"
+                                            caption="料號"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
@@ -1432,7 +1426,7 @@ export default function ProductList() {
                                         /> */}
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="編號"
+                                            caption="料號"
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1456,7 +1450,7 @@ export default function ProductList() {
                                             disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: addproductname || ' ',
+                                                    value: addproductname || '',
                                                     onChange: (e) => { setAddProductname(e.target.value) }
                                                 },
                                             }}
@@ -1467,7 +1461,7 @@ export default function ProductList() {
                                             disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: addproductspec || ' ',
+                                                    value: addproductspec || '',
                                                     onChange: (e) => { setAddProductspec(e.target.value) }
                                                 },
                                             }}
@@ -1478,7 +1472,7 @@ export default function ProductList() {
                                             disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: addproductunit || ' ',
+                                                    value: addproductunit || '',
                                                     onChange: (e) => { setAddProductunit(e.target.value) }
                                                 },
                                             }}
@@ -1489,7 +1483,7 @@ export default function ProductList() {
                                             disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: addproductmaterial || ' ',
+                                                    value: addproductmaterial || '',
                                                     onChange: (e) => { setAddProductmaterial(e.target.value) }
                                                 },
                                             }}
@@ -1500,7 +1494,7 @@ export default function ProductList() {
                                             disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: addproductsurface || ' ',
+                                                    value: addproductsurface || '',
                                                     onChange: (e) => { setAddProductsurface(e.target.value) }
                                                 },
                                             }}

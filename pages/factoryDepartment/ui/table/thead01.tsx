@@ -452,9 +452,9 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>序</span>
         <span>送審日期</span>
         <span>類別</span>
+        <span>單號</span>
         <span>主旨</span>
-        {/* <span>單號</span>
-        <span>人員</span> */}
+        <span>人員</span> 
         <span></span>
       </div>
     )
@@ -589,6 +589,40 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>審核關卡</span>
         <span>審核人員</span>
         <span>審核意見</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 請購單明細
+  else if (type === "ProdReceiptHistory") {
+    return (
+      <div className={style.thead36}>
+        <span>序</span>
+        <span>進貨單號</span>
+        <span>進貨日期</span>
+        <span>單據狀態</span>
+        <span>單據備註</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 物料明細
+  else if (type === "BomList") {
+    return (
+      <div className={style.thead38}>
+        <span></span>
+        <span>序</span>
+        <span>料號</span>
+        <span>名稱</span>
+        <span>規格</span>
+        <span>材質</span>
+        <span>表面</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>更新日期</span>
+        <span>建立日期</span>
         <span></span>
       </div>
     )
