@@ -40,6 +40,8 @@ import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -789,6 +791,7 @@ export default function AddPurchaseRequisition() {
         let filtered = searchbardata;
         if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
             if (handinputproductuuid) {
+                let filtered = searchbardata;
                 filtered = searchbardata.filter(item =>
                     item.id.includes(handinputproductuuid)
                 );
@@ -931,6 +934,7 @@ export default function AddPurchaseRequisition() {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
         setNote("");
+        setCreate_byin(userInfo?.username || '');
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
         setData2([]);
@@ -1082,12 +1086,70 @@ export default function AddPurchaseRequisition() {
         setNote(item.note);
         setCreate_atin(item.create_at);
         setNeed_date(item.need_date);
+        setCreate_byin(item.create_by);
         getPurchaseRequisitionDetail(item.purchaserequisitionuuid);
     }
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const handleRowClick = (itemId: string) => {
         setSelectedItemId(itemId);
+    };
+
+    const handleDeletePR = async (id: any) => {
+
+        myAlert.confirm({
+            title: '確定要刪除這筆單據嗎?',
+            content: <>
+                <h1>刪除後將無法復原</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            id: id
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/DeletePurchaseRequisition?${queryParams}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const responseData = await response.text();
+
+                        myAlert.success({ title: '刪除成功' });
+
+                        setPurchaserequisitionid('');
+                        setCreate_atin('');
+                        setNeed_date('');
+                        setNote('');
+                        setCreate_byin('');
+                        setStatus('');
+                        setData2([]);
+                        getPurchaseRequisition();
+                        // setKeyword3('');
+
+
+
+                    } catch (error: any) {
+                        setError(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+
+                }
+            }
+        })
     };
 
 
@@ -1140,7 +1202,12 @@ export default function AddPurchaseRequisition() {
                                     取消
                                 </button>
                             </div>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handleDeletePR(purchaserequisitionuuid) }} title="單據刪除">
+                                    <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    刪除
+                                </button>
+                            </div>
                             <div>
                                 <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
@@ -1285,7 +1352,7 @@ export default function AddPurchaseRequisition() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>

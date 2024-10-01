@@ -463,6 +463,7 @@ export default function FlowList() {
     const handleCanceladdflow = () => {
         setStatus("");
         setItems([]);
+        setFlowname("");
     }
 
 
@@ -762,12 +763,15 @@ export default function FlowList() {
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.foot_head1}>
-                                    <div></div>
+                                    <div>
+                                        <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>自訂流程</span>
+                                    </div>
                                     <div></div>
                                     <div></div>
                                 </div>
                                 <div className={scss.foot_head2}>
                                     <div>
+
                                         <InputSel
                                             {...inputSelProps}
                                             caption="名稱"

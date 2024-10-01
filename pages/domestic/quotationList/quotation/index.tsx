@@ -345,8 +345,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // region get Data
 
-  const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
+  const {
+    data: quotationData,
+    update,
+    // updateSingleProd_noRender,
+    // updateAllWholeProd_batch_noRender,
+  } = useGetQuotation_id_2(quotationId as string, {
     preBuiltPopulate: ['simple', 'attached'],
+    // getProductItems: false,
   });
   // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
   const {
@@ -547,25 +553,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     setIsLoading(true);
 
-    let isGetDetailSpecSuccess = true;
+    // let isGetDetailSpecSuccess = true;
 
-    for (const prod of Object.values(productList)) {
-      try {
-        await prod.reqGetDetailSpec();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得細部規格失敗', content: err.message });
-        isGetDetailSpecSuccess = false;
-        setIsLoading(false);
-        break;
-      }
-    }
+    // for (const prod of Object.values(productList)) {
+    //   try {
+    //     await prod.reqGetDetailSpec();
+    //   } catch (error) {
+    //     const err = error as Error;
+    //     myAlert.err({ title: '取得細部規格失敗', content: err.message });
+    //     isGetDetailSpecSuccess = false;
+    //     setIsLoading(false);
+    //     break;
+    //   }
+    // }
 
-    if (!isGetDetailSpecSuccess) {
-      setIsLoading(false);
+    // if (!isGetDetailSpecSuccess) {
+    //   setIsLoading(false);
 
-      return;
-    }
+    //   return;
+    // }
 
     // 總樘數
     let prodQty = 0;
@@ -2113,10 +2119,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
-    if (targetProd) {
-      targetProd.callApiAndGetOptions();
-    }
+    (async () => {
+      if (targetProd) {
+        // if (!targetProd.isComplete && targetProd.id) {
+        //   const wholeProd = await updateSingleProd_noRender(targetProd.id);
+
+        //   if (wholeProd) {
+        //     targetProd.renewWholeProd(targetProd.quotationProductToProd({ quotationProduct: wholeProd }));
+        //   }
+        // }
+
+        targetProd.callApiAndGetOptions();
+      }
+    })();
   }, [targetProd]);
+
+  // 批次更新主產品資料，這個useEffect先不要刪，留著備用
+  // useEffect(() => {
+  //   const stopToken = { stop: false };
+
+  //   updateAllWholeProd_batch_noRender({
+  //     stopToken,
+  //     onBatchSuceess: (wholeProdArr) => {
+  //       wholeProdArr.forEach((wholeProd) => {
+  //         if (wholeProd.id in productList) {
+  //           const prod = productList[wholeProd.id];
+
+  //           if (prod.isComplete) {
+  //             return;
+  //           }
+
+  //           prod.renewWholeProd(prod.quotationProductToProd({ quotationProduct: wholeProd }));
+  //         }
+  //       });
+  //     },
+  //   });
+
+  //   return () => {
+  //     stopToken.stop = true;
+  //   };
+  // }, [quotationData, productList]);
 
   useEffect(() => {
     if (latestContent) {

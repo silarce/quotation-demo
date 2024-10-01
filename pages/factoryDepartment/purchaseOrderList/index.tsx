@@ -97,6 +97,7 @@ export default function PurchaseOrderList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [prdata, setPrdata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -484,6 +485,43 @@ export default function PurchaseOrderList() {
         }
         return status;
     }
+    const GetProdReceiptById = async (purchaseorderid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                purchaseorderid: purchaseorderid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+
+            setPrdata(responsedata);
+
+
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+
+
+
+
 
 
 
@@ -1299,8 +1337,22 @@ export default function PurchaseOrderList() {
     };
 
     const tabChosed = (tabName: string) => {
-        setTabnow(tabName);
-        setTabshow(tabName);
+        switch (tabName) {
+            case "單據明細":
+            case "審核明細":
+                setTabnow(tabName);
+                setTabshow(tabName);
+                break;
+            case "進貨明細":
+                setTabnow(tabName);
+                setTabshow(tabName);
+                GetProdReceiptById(purchaseorderidin);
+                break;
+            default:
+                setTabnow(tabName);
+                setTabshow(tabName);
+                break;
+        }
     };
 
     //#endregion
@@ -1708,6 +1760,15 @@ export default function PurchaseOrderList() {
                                         審核明細
                                     </button>
                                 </span>
+                                <span>
+                                    <button
+                                        className={scss.detailminitabbtn}
+                                        onClick={() => tabChosed('進貨明細')}
+                                        style={getButtonStyle('進貨明細')}
+                                    >
+                                        進貨明細
+                                    </button>
+                                </span>
                             </div>
                             <div></div>
                         </div>
@@ -1824,6 +1885,26 @@ export default function PurchaseOrderList() {
                                                             <span>{_item.current_stage}</span>
                                                             <span>{_item.review_person}</span>
                                                             <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ display: `${tabshow === "進貨明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ProdReceiptHistory'} />
+                                            {prdata && (
+                                                prdata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader19} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.prodreceiptid}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.status}</span>
+                                                            <span>{_item.note}</span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))
