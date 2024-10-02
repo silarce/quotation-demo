@@ -4434,6 +4434,8 @@ class Class_product {
     if (!this.isSpecialProd) {
       this.creSubComList({ isNew: false });
     }
+
+    this.creAcceList();
   }
 
   // updateWholeProd renewWholeProd quotationProductToProd
