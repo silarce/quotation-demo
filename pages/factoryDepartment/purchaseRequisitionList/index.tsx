@@ -1928,7 +1928,7 @@ export default function PurchaseRequisitionList() {
                     <hr />
                     {/* {selectedsupplier} */}
                     <div>
-                        <Thead01 type={'Quotereq'} />
+                        <Thead01 type={'Quotereq2'} />
                         {prquotereqdata && (
                             prquotereqdata.map((_item: any, index: number) => (
                                 <CellWithBar key={index} className={scss.panelHeader17}>
