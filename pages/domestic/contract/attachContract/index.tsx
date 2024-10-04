@@ -260,11 +260,10 @@ export default function AttachContract({
     toSetFileInfo: () => {},
   };
 
-  // taxRate = 0.05;
   const subTotal_ori = attachTotal ?? 0;
-  const subTotal_calced = subTotal_ori;
+  const subTotal_calced = new Decimal(subTotal_ori).add(state_summary.tuneTotal || 0).toNumber();
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
-  const total_calced = subTotal_calced + salesTax_calced;
+  const total_calced = new Decimal(subTotal_calced || 0).add(salesTax_calced || 0).toNumber();
 
   const foreignTotal = String(
     calcNTDToForeignCurrency({
@@ -300,8 +299,20 @@ export default function AttachContract({
       },
       tuneTotal: {
         inputAttr: {
-          disabled: true,
-          value: '',
+          value: state_summary.tuneTotal,
+          placeholder: '範圍正負1000',
+          onChange: (e) => {
+            const value_num = Number(e.target.value);
+
+            if (Math.abs(value_num) > 1000) {
+              return;
+            }
+
+            setState_summary((state) => ({
+              ...state,
+              tuneTotal: e.target.value,
+            }));
+          },
         },
       },
       subTotal: {
@@ -504,7 +515,7 @@ export default function AttachContract({
 
     setState_summary({
       discountRate: discount,
-      tuneTotal,
+      tuneTotal: '',
       subTotal: String(subTotal),
       salesTax: String(salesTax),
       total: String(total),
@@ -982,6 +993,7 @@ const reqModify = async ({
       averageDiscount,
       //
       foreignTotal,
+      tuneTotal: state_summary.tuneTotal || '0',
     };
 
     let isDoorModalNameEmpty = false;

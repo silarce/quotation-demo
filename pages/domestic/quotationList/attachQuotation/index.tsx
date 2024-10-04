@@ -1082,10 +1082,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         inputAttr: {
           disabled: disabled,
           value: state_summary.tuneTotal,
+          placeholder: '範圍正負1000',
           onChange: (e) => {
             const value_num = Number(e.target.value);
 
-            if (Math.abs(value_num) > 10) {
+            if (Math.abs(value_num) > 1000) {
               return;
             }
 
