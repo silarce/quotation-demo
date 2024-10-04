@@ -1020,6 +1020,7 @@ export default function AddPurchaseOrder() {
         // setOriginalInvoicein(invoicein);
         // setOriginalSupplieraddressin(supplieraddressin);
         // setOriginalShippingaddressin(shippingaddressin);
+        setCreate_byin(userInfo?.username as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
@@ -1227,6 +1228,7 @@ export default function AddPurchaseOrder() {
         setSupplieraddressin(item.supplieraddress);
         setShippingaddressin(item.shippingaddress);
         setNeed_date(item.need_date);
+        setCreate_byin(item.create_by);
         // alert(item.need_date);
         getPurchaseOrderDetail(item.purchaseorderuuid);
     }
@@ -1551,7 +1553,7 @@ export default function AddPurchaseOrder() {
                                 >
                                     <img
                                         src={(status === '未儲存' || editmain === true) ? icon_save.src : icon_save_gray.src}
-                                        alt="search"
+                                        alt="save"
                                         style={{ height: '20px', width: '20px' }}
                                     />
                                     儲存
@@ -2539,7 +2541,7 @@ export default function AddPurchaseOrder() {
                     </div>
                     <hr />
                     <div>
-                        <Thead01 type={'Quotereq'} />
+                        <Thead01 type={'Quotereq2'} />
                         {prquotereqdata && (
                             prquotereqdata.map((_item: any, index: number) => (
                                 <CellWithBar key={index} className={scss.panelHeader17}>
