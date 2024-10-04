@@ -730,6 +730,13 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
+
+          ],
+        },
+        {
+          label: '倉儲管理',
+          erpFeature: devPass,
+          list: [
             {
               label: '領料管理',
               path: path01 + '/pickingList',
@@ -747,36 +754,6 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
-          ],
-        },
-        {
-          label: '倉儲管理',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '儲位管理',
-              path: path01 + '/wareHouseList',
-              activeChecker: ({ router }) => {
-                const { pathname, query } = router;
-
-                if (pathname === '/factoryDepartment/trayList') {
-                  return true;
-                } else if (pathname === '/factoryDepartment/addTray') {
-                  return true;
-                } else if (pathname === '/factoryDepartment/wareHouseList') {
-                  return true;
-                } else if (pathname === '/factoryDepartment/editWHPosition') {
-                  return true;
-                }
-
-                return false;
-              },
-              query: {
-                type: 'WareHouse',
-              },
-              erpFeature: [fac],
-            },
-
             {
               label: '入庫管理',
               path: path01 + '/prodEntryList',
@@ -802,14 +779,37 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
-            // {
-            //   label: 'BOM維護',
-            //   path: path01 + '/bomList',
-            //   query: {
-            //     type: 'bomList',
-            //   },
-            //   erpFeature: [fac],
-            // },
+            {
+              label: 'BOM維護',
+              path: path01 + '/bomList',
+              query: {
+                type: 'bomList',
+              },
+              erpFeature: [fac],
+            },
+            {
+              label: '儲位管理',
+              path: path01 + '/wareHouseList',
+              activeChecker: ({ router }) => {
+                const { pathname, query } = router;
+
+                if (pathname === '/factoryDepartment/trayList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/addTray') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/wareHouseList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/editWHPosition') {
+                  return true;
+                }
+
+                return false;
+              },
+              query: {
+                type: 'WareHouse',
+              },
+              erpFeature: [fac],
+            },
           ],
         },
       ],

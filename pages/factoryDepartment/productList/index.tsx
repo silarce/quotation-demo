@@ -1039,6 +1039,23 @@ export default function ProductList() {
                         setKeyword3('');
                         setKeyword4('');
 
+
+                        setType1SelectedOption('');
+                        setType1SelectedValue('');
+                        setType2SelectedOption('');
+                        setType2SelectedValue('');
+                        setType4SelectedOption('');
+                        setType4SelectedValue('');
+                        setType5SelectedOption('');
+                        setType5SelectedValue('');
+
+                        setAddProductid('');
+                        setAddProductname('');
+                        setAddProductspec('');
+                        setAddProductunit('');
+                        setAddProductmaterial('');
+                        setAddProductsurface('');
+
                         // 更新狀態或執行其他操作
                         console.log(result);
                     } catch (error: any) {
@@ -1063,6 +1080,16 @@ export default function ProductList() {
                     setAddProductunit('');
                     setAddProductmaterial('');
                     setAddProductsurface('');
+
+                    setType1SelectedOption('');
+                    setType1SelectedValue('');
+                    setType2SelectedOption('');
+                    setType2SelectedValue('');
+                    setType3InputedValue('');
+                    setType4SelectedOption('');
+                    setType4SelectedValue('');
+                    setType5SelectedOption('');
+                    setType5SelectedValue('');
                 }
             }
         });
@@ -1088,22 +1115,79 @@ export default function ProductList() {
     const [type1selectedvalue, setType1SelectedValue] = useState('');
     const [type2selectedOption, setType2SelectedOption] = useState('門型');
     const [type2selectedvalue, setType2SelectedValue] = useState('');
+    const [type3inputedvalue, setType3InputedValue] = useState('');
+    const [type4selectedOption, setType4SelectedOption] = useState('材質');
+    const [type4selectedvalue, setType4SelectedValue] = useState('');
+    const [type5selectedOption, setType5SelectedOption] = useState('表面');
+    const [type5selectedvalue, setType5SelectedValue] = useState('');
     const handelSetProductid = async (type: any, e: any) => {
+
         switch (type) {
             case 'type1':
+                e.target.blur(); // 讓 select 失去焦點
                 setType1SelectedOption(e.target.value);
                 setType1SelectedValue(e.target.value);
-                setAddProductid(addproductid + e.target.value);
+                // setAddProductid(addproductid + e.target.value);
+                // setAddProductid(addproductid + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
                 break;
             case 'type2':
+                e.target.blur(); // 讓 select 失去焦點
                 setType2SelectedOption(e.target.value);
                 setType2SelectedValue(e.target.value);
+                // setAddProductid(addproductid + type1selectedvalue  + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+                break;
+            case 'type3':
+                setType3InputedValue(e.target.value);
+                // setAddProductid(addproductid + type1selectedvalue  + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+                break;
+            case 'type4':
+                e.target.blur(); // 讓 select 失去焦點
+                setType4SelectedOption(e.target.value);
+                setType4SelectedValue(e.target.value);
+                // setAddProductid(addproductid + type1selectedvalue  + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+                break;
+            case 'type5':
+                e.target.blur(); // 讓 select 失去焦點
+                setType5SelectedOption(e.target.value);
+                setType5SelectedValue(e.target.value);
+                // setAddProductid(addproductid + type1selectedvalue  + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
                 break;
             default:
                 // 如果需要處理其他類型，可以在這裡加上
                 break;
         }
     }
+    useEffect(() => {
+        // 更新 addproductid，基於最新的 state
+        setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+    }, [type1selectedvalue, type2selectedvalue, type3inputedvalue, type4selectedvalue, type5selectedvalue]);
+
+
+    const exampledata = [
+        { company: 'SJ', category: 'S', subCategory: 'BT', serial: '00001', material: '01', surface: '2B', productid: '', name: '50*50*3t 不銹鋼#304底座角鐵' },
+    ];
+
+
+    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // 取得使用者輸入，去掉前面的 "SJ" 部分，只保留後面的部分
+        const inputValue = e.target.value;
+
+        // 確保 "SJ" 之前的部分不會被刪除，並且只更新 "SJ" 之後的部分
+        const newValue = inputValue.slice(2);  // 只取使用者修改的部分，去掉 "SJ"
+        setAddProductid("SJ" + newValue);      // 始終將 "SJ" 作為開頭
+        if (addproductid === "SJ") {
+
+            setType1SelectedOption('');
+            setType1SelectedValue('');
+            setType2SelectedOption('');
+            setType2SelectedValue('');
+            setType3InputedValue('');
+            setType4SelectedOption('');
+            setType4SelectedValue('');
+            setType5SelectedOption('');
+            setType5SelectedValue('');
+        }
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1358,8 +1442,6 @@ export default function ProductList() {
                                                 },
                                             }}
                                         />
-                                    </div>
-                                    <div style={{ borderLeft: '1px solid #c1c1c1', padding: '0px 10px' }}>
                                         <InputSel
                                             {...inputSelProps}
                                             caption="庫存數量"
@@ -1371,8 +1453,7 @@ export default function ProductList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
-                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <div style={{ borderLeft: '1px solid #c1c1c1', backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                         <InputSel
                                             {...inputSelProps}
                                             caption="更新時間"
@@ -1434,18 +1515,124 @@ export default function ProductList() {
                                     </button>
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
+                                    <div>
+                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>類別</span> */}
+                                        <select value={type1selectedOption}
+                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
+                                            onChange={(e) => { handelSetProductid("type1", e) }}>
+                                            <option value=''>選擇類別</option>
+                                            <option value="P">成品(P)</option>
+                                            <option value="C">組件(C)</option>
+                                            <option value="S">半成品(S)</option>
+                                            <option value="R">原料(R)</option>
+                                            <option value="M">物料(M)</option>
+                                        </select>
+
+                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>細分</span> */}
+                                        <select value={type2selectedOption}
+                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
+                                            onChange={(e) => { handelSetProductid("type2", e) }}>
+                                            <option value=''>選擇細分</option>
+                                            <option value="DM">門型(DM)</option>
+                                            <option value="SP">支板(SP)</option>
+                                            <option value="SC">螺絲(帽)(SC)</option>
+                                            <option value="WS">華司(WS)</option>
+                                            <option value="DP">門片(DP)</option>
+                                            <option value="SA">捲軸(SA)</option>
+                                            <option value="GE">齒輪組(GE)</option>
+                                            <option value="CO">鋼捲(CO)</option>
+                                            <option value="BT">底座(BT)</option>
+                                            <option value="RB">捲箱(RB)</option>
+                                            <option value="OT">其他(OT)</option>
+                                            <option value="TB">法蘭片(TB)</option>
+                                            <option value="GR">門軌(GR)</option>
+                                            <option value="SB">鋼板(SB)</option>
+                                            <option value="BR">軸承(BR)</option>
+                                            <option value="BF">底框(BF)</option>
+                                            <option value="PI">中柱(PI)</option>
+                                            <option value="DF">門框(DF)</option>
+                                            <option value="HI">鉸鏈(HI)</option>
+                                            <option value="HA">把手(HA)</option>
+                                            <option value="MO">馬達(MO)</option>
+                                            <option value="MT">金屬管(MT)</option>
+                                            <option value="ST">蛇管(ST)</option>
+                                            <option value="OP">油管(OP)</option>
+                                            <option value="AI">角鐵(AI)</option>
+                                            <option value="RO">棒材(RO)</option>
+                                            <option value="FI">扁鐵(FI)</option>
+                                            <option value="SS">型鋼(SS)</option>
+                                            <option value="AX">心軸(AX)</option>
+                                            <option value="CH">鍊條(CH)</option>
+                                            <option value="RE">減速機(RE)</option>
+                                            <option value="AS">膠條(AS)</option>
+                                            <option value="LO">鎖類(LO)</option>
+                                            <option value="CA">塗料(CA)</option>
+                                            <option value="SE">集合工單用(SE)</option>
+                                        </select>
+                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>序號</span> */}
+                                        <input style={{ color: "#14256a", fontSize: '15px', width: '120px', borderBottom: '1px solid #c1c1c1', margin: '0px 0px' }} placeholder='輸入序號'
+                                            value={type3inputedvalue} onChange={(e) => { handelSetProductid("type3", e) }} />
+
+                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>材質</span> */}
+                                        <select value={type4selectedOption}
+                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
+                                            onChange={(e) => { handelSetProductid("type4", e) }}>
+                                            <option value=''>選擇材質</option>
+                                            <option value="00">無(00)</option>
+                                            <option value="01">鍍鋅(01)</option>
+                                            <option value="02">不鏽鋼#304(02)</option>
+                                            <option value="03">不鏽鋼#316(03)</option>
+                                            <option value="04">樹脂鋼板(04)</option>
+                                            <option value="05">鋁合金 T5(05)</option>
+                                            <option value="06">合金鋼(06)</option>
+                                            <option value="07">尼龍(07)</option>
+                                            <option value="08">木頭(08)</option>
+                                            <option value="09">塑膠(09)</option>
+                                            <option value="10">橡膠(10)</option>
+                                            <option value="11">塑鋼(11)</option>
+                                            <option value="12">鋼(12)</option>
+                                            <option value="13">鍍五彩(13)</option>
+                                            <option value="14">銅(14)</option>
+                                            <option value="15">高耐鍍鋅(15)</option>
+                                            <option value="16">內外不鏽鋼管(16)</option>
+                                            <option value="17">內鋅管外不鏽鋼管(17)</option>
+                                            <option value="18">內鋅丸外不鏽鋼管(18)</option>
+                                            <option value="19">不鏽鋼管(19)</option>
+                                            <option value="20">黑鐵(20)</option>
+                                            <option value="21">熱浸鍍鋅(21)</option>
+                                            <option value="22">不鏽鋼#201(22)</option>
+                                            <option value="23">SS41(一般構造用鋼材)(23)</option>
+                                            <option value="24">ST不鏽鋼(24)</option>
+                                            <option value="25">SS400低碳鋼(25)</option>
+                                            <option value="26">鋁(26)</option>
+                                            <option value="27">PVC(27)</option>
+                                            <option value="28">PU(28)</option>
+                                            <option value="29">S45C中碳鋼(29)</option>
+                                        </select>
+                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>表面</span> */}
+                                        <select value={type5selectedOption}
+                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
+                                            onChange={(e) => { handelSetProductid("type5", e) }}>
+                                            <option value=''>選擇表面</option>
+                                            <option value="00">無(00)</option>
+                                            <option value="01">烤漆(01)</option>
+                                            <option value="BA">BA(BA)</option>
+                                            <option value="HL">HL(HL)</option>
+                                            <option value="2B">2B(2B)</option>
+                                            <option value="N4">NO.4(N4)</option>
+                                            <option value="02">鋅花(02)</option>
+                                            <option value="MI">鏡面(MI)</option>
+                                            <option value="N1">NO.1(N1)</option>
+                                            <option value="03">熱浸鍍鋅花紋(03)</option>
+                                            <option value="FL">氟碳烤漆(FL)</option>
+                                            <option value="04">PVC烤漆(04)</option>
+                                            <option value="05">噴砂(05)</option>
+                                            <option value="06">噴砂+底漆(06)</option>
+                                        </select></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.foot_head1_1}>
                                     <div >
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="物料編號"
-                                            disabled={false}
-                                            inputProps={{
-                                                props: {
-                                                    value: addproductid || ' ',
-                                                    onChange: (e) => { setAddProductid(e.target.value) }
-                                                },
-                                            }}
-                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="料號"
@@ -1453,7 +1640,7 @@ export default function ProductList() {
                                             inputProps={{
                                                 props: {
                                                     value: addproductid,
-                                                    onChange: (e) => setAddProductid(e.target.value),
+                                                    onChange: (e) => handleProductidChange(e),
                                                 },
                                             }}
                                         />
@@ -1461,8 +1648,6 @@ export default function ProductList() {
                                     <div>
                                         {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>物料編號已存在！</p>}
                                     </div>
-                                    <div></div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.foot_head2}>
                                     <div>
@@ -1523,59 +1708,36 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div style={{ borderLeft: '1px solid #c1c1c1', padding: '0px 10px' }}>
-                                        <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>類別</span>
-                                        <select value={type1selectedOption}
-                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
-                                            onChange={(e) => { handelSetProductid("type1", e) }}>
-                                            <option value="P">成品</option>
-                                            <option value="C">組件</option>
-                                            <option value="S">半成品</option>
-                                            <option value="R">原料</option>
-                                            <option value="M">物料</option>
-                                        </select>
-                                        <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>細分</span>
-                                        <select value={type2selectedOption}
-                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
-                                            onChange={(e) => { handelSetProductid("type2", e) }}>
-                                            <option value="DM">門型</option>
-                                            <option value="SP">支板</option>
-                                            <option value="SC">螺絲(帽)</option>
-                                            <option value="WS">華司</option>
-                                            <option value="DP">門片</option>
-                                            <option value="SA">捲軸</option>
-                                            <option value="GE">齒輪組</option>
-                                            <option value="CO">鋼捲</option>
-                                            <option value="BT">底座</option>
-                                            <option value="RB">捲箱</option>
-                                            <option value="OT">其他</option>
-                                            <option value="TB">法蘭片</option>
-                                            <option value="GR">門軌</option>
-                                            <option value="SB">鋼板</option>
-                                            <option value="BR">軸承</option>
-                                            <option value="BF">底框</option>
-                                            <option value="PI">中柱</option>
-                                            <option value="DF">門框</option>
-                                            <option value="HI">鉸鏈</option>
-                                            <option value="HA">把手</option>
-                                            <option value="MO">馬達</option>
-                                            <option value="MT">金屬管</option>
-                                            <option value="ST">蛇管</option>
-                                            <option value="OP">油管</option>
-                                            <option value="AI">角鐵</option>
-                                            <option value="RO">棒材</option>
-                                            <option value="FI">扁鐵</option>
-                                            <option value="SS">型鋼</option>
-                                            <option value="AX">心軸</option>
-                                            <option value="CH">鍊條</option>
-                                            <option value="RE">減速機</option>
-                                            <option value="AS">膠條</option>
-                                            <option value="LO">鎖類</option>
-                                            <option value="CA">塗料</option>
-                                            <option value="SE">集合工單用</option>
-                                        </select>
-
+                                        <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>編碼範例</span>
+                                        <table style={{ width: '100%', textAlign: 'left' }}>
+                                            <thead>
+                                                <tr>
+                                                    <th>公司別</th>
+                                                    <th>類別</th>
+                                                    <th>細分類</th>
+                                                    <th>序號</th>
+                                                    <th>材質</th>
+                                                    <th>表面</th>
+                                                    <th>料號</th>
+                                                    <th>名稱</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {exampledata.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td>{item.company}</td>
+                                                        <td>{item.category}</td>
+                                                        <td>{item.subCategory}</td>
+                                                        <td>{item.serial}</td>
+                                                        <td>{item.material}</td>
+                                                        <td>{item.surface}</td>
+                                                        <td>{item.company}{item.category}{item.subCategory}{item.serial}{item.material}{item.surface}</td>
+                                                        <td>{item.name}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <div></div>
                                     <div></div>
                                 </div>
                                 <br />
