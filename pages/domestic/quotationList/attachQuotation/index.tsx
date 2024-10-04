@@ -1490,7 +1490,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [productList]);
 
   useEffect(() => {
-    if (!theContent) {
+    if (!theContent || !disabled) {
       return;
     }
 
@@ -1527,7 +1527,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       foreignTotal: foreignTotal || '',
       currency,
     });
-  }, [theContent]);
+  }, [theContent, disabled]);
 
   useEffect(() => {
     // 進入page後會自動計算attachTotal
@@ -1550,7 +1550,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         subTotal,
         salesTax,
         total,
-        foreignTotal: foreignTotal,
+        foreignTotal,
       };
     });
   }, [
