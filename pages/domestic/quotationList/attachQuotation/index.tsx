@@ -708,7 +708,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       validityPeriod: state_profile.validityPeriod ?? '',
       //
       customerId: state_customer?.id ?? '',
-      designUnitId: state_designUnit?.id ?? '',
+      designUnitId: state_designUnit?.id || null,
       //
       projectName: state_profile.projectName ?? '',
       county: state_profile.county ?? '',
@@ -1185,35 +1185,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     exchangeRate: {
       value: state_summary.exchangeRate,
-      onChange: (v) => {
-        setState_summary((state) => {
-          const copy = { ...state };
-          copy.exchangeRate = v;
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.exchangeRate = v;
 
-          const total_num = copy.total.replaceAll(',', '') as `${number}`;
+      //     const total_num = copy.total.replaceAll(',', '') as `${number}`;
 
-          copy.foreignTotal = calcNTDToForeignCurrency({
-            NTD: total_num,
-            foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
-          }).toLocaleString();
+      //     copy.foreignTotal = calcNTDToForeignCurrency({
+      //       NTD: total_num,
+      //       foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+      //     }).toLocaleString();
 
-          return copy;
-        });
-      },
+      //     return copy;
+      //   });
+      // },
     },
     foreignTotal: {
       value: state_summary.foreignTotal,
     },
     currency: {
       value: state_summary.currency,
-      onChange: (v) => {
-        setState_summary((state) => {
-          const copy = { ...state };
-          copy.currency = v;
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.currency = v;
 
-          return copy;
-        });
-      },
+      //     return copy;
+      //   });
+      // },
     },
   };
 
