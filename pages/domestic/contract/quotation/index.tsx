@@ -95,6 +95,8 @@ import { useProductList } from 'hooks/quotation/useProduct';
 import type { TquotationContractDto, TquotationContentDto } from 'js/api/api_quotation';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
+
 // =============================================================
 
 // region TYPE
@@ -223,6 +225,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {};
     }
 
+    const currency = cutCurrency(contract?.currency) || '';
+    const exchangeRate = contract?.exchangeRate || '';
+
     let subContracts = contract.subContracts.filter((item) => {
       if (version === '1') {
         return true;
@@ -249,17 +254,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
     let subTotal = new Decimal(0);
     let salesTax = new Decimal(0);
     let total = new Decimal(0);
+    let foreignTotal = new Decimal(0);
 
     subContracts.forEach((item) => {
       subTotal = subTotal.plus(item.subTotal);
       salesTax = salesTax.plus(item.salesTax);
       total = total.plus(item.total);
+      foreignTotal = foreignTotal.plus(item.foreignTotal || 0);
     });
 
     const totalInfo = {
       subTotal: subTotal.toNumber(),
       salesTax: salesTax.toNumber(),
       total: total.toNumber(),
+      foreignTotal: foreignTotal.toNumber().toLocaleString(),
+      currency,
+      exchangeRate,
     };
 
     return {
@@ -615,22 +625,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
       addMethod: () => {},
     },
     exchangeRate: {
-      // 不確定TquotationContractDto下會不會有exchangeRate
-      // 若有，從totalInfo下手
-      // FIXME exchangeRate
-      value: '',
-      onChange: (v) => {},
+      value: totalInfo?.exchangeRate ?? '',
     },
     foreignTotal: {
-      // 不確定TquotationContractDto下會不會有usd
-      // 若有，從totalInfo下手
-      // value: state_summary.usd,
-      // FIXME usd
-      value: '---',
+      value: totalInfo?.foreignTotal ?? '',
     },
     currency: {
-      // FIXME currency
-      value: '---' as 'TWD 新臺幣',
+      value: (totalInfo?.currency ?? '') as Tcurrency,
     },
   };
 
