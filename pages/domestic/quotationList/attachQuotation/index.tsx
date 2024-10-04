@@ -1338,12 +1338,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
   const panel_noEditable: TpanelList = [
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出報價單',
       img: iconUpload.src,
       onClick: () => setPdfModalVisible(true),
     },
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出材料/配件',
       img: iconUpload.src,
@@ -1351,6 +1353,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     isAllReviewedBeforePending && quotationId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'redButton',
           label: '轉為準合約',
           onClick: () => {
@@ -1367,6 +1370,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     (!!isReviewer || null) && {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '審核',
       onClick: () => setReviewModalShow(true),
@@ -1374,6 +1378,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     quotationId && !contentId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '送審',
           onClick: () => {
@@ -1408,7 +1413,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     (() => {
       if (status === 'Pending') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+        return {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '合約審核表',
+          onClick: () => setReviewFormShow(true),
+        };
       } else {
         return null;
       }
@@ -1416,6 +1426,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     status === 'Pending'
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '解除鎖定',
           img: iconRedLock.src,
@@ -1434,9 +1445,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // 有contentId就會取用content，就不應該編輯
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !contentId
+      ? {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '編輯',
+          onClick: () => setDisabled(false),
+        }
+      : null,
 
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    {
+      className: classNames(style.panelListBtn, style.plus),
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
   ];
 
   const panelList = (() => {
