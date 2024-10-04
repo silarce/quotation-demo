@@ -339,17 +339,33 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   }
   //#endregion
   //#region 詢價單明細
+  // else if (type === "Quotereq2") {
+  //   return (
+  //     <div className={style.thead23}>
+  //       <span>序</span>
+  //       <span>供應商</span>
+  //       <span>單價</span>
+  //       <span>總價</span>
+  //       <span>單位</span>
+  //       <span>出貨日</span>
+  //       <span>備註</span>
+  //       <span>得標</span>
+  //       <span></span>
+  //     </div>
+  //   )
+  // }
   else if (type === "Quotereq2") {
     return (
       <div className={style.thead23}>
         <span>序</span>
         <span>供應商</span>
-        <span>單價</span>
-        <span>總價</span>
-        <span>單位</span>
-        <span>出貨日</span>
-        <span>備註</span>
-        <span>得標</span>
+        <span>詢價日期</span>
+        <span>數量</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
+        <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
+        <span>單號</span>
+        <span>選擇</span>
         <span></span>
       </div>
     )

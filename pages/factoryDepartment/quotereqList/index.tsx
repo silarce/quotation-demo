@@ -43,6 +43,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_history from 'public/image/icon/fc_history.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -179,12 +181,25 @@ export default function AddPurchaseOrder() {
     const [editmain, setEditmain] = useState<boolean>(false);
 
     // 保存原始值
-    const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
-    const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
-    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
     const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
+    const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
+    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
     const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
-    const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
+    const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
+
+    const [originalSupplier2namein, setOriginalSupplier2namein] = useState(suppliername2in);
+    const [originalSupplier2phonein, setOriginalSupplier2phonein] = useState(supplierphone2in);
+    const [originalSupplier2taxidin, setOriginalSupplier2taxidin] = useState(suppliertaxid2in);
+    const [originalSupplier2addressin, setOriginalSupplier2addressin] = useState(supplieraddress2in);
+
+    const [originalSupplier3namein, setOriginalSupplier3namein] = useState(suppliername3in);
+    const [originalSupplier3phonein, setOriginalSupplier3phonein] = useState(supplierphone3in);
+    const [originalSupplier3taxidin, setOriginalSupplier3taxidin] = useState(suppliertaxid3in);
+    const [originalSupplier3addressin, setOriginalSupplier3addressin] = useState(supplieraddress3in);
+
+    const [originalcreate_atin, setOriginalcreate_atin] = useState<string>("");
+
+    const [originalnote, setOriginalnote] = useState<string>("");
 
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
@@ -467,77 +482,148 @@ export default function AddPurchaseOrder() {
 
     //詢價單申請
     const AddQuotereq = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                create_at: create_atin,
-                need_date: moment(need_date).format('YYYY-MM-DD'),
-                create_by: create_byin,
-                note: note,
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                shippingaddress: shippingaddressin,
-                suppliername2: suppliername2in,
-                supplierphone2: supplierphone2in,
-                suppliertaxid2: suppliertaxid2in,
-                supplieraddress2: supplieraddress2in,
-                suppliername3: suppliername3in,
-                supplierphone3: supplierphone3in,
-                suppliertaxid3: suppliertaxid3in,
-                supplieraddress3: supplieraddress3in,
+        if (editmain === true) {
+            try {
+                setIsLoading(true);
+                const conditionModel = {
+                    quoterequuid:quoterequuid,
+                    create_at: create_atin,
+                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    create_by: create_byin,
+                    note: note,
+                    suppliername: suppliernamein,
+                    supplierphone: supplierphonein,
+                    suppliertaxid: suppliertaxidin,
+                    supplieraddress: supplieraddressin,
+                    shippingaddress: shippingaddressin,
+                    suppliername2: suppliername2in,
+                    supplierphone2: supplierphone2in,
+                    suppliertaxid2: suppliertaxid2in,
+                    supplieraddress2: supplieraddress2in,
+                    suppliername3: suppliername3in,
+                    supplierphone3: supplierphone3in,
+                    suppliertaxid3: suppliertaxid3in,
+                    supplieraddress3: supplieraddress3in,
 
-            };
+                };
 
 
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
 
-            console.log(JSON.stringify(conditionModel));
+                console.log(JSON.stringify(conditionModel));
 
-            const response = await fetch(`${setting.apipath}/WareHouse/AddQuotereq`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateAddQuotereq`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                myAlert.success({ title: '更新成功' })
+
+                getQuotereq();
+                getQuotereqDetail(quoterequuid);
+                setEditmain(false);
+
+
+                setStatus("未結案");
+                console.log(data);
+
+                // getProduct();
+
+                // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+            } catch (error: any) {
+                setError(error.message);
             }
-            const data = await response.json();
-            myAlert.info(
-                {
-                    title: '單據新增成功',
-                    content: `詢價單據號碼為:${data[0].quotereqid}`
-                })
+            finally {
+                setIsLoading(false);
+            }
 
-            setData2([]);
-            setQuotereqid(data[0].quotereqid);
-            setQuoterequuid(data[0].id);
-            setStatus("未結案");
-            getQuotereq();
+        } else {
+            try {
+                setIsLoading(true);
+                const conditionModel = {
+                    create_at: create_atin,
+                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    create_by: create_byin,
+                    note: note,
+                    suppliername: suppliernamein,
+                    supplierphone: supplierphonein,
+                    suppliertaxid: suppliertaxidin,
+                    supplieraddress: supplieraddressin,
+                    shippingaddress: shippingaddressin,
+                    suppliername2: suppliername2in,
+                    supplierphone2: supplierphone2in,
+                    suppliertaxid2: suppliertaxid2in,
+                    supplieraddress2: supplieraddress2in,
+                    suppliername3: suppliername3in,
+                    supplierphone3: supplierphone3in,
+                    suppliertaxid3: suppliertaxid3in,
+                    supplieraddress3: supplieraddress3in,
+
+                };
 
 
-            setStatus("未結案");
-            console.log(data);
 
-            // getProduct();
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
 
-            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+                console.log(JSON.stringify(conditionModel));
 
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
+                const response = await fetch(`${setting.apipath}/WareHouse/AddQuotereq`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                myAlert.info(
+                    {
+                        title: '單據新增成功',
+                        content: `詢價單據號碼為:${data[0].quotereqid}`
+                    })
+
+                setData2([]);
+                setQuotereqid(data[0].quotereqid);
+                setQuoterequuid(data[0].id);
+                setStatus("未結案");
+                getQuotereq();
+
+
+                setStatus("未結案");
+                console.log(data);
+
+                // getProduct();
+
+                // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+            } catch (error: any) {
+                setError(error.message);
+            }
+            finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -1003,6 +1089,7 @@ export default function AddPurchaseOrder() {
         // setOriginalInvoicein(invoicein);
         // setOriginalSupplieraddressin(supplieraddressin);
         // setOriginalShippingaddressin(shippingaddressin);
+        setCreate_byin(userInfo?.username as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
@@ -1026,24 +1113,45 @@ export default function AddPurchaseOrder() {
     }
 
     const handlecancelAddPR = () => {
-        // setSuppliernamein(originalSuppliernamein);
-        // setSupplierphonein(originalSupplierphonein);
-        // setSuppliertaxidin(originalSuppliertaxidin);
-        // setInvoicein(originalInvoicein);
-        // setSupplieraddressin(originalSupplieraddressin);
-        // setShippingaddressin(originalShippingaddressin);
-        setSuppliernamein("");
-        setSupplierphonein("");
-        setSuppliertaxidin("");
-        setInvoicein("");
-        setSupplieraddressin("");
-        setShippingaddressin("");
-        setEditmain(false);
-        setQuotereqid("");
-        setStatus("");
-        setData2([]);
-        setNote("");
-        setNeed_date(moment().toString());
+
+        if (editmain === true) {
+            setEditmain(false);
+            setInvoicein(originalInvoicein);
+
+            setSuppliernamein(originalSuppliernamein);
+            setSupplierphonein(originalSupplierphonein);
+            setSuppliertaxidin(originalSuppliertaxidin);
+            setSupplieraddressin(originalSupplieraddressin);
+
+            setSuppliername2in(originalSupplier2namein);
+            setSupplierphone2in(originalSupplier2phonein);
+            setSuppliertaxid2in(originalSupplier2taxidin);
+            setSupplieraddress2in(originalSupplier2addressin);
+
+            setSuppliername3in(originalSupplier3namein);
+            setSupplierphone3in(originalSupplier3phonein);
+            setSuppliertaxid3in(originalSupplier3taxidin);
+            setSupplieraddress3in(originalSupplier3addressin);
+
+            setCreate_atin(originalcreate_atin);
+            setNote(originalnote);
+
+        }
+        else {
+
+            setSuppliernamein("");
+            setSupplierphonein("");
+            setSuppliertaxidin("");
+            setInvoicein("");
+            setSupplieraddressin("");
+            setShippingaddressin("");
+            setEditmain(false);
+            setQuotereqid("");
+            setStatus("");
+            setData2([]);
+            setNote("");
+            setNeed_date(moment().toString());
+        }
     }
 
     const handlesaveAddPRDetail = () => {
@@ -1840,6 +1948,34 @@ export default function AddPurchaseOrder() {
 
     }
 
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalInvoicein(invoicein);
+
+        setOriginalSuppliernamein(suppliernamein);
+        setOriginalSupplierphonein(supplierphonein);
+        setOriginalSuppliertaxidin(suppliertaxidin);
+        setOriginalSupplieraddressin(supplieraddressin);
+
+        setOriginalSupplier2namein(suppliername2in);
+        setOriginalSupplier2phonein(supplierphone2in);
+        setOriginalSupplier2taxidin(suppliertaxid2in);
+        setOriginalSupplier2addressin(supplieraddress2in);
+
+        setOriginalSupplier3namein(suppliername3in);
+        setOriginalSupplier3phonein(supplierphone3in);
+        setOriginalSupplier3taxidin(suppliertaxid3in);
+        setOriginalSupplier3addressin(supplieraddress3in);
+        
+
+
+        setOriginalcreate_atin(create_atin);
+        setOriginalnote(note);
+
+        
+        setEditmain(true);
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             <PageHeader02 tag='詢價單' panelList={panelList} />
@@ -1870,26 +2006,41 @@ export default function AddPurchaseOrder() {
                                 </button>
                                 &nbsp;
                                 <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    style={{ display: `${status === "未結案" && !editmain ? '' : 'none'}` }}
+                                    className={scss.squarebtn}
+                                    onClick={handleEdit}>
+                                    <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+
+                                <button
+                                    style={{ display: `${(status === "未儲存" || status === "" || editmain) ? '' : 'none'}` }}
+                                    className={scss.disablesquarebtn} >
+                                    <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+                                &nbsp;
+                                <button
+                                    className={(status === '未儲存' || editmain === true) ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { handleAdd() }}
-                                    title="儲存新增"
-                                    disabled={status !== '未儲存'}
+                                    title="儲存"
+                                    disabled={(status !== '未儲存' && editmain !== true)}
                                 >
                                     <img
-                                        src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
-                                        alt="search"
+                                        src={(status === '未儲存' || editmain === true) ? icon_save.src : icon_save_gray.src}
+                                        alt="save"
                                         style={{ height: '20px', width: '20px' }}
                                     />
                                     儲存
                                 </button>
                                 &nbsp;
                                 <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    className={(status === '未儲存' || editmain === true) ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { handlecancelAddPR() }}
-                                    title="取消新增"
-                                    disabled={status !== '未儲存'}
+                                    title="取消"
+                                    disabled={status !== '未儲存' && editmain !== true}
                                 >
-                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={(status === '未儲存' || editmain === true) ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     取消
                                 </button>
                             </div>
@@ -1902,7 +2053,7 @@ export default function AddPurchaseOrder() {
                             <div>
                                 <button style={{ display: `${status === "未結案" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據送出">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    送出
+                                    結案
                                 </button>
                             </div>
                         </div>
@@ -1925,7 +2076,7 @@ export default function AddPurchaseOrder() {
                                         <InputSel
                                             caption="詢價日期"
                                             className="global_tip_must"
-                                            disabled={status === "未儲存" ? false : true}
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
@@ -1955,7 +2106,7 @@ export default function AddPurchaseOrder() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={status === "未儲存" ? false : true}
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     value: note || ' ',
@@ -2007,7 +2158,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商名稱"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliernamein ? suppliernamein : ' ',
@@ -2018,7 +2169,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商地址"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplieraddressin ? supplieraddressin : ' ',
@@ -2031,7 +2182,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="聯絡電話"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplierphonein ? supplierphonein : ' ',
@@ -2042,7 +2193,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="統一編號"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliertaxidin ? suppliertaxidin : ' ',
@@ -2085,7 +2236,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商名稱"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliername2in ? suppliername2in : ' ',
@@ -2096,7 +2247,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商地址"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplieraddress2in ? supplieraddress2in : ' ',
@@ -2109,7 +2260,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="聯絡電話"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplierphone2in ? supplierphone2in : ' ',
@@ -2120,11 +2271,11 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="統一編號"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliertaxid2in ? suppliertaxid2in : ' ',
-                                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                                    onChange: (e) => { handleSuppliertaxidChange(e) }
                                                                 },
                                                             }}
                                                         />
@@ -2163,7 +2314,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商名稱"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliername3in ? suppliername3in : ' ',
@@ -2174,7 +2325,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="廠商地址"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplieraddress3in ? supplieraddress3in : ' ',
@@ -2187,7 +2338,7 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="聯絡電話"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: supplierphone3in ? supplierphone3in : ' ',
@@ -2198,11 +2349,11 @@ export default function AddPurchaseOrder() {
                                                         <InputSel
                                                             {...inputSelProps}
                                                             caption="統一編號"
-                                                            disabled={status === "未儲存" ? false : true}
+                                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                                             inputProps={{
                                                                 props: {
                                                                     value: suppliertaxid3in ? suppliertaxid3in : ' ',
-                                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                                    onChange: (e) => { handleSuppliertaxidChange(e) }
                                                                 },
                                                             }}
                                                         />
@@ -2386,7 +2537,7 @@ export default function AddPurchaseOrder() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
