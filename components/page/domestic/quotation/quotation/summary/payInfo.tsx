@@ -65,6 +65,7 @@ export type Tcontrol = {
   exchangeRate: {
     value: string;
     onChange?: (v: string) => void;
+    disabled?: boolean;
   };
   foreignTotal: {
     value: string;
@@ -72,6 +73,7 @@ export type Tcontrol = {
   currency: {
     value: Tstate_summary['currency'];
     onChange?: (v: Tstate_summary['currency']) => void;
+    disabled?: boolean;
   };
 };
 
@@ -237,7 +239,7 @@ export default function PayInfo({
             <InputSel
               wrapperStyle={{ width: 150 }}
               showBaseline="auto"
-              disabled={disabled}
+              disabled={disabled || control.currency.disabled}
               selectProps={{
                 props: {
                   placeholder: '',
@@ -263,10 +265,10 @@ export default function PayInfo({
             <input
               type="number"
               onWheel={blurOnWheel}
-              className={classNames('bg-transparent', disabled && scss.noBaseLine)}
+              className={classNames('bg-transparent', (disabled || control.exchangeRate.disabled) && scss.noBaseLine)}
               value={control.exchangeRate.value}
               onChange={(e) => control.exchangeRate.onChange?.(e.target.value)}
-              readOnly={disabled}
+              readOnly={disabled || control.exchangeRate.disabled}
             />
           </div>
         </div>

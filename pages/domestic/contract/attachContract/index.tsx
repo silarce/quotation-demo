@@ -59,6 +59,8 @@ import { useProductList } from 'hooks/quotation/useProduct';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+import { calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
+
 // ===========================================================================
 
 type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
@@ -240,6 +242,8 @@ export default function AttachContract({
       //
       discount: state_summary.discountRate,
       averageDiscount: avgDiscount_withQty,
+      //
+      foreignTotal,
     });
   };
 
@@ -261,6 +265,13 @@ export default function AttachContract({
   const subTotal_calced = subTotal_ori;
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
+
+  const foreignTotal = String(
+    calcNTDToForeignCurrency({
+      NTD: total_calced,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    })
+  ) as `${number}`;
 
   const payInfoControl: TpayInfoControl = {
     payment: {
@@ -375,24 +386,14 @@ export default function AttachContract({
     },
     exchangeRate: {
       value: state_summary.exchangeRate,
-      // onChange: (v) => {
-      //   // setState_summary((state) => {
-      //   //   const copy = { ...state };
-      //   //   copy.exchangeRate = v;
-      //   //   const total_num = copy.total.replaceAll(',', '') as `${number}`;
-      //   //   copy.usd = calcNTDToUSD({
-      //   //     NTD: total_num,
-      //   //     USDtoNTD: (copy.exchangeRate || '0') as `${number}`,
-      //   //   }).toLocaleString();
-      //   //   return copy;
-      //   // });
-      // },
+      disabled: true,
     },
     foreignTotal: {
-      value: state_summary.foreignTotal,
+      value: foreignTotal,
     },
     currency: {
       value: state_summary.currency,
+      disabled: true,
     },
   };
 
@@ -752,6 +753,8 @@ const reqModify = async ({
   //
   discount,
   averageDiscount,
+  //
+  foreignTotal,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -777,6 +780,8 @@ const reqModify = async ({
   verticleKeyArr_attach: string[] | undefined;
   discount: string;
   averageDiscount: string;
+  //
+  foreignTotal: `${number}`;
 }) => {
   try {
     setIsLading(true);
@@ -785,40 +790,61 @@ const reqModify = async ({
       return;
     }
 
-    const content_copy = _.cloneDeep(data_contract.content);
+    // const content_copy = _.cloneDeep(data_contract.content);
 
-    const copy_shallow = {
-      //
-      ...content_copy,
-      discount: discount,
-      // 根據api文件，後端不收
-      // 但是預防萬一，還是把這些資料清掉比較安心
-      reviewSalesEmployee: undefined,
-      salesReviewedAt: undefined,
-      toSalesAt: undefined,
-      reviewSupervisorEmployee: undefined,
-      supervisorReviewedAt: undefined,
-      toSupervisorAt: undefined,
-      reviewWorkDirectorEmployee: undefined,
-      workDirectorReviewedAt: undefined,
-      toWorkDirectorAt: undefined,
-      reviewManagerEmployee: undefined,
-      managerReviewedAt: undefined,
-      toManagerAt: undefined,
-    };
+    const content_copy = (() => {
+      const {
+        reviewSalesEmployee,
+        salesReviewedAt,
+        toSalesAt,
+        reviewSupervisorEmployee,
+        supervisorReviewedAt,
+        toSupervisorAt,
+        reviewWorkDirectorEmployee,
+        workDirectorReviewedAt,
+        toWorkDirectorAt,
+        reviewManagerEmployee,
+        managerReviewedAt,
+        toManagerAt,
+        ...content_copy
+      } = _.cloneDeep(data_contract.content);
+      content_copy.discount = discount;
 
-    delete copy_shallow.reviewSalesEmployee;
-    delete copy_shallow.salesReviewedAt;
-    delete copy_shallow.toSalesAt;
-    delete copy_shallow.reviewSupervisorEmployee;
-    delete copy_shallow.supervisorReviewedAt;
-    delete copy_shallow.toSupervisorAt;
-    delete copy_shallow.reviewWorkDirectorEmployee;
-    delete copy_shallow.workDirectorReviewedAt;
-    delete copy_shallow.toWorkDirectorAt;
-    delete copy_shallow.reviewManagerEmployee;
-    delete copy_shallow.managerReviewedAt;
-    delete copy_shallow.toManagerAt;
+      return content_copy;
+    })();
+
+    // const copy_shallow = {
+    //   //
+    //   ...content_copy,
+    //   discount: discount,
+    //   // 根據api文件，後端不收
+    //   // 但是預防萬一，還是把這些資料清掉比較安心
+    //   reviewSalesEmployee: undefined,
+    //   salesReviewedAt: undefined,
+    //   toSalesAt: undefined,
+    //   reviewSupervisorEmployee: undefined,
+    //   supervisorReviewedAt: undefined,
+    //   toSupervisorAt: undefined,
+    //   reviewWorkDirectorEmployee: undefined,
+    //   workDirectorReviewedAt: undefined,
+    //   toWorkDirectorAt: undefined,
+    //   reviewManagerEmployee: undefined,
+    //   managerReviewedAt: undefined,
+    //   toManagerAt: undefined,
+    // };
+
+    // delete copy_shallow.reviewSalesEmployee;
+    // delete copy_shallow.salesReviewedAt;
+    // delete copy_shallow.toSalesAt;
+    // delete copy_shallow.reviewSupervisorEmployee;
+    // delete copy_shallow.supervisorReviewedAt;
+    // delete copy_shallow.toSupervisorAt;
+    // delete copy_shallow.reviewWorkDirectorEmployee;
+    // delete copy_shallow.workDirectorReviewedAt;
+    // delete copy_shallow.toWorkDirectorAt;
+    // delete copy_shallow.reviewManagerEmployee;
+    // delete copy_shallow.managerReviewedAt;
+    // delete copy_shallow.toManagerAt;
 
     // 材料配件有問題的主產品
     let breakComponentProdIndex_div = '';
@@ -915,7 +941,7 @@ const reqModify = async ({
     }
 
     const body: TcreateModifyQuotationDto = {
-      ...copy_shallow,
+      ...content_copy,
       products: [...divProdArr, ...attachProdArr],
 
       // agentId: content.agentEmployee?.id,
@@ -929,7 +955,7 @@ const reqModify = async ({
       // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
       // 應該不送才是對的
       others: [],
-      discount: copy_shallow.discount as `${number}`,
+      discount: content_copy.discount as `${number}`,
       //
 
       validityPeriod: state_profile.validityPeriod ?? '',
@@ -954,6 +980,8 @@ const reqModify = async ({
       paymentMethods: state_paymentMethod,
       //
       averageDiscount,
+      //
+      foreignTotal,
     };
 
     let isDoorModalNameEmpty = false;
