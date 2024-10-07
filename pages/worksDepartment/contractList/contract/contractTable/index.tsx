@@ -128,85 +128,88 @@ export default function ContracTable({
   // -------------------------------------------------------------
   // -------------------------------------------------------------
 
-  const {
-    productDict,
-    productArr = [],
-    versionCount_withoutFirst = 0,
-    version1Summary,
-    versionSummaryArr = [],
-    versionSummeryTotal,
-  } = useMemo(() => {
-    if (!contract?.subContracts) {
-      return {};
-    }
+  // FIXME
+  // 追加的rootProductId不等於id，與後端告知的規則不符
+  // 導致後續的處理錯誤，待修正在將以下的註解解除
+  // const {
+  //   productDict,
+  //   productArr = [],
+  //   versionCount_withoutFirst = 0,
+  //   version1Summary,
+  //   versionSummaryArr = [],
+  //   versionSummeryTotal,
+  // } = useMemo(() => {
+  //   if (!contract?.subContracts) {
+  //     return {};
+  //   }
 
-    Product.versionCount_withoutFirst = contract.subContracts.length - 1;
+  //   Product.versionCount_withoutFirst = contract.subContracts.length - 1;
 
-    // ___________________________________________________________
+  //   // ___________________________________________________________
 
-    let subContracts = contract.subContracts;
-    subContracts = _.sortBy(subContracts, 'version');
+  //   let subContracts = contract.subContracts;
+  //   subContracts = _.sortBy(subContracts, 'version');
 
-    const productDict = initProductDict(subContracts);
-    const productArr = Object.values(productDict);
+  //   const productDict = initProductDict(subContracts);
+  //   const productArr = Object.values(productDict);
 
-    // ___________________________________________________________
+  //   // ___________________________________________________________
 
-    const versionSummaryTotal_pre = {
-      tuneTotal: new Decimal(0),
-      subTotal: new Decimal(0),
-      salesTax: new Decimal(0),
-      total: new Decimal(0),
-      foreignTotal: new Decimal(0),
-    };
-    let currency_pre: Tcurrency = '' as Tcurrency;
+  //   const versionSummaryTotal_pre = {
+  //     tuneTotal: new Decimal(0),
+  //     subTotal: new Decimal(0),
+  //     salesTax: new Decimal(0),
+  //     total: new Decimal(0),
+  //     foreignTotal: new Decimal(0),
+  //   };
+  //   let currency_pre: Tcurrency = '' as Tcurrency;
 
-    const versionSummaryArr: TversionSummary[] = subContracts.map((item) => {
-      const { tuneTotal, subTotal, salesTax, total, foreignTotal, currency } = item.content;
+  //   const versionSummaryArr: TversionSummary[] = subContracts.map((item) => {
+  //     const { tuneTotal, subTotal, salesTax, total, foreignTotal, currency } = item.content;
 
-      versionSummaryTotal_pre.tuneTotal = versionSummaryTotal_pre.tuneTotal.plus(tuneTotal || 0);
-      versionSummaryTotal_pre.subTotal = versionSummaryTotal_pre.subTotal.plus(subTotal || 0);
-      versionSummaryTotal_pre.salesTax = versionSummaryTotal_pre.salesTax.plus(salesTax || 0);
-      versionSummaryTotal_pre.total = versionSummaryTotal_pre.total.plus(total || 0);
-      versionSummaryTotal_pre.foreignTotal = versionSummaryTotal_pre.foreignTotal.plus(foreignTotal || 0);
-      currency_pre = currency;
+  //     versionSummaryTotal_pre.tuneTotal = versionSummaryTotal_pre.tuneTotal.plus(tuneTotal || 0);
+  //     versionSummaryTotal_pre.subTotal = versionSummaryTotal_pre.subTotal.plus(subTotal || 0);
+  //     versionSummaryTotal_pre.salesTax = versionSummaryTotal_pre.salesTax.plus(salesTax || 0);
+  //     versionSummaryTotal_pre.total = versionSummaryTotal_pre.total.plus(total || 0);
+  //     versionSummaryTotal_pre.foreignTotal = versionSummaryTotal_pre.foreignTotal.plus(foreignTotal || 0);
+  //     currency_pre = currency;
 
-      const tuneTotal_locale = Number(tuneTotal).toLocaleString();
-      const subTotal_locale = Number(subTotal).toLocaleString();
-      const salesTax_locale = Number(salesTax).toLocaleString();
-      const total_locale = Number(total).toLocaleString();
-      const foreignTotal_locale = Number(foreignTotal).toLocaleString();
+  //     const tuneTotal_locale = Number(tuneTotal).toLocaleString();
+  //     const subTotal_locale = Number(subTotal).toLocaleString();
+  //     const salesTax_locale = Number(salesTax).toLocaleString();
+  //     const total_locale = Number(total).toLocaleString();
+  //     const foreignTotal_locale = Number(foreignTotal).toLocaleString();
 
-      return {
-        tuneTotal: tuneTotal_locale,
-        subTotal: subTotal_locale,
-        salesTax: salesTax_locale,
-        total: total_locale,
-        foreignTotal: cutCurrency(currency) + '　' + foreignTotal_locale,
-      };
-    });
+  //     return {
+  //       tuneTotal: tuneTotal_locale,
+  //       subTotal: subTotal_locale,
+  //       salesTax: salesTax_locale,
+  //       total: total_locale,
+  //       foreignTotal: cutCurrency(currency) + '　' + foreignTotal_locale,
+  //     };
+  //   });
 
-    const version1Summary: TversionSummary | undefined = versionSummaryArr.shift();
+  //   const version1Summary: TversionSummary | undefined = versionSummaryArr.shift();
 
-    const versionSummeryTotal: TversionSummary = {
-      tuneTotal: versionSummaryTotal_pre.tuneTotal.toNumber().toLocaleString(),
-      subTotal: versionSummaryTotal_pre.subTotal.toNumber().toLocaleString(),
-      salesTax: versionSummaryTotal_pre.salesTax.toNumber().toLocaleString(),
-      total: versionSummaryTotal_pre.total.toNumber().toLocaleString(),
-      foreignTotal: cutCurrency(currency_pre) + '　' + versionSummaryTotal_pre.foreignTotal.toNumber().toLocaleString(),
-    };
+  //   const versionSummeryTotal: TversionSummary = {
+  //     tuneTotal: versionSummaryTotal_pre.tuneTotal.toNumber().toLocaleString(),
+  //     subTotal: versionSummaryTotal_pre.subTotal.toNumber().toLocaleString(),
+  //     salesTax: versionSummaryTotal_pre.salesTax.toNumber().toLocaleString(),
+  //     total: versionSummaryTotal_pre.total.toNumber().toLocaleString(),
+  //     foreignTotal: cutCurrency(currency_pre) + '　' + versionSummaryTotal_pre.foreignTotal.toNumber().toLocaleString(),
+  //   };
 
-    // ___________________________________________________________
+  //   // ___________________________________________________________
 
-    return {
-      productDict,
-      productArr,
-      versionCount_withoutFirst: Product.versionCount_withoutFirst,
-      versionSummaryArr,
-      version1Summary,
-      versionSummeryTotal,
-    };
-  }, [contract?.subContracts]);
+  //   return {
+  //     productDict,
+  //     productArr,
+  //     versionCount_withoutFirst: Product.versionCount_withoutFirst,
+  //     versionSummaryArr,
+  //     version1Summary,
+  //     versionSummeryTotal,
+  //   };
+  // }, [contract?.subContracts]);
 
   // -------------------------------------------------------------
   // -------------------------------------------------------------
@@ -218,9 +221,10 @@ export default function ContracTable({
       />
 
       <div className={scss.main}>
-        <div className={scss.tableContainer}>
+        <h1 className="text-9xl">施工中</h1>
+
+        {/* <div className={scss.tableContainer}>
           <div className={scss.tablewrapper}>
-            {/*  */}
             <div className={scss.table}>
               <Thead subContractQty={versionCount_withoutFirst} />
               <Tbody productArr={productArr} />
@@ -230,10 +234,8 @@ export default function ContracTable({
                 versionSummeryTotal={versionSummeryTotal}
               />
             </div>
-
-            {/*  */}
           </div>
-        </div>
+        </div> */}
       </div>
     </SubLayer>
   );
@@ -858,3 +860,9 @@ const kerArr_summary: (keyof Tconfig_summary_item['labelDict'])[] = [
   'total',
   'foreignTotal',
 ] as const;
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
