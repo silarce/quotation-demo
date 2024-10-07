@@ -37,75 +37,113 @@
   overflow: auto;
 }
 
+// .row {
+//   display: flex;
+//   flex-wrap: nowrap;
+//   gap: 3px;
+//   // padding: 11px 22px;
+//   padding: 0px 22px;
+//   > * {
+//     flex: none;
+//   }
+
+//   &.totalRow {
+//     width: fit-content;
+//     border-top: solid 1px theme("colors.border");
+//     position: sticky;
+//     bottom: 0;
+//     z-index: 1;
+//     background-color: #fff;
+//   }
+
+//   &.thead {
+//     background-color: theme("colors.bgc01");
+//     margin-bottom: 3px;
+
+//     span {
+//       color: theme("colors.main");
+//       font-size: 16px;
+//       font-weight: 400;
+//     }
+//     .rightCell {
+//       background-color: inherit;
+//     }
+//     .centerCell {
+//       background-color: inherit;
+//     }
+//   }
+
+//   > div {
+//     padding: 11px 0px;
+//   }
+
+//   .rightCell {
+//     background-color: #fff0f0;
+//     text-align: center;
+//     &:nth-last-of-type(1) {
+//       text-align: left;
+//       background-color: inherit;
+//     }
+//   } // rightCell
+
+//   .centerCell {
+//     text-align: center;
+//     background: #ebfbf1;
+//     &.odd {
+//       background: #fbf8eb;
+//     }
+//   }
+
+//   .totalGrid {
+//     display: grid;
+//     gap: 22px;
+//     span {
+//       font-size: 16px;
+//     }
+//     &.labelGrid {
+//       span {
+//         color: theme("colors.main");
+//         font-weight: 700;
+//       }
+//     }
+//   }
+//   //
+// }
+
 .row {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 3px;
-  // padding: 11px 22px;
-  padding: 0px 22px;
-  > * {
-    flex: none;
+  gap: 5px;
+}
+.cell_value.plus {
+  justify-content: flex-end;
+}
+
+.cell_summary {
+  display: grid;
+  gap: 10px;
+}
+
+.cell_summary_label.plus {
+  @extend .cell_summary;
+  > span {
+    color: theme("colors.main");
+    font-size: 18px;
+    font-weight: 500;
   }
+}
 
-  &.totalRow {
-    width: fit-content;
-    border-top: solid 1px theme("colors.border");
-    position: sticky;
-    bottom: 0;
-    z-index: 1;
-    background-color: #fff;
+.cell_summary_value.plus {
+  @extend .cell_summary;
+  justify-content: flex-end;
+  > span {
+    text-align: right;
   }
+}
 
-  &.thead {
-    background-color: theme("colors.bgc01");
-    margin-bottom: 3px;
-
-    span {
-      color: theme("colors.main");
-      font-size: 16px;
-      font-weight: 400;
-    }
-    .rightCell {
-      background-color: inherit;
-    }
-    .centerCell {
-      background-color: inherit;
-    }
-  }
-
-  > div {
-    padding: 11px 0px;
-  }
-
-  .rightCell {
-    background-color: #fff0f0;
-    text-align: center;
-    &:nth-last-of-type(1) {
-      text-align: left;
-      background-color: inherit;
-    }
-  } // rightCell
-
-  .centerCell {
-    text-align: center;
-    background: #ebfbf1;
-    &.odd {
-      background: #fbf8eb;
-    }
-  }
-
-  .totalGrid {
-    display: grid;
-    gap: 22px;
-    span {
-      font-size: 16px;
-    }
-    &.labelGrid {
-      span {
-        color: theme("colors.main");
-        font-weight: 700;
-      }
-    }
-  }
-  //
+.summaryLabel {
+  color: theme("colors.main");
+  font-size: 18px;
+  font-weight: 500;
+}
+.summaryValue {
+  text-align: right;
 }
