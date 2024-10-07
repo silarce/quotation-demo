@@ -29,6 +29,7 @@ interface Tproduct {
   quotationNumber: string;
   itemName: string;
   size: string;
+  version: number;
 
   rootContract: {
     qty: string;
@@ -130,7 +131,7 @@ export default function ContracTable({
   const {
     productDict,
     productArr = [],
-    subContractQty = 0,
+    versionCount_withoutFirst = 0,
     version1Summary,
     versionSummaryArr = [],
     versionSummeryTotal,
@@ -138,12 +139,14 @@ export default function ContracTable({
     if (!contract?.subContracts) {
       return {};
     }
+
+    Product.versionCount_withoutFirst = contract.subContracts.length - 1;
+
     // ___________________________________________________________
 
     let subContracts = contract.subContracts;
     subContracts = _.sortBy(subContracts, 'version');
 
-    const subContractQty = subContracts.length - 1;
     const productDict = initProductDict(subContracts);
     const productArr = Object.values(productDict);
 
@@ -195,7 +198,14 @@ export default function ContracTable({
 
     // ___________________________________________________________
 
-    return { productDict, productArr, subContractQty, versionSummaryArr, version1Summary, versionSummeryTotal };
+    return {
+      productDict,
+      productArr,
+      versionCount_withoutFirst: Product.versionCount_withoutFirst,
+      versionSummaryArr,
+      version1Summary,
+      versionSummeryTotal,
+    };
   }, [contract?.subContracts]);
 
   // -------------------------------------------------------------
@@ -212,205 +222,13 @@ export default function ContracTable({
           <div className={scss.tablewrapper}>
             {/*  */}
             <div className={scss.table}>
-              <Row thead={true} className={scss.row}>
-                {keyArr_version1.map((key) => {
-                  const { label, style } = config[key];
-
-                  return (
-                    <Cell key={key} style={style}>
-                      {label}
-                    </Cell>
-                  );
-                })}
-
-                {Array(subContractQty)
-                  .fill('')
-                  .map((item, index) => {
-                    return (
-                      <Fragment key={index}>
-                        {keyArr_restVersion.map((key) => {
-                          const { dynaLable, style } = config[key];
-
-                          return (
-                            <Cell key={key} style={style}>
-                              {dynaLable?.(index + 1)}
-                            </Cell>
-                          );
-                        })}
-                      </Fragment>
-                    );
-                  })}
-
-                {keyArr_remain.map((key) => {
-                  const { label, style } = config[key];
-
-                  return (
-                    <Cell key={key} style={style}>
-                      {label}
-                    </Cell>
-                  );
-                })}
-              </Row>
-              {/*  */}
-              {productArr.map((prod, index) => {
-                const { version1, restVersion, remain } = prod;
-                const theRemain = {
-                  remainQty: remain.quantity,
-                  remainTotalPrice: remain.totalPrice,
-                };
-
-                return (
-                  <Row key={index} className={scss.row}>
-                    {keyArr_version1.map((key) => {
-                      const { style, className } = config[key];
-
-                      return (
-                        <Cell key={key} style={style} className={className}>
-                          {version1[key]}
-                        </Cell>
-                      );
-                    })}
-
-                    {restVersion.map((item) => {
-                      const foo = {
-                        versionQty: item.quantity,
-                        versionTotalPrice: item.totalPrice,
-                      };
-
-                      return (
-                        <Fragment key={item.quantity}>
-                          {keyArr_restVersion.map((key) => {
-                            const { style, className } = config[key];
-
-                            return (
-                              <Cell key={key} style={style} className={className}>
-                                {foo[key]}
-                              </Cell>
-                            );
-                          })}
-                        </Fragment>
-                      );
-                    })}
-
-                    {keyArr_remain.map((key) => {
-                      const { style, className } = config[key];
-                      const value = theRemain[key];
-
-                      return (
-                        <Cell key={key} style={style} className={className}>
-                          {value}
-                        </Cell>
-                      );
-                    })}
-                  </Row>
-                );
-              })}
-
-              {/* total */}
-              <Row className={scss.row}>
-                {keyArr_version1.slice(0, keyArr_version1.length - 2).map((key) => {
-                  const { style } = config[key];
-
-                  return <Cell key={key} style={style}></Cell>;
-                })}
-                {/* version1Summary */}
-                <Cell style={config.unitPrice.style} className={classNames(scss.cell_summary_label, scss.plus)}>
-                  {kerArr_summary.map((key) => {
-                    const { labelClassName, labelDict } = config_summary.version1Summary;
-                    const label = labelDict[key];
-
-                    return (
-                      <span key={key} className={labelClassName}>
-                        {label}
-                      </span>
-                    );
-                  })}
-                </Cell>
-                <Cell
-                  //
-                  style={config.totalPrice.style}
-                  className={classNames(scss.cell_summary_value, scss.plus)}
-                >
-                  {kerArr_summary.map((key) => {
-                    const { valueClassName } = config_summary.version1Summary;
-                    const value = version1Summary?.[key];
-
-                    return (
-                      <span key={key} className={valueClassName}>
-                        {value}
-                      </span>
-                    );
-                  })}
-                </Cell>
-                {/* versionSummaryArr */}
-                {versionSummaryArr.map((item, index) => {
-                  return (
-                    <Fragment key={index}>
-                      <Cell style={config.versionQty.style} className={classNames(scss.cell_summary_label, scss.plus)}>
-                        {kerArr_summary.map((key) => {
-                          const { labelClassName, labelDict } = config_summary.versionArr;
-                          const label = labelDict[key];
-
-                          return (
-                            <span key={key} className={labelClassName}>
-                              {label}
-                            </span>
-                          );
-                        })}
-                      </Cell>
-                      <Cell
-                        style={config.versionTotalPrice.style}
-                        className={classNames(scss.cell_summary_value, scss.plus)}
-                      >
-                        {kerArr_summary.map((key) => {
-                          const { valueClassName } = config_summary.versionArr;
-                          const value = item[key];
-
-                          return (
-                            <span key={key} className={valueClassName}>
-                              {value}
-                            </span>
-                          );
-                        })}
-                      </Cell>
-                    </Fragment>
-                  );
-                })}
-
-                {/* versionSummeryTotal */}
-                <Cell
-                  //
-                  style={config.remainQty.style}
-                  className={classNames(scss.cell_summary_label, scss.plus)}
-                >
-                  {kerArr_summary.map((key) => {
-                    const { labelClassName, labelDict } = config_summary.versionTotal;
-                    const label = labelDict[key];
-
-                    return (
-                      <span key={key} className={labelClassName}>
-                        {label}
-                      </span>
-                    );
-                  })}
-                </Cell>
-                <Cell
-                  //
-                  style={config.remainTotalPrice.style}
-                  className={classNames(scss.cell_summary_value, scss.plus)}
-                >
-                  {kerArr_summary.map((key) => {
-                    const { valueClassName } = config_summary.versionTotal;
-                    const value = versionSummeryTotal?.[key];
-
-                    return (
-                      <span key={key} className={valueClassName}>
-                        {value}
-                      </span>
-                    );
-                  })}
-                </Cell>
-              </Row>
+              <Thead subContractQty={versionCount_withoutFirst} />
+              <Tbody productArr={productArr} />
+              <Ttotal
+                version1Summary={version1Summary}
+                versionSummaryArr={versionSummaryArr}
+                versionSummeryTotal={versionSummeryTotal}
+              />
             </div>
 
             {/*  */}
@@ -427,26 +245,266 @@ export default function ContracTable({
 // ===============================================================================
 // ===============================================================================
 
+// region COMPONENTS
+//
+//
+//
+//
+
+// MARK:Thead
+const Thead = ({ subContractQty }: { subContractQty: number }) => {
+  return (
+    <Row thead={true} className={scss.row}>
+      {keyArr_version1.map((key) => {
+        const { label, style } = config[key];
+
+        return (
+          <Cell key={key} style={style}>
+            {label}
+          </Cell>
+        );
+      })}
+
+      {Array(subContractQty)
+        .fill('')
+        .map((item, index) => {
+          return (
+            <Fragment key={index}>
+              {keyArr_restVersion.map((key) => {
+                const { dynaLable, style } = config[key];
+
+                return (
+                  <Cell key={key} style={style}>
+                    {dynaLable?.(index + 1)}
+                  </Cell>
+                );
+              })}
+            </Fragment>
+          );
+        })}
+
+      {keyArr_remain.map((key) => {
+        const { label, style } = config[key];
+
+        return (
+          <Cell key={key} style={style}>
+            {label}
+          </Cell>
+        );
+      })}
+    </Row>
+  );
+};
+
+// MARK:Tbody
+const Tbody = ({ productArr }: { productArr: Tproduct[] }) => {
+  return (
+    <>
+      {productArr.map((prod, index) => {
+        const { version, version1, restVersion, remain } = prod;
+        const theRemain = {
+          remainQty: remain.quantity,
+          remainTotalPrice: remain.totalPrice,
+        };
+
+        return (
+          <Row key={index} className={classNames(scss.row, scss[`remainder${version % 3}`])}>
+            {keyArr_version1.map((key) => {
+              const { style, className } = config[key];
+
+              return (
+                <Cell key={key} style={style} className={classNames(scss.cell, className)}>
+                  {version1[key]}
+                </Cell>
+              );
+            })}
+
+            {restVersion.map((item, index_restVersion) => {
+              const foo = {
+                versionQty: item.quantity,
+                versionTotalPrice: item.totalPrice,
+              };
+
+              return (
+                <Fragment key={item.quantity}>
+                  {keyArr_restVersion.map((key) => {
+                    const { style, className } = config[key];
+
+                    return (
+                      <Cell
+                        //
+                        key={key}
+                        style={style}
+                        className={classNames(scss.cell, className, scss[`remainder${(index_restVersion + 2) % 3}`])}
+                      >
+                        {foo[key]}
+                      </Cell>
+                    );
+                  })}
+                </Fragment>
+              );
+            })}
+
+            {keyArr_remain.map((key) => {
+              const { style, className } = config[key];
+              const value = theRemain[key];
+
+              return (
+                <Cell key={key} style={style} className={className}>
+                  {value}
+                </Cell>
+              );
+            })}
+          </Row>
+        );
+      })}
+    </>
+  );
+};
+
+// MARK:Ttotal
+const Ttotal = ({
+  version1Summary,
+  versionSummaryArr,
+  versionSummeryTotal,
+}: {
+  version1Summary: TversionSummary | undefined;
+  versionSummaryArr: TversionSummary[];
+  versionSummeryTotal: TversionSummary | undefined;
+}) => {
+  return (
+    <Row className={scss.row}>
+      {keyArr_version1.slice(0, keyArr_version1.length - 2).map((key) => {
+        const { style } = config[key];
+
+        return <Cell key={key} style={style}></Cell>;
+      })}
+      {/* version1Summary */}
+      <Cell style={config.unitPrice.style} className={classNames(scss.cell_summary_label, scss.plus)}>
+        {kerArr_summary.map((key) => {
+          const { labelClassName, labelDict } = config_summary.version1Summary;
+          const label = labelDict[key];
+
+          return (
+            <span key={key} className={labelClassName}>
+              {label}
+            </span>
+          );
+        })}
+      </Cell>
+      <Cell
+        //
+        style={config.totalPrice.style}
+        className={classNames(scss.cell_summary_value, scss.plus)}
+      >
+        {kerArr_summary.map((key) => {
+          const { valueClassName } = config_summary.version1Summary;
+          const value = version1Summary?.[key];
+
+          return (
+            <span key={key} className={valueClassName}>
+              {value}
+            </span>
+          );
+        })}
+      </Cell>
+      {/* versionSummaryArr */}
+      {versionSummaryArr.map((item, index) => {
+        return (
+          <Fragment key={index}>
+            <Cell style={config.versionQty.style} className={classNames(scss.cell_summary_label, scss.plus)}>
+              {kerArr_summary.map((key) => {
+                const { labelClassName, labelDict } = config_summary.versionArr;
+                const label = labelDict[key];
+
+                return (
+                  <span key={key} className={labelClassName}>
+                    {label}
+                  </span>
+                );
+              })}
+            </Cell>
+            <Cell style={config.versionTotalPrice.style} className={classNames(scss.cell_summary_value, scss.plus)}>
+              {kerArr_summary.map((key) => {
+                const { valueClassName } = config_summary.versionArr;
+                const value = item[key];
+
+                return (
+                  <span key={key} className={valueClassName}>
+                    {value}
+                  </span>
+                );
+              })}
+            </Cell>
+          </Fragment>
+        );
+      })}
+
+      {/* versionSummeryTotal */}
+      <Cell
+        //
+        style={config.remainQty.style}
+        className={classNames(scss.cell_summary_label, scss.plus)}
+      >
+        {kerArr_summary.map((key) => {
+          const { labelClassName, labelDict } = config_summary.versionTotal;
+          const label = labelDict[key];
+
+          return (
+            <span key={key} className={labelClassName}>
+              {label}
+            </span>
+          );
+        })}
+      </Cell>
+      <Cell
+        //
+        style={config.remainTotalPrice.style}
+        className={classNames(scss.cell_summary_value, scss.plus)}
+      >
+        {kerArr_summary.map((key) => {
+          const { valueClassName } = config_summary.versionTotal;
+          const value = versionSummeryTotal?.[key];
+
+          return (
+            <span key={key} className={valueClassName}>
+              {value}
+            </span>
+          );
+        })}
+      </Cell>
+    </Row>
+  );
+};
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+
 // MARK:Product
 class Product implements Tproduct {
+  static versionCount_withoutFirst = 0;
+
+  //
   readonly quotationNumber: string;
   readonly itemName: string;
   readonly size: string;
   readonly rootContract;
+  readonly _version;
   private _eachSubContract: (Tproduct['restVersion'][number] | undefined)[] = [];
   private _remain;
-  readonly versionCount: number;
+  // readonly versionCount: number;
 
   constructor({
     quotationNumber,
     quotationProduct,
     isRootContract = true,
-    versionCount,
+    version,
   }: {
     quotationNumber: string; // 若為原合約則放''
     quotationProduct: TquotationProductDto;
     isRootContract?: boolean;
-    versionCount: number;
+    version: number;
   }) {
     const {
       //
@@ -460,7 +518,8 @@ class Product implements Tproduct {
       totalPrice,
     } = quotationProduct;
 
-    this.versionCount = versionCount;
+    // this.versionCount = versionCount;
+    this._version = version;
 
     this.quotationNumber = quotationNumber;
     this.itemName = itemName;
@@ -503,7 +562,7 @@ class Product implements Tproduct {
   }
 
   get restVersion() {
-    const eachSubContract = Array(this.versionCount).fill({
+    const eachSubContract = Array(Product.versionCount_withoutFirst).fill({
       quantity: '0',
       totalPrice: '0',
     });
@@ -531,6 +590,14 @@ class Product implements Tproduct {
       unitPrice,
       totalPrice,
     };
+  }
+
+  get version() {
+    if (this._version === 1) {
+      return -1;
+    }
+
+    return this._version;
   }
 
   // -------------------------------------------------------------
@@ -575,13 +642,14 @@ const initProductDict = (subContractArr: TquotationContractDto[]) => {
     productDict[prod.id] = new Product({
       quotationNumber: '',
       quotationProduct: prod,
-      versionCount: subContractArr.length - 1,
+      version: 1,
     });
   });
 
   subContractArr.forEach((subContract, index_subContract) => {
     const quotationNumber = subContract.content.quotationNumber;
     const productArr = subContract.content.products;
+    const version = subContract.version;
 
     productArr.forEach((prod) => {
       const { id, rootProductId, attachedToProductId } = prod;
@@ -592,7 +660,7 @@ const initProductDict = (subContractArr: TquotationContractDto[]) => {
           quotationNumber: quotationNumber,
           quotationProduct: prod,
           isRootContract: false,
-          versionCount: subContractArr.length,
+          version,
         });
 
         productDict[id].addVersion({
@@ -733,10 +801,12 @@ const config: Tconfig = {
   remainQty: {
     label: '變更後數量',
     style: { width: 150 },
+    className: scss.cell_remain,
   },
   remainTotalPrice: {
     label: '變更後金額',
     style: { width: 150, justifyContent: 'flex-end' },
+    className: scss.cell_remain,
     // className: classNames(scss.cell_value, scss.plus),
   },
 };

@@ -113,6 +113,7 @@
 .row {
   gap: 5px;
 }
+
 .cell_value.plus {
   justify-content: flex-end;
 }
@@ -146,4 +147,34 @@
 }
 .summaryValue {
   text-align: right;
+}
+
+.remainder0 {
+  > .cell {
+    background-color: #fbf8eb;
+  }
+}
+.remainder1 {
+  > .cell {
+    background-color: #e6e7f5;
+  }
+}
+.remainder2 {
+  > .cell {
+    background-color: #ebfbf1;
+  }
+}
+
+.remainder0.cell {
+  background-color: #fbf8eb;
+}
+.remainder1.cell {
+  background-color: #e6e7f5;
+}
+.remainder2.cell {
+  background-color: #ebfbf1;
+}
+
+.cell_remain {
+  background-color: #fff0f0;
 }
