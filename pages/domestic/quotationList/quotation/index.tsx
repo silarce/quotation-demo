@@ -90,7 +90,11 @@ import { AppContext } from 'pages/_app';
 
 // utils
 import { urlToFile } from 'js/utils/helpers/urlToFile';
-import { init_variable, checkIsReviewer } from 'components/page/domestic/quotation/function/utils_quotation';
+import {
+  init_variable,
+  calcNTDToForeignCurrency,
+  checkIsReviewer,
+} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -121,6 +125,7 @@ import {
 
 // hook
 import { useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
@@ -179,15 +184,17 @@ type Tquery = {
   isContract: string | undefined;
 };
 
-type Tstate_summary = {
-  discountRate: string;
-  tuneTotal: string;
-  subTotal: string;
-  salesTax: string;
-  total: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-};
+// type Tstate_summary = {
+//   discountRate: string;
+//   tuneTotal: string;
+//   subTotal: string;
+//   salesTax: string;
+//   total: string;
+//   deliveryLocation: string;
+//   deliveryDate: string;
+//   exchangeRate: string;
+//   usd: string;
+// };
 
 type TcustomerSelectorShow = {
   show: boolean;
@@ -326,15 +333,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [state_anno, setState_annotation] = useState<string[]>([]);
   const [state_qr, setState_qr] = useState<string[]>([]);
 
-  const [state_summary, setState_summary] = useState<Tstate_summary>({
-    discountRate: '',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
 
   const [state_paymentMethod, setState_PaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
     []
@@ -713,6 +712,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
+      exchangeRate: state_summary.exchangeRate,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
+      currency: state_summary.currency,
+
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
@@ -1586,6 +1589,39 @@ function TheQuotation({ router }: { router: NextRouter }) {
           });
         },
       },
+
+      exchangeRate: {
+        value: state_summary.exchangeRate,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.exchangeRate = v;
+
+            const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+            copy.foreignTotal = calcNTDToForeignCurrency({
+              NTD: total_num,
+              foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+            }).toLocaleString();
+
+            return copy;
+          });
+        },
+      },
+      foreignTotal: {
+        value: state_summary.foreignTotal,
+      },
+      currency: {
+        value: state_summary.currency,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.currency = v;
+
+            return copy;
+          });
+        },
+      },
     };
 
     return payInfoControl;
@@ -2174,6 +2210,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         paymentMethods,
         annotations,
         quotationRanges,
+        //
+        exchangeRate,
+        foreignTotal,
+        currency,
       } = latestContent;
 
       const haveTax = !!salesTax;
@@ -2190,6 +2230,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total: total.toLocaleString(),
         deliveryLocation,
         deliveryDate,
+        exchangeRate: exchangeRate || '',
+        foreignTotal: foreignTotal || '',
+        currency: currency,
       });
 
       setTaxRate(haveTax ? 0.05 : 0);
@@ -2215,15 +2258,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       ]);
 
-      setState_summary({
-        discountRate: '100',
-        tuneTotal: '',
-        subTotal: '',
-        salesTax: '',
-        total: '',
-        deliveryLocation: '',
-        deliveryDate: '',
-      });
+      // setState_summary({
+      //   discountRate: '100',
+      //   tuneTotal: '',
+      //   subTotal: '',
+      //   salesTax: '',
+      //   total: '',
+      //   deliveryLocation: '',
+      //   deliveryDate: '',
+      //   exchangeRate: '',
+      //   usd: '',
+      // });
+      clearSummary();
+
       setTaxRate(0.05);
     }
   }, [quotationData, quotationContentData, disabled]);
@@ -2239,12 +2286,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       taxRate,
     });
 
+    const foreignTotal = calcNTDToForeignCurrency({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
     setState_summary((state) => {
       return {
         ...state,
         subTotal,
         salesTax,
         total,
+        foreignTotal,
       };
     });
 
