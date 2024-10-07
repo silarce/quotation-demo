@@ -89,7 +89,9 @@ import {
   useQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { Class_product, useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 import Summary, {
   TsummaryControl,
@@ -103,7 +105,11 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
-import { init_variable, checkIsReviewer } from 'components/page/domestic/quotation/function/utils_quotation';
+import {
+  init_variable,
+  calcNTDToForeignCurrency,
+  checkIsReviewer,
+} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -234,23 +240,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
-  const [state_summary, setState_Summary] = useState<{
-    discountRate: string;
-    tuneTotal: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
+
+  // const [state_summary, setState_Summary] = useState<{
+  //   discountRate: string;
+  //   tuneTotal: string;
+  //   subTotal: string;
+  //   salesTax: string;
+  //   total: string;
+  //   deliveryLocation: string;
+  //   deliveryDate: string;
+  //   exchangeRate: string;
+  //   usd: string;
+  // }>({
+  //   discountRate: '100',
+  //   tuneTotal: '',
+  //   subTotal: '',
+  //   salesTax: '',
+  //   total: '',
+  //   deliveryLocation: '',
+  //   deliveryDate: '',
+  //   exchangeRate: '',
+  //   usd: '',
+  // });
 
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
@@ -696,7 +708,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       validityPeriod: state_profile.validityPeriod ?? '',
       //
       customerId: state_customer?.id ?? '',
-      designUnitId: state_designUnit?.id ?? '',
+      designUnitId: state_designUnit?.id || null,
       //
       projectName: state_profile.projectName ?? '',
       county: state_profile.county ?? '',
@@ -743,6 +755,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: paymentMethod,
+      exchangeRate: state_summary.exchangeRate,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
+      currency: state_summary.currency,
       //
       //
       // products: [...prodArr, ...attachProdArr],
@@ -1041,7 +1056,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: state_summary.discountRate,
           onChange: (e) => {
             let v = e.target.value;
-            setState_Summary((state) => {
+            setState_summary((state) => {
               const copy = { ...state };
 
               if ((v as string) === '') {
@@ -1067,14 +1082,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         inputAttr: {
           disabled: disabled,
           value: state_summary.tuneTotal,
+          placeholder: '範圍正負1000',
           onChange: (e) => {
             const value_num = Number(e.target.value);
 
-            if (Math.abs(value_num) > 10) {
+            if (Math.abs(value_num) > 1000) {
               return;
             }
 
-            setState_Summary((state) => ({
+            setState_summary((state) => ({
               ...state,
               tuneTotal: e.target.value,
             }));
@@ -1105,7 +1121,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: {
         value: state_summary.deliveryLocation,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryLocation = v;
 
@@ -1116,7 +1132,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: {
         value: state_summary.deliveryDate,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryDate = v;
 
@@ -1167,6 +1183,40 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return copy;
         });
       },
+    },
+    exchangeRate: {
+      value: state_summary.exchangeRate,
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.exchangeRate = v;
+
+      //     const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+      //     copy.foreignTotal = calcNTDToForeignCurrency({
+      //       NTD: total_num,
+      //       foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+      //     }).toLocaleString();
+
+      //     return copy;
+      //   });
+      // },
+    },
+    foreignTotal: {
+      value: state_summary.foreignTotal,
+    },
+    currency: {
+      value: state_summary.currency,
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.currency = v;
+
+      //     return copy;
+      //   });
+      // },
     },
   };
 
@@ -1288,12 +1338,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
   const panel_noEditable: TpanelList = [
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出報價單',
       img: iconUpload.src,
       onClick: () => setPdfModalVisible(true),
     },
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出材料/配件',
       img: iconUpload.src,
@@ -1301,6 +1353,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     isAllReviewedBeforePending && quotationId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'redButton',
           label: '轉為準合約',
           onClick: () => {
@@ -1317,6 +1370,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     (!!isReviewer || null) && {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '審核',
       onClick: () => setReviewModalShow(true),
@@ -1324,6 +1378,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     quotationId && !contentId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '送審',
           onClick: () => {
@@ -1358,7 +1413,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     (() => {
       if (status === 'Pending') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+        return {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '合約審核表',
+          onClick: () => setReviewFormShow(true),
+        };
       } else {
         return null;
       }
@@ -1366,6 +1426,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     status === 'Pending'
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '解除鎖定',
           img: iconRedLock.src,
@@ -1384,9 +1445,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // 有contentId就會取用content，就不應該編輯
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !contentId
+      ? {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '編輯',
+          onClick: () => setDisabled(false),
+        }
+      : null,
 
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    {
+      className: classNames(style.panelListBtn, style.plus),
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
   ];
 
   const panelList = (() => {
@@ -1440,7 +1513,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [productList]);
 
   useEffect(() => {
-    if (!theContent) {
+    if (!theContent || !disabled) {
       return;
     }
 
@@ -1456,13 +1529,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods,
       annotations,
       quotationRanges,
+      exchangeRate,
+      foreignTotal,
+      currency,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
     setPaymentMethod(paymentMethods);
 
-    setState_Summary({
+    setState_summary({
       discountRate: discount,
       tuneTotal,
       subTotal: String(subTotal),
@@ -1470,8 +1546,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       total: String(total),
       deliveryLocation,
       deliveryDate,
+      exchangeRate: exchangeRate || '',
+      foreignTotal: foreignTotal || '',
+      currency,
     });
-  }, [theContent]);
+  }, [theContent, disabled]);
 
   useEffect(() => {
     // 進入page後會自動計算attachTotal
@@ -1483,12 +1562,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       prodSubTotal: attachTotal,
     });
 
-    setState_Summary((state) => {
+    const foreignTotal = calcNTDToForeignCurrency({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
+    setState_summary((state) => {
       return {
         ...state,
         subTotal,
         salesTax,
         total,
+        foreignTotal,
       };
     });
   }, [
@@ -1679,7 +1764,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   return;
                 }
 
-                setState_Summary((state) => {
+                setState_summary((state) => {
                   return {
                     ...state,
                     discountRate: v,
