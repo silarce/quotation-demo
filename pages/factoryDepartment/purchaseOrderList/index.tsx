@@ -151,6 +151,7 @@ export default function PurchaseOrderList() {
     const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
     const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
     const [originaldata1, setOriginaldata1] = useState<any[]>([]);
+    const [originalnote, setOriginalnote] = useState(notein);
 
     //進貨總數
     const [totalreq, setTotalreq] = useState<string>("");
@@ -608,6 +609,7 @@ export default function PurchaseOrderList() {
         setOriginalSupplieraddressin(supplieraddressin);
         setOriginalShippingaddressin(shippingaddressin);
         setOriginaldata1(data1);
+        setOriginalnote(notein);
         setEditmain(true);
     };
 
@@ -628,6 +630,7 @@ export default function PurchaseOrderList() {
                     setShippingaddressin(originalShippingaddressin);
                     setData1(originaldata1);
                     setEditmain(false);
+                    setNotein(originalnote);
                 }
             }
         });
