@@ -95,6 +95,8 @@ import { useProductList } from 'hooks/quotation/useProduct';
 import type { TquotationContractDto, TquotationContentDto } from 'js/api/api_quotation';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
+
 // =============================================================
 
 // region TYPE
@@ -223,6 +225,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {};
     }
 
+    const currency = cutCurrency(contract?.currency) || '';
+    const exchangeRate = contract?.exchangeRate || '';
+
     let subContracts = contract.subContracts.filter((item) => {
       if (version === '1') {
         return true;
@@ -249,17 +254,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
     let subTotal = new Decimal(0);
     let salesTax = new Decimal(0);
     let total = new Decimal(0);
+    let foreignTotal = new Decimal(0);
 
     subContracts.forEach((item) => {
       subTotal = subTotal.plus(item.subTotal);
       salesTax = salesTax.plus(item.salesTax);
       total = total.plus(item.total);
+      foreignTotal = foreignTotal.plus(item.foreignTotal || 0);
     });
 
     const totalInfo = {
       subTotal: subTotal.toNumber(),
       salesTax: salesTax.toNumber(),
       total: total.toNumber(),
+      foreignTotal: foreignTotal.toNumber().toLocaleString(),
+      currency,
+      exchangeRate,
     };
 
     return {
@@ -613,6 +623,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           //
         }) ?? [],
       addMethod: () => {},
+    },
+    exchangeRate: {
+      value: totalInfo?.exchangeRate ?? '',
+    },
+    foreignTotal: {
+      value: totalInfo?.foreignTotal ?? '',
+    },
+    currency: {
+      value: (totalInfo?.currency ?? '') as Tcurrency,
     },
   };
 

@@ -47,7 +47,10 @@ import {
   TquotationContractDto,
 } from 'js/api/api_quotation';
 import { TuserDto, TcustomerDto } from 'js/api/dtoTypes';
+
+// hook
 import { Class_product } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -56,18 +59,11 @@ import { useProductList } from 'hooks/quotation/useProduct';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+import { calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
+
 // ===========================================================================
 
 type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
-type Tstate_summary = {
-  discountRate: string;
-  tuneTotal: string;
-  subTotal: string;
-  salesTax: string;
-  total: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-};
 
 // ===========================================================================
 
@@ -98,15 +94,7 @@ export default function AttachContract({
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
 
-  const [state_summary, setState_Summary] = useState<Tstate_summary>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
 
   const [state_paymentMethod, setState_paymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
     []
@@ -254,6 +242,8 @@ export default function AttachContract({
       //
       discount: state_summary.discountRate,
       averageDiscount: avgDiscount_withQty,
+      //
+      foreignTotal,
     });
   };
 
@@ -270,11 +260,17 @@ export default function AttachContract({
     toSetFileInfo: () => {},
   };
 
-  // taxRate = 0.05;
   const subTotal_ori = attachTotal ?? 0;
-  const subTotal_calced = subTotal_ori;
+  const subTotal_calced = new Decimal(subTotal_ori).add(state_summary.tuneTotal || 0).toNumber();
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
-  const total_calced = subTotal_calced + salesTax_calced;
+  const total_calced = new Decimal(subTotal_calced || 0).add(salesTax_calced || 0).toNumber();
+
+  const foreignTotal = String(
+    calcNTDToForeignCurrency({
+      NTD: total_calced,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    })
+  ) as `${number}`;
 
   const payInfoControl: TpayInfoControl = {
     payment: {
@@ -294,7 +290,7 @@ export default function AttachContract({
           disabled: true,
           value: state_summary.discountRate ?? '',
           onChange: (e) => {
-            setState_Summary((state) => ({
+            setState_summary((state) => ({
               ...state,
               discountRate: e.target.value,
             }));
@@ -303,8 +299,20 @@ export default function AttachContract({
       },
       tuneTotal: {
         inputAttr: {
-          disabled: true,
-          value: '',
+          value: state_summary.tuneTotal,
+          placeholder: '範圍正負1000',
+          onChange: (e) => {
+            const value_num = Number(e.target.value);
+
+            if (Math.abs(value_num) > 1000) {
+              return;
+            }
+
+            setState_summary((state) => ({
+              ...state,
+              tuneTotal: e.target.value,
+            }));
+          },
         },
       },
       subTotal: {
@@ -332,14 +340,14 @@ export default function AttachContract({
         // value: data_contract?.deliveryLocation ?? '',
         value: state_summary.deliveryLocation ?? '',
         onChange: (v) => {
-          setState_Summary({ ...state_summary, deliveryLocation: v });
+          setState_summary({ ...state_summary, deliveryLocation: v });
         },
       },
       deliveryDate: {
         // value: data_contract?.deliveryDate ?? '',
         value: state_summary.deliveryDate ?? '',
         onChange: (v) => {
-          setState_Summary({ ...state_summary, deliveryDate: v });
+          setState_summary({ ...state_summary, deliveryDate: v });
         },
       },
     },
@@ -386,6 +394,17 @@ export default function AttachContract({
           return copy;
         });
       },
+    },
+    exchangeRate: {
+      value: state_summary.exchangeRate,
+      disabled: true,
+    },
+    foreignTotal: {
+      value: foreignTotal,
+    },
+    currency: {
+      value: state_summary.currency,
+      disabled: true,
     },
   };
 
@@ -485,20 +504,26 @@ export default function AttachContract({
       paymentMethods,
       annotations,
       quotationRanges,
+      exchangeRate,
+      foreignTotal,
+      currency,
     } = data_contract?.content;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
     setState_paymentMethod(_.cloneDeep(paymentMethods));
 
-    setState_Summary({
+    setState_summary({
       discountRate: discount,
-      tuneTotal,
+      tuneTotal: '',
       subTotal: String(subTotal),
       salesTax: String(salesTax),
       total: String(total),
       deliveryLocation,
       deliveryDate,
+      exchangeRate: exchangeRate || '',
+      foreignTotal: foreignTotal || '',
+      currency: currency || 'TWD 新臺幣',
     });
   }, [data_contract?.content]);
 
@@ -633,7 +658,7 @@ export default function AttachContract({
                 //   return;
                 // }
 
-                setState_Summary((state) => {
+                setState_summary((state) => {
                   // changeAllProdQuotationDiscount(Number(v));
                   // changeAllProductDiscount(Number(v));
                   return {
@@ -739,6 +764,8 @@ const reqModify = async ({
   //
   discount,
   averageDiscount,
+  //
+  foreignTotal,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -764,6 +791,8 @@ const reqModify = async ({
   verticleKeyArr_attach: string[] | undefined;
   discount: string;
   averageDiscount: string;
+  //
+  foreignTotal: `${number}`;
 }) => {
   try {
     setIsLading(true);
@@ -772,40 +801,61 @@ const reqModify = async ({
       return;
     }
 
-    const content_copy = _.cloneDeep(data_contract.content);
+    // const content_copy = _.cloneDeep(data_contract.content);
 
-    const copy_shallow = {
-      //
-      ...content_copy,
-      discount: discount,
-      // 根據api文件，後端不收
-      // 但是預防萬一，還是把這些資料清掉比較安心
-      reviewSalesEmployee: undefined,
-      salesReviewedAt: undefined,
-      toSalesAt: undefined,
-      reviewSupervisorEmployee: undefined,
-      supervisorReviewedAt: undefined,
-      toSupervisorAt: undefined,
-      reviewWorkDirectorEmployee: undefined,
-      workDirectorReviewedAt: undefined,
-      toWorkDirectorAt: undefined,
-      reviewManagerEmployee: undefined,
-      managerReviewedAt: undefined,
-      toManagerAt: undefined,
-    };
+    const content_copy = (() => {
+      const {
+        reviewSalesEmployee,
+        salesReviewedAt,
+        toSalesAt,
+        reviewSupervisorEmployee,
+        supervisorReviewedAt,
+        toSupervisorAt,
+        reviewWorkDirectorEmployee,
+        workDirectorReviewedAt,
+        toWorkDirectorAt,
+        reviewManagerEmployee,
+        managerReviewedAt,
+        toManagerAt,
+        ...content_copy
+      } = _.cloneDeep(data_contract.content);
+      content_copy.discount = discount;
 
-    delete copy_shallow.reviewSalesEmployee;
-    delete copy_shallow.salesReviewedAt;
-    delete copy_shallow.toSalesAt;
-    delete copy_shallow.reviewSupervisorEmployee;
-    delete copy_shallow.supervisorReviewedAt;
-    delete copy_shallow.toSupervisorAt;
-    delete copy_shallow.reviewWorkDirectorEmployee;
-    delete copy_shallow.workDirectorReviewedAt;
-    delete copy_shallow.toWorkDirectorAt;
-    delete copy_shallow.reviewManagerEmployee;
-    delete copy_shallow.managerReviewedAt;
-    delete copy_shallow.toManagerAt;
+      return content_copy;
+    })();
+
+    // const copy_shallow = {
+    //   //
+    //   ...content_copy,
+    //   discount: discount,
+    //   // 根據api文件，後端不收
+    //   // 但是預防萬一，還是把這些資料清掉比較安心
+    //   reviewSalesEmployee: undefined,
+    //   salesReviewedAt: undefined,
+    //   toSalesAt: undefined,
+    //   reviewSupervisorEmployee: undefined,
+    //   supervisorReviewedAt: undefined,
+    //   toSupervisorAt: undefined,
+    //   reviewWorkDirectorEmployee: undefined,
+    //   workDirectorReviewedAt: undefined,
+    //   toWorkDirectorAt: undefined,
+    //   reviewManagerEmployee: undefined,
+    //   managerReviewedAt: undefined,
+    //   toManagerAt: undefined,
+    // };
+
+    // delete copy_shallow.reviewSalesEmployee;
+    // delete copy_shallow.salesReviewedAt;
+    // delete copy_shallow.toSalesAt;
+    // delete copy_shallow.reviewSupervisorEmployee;
+    // delete copy_shallow.supervisorReviewedAt;
+    // delete copy_shallow.toSupervisorAt;
+    // delete copy_shallow.reviewWorkDirectorEmployee;
+    // delete copy_shallow.workDirectorReviewedAt;
+    // delete copy_shallow.toWorkDirectorAt;
+    // delete copy_shallow.reviewManagerEmployee;
+    // delete copy_shallow.managerReviewedAt;
+    // delete copy_shallow.toManagerAt;
 
     // 材料配件有問題的主產品
     let breakComponentProdIndex_div = '';
@@ -902,7 +952,7 @@ const reqModify = async ({
     }
 
     const body: TcreateModifyQuotationDto = {
-      ...copy_shallow,
+      ...content_copy,
       products: [...divProdArr, ...attachProdArr],
 
       // agentId: content.agentEmployee?.id,
@@ -916,7 +966,7 @@ const reqModify = async ({
       // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
       // 應該不送才是對的
       others: [],
-      discount: copy_shallow.discount as `${number}`,
+      discount: content_copy.discount as `${number}`,
       //
 
       validityPeriod: state_profile.validityPeriod ?? '',
@@ -941,6 +991,9 @@ const reqModify = async ({
       paymentMethods: state_paymentMethod,
       //
       averageDiscount,
+      //
+      foreignTotal,
+      tuneTotal: state_summary.tuneTotal || '0',
     };
 
     let isDoorModalNameEmpty = false;

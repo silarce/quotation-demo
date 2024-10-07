@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 import type { TquotationContentDto } from 'js/api/dtoTypes';
@@ -119,6 +120,21 @@ const init_variable = (): {
     version,
     editNotes,
   };
+};
+
+const calcNTDToForeignCurrency = ({
+  NTD,
+  foreignCurrencyToNTD,
+}: {
+  NTD: number | `${number}`;
+  // 外幣兌台幣，也就是1外幣等於多少台幣
+  foreignCurrencyToNTD: number | `${number}`;
+}) => {
+  if (!Number(foreignCurrencyToNTD)) {
+    return 0;
+  }
+
+  return new Decimal(NTD).div(foreignCurrencyToNTD).toDecimalPlaces(2).toNumber();
 };
 
 // ============================================================================
@@ -326,4 +342,4 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
 
 // ============================================================================
 
-export { init_variable, checkIsReviewer };
+export { init_variable, calcNTDToForeignCurrency, checkIsReviewer };
