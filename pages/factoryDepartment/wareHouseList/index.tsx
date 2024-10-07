@@ -24,10 +24,10 @@ type Tquery = {
 
 export const setting = {
     // apipath:'https://new-erp-api.prod.san-jeou.com.tw',
-    // apipath: 'https://new-erp-api.beta.san-jeou.com.tw', // 確保這裡包含正確的 API 路徑
+    apipath: 'https://new-erp-api.beta.san-jeou.com.tw', // 確保這裡包含正確的 API 路徑
 
-    
-    apipath:`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`,
+
+    // apipath:`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`,
     // apipath: 'https://localhost:44383', // 確保這裡包含正確的 API 路徑
     env: 'prod',
     // env: 'local',
@@ -88,6 +88,7 @@ export default function WareHouseList() {
 
     useEffect(() => {
         fetchData();
+        console.log(`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`);
     }, []);
 
 
@@ -98,6 +99,7 @@ export default function WareHouseList() {
             setIsLoading(true);
             // const response = await fetch('YOUR_C#_API_ENDPOINT');
             //erpAPI
+            console.log(setting.apipath);
             const response = await fetch(`${setting.apipath}/WareHouse/GetWareHouse`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
