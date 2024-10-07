@@ -690,8 +690,13 @@ export default function FlowList() {
                         </div>
                         <div className={scss.head_body}>
                             <div>
-                                <div className={scss.head_content1}>
-                                    <div></div>
+                                <div className={scss.head_content1} style={{ fontSize: '16px' }}>
+                                    <div>
+                                        {/* 流程順序：新增流程{">"}輸入流程名稱{">"}新增流程關卡<br />
+                                        (1).可輸入職稱或人名帶入<br />
+                                        (2).流程第一關請選"提出"，中間關卡請選審查，最後一關請選核准<br />
+                                        (2).流程若有異動，請刪除原流程後重新新增<br /> */}
+                                    </div>
                                     <div></div>
                                     <div></div>
                                 </div>

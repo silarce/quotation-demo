@@ -168,7 +168,7 @@
 
 .head_foot2 {
     display: grid;
-    grid-template-columns:30px 200px 350px 350px 60px 1fr 1fr;
+    grid-template-columns: 30px 200px 350px 350px 60px 1fr 1fr;
     // gap: 15px;
     width: auto;
     //   margin-top: 5px;
@@ -250,7 +250,23 @@
 
 .foot_head1 {
     display: grid;
-    grid-template-columns: 390px 1fr 1fr 1fr;
+    grid-template-columns: 1000px 1fr;
+    // gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+
+    // margin-bottom: 5px;
+    // border-top:1px solid #c1c1c1;
+    div {
+        margin-right: 20px;
+    }
+}
+
+.foot_head1_1 {
+    display: grid;
+    grid-template-columns: 390px 1fr 1fr;
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -266,7 +282,7 @@
 
 .foot_head2 {
     display: grid;
-    grid-template-columns: 700px 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     // gap: 15px;
     width: auto;
     // margin-top: 5px;
@@ -443,7 +459,7 @@ div.panelHeader13 {
     // color: #14256a;
     color: #14256a;
     transform: translateY(2px);
-    width:100px;
+    width: 100px;
 
 
     // &:focus {
@@ -451,7 +467,7 @@ div.panelHeader13 {
     //     // background-color: $bgc01;
     //     border: solid 1px #c1c1c1;
     //     border-bottom: 0px;
-        
+
     // }
 }
 
@@ -688,9 +704,10 @@ div.panelHeader14 {
     margin-top: 5px;
     margin-left: 20px;
     margin-right: 20px;
+
     div {
         margin-right: 10px;
-      }
+    }
 
 }
 
@@ -710,7 +727,7 @@ div.panelHeader14 {
 
 .modal_head_content3 {
     display: grid;
-    grid-template-columns: 800px 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 800px 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -724,7 +741,7 @@ div.panelHeader14 {
 
 .modal_head_content4 {
     display: grid;
-    grid-template-columns: 350px 1fr 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 350px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -738,7 +755,7 @@ div.panelHeader14 {
 
 .modal_head_content5 {
     display: grid;
-    grid-template-columns: 800px 1fr 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 800px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -749,9 +766,10 @@ div.panelHeader14 {
     //     margin-right: 10px;
     //   }
 }
+
 .modal_head_content6 {
     display: grid;
-    grid-template-columns: 600px 1fr 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 600px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -760,7 +778,7 @@ div.panelHeader14 {
 
     div {
         margin-right: 10px;
-      }
+    }
 }
 
 .squarebtn {
@@ -792,10 +810,11 @@ div.panelHeader14 {
 //#region 物料維護
 div.panelHeader21 {
     border-bottom: solid 1px $colorBorder01;
-    
+
     .row01,
     .row02 {
         padding-left: 20px;
+
         span {
             font-weight: 400;
             font-size: 16px;

@@ -210,7 +210,7 @@ export default function BomList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/RemovePurchaseOrderDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/RemoveBomDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }

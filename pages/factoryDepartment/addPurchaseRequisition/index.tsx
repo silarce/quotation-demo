@@ -934,7 +934,7 @@ export default function AddPurchaseRequisition() {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
         setNote("");
-        setCreate_byin(userInfo?.username || '');
+        setCreate_byin(userInfo?.username as string);
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
         setData2([]);
