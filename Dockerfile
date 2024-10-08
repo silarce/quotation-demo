@@ -18,6 +18,7 @@ COPY . .
 
 # Use ARGs
 ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_API_NETCORE_URL
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
