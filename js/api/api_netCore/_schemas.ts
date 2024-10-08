@@ -1,4 +1,8 @@
-interface TnetCoreapiBody {
+type Tinvoice_type = '三聯' | '二聯';
+
+// ==============================================================================
+
+interface TnetCoreApiBody {
   TypeName: string;
   ServiceName: string;
   FunctionName: string;
@@ -13,6 +17,14 @@ interface Tbase {
   updated_at: string;
 }
 
+// ==============================================================================
+
+// region =Accountant=
+//
+//
+//
+
+// MARK:TaccountantPresetDto
 interface TaccountantPresetDto extends Tbase {
   // 帳戶名稱
   account_name: string;
@@ -24,20 +36,93 @@ interface TaccountantPresetDto extends Tbase {
   bank_name: string;
 }
 
-type TcreateAccountantPresetDto = Omit<
-  TaccountantPresetDto,
-  'id' | 'create_by' | 'created_at' | 'update_by' | 'updated_at'
->;
+type TcreateAccountantPresetDto = Omit<TaccountantPresetDto, keyof Tbase>;
 type TupdateAccountantPresetDto = Partial<TcreateAccountantPresetDto> & {
   id: string;
 };
 
+// MARK:TapplyPaymentDto
+
+interface TapplyPayment_Dto extends Tbase {
+  serial_number: string; // 單號
+  payment_date: string; //  支出日期
+  total_price: number; //  合計
+  applicant_department: string; //  申請單位(支出部門)
+  agent_employee_id: string; //  經辦人id
+  description: string; // 備註說明
+  status: string; // 付款狀態
+}
+
+interface TcreateApplyPayment_data_Dto {
+  item: string;
+  invoice_business_title: string;
+  invoice_type: Tinvoice_type;
+  tax: `${number}`;
+  amount_total: `${number}`;
+  accounting_subject: string;
+  invoice_number: string;
+  note: string;
+}
+interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
+  id: string;
+}
+
+interface TcreateApplyPayment_Dto {
+  payment_date: string;
+  applicant_department: string;
+  description: string;
+  agent_employee_id: string;
+  total_price: `${number}`;
+  data: TcreateApplyPayment_data_Dto[];
+}
+
+// interface TupdateApplyPayment_Dto extends TcreateApplyPayment_Dto {
+//   apply_payment_id: string;
+//   data: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
+// }
+interface TupdateApplyPayment_Dto extends Partial<TcreateApplyPayment_Dto> {
+  apply_payment_id: string;
+  data?: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
+}
+
+interface TapplyPaymentDetail_Dto extends Tbase {
+  date: string; // 發票日期
+  number: string; // 發票號碼
+  subtotal: number; // 發票小計
+  tax: number; // 發票稅額
+  amount_total: number; // 發票總計金額
+  title: string; // 發票抬頭
+  tax_id: string; // 發票統編
+  business_title: string; // 營業人抬頭
+  business_tax_id: string; // 營業人統編
+  type: string; // 發票類別(二聯式/三聯式)
+  payment_status: string; // 付款狀態
+  tax_type: string; // 稅別(應稅/零稅/免稅)
+  declaration_category: string; // 申報類別
+  is_offset: boolean; // 是否進項折抵
+  note: string; // 說明備註
+  apply_payment_uuid: string; // 支出單uuid
+  account_payable_uuid: string; // 付款申請uuid
+  address: string; // 發票地址
+  item: string; // 發票項目
+  accounting_subject: string; // 會計科目
+}
+
+// ==============================================================================
+
 export type {
   //
-  TnetCoreapiBody,
+  TnetCoreApiBody,
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
+  //
+  TapplyPayment_Dto,
+  TcreateApplyPayment_data_Dto,
+  TupdateApplyPayment_data_Dto,
+  TcreateApplyPayment_Dto,
+  TupdateApplyPayment_Dto,
+  TapplyPaymentDetail_Dto,
   //
 };
