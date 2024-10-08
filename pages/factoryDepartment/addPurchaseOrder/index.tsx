@@ -166,7 +166,7 @@ export default function AddPurchaseOrder() {
     const [originalcreate_atin, setOriginalcreate_atin] = useState<string>("");
     const [originalneed_date, setOriginalneed_date] = useState<string>("");
     const [originalnote, setOriginalnote] = useState<string>("");
-
+    const [originaldata2, setOriginaldata2] = useState<any[]>([]);
 
 
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
@@ -488,6 +488,7 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
+                    data1: data2
                 };
 
                 var inputModel = {
@@ -1047,6 +1048,7 @@ export default function AddPurchaseOrder() {
             setCreate_atin(originalcreate_atin);
             setNeed_date(originalneed_date);
             setNote(originalnote);
+            setData2(originaldata2);
         } else {
             setSuppliernamein("");
             setSupplierphonein("");
@@ -1494,6 +1496,7 @@ export default function AddPurchaseOrder() {
         setOriginalcreate_atin(create_atin);
         setOriginalneed_date(need_date);
         setOriginalnote(note);
+        setOriginaldata2(data2);
         setEditmain(true);
     };
 
@@ -1943,14 +1946,23 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
-                                                maxLength={5}
+                                                // maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!editmain ? true : false}
                                                 onChange={(e) => {
-                                                    handleNumberChange(index, "quantity", e.target.value);
+                                                    // handleNumberChange(index, "quantity", e.target.value)
+                                                    const newData = [...data2];
+                                                    const newQuantity = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        quantity: newQuantity,
+                                                        totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>
@@ -1980,14 +1992,21 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', width: '95%' }}
                                                 type="text"
                                                 value={_item.unitprice !== undefined ? _item.unitprice.toLocaleString() : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                readOnly={!editmain ? true : false}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "unitprice", e.target.value);
+                                                    // handleStringChange(index, "unitprice", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        unitprice: newUnitPrice,
+                                                        totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>
