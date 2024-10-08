@@ -243,6 +243,67 @@ export default function BomList() {
             // setIsLoading(false);
         }
     }
+    const UpdateBomDetail = async (item: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                data:item,
+                username:userInfo?.username,
+                id: item.id
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+            
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateBomDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+            
+            
+            
+            if (!response.ok) {
+                myAlert.err({ title: 'BOM_handleUpdate', content: `API Status: ${response.status}` });
+                return;
+            }
+
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: '成功', content: result.message });
+                // setEdithandkey(!edithandkey);
+                GetBom(parent_product); // 更新狀態或刷新數據
+            } else {
+                // 失敗，顯示錯誤提示
+                myAlert.warning({ title: '失敗', content: "更新失敗" });
+            }
+
+
+
+
+            GetBom(parent_product);
+
+            setEditlist(false);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
 
     //#endregion
 
@@ -369,6 +430,7 @@ export default function BomList() {
                 myAlert.warning({ title: '失敗', content: result.message });
             }
 
+            setEdithandkey(false);
             console.log(result);
         } catch (error: any) {
             // 顯示錯誤信息
@@ -503,7 +565,7 @@ export default function BomList() {
     const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
     const quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
     // 組件編輯
-    const handleEditList = async (index: any) => {
+    const handleEdit = async (index: any) => {
         if (editlist === true) {
             myAlert.warning({ title: '組件編輯中，請先結束編輯狀態' })
             return;
@@ -513,7 +575,7 @@ export default function BomList() {
         setEditlistindex(index);
     };
     // 組件取消編輯
-    const handleCancelEditList = async (index: any) => {
+    const handleCancel = async (index: any) => {
         setEditlist(!editlist);
         setBomdata(originaleditlistdata);
     };
@@ -531,6 +593,18 @@ export default function BomList() {
             }
         });
     };
+    // 更新組件清單
+    const handleUpdate = (index: number, item: any) => {
+        myAlert.confirm({
+            title: '確定更新嗎?',
+            props: {
+                onOk: () => {
+                    UpdateBomDetail(item);
+                }
+            }
+        });
+    };
+
 
 
     //#endregion
@@ -811,13 +885,13 @@ export default function BomList() {
                                                 <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                     <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleEditList(index) }}>
+                                                <button onClick={() => { handleEdit(index) }}>
                                                     <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleCancelEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
                                                     <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
                                                     <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
