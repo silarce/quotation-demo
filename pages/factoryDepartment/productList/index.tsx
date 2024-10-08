@@ -974,6 +974,10 @@ export default function ProductList() {
             myAlert.warning({ title: '物料編號已經存在' })
             return;
         }
+        if(addproductid.length<14){
+            myAlert.warning({ title: '料號不符合編碼原則，請重新編碼' })
+            return;
+        }
         // 顯示確認對話框
         myAlert.confirm({
             title: '確定要新增物料嗎?',
@@ -1165,6 +1169,7 @@ export default function ProductList() {
 
     const exampledata = [
         { company: 'SJ', category: 'S', subCategory: 'BT', serial: '00001', material: '01', surface: '2B', productid: '', name: '50*50*3t 不銹鋼#304底座角鐵' },
+        { company: 'SJ', category: 'M', subCategory: 'MO', serial: 'A0041', material: '00', surface: '00', productid: '', name: '大同馬達' },
     ];
 
 
@@ -1648,7 +1653,8 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>物料編號已存在！</p>}
+                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>料號已存在！</p>}
+                                        {addproductid.length<14 && <p style={{ fontSize: '16px', color: 'red' }}>料號不符編碼原則！</p>}
                                     </div>
                                 </div>
                                 <div className={scss.foot_head2}>

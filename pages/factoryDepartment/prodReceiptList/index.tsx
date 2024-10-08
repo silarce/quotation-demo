@@ -235,19 +235,19 @@ export default function ProdReceiptList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // { searchGroup },
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseOrder`,
-        //             query: {
-        //                 type: 'Tray',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增進貨單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addProdReceipt`,
+                    query: {
+                        type: 'addProdreceipt',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 

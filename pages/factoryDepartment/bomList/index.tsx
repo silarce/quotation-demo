@@ -1,7 +1,7 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import scss from './bomList.module.scss';
-import { useContext, useEffect, useRef, useState } from "react";
+import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { setting } from '../wareHouseList/index';
 import { useRouter } from "next/router";
 import { content } from "html2canvas/dist/types/css/property-descriptors/content";
@@ -214,9 +214,9 @@ export default function BomList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const responseData = await response.json();
+            // const responseData = await response.text();
 
-            GetBom(parent_product);
+            // GetBom(parent_product);
 
         } catch (error: any) {
             // setError(error.message);
@@ -360,7 +360,6 @@ export default function BomList() {
     };
 
 
-
     //手key清除
     const handleClearHandKey = () => {
         setHandinputproductuuid('');
@@ -456,12 +455,7 @@ export default function BomList() {
         setShowSuggestions2(false);
     };
 
-    // 從口袋清單移除
-    const handleRemove = (index: number, item: any) => {
-        const updatedData = bomdata.filter((_, i) => i !== index);
-        setBomdata(updatedData);
-        RemoveBomDetail(item.id);
-    };
+
 
     // 手Key物料查詢
     const dropdownRef = useRef<HTMLUListElement | null>(null);
@@ -485,6 +479,25 @@ export default function BomList() {
         };
     }, []);
 
+
+    // 組件清單編輯
+    const [editlist, setEditlist] = useState<boolean>(false);
+    const [editlistindex, setEditlistindex] = useState<number>();
+    const quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const handleEditList = async (index: any) => {
+        setEditlist(!editlist);
+        setEditlistindex(index);
+    };
+
+    // 從組件清單移除
+    const handleRemove = (index: number, item: any) => {
+
+        const updatedData = bomdata.filter((_, i) => i !== index);
+        setBomdata(updatedData);
+        RemoveBomDetail(item.id);
+
+
+    };
 
 
     //#endregion
@@ -753,20 +766,26 @@ export default function BomList() {
                         <div></div>
                     </div>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-                        <Thead01 type={'BomList'} />
                     </div>
                     <div>
                         <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', overflowX: 'auto' }}>
+                            <Thead01 type={'BomList'} />
                             {bomdata && (
                                 bomdata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader11}>
                                         <div className={scss.row01}>
                                             <span>
-                                                {/* <button onClick={() => { alert("OK") }}>
-                                                    <img src={icon_edit.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button> */}
-                                                <button onClick={() => { handleRemove(index, _item) }} style={{ display: '' }}>
+                                                <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                     <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleEditList(index) }}>
+                                                    <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
                                             <span>{index + 1}</span>
@@ -776,7 +795,26 @@ export default function BomList() {
                                             <span>{_item.material}</span>
                                             <span>{_item.surface}</span>
                                             <span>
-                                                {_item.quantity}
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newQuantity = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+
+                                                        };
+                                                        setBomdata(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
                                             </span>
                                             <span>{_item.unit}</span>
                                             <span>{getTaiwanDateStr(_item.update_at)}</span>
@@ -789,7 +827,7 @@ export default function BomList() {
 
                             <div className={scss.addbar}>
                                 <div>
-                                    <button onClick={() => { handleEditByHandKey() }} style={{ paddingLeft: '15px', display: `${edithandkey ? 'none' : ''}` }}>
+                                    <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? 'none' : ''}` }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                     <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
@@ -800,6 +838,7 @@ export default function BomList() {
                                         <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <div></div>
                                 <div>
                                     <input
                                         type="text"
