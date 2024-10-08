@@ -195,7 +195,7 @@ export default function BomList() {
     };
     const RemoveBomDetail = async (id: any) => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 id: id
             };
@@ -212,11 +212,28 @@ export default function BomList() {
 
             const response = await fetch(`${setting.apipath}/WareHouse/RemoveBomDetail?${queryParams}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                myAlert.err({ title: 'BOM_handleRemove', content: `API Status: ${response.status}` });
+                return;
             }
-            // const responseData = await response.text();
 
-            // GetBom(parent_product);
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: '成功', content: result.message });
+                // setEdithandkey(!edithandkey);
+                GetBom(parent_product); // 更新狀態或刷新數據
+            } else {
+                // 失敗，顯示錯誤提示
+                myAlert.warning({ title: '失敗', content: "移除失敗" });
+            }
+
+
+
+
+            GetBom(parent_product);
 
         } catch (error: any) {
             // setError(error.message);
@@ -333,7 +350,7 @@ export default function BomList() {
             });
 
             if (!response.ok) {
-                myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` });
+                myAlert.err({ title: 'BOM_handleAdd', content: `API Status: ${response.status}` });
                 return;
             }
 
@@ -482,21 +499,37 @@ export default function BomList() {
 
     // 組件清單編輯
     const [editlist, setEditlist] = useState<boolean>(false);
-    const [editlistindex, setEditlistindex] = useState<number>();
+    const [editlistindex, setEditlistindex] = useState<number>(0);
+    const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
     const quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    // 組件編輯
     const handleEditList = async (index: any) => {
+        if (editlist === true) {
+            myAlert.warning({ title: '組件編輯中，請先結束編輯狀態' })
+            return;
+        }
+        setOriginaleditlistdata(bomdata);
         setEditlist(!editlist);
         setEditlistindex(index);
+    };
+    // 組件取消編輯
+    const handleCancelEditList = async (index: any) => {
+        setEditlist(!editlist);
+        setBomdata(originaleditlistdata);
     };
 
     // 從組件清單移除
     const handleRemove = (index: number, item: any) => {
-
-        const updatedData = bomdata.filter((_, i) => i !== index);
-        setBomdata(updatedData);
-        RemoveBomDetail(item.id);
-
-
+        myAlert.confirm({
+            title: '確定要將組件移除嗎?',
+            props: {
+                onOk: () => {
+                    const updatedData = bomdata.filter((_, i) => i !== index);
+                    setBomdata(updatedData);
+                    RemoveBomDetail(item.id);
+                }
+            }
+        });
     };
 
 
@@ -781,7 +814,7 @@ export default function BomList() {
                                                 <button onClick={() => { handleEditList(index) }}>
                                                     <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                <button onClick={() => { handleCancelEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
                                                     <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                                 <button onClick={() => { handleEditList(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
