@@ -779,14 +779,14 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
-            // {
-            //   label: 'BOM維護',
-            //   path: path01 + '/bomList',
-            //   query: {
-            //     type: 'bomList',
-            //   },
-            //   erpFeature: [fac],
-            // },
+            {
+              label: 'BOM維護',
+              path: path01 + '/bomList',
+              query: {
+                type: 'bomList',
+              },
+              erpFeature: [fac],
+            },
             {
               label: '儲位管理',
               path: path01 + '/wareHouseList',
