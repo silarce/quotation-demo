@@ -114,8 +114,8 @@
 
 .head_content1 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
+  grid-template-columns: 597px 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
@@ -128,8 +128,8 @@
 
 .head_content2 {
   display: grid;
-  grid-template-columns: 600px 1fr 1fr;
-  // gap: 15px;
+  grid-template-columns: 597px 1fr 1fr;
+  gap: 15px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;

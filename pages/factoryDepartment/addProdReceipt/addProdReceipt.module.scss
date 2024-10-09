@@ -1,0 +1,207 @@
+@use "styles/theme01" as *;
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    // border: 1px solid #c1c1c1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    // height: 712px;
+}
+
+.content {
+    width: 100%;
+    overflow-y: auto;
+    top: 0;
+}
+
+.head_head1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+
+    div {
+        margin-right: 2px;
+    }
+
+    // background-color: gray;
+}
+
+.head_body {
+    display: grid;
+    grid-template-columns: 75% 1fr;
+    // gap: 15px;
+    // width: auto;
+    // margin-top: 5px;
+    // margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+  }
+
+.head_content1 {
+    display: grid;
+    grid-template-columns: 597px 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    // margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+  
+    div {
+      margin-right: 2px;
+    }
+  }
+
+  .head_content2 {
+    display: grid;
+    grid-template-columns: 597px 1fr 1fr;
+    gap: 15px;
+    width: auto;
+    // margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+  
+    div {
+      margin-right: 2px;
+    }
+  }
+
+  .body_content1 {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    gap: 0px;
+    width: auto;
+    // margin-top: 4px;
+    margin-left: 20px;
+    margin-right: 20px;
+    // border-top:1px solid rgb(168, 168, 168);
+    overflow-x: hidden;
+    // background-color: gray;
+  }
+
+//#region 按鈕
+.squarebtn {
+    height: 50px;
+    width: 50px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: #14256a;
+    transform: translateY(2px);
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
+}
+
+.disablesquarebtn {
+    height: 50px;
+    width: 50px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: #5b5a5ad6;
+    transform: translateY(2px);
+  
+    &:hover {
+      background-repeat: no-repeat;
+      background-position: center right 10px;
+      /* 調整圖標位置 */
+      cursor: not-allowed;
+      /* 添加這行使滑鼠顯示禁止符號 */
+    }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
+    }
+  }
+
+//#endregion
+
+
+
+
+div.panelHeader21 {
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        padding: 0 20px;
+
+        span {
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns:60px 30px 150px 250px 100px 200px 200px 200px 30px;
+        gap: 15px;
+        // border-bottom: 1px solid #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        
+    }
+
+    .selectedRow {
+        background-color: #ecf1ff;
+        /* 當前選擇項目的背景顏色 */
+    }
+}
+
+
+
+.customCollapse {
+    border: none; // 移除邊框
+    background: none; // 移除背景
+    box-shadow: none; // 移除陰影
+    padding:0;
+    margin:0;
+}
+
+.customCollapse .ant-collapse-header {
+    background: none;
+    padding: 0;
+    border: none;;
+}
+
+.customCollapse .ant-collapse-content {
+    padding: 0;
+    border: none;
+}
