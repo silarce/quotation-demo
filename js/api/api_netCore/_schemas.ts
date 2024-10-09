@@ -1,4 +1,7 @@
-type Tinvoice_type = '三聯' | '二聯';
+type Tinvoice_type = '二聯式' | '三聯式';
+type Ttax_type = '應稅' | '零稅' | '免稅';
+
+export type { Tinvoice_type, Ttax_type };
 
 // ==============================================================================
 
@@ -82,26 +85,26 @@ interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
 }
 
 interface TpurchaseInvoice_Dto extends Tbase {
-  date: string; // 發票日期
-  number: string; // 發票號碼
-  subtotal: number; // 發票小計
-  tax: number; // 發票稅額
-  amount_total: number; // 發票總計金額
-  title: string; // 發票抬頭
-  tax_id: string; // 發票統編
-  business_title: string; // 營業人抬頭
-  business_tax_id: string; // 營業人統編
-  type: string; // 發票類別(二聯式/三聯式)
-  payment_status: string; // 付款狀態
-  tax_type: string; // 稅別(應稅/零稅/免稅)
-  declaration_category: string; // 申報類別
-  is_offset: boolean; // 是否進項折抵
-  note: string; // 說明備註
-  apply_payment_uuid: string; // 支出單uuid
-  account_payable_uuid: string; // 付款申請uuid
-  address: string; // 發票地址
-  item: string; // 發票項目
-  accounting_subject: string; // 會計科目
+  date: string | null; // 發票日期
+  number: string | null; // 發票號碼
+  subtotal: number | null; // 發票小計
+  tax: number | null; // 發票稅額
+  amount_total: number | null; // 發票總計金額
+  title: string | null; // 發票抬頭
+  tax_id: string | null; // 發票統編
+  business_title: string | null; // 營業人抬頭
+  business_tax_id: string | null; // 營業人統編
+  type: Tinvoice_type | null; // 發票類別(二聯式/三聯式)
+  payment_status: string | null; // 付款狀態
+  tax_type: Ttax_type | null; // 稅別(應稅/零稅/免稅)
+  declaration_category: string | null; // 申報類別
+  is_offset: boolean | null; // 是否進項折抵
+  note: string | null; // 說明備註
+  apply_payment_uuid: string | null; // 支出單uuid
+  account_payable_uuid: string | null; // 付款申請uuid
+  address: string | null; // 發票地址
+  item: string | null; // 發票項目
+  accounting_subject: string | null; // 會計科目
 }
 
 // ==============================================================================
