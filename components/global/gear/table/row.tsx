@@ -38,17 +38,34 @@ const Row_pre = (
   );
 };
 
-const Cell = (
-  props: React.HTMLAttributes<HTMLDivElement> & {
-    preBuilt?: 'flex' | 'block' | 'unset';
-    bgc?: 'gray' | 'white';
-  }
-) => {
-  const { preBuilt = 'flex', bgc } = props;
-
+const Cell = ({
+  preBuilt = 'flex',
+  bgc,
+  justifyContent = 'center',
+  alignItems = 'center',
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement> & {
+  preBuilt?: 'flex' | 'block' | 'unset';
+  bgc?: 'gray' | 'white';
+  justifyContent?: 'center' | 'flex-start' | 'flex-end';
+  alignItems?: 'center' | 'flex-start' | 'flex-end';
+}) => {
   return (
-    <div {...props} className={classNames(scss.cell, scss[preBuilt], bgc && scss[bgc], props.className)}>
-      {props.children}
+    <div
+      className={classNames(
+        //
+        scss.cell,
+        scss[preBuilt],
+        bgc && scss[bgc],
+        scss[`justifyContent-${justifyContent}`],
+        scss[`alignItems-${alignItems}`],
+        className
+      )}
+      {...rest}
+    >
+      {children}
     </div>
   );
 };
