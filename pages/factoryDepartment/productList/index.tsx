@@ -1203,7 +1203,7 @@ export default function ProductList() {
                         type="text"
                         placeholder='請輸入料號'
                         value={keyword2}
-                        style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                        style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                         onChange={(e) => setKeyword2(e.target.value)}
                     />
                     <input
@@ -1213,13 +1213,13 @@ export default function ProductList() {
                         style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                         onChange={(e) => setKeyword3(e.target.value)}
                     />
-                     <input
-                                        type="text"
-                                        placeholder='請輸入規格'
-                                        value={keyword4}
-                                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
-                                        onChange={(e) => setKeyword4(e.target.value)}
-                                    />
+                    <input
+                        type="text"
+                        placeholder='請輸入規格'
+                        value={keyword4}
+                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                        onChange={(e) => setKeyword4(e.target.value)}
+                    />
                 </div>
             ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>

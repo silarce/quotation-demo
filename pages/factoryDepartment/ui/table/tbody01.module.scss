@@ -1,7 +1,7 @@
 @use "styles/theme01" as *;
 
 div.panelHeader {
-  padding: 17px 30px;
+  // padding: 17px 30px;
   border-bottom: solid 1px $colorBorder01;
 
   //   background-color: rgb(245, 104, 69);
@@ -20,7 +20,7 @@ div.panelHeader {
 
   .row01 {
     display: grid;
-    grid-template-columns: 200px 200px 200px 200px 200px 250px 200px 100px 100px;
+    grid-template-columns: 200px 200px 200px 200px 200px 250px 100px;
     gap: 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;

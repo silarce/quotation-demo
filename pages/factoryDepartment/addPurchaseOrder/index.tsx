@@ -488,7 +488,7 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
-                    data1: data2
+                    data2: data2
                 };
 
                 var inputModel = {
@@ -678,18 +678,33 @@ export default function AddPurchaseOrder() {
             myAlert.warning({ title: '請確認欄位是否填寫完整' })
             return;
         }
-        myAlert.confirm({
-            title: '確定要新增單據嗎?',
-            content: <>
-                <h1>請檢查資料是否填寫完整</h1>
-            </>,
-            props: {
-                onOk: async () => {
-                    AddPurchaseOrder();
-
+        if (editmain === true) {
+            myAlert.confirm({
+                title: '確定要修改單據嗎?',
+                content: <>
+                    <h1>請檢查資料是否填寫完整</h1>
+                </>,
+                props: {
+                    onOk: async () => {
+                        AddPurchaseOrder();
+                    }
                 }
-            }
-        })
+            })
+
+        } else {
+            myAlert.confirm({
+                title: '確定要新增單據嗎?',
+                content: <>
+                    <h1>請檢查資料是否填寫完整</h1>
+                </>,
+                props: {
+                    onOk: async () => {
+                        AddPurchaseOrder();
+
+                    }
+                }
+            })
+        }
 
     }
 
@@ -1506,12 +1521,6 @@ export default function AddPurchaseOrder() {
             <PageHeader02 tag='新增採購單' panelList={panelList} />
             {/* <div className={scss.main}> */}
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
-                    <div></div>
-                    <div className={scss.content}>
-                        <div></div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
@@ -1596,16 +1605,6 @@ export default function AddPurchaseOrder() {
                                         />
                                     </div>
                                     <div>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="採購日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
-                                                },
-                                            }}
-                                        /> */}
                                         <InputSel
                                             caption="採購日期"
                                             disabled={(status === "未儲存" || editmain === true) ? false : true}
@@ -1617,8 +1616,6 @@ export default function AddPurchaseOrder() {
                                                 },
                                             }}
                                         />
-
-
                                     </div>
                                     <div style={{ paddingRight: '20px' }}>
                                         <InputSel
@@ -1881,7 +1878,7 @@ export default function AddPurchaseOrder() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: data2.length || 0,
+                                                value: data2.length || ' ',
                                             },
                                         }}
                                     />
@@ -2027,12 +2024,10 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                readOnly={!editmain ? true : false}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
                                                 }}

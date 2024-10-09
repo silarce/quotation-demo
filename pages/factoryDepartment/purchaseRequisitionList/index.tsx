@@ -1656,10 +1656,11 @@ export default function PurchaseRequisitionList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${quotereqprogress}/${totalreqprogress}`,
+                                                value: totalreqprogress === '' ? ' ' : `${quotereqprogress}/${totalreqprogress}`,
                                             },
                                         }}
                                     />
+
                                     <InputSel
                                         {...inputSelProps}
                                         caption="已轉採購"
@@ -1667,10 +1668,11 @@ export default function PurchaseRequisitionList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${transpoprogress}/${totalreqprogress}`,
+                                                value: totalreqprogress ? `${transpoprogress}/${totalreqprogress}` : ' ',
                                             },
                                         }}
                                     />
+
                                 </div>
                             </div>
                         </div>

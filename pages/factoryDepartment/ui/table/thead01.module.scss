@@ -3,7 +3,7 @@
 
 .thead {
   display: grid;
-  grid-template-columns: 200px 200px 200px 200px 200px 250px 200px 100px 100px;
+  grid-template-columns: 200px 200px 200px 200px 200px 250px 100px;
   gap: 15px;
   height: 40px;
   padding: 0 30px;
@@ -1212,5 +1212,70 @@
     color: #979797;
   }
 }
+
+//#endregion
+
+//#region 採購單清單，新增進貨單用的
+.thead39 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns:60px 30px 150px 250px 100px 200px 200px 200px 30px;
+  gap: 15px;
+  height: 30px;
+  padding: 0 32px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+
+
+//#endregion
+
+//#region 進貨明細
+.thead40 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 150px 150px 150px 150px;
+  // gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+
+
 
 //#endregion
