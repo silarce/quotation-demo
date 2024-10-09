@@ -1,4 +1,4 @@
-import { useState, useEffect, MouseEvent as ReactMouseEvent, createContext, Key } from 'react';
+import { useState, useEffect, MouseEvent as ReactMouseEvent, createContext, Key, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -23,6 +23,7 @@ export default function TrayList() {
     const { firstin, type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
     const [data, setData] = useState<any[]>([]);
+    const [datafilter, setDatafilter] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [data11, setData11] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -36,21 +37,33 @@ export default function TrayList() {
 
     const [datatrans, setDataTrans] = useState<any[]>([]);
 
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+
+
     const searchTargetList = [
         {
-            placeholder: '請輸入料號、名稱或規格',
+            placeholder: '請輸入料號',
+        },
+        {
+            placeholder: '請輸入名稱',
+        },
+        {
+            placeholder: '請輸入規格',
         },
     ];
 
     const searchGroup = {
         searchTargetList,
         doSearch: (arr: any) => {
-            const keyword = arr[0] as string;
-            if (keyword === '' || keyword === undefined) {
-                fetchData1(whid, trayname);
-            } else {
-                searchData(keyword);
-            }
+            const arrkeyword2 = arr[0] as string;
+            const arrkeyword3 = arr[1] as string;
+            const arrkeyword4 = arr[2] as string;
+            setKeyword2(arrkeyword2);
+            setKeyword3(arrkeyword3);
+            setKeyword4(arrkeyword4);
+
         }
     };
 
@@ -89,34 +102,39 @@ export default function TrayList() {
         },
     ];
 
-    const searchData = async (keyword: string) => {
-        try {
-            setIsLoading(true);
-            const conditionModel: { keyword: string | undefined; } = {
-                keyword: keyword as string | undefined,
-            };
+    const [filteredData, setFilteredData] = useState<any[]>([]);
+    const isSelectingRef = useRef(false);
+    useEffect(() => {
+        if (isSelectingRef.current) return;
+        let filteredData = datafilter;
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/SearchWHPositionByID?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData1(data);
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
+        if (keyword2) {
+            filteredData = filteredData.filter(item =>
+                item.productid && item.productid.toString().includes(keyword2.trim())
+            );
         }
-    };
 
+        if (keyword3) {
+            filteredData = filteredData.filter(item =>
+                item.name && item.name.toString().includes(keyword3.trim())
+            );
+        }
+
+        if (keyword4) {
+            filteredData = filteredData.filter(item =>
+                item.spec && item.spec.toString().includes(keyword4.trim())
+            );
+        }
+
+
+        // setFilteredData(filteredData);
+        const distinctData = Array.from(
+            new Map(filteredData.map((item: any) => [item.trayname, item])).values()
+        );
+
+        setData(distinctData);
+
+    }, [keyword2, keyword3, keyword4]);
 
 
 
@@ -128,7 +146,14 @@ export default function TrayList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData(data);
+            // setData(data);
+            const distinctData = Array.from(
+                new Map(data.map((item: any) => [item.trayname, item])).values()
+            );
+
+            setData(distinctData);
+            setDatafilter(data);
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 50));
             if (data.length > 0 && checkfirstin > 0) {
                 const firstItem = data[0];
@@ -451,7 +476,7 @@ export default function TrayList() {
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {/* {childDataItem.length}-{childDataItem.width}-{childDataItem.childlength}-{childDataItem.childwidth}<br /> */}
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                            <span style={{fontSize:'10px'}}>{`${childDataItem.productid}\n`}</span><br />
+                                                                            <span style={{ fontSize: '10px' }}>{`${childDataItem.productid}\n`}</span><br />
                                                                         </button>
                                                                     </td>
                                                                 ))}

@@ -486,7 +486,7 @@ export default function AddPurchaseOrder() {
             try {
                 setIsLoading(true);
                 const conditionModel = {
-                    quoterequuid:quoterequuid,
+                    quoterequuid: quoterequuid,
                     create_at: create_atin,
                     need_date: moment(need_date).format('YYYY-MM-DD'),
                     create_by: create_byin,
@@ -1966,13 +1966,13 @@ export default function AddPurchaseOrder() {
         setOriginalSupplier3phonein(supplierphone3in);
         setOriginalSupplier3taxidin(suppliertaxid3in);
         setOriginalSupplier3addressin(supplieraddress3in);
-        
+
 
 
         setOriginalcreate_atin(create_atin);
         setOriginalnote(note);
 
-        
+
         setEditmain(true);
     };
 
@@ -2497,11 +2497,10 @@ export default function AddPurchaseOrder() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: data2.length,
+                                                value: data2.length > 0 ? data2.length : ' ',
                                             },
                                         }}
                                     />
-
                                 </div>
                             </div>
                         </div>

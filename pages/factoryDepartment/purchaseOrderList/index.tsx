@@ -74,7 +74,8 @@ export default function PurchaseOrderList() {
         status,
         shippingaddress,
         need_date,
-        viewtype
+        viewtype,
+        quoterequuid
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -335,6 +336,7 @@ export default function PurchaseOrderList() {
             setStatusin(status as string);
             setShippingaddressin(shippingaddress as string);
             setNeed_datein(need_date as string);
+            setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
@@ -1416,7 +1418,7 @@ export default function PurchaseOrderList() {
                                     單據
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "pc") }} title="比價Excel">
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "pc") }} title="比價Excel" style={{ display: `${(quoterequuidin === '' || quoterequuidin === undefined) ? 'none' : ''}` }}>
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
                                 </button>
@@ -1452,7 +1454,7 @@ export default function PurchaseOrderList() {
                                 </button>
                             </div>
                             <div>
-
+                                {quoterequuidin}
                             </div>
                             <div>
                                 {/* <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">
@@ -1725,10 +1727,11 @@ export default function PurchaseOrderList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${completereq}/${totalreq}`
+                                                value: totalreq ? `${completereq}/${totalreq}` : ' ',
                                             },
                                         }}
                                     />
+
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"

@@ -247,8 +247,8 @@ export default function BomList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                data:item,
-                username:userInfo?.username,
+                data: item,
+                username: userInfo?.username,
                 id: item.id
             };
 
@@ -259,7 +259,7 @@ export default function BomList() {
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-            
+
             const response = await fetch(`${setting.apipath}/WareHouse/UpdateBomDetail`, {
                 method: 'POST',
                 headers: {
@@ -267,9 +267,9 @@ export default function BomList() {
                 },
                 body: JSON.stringify(inputModel)
             });
-            
-            
-            
+
+
+
             if (!response.ok) {
                 myAlert.err({ title: 'BOM_handleUpdate', content: `API Status: ${response.status}` });
                 return;
@@ -676,7 +676,33 @@ export default function BomList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'BOM維護'} panelList={undefined} />
+            <PageHeader02 tag={'BOM維護'} panelList={undefined} customeRight={
+                [
+                    <div>
+                        {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                        <input
+                            type="text"
+                            placeholder='請輸入料號'
+                            value={keyword2}
+                            style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword2(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入名稱'
+                            value={keyword3}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword3(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入規格'
+                            value={keyword4}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                            onChange={(e) => setKeyword4(e.target.value)}
+                        />
+                    </div>]
+            } />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
@@ -695,41 +721,40 @@ export default function BomList() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                             </div>
 
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入料號'
                                     value={keyword2}
                                     style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                     onChange={(e) => setKeyword2(e.target.value)}
-                                />
-
+                                /> */}
                             </div>
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入名稱'
                                     value={keyword3}
                                     style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                     onChange={(e) => setKeyword3(e.target.value)}
-                                />
+                                /> */}
                             </div>
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入規格'
                                     value={keyword4}
                                     style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                     onChange={(e) => setKeyword4(e.target.value)}
-                                />
+                                /> */}
                             </div>
                             <div>
-                                <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                                {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
                                     <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button>
+                                </button> */}
                             </div>
                             <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                                 <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
@@ -871,6 +896,9 @@ export default function BomList() {
                         </div>
                         <div></div>
                         <div></div>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>組件總數：<span style={{ color: 'gray' }}>{bomdata.length}</span></p>
+                        </div>
                     </div>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                     </div>

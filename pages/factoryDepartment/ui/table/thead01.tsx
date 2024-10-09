@@ -9,13 +9,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead}>
         <span>倉庫名稱</span>
-        <span>倉庫位置</span>
         <span>托盤數量</span>
-        {/* <span>建立時間</span> */}
-        {/* <span>建立人員</span> */}
-        <span>IP位址</span>
         <span>修改人員</span>
         <span>修改時間</span>
+        <span>倉庫位置</span>
+        <span>IP位址</span>
         <span>{/* 按鈕格 留白 */}</span>
       </div>
     );
@@ -470,7 +468,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>類別</span>
         <span>單號</span>
         <span>主旨</span>
-        <span>人員</span> 
+        <span>人員</span>
         <span></span>
       </div>
     )
@@ -595,7 +593,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 請購單明細
+  //#region 審核紀錄
   else if (type === "ReviewHistory") {
     return (
       <div className={style.thead36}>
@@ -610,10 +608,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 請購單明細
+  //#region 進貨紀錄
   else if (type === "ProdReceiptHistory") {
     return (
-      <div className={style.thead36}>
+      <div className={style.thead40}>
         <span>序</span>
         <span>進貨單號</span>
         <span>進貨日期</span>
@@ -638,7 +636,24 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span>單位</span>
         <span>更新日期</span>
-        <span>建立日期</span>
+        <span>建立人員</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 採購單清單，新增進貨單用的
+  else if (type === "PurchaseOrderForAddProdReceipt") {
+    return (
+      <div className={style.thead39}>
+        <span></span>
+        <span>序</span>
+        <span>採購單號</span>
+        <span>廠商名稱</span>
+        <span>採購日期</span>
+        <span>總金額</span>
+        <span>採購人員</span>
+        <span>狀態</span>
         <span></span>
       </div>
     )
