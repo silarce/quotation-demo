@@ -16,7 +16,7 @@ import type {
   TupdateApplyPayment_data_Dto,
   TcreateApplyPayment_Dto,
   TupdateApplyPayment_Dto,
-  TapplyPaymentDetail_Dto,
+  TpurchaseInvoice_Dto,
 } from './_schemas';
 
 const subRoot = 'Accountant';
@@ -24,7 +24,7 @@ const subRoot = 'Accountant';
 // =================================================================================
 
 interface TapplyPayment_Dto_detailed extends TapplyPayment_Dto {
-  details: TapplyPaymentDetail_Dto[];
+  detailArr: TpurchaseInvoice_Dto[];
 }
 
 // =================================================================================
@@ -157,7 +157,7 @@ const apiGetApplyPaymentDetail = async (apply_payment_id: string) => {
   };
 
   return axi2
-    .get<TapplyPaymentDetail_Dto[]>(api, { params })
+    .get<TpurchaseInvoice_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       myAlert.err({ title: '取得支出單明細失敗', content: err.message });
@@ -258,7 +258,7 @@ const useGetApplyPaymentById = (
       .then(async (applyPayment) => {
         const detailArr = await apiGetApplyPaymentDetail(id);
 
-        const applyPayment_detailed = { ...applyPayment, details: detailArr };
+        const applyPayment_detailed: TapplyPayment_Dto_detailed = { ...applyPayment, detailArr: detailArr };
 
         setRes(applyPayment_detailed);
 
@@ -326,6 +326,10 @@ const useGetApplyPaymentById = (
     [isFetching, callAlertOnError, update]
   );
 
+  const clear = () => {
+    setRes(undefined);
+  };
+
   useEffect(() => {
     autoUpdate && update();
   }, [id]);
@@ -333,6 +337,7 @@ const useGetApplyPaymentById = (
   return {
     res,
     setRes,
+    clear,
     update,
     reqPatch,
     reqDeleteDetail,
@@ -351,7 +356,7 @@ const useGetApplyPaymentDetail = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [res, setRes] = useState<TapplyPaymentDetail_Dto[]>();
+  const [res, setRes] = useState<TpurchaseInvoice_Dto[]>();
 
   const update = useCallback(async () => {
     if (isFetching || !apply_paymnet_id) {
@@ -402,7 +407,7 @@ export {
   TupdateApplyPayment_data_Dto,
   TcreateApplyPayment_Dto,
   TupdateApplyPayment_Dto,
-  TapplyPaymentDetail_Dto,
+  TpurchaseInvoice_Dto,
   // TapplyPayment_Dto_detailed,
   apiPostAddApplyPayment,
   useGetApplyPayment,

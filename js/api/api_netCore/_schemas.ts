@@ -48,9 +48,23 @@ interface TapplyPayment_Dto extends Tbase {
   payment_date: string; //  支出日期
   total_price: number; //  合計
   applicant_department: string; //  申請單位(支出部門)
-  agent_employee_id: string; //  經辦人id
   description: string; // 備註說明
+  agent_employee_id: string; //  經辦人id
   status: string; // 付款狀態
+}
+
+interface TcreateApplyPayment_Dto {
+  payment_date: string;
+  total_price: `${number}`;
+  applicant_department: string;
+  description: string;
+  agent_employee_id: string;
+  data: TcreateApplyPayment_data_Dto[];
+}
+
+interface TupdateApplyPayment_Dto extends Partial<TcreateApplyPayment_Dto> {
+  apply_payment_id: string;
+  data?: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
 }
 
 interface TcreateApplyPayment_data_Dto {
@@ -67,25 +81,7 @@ interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
   id: string;
 }
 
-interface TcreateApplyPayment_Dto {
-  payment_date: string;
-  applicant_department: string;
-  description: string;
-  agent_employee_id: string;
-  total_price: `${number}`;
-  data: TcreateApplyPayment_data_Dto[];
-}
-
-// interface TupdateApplyPayment_Dto extends TcreateApplyPayment_Dto {
-//   apply_payment_id: string;
-//   data: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
-// }
-interface TupdateApplyPayment_Dto extends Partial<TcreateApplyPayment_Dto> {
-  apply_payment_id: string;
-  data?: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
-}
-
-interface TapplyPaymentDetail_Dto extends Tbase {
+interface TpurchaseInvoice_Dto extends Tbase {
   date: string; // 發票日期
   number: string; // 發票號碼
   subtotal: number; // 發票小計
@@ -113,6 +109,7 @@ interface TapplyPaymentDetail_Dto extends Tbase {
 export type {
   //
   TnetCoreApiBody,
+  Tbase,
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
@@ -123,6 +120,6 @@ export type {
   TupdateApplyPayment_data_Dto,
   TcreateApplyPayment_Dto,
   TupdateApplyPayment_Dto,
-  TapplyPaymentDetail_Dto,
+  TpurchaseInvoice_Dto,
   //
 };
