@@ -239,7 +239,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         status: item.status,
         note: item.note,
         shippingaddress: item.shippingaddress,
-        need_date: item.need_date
+        need_date: item.need_date,
+        quoterequuid:item.quoterequuid
       }
     })
   }
@@ -393,14 +394,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
               >
                 <span>{_item.whname}</span>
-                <span>{_item.position}</span>
                 <span style={{ color: '#14256a', fontWeight: 'bolder' }}>{_item.traycodetotal}</span>
                 {/* <span>{convertToYearMonthDay('Datea', _item.created_at)}</span> */}
                 {/* <span>{_item.create_by}</span> */}
-                <span>{_item.url}</span>
                 <span>{_item.update_by}</span>
                 {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
                 <span>{getTaiwanDateStr(_item.update_at)}</span>
+                <span>{_item.url}</span>
+                <span>{_item.position}</span>
                 {/* <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
                 <span></span>
               </div>
