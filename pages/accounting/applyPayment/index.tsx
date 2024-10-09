@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, forwardRef, useImperativeHandle, use } from 'react';
+import { useState, useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
@@ -13,6 +13,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 // component
 import Table_paymentApplication from 'components/page/accounting/paymentApplication/table_paymentApplication';
 import { SearchModal_applyPayment } from 'components/composition/searchModal/useSearchModal/useSearchModal_applyPayment';
+import Detail, { DetailHeader, TimperativeHandle } from 'components/page/accounting/applyPayment/detail';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
@@ -44,19 +45,6 @@ import type { TuserDto } from 'js/api/dtoTypes';
 
 // ===================================================================================
 
-// interface Tstate_applyPayment extends Omit<TcreateApplyPayment_Dto, 'payment_date'> {
-//   readonly id?: string;
-//   readonly serial_number: TapplyPayment_Dto['serial_number'] | undefined; // 單號
-//   readonly status: TapplyPayment_Dto['status'] | undefined; // 付款狀態
-//   payment_date: Moment | null;
-//   // agentName: string;
-
-//   //   payment_date: string; //  支出日期
-//   //   total_price: number; //  合計
-//   //   applicant_department: string; //  申請單位(支出部門)
-//   //   description: string; // 備註說明
-//   //   agent_employee_id: string; //  經辦人id
-// }
 interface Tstate_applyPayment {
   readonly id?: string;
   readonly serial_number: string | undefined; // 單號
@@ -69,33 +57,31 @@ interface Tstate_applyPayment {
   agentName: string | undefined; //  經辦人名字
 }
 
-interface Tstate_detail {
-  readonly id?: string;
-  date: string | undefined; // 發票日期
-  number: string | undefined; // 發票號碼
-  subtotal: number | undefined; // 發票小計
-  tax: number | undefined; // 發票稅額
-  amount_total: number | undefined; // 發票總計金額
-  title: string | undefined; // 發票抬頭
-  tax_id: string | undefined; // 發票統編
-  business_title: string | undefined; // 營業人抬頭
-  business_tax_id: string | undefined; // 營業人統編
-  type: string | undefined; // 發票類別(二聯式/三聯式)
-  payment_status: string | undefined; // 付款狀態
-  tax_type: string | undefined; // 稅別(應稅/零稅/免稅)
-  declaration_category: string | undefined; // 申報類別
-  is_offset: boolean | undefined; // 是否進項折抵
-  note: string | undefined; // 說明備註
-  // apply_payment_uuid: string | undefined; // 支出單uuid
-  // account_payable_uuid: string | undefined; // 付款申請uuid
-  address: string | undefined; // 發票地址
-  item: string | undefined; // 發票項目
-  accounting_subject: string | undefined; // 會計科目
-}
+// interface Tstate_detail {
+//   readonly id?: string;
+//   date: string | undefined; // 發票日期
+//   number: string | undefined; // 發票號碼
+//   subtotal: number | undefined; // 發票小計
+//   tax: number | undefined; // 發票稅額
+//   amount_total: number | undefined; // 發票總計金額
+//   title: string | undefined; // 發票抬頭
+//   tax_id: string | undefined; // 發票統編
+//   business_title: string | undefined; // 營業人抬頭
+//   business_tax_id: string | undefined; // 營業人統編
+//   type: string | undefined; // 發票類別(二聯式/三聯式)
+//   payment_status: string | undefined; // 付款狀態
+//   tax_type: string | undefined; // 稅別(應稅/零稅/免稅)
+//   declaration_category: string | undefined; // 申報類別
+//   is_offset: boolean | undefined; // 是否進項折抵
+//   note: string | undefined; // 說明備註
+//   address: string | undefined; // 發票地址
+//   item: string | undefined; // 發票項目
+//   accounting_subject: string | undefined; // 會計科目
+// }
 
-type TimperativeHandle = {
-  count: number;
-};
+// type TimperativeHandle = {
+//   count: number;
+// };
 
 // ===================================================================================
 // MARK: START
@@ -112,9 +98,17 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     isFetching,
   } = useGetApplyPaymentById(apply_paymnet_id);
 
-  console.log(data_applyPayment);
+  // console.log(data_applyPayment);
 
+  const raw_detailArr = data_applyPayment?.detailArr;
   // --------------------------------------------------------------------------
+  const {
+    state_detailDict,
+    // setState_detailDict,
+    addDetail,
+    removeDetail,
+  } = useDetailArr(raw_detailArr);
+
   const { state_applyPayment, setState_applyPayment } = useApplyPayment(
     data_applyPayment,
     disabled,
@@ -144,15 +138,20 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   // --------------------------------------------------------------------------
 
   const ref = useRef<(TimperativeHandle | null)[]>([]);
+  // const ref = useRef<{ [key: string]: TimperativeHandle | null }>({});
 
   const test = () => {
     console.log(ref.current);
-    ref.current?.forEach((item) => {
-      console.log(item?.count);
-    });
+    // ref.current?.forEach((item) => {
+    //   console.log(item?.state_detail);
+    // });
   };
 
+  console.log(ref.current);
+
   // --------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer bodyPreStyle="style01">
@@ -177,28 +176,24 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
             <button onClick={test}>test</button>
 
             <div>
-              <Row thead={true}></Row>
-              <Row></Row>
-              <Detail
-                ref={(handle) => {
-                  ref.current[0] = handle;
-                }}
-              />
-              <Detail
-                ref={(handle) => {
-                  ref.current[1] = handle;
-                }}
-              />
-              <Detail
-                ref={(handle) => {
-                  ref.current[2] = handle;
-                }}
-              />
-              <Detail
-                ref={(handle) => {
-                  ref.current[3] = handle;
-                }}
-              />
+              <DetailHeader />
+
+              {Object.entries(state_detailDict).map(([id, state_detail], index) => {
+                return (
+                  <Detail
+                    key={id}
+                    disabled={disabled}
+                    indexNumber={index + 1}
+                    raw_detail={state_detail}
+                    ref={(handle) => {
+                      ref.current[index] = handle;
+                    }}
+                    onDeleteClick={() => {
+                      removeDetail(id);
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
         </Spin>
@@ -211,6 +206,39 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
 // ==============================================================================
 
 // region HOOKs
+
+const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined) => {
+  const [state, setState] = useState<{ [id: string]: TpurchaseInvoice_Dto | undefined }>({});
+
+  const add = () => {
+    setState((state) => {
+      return { ...state, [nanoid()]: undefined };
+    });
+  };
+
+  const remove = (id: string) => {
+    setState((state) => {
+      const { [id]: removed, ...remain } = state;
+
+      return remain;
+    });
+  };
+
+  useEffect(() => {
+    const detailDict = detailArr?.reduce((acc, item) => {
+      return { ...acc, [item.id]: item };
+    }, {});
+    setState(detailDict ?? {});
+  }, [detailArr]);
+
+  return {
+    state_detailDict: state,
+    setState_detailDict: setState,
+    addDetail: add,
+    removeDetail: remove,
+  };
+};
+
 const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: boolean, userName: string) => {
   const [state, setState] = useState<Tstate_applyPayment>(emptyState_applyPayment());
 
@@ -247,50 +275,50 @@ const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: 
   };
 };
 
-const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) => {
-  const [state, setState] = useState<Tstate_detail>();
+// const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) => {
+//   const [state, setState] = useState<Tstate_detail>();
 
-  const defaultState = useMemo(() => {
-    if (!detail) {
-      return emptyState_detail();
-    }
+//   const defaultState = useMemo(() => {
+//     if (!detail) {
+//       return emptyState_detail();
+//     }
 
-    const defaultState: Tstate_detail = {
-      id: detail.id,
-      date: detail.date,
-      number: detail.number,
-      subtotal: detail.subtotal,
-      tax: detail.tax,
-      amount_total: detail.amount_total,
-      title: detail.title,
-      tax_id: detail.tax_id,
-      business_title: detail.business_title,
-      business_tax_id: detail.business_tax_id,
-      type: detail.type,
-      payment_status: detail.payment_status,
-      tax_type: detail.tax_type,
-      declaration_category: detail.declaration_category,
-      is_offset: detail.is_offset,
-      note: detail.note,
-      address: detail.address,
-      item: detail.item,
-      accounting_subject: detail.accounting_subject,
-    };
+//     const defaultState: Tstate_detail = {
+//       id: detail.id,
+//       date: detail.date,
+//       number: detail.number,
+//       subtotal: detail.subtotal,
+//       tax: detail.tax,
+//       amount_total: detail.amount_total,
+//       title: detail.title,
+//       tax_id: detail.tax_id,
+//       business_title: detail.business_title,
+//       business_tax_id: detail.business_tax_id,
+//       type: detail.type,
+//       payment_status: detail.payment_status,
+//       tax_type: detail.tax_type,
+//       declaration_category: detail.declaration_category,
+//       is_offset: detail.is_offset,
+//       note: detail.note,
+//       address: detail.address,
+//       item: detail.item,
+//       accounting_subject: detail.accounting_subject,
+//     };
 
-    return defaultState;
-  }, [detail]);
+//     return defaultState;
+//   }, [detail]);
 
-  useEffect(() => {
-    if (disabled) {
-      setState(defaultState);
-    }
-  }, [defaultState, disabled]);
+//   useEffect(() => {
+//     if (disabled) {
+//       setState(defaultState);
+//     }
+//   }, [defaultState, disabled]);
 
-  return {
-    state_detail: state,
-    setState_detail: setState,
-  };
-};
+//   return {
+//     state_detail: state,
+//     setState_detail: setState,
+//   };
+// };
 
 // ==============================================================================
 
@@ -393,32 +421,39 @@ const Profile = ({
   );
 };
 
-const Detail_pre = (_: object, ref: React.Ref<TimperativeHandle>) => {
-  const [count, setCount] = useState(0);
+// const Detail_pre = (
+//   {
+//     raw_detailArr,
+//   }: {
+//     raw_detailArr: TpurchaseInvoice_Dto | undefined;
+//   },
+//   ref: React.Ref<TimperativeHandle>
+// ) => {
+//   const [count, setCount] = useState(0);
 
-  useImperativeHandle(
-    ref,
-    (): TimperativeHandle => ({
-      count,
-    })
-  );
+//   useImperativeHandle(
+//     ref,
+//     (): TimperativeHandle => ({
+//       count,
+//     })
+//   );
 
-  // return <Row></Row>;
-  return (
-    <div>
-      <button
-        onClick={() => {
-          setCount(count + 1);
-        }}
-      >
-        count test
-      </button>
-      {count}
-    </div>
-  );
-};
+//   // return <Row></Row>;
+//   return (
+//     <div>
+//       <button
+//         onClick={() => {
+//           setCount(count + 1);
+//         }}
+//       >
+//         count test
+//       </button>
+//       {count}
+//     </div>
+//   );
+// };
 
-const Detail = forwardRef(Detail_pre);
+// const Detail = forwardRef(Detail_pre);
 
 // ========================================================================
 
@@ -433,24 +468,24 @@ const emptyState_applyPayment = (): Tstate_applyPayment => ({
   agentName: undefined,
 });
 
-const emptyState_detail = (): Tstate_detail => ({
-  id: undefined,
-  date: undefined,
-  number: undefined,
-  subtotal: undefined,
-  tax: undefined,
-  amount_total: undefined,
-  title: undefined,
-  tax_id: undefined,
-  business_title: undefined,
-  business_tax_id: undefined,
-  type: undefined,
-  payment_status: undefined,
-  tax_type: undefined,
-  declaration_category: undefined,
-  is_offset: undefined,
-  note: undefined,
-  address: undefined,
-  item: undefined,
-  accounting_subject: undefined,
-});
+// const emptyState_detail = (): Tstate_detail => ({
+//   id: undefined,
+//   date: undefined,
+//   number: undefined,
+//   subtotal: undefined,
+//   tax: undefined,
+//   amount_total: undefined,
+//   title: undefined,
+//   tax_id: undefined,
+//   business_title: undefined,
+//   business_tax_id: undefined,
+//   type: undefined,
+//   payment_status: undefined,
+//   tax_type: undefined,
+//   declaration_category: undefined,
+//   is_offset: undefined,
+//   note: undefined,
+//   address: undefined,
+//   item: undefined,
+//   accounting_subject: undefined,
+// });
