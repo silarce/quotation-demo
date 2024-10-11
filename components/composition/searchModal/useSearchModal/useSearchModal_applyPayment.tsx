@@ -94,12 +94,19 @@ const useData = (filter: Tstate): TmodalData<TapplyPayment_Dto> => {
 
 // 要做i18n的處理，因此設定不能抽出hook
 const useConfig_data = () => {
-  const { t, i18n } = useTranslation('common');
+  const { t: t_common, i18n } = useTranslation('common');
+  const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
 
   const dataConfig = useMemo(() => {
     const config: Tconfig<TapplyPayment_Dto> = {
+      serial_number: {
+        label: t('serial_number'),
+        style: {
+          width: '200px',
+        },
+      },
       payment_date: {
-        label: 'payment_date',
+        label: t('payment_date'),
         style: {
           width: '80px',
         },
@@ -107,18 +114,56 @@ const useConfig_data = () => {
           return getTaiwanDateStr(payment_date);
         },
       },
-      serial_number: {
-        label: 'serial_number',
+      applicant_department: {
+        label: t('applicant_department'),
+        style: {
+          width: '80px',
+        },
+      },
+      status: {
+        label: t('status'),
+        style: {
+          width: '80px',
+        },
+      },
+      total_price: {
+        label: t('total_price'),
+        style: {
+          width: '80px',
+        },
+      },
+      description: {
+        label: t('description'),
         style: {
           width: '200px',
         },
       },
+      // agent: {
+      //   label: t_common('agent'),
+      //   style: {
+      //     width: '80px',
+      //   },
+      //   reducer: ({ agent_employee }, { index }) => {
+      //     return agent_employee?.chName || '';
+      //   },
+      // },
+
+      //
     };
 
     return config;
   }, [i18n.language]);
 
-  const dataKeyArr: string[] = ['payment_date', 'serial_number'];
+  // const dataKeyArr: string[] = ['serial_number', 'payment_date'];
+  const dataKeyArr: string[] = [
+    'serial_number',
+    'payment_date',
+    'applicant_department',
+    'status',
+    'total_price',
+    'description',
+    // 'agent',
+  ];
 
   return { dataConfig, dataKeyArr };
 };

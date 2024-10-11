@@ -5,5 +5,13 @@
     "bankCode": "Bank Code",
     "account": "Account",
     "accountName": "Account Name"
+  },
+  "applyPayment": {
+    "serial_number": "Serial Number",
+    "payment_date": "Payment Date",
+    "applicant_department": "Applicant Department",
+    "status": "Payment Status",
+    "description": "Description",
+    "total_price": "Total Price"
   }
 }

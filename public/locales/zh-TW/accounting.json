@@ -5,5 +5,13 @@
     "bankCode": "銀行代號",
     "account": "帳戶",
     "accountName": "帳戶名"
+  },
+  "applyPayment": {
+    "serial_number": "單號",
+    "payment_date": "支出日期",
+    "applicant_department": "申請單位",
+    "status": "付款狀態",
+    "description": "備註說明",
+    "total_price": "合計"
   }
 }

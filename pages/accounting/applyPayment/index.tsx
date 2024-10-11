@@ -226,7 +226,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
             disabled={disabled}
           />
           <div>
-            <p>費用資訊</p>
+            <span className="text-xl text-main mt-2 block">費用資訊</span>
 
             <div>
               <DetailHeader disabled={disabled} onAddClick={addDetail} />
@@ -437,40 +437,6 @@ const Profile = ({
   );
 };
 
-// const Detail_pre = (
-//   {
-//     raw_detailArr,
-//   }: {
-//     raw_detailArr: TpurchaseInvoice_Dto | undefined;
-//   },
-//   ref: React.Ref<TimperativeHandle>
-// ) => {
-//   const [count, setCount] = useState(0);
-
-//   useImperativeHandle(
-//     ref,
-//     (): TimperativeHandle => ({
-//       count,
-//     })
-//   );
-
-//   // return <Row></Row>;
-//   return (
-//     <div>
-//       <button
-//         onClick={() => {
-//           setCount(count + 1);
-//         }}
-//       >
-//         count test
-//       </button>
-//       {count}
-//     </div>
-//   );
-// };
-
-// const Detail = forwardRef(Detail_pre);
-
 // ========================================================================
 
 const emptyState_applyPayment = (): Tstate_applyPayment => ({
@@ -483,25 +449,3 @@ const emptyState_applyPayment = (): Tstate_applyPayment => ({
   description: undefined,
   agentName: undefined,
 });
-
-// const emptyState_detail = (): Tstate_detail => ({
-//   id: undefined,
-//   date: undefined,
-//   number: undefined,
-//   subtotal: undefined,
-//   tax: undefined,
-//   amount_total: undefined,
-//   title: undefined,
-//   tax_id: undefined,
-//   business_title: undefined,
-//   business_tax_id: undefined,
-//   type: undefined,
-//   payment_status: undefined,
-//   tax_type: undefined,
-//   declaration_category: undefined,
-//   is_offset: undefined,
-//   note: undefined,
-//   address: undefined,
-//   item: undefined,
-//   accounting_subject: undefined,
-// });
