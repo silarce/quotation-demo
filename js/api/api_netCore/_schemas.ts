@@ -1,3 +1,5 @@
+import { TemployeeDto } from '../dtoTypes';
+
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
 
@@ -53,6 +55,7 @@ interface TapplyPayment_Dto extends Tbase {
   applicant_department: string; //  申請單位(支出部門)
   description: string; // 備註說明
   agent_employee_id: string; //  經辦人id
+  agent_employee: TemployeeDto; // 經辦人
   status: string; // 付款狀態
 }
 

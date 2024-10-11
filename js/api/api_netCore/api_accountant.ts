@@ -5,6 +5,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
+import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
+
 import type {
   //
   TaccountantPresetDto,
@@ -25,6 +27,7 @@ const subRoot = 'Accountant';
 
 interface TapplyPayment_Dto_detailed extends TapplyPayment_Dto {
   detailArr: TpurchaseInvoice_Dto[];
+  agent_employee: TemployeeDto;
 }
 
 // =================================================================================
@@ -259,9 +262,16 @@ const useGetApplyPaymentById = (
         return applyPayment;
       })
       .then(async (applyPayment) => {
-        const detailArr = await apiGetApplyPaymentDetail(id);
+        const [detailArr, employee] = await Promise.all([
+          await apiGetApplyPaymentDetail(id),
+          await apiGetEmployee_id(applyPayment.agent_employee_id),
+        ]);
 
-        const applyPayment_detailed: TapplyPayment_Dto_detailed = { ...applyPayment, detailArr: detailArr };
+        const applyPayment_detailed: TapplyPayment_Dto_detailed = {
+          ...applyPayment,
+          detailArr: detailArr,
+          agent_employee: employee,
+        };
 
         setRes(applyPayment_detailed);
 

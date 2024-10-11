@@ -206,8 +206,6 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
 
   // --------------------------------------------------------------------------
 
-  // --------------------------------------------------------------------------
-
   // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
@@ -307,7 +305,7 @@ const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: 
     let defaultState: Tstate_applyPayment = emptyState_applyPayment();
 
     if (!applyPaymnet) {
-      defaultState.agentName = userName;
+      !disabled && (defaultState.agentName = userName);
 
       return defaultState;
     }
@@ -320,11 +318,11 @@ const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: 
       total_price: applyPaymnet.total_price,
       applicant_department: applyPaymnet.applicant_department,
       description: applyPaymnet.description,
-      agentName: 'agentName',
+      agentName: applyPaymnet.agent_employee.chName,
     };
 
     return defaultState;
-  }, [applyPaymnet, userName]);
+  }, [applyPaymnet, userName, disabled]);
 
   useEffect(() => {
     setState(defaultState);
