@@ -449,11 +449,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>料號</span>
         <span>品名</span>
         <span>規格</span>
+        <span>已領</span>
         <span>數量</span>
         <span>單位</span>
         <span></span>
-        <span>備註</span>
         <span>領料人員</span>
+        <span>備註</span>
         <span></span>
       </div>
     )
@@ -642,7 +643,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 採購單清單，新增進貨單用的
+  //#region 新增進貨單用的採購單清單
   else if (type === "PurchaseOrderForAddProdReceipt") {
     return (
       <div className={style.thead39}>
@@ -654,11 +655,32 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>總金額</span>
         <span>採購人員</span>
         <span>狀態</span>
+        <span>備註</span>
         <span></span>
       </div>
     )
   }
   //#endregion
+    //#region 新增進貨單明細
+    else if (type === "AddPRe_ReqList") {
+      return (
+        <div className={style.thead41}>
+          <span></span>
+          <span>序</span>
+          <span>料號</span>
+          <span>品名</span>
+          <span>規格</span>
+          <span>數量</span>
+          <span>單位</span>
+          <span></span>
+          <span>單價</span>
+          <span>金額</span>
+          <span>備註</span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
   else {
     return null;
   }

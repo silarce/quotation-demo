@@ -28,6 +28,8 @@ import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 //日期
 import moment from "moment";
 import { Collapse } from "antd";
@@ -54,6 +56,7 @@ export default function AddProdReceipt() {
     const [bomdata, setBomdata] = useState<any[]>([]); // 物料data
     const [searchdata, setSearchdata] = useState<any[]>([]); // 物料查詢
     const [searchbardata, setSearchBarData] = useState<any[]>([]); // 手key物料查詢
+    const [data2, setData2] = useState<any[]>([]); // 進貨明細清單data
 
 
     // 查詢變數-物料
@@ -89,6 +92,9 @@ export default function AddProdReceipt() {
 
     //編輯狀態
     const [editmain, setEditmain] = useState<boolean>(false);
+
+    //展開狀態
+    const [poopen, setPoopen] = useState<boolean>(false);// 採購清單展開
 
     // 保存原始值
     const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
@@ -152,7 +158,24 @@ export default function AddProdReceipt() {
     };
     //新增按鈕
     const panelList: TpanelList = [
-        { searchGroup },
+        // { searchGroup },
+        {
+            type: 'myButton',
+            label: '返回',
+            onClick: () => {
+                myAlert.confirm({
+                    title: '確定要返回進貨管理嗎?',
+                    content: <>
+                        <h1>未儲存的資料將不會保留</h1>
+                    </>,
+                    props: {
+                        onOk: () => {
+                            router.back();
+                        }
+                    }
+                });
+            },
+        },
     ];
 
 
@@ -192,6 +215,71 @@ export default function AddProdReceipt() {
         }
     };
 
+    const AddProdReceipt = async () => {
+        if (editmain === true) {
+
+        } else {
+            try {
+                // setIsLoading(true);
+                const conditionModel = {
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    note: note
+                };
+
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/WareHouse/AddProdReceipt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                myAlert.info(
+                    {
+                        title: '單據新增成功',
+                        content: `進貨單據號碼為:${data[0].prodreceiptid}`
+                    })
+
+                setData2([]);
+                // setPurchaseorderid(data[0].purchaseorderid);
+                // setPurchaseorderuuid(data[0].id);
+                setStatus("未送出");
+                // getPurchaseOrder();
+                
+                console.log(data);
+
+                // getProduct();
+
+                // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+            } catch (error: any) {
+                // setError(error.message);
+                console.log(error.message);
+            }
+            finally {
+                // setIsLoading(false);
+            }
+        }
+    }
+
+
+
     //#endregion
 
     //#region =============【方法入口】===============================================================================
@@ -203,19 +291,10 @@ export default function AddProdReceipt() {
     const handleRowClick = (itemId: string) => {
         setSelectedItemId(itemId);
     };
-
-    //#endregion
-
-
-
-
-
-    //#region 編輯Bomdetail
-    // const [editbomdetail, setEditbomdetail] = useState<boolean>(false);
     //#endregion
 
     //新增單據
-    const handlePreAddPO = () => {
+    const handlePreAdd = () => {
         setCreate_byin(userInfo?.username as string);
         // setSuppliernamein("");
         // setSupplierphonein("");
@@ -225,10 +304,40 @@ export default function AddProdReceipt() {
         // setShippingaddressin("台中市霧峰區峰北路666號");
         setProdreceiptid("儲存後產生");
         setStatus("未儲存");
-        // setNote("");
+        setNote("");
         // setData2([]);
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         // setNeed_date(moment().format('YYYY-MM-DD') || '');
+        setPoopen(!poopen);
+    }
+
+    const handleAdd = () => {
+        if (editmain === true) {
+            myAlert.confirm({
+                title: '確定要修改單據嗎?',
+                content: <>
+                    <h1>請檢查資料是否填寫完整</h1>
+                </>,
+                props: {
+                    onOk: async () => {
+                        // AddProdReceipt();
+                    }
+                }
+            })
+        } else {
+            myAlert.confirm({
+                title: '確定要新增單據嗎?',
+                content: <>
+                    <h1>請檢查資料是否填寫完整</h1>
+                </>,
+                props: {
+                    onOk: async () => {
+                        AddProdReceipt();
+
+                    }
+                }
+            })
+        }
     }
 
     const handleEdit = () => {
@@ -242,6 +351,7 @@ export default function AddProdReceipt() {
         setOriginalnote(note);
         // setOriginaldata2(data2);
         setEditmain(true);
+        setPoopen(!poopen);
     };
 
     const handlecancelAddPR = () => {
@@ -257,6 +367,7 @@ export default function AddProdReceipt() {
             // setNeed_date(originalneed_date);
             setNote(originalnote);
             // setData2(originaldata2);
+            setPoopen(!poopen);
         } else {
             setSuppliernamein("");
             setSupplierphonein("");
@@ -270,7 +381,13 @@ export default function AddProdReceipt() {
             // setData2([]);
             setNote("");
             // setNeed_date(moment().toString());
+            setPoopen(!poopen);
         }
+    }
+
+    // 手key加入
+    const handleAddByHandKey = () => {
+
     }
 
     //#endregion
@@ -280,12 +397,48 @@ export default function AddProdReceipt() {
     const onChange = (item: any) => {
         // alert(item.purchaseorderid);
     };
+
+
+    //#region Tab頁籤切換
+    //頁籤切換判斷
+    const [tabnow, setTabnow] = useState<string>("採購單據");
+    const [tabshow, setTabshow] = useState<string>("採購單據");
+    const [tabnow2, setTabnow2] = useState<string>("單據明細");
+    const [tabshow2, setTabshow2] = useState<string>("單據明細");
+
+    // 根據當前選中的 tab 設置按鈕的樣式
+    const getButtonStyle = (tabName: string) => {
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed = (tabName: string) => {
+        setTabnow(tabName);
+        setTabshow(tabName);
+    };
+
+    // 2
+    const getButtonStyle2 = (tabName: string) => {
+        // return tabnow === tabName ? { color: '#14256a', borderColor: '#c1c1c1', backgroundColor: 'white', borderBottom: '0px' } : {};
+        return tabnow2 === tabName ? { color: '#14256a', backgroundColor: '#FFEEEE', borderBottom: '2px solid #ea1833' } : {};
+    };
+
+    const tabChosed2 = (tabName: string) => {
+        setTabnow2(tabName);
+        setTabshow2(tabName);
+    };
+
+
+    //#endregion
+
     //#endregion
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'新增進貨單'} panelList={undefined} />
+            <PageHeader02 tag={'新增進貨單'} panelList={panelList}
+                customeLeft={[
+
+                ]} />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div className={scss.head_head1}>
@@ -295,13 +448,13 @@ export default function AddProdReceipt() {
                                 查詢
                             </button>
                             &nbsp;
-                            <button className={scss.squarebtn} onClick={() => { }} title="查尋單據">
+                            {/* <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
                                 <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 採購
-                            </button>
+                            </button> */}
                         </div>
                         <div>
-                            <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPO() }} title="新增單據">
+                            <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAdd() }} title="新增單據">
                                 <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                 新增
                             </button>
@@ -323,7 +476,7 @@ export default function AddProdReceipt() {
                             &nbsp;
                             <button
                                 className={(status === '未儲存' || editmain === true) ? scss.squarebtn : scss.disablesquarebtn}
-                                // onClick={() => { handleAdd() }}
+                                onClick={() => { handleAdd() }}
                                 title="儲存"
                                 disabled={(status !== '未儲存' && editmain !== true)}
                             >
@@ -392,7 +545,7 @@ export default function AddProdReceipt() {
                             </div>
                             <div className={scss.head_content2}>
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="廠商名稱"
                                         disabled={(status === "未儲存" || editmain === true) ? false : true}
@@ -413,7 +566,7 @@ export default function AddProdReceipt() {
                                                 // onChange: (e) => { handleSupplieraddressChange(e) }
                                             },
                                         }}
-                                    />
+                                    /> */}
                                     <InputSel
                                         {...inputSelProps}
                                         caption="備註"
@@ -427,7 +580,7 @@ export default function AddProdReceipt() {
                                     />
                                 </div>
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="聯絡電話"
                                         disabled={(status === "未儲存" || editmain === true) ? false : true}
@@ -448,7 +601,7 @@ export default function AddProdReceipt() {
                                                 onChange: (e) => { setSuppliertaxidin(e.target.value) }
                                             },
                                         }}
-                                    />
+                                    /> */}
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -506,55 +659,157 @@ export default function AddProdReceipt() {
                             </div>
                         </div>
                     </div>
-                    <div className={scss.body_content1} style={{ height: '300px', border: '1px solid #c1c1c1', overflowX: 'auto' }}>
-                        {/* <span> */}
+                    <div className={scss.head_tab}>
                         <div>
-                            <Thead01 type={'PurchaseOrderForAddProdReceipt'} />
-
-
-                            {data && (
-                                data.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader21}>
-                                        <Collapse defaultActiveKey={[]} onChange={() => onChange(_item)} className={scss.customCollapse}>
-                                            <Panel
-                                                key="1"
-                                                showArrow={false}
-                                                header={(
-                                                    <div
-                                                        key={index}
-                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                    // onClick={() => onChange(_item)}  // 新增 onClick 事件
-                                                    >
-                                                        <span></span>
-                                                        <span>{index + 1}</span>
-                                                        <span>{_item.purchaseOrder.purchaseorderid}</span>
-                                                        <span>{_item.purchaseOrder.suppliername}</span>
-                                                        <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
-                                                        <span>{_item.purchaseOrder.totalprice.toLocaleString()}</span>
-                                                        <span>{_item.purchaseOrder.create_by}</span>
-                                                        <span>{_item.purchaseOrder.status}</span>
-                                                        <span></span>
-                                                    </div>
-                                                )}
-                                            >
-                                                <div>
-                                                    {_item.details.map((detail: any, detailIndex: number) => (
-                                                        <div key={detailIndex} className={scss.detailRow}>
-                                                            <span>{detail.productid}</span>
-                                                            <span>{detail.quantity}</span>
-                                                            <span>{detail.unitprice}</span>
-                                                            {/* 更多明細項目 */}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </Panel>
-                                        </Collapse>
-                                    </CellWithBar>
-                                ))
-                            )}
-
+                            <span>
+                                <button
+                                    className={scss.detailminitabbtn}
+                                    onClick={() => tabChosed('採購單據')}
+                                    style={getButtonStyle('採購單據')}
+                                >
+                                    採購單據
+                                </button>
+                            </span>
+                            <span>
+                            </span>
                         </div>
-                        {/* </span> */}
+                        <div></div>
+                    </div>
+                    <div className={scss.tabbody}>
+                        <div>
+                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                {/* <span> */}
+                                <div>
+                                    <Thead01 type={'PurchaseOrderForAddProdReceipt'} />
+                                    {data && (
+                                        data.map((_item: any, index: number) => (
+                                            <CellWithBar key={index} className={scss.panelHeader21}>
+                                                <div style={{ display: 'flex', alignItems: 'center' }}> {/* 新增一個容器包住箭頭和其他內容 */}
+                                                    <span style={{ paddingLeft: '20px' }}>
+                                                        {/* 添加阻止展開的事件 */}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation(); // 阻止 Collapse 展開
+
+                                                                if (status === '未送出') {
+                                                                    // 當 poopen 為 true 時才執行動作
+                                                                    alert(_item.purchaseOrder.purchaseorderid);
+                                                                }
+
+                                                                // setPoopen(!poopen); // 切換 poopen 的值
+                                                            }}
+                                                            disabled={status != '未送出'} // 當 poopen 為 false 時，按鈕禁用
+                                                        >
+                                                            <img
+                                                                src={status === '未送出' ? icon_fc_arrow_down.src : icon_fc_arrow_down_gray.src} // 根據 poopen 狀態顯示不同的圖片
+                                                                alt="search"
+                                                                style={{ height: '20px', width: '20px' }}
+                                                            />
+                                                        </button>
+                                                    </span>
+                                                    <Collapse defaultActiveKey={[]} onChange={() => onChange(_item)} className={scss.customCollapse} >
+                                                        <Panel
+                                                            style={{ backgroundColor: 'transparent', border: '0' }}
+                                                            key="1"
+                                                            showArrow={false}
+                                                            header={(
+                                                                <div
+                                                                    key={index}
+                                                                    className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                >
+                                                                    <span>{index + 1}</span>
+                                                                    <span>{_item.purchaseOrder.purchaseorderid}</span>
+                                                                    <span>{_item.purchaseOrder.suppliername}</span>
+                                                                    <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
+                                                                    <span>{_item.purchaseOrder.totalprice.toLocaleString()}</span>
+                                                                    <span>{_item.purchaseOrder.create_by}</span>
+                                                                    <span>{_item.purchaseOrder.status}</span>
+                                                                    <span>{_item.purchaseOrder.note}</span>
+                                                                    <span></span>
+                                                                </div>
+                                                            )}
+                                                        >
+                                                            <div>
+                                                                <table className={scss.detailTable}>
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style={{ width: '50px' }}>序</th>
+                                                                            <th style={{ width: '100px' }}>料號</th>
+                                                                            <th style={{ width: '300px' }}>名稱</th>
+                                                                            <th>規格</th>
+                                                                            {/* <th>已進</th> */}
+                                                                            <th>數量</th>
+                                                                            <th>單價</th>
+                                                                            <th>金額</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {_item.details.map((detail: any, detailIndex: number) => (
+                                                                            <tr key={detailIndex}>
+                                                                                <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                                                                <td style={{ width: '100px' }}>{detail.productid}</td>
+                                                                                <td style={{ width: '300px' }}>{detail.name}</td>
+                                                                                <td>{detail.spec}</td>
+                                                                                {/* <td>{detail.alreadyinquantity}</td> */}
+                                                                                <td>{detail.quantity.toLocaleString()}</td>
+                                                                                <td>{detail.unitprice.toLocaleString()}</td>
+                                                                                <td>{detail.totalprice.toLocaleString()}</td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </Panel>
+                                                    </Collapse>
+                                                </div>
+                                            </CellWithBar>
+                                        ))
+                                    )}
+                                </div>
+                                {/* </span> */}
+                            </div>
+                        </div>
+                    </div>
+                    <div className={scss.head_tab}>
+                        <div>
+                            <span>
+                                <button
+                                    className={scss.detailminitabbtn}
+                                    onClick={() => tabChosed2('單據明細')}
+                                    style={getButtonStyle2('單據明細')}
+                                >
+                                    單據明細
+                                </button>
+                            </span>
+                            <span></span>
+                        </div>
+                        <div></div>
+                    </div>
+                    <div className={scss.tabbody}>
+                        <div>
+                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                <Thead01 type={'AddPRe_ReqList'} />
+                                {data2 && (
+                                    data2.map((_item: any, index: number) => (
+                                        <CellWithBar key={index} className={scss.panelHeader14}>
+                                            <div className={scss.row01}>
+                                                <span></span>
+                                                <span>{index + 1}</span>
+                                                <span>{_item.productid}</span>
+                                                <span>{_item.name}</span>
+                                                <span>{_item.spec}</span>
+                                                <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                                <span>{_item.quantity.toLocaleString()}</span>
+                                                <span>{_item.unit}</span>
+                                                <span>{_item.unitprice.toLocaleString()}</span>
+                                                <span>{_item.totalprice.toLocaleString()}</span>
+                                                <span className="truncate" title={_item.note}>{_item.note}</span>
+                                            </div>
+                                        </CellWithBar>
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     </div>
                     <div className={scss.body_foot1}>
                         <div></div>

@@ -438,10 +438,7 @@ export default function ProdReceiptList() {
     const GetProdEntryDetailByProdReceiptId = async (prodreceiptuuid: any, prodreceiptdetailuuid: any) => {
         try {
             setIsLoading(true);
-            const conditionModel: {
-                prodreceiptuuid: string | undefined,
-                prodreceiptdetailuuid: string | undefined
-            } = {
+            const conditionModel= {
                 prodreceiptuuid: prodreceiptuuid as string | undefined,
                 prodreceiptdetailuuid: prodreceiptdetailuuid as string | undefined
             };

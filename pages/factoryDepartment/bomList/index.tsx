@@ -676,7 +676,8 @@ export default function BomList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'BOM維護'} panelList={undefined} customeRight={
+            <PageHeader02 tag={'BOM維護'} panelList={undefined} 
+            customeRight={
                 [
                     <div>
                         {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
@@ -684,7 +685,7 @@ export default function BomList() {
                             type="text"
                             placeholder='請輸入料號'
                             value={keyword2}
-                            style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                             onChange={(e) => setKeyword2(e.target.value)}
                         />
                         <input
@@ -701,8 +702,25 @@ export default function BomList() {
                             style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                             onChange={(e) => setKeyword4(e.target.value)}
                         />
-                    </div>]
-            } />
+                    </div>
+                    ]}
+                    customeLeft={[
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                                <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                    符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
+                                </p>
+                            </div>
+                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                                <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                    物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
+                                </p>
+                            </div>
+                        </div>
+    
+    
+                    ]}
+                    />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
@@ -757,10 +775,10 @@ export default function BomList() {
                                 </button> */}
                             </div>
                             <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
+                                {/* <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p> */}
                             </div>
                             <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p>
+                                {/* <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p> */}
                             </div>
                         </div>
                         <Thead01 type={'ProductList'} />
