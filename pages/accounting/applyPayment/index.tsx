@@ -427,6 +427,7 @@ const Profile = ({
         disabled={disabled}
         selectProps={{
           props: {
+            placeholder: '請選擇支出部門',
             options: optionArr_name,
             value: state_applyPayment.applicant_department
               ? {
