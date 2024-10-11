@@ -131,11 +131,14 @@ const apiGetApplyPaymentById = async (id: string) => {
 const apiPostAddApplyPayment = async (data: TcreateApplyPayment_Dto) => {
   const api = `/${subRoot}/AddApplyPayment`;
 
-  return axi2.post(api, data).catch((err: AxiosError) => {
-    myAlert.err({ title: '新增支出單失敗', content: err.message });
+  return axi2
+    .post<string>(api, data)
+    .then(({ data: id }) => id)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '新增支出單失敗', content: err.message });
 
-    return Promise.reject(err);
-  });
+      return Promise.reject(err);
+    });
 };
 
 // 編輯支出單

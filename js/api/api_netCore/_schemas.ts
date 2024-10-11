@@ -65,9 +65,9 @@ interface TcreateApplyPayment_Dto {
   data: TcreateApplyPayment_data_Dto[];
 }
 
-interface TupdateApplyPayment_Dto extends Partial<TcreateApplyPayment_Dto> {
+interface TupdateApplyPayment_Dto extends TcreateApplyPayment_Dto {
   apply_payment_id: string;
-  data?: (TcreateApplyPayment_data_Dto | TupdateApplyPayment_data_Dto)[];
+  data: TupdateApplyPayment_data_Dto[];
 }
 
 interface TcreateApplyPayment_data_Dto {
@@ -81,7 +81,7 @@ interface TcreateApplyPayment_data_Dto {
   note: string;
 }
 interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
-  id: string;
+  id?: string;
 }
 
 interface TpurchaseInvoice_Dto extends Tbase {

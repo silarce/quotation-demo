@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import _ from 'lodash';
 
 import type { TuseSearchModal, Tstate, Tconfig_filter, Tconfig, TmodalData } from '../types';
 
@@ -71,7 +72,12 @@ const useData = (filter: Tstate): TmodalData<TapplyPayment_Dto> => {
   // const { dataArr, viewRef_bottom, isLoadingPage1, reset, meta } = useGetCustomers_infinite_2({
   //   customParams: params,
   // });
-  const { res: dataArr = [], isFetching, update } = useGetApplyPayment();
+  const dataKit = useGetApplyPayment();
+  const { res = [], isFetching, update } = dataKit;
+
+  const dataArr = useMemo(() => {
+    return _.sortBy(res, 'serial_number');
+  }, [res]);
 
   // useEffect(() => {
   //   update();

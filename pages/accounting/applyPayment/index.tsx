@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // antd
 import { Spin } from 'antd';
@@ -19,6 +20,7 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
@@ -52,32 +54,6 @@ interface Tstate_applyPayment {
   agentName: string | undefined; //  經辦人名字
 }
 
-// interface Tstate_detail {
-//   readonly id?: string;
-//   date: string | undefined; // 發票日期
-//   number: string | undefined; // 發票號碼
-//   subtotal: number | undefined; // 發票小計
-//   tax: number | undefined; // 發票稅額
-//   amount_total: number | undefined; // 發票總計金額
-//   title: string | undefined; // 發票抬頭
-//   tax_id: string | undefined; // 發票統編
-//   business_title: string | undefined; // 營業人抬頭
-//   business_tax_id: string | undefined; // 營業人統編
-//   type: string | undefined; // 發票類別(二聯式/三聯式)
-//   payment_status: string | undefined; // 付款狀態
-//   tax_type: string | undefined; // 稅別(應稅/零稅/免稅)
-//   declaration_category: string | undefined; // 申報類別
-//   is_offset: boolean | undefined; // 是否進項折抵
-//   note: string | undefined; // 說明備註
-//   address: string | undefined; // 發票地址
-//   item: string | undefined; // 發票項目
-//   accounting_subject: string | undefined; // 會計科目
-// }
-
-// type TimperativeHandle = {
-//   count: number;
-// };
-
 // ===================================================================================
 // MARK: START
 export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
@@ -85,15 +61,16 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
 
   // --------------------------------------------------------------------------
+  const ref_detailArr = useRef<(TimperativeHandle | null)[]>([]);
+  // --------------------------------------------------------------------------
   const {
     res: data_applyPayment,
     clear: clear_data_applyPayment,
+    update: update_data_applyPayment,
     reqPatch,
     reqDeleteDetail,
     isFetching,
   } = useGetApplyPaymentById(apply_paymnet_id);
-
-  // console.log(data_applyPayment);
 
   const raw_detailArr = data_applyPayment?.detailArr;
   // --------------------------------------------------------------------------
@@ -111,6 +88,93 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   );
 
   // --------------------------------------------------------------------------
+
+  // region API
+
+  const createBody = () => {
+    type Tbody = Parameters<typeof reqPatch>[0];
+
+    const {
+      payment_date,
+      //  total_price,
+      applicant_department,
+      description,
+    } = state_applyPayment;
+
+    if (!payment_date) {
+      myAlert.info({ title: '請選擇支出日期' });
+
+      return;
+    }
+
+    if (!userInfo.employee?.id) {
+      myAlert.info({ title: '沒有經辦人ID' });
+
+      return;
+    }
+
+    const data: Tbody['data'] = ref_detailArr.current.map((item) => {
+      const state_detail = item!.state_detail;
+
+      const dataItem: TupdateApplyPayment_data_Dto = {
+        id: state_detail.id,
+        item: state_detail.item || '',
+        invoice_business_title: state_detail.business_title || '',
+        invoice_type: state_detail.type,
+        tax: state_detail.tax || '0',
+        amount_total: state_detail.amount_total || '0',
+        accounting_subject: state_detail.accounting_subject || '',
+        invoice_number: state_detail.number || '',
+        note: state_detail.note || '',
+      };
+
+      return dataItem;
+    });
+
+    const total_price = data
+      .reduce((de, item) => {
+        return de.add(item.amount_total);
+      }, new Decimal(0))
+      .toString() as `${number}`;
+
+    const body: Tbody = {
+      payment_date: payment_date.toISOString(),
+      total_price,
+      applicant_department: applicant_department || '',
+      description: description || '',
+      agent_employee_id: userInfo.employee.id,
+      data,
+    };
+
+    return body;
+  };
+
+  const reqPostApplyPayment = async () => {
+    const body = createBody();
+    body &&
+      apiPostAddApplyPayment(body).then((id) => {
+        setApply_paymnet_id(id);
+        setDisabled(true);
+      });
+  };
+
+  const reqPatchApplyPayment = async () => {
+    const body = createBody();
+    body &&
+      (await reqPatch(body)
+        .then(update_data_applyPayment)
+        .then(() => setDisabled(true)));
+  };
+
+  // --------------------------------------------------------------------------
+
+  const handleConfirm = () => {
+    if (apply_paymnet_id) {
+      reqPatchApplyPayment();
+    } else {
+      reqPostApplyPayment();
+    }
+  };
 
   const handleSearch = () => {
     const { unmount } = DragableModal.create({
@@ -141,10 +205,8 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   //  This is because a new instance of the function is created with each render,
   //  so React needs to clear the old ref and set up the new one.
 
-  const ref = useRef<(TimperativeHandle | null)[]>([]);
-
   const test = () => {
-    console.log(ref.current);
+    console.log(ref_detailArr.current);
     // ref.current?.forEach((item) => {
     //   console.log(item?.state_detail);
     // });
@@ -166,6 +228,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
           onCancelClick={() => setDisabled(true)}
           onEditClick={() => setDisabled(false)}
           onAddClick={handleAdd}
+          onConfirmClick={handleConfirm}
         />
         <Spin spinning={isFetching} delay={300}>
           <Profile
@@ -186,7 +249,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
                     indexNumber={index + 1}
                     raw_detail={state_detail}
                     ref={(handle) => {
-                      ref.current[index] = handle;
+                      ref_detailArr.current[index] = handle;
                     }}
                     onDeleteClick={() => {
                       removeDetail(id);
@@ -292,12 +355,14 @@ const BtnBar = ({
   onCancelClick,
   onEditClick,
   onAddClick,
+  onConfirmClick,
 }: {
   disabled: boolean;
   onSearchClick: () => void;
   onCancelClick: () => void;
   onEditClick: () => void;
   onAddClick: () => void;
+  onConfirmClick: () => void;
 }) => {
   return (
     <ThreePartBar>
@@ -308,9 +373,9 @@ const BtnBar = ({
       <>
         {!disabled && (
           <>
-            <SquareBtn content="add" className="invisible" />
+            <SquareBtn className="invisible" />
             <SquareBtn content="cancel" onClick={onCancelClick} />
-            <SquareBtn content="save" theme="danger" />
+            <SquareBtn content="save" theme="danger" onClick={onConfirmClick} />
           </>
         )}
         {disabled && (

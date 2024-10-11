@@ -28,9 +28,9 @@ interface Tstate_detail {
   tax_id: string | null; // 發票統編
   business_title: string | null; // 營業人抬頭
   business_tax_id: string | null; // 營業人統編
-  type: Tinvoice_type | null; // 發票類別(二聯式/三聯式)
+  type: Tinvoice_type; // 發票類別(二聯式/三聯式)
   payment_status: string | null; // 付款狀態
-  tax_type: Ttax_type | null; // 稅別(應稅/零稅/免稅)
+  tax_type: Ttax_type; // 稅別(應稅/零稅/免稅)
   declaration_category: string | null; // 申報類別
   is_offset: boolean | null; // 是否進項折抵
   note: string | null; // 說明備註
@@ -155,9 +155,9 @@ const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) 
       tax_id: detail.tax_id,
       business_title: detail.business_title,
       business_tax_id: detail.business_tax_id,
-      type: detail.type,
+      type: detail.type || '二聯式',
       payment_status: detail.payment_status,
-      tax_type: detail.tax_type,
+      tax_type: detail.tax_type || '應稅',
       declaration_category: detail.declaration_category,
       is_offset: detail.is_offset,
       note: detail.note,
@@ -187,7 +187,7 @@ const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) 
 
 const keyArr: (keyof Tconfig)[] = [
   'item',
-  'title',
+  'business_title',
   'tax_type',
   'subtotal',
   'tax',
@@ -229,17 +229,17 @@ const config: Tconfig = {
       };
     },
   },
-  title: {
+  business_title: {
     label: '付款對象',
     style: { width: 100 },
     propsCreator: (state, setState, disabled) => {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
-          value: state.title ?? '',
+          value: state.business_title ?? '',
           readOnly: disabled,
           disabled: false,
           onChange: (e) => {
-            setState({ ...state, title: e.target.value });
+            setState({ ...state, business_title: e.target.value });
           },
         },
       };
@@ -253,11 +253,22 @@ const config: Tconfig = {
     label: '稅別',
     style: { width: 100 },
     propsCreator: (state, setState, disabled) => {
+      const options = [
+        { value: '應稅', label: '應稅' },
+        { value: '零稅', label: '零稅' },
+        { value: '免稅', label: '免稅' },
+      ];
+
       const selectProps: TinputSelProps['selectProps'] = {
         props: {
+          options,
           value: state.tax_type ? { value: state.tax_type, label: state.tax_type } : null,
           onChange: (option) => {
             const value = (option?.value || null) as Ttax_type | null;
+
+            if (!value) {
+              return;
+            }
 
             setState({ ...state, tax_type: value });
           },
@@ -487,9 +498,9 @@ const emptyState_detail = (): Tstate_detail => ({
   tax_id: null,
   business_title: null,
   business_tax_id: null,
-  type: null,
+  type: '二聯式',
   payment_status: null,
-  tax_type: null,
+  tax_type: '應稅',
   declaration_category: null,
   is_offset: null,
   note: null,
