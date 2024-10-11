@@ -122,7 +122,9 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
       return;
     }
 
-    const data: Tbody['data'] = ref_detailArr.current.map((item) => {
+    const currentArr = ref_detailArr.current.filter((item) => item !== null) as TimperativeHandle[];
+
+    const data: Tbody['data'] = currentArr.map((item) => {
       const state_detail = item!.state_detail;
 
       const dataItem: TupdateApplyPayment_data_Dto = {
