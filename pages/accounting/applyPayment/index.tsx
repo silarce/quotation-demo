@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
@@ -11,19 +11,14 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Table_paymentApplication from 'components/page/accounting/paymentApplication/table_paymentApplication';
 import { SearchModal_applyPayment } from 'components/composition/searchModal/useSearchModal/useSearchModal_applyPayment';
 import Detail, { DetailHeader, TimperativeHandle } from 'components/page/accounting/applyPayment/detail';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
-import Row, { Cell } from 'components/global/gear/table/row';
-
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // api
 import {
@@ -92,7 +87,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   // --------------------------------------------------------------------------
   const {
     res: data_applyPayment,
-    clear,
+    clear: clear_data_applyPayment,
     reqPatch,
     reqDeleteDetail,
     isFetching,
@@ -107,7 +102,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     // setState_detailDict,
     addDetail,
     removeDetail,
-  } = useDetailArr(raw_detailArr);
+  } = useDetailArr(raw_detailArr, disabled);
 
   const { state_applyPayment, setState_applyPayment } = useApplyPayment(
     data_applyPayment,
@@ -131,14 +126,22 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   };
 
   const handleAdd = () => {
-    clear();
+    clear_data_applyPayment();
     setDisabled(false);
   };
 
   // --------------------------------------------------------------------------
 
+  // ref.current的長度不會縮短且被填入null的原因
+  // https://stackoverflow.com/questions/75927246/how-does-react-clear-the-old-ref-when-calling-ref-callback-after-re-render
+
+  //  If the ref callback is defined as an inline function,
+  //  it will get called twice during updates,
+  //  first with null and then again with the DOM element.
+  //  This is because a new instance of the function is created with each render,
+  //  so React needs to clear the old ref and set up the new one.
+
   const ref = useRef<(TimperativeHandle | null)[]>([]);
-  // const ref = useRef<{ [key: string]: TimperativeHandle | null }>({});
 
   const test = () => {
     console.log(ref.current);
@@ -147,16 +150,16 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     // });
   };
 
-  console.log(ref.current);
-
   // --------------------------------------------------------------------------
 
   // MARK: RENDER
-
   return (
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag="支出單" />
       <div>
+        <button onClick={test}>test</button>
+        <br />
+        <br />
         <BtnBar
           disabled={disabled}
           onSearchClick={handleSearch}
@@ -173,11 +176,8 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
           <div>
             <p>費用資訊</p>
 
-            <button onClick={test}>test</button>
-
             <div>
-              <DetailHeader />
-
+              <DetailHeader disabled={disabled} onAddClick={addDetail} />
               {Object.entries(state_detailDict).map(([id, state_detail], index) => {
                 return (
                   <Detail
@@ -204,11 +204,21 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
 // MARK: END
 
 // ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
 // region HOOKs
 
-const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined) => {
-  const [state, setState] = useState<{ [id: string]: TpurchaseInvoice_Dto | undefined }>({});
+const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined, disabled: boolean) => {
+  const defaultState = useMemo(() => {
+    const detailDict = detailArr?.reduce((acc, item) => {
+      return { ...acc, [item.id]: item };
+    }, {});
+
+    return detailDict ?? {};
+  }, [detailArr]);
+
+  const [state, setState] = useState<{ [id: string]: TpurchaseInvoice_Dto | undefined }>(defaultState);
 
   const add = () => {
     setState((state) => {
@@ -225,11 +235,8 @@ const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined) => {
   };
 
   useEffect(() => {
-    const detailDict = detailArr?.reduce((acc, item) => {
-      return { ...acc, [item.id]: item };
-    }, {});
-    setState(detailDict ?? {});
-  }, [detailArr]);
+    setState(defaultState);
+  }, [defaultState, disabled]);
 
   return {
     state_detailDict: state,
@@ -274,51 +281,6 @@ const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: 
     setState_applyPayment: setState,
   };
 };
-
-// const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) => {
-//   const [state, setState] = useState<Tstate_detail>();
-
-//   const defaultState = useMemo(() => {
-//     if (!detail) {
-//       return emptyState_detail();
-//     }
-
-//     const defaultState: Tstate_detail = {
-//       id: detail.id,
-//       date: detail.date,
-//       number: detail.number,
-//       subtotal: detail.subtotal,
-//       tax: detail.tax,
-//       amount_total: detail.amount_total,
-//       title: detail.title,
-//       tax_id: detail.tax_id,
-//       business_title: detail.business_title,
-//       business_tax_id: detail.business_tax_id,
-//       type: detail.type,
-//       payment_status: detail.payment_status,
-//       tax_type: detail.tax_type,
-//       declaration_category: detail.declaration_category,
-//       is_offset: detail.is_offset,
-//       note: detail.note,
-//       address: detail.address,
-//       item: detail.item,
-//       accounting_subject: detail.accounting_subject,
-//     };
-
-//     return defaultState;
-//   }, [detail]);
-
-//   useEffect(() => {
-//     if (disabled) {
-//       setState(defaultState);
-//     }
-//   }, [defaultState, disabled]);
-
-//   return {
-//     state_detail: state,
-//     setState_detail: setState,
-//   };
-// };
 
 // ==============================================================================
 

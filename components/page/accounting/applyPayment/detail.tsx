@@ -7,10 +7,10 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 
 // api
 import { TpurchaseInvoice_Dto } from 'js/api/api_netCore/api_accountant';
-
 import { Ttax_type, Tinvoice_type } from 'js/api/api_netCore/_schemas';
 
-import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+// icon
+import { Icon_fc_add2, Icon_fc_delete } from 'public/image/icon/fcIconComponent/fcIcons';
 
 // config
 import { taxRate } from 'config/config_common';
@@ -63,10 +63,12 @@ const Cell = (props: Tprops_cell) => <Cell_ori justifyContent="flex-start" align
 
 // ==============================================================================
 
-const DetailHeader = () => {
+const DetailHeader = ({ disabled, onAddClick }: { disabled: boolean; onAddClick: () => void }) => {
   return (
     <Row thead={true}>
-      <Cell {...config_other.btnCell}></Cell>
+      <Cell {...config_other.btnCell}>
+        {!disabled && <Icon_fc_add2 className="cursor-pointer translate-y-[-3px]" onClick={onAddClick} />}
+      </Cell>
       <Cell {...config_other.indexNumber}>{config_other.indexNumber.label}</Cell>
       {keyArr.map((key) => {
         const { label, style } = config[key]!;
@@ -111,7 +113,7 @@ const Detail_pre = (
   return (
     <Row>
       <Cell style={config_other.btnCell.style}>
-        <IconDelete01 onClick={onDeleteClick} />
+        {!disabled && <Icon_fc_delete className={'cursor-pointer translate-y-[-3px]'} onClick={onDeleteClick} />}
       </Cell>
       <Cell style={config_other.indexNumber.style}>{indexNumber}</Cell>
       {keyArr.map((key) => {
@@ -198,7 +200,7 @@ const keyArr: (keyof Tconfig)[] = [
 const config_other = {
   btnCell: {
     label: '',
-    style: { width: 30 },
+    style: { width: 30, justifyContent: 'center' },
   },
   indexNumber: {
     label: '序',
