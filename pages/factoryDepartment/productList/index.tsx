@@ -1196,32 +1196,49 @@ export default function ProductList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'物料維護'} panelList={panelList} customeRight={[
-                <div>
-                    {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                    <input
-                        type="text"
-                        placeholder='請輸入料號'
-                        value={keyword2}
-                        style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                        onChange={(e) => setKeyword2(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder='請輸入名稱'
-                        value={keyword3}
-                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                        onChange={(e) => setKeyword3(e.target.value)}
-                    />
-                    <input
-                        type="text"
-                        placeholder='請輸入規格'
-                        value={keyword4}
-                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
-                        onChange={(e) => setKeyword4(e.target.value)}
-                    />
-                </div>
-            ]} />
+            <PageHeader02 tag={'物料維護'} panelList={panelList}
+                customeRight={[
+                    <div>
+                        {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                        <input
+                            type="text"
+                            placeholder='請輸入料號'
+                            value={keyword2}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword2(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入名稱'
+                            value={keyword3}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword3(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入規格'
+                            value={keyword4}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                            onChange={(e) => setKeyword4(e.target.value)}
+                        />
+                    </div>
+                ]}
+                customeLeft={[
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
+                            </p>
+                        </div>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
+                            </p>
+                        </div>
+                    </div>
+
+
+                ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -1290,21 +1307,10 @@ export default function ProductList() {
                                     </button> */}
                                 </div>
                                 <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                    <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
+                                    {/* <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p> */}
                                 </div>
                                 <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                    <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p>
-                                    {/* <InputSel
-                                        {...inputSelProps}
-                                        caption="物料數量"
-                                        className='align-bottom'
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                value: `${searchdata.length}`
-                                            },
-                                        }}
-                                    /> */}
+                                    {/* <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p> */}
                                 </div>
                             </div>
                             <Thead01 type={'ProductList'} />
