@@ -695,13 +695,13 @@ const sidePathList: TsidePathList = {
           erpFeature: devPass,
           list: [
             {
-              label: '請購申請',
-              path: path01 + '/addPurchaseRequisition',
+              label: '詢價管理',
+              path: path01 + '/quotereqList',
               erpFeature: [fac],
             },
             {
-              label: '詢價管理',
-              path: path01 + '/quotereqList',
+              label: '請購申請',
+              path: path01 + '/addPurchaseRequisition',
               erpFeature: [fac],
             },
             {
@@ -807,14 +807,14 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
-            // {
-            //   label: 'BOM維護',
-            //   path: path01 + '/bomList',
-            //   query: {
-            //     type: 'bomList',
-            //   },
-            //   erpFeature: [fac],
-            // },
+            {
+              label: 'BOM維護',
+              path: path01 + '/bomList',
+              query: {
+                type: 'bomList',
+              },
+              erpFeature: [fac],
+            },
             {
               label: '儲位管理',
               path: path01 + '/wareHouseList',

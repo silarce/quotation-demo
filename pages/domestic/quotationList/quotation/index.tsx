@@ -703,7 +703,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: state_profile.trackProgress ?? '',
       projectProgress: state_profile.projectProgress ?? '',
 
-      discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      discount: `${Number(state_summary.discountRate ?? 100)}`,
       averageDiscount: avgDiscount_withQty || null,
       tuneTotal: state_summary.tuneTotal || '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
@@ -712,8 +712,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
-      exchangeRate: state_summary.exchangeRate,
-      foreignTotal: state_summary.foreignTotal.replaceAll(',', ''),
+      exchangeRate: state_summary.exchangeRate || null,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', '') || null,
       currency: state_summary.currency,
 
       //

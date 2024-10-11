@@ -1215,131 +1215,124 @@ export default function AddPurchaseRequisition() {
                                 </button>
                             </div>
                         </div>
-                        <div className={scss.head_content1}>
+                        <div className={scss.head_body}>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: purchaserequisitionid || ' ',
-                                        },
-                                    }}
-                                />
+                                <div className={scss.head_content1}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購單號"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: purchaserequisitionid || ' ',
+                                                },
+                                            }}
+                                        />
 
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="請購部門"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: create_byin,
-                                        },
-                                    }}
-                                /> */}
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="申請人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: create_byin,
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: getTaiwanDateStr(create_atin || '') || '',
-                                        },
-                                    }}
-                                />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購日期"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') || '',
+                                                },
+                                            }}
+                                        />
 
-                            </div>
-                            <div>
-                                <InputSel
-                                    caption="需用日期"
-                                    className="global_tip_must"
-                                    // disabled={status === "未儲存" ? false : true}
-                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                    datePickerProps={{
-                                        props: {
-                                            value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
-                                            onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red' },
-                                            value: status || ' ',
-                                        },
-                                    }}
-                                />
-
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={status === "未儲存" ? false : true}
-                                    inputProps={{
-                                        props: {
-                                            value: note || ' ',
-                                            onChange: (e) => { setNote(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content3}>
-                            <div style={{ marginRight: '20px' }}>
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            caption="需用日期"
+                                            className="global_tip_must"
+                                            // disabled={status === "未儲存" ? false : true}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
+                                                    onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="請購人員"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: create_byin,
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={scss.head_content2}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註"
+                                            disabled={status === "未儲存" ? false : true}
+                                            inputProps={{
+                                                props: {
+                                                    value: note || ' ',
+                                                    onChange: (e) => { setNote(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_content3}>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.head_foot1}>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
 
                             </div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot1}>
                             <div>
-                            </div>
-                            <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
-                                {/* <span>
-                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
-                                </span> */}
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: status || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="品項數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { color: 'red' },
+                                                value: data2.length || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
-                            <div>
-                                {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
-                                    品項查詢
-                                </button> */}
-                            </div>
-                            <div style={{ marginTop: '5px' }}></div>
                             <div></div>
-                            <div>
-                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
-                                    總比數：
-                                    {data2.length}
-                                </span>
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
                         <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                             <Thead01 type={'AddPR_ReqList'} />

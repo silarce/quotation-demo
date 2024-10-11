@@ -1613,12 +1613,8 @@ export default function ProdEntryList() {
                                                 },
                                             }}
                                         />
-
-
                                     </div>
                                     <div>
-
-
                                         <InputSel
                                             {...inputSelProps}
                                             caption="入庫日期"
@@ -1663,7 +1659,6 @@ export default function ProdEntryList() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1786,7 +1781,7 @@ export default function ProdEntryList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${entryprogress}/${totalentryprogress}`,
+                                                value: entryprogress && totalentryprogress ? `${entryprogress}/${totalentryprogress}` : entryprogress || totalentryprogress || ' ',
                                             },
                                         }}
                                     />

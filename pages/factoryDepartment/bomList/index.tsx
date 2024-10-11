@@ -1,7 +1,7 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import scss from './bomList.module.scss';
-import { useContext, useEffect, useRef, useState } from "react";
+import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { setting } from '../wareHouseList/index';
 import { useRouter } from "next/router";
 import { content } from "html2canvas/dist/types/css/property-descriptors/content";
@@ -195,7 +195,7 @@ export default function BomList() {
     };
     const RemoveBomDetail = async (id: any) => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 id: id
             };
@@ -212,11 +212,89 @@ export default function BomList() {
 
             const response = await fetch(`${setting.apipath}/WareHouse/RemoveBomDetail?${queryParams}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                myAlert.err({ title: 'BOM_handleRemove', content: `API Status: ${response.status}` });
+                return;
             }
-            const responseData = await response.json();
+
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: '成功', content: result.message });
+                // setEdithandkey(!edithandkey);
+                GetBom(parent_product); // 更新狀態或刷新數據
+            } else {
+                // 失敗，顯示錯誤提示
+                myAlert.warning({ title: '失敗', content: "移除失敗" });
+            }
+
+
+
 
             GetBom(parent_product);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+    const UpdateBomDetail = async (item: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                data: item,
+                username: userInfo?.username,
+                id: item.id
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateBomDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+
+
+            if (!response.ok) {
+                myAlert.err({ title: 'BOM_handleUpdate', content: `API Status: ${response.status}` });
+                return;
+            }
+
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: '成功', content: result.message });
+                // setEdithandkey(!edithandkey);
+                GetBom(parent_product); // 更新狀態或刷新數據
+            } else {
+                // 失敗，顯示錯誤提示
+                myAlert.warning({ title: '失敗', content: "更新失敗" });
+            }
+
+
+
+
+            GetBom(parent_product);
+
+            setEditlist(false);
 
         } catch (error: any) {
             // setError(error.message);
@@ -333,7 +411,7 @@ export default function BomList() {
             });
 
             if (!response.ok) {
-                myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` });
+                myAlert.err({ title: 'BOM_handleAdd', content: `API Status: ${response.status}` });
                 return;
             }
 
@@ -352,13 +430,13 @@ export default function BomList() {
                 myAlert.warning({ title: '失敗', content: result.message });
             }
 
+            setEdithandkey(false);
             console.log(result);
         } catch (error: any) {
             // 顯示錯誤信息
             myAlert.err({ title: 'FunctionError', content: error.message });
         }
     };
-
 
 
     //手key清除
@@ -456,12 +534,7 @@ export default function BomList() {
         setShowSuggestions2(false);
     };
 
-    // 從口袋清單移除
-    const handleRemove = (index: number, item: any) => {
-        const updatedData = bomdata.filter((_, i) => i !== index);
-        setBomdata(updatedData);
-        RemoveBomDetail(item.id);
-    };
+
 
     // 手Key物料查詢
     const dropdownRef = useRef<HTMLUListElement | null>(null);
@@ -484,6 +557,53 @@ export default function BomList() {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+
+
+    // 組件清單編輯
+    const [editlist, setEditlist] = useState<boolean>(false);
+    const [editlistindex, setEditlistindex] = useState<number>(0);
+    const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
+    const quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    // 組件編輯
+    const handleEdit = async (index: any) => {
+        if (editlist === true) {
+            myAlert.warning({ title: '組件編輯中，請先結束編輯狀態' })
+            return;
+        }
+        setOriginaleditlistdata(bomdata);
+        setEditlist(!editlist);
+        setEditlistindex(index);
+    };
+    // 組件取消編輯
+    const handleCancel = async (index: any) => {
+        setEditlist(!editlist);
+        setBomdata(originaleditlistdata);
+    };
+
+    // 從組件清單移除
+    const handleRemove = (index: number, item: any) => {
+        myAlert.confirm({
+            title: '確定要將組件移除嗎?',
+            props: {
+                onOk: () => {
+                    const updatedData = bomdata.filter((_, i) => i !== index);
+                    setBomdata(updatedData);
+                    RemoveBomDetail(item.id);
+                }
+            }
+        });
+    };
+    // 更新組件清單
+    const handleUpdate = (index: number, item: any) => {
+        myAlert.confirm({
+            title: '確定更新嗎?',
+            props: {
+                onOk: () => {
+                    UpdateBomDetail(item);
+                }
+            }
+        });
+    };
 
 
 
@@ -556,7 +676,33 @@ export default function BomList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'BOM維護'} panelList={undefined} />
+            <PageHeader02 tag={'BOM維護'} panelList={undefined} customeRight={
+                [
+                    <div>
+                        {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                        <input
+                            type="text"
+                            placeholder='請輸入料號'
+                            value={keyword2}
+                            style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword2(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入名稱'
+                            value={keyword3}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                            onChange={(e) => setKeyword3(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='請輸入規格'
+                            value={keyword4}
+                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                            onChange={(e) => setKeyword4(e.target.value)}
+                        />
+                    </div>]
+            } />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
@@ -575,41 +721,40 @@ export default function BomList() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                             </div>
 
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入料號'
                                     value={keyword2}
                                     style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                     onChange={(e) => setKeyword2(e.target.value)}
-                                />
-
+                                /> */}
                             </div>
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入名稱'
                                     value={keyword3}
                                     style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                     onChange={(e) => setKeyword3(e.target.value)}
-                                />
+                                /> */}
                             </div>
                             <div>
-                                <input
+                                {/* <input
                                     type="text"
                                     placeholder='請輸入規格'
                                     value={keyword4}
                                     style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                     onChange={(e) => setKeyword4(e.target.value)}
-                                />
+                                /> */}
                             </div>
                             <div>
-                                <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                                {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
                                     <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button>
+                                </button> */}
                             </div>
                             <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                                 <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
@@ -751,22 +896,31 @@ export default function BomList() {
                         </div>
                         <div></div>
                         <div></div>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>組件總數：<span style={{ color: 'gray' }}>{bomdata.length}</span></p>
+                        </div>
                     </div>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-                        <Thead01 type={'BomList'} />
                     </div>
                     <div>
                         <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', overflowX: 'auto' }}>
+                            <Thead01 type={'BomList'} />
                             {bomdata && (
                                 bomdata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader11}>
                                         <div className={scss.row01}>
                                             <span>
-                                                {/* <button onClick={() => { alert("OK") }}>
-                                                    <img src={icon_edit.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button> */}
-                                                <button onClick={() => { handleRemove(index, _item) }} style={{ display: '' }}>
+                                                <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                     <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleEdit(index) }}>
+                                                    <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
                                             <span>{index + 1}</span>
@@ -776,7 +930,26 @@ export default function BomList() {
                                             <span>{_item.material}</span>
                                             <span>{_item.surface}</span>
                                             <span>
-                                                {_item.quantity}
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newQuantity = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+
+                                                        };
+                                                        setBomdata(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
                                             </span>
                                             <span>{_item.unit}</span>
                                             <span>{getTaiwanDateStr(_item.update_at)}</span>
@@ -789,7 +962,7 @@ export default function BomList() {
 
                             <div className={scss.addbar}>
                                 <div>
-                                    <button onClick={() => { handleEditByHandKey() }} style={{ paddingLeft: '15px', display: `${edithandkey ? 'none' : ''}` }}>
+                                    <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? 'none' : ''}` }}>
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                     <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
@@ -800,6 +973,7 @@ export default function BomList() {
                                         <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <div></div>
                                 <div>
                                     <input
                                         type="text"

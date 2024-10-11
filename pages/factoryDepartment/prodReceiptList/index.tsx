@@ -235,15 +235,15 @@ export default function ProdReceiptList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // { searchGroup },
         // {
         //     type: 'addButton',
-        //     label: '新增採購單',
+        //     label: '新增進貨單',
         //     onClick: () => {
+        //         // setOpen(true);
         //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseOrder`,
+        //             pathname: `/factoryDepartment/addProdReceipt`,
         //             query: {
-        //                 type: 'Tray',
+        //                 type: 'addProdreceipt',
         //             },
         //         });
         //     },
@@ -1363,71 +1363,6 @@ export default function ProdReceiptList() {
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            position: 'sticky',
-                            top: 0,
-                            backgroundColor: '#fff',
-                            zIndex: 1000,
-                        }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        caption="進貨日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="進貨單號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
-                                </div>
-                                <div>
-                                    <Thead01 type={'ProdReceipt'} />
-                                </div>
-                            </form>
-                        </div>
-                        {/* <hr /> */}
-                        <div>
-                            {/* <Thead01 type={'ProdReceipt'} /> */}
-                            <Tbody01 type={'ProdReceipt'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                        </div>
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1} style={{ display: viewtype === 'review' ? 'none' : '' }}>
@@ -1436,6 +1371,11 @@ export default function ProdReceiptList() {
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     查詢
                                 </button>
+                                {/* &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    採購
+                                </button> */}
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1727,10 +1667,11 @@ export default function ProdReceiptList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${completeentry}/${totalentry}`
+                                                value: totalentry ? `${completeentry}/${totalentry}` : ' ',
                                             },
                                         }}
                                     />
+
                                 </div>
                             </div>
                         </div>
@@ -1825,7 +1766,6 @@ export default function ProdReceiptList() {
                         <div className={scss.body_foot1}>
                             <div>
                                 (1).轉入庫單進行入庫<br />
-                                (2).轉付款申請單請附款項。
                             </div>
                             <div></div>
                             <div>

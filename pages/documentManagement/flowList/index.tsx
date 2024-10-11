@@ -454,11 +454,12 @@ export default function FlowList() {
             {
                 stage_order: prevData2.length + 1, // 新增的資料順序號
                 review_type: '提出',
-                stage_user_uuid: userInfo?.id,
+                stage_user_uuid: userInfo?.employee?.id,
                 stage_user_name: userInfo?.username,
                 stage_user_title: '經辦',
             }
         ]);
+        console.log(userInfo);
     };
     const handleCanceladdflow = () => {
         setStatus("");
@@ -632,7 +633,7 @@ export default function FlowList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'簽核清單'} panelList={panelList} />
+            <PageHeader02 tag={'自訂審核'} panelList={panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -646,7 +647,7 @@ export default function FlowList() {
                                 <button
                                     className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn}
                                     onClick={status !== '未儲存' ? () => handleAddflow() : undefined}
-                                    title="新增單據"
+                                    title="新增流程"
                                     disabled={status === '未儲存'} // 確保在未儲存狀態下按鈕無法互動
                                 >
                                     <img
@@ -661,7 +662,7 @@ export default function FlowList() {
                                 <button
                                     className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { handleSaveFlow() }}
-                                    title="儲存新增"
+                                    title="儲存流程"
                                     disabled={status !== '未儲存'
                                     }
                                 >

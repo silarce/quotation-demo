@@ -974,6 +974,10 @@ export default function ProductList() {
             myAlert.warning({ title: '物料編號已經存在' })
             return;
         }
+        if (addproductid.length < 14) {
+            myAlert.warning({ title: '料號不符合編碼原則，請重新編碼' })
+            return;
+        }
         // 顯示確認對話框
         myAlert.confirm({
             title: '確定要新增物料嗎?',
@@ -1165,6 +1169,7 @@ export default function ProductList() {
 
     const exampledata = [
         { company: 'SJ', category: 'S', subCategory: 'BT', serial: '00001', material: '01', surface: '2B', productid: '', name: '50*50*3t 不銹鋼#304底座角鐵' },
+        { company: 'SJ', category: 'M', subCategory: 'MO', serial: 'A0041', material: '00', surface: '00', productid: '', name: '大同馬達' },
     ];
 
 
@@ -1191,7 +1196,32 @@ export default function ProductList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'物料維護'} panelList={panelList} />
+            <PageHeader02 tag={'物料維護'} panelList={panelList} customeRight={[
+                <div>
+                    {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                    <input
+                        type="text"
+                        placeholder='請輸入料號'
+                        value={keyword2}
+                        style={{ padding: '4px 5px', width: '269px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                        onChange={(e) => setKeyword2(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder='請輸入名稱'
+                        value={keyword3}
+                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                        onChange={(e) => setKeyword3(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder='請輸入規格'
+                        value={keyword4}
+                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                        onChange={(e) => setKeyword4(e.target.value)}
+                    />
+                </div>
+            ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -1225,40 +1255,39 @@ export default function ProductList() {
                             </div>
                             <div className={scss.head_foot2}>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                 </div>
                                 <div>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         placeholder='請輸入料號'
                                         value={keyword2}
                                         style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                         onChange={(e) => setKeyword2(e.target.value)}
-                                    />
-
+                                    /> */}
                                 </div>
                                 <div>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         placeholder='請輸入名稱'
                                         value={keyword3}
                                         style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
                                         onChange={(e) => setKeyword3(e.target.value)}
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         placeholder='請輸入規格'
                                         value={keyword4}
                                         style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                         onChange={(e) => setKeyword4(e.target.value)}
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
-                                    <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                                    {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
                                         <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    </button>
+                                    </button> */}
                                 </div>
                                 <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                                     <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
@@ -1363,8 +1392,8 @@ export default function ProductList() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: productidin || ' ',
-                                                },
+                                                    value: productidin || '',
+                                                }
                                             }}
                                         />
                                     </div>
@@ -1376,7 +1405,7 @@ export default function ProductList() {
                                             className='invisible'
                                             inputProps={{
                                                 props: {
-                                                    value: ' ',
+                                                    value: '',
                                                 },
                                             }}
                                         />
@@ -1393,7 +1422,7 @@ export default function ProductList() {
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: productnamein || ' ',
+                                                    value: productnamein || '',
                                                     onChange: (e) => { setProductnamein(e.target.value) }
                                                 },
                                             }}
@@ -1404,7 +1433,7 @@ export default function ProductList() {
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: productspecin || ' ',
+                                                    value: productspecin || '',
                                                     onChange: (e) => { setProductspecin(e.target.value) }
                                                 },
                                             }}
@@ -1415,7 +1444,7 @@ export default function ProductList() {
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: unitin || ' ',
+                                                    value: unitin || '',
                                                     onChange: (e) => { setUnitin(e.target.value) }
                                                 },
                                             }}
@@ -1426,7 +1455,7 @@ export default function ProductList() {
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: materialin || ' ',
+                                                    value: materialin || '',
                                                     onChange: (e) => { setMaterialin(e.target.value) }
                                                 },
                                             }}
@@ -1437,7 +1466,7 @@ export default function ProductList() {
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: surfacein || ' ',
+                                                    value: surfacein || '',
                                                     onChange: (e) => { setSurfacein(e.target.value) }
                                                 },
                                             }}
@@ -1648,7 +1677,8 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>物料編號已存在！</p>}
+                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>料號已存在！</p>}
+                                        {addproductid.length < 14 && <p style={{ fontSize: '16px', color: 'red' }}>料號不符編碼原則！</p>}
                                     </div>
                                 </div>
                                 <div className={scss.foot_head2}>

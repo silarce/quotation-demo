@@ -609,28 +609,28 @@ export default function PurchaseRequisitionList() {
         let totalprice = 0;
         data2.forEach((element) => {
             // 檢查 totalprice 是不是數字，如果是字串就移除逗號
-            const price = typeof element.totalprice === 'string' 
-                ? parseFloat(element.totalprice.replace(/,/g, '')) 
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
                 : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
             console.log(price);  // 顯示正確的數字格式
             totalprice += price;  // 將其加總
         });
         console.log(totalprice); // 應顯示正確的加總結果
-    
+
         // 計算總價後，四捨五入到兩位小數，然後再格式化
         const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
         setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    
+
         // 計算稅金，四捨五入到最接近的整數
         const taxPrice = Math.round(roundedTotalPrice * 0.05);
         setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    
+
         // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
         const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
         setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     }, [data2]);
-    
-    
+
+
 
 
 
@@ -1415,6 +1415,60 @@ export default function PurchaseRequisitionList() {
         setSelectedItemId(itemId);
     };
 
+    const Excel = async (id: any) => {
+        try {
+
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+                type: 'purchaserequisition',
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_請購單_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
@@ -1438,6 +1492,10 @@ export default function PurchaseRequisitionList() {
                                     列印
                                 </button>
                                 &nbsp;
+                                {/* <button className={scss.squarebtn} onClick={() => { Excel(purchaserequisitionidin) }} title="比價Excel">
+                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    單據
+                                </button> */}
                             </div>
                             <div></div>
                             <div></div>
@@ -1598,10 +1656,11 @@ export default function PurchaseRequisitionList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${quotereqprogress}/${totalreqprogress}`,
+                                                value: totalreqprogress === '' ? ' ' : `${quotereqprogress}/${totalreqprogress}`,
                                             },
                                         }}
                                     />
+
                                     <InputSel
                                         {...inputSelProps}
                                         caption="已轉採購"
@@ -1609,10 +1668,11 @@ export default function PurchaseRequisitionList() {
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
-                                                value: `${transpoprogress}/${totalreqprogress}`,
+                                                value: totalreqprogress ? `${transpoprogress}/${totalreqprogress}` : ' ',
                                             },
                                         }}
                                     />
+
                                 </div>
                             </div>
                         </div>
