@@ -36,8 +36,8 @@ import {
   useGetApplyPaymentById,
   useGetApplyPaymentDetail,
 } from 'js/api/api_netCore/api_accountant';
+import { useDepartments } from 'js/api/api_department';
 
-import { Tbase } from 'js/api/api_netCore/_schemas';
 import type { TuserDto } from 'js/api/dtoTypes';
 
 // ===================================================================================
@@ -389,6 +389,12 @@ const Profile = ({
   setState_applyPayment: React.Dispatch<React.SetStateAction<Tstate_applyPayment>>;
   disabled: boolean;
 }) => {
+  const { optionArr_name, update } = useDepartments();
+
+  useEffect(() => {
+    update();
+  }, []);
+
   return (
     <div className="global_grid01">
       <InputSel
@@ -421,6 +427,7 @@ const Profile = ({
         disabled={disabled}
         selectProps={{
           props: {
+            options: optionArr_name,
             value: state_applyPayment.applicant_department
               ? {
                   value: state_applyPayment.applicant_department,
