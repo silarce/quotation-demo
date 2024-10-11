@@ -61,6 +61,15 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
 
   // --------------------------------------------------------------------------
+
+  // ref.current的長度不會縮短且被填入null的原因
+  // https://stackoverflow.com/questions/75927246/how-does-react-clear-the-old-ref-when-calling-ref-callback-after-re-render
+
+  //  If the ref callback is defined as an inline function,
+  //  it will get called twice during updates,
+  //  first with null and then again with the DOM element.
+  //  This is because a new instance of the function is created with each render,
+  //  so React needs to clear the old ref and set up the new one.
   const ref_detailArr = useRef<(TimperativeHandle | null)[]>([]);
   // --------------------------------------------------------------------------
   const {
@@ -181,6 +190,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
       children: (
         <SearchModal_applyPayment
           onRowClick={(data) => {
+            setDisabled(true);
             setApply_paymnet_id(data.id);
             unmount();
           }}
@@ -196,22 +206,6 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
 
   // --------------------------------------------------------------------------
 
-  // ref.current的長度不會縮短且被填入null的原因
-  // https://stackoverflow.com/questions/75927246/how-does-react-clear-the-old-ref-when-calling-ref-callback-after-re-render
-
-  //  If the ref callback is defined as an inline function,
-  //  it will get called twice during updates,
-  //  first with null and then again with the DOM element.
-  //  This is because a new instance of the function is created with each render,
-  //  so React needs to clear the old ref and set up the new one.
-
-  const test = () => {
-    console.log(ref_detailArr.current);
-    // ref.current?.forEach((item) => {
-    //   console.log(item?.state_detail);
-    // });
-  };
-
   // --------------------------------------------------------------------------
 
   // MARK: RENDER
@@ -219,9 +213,6 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag="支出單" />
       <div>
-        <button onClick={test}>test</button>
-        <br />
-        <br />
         <BtnBar
           disabled={disabled}
           onSearchClick={handleSearch}
