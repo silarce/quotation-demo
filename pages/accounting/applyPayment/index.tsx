@@ -189,10 +189,11 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_applyPayment
+          limit={1}
           onRowClick={(data) => {
             setDisabled(true);
             setApply_paymnet_id(data.id);
-            unmount();
+            // unmount();
           }}
         />
       ),
