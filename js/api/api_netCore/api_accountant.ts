@@ -21,6 +21,8 @@ import type {
   TpurchaseInvoice_Dto,
 } from './_schemas';
 
+import { dtoSnakeToCamel } from '../apiUtils/dtoSnakeToCamel';
+
 const subRoot = 'Accountant';
 
 // =================================================================================
@@ -205,6 +207,15 @@ const useGetApplyPayment = ({
 
     return await apiGetApplyPayment()
       .then((data) => {
+        data = data.map((item) => {
+          // return item;
+          // return dtoSnakeToCamel(item);
+          return {
+            ...item,
+            agent_employee: dtoSnakeToCamel(item.agent_employee),
+          };
+        });
+
         setRes(data);
 
         return data;
@@ -262,7 +273,7 @@ const useGetApplyPaymentById = (
         return applyPayment;
       })
       .then(async (applyPayment) => {
-        const [detailArr, employee] = await Promise.all([
+        const [detailArr, employee_snake] = await Promise.all([
           await apiGetApplyPaymentDetail(id),
           await apiGetEmployee_id(applyPayment.agent_employee_id),
         ]);
@@ -270,7 +281,7 @@ const useGetApplyPaymentById = (
         const applyPayment_detailed: TapplyPayment_Dto_detailed = {
           ...applyPayment,
           detailArr: detailArr,
-          agent_employee: employee,
+          agent_employee: employee_snake,
         };
 
         setRes(applyPayment_detailed);

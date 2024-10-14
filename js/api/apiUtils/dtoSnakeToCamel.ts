@@ -2,8 +2,7 @@ import { camelCase } from 'change-case';
 
 // .netCore api返回的資料都是蛇式命名，
 // 使的來自js/api/dtoTypes.ts的dto也都變成蛇式命名，導致型別不對
-// 因
-//
+// 因此使用這個函數將dto轉換成駝峰式命名
 
 const snakeToCamel = (property: any) => {
   if (Array.isArray(property)) {
