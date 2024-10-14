@@ -16,9 +16,9 @@ interface TnetCoreApiBody {
 
 interface Tbase {
   id: string;
-  create_by: string;
+  create_by: string | null;
   created_at: string;
-  update_by: string;
+  update_by: string | null;
   updated_at: string;
 }
 
@@ -114,14 +114,14 @@ interface TpurchaseInvoice_Dto extends Tbase {
 // region purchaseCollectTicket
 interface TpurchaseCollectTicket_Dto extends Tbase {
   serial_number: string; // 收票作業
-  applicant_department: string; // 申請單位
+  applicant_department: string | null; // 申請單位
   agent_employee_id: string; // 經辦人id
-  ticket_method: string; // 開票方式
-  tax_deduction_category: string; //  扣稅類別
-  journal_method: string; // 立帳方式
-  invoice_number: string; // 發票號碼
-  invoice_price: string; // 發票金額
-  note: string; // 備註
+  ticket_method: string | null; // 開票方式
+  tax_deduction_category: string | null; //  扣稅類別
+  journal_method: string | null; // 立帳方式
+  invoice_number: string | null; // 發票號碼
+  invoice_price: number | null; // 發票金額
+  note: string | null; // 備註
 }
 
 type TcreatePurchaseCollectTicket_Dto = Pick<
@@ -145,16 +145,16 @@ interface TupdatePurchaseCollectTicket_Dto extends TcreatePurchaseCollectTicket_
 
 interface TpurchaseCollectTicketDetail_Dto extends Tbase {
   purchase_collect_ticket_uuid: string; // 收票主檔uuid
-  item: string; // 項目名稱
-  prodreceipt_number: string; // 進貨單號
+  item: string | null; // 項目名稱
+  prodreceipt_number: string | null; // 進貨單號
   prodreceipt_uuid: string; // 進貨單uuid
-  transaction_date: string; // 交易日期
-  quantity: string; // 數量
-  goods_spec: string; // 貨品規格
-  unit: string; // 單位
-  unit_price: string; // 單項
-  amount: string; // 應開金額
-  note: string; // 摘要說明
+  transaction_date: string | null; // 交易日期
+  quantity: number | null; // 數量
+  goods_spec: string | null; // 貨品規格
+  unit: string | null; // 單位
+  unit_price: number | null; // 單價
+  amount: string | null; // 應開金額
+  note: string | null; // 摘要說明
 }
 
 type TcreatePurchaseCollectTicketDetail_Dto = Pick<

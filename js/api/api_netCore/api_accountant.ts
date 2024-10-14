@@ -41,6 +41,11 @@ interface TapplyPayment_Dto_detailed extends TapplyPayment_Dto {
   agent_employee: TemployeeDto;
 }
 
+interface TpurchaseCollectTicket_Dto_detailed extends TpurchaseCollectTicket_Dto {
+  detailArr: TpurchaseCollectTicketDetail_Dto[];
+  agent_employee: TemployeeDto;
+}
+
 // =================================================================================
 
 // region bankAccount
@@ -578,7 +583,7 @@ const useGetPurchaseCollectTicketById = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [res, setRes] = useState<TpurchaseCollectTicket_Dto>();
+  const [res, setRes] = useState<TpurchaseCollectTicket_Dto_detailed>();
 
   const update = useCallback(() => {
     if (isFetching || !id) {
@@ -589,9 +594,23 @@ const useGetPurchaseCollectTicketById = (
 
     return apiGetPurchaseCollectTicketById(id)
       .then((data) => {
-        setRes(data[0]);
-
         return data[0];
+      })
+      .then(async (purchaseCollectTicket) => {
+        const [detailArr, employee_snake] = await Promise.all([
+          await apiGetPurchaseCollectTicketDetailByTicketId(id),
+          await apiGetEmployee_id(purchaseCollectTicket.agent_employee_id),
+        ]);
+
+        const purchaseCollectTicket_detailed: TpurchaseCollectTicket_Dto_detailed = {
+          ...purchaseCollectTicket,
+          detailArr: detailArr,
+          agent_employee: employee_snake,
+        };
+
+        setRes(purchaseCollectTicket_detailed);
+
+        return purchaseCollectTicket;
       })
       .catch((err: AxiosError) => {
         setRes(undefined);
@@ -776,4 +795,4 @@ export {
   useGetUnpaidProdreceiptByInvoiceNumber,
 };
 
-export type { TapplyPayment_Dto_detailed };
+export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed };

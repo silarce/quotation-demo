@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, memo } from 'react';
+import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
@@ -31,6 +32,7 @@ import {
   TpurchaseCollectTicketDetail_Dto,
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
+  TpurchaseCollectTicket_Dto_detailed,
   apiPostAddPurchaseCollectTicket,
   useGetPurchaseCollectTicket,
   useGetPurchaseCollectTicketById,
@@ -38,15 +40,84 @@ import {
   useGetUnpaidProdreceiptByInvoiceNumber,
 } from 'js/api/api_netCore/api_accountant';
 
+// type
+import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
+
+// ===========================================================================
+type Tquery = {
+  purchaseCollectTicketId: string | undefined;
+};
+interface Tstate {
+  id: string | undefined; // purchase_collect_ticket_uuid
+  // prodreceipt_uuid: string | undefined; // 進貨單uuid
+  //
+  agent_employee: TemployeeDto | undefined;
+  //
+  serial_number: string | undefined; // 收票單號
+  applicant_department: string; // 申請單位
+  ticket_method: string; // 開票方式
+  tax_deduction_category: string; //  扣稅類別
+  journal_method: string; // 立帳方式
+  invoice_number: string; // 發票號碼
+  invoice_price: `${number}` | ''; // 發票金額
+  note: string; // 備註
+  //
+  // detailArr: (TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto)[];
+  detailArr: Tstate_detail[];
+}
+
+interface Tstate_detail {
+  id: string | undefined; // detail_uuid
+  //
+  item: string;
+  prodreceipt_number: string;
+  transaction_date: Moment | null;
+  quantity: `${number}` | '';
+  unit: string;
+  unit_price: `${number}` | '';
+  amount: string;
+  note: string;
+  //
+  goods_spec: string;
+  prodreceipt_uuid: string | undefined;
+}
+
 // ===========================================================================
 
 // MARK: START
 
-export default function PurchaseCollectTicket() {
+export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
+  //
+  const router = useRouter();
+  const { purchaseCollectTicketId } = router.query as Tquery;
+
   const [disabled, setDisabled] = useState(true);
 
-  // MARK: RENDER
+  // ------------------------------------------------------------
 
+  const {
+    res: raw_purchaseCollectTicket,
+    // setRes,
+    clear,
+    update: update_purchaseCollectTicket,
+    reqPatch,
+    isFetching: isFetching_purchaseCollectTicket,
+  } = useGetPurchaseCollectTicketById(purchaseCollectTicketId ?? '88f78fe4-4ca0-4577-abcd-27dcced43e3a');
+  // "88f78fe4-4ca0-4577-abcd-27dcced43e3a"
+  // "aa364336-1836-434f-af8f-de1b10f06057"
+  // "5f34502e-0741-43c1-ba07-2191d709ba7b"
+  // "8dce7a3c-b63c-44fa-a96f-e07647e61500"
+  // "b94c34eb-0f88-4c8c-adaa-43f0aad0210a"
+  // "d4c94da0-9a36-4f45-9af6-ff7a224c8e54"
+  console.log(raw_purchaseCollectTicket);
+
+  // ------------------------------------------------------------
+
+  const { state } = useTicket(raw_purchaseCollectTicket, userInfo.employee);
+  console.log('state', state);
+
+  // ------------------------------------------------------------
+  // MARK: RENDER
   // ------------------------------------------------------------
   return (
     <SubLayer bodyPreStyle="style01">
@@ -60,7 +131,7 @@ export default function PurchaseCollectTicket() {
           // onAddClick={handleAdd}
           // onConfirmClick={handleConfirm}
         />
-        <Spin spinning={false} delay={300}>
+        <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
           <Profile disabled={disabled} />
           <div>
             <div>
@@ -235,3 +306,101 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
 };
 
 // ===============================================================================
+
+// MARK:useTicket
+const useTicket = (
+  //
+  rawData: TpurchaseCollectTicket_Dto_detailed | undefined,
+  userEmployee: TemployeeDto | undefined
+) => {
+  const defaultState = useDefaultState(rawData, userEmployee);
+
+  const [state, setState] = useState<Tstate>(defaultState);
+
+  useEffect(() => {
+    setState(defaultState);
+  }, [defaultState]);
+
+  return { state };
+};
+
+const useDefaultState = (
+  //
+  rawData: TpurchaseCollectTicket_Dto_detailed | undefined,
+  userEmployee: TemployeeDto | undefined
+) => {
+  const defaultState: Tstate = useMemo(() => {
+    if (!rawData) {
+      return emptyState(userEmployee);
+    } else {
+      const detailArr: Tstate_detail[] = rawData.detailArr.map((detail) => {
+        const state_detail: Tstate_detail = {
+          id: detail.id,
+          item: detail.item || '',
+          prodreceipt_number: detail.prodreceipt_number || '',
+          transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
+          quantity: String(detail.quantity || '') as Tstate_detail['quantity'],
+          unit: detail.unit || '',
+          unit_price: String(detail.unit_price || '') as Tstate_detail['unit_price'],
+          amount: detail.amount || '',
+          note: detail.note || '',
+          goods_spec: detail.goods_spec || '',
+          prodreceipt_uuid: detail.prodreceipt_uuid || '',
+        };
+
+        return state_detail;
+      });
+
+      const state: Tstate = {
+        id: rawData.id,
+        agent_employee: rawData.agent_employee,
+        // prodreceipt_uuid: prodreceipt_uuid,
+        //
+        serial_number: rawData.serial_number,
+        applicant_department: rawData.applicant_department || '',
+        ticket_method: rawData.ticket_method || '',
+        tax_deduction_category: rawData.tax_deduction_category || '',
+        journal_method: rawData.journal_method || '',
+        invoice_number: rawData.invoice_number || '',
+        invoice_price: String(rawData.invoice_price || '') as Tstate['invoice_price'],
+        note: rawData.note || '',
+        detailArr: detailArr,
+      };
+
+      return state;
+    }
+  }, [rawData, userEmployee]);
+
+  return defaultState;
+};
+
+const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
+  id: undefined,
+  // prodreceipt_uuid: undefined,
+  agent_employee,
+  serial_number: undefined,
+  applicant_department: '',
+  ticket_method: '',
+  tax_deduction_category: '',
+  journal_method: '',
+  invoice_number: '',
+  invoice_price: '',
+  note: '',
+  detailArr: [],
+});
+
+const emptyuState_detail = (): Tstate_detail => ({
+  id: undefined,
+  //
+  item: '',
+  prodreceipt_number: '',
+  transaction_date: null,
+  quantity: '',
+  unit: '',
+  unit_price: '',
+  amount: '',
+  note: '',
+  //
+  goods_spec: '',
+  prodreceipt_uuid: undefined,
+});
