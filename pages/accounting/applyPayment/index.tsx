@@ -58,7 +58,7 @@ interface Tstate_applyPayment {
 
 // ===================================================================================
 // MARK: START
-export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
+export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
 
   // --------------------------------------------------------------------------
@@ -211,6 +211,19 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
     clear_data_applyPayment();
     setDisabled(false);
   };
+
+  // --------------------------------------------------------------------------
+
+  if (!isAdmin) {
+    return (
+      <SubLayer bodyPreStyle="style01">
+        <PageHeader02 tag={t('applyPayment')} />
+        <div>
+          <h1 className="text-5xl">施工中</h1>
+        </div>
+      </SubLayer>
+    );
+  }
 
   // --------------------------------------------------------------------------
 
