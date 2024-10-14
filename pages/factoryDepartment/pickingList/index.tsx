@@ -94,6 +94,8 @@ export default function AddPurchaseRequisition() {
     const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const picking_byRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const picking_qtyRefs= useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -1949,7 +1951,7 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div></div>
                         </div>
-                        <div className={scss.body_content1}>
+                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                             <Thead01 type={'AddPR_PickingList'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
@@ -1979,6 +1981,20 @@ export default function AddPurchaseRequisition() {
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={picking_qtyRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                type="text"
+                                                maxLength={5}
+                                                value={_item.picking_qty !== undefined ? _item.picking_qty : 0}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleNumberChange(index, "picking_qty", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -2026,14 +2042,14 @@ export default function AddPurchaseRequisition() {
                                         </span>
                                         <span>
                                             <input
-                                                ref={noteRefs.current[index]}
+                                                ref={picking_byRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
                                                 type="text"
-                                                value={_item.note !== undefined ? _item.note : ''}
+                                                value={_item.picking_by !== undefined ? _item.picking_by : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "note", e.target.value);
+                                                    handleStringChange(index, "picking_by", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -2043,10 +2059,10 @@ export default function AddPurchaseRequisition() {
                                                 style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
                                                 type="text"
-                                                value={_item.picking_by !== undefined ? _item.picking_by : ''}
+                                                value={_item.note !== undefined ? _item.note : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "picking_by", e.target.value);
+                                                    handleStringChange(index, "note", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -2111,6 +2127,7 @@ export default function AddPurchaseRequisition() {
                                         onChange={handleSpecChange}
                                     />
                                 </div>
+                                <div></div>
                                 <div>
                                     <input
                                         style={{ backgroundColor: 'transparent', width: '50px' }}
@@ -2134,22 +2151,7 @@ export default function AddPurchaseRequisition() {
                                         onChange={(e) => setHandinputunit(e.target.value)}
                                     />
                                 </div>
-                                <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='單位'
-                                        value={handinputunit}
-                                        onChange={(e) => setHandinputunit(e.target.value)}
-                                    /> */}
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder='備註'
-                                        value={handinputnote}
-                                        onChange={(e) => setHandinputnote(e.target.value)}
-                                    />
-                                </div>
+                                <div></div>
                                 <div>
                                     <input
                                         type="text"
@@ -2157,6 +2159,14 @@ export default function AddPurchaseRequisition() {
                                         onChange={handlePickingByChange}
                                         placeholder="姓名"
                                         style={{ width: '100%' }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='備註'
+                                        value={handinputnote}
+                                        onChange={(e) => setHandinputnote(e.target.value)}
                                     />
                                 </div>
                                 <div>

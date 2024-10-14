@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import { axi } from './_axiosCreator';
 
 import _ from 'lodash';
 
 // type
+import { Toption } from 'js/utils/options/options';
+
 import {
   TpageMetaDto,
   TdepartmentDto,
@@ -78,7 +80,27 @@ export const useDepartments = (params: Tparams = {}) => {
     return data;
   };
 
-  return { data, setData, update, isLoading };
+  const { optionArr, optionArr_name } = useMemo(() => {
+    const departmentArr = data?.data ?? [];
+
+    const optionArr = departmentArr.map((item) => {
+      return {
+        value: item.id,
+        label: item.name,
+      };
+    });
+
+    const optionArr_name = departmentArr.map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+
+    return { optionArr, optionArr_name };
+  }, [data]);
+
+  return { data, setData, update, isLoading, optionArr, optionArr_name };
 };
 
 /**

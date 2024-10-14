@@ -1,4 +1,4 @@
-import * as Icons from '../../svgIcon/fcIcon';
+import * as Icons from '../../../../../public/image/icon/fcIconComponent/fcIcons';
 
 const btnLookup: {
   [key: string]: {
