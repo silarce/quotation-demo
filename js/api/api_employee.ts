@@ -145,7 +145,7 @@ export type TapiGetEmployee_idParams = {
   populate: Tpopulate;
 };
 
-const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
+export const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
   const api = `/employees/${id}`;
 
   return axi
