@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { TnetCoreapiBody } from './api_netCore/_schemas';
+import { TnetCoreApiBody } from './api_netCore/_schemas';
 
 import Error429 from 'components/wholePage/error429';
 
@@ -132,7 +132,7 @@ axi2.interceptors.request.use(
     const { method, data, params } = config;
 
     if (method === 'post' || method === 'patch') {
-      const body: TnetCoreapiBody = {
+      const body: TnetCoreApiBody = {
         TypeName: 'ERP',
         ServiceName: 'AccountService',
         FunctionName: 'no',

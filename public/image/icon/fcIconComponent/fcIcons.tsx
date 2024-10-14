@@ -45,7 +45,7 @@ const Icon_fc_cancel = (props: React.SVGProps<SVGSVGElement>) => {
       width="20"
       height="20"
       viewBox="0 0 100 100"
-      enable-background="new 0 0 100 100"
+      enableBackground="new 0 0 100 100"
       xmlSpace="preserve"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"

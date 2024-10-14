@@ -35,6 +35,8 @@ interface Tprops<Dto extends Tdto = Tdto> {
   style_filter?: React.CSSProperties;
   className_table?: string;
   style_table?: React.CSSProperties;
+  //
+  limit?: number;
 }
 
 type Tprops_refine<Dto extends Tdto = Tdto> = Omit<Tprops<Dto>, 'useSearchModal'>;
@@ -52,6 +54,7 @@ export default function SearchModal<Dto extends Tdto>({
   style_filter,
   className_table,
   style_table,
+  limit,
 }: Tprops<Dto>) {
   const [dtoDirc, setDtoDirc] = useState<TdtoDirc<Dto>>({});
 
@@ -74,11 +77,21 @@ export default function SearchModal<Dto extends Tdto>({
     const id = dto.id;
 
     setDtoDirc((prev) => {
-      const copy = { ...prev };
+      let copy = { ...prev };
 
       if (id in copy) {
         delete copy[id];
-      } else {
+
+        return copy;
+      }
+
+      if (limit === undefined) {
+        copy[id] = dto;
+      } else if (limit === 1) {
+        copy = {
+          [id]: dto,
+        };
+      } else if (Object.keys(copy).length < limit) {
         copy[id] = dto;
       }
 

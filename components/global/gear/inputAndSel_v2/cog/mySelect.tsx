@@ -135,6 +135,7 @@ export default function MySelect<
             classNames(
               fontClassName,
               scss.selPlaceholder,
+              scss.plus,
 
               props?.classNames?.placeholder?.(state)
             ),

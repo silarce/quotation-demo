@@ -5,5 +5,24 @@
     "bankCode": "銀行代號",
     "account": "帳戶",
     "accountName": "帳戶名"
+  },
+  "applyPayment": {
+    "applyPayment": "支出單",
+    "serial_number": "單號",
+    "payment_date": "支出日期",
+    "applicant_department": "支出單位",
+    "status": "付款狀態",
+    "description": "備註說明",
+    "total_price": "合計",
+    "paymentDetail": "費用資訊",
+    "item": "費用項目",
+    "business_title": "付款對象",
+    "tax_type": "稅別",
+    "subtotal": "金額",
+    "tax": "稅額",
+    "amount_total": "發票金額",
+    "accounting_subject": "費用科目",
+    "number": "發票號碼",
+    "note": "摘要說明"
   }
 }
