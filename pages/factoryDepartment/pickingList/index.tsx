@@ -1259,9 +1259,9 @@ export default function AddPurchaseRequisition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (nowwhname === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (nowwhname === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (nowwhname === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (nowwhname === "101") ? `https://${setting.warehouse1}/` :
+                    (nowwhname === "102") ? `https://${setting.warehouse2}/` :
+                        (nowwhname === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -1335,9 +1335,9 @@ export default function AddPurchaseRequisition() {
             const traynumber = traynamecalled;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whnamecalled === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (whnamecalled === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (whnamecalled === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (whnamecalled === "101") ? `https://${setting.warehouse1}/` :
+                    (whnamecalled === "102") ? `https://${setting.warehouse2}/` :
+                        (whnamecalled === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數
@@ -1716,7 +1716,7 @@ export default function AddPurchaseRequisition() {
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag='領料管理' panelList={panelList} />
             {/* <div className={scss.main}> */}
-            <div className={scss.container}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div>
                         <form onSubmit={handleSubmit}>
@@ -1947,7 +1947,7 @@ export default function AddPurchaseRequisition() {
                                     品項查詢
                                 </button> */}
                             </div>
-                            <div style={{ marginTop: '5px' }}></div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -1956,6 +1956,7 @@ export default function AddPurchaseRequisition() {
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
+                                        <span></span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>
@@ -2094,6 +2095,7 @@ export default function AddPurchaseRequisition() {
                                         <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <span></span>
                                 <div>
                                     <input
                                         type="text"
@@ -2252,88 +2254,18 @@ export default function AddPurchaseRequisition() {
                                 </ul>
                             )}
                         </div>
-                        <div className={scss.body_foot1}>
+                        {/* <div className={scss.body_foot1}>
                             <div>
                                 (1).請確實填寫品名、規格與數量。<br />
                                 (2).如不知領取品項料號，可以利用查詢代入。<br />
-                                {/* {showSuggestions && (
-                                    <div
-                                        style={{
-                                            position: 'absolute',
-                                            zIndex: 1001,
-                                            backgroundColor: 'white',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                                            width: '750px',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            fontSize: '16px',
-                                            left: `${position.x}px`,
-                                            top: `${position.y}px`,
-                                            cursor: 'default',
-                                        }}
-                                        onMouseDown={handleMouseDown}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
-                                            <button
-                                                onClick={() => setShowSuggestions(false)}
-                                                style={{
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    fontSize: '16px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 'bold',
-                                                    color: '#555',
-                                                    outline: 'none',
-                                                    transition: 'color 0.3s ease',
-
-                                                }}
-                                                onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
-                                                onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            {filteredData.length > 0 ? (
-                                                filteredData.map((item, index) => (
-                                                    <tr
-                                                        key={index}
-                                                        onClick={() => handleSelect(item)}
-                                                        style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
-                                                        onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                                                    >
-                                                        <td style={{ padding: '8px', width: '150px' }}>
-                                                            {item.productid}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '250px' }}>
-                                                            {item.name}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '350px' }}>
-                                                            {item.spec}
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                        沒有匹配的結果
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </table>
-                                    </div>
-                                )} */}
+                                
                             </div>
                             <div>
 
                             </div>
                             <div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

@@ -235,19 +235,19 @@ export default function ProdReceiptList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增進貨單',
-        //     onClick: () => {
-        //         // setOpen(true);
-        //         router.push({
-        //             pathname: `/factoryDepartment/addProdReceipt`,
-        //             query: {
-        //                 type: 'addProdreceipt',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增進貨單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addProdReceipt`,
+                    query: {
+                        type: 'addProdreceipt',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -257,10 +257,9 @@ export default function ProdReceiptList() {
         try {
             // alert(checkfirstin);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel = {
+                type: '進貨中',
+                username: userInfo?.username
             };
 
 
@@ -438,7 +437,7 @@ export default function ProdReceiptList() {
     const GetProdEntryDetailByProdReceiptId = async (prodreceiptuuid: any, prodreceiptdetailuuid: any) => {
         try {
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
                 prodreceiptuuid: prodreceiptuuid as string | undefined,
                 prodreceiptdetailuuid: prodreceiptdetailuuid as string | undefined
             };
@@ -1968,24 +1967,6 @@ export default function ProdReceiptList() {
                     show={searchmodalopen}
                     onCrossClick={SearchModalClose}
                 >
-                    {/* <Modal
-                    visible={searchmodalopen}
-                    footer={null}
-                    onCancel={SearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    title={
-                        <div className={scss.modal_head_head1}>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
-                            </div>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
-                            </div>
-                        </div>
-                    }
-                    style={{ top: 250 }}
-                > */}
                     <div className={scss.modal_head_head1}>
                         <div>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>

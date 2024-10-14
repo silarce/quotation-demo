@@ -1,150 +1,150 @@
 @use "styles/theme01" as *;
 
 .body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    // border: 1px solid #c1c1c1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    position: sticky;
-    top: 0;
-    right: 0;
-    z-index: 1000;
-    // height: 712px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  // border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  // height: 712px;
 }
 
 .content {
-    width: 100%;
-    overflow-y: auto;
-    top: 0;
+  width: 100%;
+  overflow-y: auto;
+  top: 0;
 }
 
 .head_head1 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid rgb(214, 214, 214);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgb(214, 214, 214);
 
-    div {
-        margin-right: 2px;
-    }
+  div {
+    margin-right: 2px;
+  }
 
-    // background-color: gray;
+  // background-color: gray;
 }
 
 .head_body {
-    display: grid;
-    grid-template-columns: 75% 1fr;
-    // gap: 15px;
-    // width: auto;
-    // margin-top: 5px;
-    // margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 5px;
-  }
+  display: grid;
+  grid-template-columns: 75% 1fr;
+  // gap: 15px;
+  // width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+}
 
 .head_content1 {
-    display: grid;
-    grid-template-columns: 597px 1fr 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
-    width: auto;
-    // margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-  
-    div {
-      margin-right: 2px;
-    }
-  }
+  display: grid;
+  grid-template-columns: 597px 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 
-  .head_content2 {
-    display: grid;
-    grid-template-columns: 597px 1fr 1fr;
-    gap: 15px;
-    width: auto;
-    // margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-  
-    div {
-      margin-right: 2px;
-    }
+  div {
+    margin-right: 2px;
   }
+}
 
-  .body_content1 {
-    display: grid;
-    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-    gap: 0px;
-    width: auto;
-    margin-top: 2px;
-    margin-left: 20px;
-    margin-right: 20px;
-    // border-top:1px solid rgb(168, 168, 168);
-    overflow-x: hidden;
-    // background-color: gray;
+.head_content2 {
+  display: grid;
+  grid-template-columns: 597px 1fr 1fr;
+  gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
+    margin-right: 2px;
   }
+}
+
+.body_content1 {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  gap: 0px;
+  width: auto;
+  margin-top: 2px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid rgb(168, 168, 168);
+  overflow-x: hidden;
+  // background-color: gray;
+}
 
 //#region 按鈕
 .squarebtn {
-    height: 50px;
-    width: 50px;
-    // padding: 0px 40px;
+  height: 50px;
+  width: 50px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  background-color: $bgc01;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
     border: solid 1px #c1c1c1;
+    background-color: #c1c1c17c
+  }
+
+  &:focus {
     background-color: $bgc01;
-    padding: 0px 8px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 400;
-    font-size: 0.9rem;
-    color: #14256a;
-    transform: translateY(2px);
-
-    &:hover {
-        border: solid 1px #c1c1c1;
-        background-color: #c1c1c17c
-    }
-
-    &:focus {
-        background-color: $bgc01;
-        border: solid 1px #c1c1c1;
-    }
+    border: solid 1px #c1c1c1;
+  }
 }
 
 .disablesquarebtn {
-    height: 50px;
-    width: 50px;
-    // padding: 0px 40px;
-    border: solid 1px #c1c1c1;
-    background-color: $bgc01;
-    padding: 0px 8px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 400;
-    font-size: 0.9rem;
-    color: #5b5a5ad6;
-    transform: translateY(2px);
-  
-    &:hover {
-      background-repeat: no-repeat;
-      background-position: center right 10px;
-      /* 調整圖標位置 */
-      cursor: not-allowed;
-      /* 添加這行使滑鼠顯示禁止符號 */
-    }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1;
-    }
+  height: 50px;
+  width: 50px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  background-color: $bgc01;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+
+  &:hover {
+    background-repeat: no-repeat;
+    background-position: center right 10px;
+    /* 調整圖標位置 */
+    cursor: not-allowed;
+    /* 添加這行使滑鼠顯示禁止符號 */
   }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}
 
 //#endregion
 
@@ -152,37 +152,38 @@
 
 //#region 未進貨採購單
 div.panelHeader21 {
-    border-bottom: solid 1px $colorBorder01;
+  border-bottom: solid 1px $colorBorder01;
 
-    .row01,
-    .row02 {
-        padding: 0 20px;
+  .row01,
+  .row02 {
+    // padding: 0 20px;
+    padding:10px 20px;
 
-        span {
-            font-weight: 400;
-            font-size: 18px;
-        }
-
-        .clientName,
-        .country {
-            color: $colorMain;
-        }
+    span {
+      font-weight: 400;
+      font-size: 18px;
     }
 
-    .row01 {
-        display: grid;
-        grid-template-columns:30px 130px 200px 100px 150px 100px 100px 250px 30px;
-        gap: 15px;
-        // border-bottom: 1px solid #ddd;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        
+    .clientName,
+    .country {
+      color: $colorMain;
     }
+  }
 
-    .selectedRow {
-        background-color: #ecf1ff;
-        /* 當前選擇項目的背景顏色 */
-    }
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 130px 200px 100px 150px 100px 100px 250px 30px;
+    gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
 }
 
 //#region 未進貨採購單明細
@@ -194,12 +195,12 @@ div.panelHeader21 {
   margin-left: 50px;
 }
 
-.detailTable th{
+.detailTable th {
   padding: 0px 8px;
   text-align: left;
-  color:#979797;
+  color: #979797;
   font-weight: 400;
-  
+
 }
 
 .detailTable td {
@@ -215,56 +216,90 @@ div.panelHeader21 {
 }
 
 
-// div.panelHeader14 {
-//   // padding-left: 20px;
-//   border-bottom: solid 1px $colorBorder01;
+//#region 進貨單
+div.panelHeader12 {
+  border-bottom: solid 1px $colorBorder01;
 
-//   .row01,
-//   .row02 {
-//     span {
-      
-//       font-weight: 400;
-//       font-size: 16px;
-//     }
+  .row01,
+  .row02 {
+    padding-left: 20px;
 
-//     .clientName,
-//     .country {
-//       color: $colorMain;
-//     }
-//   }
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
 
-//   .row01 {
-//     display: grid;
-//     grid-template-columns:30px 30px 150px 415px 415px 100px 100px 40px 100px 150px 250px;
-//     gap: 5px;
-//   }
-// }
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
 
-// //#endregion
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 100px 80px 50px 200px;
+    gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
 
+//#endregion
 
+//#region 進貨單明細
+div.panelHeader14 {
+  padding:10px 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 18px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 30px 150px 150px 415px 415px 100px 100px 100px 150px 250px;
+    gap: 15px;
+  }
+}
+
+//#endregion
 
 // 功能
 //#region 收折
 .customCollapse {
-    border: none; // 移除邊框
-    background: transparent; // 移除背景
-    box-shadow: none; // 移除陰影
-    padding:0;
-    margin:0;
+  border: none; // 移除邊框
+  background: transparent; // 移除背景
+  box-shadow: none; // 移除陰影
+  padding: 0;
+  margin: 0;
 }
 
 .customCollapse .ant-collapse-header {
   background: transparent; // 移除背景
-    padding: 0;
-    border: none;;
+  padding: 0;
+  border: none;
+  ;
 }
 
 .customCollapse .ant-collapse-content {
-    padding: 0;
-    border: none;
+  padding: 0;
+  border: none;
 }
+
 //#endregion
 
 //#region 頁籤
@@ -276,6 +311,7 @@ div.panelHeader21 {
   // margin-left: 20px;
   margin-left: 20px;
   margin-right: 20px;
+
   div {
     margin-right: 2px;
   }
@@ -299,3 +335,31 @@ div.panelHeader21 {
   width: 100px;
 }
 
+
+
+//#region 查詢modal
+.modal_head_head1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 10px;
+  // margin-right: 20px;  
+
+
+}
+
+.modal_head_content1 {
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+
+
+}
+
+//#endregion

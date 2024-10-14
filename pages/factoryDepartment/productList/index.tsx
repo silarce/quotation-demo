@@ -1200,6 +1200,9 @@ export default function ProductList() {
                 customeRight={[
                     <div>
                         {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                        <button style={{  paddingRight: '10px', display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                            <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                        </button>
                         <input
                             type="text"
                             placeholder='請輸入料號'
