@@ -15,6 +15,8 @@ import { Icon_fc_add2, Icon_fc_delete } from 'public/image/icon/fcIconComponent/
 // config
 import { taxRate } from 'config/config_common';
 
+import { useTranslation } from 'react-i18next';
+
 // ==============================================================================
 
 interface Tstate_detail {
@@ -41,12 +43,15 @@ interface Tstate_detail {
 
 interface TconfigItem {
   label: string;
+  i18nKey: string;
   style?: React.CSSProperties;
   className?: string;
   propsCreator: (
     state: Tstate_detail,
     setState: React.Dispatch<React.SetStateAction<Tstate_detail>>,
-    disabled: boolean
+    disabled: boolean,
+    // t: TFunction<'accountant', 'applyPayment'>
+    t: (key: string) => string
   ) => TinputSelProps;
 }
 
@@ -64,14 +69,18 @@ const Cell = (props: Tprops_cell) => <Cell_ori justifyContent="flex-start" align
 // ==============================================================================
 
 const DetailHeader = ({ disabled, onAddClick }: { disabled: boolean; onAddClick: () => void }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
+  const { t: t_commont } = useTranslation('common');
+
   return (
     <Row thead={true}>
       <Cell {...config_other.btnCell}>
         {!disabled && <Icon_fc_add2 className="cursor-pointer translate-y-[-3px]" onClick={onAddClick} />}
       </Cell>
-      <Cell {...config_other.indexNumber}>{config_other.indexNumber.label}</Cell>
+      <Cell {...config_other.indexNumber}>{t_commont(config_other.indexNumber.i18nKey)}</Cell>
       {keyArr.map((key) => {
-        const { label, style } = config[key]!;
+        const { i18nKey, style } = config[key]!;
+        const label = t(i18nKey);
 
         return (
           <Cell key={key} style={style}>
@@ -101,6 +110,8 @@ const Detail_pre = (
   },
   ref: React.Ref<TimperativeHandle>
 ) => {
+  const { t } = useTranslation('accountant', { keyPrefix: 'applyPayment' });
+
   const { state, setState } = useDetail(raw_detail, disabled);
 
   useImperativeHandle(
@@ -119,7 +130,7 @@ const Detail_pre = (
       {keyArr.map((key) => {
         const { style, propsCreator } = config[key]!;
 
-        const inputSelProps = propsCreator(state, setState, disabled);
+        const inputSelProps = propsCreator(state, setState, disabled, t);
 
         return (
           <Cell key={key} style={style}>
@@ -204,6 +215,7 @@ const config_other = {
   },
   indexNumber: {
     label: '序',
+    i18nKey: 'indexNumber02',
     style: { width: 30 },
   },
 } as const;
@@ -211,6 +223,7 @@ const config_other = {
 const config: Tconfig = {
   item: {
     label: '費用項目',
+    i18nKey: 'item',
     style: { width: 100 },
     propsCreator: (state, setState, disabled) => {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -231,7 +244,8 @@ const config: Tconfig = {
   },
   business_title: {
     label: '付款對象',
-    style: { width: 100 },
+    i18nKey: 'business_title',
+    style: { width: 120 },
     propsCreator: (state, setState, disabled) => {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
@@ -251,6 +265,7 @@ const config: Tconfig = {
   },
   tax_type: {
     label: '稅別',
+    i18nKey: 'tax_type',
     style: { width: 100 },
     propsCreator: (state, setState, disabled) => {
       const options = [
@@ -282,6 +297,7 @@ const config: Tconfig = {
   },
   subtotal: {
     label: '金額',
+    i18nKey: 'subtotal',
     style: { width: 100, justifyContent: 'flex-end' },
     propsCreator: (state, setState, disabled) => {
       const { value, type } = interceptor_money(state.subtotal, disabled);
@@ -296,7 +312,6 @@ const config: Tconfig = {
           onChange: (e) => {
             const subtotal = e.target.value as `${number}` | '';
 
-            console.log(subtotal);
             setState({ ...state, ...countMoney({ subtotal }) });
           },
         },
@@ -309,6 +324,7 @@ const config: Tconfig = {
   },
   tax: {
     label: '稅額',
+    i18nKey: 'tax',
     style: { width: 100, justifyContent: 'flex-end' },
     propsCreator: (state, setState, disabled) => {
       const { value, type } = interceptor_money(state.tax, disabled);
@@ -332,7 +348,8 @@ const config: Tconfig = {
   },
   amount_total: {
     label: '發票金額',
-    style: { width: 100, justifyContent: 'flex-end' },
+    i18nKey: 'amount_total',
+    style: { width: 120, justifyContent: 'flex-end' },
     propsCreator: (state, setState, disabled) => {
       const { value, type } = interceptor_money(state.amount_total, disabled);
 
@@ -358,7 +375,8 @@ const config: Tconfig = {
   },
   accounting_subject: {
     label: '費用科目',
-    style: { width: 100 },
+    i18nKey: 'accounting_subject',
+    style: { width: 150 },
     propsCreator: (state, setState, disabled) => {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
@@ -379,6 +397,7 @@ const config: Tconfig = {
 
   number: {
     label: '發票號碼',
+    i18nKey: 'number',
     style: { width: 120 },
     propsCreator: (state, setState, disabled) => {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -399,6 +418,7 @@ const config: Tconfig = {
   },
   note: {
     label: '摘要說明',
+    i18nKey: 'note',
     style: { width: 200 },
     propsCreator: (state, setState, disabled) => {
       const textareaProps: TinputSelProps['textareaProps'] = {

@@ -40,6 +40,8 @@ import { useDepartments } from 'js/api/api_department';
 
 import type { TuserDto } from 'js/api/dtoTypes';
 
+import { useTranslation } from 'react-i18next';
+
 // ===================================================================================
 
 interface Tstate_applyPayment {
@@ -57,6 +59,9 @@ interface Tstate_applyPayment {
 // ===================================================================================
 // MARK: START
 export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
+  const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
+
+  // --------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
   const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
 
@@ -212,7 +217,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
   // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag="支出單" />
+      <PageHeader02 tag={t('applyPayment')} />
       <div>
         <BtnBar
           disabled={disabled}
@@ -229,7 +234,7 @@ export default function ApplyPayment({ userInfo }: { userInfo: TuserDto }) {
             disabled={disabled}
           />
           <div>
-            <span className="text-xl text-main mt-2 block">費用資訊</span>
+            <span className="text-xl text-main mt-2 block">{t('paymentDetail')}</span>
 
             <div>
               <DetailHeader disabled={disabled} onAddClick={addDetail} />
@@ -391,6 +396,9 @@ const Profile = ({
   setState_applyPayment: React.Dispatch<React.SetStateAction<Tstate_applyPayment>>;
   disabled: boolean;
 }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
+  const { t: t_common } = useTranslation('common');
+
   const { optionArr_name, update } = useDepartments();
 
   useEffect(() => {
@@ -400,7 +408,7 @@ const Profile = ({
   return (
     <div className="global_grid01">
       <InputSel
-        caption="支出單號"
+        caption={t('serial_number')}
         showBaseline="invisible"
         inputProps={{
           props: {
@@ -411,7 +419,7 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption="支出日期"
+        caption={t('payment_date')}
         showBaseline="auto"
         disabled={disabled}
         datePickerProps={{
@@ -424,7 +432,7 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption="支出部門"
+        caption={t('applicant_department')}
         showBaseline="auto"
         disabled={disabled}
         selectProps={{
@@ -443,7 +451,7 @@ const Profile = ({
           },
         }}
       />
-      <InputSel caption="經辦人員" showBaseline="invisible" node={state_applyPayment.agentName} />
+      <InputSel caption={t_common('agent')} showBaseline="invisible" node={state_applyPayment.agentName} />
     </div>
   );
 };
