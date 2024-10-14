@@ -1240,8 +1240,14 @@ type Tkit = {
 const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = {
   slat: (classCom) => {
     let typeName = '捲門片';
+    let unit = 'm\u00B2';
 
     classCom.prod.doorType === 'W2' && (typeName = '門片');
+
+    if (classCom.prod.doorType === 'W2') {
+      typeName = '門片';
+      unit = 'M';
+    }
 
     return {
       typeName,
@@ -1254,7 +1260,7 @@ const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = 
       //     m<sup>2</sup>
       //   </span>
       // ),
-      unit: 'm\u00B2',
+      unit,
     };
   },
   bottomBar: () => {
