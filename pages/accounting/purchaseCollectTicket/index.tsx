@@ -24,6 +24,19 @@ import Row, { Cell } from 'components/global/gear/table/row';
 
 // api
 import { useDepartments } from 'js/api/api_department';
+import {
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  apiPostAddPurchaseCollectTicket,
+  useGetPurchaseCollectTicket,
+  useGetPurchaseCollectTicketById,
+  useGetPurchaseCollectTicketDetailByTicketId,
+  useGetUnpaidProdreceiptByInvoiceNumber,
+} from 'js/api/api_netCore/api_accountant';
 
 // ===========================================================================
 

@@ -87,6 +87,7 @@ interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
   id?: string;
 }
 
+// region TpurchaseInvoice_Dto
 interface TpurchaseInvoice_Dto extends Tbase {
   date: string | null; // 發票日期
   number: string | null; // 發票號碼
@@ -110,6 +111,87 @@ interface TpurchaseInvoice_Dto extends Tbase {
   accounting_subject: string | null; // 會計科目
 }
 
+// region purchaseCollectTicket
+interface TpurchaseCollectTicket_Dto extends Tbase {
+  serial_number: string; // 收票作業
+  applicant_department: string; // 申請單位
+  agent_employee_id: string; // 經辦人id
+  ticket_method: string; // 開票方式
+  tax_deduction_category: string; //  扣稅類別
+  journal_method: string; // 立帳方式
+  invoice_number: string; // 發票號碼
+  invoice_price: string; // 發票金額
+  note: string; // 備註
+}
+
+type TcreatePurchaseCollectTicket_Dto = Pick<
+  TpurchaseCollectTicket_Dto,
+  | 'applicant_department'
+  | 'agent_employee_id'
+  | 'ticket_method'
+  | 'tax_deduction_category'
+  | 'journal_method'
+  | 'invoice_number'
+  | 'invoice_price'
+  | 'note'
+> & {
+  data: TcreatePurchaseCollectTicketDetail_Dto[];
+};
+
+interface TupdatePurchaseCollectTicket_Dto extends TcreatePurchaseCollectTicket_Dto {
+  purchase_collect_ticket_uuid: string;
+  data: TupdatePurchaseCollectTicketDetail_Dto[];
+}
+
+interface TpurchaseCollectTicketDetail_Dto extends Tbase {
+  purchase_collect_ticket_uuid: string; // 收票主檔uuid
+  item: string; // 項目名稱
+  prodreceipt_number: string; // 進貨單號
+  prodreceipt_uuid: string; // 進貨單uuid
+  transaction_date: string; // 交易日期
+  quantity: string; // 數量
+  goods_spec: string; // 貨品規格
+  unit: string; // 單位
+  unit_price: string; // 單項
+  amount: string; // 應開金額
+  note: string; // 摘要說明
+}
+
+type TcreatePurchaseCollectTicketDetail_Dto = Pick<
+  TpurchaseCollectTicketDetail_Dto,
+  'item' | 'goods_spec' | 'unit_price' | 'note' | 'transaction_date' | 'prodreceipt_uuid'
+>;
+
+interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectTicketDetail_Dto {
+  detail_uuid: string;
+}
+
+// region prodreceipt
+interface Tprodreceipt_Dto extends Tbase {
+  prodreceiptid: string;
+  supplieruuid: string;
+  invoice: string;
+  purchaseorderuuid: string;
+  purchaseorderid: string;
+  inspected: string;
+  totalprice: string;
+  tax: string;
+  purchaseordercreate_at: string;
+  purchaseordercreate_by: string;
+  review_by: string;
+  review_at: string;
+  review_type: string;
+  status: string;
+  suppliername: string;
+  supplierphone: string;
+  supplieraddress: string;
+  suppliertaxid: string;
+  pay_status: string;
+  entry_status: string;
+  note: string;
+  batchid: string;
+}
+
 // ==============================================================================
 
 export type {
@@ -128,4 +210,12 @@ export type {
   TupdateApplyPayment_Dto,
   TpurchaseInvoice_Dto,
   //
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  //
+  Tprodreceipt_Dto,
 };

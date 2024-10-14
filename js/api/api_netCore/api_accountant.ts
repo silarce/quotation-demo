@@ -19,6 +19,15 @@ import type {
   TcreateApplyPayment_Dto,
   TupdateApplyPayment_Dto,
   TpurchaseInvoice_Dto,
+  //
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  //
+  Tprodreceipt_Dto,
 } from './_schemas';
 
 import { dtoSnakeToCamel } from '../apiUtils/dtoSnakeToCamel';
@@ -34,7 +43,7 @@ interface TapplyPayment_Dto_detailed extends TapplyPayment_Dto {
 
 // =================================================================================
 
-// region BankAccount
+// region bankAccount
 const apiGetBankAccount = async () => {
   const api = `/${subRoot}/GetBankAccount`;
 
@@ -418,6 +427,322 @@ const useGetApplyPaymentDetail = (
 
 // =================================================================================
 
+// region purchaseCollectTicket
+
+// 取得所有進貨收票
+// api未完成 // 猜測api並預接
+const apiGetPurchaseCollectTicket = async () => {
+  const api = `/${subRoot}/GetPurchaseCollectTicket`;
+  const params = {
+    id: 'all',
+  };
+
+  return axi2
+    .get<TpurchaseCollectTicket_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得進貨收票列表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 取得單一 進貨收票單
+const apiGetPurchaseCollectTicketById = async (id: string) => {
+  const api = `/${subRoot}/GetPurchaseCollectTicketById`;
+  const params = {
+    id,
+  };
+
+  return axi2
+    .get<TpurchaseCollectTicket_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得進貨收票失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 新增進貨收票 (進貨單不可重複選)
+const apiPostAddPurchaseCollectTicket = async (data: TcreatePurchaseCollectTicket_Dto) => {
+  const api = `/${subRoot}/AddPurchaseCollectTicket`;
+
+  return axi2
+    .post<string>(api, data)
+    .then(({ data: id }) => id)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '新增進貨收票失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 編輯進貨收票單
+const apiPatchUpdatePurchaseCollectTicket = async (data: TupdatePurchaseCollectTicket_Dto) => {
+  const api = `/${subRoot}/UpdatePurchaseCollectTicket`;
+
+  return axi2.post(api, data).catch((err: AxiosError) => {
+    myAlert.err({ title: '更新進貨收票失敗', content: err.message });
+
+    return Promise.reject(err);
+  });
+};
+
+// 已進貨收票id 取得所有進貨收票單明細
+const apiGetPurchaseCollectTicketDetailByTicketId = async (id: string) => {
+  const api = `/${subRoot}/GetPurchaseCollectTicketDetailByTicketId`;
+  const params = {
+    ticket_id: id,
+  };
+
+  return axi2
+    .get<TpurchaseCollectTicketDetail_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得進貨收票明細失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
+const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number: string) => {
+  const api = `/${subRoot}/SearchUnpaidProdreceiptByInvoiceNumber`;
+  const params = {
+    invoice_number,
+  };
+
+  return axi2
+    .get<Tprodreceipt_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得未結案進貨單失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+const useGetPurchaseCollectTicket = ({
+  callAlertOnError = true,
+  autoUpdate = true,
+}: {
+  callAlertOnError?: boolean;
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<TpurchaseCollectTicket_Dto[]>();
+
+  const update = useCallback(async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetPurchaseCollectTicket()
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得進貨收票列表失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, []);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
+const useGetPurchaseCollectTicketById = (
+  id: string | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<TpurchaseCollectTicket_Dto>();
+
+  const update = useCallback(() => {
+    if (isFetching || !id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return apiGetPurchaseCollectTicketById(id)
+      .then((data) => {
+        setRes(data[0]);
+
+        return data[0];
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得進貨收票失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [id]);
+
+  const reqPatch = useCallback(
+    async (preBody: Omit<TupdatePurchaseCollectTicket_Dto, 'purchase_collect_ticket_uuid'>) => {
+      if (isFetching || !id) {
+        return;
+      }
+
+      setIsFetching(true);
+      const body: TupdatePurchaseCollectTicket_Dto = { purchase_collect_ticket_uuid: id, ...preBody };
+
+      const res = await apiPatchUpdatePurchaseCollectTicket(body)
+        .then(() => {
+          return 'success';
+        })
+        .catch((err: AxiosError) => {
+          callAlertOnError && myAlert.err({ title: '更新進貨收票失敗', content: err.message });
+        })
+        .finally(() => {
+          setIsFetching(false);
+        });
+
+      if (res === 'success') {
+        return await update();
+      }
+    },
+    [isFetching, id]
+  );
+
+  const clear = () => {
+    setRes(undefined);
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [id]);
+
+  return {
+    res,
+    setRes,
+    clear,
+    update,
+    reqPatch,
+    isFetching,
+  };
+};
+
+const useGetPurchaseCollectTicketDetailByTicketId = (
+  ticket_id: string | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<TpurchaseCollectTicketDetail_Dto[]>();
+
+  const update = useCallback(async () => {
+    if (isFetching || !ticket_id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetPurchaseCollectTicketDetailByTicketId(ticket_id)
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得進貨收票明細失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [ticket_id]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [ticket_id]);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
+const useGetUnpaidProdreceiptByInvoiceNumber = (
+  invoice_number: string,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<Tprodreceipt_Dto[]>();
+
+  const update = useCallback(async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetUnpaidProdreceiptByInvoiceNumber(invoice_number)
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得未結案進貨單失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [invoice_number]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [invoice_number]);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
+// =================================================================================
+
 export {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
@@ -437,6 +762,18 @@ export {
   useGetApplyPayment,
   useGetApplyPaymentById,
   useGetApplyPaymentDetail,
+  //
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  apiPostAddPurchaseCollectTicket,
+  useGetPurchaseCollectTicket,
+  useGetPurchaseCollectTicketById,
+  useGetPurchaseCollectTicketDetailByTicketId,
+  useGetUnpaidProdreceiptByInvoiceNumber,
 };
 
 export type { TapplyPayment_Dto_detailed };
