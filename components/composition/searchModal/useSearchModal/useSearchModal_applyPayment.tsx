@@ -53,21 +53,21 @@ const useSearchModal_applyPayment = (): TuseSearchModal<TapplyPayment_Dto> => {
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
 const useData = (filter: Tstate): TmodalData<TapplyPayment_Dto> => {
-  const params: Tparams = useMemo(() => {
-    return {
-      pageSize: 20,
-      sort: 'customerNumber',
-      order: 'ASC',
-      filter: {
-        name: {
-          $contains: filter.name,
-        },
-        customerNumber: {
-          $contains: filter.customerNumber,
-        },
-      },
-    };
-  }, [filter]);
+  // const params: Tparams = useMemo(() => {
+  //   return {
+  //     pageSize: 20,
+  //     sort: 'customerNumber',
+  //     order: 'ASC',
+  //     filter: {
+  //       name: {
+  //         $contains: filter.name,
+  //       },
+  //       customerNumber: {
+  //         $contains: filter.customerNumber,
+  //       },
+  //     },
+  //   };
+  // }, [filter]);
 
   // const { dataArr, viewRef_bottom, isLoadingPage1, reset, meta } = useGetCustomers_infinite_2({
   //   customParams: params,
@@ -130,6 +130,10 @@ const useConfig_data = () => {
         label: t('total_price'),
         style: {
           width: '80px',
+          justifyContent: 'flex-end',
+        },
+        reducer: ({ total_price }, { index }) => {
+          return total_price?.toLocaleString() || '';
         },
       },
       description: {
