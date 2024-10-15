@@ -400,8 +400,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.update_by}</span>
                 {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
                 <span>{getTaiwanDateStr(_item.update_at)}</span>
-                <span>{_item.url}</span>
                 <span>{_item.position}</span>
+                <span>{_item.url}</span>
                 {/* <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
                 <span></span>
               </div>

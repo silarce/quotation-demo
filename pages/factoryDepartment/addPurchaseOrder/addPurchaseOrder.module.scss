@@ -118,11 +118,12 @@
   z-index: 1000;
   display: grid;
   // grid-template-columns: 45px 150px 415px 415px 65px 50px 300px 65px 70px ;
-  grid-template-columns: 75px 150px 410px 410px 100px 40px 30px 100px 100px 300px 70px;
+  grid-template-columns: 60px 30px 150px 410px 410px 100px 40px 30px 100px 100px 300px 70px;
   // gap: 15px;
   width: auto;
   // margin: 5px 20px;
   // height: 41px;
+  padding:10px 20px;
 
   div {
     // border-bottom: 1px solid gray;
@@ -370,7 +371,7 @@ div.panelHeader19 {
 
 //新增請購單明細
 div.panelHeader20 {
-  padding-left: 15px;
+  padding:10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -388,7 +389,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns:30px 30px 150px 410px 410px 100px 40px 30px 100px 100px 300px ;
+    grid-template-columns:60px 30px 150px 410px 410px 100px 40px 30px 100px 100px 300px ;
     // gap: 5px;
   }
 }

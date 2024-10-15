@@ -295,6 +295,23 @@
     }
 }
 
+.foot_head3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    // gap: 15px;
+    width: auto;
+    // margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+
+
+    div {
+        margin-right: 20px;
+    }
+
+}
+
 .foot_content1 {
     display: grid;
     grid-template-columns: 1fr; // 左右兩邊比例，可以調整

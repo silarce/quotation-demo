@@ -79,6 +79,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
         const updateTime = () => {
             const now = new Date();
             setLocalTime(now.toLocaleString());
+            setCreateBy(userInfo?.username as string);
         };
 
         // 初始化時間
@@ -96,10 +97,10 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             type: 'redButton',
             label: '新增',
             onClick: () => {
+                console.log(whname+"/"+position+'/'+create_by);
                 if (whname === '' || whname === undefined || whname === null &&
                     position === '' || position === undefined || position === null &&
-                    create_by === '' || create_by === undefined || create_by === null &&
-                    url === '' || url === undefined || url === null
+                    create_by === '' || create_by === undefined || create_by === null
                 ) {
                     myAlert.warning({ title: '請確實填寫倉庫資訊' });
                 } else {
@@ -225,11 +226,11 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="建立人員"
-                            disabled={disabled}
+                            disabled={!disabled}
                             inputProps={{
                                 props: {
-                                    // value: data1.whpname,
-                                    onChange: (e) => setCreateBy(e.target.value.trim())
+                                    value: userInfo?.username,
+                                    // onChange: (e) => setCreateBy(e.target.value.trim())
                                 },
                             }}
                         />
