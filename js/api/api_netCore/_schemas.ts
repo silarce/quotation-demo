@@ -113,7 +113,7 @@ interface TpurchaseInvoice_Dto extends Tbase {
 
 // region purchaseCollectTicket
 interface TpurchaseCollectTicket_Dto extends Tbase {
-  serial_number: string; // 收票作業
+  serial_number: string; // 收票單號
   applicant_department: string | null; // 申請單位
   agent_employee_id: string; // 經辦人id
   ticket_method: string | null; // 開票方式

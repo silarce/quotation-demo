@@ -26,6 +26,14 @@
     "note": "摘要說明"
   },
   "purchaseCollectTicket": {
+    "purchaseCollectTicket": "進貨收票單",
+    "serial_number": "收票單號",
+    "applicant_department": "申請單位",
+    "ticket_method": "開票方式",
+    "tax_deduction_category": "扣稅類別",
+    "journal_method": "立帳方式",
+    "invoice_number": "發票號碼",
+    "note": "摘要說明",
     "item": "貨品名稱",
     "prodreceipt_number": "來源單號",
     "transaction_date": "交易日期",
@@ -33,7 +41,9 @@
     "unit": "單位",
     "unit_price": "單價",
     "amount": "應該金額",
-    "note": "摘要說明",
-    "goods_spec": "規格"
+    "goods_spec": "規格",
+    "detail": "明細資料",
+    "addDetail": "新增明細資料",
+    "selectInvoice": "選擇發票"
   }
 }

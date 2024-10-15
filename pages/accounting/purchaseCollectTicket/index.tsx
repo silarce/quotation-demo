@@ -21,8 +21,6 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import Row, { Cell } from 'components/global/gear/table/row';
 
 // api
 import { useDepartments } from 'js/api/api_department';
@@ -43,6 +41,8 @@ import {
 
 // type
 import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
+
+import { useTranslation } from 'react-i18next';
 
 // ===========================================================================
 type Tquery = {
@@ -132,6 +132,8 @@ export type { Tstate, Tstate_detail, Interface_classState, Interface_classState_
 
 export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   //
+  const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
+  //
   const router = useRouter();
   const { purchaseCollectTicketId } = router.query as Tquery;
 
@@ -193,7 +195,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // ------------------------------------------------------------
   return (
     <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag="進貨收票單" />
+      <PageHeader02 tag={t('purchaseCollectTicket')} />
       <div>
         <BtnBar
           disabled={disabled}
@@ -205,12 +207,12 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
         />
         <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
           <Profile disabled={disabled} classState={State} onInovoiceBtnClick={handleSelectInvoice} />
-          <div>
+          <div className="mt-2 ">
             <div>
-              <span>明細資料</span>
-              <SquareBtn label="查詢進貨單" sharp="mini" />
+              <span className="text-xl text-main mr-5">{t('detail')}</span>
+              <SquareBtn label={t('addDetail')} sharp="mini" />
             </div>
-            <div>
+            <div className="mt-2">
               <Detail_thead />
               {State.detailArr.map((classDetail, index) => {
                 const identifyId = classDetail.identifyId;
@@ -285,6 +287,9 @@ const Profile = ({
   classState: Interface_classState;
   onInovoiceBtnClick: () => void;
 }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
+  const { t: t_common } = useTranslation('common');
+
   const { optionArr_name, update } = useDepartments();
 
   useEffect(() => {
@@ -294,7 +299,7 @@ const Profile = ({
   return (
     <div className="global_grid01">
       <InputSel
-        caption={'收票單號'}
+        caption={t('serial_number')}
         showBaseline="invisible"
         inputProps={{
           props: {
@@ -305,7 +310,7 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption={'部門'}
+        caption={t('serial_number')}
         showBaseline="auto"
         disabled={disabled}
         selectProps={{
@@ -324,11 +329,11 @@ const Profile = ({
           },
         }}
       />
-      <InputSel caption={'經辦人員'} showBaseline="invisible" node={classState.agentName} />
+      <InputSel caption={t_common('agent')} showBaseline="invisible" node={classState.agentName} />
       <div />
       {/*  */}
       <InputSel
-        caption={'開票方式'}
+        caption={t('ticket_method')}
         disabled={disabled}
         showBaseline="auto"
         inputProps={{
@@ -344,7 +349,7 @@ const Profile = ({
       />
 
       <InputSel
-        caption={'扣稅類別'}
+        caption={t('tax_deduction_category')}
         disabled={disabled}
         showBaseline="auto"
         inputProps={{
@@ -359,8 +364,9 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption={'立帳方式'}
+        caption={t('journal_method')}
         showBaseline="auto"
+        disabled={disabled}
         inputProps={{
           props: {
             value: classState.journal_method,
@@ -376,7 +382,7 @@ const Profile = ({
       {/*  */}
 
       <InputSel
-        caption={'發票號碼'}
+        caption={t('invoice_number')}
         showBaseline="invisible"
         inputProps={{
           props: {
@@ -388,7 +394,7 @@ const Profile = ({
         suffix={
           <SquareBtn
             className={classNames(disabled && 'invisible')}
-            label="選擇發票"
+            label={t('selectInvoice')}
             sharp="mini"
             onClick={onInovoiceBtnClick}
           />
@@ -399,7 +405,7 @@ const Profile = ({
       <div />
       {/*  */}
       <InputSel
-        caption={'摘要說明'}
+        caption={t('note')}
         disabled={disabled}
         showBaseline="auto"
         inputProps={{

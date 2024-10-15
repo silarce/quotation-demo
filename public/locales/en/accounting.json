@@ -26,6 +26,14 @@
     "note": "Note"
   },
   "purchaseCollectTicket": {
+    "purchaseCollectTicket": "Purchase Collect Ticket",
+    "serial_number": "Serial Number",
+    "applicant_department": "Applicant Department",
+    "ticket_method": "Ticket Method",
+    "tax_deduction_category": "Tax Deduction Category",
+    "journal_method": "Journal Method",
+    "invoice_number": "Invoice Number",
+    "note": "Note",
     "item": "Item",
     "prodreceipt_number": "Source Number",
     "transaction_date": "Transaction Date",
@@ -33,7 +41,9 @@
     "unit": "Unit",
     "unit_price": "Unit Price",
     "amount": "Amount",
-    "note": "Note",
-    "goods_spec": "Spec"
+    "goods_spec": "Spec",
+    "detail": "Detail",
+    "addDetail": "Add Detail",
+    "selectInvoice": "Select Invoice"
   }
 }
