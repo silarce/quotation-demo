@@ -34,7 +34,7 @@ import { Modal } from 'antd';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
-
+import icon_add from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -85,6 +85,11 @@ export default function ProductList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [producttypedata, setProducttypedata] = useState<any[]>([]);
+    const [classificationdata, setClassificationdata] = useState<any[]>([]);
+    const [componentdata, setComponentdata] = useState<any[]>([]);
+    const [materialdata, setMaterialdata] = useState<any[]>([]);
+    const [surfacedata, setSurfacedata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -129,6 +134,12 @@ export default function ProductList() {
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
 
+    // 物料編碼搜尋
+    const [keywordclassification, setKeywordclassification] = useState<string>("");
+    const [keywordcomponent, setKeywordcomponent] = useState<string>("");
+    const [keywordmaterial, setKeywordmaterial] = useState<string>("");
+    const [keywordsurface, setKeywordsurface] = useState<string>("");
+
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -164,6 +175,15 @@ export default function ProductList() {
     const [addproductsurface, setAddProductsurface] = useState<string>("");
     const [addoldproductid, setAddOldProductid] = useState<string>("");
 
+
+    const [handinputclassificationcodename, setHandinputclassificationcodename] = useState<string>("");
+    const [handinputclassificationname, setHandinputclassificationname] = useState<string>("");
+    const [handinputcomponentcodename, setHandinputcomponentcodename] = useState<string>("");
+    const [handinputcomponentname, setHandinputcomponentname] = useState<string>("");
+    const [handinputmaterialcodename, setHandinputmaterialcodename] = useState<string>("");
+    const [handinputmaterialname, setHandinputmaterialname] = useState<string>("");
+    const [handinputsurfacecodename, setHandinputsurfacecodename] = useState<string>("");
+    const [handinputsurfacename, setHandinputsurfacename] = useState<string>("");
 
     //入庫總數
     const [totalentry, setTotalentry] = useState<string>("");
@@ -329,6 +349,7 @@ export default function ProductList() {
 
     useEffect(() => {
         getProduct();
+        getProductidType();
     }, []);
 
 
@@ -504,7 +525,62 @@ export default function ProductList() {
         }
     };
 
+    const getProductidType = async () => {
+        try {
+            // alert(checkfirstin);
+            setIsLoading(true);
+            const conditionModel: {
+                // keyword: string | undefined;
+            } = {
+                // keyword: "search" as string | undefined,
+            };
 
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProductidType?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+
+            setProducttypedata(responsedata);
+            // 過濾出 type 為 classification 的資料，並設置到 classificationdata
+            const classificationData = responsedata.filter((item: any) => item.type === 'classification');
+            setClassificationdata(classificationData);
+            setFilteredClassificationData(classificationData);
+
+            const componentData = responsedata.filter((item: any) => item.type === 'component');
+            setComponentdata(componentData);
+            setFilteredComponentData(componentData);
+
+            const materialData = responsedata.filter((item: any) => item.type === 'material');
+            setMaterialdata(materialData);
+            setFilteredMaterialData(materialData);
+
+            // 過濾出 type 為 classification 的資料，並設置到 classificationdata
+            const surfaceData = responsedata.filter((item: any) => item.type === 'surface');
+            setSurfacedata(surfaceData);
+            setFilteredSurfaceData(surfaceData);
+
+
+            console.log(responsedata);
+
+        } catch (error: any) {
+            // setError("getProduct:" + error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
 
     //#endregion
@@ -964,6 +1040,7 @@ export default function ProductList() {
         setMaterialin(originalmaterialin);
         setUnitin(originalunitin);
         setSurfacein(originalsurfacein);
+        setOldProductid(originaloldproductid);
     };
 
 
@@ -1087,6 +1164,7 @@ export default function ProductList() {
                     setAddProductunit('');
                     setAddProductmaterial('');
                     setAddProductsurface('');
+                    setAddOldProductid('');
 
                     setType1SelectedOption('');
                     setType1SelectedValue('');
@@ -1196,6 +1274,251 @@ export default function ProductList() {
             setType5SelectedValue('');
         }
     };
+
+
+
+    const [filteredclassificationData, setFilteredClassificationData] = useState<any[]>([]);
+
+    // 監聽條件變更
+    useEffect(() => {
+        let filteredData = classificationdata;
+
+        if (keywordclassification) {
+            const keyword = keywordclassification.trim();
+
+            // 過濾 name 和 code_name 欄位
+            filteredData = filteredData.filter(item =>
+                item.name.toString().includes(keyword) ||
+                item.code_name.toString().includes(keyword)
+            );
+        }
+
+        setFilteredClassificationData(filteredData);
+    }, [keywordclassification, classificationdata]);
+
+
+    const [filteredcomponentData, setFilteredComponentData] = useState<any[]>([]);
+
+    // 監聽條件變更
+    useEffect(() => {
+        let filteredData = componentdata;
+
+        if (keywordcomponent) {
+            const keyword = keywordcomponent.trim();
+
+            // 過濾 name 和 code_name 欄位
+            filteredData = filteredData.filter(item =>
+                item.name.toString().includes(keyword) ||
+                item.code_name.toString().includes(keyword)
+            );
+        }
+
+        setFilteredComponentData(filteredData);
+    }, [keywordcomponent, componentdata]);
+
+    const [filteredmaterialData, setFilteredMaterialData] = useState<any[]>([]);
+
+    // 監聽條件變更
+    useEffect(() => {
+        let filteredData = materialdata;
+
+        if (keywordmaterial) {
+            const keyword = keywordmaterial.trim();
+
+            // 過濾 name 和 code_name 欄位
+            filteredData = filteredData.filter(item =>
+                item.name.toString().includes(keyword) ||
+                item.code_name.toString().includes(keyword)
+            );
+        }
+
+        setFilteredMaterialData(filteredData);
+    }, [keywordmaterial, materialdata]);
+
+
+    const [filteredsurfaceData, setFilteredSurfaceData] = useState<any[]>([]);
+
+    // 監聽條件變更
+    useEffect(() => {
+        let filteredData = surfacedata;
+
+        if (keywordsurface) {
+            const keyword = keywordsurface.trim();
+
+            // 過濾 name 和 code_name 欄位
+            filteredData = filteredData.filter(item =>
+                item.name.toString().includes(keyword) ||
+                item.code_name.toString().includes(keyword)
+            );
+        }
+
+        setFilteredSurfaceData(filteredData);
+    }, [keywordsurface, surfacedata]);
+
+
+
+    const handleAddByHandKey = async (type: any) => {
+        try {
+            // 建立要傳送的數據
+            let data = {};
+
+            switch (type) {
+                case 'classification':
+                    data = {
+                        code_name: handinputclassificationcodename,
+                        name: handinputclassificationname,
+                    };
+                    break;
+                case 'component':
+                    data = {
+                        code_name: handinputcomponentcodename,
+                        name: handinputcomponentname,
+                    };
+                    break;
+                case 'material':
+                    data = {
+                        code_name: handinputmaterialcodename,
+                        name: handinputmaterialname,
+                    };
+                    break;
+                case 'surface':
+                    data = {
+                        code_name: handinputsurfacecodename,
+                        name: handinputsurfacename,
+                    };
+                    break;
+                default:
+                    console.error("Invalid type provided");
+                    break;
+            }
+
+            console.log(data);
+            // return;
+
+            const conditionModel = {
+                data: data,
+                type: type,
+                username: userInfo?.username
+            };
+
+            console.log(conditionModel);
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+
+
+            // 發送數據到 API
+            const response = await fetch(`${setting.apipath}/WareHouse/AddProductidType`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+                myAlert.err({ title: 'AddProductidType', content: `API Status: ${response.status}` })
+
+            }
+            // 解析 API 響應
+            const result = await response.json();
+
+            // 顯示成功提示
+            myAlert.success({ title: '新增成功' })
+
+            getProductidType();
+
+            switch (type) {
+                case 'classification':
+                    setHandinputclassificationcodename('');
+                    setHandinputclassificationname('');
+                    break;
+                case 'component':
+                    setHandinputcomponentcodename('');
+                    setHandinputcomponentname('');
+                    break;
+                case 'material':
+                    setHandinputmaterialcodename('');
+                    setHandinputmaterialname('');
+                    break;
+                case 'surface':
+                    setHandinputsurfacecodename('');
+                    setHandinputsurfacename('');
+                    break;
+                default:
+                    break;
+            }
+
+
+
+            // 更新狀態或執行其他操作
+            console.log(result);
+        } catch (error: any) {
+            // 顯示錯誤信息
+            myAlert.err({ title: 'FunctionError', content: error.message },)
+        }
+    }
+
+    const handleDeleteById = async (type: any, id: any) => {
+
+        myAlert.confirm({
+            title: '確定移除編碼嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+
+
+
+                    try {
+                        const conditionModel = {
+                            id: id,
+                            type: type,
+                            username: userInfo?.username
+                        };
+
+                        // console.log(conditionModel);
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/DeleteProductidType?${queryParams}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const result = await response.json();
+                        // 根據 API 回應處理結果
+                        if (result.success) {
+                            // 成功，顯示提示
+                            myAlert.success({ title: '成功', content: result.message });
+                            // setEdithandkey(!edithandkey);
+                            getProductidType();
+                        } else {
+                            // 失敗，顯示錯誤提示
+                            myAlert.warning({ title: '失敗', content: "移除失敗" });
+                        }
+
+
+                    } catch (error: any) {
+                        // 顯示錯誤信息
+                        myAlert.err({ title: 'FunctionError', content: error.message },)
+                    }
+                }
+            }
+        });
+    }
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1371,6 +1694,15 @@ export default function ProductList() {
                                         style={getButtonStyle('新增')}
                                     >
                                         新增
+                                    </button>
+                                </span>
+                                <span>
+                                    <button
+                                        className={scss.minitabbtn}
+                                        onClick={() => tabChosed('編碼')}
+                                        style={getButtonStyle('編碼')}
+                                    >
+                                        編碼維護
                                     </button>
                                 </span>
                             </div>
@@ -1569,120 +1901,68 @@ export default function ProductList() {
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
                                     <div>
                                         {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>類別</span> */}
-                                        <select value={type1selectedOption}
+                                        <select
+                                            value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type1", e) }}>
                                             <option value=''>選擇類別</option>
-                                            <option value="P">(P)成品</option>
-                                            <option value="C">(C)組件</option>
-                                            <option value="S">(S)半成品</option>
-                                            <option value="R">(R)原料</option>
-                                            <option value="M">(M)物料</option>
+                                            {producttypedata
+                                                .filter(item => item.type === 'classification') // 過濾 type === 'classification'
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .map(item => (
+                                                    <option key={item.id} value={item.code_name}>
+                                                        {`(${item.code_name}) ${item.name}`}  {/* 動態生成選項，顯示格式如 (P)成品 */}
+                                                    </option>
+                                                ))}
                                         </select>
-
-                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>細分</span> */}
-                                        <select value={type2selectedOption}
+                                        <select
+                                            value={type2selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type2", e) }}>
                                             <option value=''>選擇細分</option>
-                                            <option value="DM">(DM)門型</option>
-                                            <option value="SP">(SP)支板</option>
-                                            <option value="SC">(SC)螺絲帽</option>
-                                            <option value="WS">(WS)華司</option>
-                                            <option value="DP">(DP)門片</option>
-                                            <option value="SA">(SA)捲軸</option>
-                                            <option value="GE">(GE)齒輪組</option>
-                                            <option value="CO">(CO)鋼捲</option>
-                                            <option value="BT">(BT)底座</option>
-                                            <option value="RB">(RB)捲箱</option>
-                                            <option value="OT">(OT)其他</option>
-                                            <option value="TB">(TB)法蘭片</option>
-                                            <option value="GR">(GR)門軌</option>
-                                            <option value="SB">(SB)鋼板</option>
-                                            <option value="BR">(BR)軸承</option>
-                                            <option value="BF">(BF)底框</option>
-                                            <option value="PI">(PI)中柱</option>
-                                            <option value="DF">(DF)門框</option>
-                                            <option value="HI">(HI)鉸鏈</option>
-                                            <option value="HA">(HA)把手</option>
-                                            <option value="MO">(MO)馬達</option>
-                                            <option value="MT">(MT)金屬管</option>
-                                            <option value="ST">(ST)蛇管</option>
-                                            <option value="OP">(OP)油管</option>
-                                            <option value="AI">(AI)角鐵</option>
-                                            <option value="RO">(RO)棒材</option>
-                                            <option value="FI">(FI)扁鐵</option>
-                                            <option value="SS">(SS)型鋼</option>
-                                            <option value="AX">(AX)心軸</option>
-                                            <option value="CH">(CH)鍊條</option>
-                                            <option value="RE">(RE)減速機</option>
-                                            <option value="AS">(AS)膠條</option>
-                                            <option value="LO">(LO)鎖類</option>
-                                            <option value="CA">(CA)塗料</option>
-                                            <option value="SE">(SE)集合工單用</option>
-
+                                            {producttypedata
+                                                .filter(item => item.type === 'component') // 過濾出 type 為 'component' 的資料
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .map(item => (
+                                                    <option key={item.id} value={item.code_name}>
+                                                        ({item.code_name}) {item.name}
+                                                    </option>
+                                                ))
+                                            }
                                         </select>
-                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>序號</span> */}
+
                                         <input maxLength={5} style={{ color: "#14256a", fontSize: '15px', width: '120px', borderBottom: '1px solid #c1c1c1', margin: '0px 0px' }} placeholder='輸入序號'
                                             value={type3inputedvalue} onChange={(e) => { handelSetProductid("type3", e) }} />
-
-                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>材質</span> */}
                                         <select value={type4selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type4", e) }}>
                                             <option value=''>選擇材質</option>
-                                            <option value="00">(00)無</option>
-                                            <option value="01">(01)鍍鋅</option>
-                                            <option value="02">(02)不鏽鋼#304</option>
-                                            <option value="03">(03)不鏽鋼#316</option>
-                                            <option value="04">(04)樹脂鋼板</option>
-                                            <option value="05">(05)鋁合金 T5</option>
-                                            <option value="06">(06)合金鋼</option>
-                                            <option value="07">(07)尼龍</option>
-                                            <option value="08">(08)木頭</option>
-                                            <option value="09">(09)塑膠</option>
-                                            <option value="10">(10)橡膠</option>
-                                            <option value="11">(11)塑鋼</option>
-                                            <option value="12">(12)鋼</option>
-                                            <option value="13">(13)鍍五彩</option>
-                                            <option value="14">(14)銅</option>
-                                            <option value="15">(15)高耐鍍鋅</option>
-                                            <option value="16">(16)內外不鏽鋼管</option>
-                                            <option value="17">(17)內鋅管外不鏽鋼管</option>
-                                            <option value="18">(18)內鋅丸外不鏽鋼管</option>
-                                            <option value="19">(19)不鏽鋼管</option>
-                                            <option value="20">(20)黑鐵</option>
-                                            <option value="21">(21)熱浸鍍鋅</option>
-                                            <option value="22">(22)不鏽鋼#201</option>
-                                            <option value="23">(23)SS41(一般構造用鋼材)</option>
-                                            <option value="24">(24)ST不鏽鋼</option>
-                                            <option value="25">(25)SS400低碳鋼</option>
-                                            <option value="26">(26)鋁</option>
-                                            <option value="27">(27)PVC</option>
-                                            <option value="28">(28)PU</option>
-                                            <option value="29">(29)S45C中碳鋼</option>
+                                            {producttypedata
+                                                .filter(item => item.type === 'material') // 過濾出類型為 'material' 的資料
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .map(item => (
+                                                    <option key={item.id} value={item.code_name}>
+                                                        ({item.code_name}) {item.name}
+                                                    </option>
+                                                ))}
                                         </select>
-                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>表面</span> */}
+
+
                                         <select value={type5selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type5", e) }}>
                                             <option value=''>選擇表面</option>
-                                            <option value="00">(00)無</option>
-                                            <option value="01">(01)烤漆</option>
-                                            <option value="BA">(BA)BA</option>
-                                            <option value="HL">(HL)HL</option>
-                                            <option value="2B">(2B)2B</option>
-                                            <option value="N4">(N4)NO.4</option>
-                                            <option value="02">(02)鋅花</option>
-                                            <option value="MI">(MI)鏡面</option>
-                                            <option value="N1">(N1)NO.1</option>
-                                            <option value="03">(03)熱浸鍍鋅花紋</option>
-                                            <option value="FL">(FL)氟碳烤漆</option>
-                                            <option value="04">(04)PVC烤漆</option>
-                                            <option value="05">(05)噴砂</option>
-                                            <option value="06">(06)噴砂+底漆</option>
+                                            {producttypedata
+                                                .filter(item => item.type === 'surface') // 過濾 type 為 'surface' 的資料
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .map(item => (
+                                                    <option key={item.id} value={item.code_name}>
+                                                        ({item.code_name}){item.name}
+                                                    </option>
+                                                ))}
+                                        </select>
 
-                                        </select></div>
+                                    </div>
                                     <div></div>
                                 </div>
                                 <div className={scss.foot_head1_1}>
@@ -1805,6 +2085,360 @@ export default function ProductList() {
                                         </table>
                                     </div>
                                     <div></div>
+                                </div>
+                                <br />
+                            </div>
+                            <div style={{ display: `${tabshow === "編碼" ? '' : 'none'}` }}>
+                                <div className={scss.foot_head3} style={{ borderTop: '1px solid #c1c1c1' }}>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder='搜尋類別'
+                                            value={keywordclassification}
+                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            onChange={(e) => setKeywordclassification(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder='搜尋細分'
+                                            value={keywordcomponent}
+                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            onChange={(e) => setKeywordcomponent(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder='搜尋材質'
+                                            value={keywordmaterial}
+                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            onChange={(e) => setKeywordmaterial(e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder='搜尋表面'
+                                            value={keywordsurface}
+                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            onChange={(e) => setKeywordsurface(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className={scss.foot_head3}>
+                                    <div>
+                                        <div style={{ maxHeight: '240px', overflowY: 'auto', border: '1px solid #c1c1c1', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1, border: '1px solid #c1c1c1', color: '#14256a' }}>
+                                                    <tr>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>
+
+                                                        </th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>編碼</th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>類別</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style={{ border: '1px solid #c1c1c1' }}>
+                                                    {filteredclassificationData
+                                                        // .filter(item => item.type === 'classification') // 過濾出 type === 'classification' 的項目
+                                                        .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                        .map((item, index) => (
+                                                            <tr key={index} style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                                <td style={{ padding: '8px' }}>
+                                                                    <button onClick={() => { handleDeleteById("classification", item.id) }}>
+                                                                        <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                                    </button>
+                                                                    {/* <button onClick={() => { alert(item.id) }}>
+                                                                        <img src={icon_edit.src} alt="cancel"
+                                                                            style={{
+                                                                                // display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`,
+                                                                                width: '30px', height: '20px'
+                                                                            }}
+                                                                        />
+                                                                    </button> */}
+                                                                </td>
+                                                                <td style={{ padding: '8px' }}>{item.code_name}</td>
+                                                                <td style={{ padding: '8px' }}>{item.name}</td> {/* 顯示 classification */}
+                                                            </tr>
+
+                                                        ))}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+
+
+                                    </div>
+                                    <div>
+                                        <div style={{ height: '240px', overflowY: 'auto', border: '1px solid #c1c1c1', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1, border: '1px solid #c1c1c1', color: '#14256a' }}>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>編碼</th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>細分</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style={{ border: '1px solid #c1c1c1' }}>
+                                                    {filteredcomponentData
+                                                        // .filter(item => item.type === 'component') // 過濾出 type === 'component' 的項目
+                                                        .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                        .map((item, index) => (
+                                                            <tr key={index} style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                                <td style={{ padding: '8px' }}>
+                                                                    <button onClick={() => { handleDeleteById("component", item.id) }}>
+                                                                        <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                                    </button>
+                                                                    {/* <button onClick={() => { alert(item.id) }}>
+                                                                        <img src={icon_edit.src} alt="cancel"
+                                                                            style={{
+                                                                                // display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`,
+                                                                                width: '30px', height: '20px'
+                                                                            }}
+                                                                        />
+                                                                    </button> */}
+                                                                </td>
+                                                                <td style={{ padding: '8px' }}>{item.code_name}</td>
+                                                                <td style={{ padding: '8px' }}>{item.name}</td> {/* 顯示 component 的名稱 */}
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                    <div>
+                                        <div style={{ height: '240px', overflowY: 'auto', border: '1px solid #c1c1c1', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1, border: '1px solid #c1c1c1', color: '#14256a' }}>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>編碼</th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>材質</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style={{ border: '1px solid #c1c1c1' }}>
+                                                    {filteredmaterialData
+                                                        // .filter(item => item.type === 'material') // 過濾出 type === 'material' 的項目
+                                                        .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                        .map((item, index) => (
+                                                            <tr key={index} style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                                <td style={{ padding: '8px' }}>
+                                                                    <button onClick={() => { handleDeleteById("material", item.id) }}>
+                                                                        <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                                    </button>
+                                                                    {/* <button onClick={() => { alert(item.id) }}>
+                                                                        <img src={icon_edit.src} alt="cancel"
+                                                                            style={{
+                                                                                // display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`,
+                                                                                width: '30px', height: '20px'
+                                                                            }}
+                                                                        />
+                                                                    </button> */}
+                                                                </td>
+                                                                <td style={{ padding: '8px' }}>{item.code_name}</td>
+                                                                <td style={{ padding: '8px' }}>{item.name}</td> {/* 顯示 material 的名稱 */}
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                    <div>
+                                        <div style={{ height: '240px', overflowY: 'auto', border: '1px solid #c1c1c1', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <thead style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 1, border: '1px solid #c1c1c1', color: '#14256a' }}>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>編碼</th>
+                                                        <th style={{ padding: '8px', borderBottom: '1px solid #c1c1c1' }}>表面</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody style={{ border: '1px solid #c1c1c1' }}>
+                                                    {filteredsurfaceData
+                                                        // .filter(item => item.type === 'surface') // 過濾出 type === 'surface' 的項目
+                                                        .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                        .map((item, index) => (
+                                                            <tr key={index} style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                                <td style={{ padding: '8px' }}>
+                                                                    <button onClick={() => { handleDeleteById("surface", item.id) }}>
+                                                                        <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                                    </button>
+                                                                    {/* <button onClick={() => { alert(item.id) }}>
+                                                                        <img src={icon_edit.src} alt="cancel"
+                                                                            style={{
+                                                                                // display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`,
+                                                                                width: '30px', height: '20px'
+                                                                            }}
+                                                                        />
+                                                                    </button> */}
+                                                                </td>
+                                                                <td style={{ padding: '8px' }}>{item.code_name}</td>
+                                                                <td style={{ padding: '8px' }}>{item.name}</td> {/* 顯示 surface 的名稱 */}
+                                                            </tr>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                                <div className={scss.foot_head3}>
+                                    <div>
+                                        <div style={{ maxHeight: '250px', overflowY: 'auto', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <tbody>
+                                                    <tr style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <button onClick={() => { handleAddByHandKey("classification") }}
+                                                            >
+                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                            </button>
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入編碼"
+                                                                value={handinputclassificationcodename}
+                                                                onChange={(e) => setHandinputclassificationcodename(e.target.value)}
+                                                                style={{ width: '100%' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入類別"
+                                                                value={handinputclassificationname}
+                                                                onChange={(e) => setHandinputclassificationname(e.target.value)}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    // display: `${edithandkey ? '' : 'none'}`
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ maxHeight: '250px', overflowY: 'auto', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <tbody>
+                                                    <tr style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <button onClick={() => { handleAddByHandKey("component") }}
+                                                            >
+                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                            </button>
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入編碼"
+                                                                value={handinputcomponentcodename}
+                                                                onChange={(e) => setHandinputcomponentcodename(e.target.value)}
+                                                                style={{ width: '100%' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入細分"
+                                                                value={handinputcomponentname}
+                                                                onChange={(e) => setHandinputcomponentname(e.target.value)}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    // display: `${edithandkey ? '' : 'none'}`
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ maxHeight: '250px', overflowY: 'auto', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <tbody>
+                                                    <tr style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <button onClick={() => { handleAddByHandKey("material") }}
+                                                            >
+                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                            </button>
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入編碼"
+                                                                value={handinputmaterialcodename}
+                                                                onChange={(e) => setHandinputmaterialcodename(e.target.value)}
+                                                                style={{ width: '100%' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入材質"
+                                                                value={handinputmaterialname}
+                                                                onChange={(e) => setHandinputmaterialname(e.target.value)}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    // display: `${edithandkey ? '' : 'none'}`
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ maxHeight: '250px', overflowY: 'auto', width: '100%' }}>
+                                            <table style={{ width: '100%', textAlign: 'left', fontSize: '16px', borderCollapse: 'collapse' }}>
+                                                <tbody>
+                                                    <tr style={{ borderBottom: '1px solid #c1c1c1' }}>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <button onClick={() => { handleAddByHandKey("surface") }}
+                                                            >
+                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                            </button>
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入編碼"
+                                                                value={handinputsurfacecodename}
+                                                                onChange={(e) => setHandinputsurfacecodename(e.target.value)}
+                                                                style={{ width: '100%' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ padding: '8px' }}>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="請輸入表面"
+                                                                value={handinputsurfacename}
+                                                                onChange={(e) => setHandinputsurfacename(e.target.value)}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    // display: `${edithandkey ? '' : 'none'}`
+                                                                }}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                                 <br />
                             </div>

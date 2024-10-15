@@ -42,6 +42,7 @@ import { title } from 'process';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -2130,7 +2131,7 @@ export default function AddPurchaseRequisition() {
                             <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1', display: `${(pickinglistid != '' && status === '領料中') ? '' : 'none'}` }}>
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
                                 <span></span>
