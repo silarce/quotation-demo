@@ -42,6 +42,7 @@ import {
 
 // type
 import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
+import { set } from 'lodash';
 
 // ===========================================================================
 type Tquery = {
@@ -67,6 +68,8 @@ interface Tstate {
 }
 
 interface Tstate_detail {
+  updateCount: number;
+  //
   id: string | undefined; // detail_uuid
   //
   item: string;
@@ -81,6 +84,45 @@ interface Tstate_detail {
   goods_spec: string;
   prodreceipt_uuid: string | undefined;
 }
+
+type TclassState = Pick<
+  Tstate,
+  | 'serial_number'
+  | 'applicant_department'
+  | 'ticket_method'
+  | 'tax_deduction_category'
+  | 'journal_method'
+  | 'invoice_number'
+  // | 'invoice_price'
+  | 'note'
+> & {
+  agentName: string;
+  invoice_price: string;
+  chagneAgent: (agent: TemployeeDto) => TclassState;
+  changeInvoice: (invoice: { invoiceNumber: string; invoicePrice: `${number}` | number }) => TclassState;
+  //
+  detailArr: TclassState_detail[];
+  detailTotal: string;
+};
+
+type TclassState_detail = Pick<
+  Tstate_detail,
+  | 'updateCount'
+  | 'item'
+  | 'prodreceipt_number'
+  | 'transaction_date'
+  | 'quantity'
+  | 'unit'
+  | 'unit_price'
+  | 'amount'
+  | 'note'
+  | 'goods_spec'
+> & {
+  identifyId: string;
+  // quantity: string;
+  // unit_price: string;
+  // amount: string;
+};
 
 // ===========================================================================
 
@@ -109,12 +151,20 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // "8dce7a3c-b63c-44fa-a96f-e07647e61500"
   // "b94c34eb-0f88-4c8c-adaa-43f0aad0210a"
   // "d4c94da0-9a36-4f45-9af6-ff7a224c8e54"
-  console.log(raw_purchaseCollectTicket);
+  // console.log(raw_purchaseCollectTicket);
 
   // ------------------------------------------------------------
 
-  const { state } = useTicket(raw_purchaseCollectTicket, userInfo.employee);
-  console.log('state', state);
+  const { state, setState } = useTicket({
+    rawData: raw_purchaseCollectTicket,
+    userEmployee: userInfo.employee,
+    disabled,
+  });
+  // console.log('state', state);
+
+  const State = useMemo(() => {
+    return new ClassState(state, setState, ClassState_detail);
+  }, [state]);
 
   // ------------------------------------------------------------
   // MARK: RENDER
@@ -132,7 +182,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           // onConfirmClick={handleConfirm}
         />
         <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
-          <Profile disabled={disabled} />
+          <Profile disabled={disabled} classState={State} />
           <div>
             <div>
               <span>明細資料</span>
@@ -199,7 +249,14 @@ const BtnBar = ({
 };
 
 // MARK: Profile
-const Profile = ({ disabled }: { disabled: boolean }) => {
+const Profile = ({
+  //
+  disabled,
+  classState,
+}: {
+  disabled: boolean;
+  classState: TclassState;
+}) => {
   const { optionArr_name, update } = useDepartments();
 
   useEffect(() => {
@@ -213,7 +270,7 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
         showBaseline="invisible"
         inputProps={{
           props: {
-            defaultValue: '',
+            defaultValue: classState.serial_number,
             placeholder: '儲存後自動產生',
             readOnly: true,
           },
@@ -227,19 +284,19 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
           props: {
             placeholder: '請選擇支出部門',
             options: optionArr_name,
-            // value: state_applyPayment.applicant_department
-            //   ? {
-            //       value: state_applyPayment.applicant_department,
-            //       label: state_applyPayment.applicant_department,
-            //     }
-            //   : null,
-            // onChange: (option) => {
-            //   setState_applyPayment((prev) => ({ ...prev, applicant_department: option?.value }));
-            // },
+            value: classState.applicant_department
+              ? {
+                  value: classState.applicant_department,
+                  label: classState.applicant_department,
+                }
+              : null,
+            onChange: (option) => {
+              classState.applicant_department = option?.value ?? '';
+            },
           },
         }}
       />
-      <InputSel caption={'經辦人員'} showBaseline="invisible" node={''} />
+      <InputSel caption={'經辦人員'} showBaseline="invisible" node={classState.agentName} />
       <div />
       {/*  */}
       <InputSel
@@ -247,7 +304,14 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
         disabled={disabled}
         showBaseline="auto"
         inputProps={{
-          props: {},
+          props: {
+            value: classState.ticket_method,
+            onChange: (e) => {
+              classState.ticket_method = e.target.value;
+            },
+            readOnly: disabled,
+            disabled: false,
+          },
         }}
       />
 
@@ -256,14 +320,28 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
         disabled={disabled}
         showBaseline="auto"
         inputProps={{
-          props: {},
+          props: {
+            value: classState.tax_deduction_category,
+            onChange: (e) => {
+              classState.tax_deduction_category = e.target.value;
+            },
+            readOnly: disabled,
+            disabled: false,
+          },
         }}
       />
       <InputSel
         caption={'立帳方式'}
-        showBaseline="invisible"
+        showBaseline="auto"
         inputProps={{
-          props: {},
+          props: {
+            value: classState.journal_method,
+            onChange: (e) => {
+              classState.journal_method = e.target.value;
+            },
+            readOnly: disabled,
+            disabled: false,
+          },
         }}
       />
       <div />
@@ -298,7 +376,14 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
         disabled={disabled}
         showBaseline="auto"
         inputProps={{
-          props: {},
+          props: {
+            value: classState.note,
+            onChange: (e) => {
+              classState.note = e.target.value;
+            },
+            readOnly: disabled,
+            disabled: false,
+          },
         }}
       />
     </div>
@@ -308,20 +393,24 @@ const Profile = ({ disabled }: { disabled: boolean }) => {
 // ===============================================================================
 
 // MARK:useTicket
-const useTicket = (
-  //
-  rawData: TpurchaseCollectTicket_Dto_detailed | undefined,
-  userEmployee: TemployeeDto | undefined
-) => {
+const useTicket = ({
+  rawData,
+  userEmployee,
+  disabled,
+}: {
+  rawData: TpurchaseCollectTicket_Dto_detailed | undefined;
+  userEmployee: TemployeeDto | undefined;
+  disabled: boolean;
+}) => {
   const defaultState = useDefaultState(rawData, userEmployee);
 
   const [state, setState] = useState<Tstate>(defaultState);
 
   useEffect(() => {
     setState(defaultState);
-  }, [defaultState]);
+  }, [defaultState, disabled]);
 
-  return { state };
+  return { state, setState };
 };
 
 const useDefaultState = (
@@ -335,6 +424,7 @@ const useDefaultState = (
     } else {
       const detailArr: Tstate_detail[] = rawData.detailArr.map((detail) => {
         const state_detail: Tstate_detail = {
+          updateCount: 0,
           id: detail.id,
           item: detail.item || '',
           prodreceipt_number: detail.prodreceipt_number || '',
@@ -390,6 +480,7 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
 });
 
 const emptyuState_detail = (): Tstate_detail => ({
+  updateCount: 0,
   id: undefined,
   //
   item: '',
@@ -404,3 +495,263 @@ const emptyuState_detail = (): Tstate_detail => ({
   goods_spec: '',
   prodreceipt_uuid: undefined,
 });
+
+// =============================================================================
+
+// MARK:ClassState
+class ClassState implements TclassState {
+  private readonly state;
+  private readonly setState;
+  readonly detailArr: TclassState_detail[] = [];
+  //
+  constructor(
+    //
+    state: Tstate,
+    setState: React.Dispatch<React.SetStateAction<Tstate>>,
+    ClassDetail: new (
+      state_datail: Tstate_detail,
+      setState_detail: (state_detail: Tstate_detail) => void
+    ) => TclassState_detail
+  ) {
+    this.state = state;
+    this.setState = setState;
+
+    this.detailArr = state.detailArr.map((detail, index) => {
+      const setState_detail = (state_detail: Tstate_detail) => {
+        setState((state) => {
+          const newDetailArr = [...state.detailArr];
+          newDetailArr[index] = state_detail;
+
+          return {
+            ...state,
+            detailArr: newDetailArr,
+          };
+        });
+      };
+
+      return new ClassDetail(detail, setState_detail);
+    });
+  } // constructor
+  //
+  get agentName() {
+    return this.state.agent_employee?.chName ?? '';
+  }
+  get serial_number() {
+    return this.state.serial_number ?? '';
+  }
+  get applicant_department() {
+    return this.state.applicant_department;
+  }
+  set applicant_department(department: string) {
+    this.setState((state) => ({
+      ...state,
+      applicant_department: department,
+    }));
+  }
+  get ticket_method() {
+    return this.state.ticket_method;
+  }
+  set ticket_method(method: string) {
+    this.setState((state) => ({
+      ...state,
+      ticket_method: method,
+    }));
+  }
+  get tax_deduction_category() {
+    return this.state.tax_deduction_category;
+  }
+  set tax_deduction_category(category: string) {
+    this.setState((state) => ({
+      ...state,
+      tax_deduction_category: category,
+    }));
+  }
+  get journal_method() {
+    return this.state.journal_method;
+  }
+  set journal_method(method: string) {
+    this.setState((state) => ({
+      ...state,
+      journal_method: method,
+    }));
+  }
+  get invoice_number() {
+    return this.state.invoice_number;
+  }
+  set invoice_number(number: string) {
+    this.setState((state) => ({
+      ...state,
+      invoice_number: number,
+    }));
+  }
+  get invoice_price() {
+    return Number(this.state.invoice_price).toLocaleString();
+  }
+  get note() {
+    return this.state.note;
+  }
+  set note(note: string) {
+    this.setState((state) => ({
+      ...state,
+      note: note,
+    }));
+  }
+
+  // ------------------------------------------------------------
+  chagneAgent(agent: TemployeeDto) {
+    this.setState((state) => ({
+      ...state,
+      agent_employee: agent,
+    }));
+
+    return this;
+  }
+
+  changeInvoice({ invoiceNumber, invoicePrice }: { invoiceNumber: string; invoicePrice: `${number}` | number }) {
+    this.setState((state) => ({
+      ...state,
+      invoice_number: invoiceNumber,
+      invoice_price: `${invoicePrice}`,
+    }));
+
+    return this;
+  }
+  // ------------------------------------------------------------
+  get detailTotal() {
+    // this.detailArr.forEach
+    return '';
+  }
+  // get detailArr() {}
+} // ClassState
+
+// MARK:ClassState_detail
+class ClassState_detail implements TclassState_detail {
+  state_datail;
+  setState_detail;
+  identifyId;
+
+  constructor(state_datail: Tstate_detail, setState_detail: (state_detail: Tstate_detail) => void) {
+    this.state_datail = state_datail;
+    this.setState_detail = setState_detail;
+
+    this.identifyId = state_datail.id ?? nanoid();
+  } // constructor
+
+  get updateCount() {
+    return this.state_datail.updateCount;
+  }
+
+  get item() {
+    return this.state_datail.item;
+  }
+  set item(item: string) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      item: item,
+    });
+  }
+
+  get prodreceipt_number() {
+    return this.state_datail.prodreceipt_number;
+  }
+
+  get transaction_date() {
+    return this.state_datail.transaction_date;
+  }
+  set transaction_date(date: Moment | null) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      transaction_date: date,
+    });
+  }
+
+  get quantity() {
+    return this.state_datail.quantity;
+  }
+  set quantity(value) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      quantity: value,
+    });
+  }
+
+  get unit() {
+    return this.state_datail.unit;
+  }
+  set unit(unit: string) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      unit: unit,
+    });
+  }
+
+  get unit_price() {
+    return this.state_datail.unit_price;
+  }
+  set unit_price(price) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      unit_price: price,
+    });
+  }
+
+  get amount() {
+    return this.state_datail.amount;
+  }
+  set amount(amount) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      amount: amount,
+    });
+  }
+
+  get note() {
+    return this.state_datail.note;
+  }
+  set note(note) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      note: note,
+    });
+  }
+
+  get goods_spec() {
+    return this.state_datail.goods_spec;
+  }
+  set goods_spec(spec) {
+    this.countUpdate();
+    this.setState_detail({
+      ...this.state_datail,
+      goods_spec: spec,
+    });
+  }
+
+  // ------------------------------------------------------------
+  private countUpdate() {
+    this.setState_detail({
+      ...this.state_datail,
+      updateCount: this.state_datail.updateCount + 1,
+    });
+
+    return this;
+  }
+
+  changeProdreceipt({ prodreceiptNumber, prodreceiptId }: { prodreceiptNumber: string; prodreceiptId: string }) {
+    this.setState_detail({
+      ...this.state_datail,
+      prodreceipt_number: prodreceiptNumber,
+      prodreceipt_uuid: prodreceiptId,
+    });
+
+    this.countUpdate();
+
+    return this;
+  }
+} // ClassState_detail
