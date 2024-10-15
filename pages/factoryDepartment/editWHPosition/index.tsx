@@ -121,7 +121,14 @@ export default function EditWHPosition() {
             },
         },
     ] : [
-
+        //先開放編輯功能
+        {
+            type: 'myButton',
+            label: '編輯',
+            onClick: () => {
+                setDisabled(false);
+            },
+        },
         {
             type: 'myButton',
             label: '返回',

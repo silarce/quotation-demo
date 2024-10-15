@@ -41,6 +41,8 @@ import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
 import { title } from 'process';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -95,7 +97,7 @@ export default function AddPurchaseRequisition() {
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const picking_byRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const picking_qtyRefs= useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const picking_qtyRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -136,6 +138,7 @@ export default function AddPurchaseRequisition() {
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
+    const [editmain, setEditmain] = useState<boolean>(false);
 
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
@@ -183,6 +186,9 @@ export default function AddPurchaseRequisition() {
     const [nowpickinglistdetailuuid, setNowpickinglistdetailuuid] = useState<string>("");
 
 
+    const [originalnote, setOriginalnote] = useState<string>("");
+    const [originaldata, setOriginalData] = useState<any[]>([]);
+    const [originalcreate_atin, setOriginalcreate_atin] = useState<string>("");
 
     //#region 上方功能列
 
@@ -920,6 +926,7 @@ export default function AddPurchaseRequisition() {
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
+        setCreate_byin(item.create_by);
         getPickingListDetailById(item.id);
     }
 
@@ -946,9 +953,17 @@ export default function AddPurchaseRequisition() {
 
 
     const handlecancelAddPickingList = () => {
-        setStatus('');
-        setNote('');
-        setPickinglistid('');
+        if (editmain === true) {
+            setEditmain(false);
+            setCreate_atin(originalcreate_atin);
+            setNote(originalnote);
+            setData2(originaldata);
+
+        } else {
+            setStatus('');
+            setNote('');
+            setPickinglistid('');
+        }
     }
 
 
@@ -1711,6 +1726,14 @@ export default function AddPurchaseRequisition() {
     };
 
 
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalcreate_atin(create_atin);
+        setOriginalnote(note);
+        setOriginalData(data2);
+        setEditmain(true);
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1797,6 +1820,20 @@ export default function AddPurchaseRequisition() {
                                 </button>
                                 &nbsp;
                                 <button
+                                    style={{ display: `${status === "領料中" && !editmain ? '' : 'none'}` }}
+                                    className={scss.squarebtn}
+                                    onClick={handleEdit}>
+                                    <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+                                <button
+                                    style={{ display: `${(status === "未儲存" || status === "" || editmain || status === "已結案") ? '' : 'none'}` }}
+                                    className={scss.disablesquarebtn} >
+                                    <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+                                &nbsp;
+                                <button
                                     className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { AddPickingList() }}
                                     title="儲存新增"
@@ -1809,15 +1846,14 @@ export default function AddPurchaseRequisition() {
                                     />
                                     儲存
                                 </button>
-
                                 &nbsp;
                                 <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    className={(status === '未儲存' || editmain === true) ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { handlecancelAddPickingList() }}
                                     title="取消新增"
-                                    disabled={status !== '未儲存'}
+                                    disabled={status !== '未儲存' && editmain !== true}
                                 >
-                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={(status === '未儲存' || editmain === true) ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     取消
                                 </button>
                             </div>
@@ -1863,12 +1899,14 @@ export default function AddPurchaseRequisition() {
                                     </div>
                                     <div>
                                         <InputSel
-                                            {...inputSelProps}
                                             caption="領料日期"
-                                            disabled={true}
-                                            inputProps={{
+                                            className="global_tip_must"
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin((e?.toString() || '') || '') }
                                                 },
                                             }}
                                         />
@@ -1881,7 +1919,7 @@ export default function AddPurchaseRequisition() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={(status === '領料中' || status === '已結案' || status === '') ? true : false}
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     value: note || ' ',

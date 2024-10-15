@@ -225,11 +225,11 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="建立人員"
-                            disabled={disabled}
+                            disabled={!disabled}
                             inputProps={{
                                 props: {
-                                    // value: data1.whpname,
-                                    onChange: (e) => setCreateBy(e.target.value.trim())
+                                    value: userInfo?.username,
+                                    // onChange: (e) => setCreateBy(e.target.value.trim())
                                 },
                             }}
                         />

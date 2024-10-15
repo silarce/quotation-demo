@@ -121,6 +121,7 @@ export default function ProductList() {
     const [unitin, setUnitin] = useState<string>("");
     const [materialin, setMaterialin] = useState<string>("");
     const [surfacein, setSurfacein] = useState<string>("");
+    const [oldproductid, setOldProductid] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -152,6 +153,7 @@ export default function ProductList() {
     const [originalunitin, setOriginalunitin] = useState(unitin);
     const [originalmaterialin, setOriginalmaterialin] = useState(materialin);
     const [originalsurfacein, setOriginalsurfacein] = useState(surfacein);
+    const [originaloldproductid, setOriginaloldproductid] = useState(surfacein);
 
     //新增物料
     const [addproductid, setAddProductid] = useState<string>("SJ");
@@ -160,6 +162,7 @@ export default function ProductList() {
     const [addproductunit, setAddProductunit] = useState<string>("");
     const [addproductmaterial, setAddProductmaterial] = useState<string>("");
     const [addproductsurface, setAddProductsurface] = useState<string>("");
+    const [addoldproductid, setAddOldProductid] = useState<string>("");
 
 
     //入庫總數
@@ -680,6 +683,7 @@ export default function ProductList() {
         setOriginalunitin(unitin);
         setOriginalmaterialin(materialin);
         setOriginalsurfacein(surfacein);
+        setOriginaloldproductid(oldproductid);
         setEditmain(true);
     };
 
@@ -698,6 +702,7 @@ export default function ProductList() {
                     setMaterialin(originalmaterialin);
                     setUnitin(originalunitin);
                     setSurfacein(originalsurfacein);
+                    setOldProductid(originaloldproductid);
                     setEditmain(false);
                 }
             }
@@ -724,18 +729,16 @@ export default function ProductList() {
                             productspec: productspecin,
                             productunit: unitin,
                             productmaterial: materialin,
-                            productsurface: surfacein
+                            productsurface: surfacein,
+                            oldproductid: oldproductid
                         }
-                        console.log(data);
+                        // console.log(data);
 
                         // 打印數據到控制台以供調試
-                        console.log(data);
+                        // console.log(data);
                         // return;
 
-                        const conditionModel: {
-                            data: any,
-                            username: any
-                        } = {
+                        const conditionModel = {
                             data: data,
                             username: userInfo?.username
                         };
@@ -911,13 +914,14 @@ export default function ProductList() {
         setUnitin(item.unit);
         setMaterialin(item.material);
         setSurfacein(item.surface);
-        // alert(item.productid);
+        setOldProductid(item.oldcode);
         setAddProductid(item.productid);
         setAddProductname(item.name);
         setAddProductspec(item.spec);
         setAddProductunit(item.unit);
         setAddProductmaterial(item.material);
         setAddProductsurface(item.surface);
+        setAddOldProductid(item.oldcode);
     }
 
 
@@ -992,18 +996,16 @@ export default function ProductList() {
                             productspec: addproductspec,
                             productunit: addproductunit,
                             productmaterial: addproductmaterial,
-                            productsurface: addproductsurface
+                            productsurface: addproductsurface,
+                            oldproductid: addoldproductid
                         }
-                        console.log(data);
+                        // console.log(data);
 
                         // 打印數據到控制台以供調試
-                        console.log(data);
+                        // console.log(data);
                         // return;
 
-                        const conditionModel: {
-                            data: any,
-                            username: any
-                        } = {
+                        const conditionModel = {
                             data: data,
                             username: userInfo?.username
                         };
@@ -1059,6 +1061,7 @@ export default function ProductList() {
                         setAddProductunit('');
                         setAddProductmaterial('');
                         setAddProductsurface('');
+                        setAddOldProductid('');
 
                         // 更新狀態或執行其他操作
                         console.log(result);
@@ -1200,7 +1203,7 @@ export default function ProductList() {
                 customeRight={[
                     <div>
                         {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                        <button style={{  paddingRight: '10px', display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                        <button style={{ paddingRight: '10px', display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
                             <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
                         </button>
                         <input
@@ -1490,6 +1493,17 @@ export default function ProductList() {
                                                 },
                                             }}
                                         />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="舊料號"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: oldproductid || '',
+                                                    onChange: (e) => { setOldProductid(e.target.value) }
+                                                },
+                                            }}
+                                        />
                                     </div>
                                     <div style={{ borderLeft: '1px solid #c1c1c1', backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                         <InputSel
@@ -1744,6 +1758,17 @@ export default function ProductList() {
                                                 props: {
                                                     value: addproductsurface || '',
                                                     onChange: (e) => { setAddProductsurface(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="舊料號"
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: addoldproductid || '',
+                                                    onChange: (e) => { setAddOldProductid(e.target.value) }
                                                 },
                                             }}
                                         />
