@@ -45,6 +45,7 @@ import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -200,6 +201,8 @@ export default function AddPurchaseOrder() {
     const [originalcreate_atin, setOriginalcreate_atin] = useState<string>("");
 
     const [originalnote, setOriginalnote] = useState<string>("");
+
+    const [originaldata, setOriginalData] = useState<any[]>([]);
 
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
@@ -504,6 +507,7 @@ export default function AddPurchaseOrder() {
                     supplierphone3: supplierphone3in,
                     suppliertaxid3: suppliertaxid3in,
                     supplieraddress3: supplieraddress3in,
+                    data2: data2
 
                 };
 
@@ -611,6 +615,7 @@ export default function AddPurchaseOrder() {
                 getQuotereq();
 
 
+
                 setStatus("未結案");
                 console.log(data);
 
@@ -706,23 +711,35 @@ export default function AddPurchaseOrder() {
 
     // 送出按鈕
     function handleAdd() {
-        // AddPurchaseOrder();
-        if (suppliernamein === '' || supplieraddressin === '') {
-            myAlert.warning({ title: '請確認欄位是否填寫完整' })
-            return;
-        }
-        myAlert.confirm({
-            title: '確定要新增單據嗎?',
-            content: <>
-                <h1>請檢查資料是否填寫完整</h1>
-            </>,
-            props: {
-                onOk: async () => {
-                    AddQuotereq();
+        if (editmain === true) {
+            myAlert.confirm({
+                title: '確定要儲存異動的資料嗎?',
+                content: null,
+                props: {
+                    onOk: async () => {
+                        AddQuotereq();
 
+                    }
                 }
+            })
+        } else {
+            if (suppliernamein === '' || supplieraddressin === '') {
+                myAlert.warning({ title: '請確認欄位是否填寫完整' })
+                return;
             }
-        })
+            myAlert.confirm({
+                title: '確定要新增單據嗎?',
+                content: <>
+                    <h1>請檢查資料是否填寫完整</h1>
+                </>,
+                props: {
+                    onOk: async () => {
+                        AddQuotereq();
+
+                    }
+                }
+            })
+        }
     }
 
 
@@ -826,9 +843,19 @@ export default function AddPurchaseOrder() {
 
     // 從口袋清單移除
     const handleRemove = (index: number, item: any) => {
-        const updatedData = data2.filter((_, i) => i !== index);
-        setData2(updatedData);
-        RemoveQuotereqDetail(item.detail_id);
+        myAlert.confirm({
+            title: '確定要移除嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+                    const updatedData = data2.filter((_, i) => i !== index);
+                    setData2(updatedData);
+                    RemoveQuotereqDetail(item.detail_id);
+                }
+            }
+        })
+
     };
 
     // 改變數字口袋清單值
@@ -1135,6 +1162,8 @@ export default function AddPurchaseOrder() {
 
             setCreate_atin(originalcreate_atin);
             setNote(originalnote);
+
+            setData2(originaldata);
 
         }
         else {
@@ -1967,11 +1996,10 @@ export default function AddPurchaseOrder() {
         setOriginalSupplier3taxidin(suppliertaxid3in);
         setOriginalSupplier3addressin(supplieraddress3in);
 
-
-
         setOriginalcreate_atin(create_atin);
         setOriginalnote(note);
 
+        setOriginalData(data2);
 
         setEditmain(true);
     };
@@ -2535,8 +2563,8 @@ export default function AddPurchaseOrder() {
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
                                             <button style={{ display: (editstatus === false && status === '未結案') ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
+                                                <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                {/* <img src={icon_cancel3.src} alt="cancel" style={{ width: '20px', height: '20px' }} /> */}
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
@@ -2578,14 +2606,27 @@ export default function AddPurchaseOrder() {
                                             <input
                                                 ref={quantityRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
-                                                maxLength={5}
+                                                // maxLength={5}
                                                 value={_item.detail_quantity !== undefined ? _item.detail_quantity.toLocaleString() : 0}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                // readOnly
+                                                // onChange={(e) => {
+                                                //     handleNumberChange(index, "quantity", e.target.value);
+                                                // }}
                                                 onChange={(e) => {
-                                                    handleNumberChange(index, "quantity", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newQuantity = e.target.value;
+                                                    console.log(newData);
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        detail_quantity: newQuantity,
+                                                        detail_totalprice: ((parseFloat(newQuantity || '0') * newData[index].detail_unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+
+                                                    };
+                                                    setData2(newData);
+                                                    // handleChange(index, "quantity", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -2615,20 +2656,32 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
                                                 value={_item.detail_unitprice !== undefined ? _item.detail_unitprice.toLocaleString() : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                // readOnly
+                                                // onChange={(e) => {
+                                                //     handleStringChange(index, "unitprice", e.target.value);
+                                                // }}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "unitprice", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        detail_unitprice: newUnitPrice,
+                                                        detail_totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].detail_quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>
                                         <span>
                                             {/* {_item.detail_totalprice.toLocaleString()} */}
                                             <span>
-                                                {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()}
+                                                {/* {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()} */}
+                                                <span>{_item.detail_totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </span>
                                         </span>
                                         <span>
@@ -2666,10 +2719,11 @@ export default function AddPurchaseOrder() {
                                 {/* <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}> */}
                                 <div>
 
-                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '10px' }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    <button onClick={() => { handleAddByHandKey() }}>
+                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <div></div>
                                 <div>
                                     <input
                                         type="text"

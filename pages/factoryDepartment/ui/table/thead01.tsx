@@ -445,6 +445,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "AddPR_PickingList") {
     return (
       <div className={style.thead28}>
+        <span></span>
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
@@ -667,12 +668,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <div className={style.thead41}>
           <span></span>
           <span>序</span>
+          <span>單號</span>
           <span>料號</span>
           <span>品名</span>
           <span>規格</span>
           <span>數量</span>
           <span>單位</span>
-          <span></span>
           <span>單價</span>
           <span>金額</span>
           <span>備註</span>
