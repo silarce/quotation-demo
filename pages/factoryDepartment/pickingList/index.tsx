@@ -41,6 +41,9 @@ import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
 import { title } from 'process';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -95,7 +98,7 @@ export default function AddPurchaseRequisition() {
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const picking_byRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const picking_qtyRefs= useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const picking_qtyRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -136,6 +139,7 @@ export default function AddPurchaseRequisition() {
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
+    const [editmain, setEditmain] = useState<boolean>(false);
 
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
@@ -183,6 +187,9 @@ export default function AddPurchaseRequisition() {
     const [nowpickinglistdetailuuid, setNowpickinglistdetailuuid] = useState<string>("");
 
 
+    const [originalnote, setOriginalnote] = useState<string>("");
+    const [originaldata, setOriginalData] = useState<any[]>([]);
+    const [originalcreate_atin, setOriginalcreate_atin] = useState<string>("");
 
     //#region 上方功能列
 
@@ -920,6 +927,7 @@ export default function AddPurchaseRequisition() {
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
+        setCreate_byin(item.create_by);
         getPickingListDetailById(item.id);
     }
 
@@ -946,9 +954,17 @@ export default function AddPurchaseRequisition() {
 
 
     const handlecancelAddPickingList = () => {
-        setStatus('');
-        setNote('');
-        setPickinglistid('');
+        if (editmain === true) {
+            setEditmain(false);
+            setCreate_atin(originalcreate_atin);
+            setNote(originalnote);
+            setData2(originaldata);
+
+        } else {
+            setStatus('');
+            setNote('');
+            setPickinglistid('');
+        }
     }
 
 
@@ -1259,9 +1275,9 @@ export default function AddPurchaseRequisition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (nowwhname === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (nowwhname === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (nowwhname === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (nowwhname === "101") ? `https://${setting.warehouse1}/` :
+                    (nowwhname === "102") ? `https://${setting.warehouse2}/` :
+                        (nowwhname === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -1335,9 +1351,9 @@ export default function AddPurchaseRequisition() {
             const traynumber = traynamecalled;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whnamecalled === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (whnamecalled === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (whnamecalled === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (whnamecalled === "101") ? `https://${setting.warehouse1}/` :
+                    (whnamecalled === "102") ? `https://${setting.warehouse2}/` :
+                        (whnamecalled === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數
@@ -1711,12 +1727,20 @@ export default function AddPurchaseRequisition() {
     };
 
 
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalcreate_atin(create_atin);
+        setOriginalnote(note);
+        setOriginalData(data2);
+        setEditmain(true);
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag='領料管理' panelList={panelList} />
             {/* <div className={scss.main}> */}
-            <div className={scss.container}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div>
                         <form onSubmit={handleSubmit}>
@@ -1797,6 +1821,20 @@ export default function AddPurchaseRequisition() {
                                 </button>
                                 &nbsp;
                                 <button
+                                    style={{ display: `${status === "領料中" && !editmain ? '' : 'none'}` }}
+                                    className={scss.squarebtn}
+                                    onClick={handleEdit}>
+                                    <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+                                <button
+                                    style={{ display: `${(status === "未儲存" || status === "" || editmain || status === "已結案") ? '' : 'none'}` }}
+                                    className={scss.disablesquarebtn} >
+                                    <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    編輯
+                                </button>
+                                &nbsp;
+                                <button
                                     className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { AddPickingList() }}
                                     title="儲存新增"
@@ -1809,15 +1847,14 @@ export default function AddPurchaseRequisition() {
                                     />
                                     儲存
                                 </button>
-
                                 &nbsp;
                                 <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
+                                    className={(status === '未儲存' || editmain === true) ? scss.squarebtn : scss.disablesquarebtn}
                                     onClick={() => { handlecancelAddPickingList() }}
                                     title="取消新增"
-                                    disabled={status !== '未儲存'}
+                                    disabled={status !== '未儲存' && editmain !== true}
                                 >
-                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    <img src={(status === '未儲存' || editmain === true) ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     取消
                                 </button>
                             </div>
@@ -1863,12 +1900,14 @@ export default function AddPurchaseRequisition() {
                                     </div>
                                     <div>
                                         <InputSel
-                                            {...inputSelProps}
                                             caption="領料日期"
-                                            disabled={true}
-                                            inputProps={{
+                                            className="global_tip_must"
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin((e?.toString() || '') || '') }
                                                 },
                                             }}
                                         />
@@ -1881,7 +1920,7 @@ export default function AddPurchaseRequisition() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={(status === '領料中' || status === '已結案' || status === '') ? true : false}
+                                            disabled={(status === "未儲存" || editmain === true) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     value: note || ' ',
@@ -1947,7 +1986,7 @@ export default function AddPurchaseRequisition() {
                                     品項查詢
                                 </button> */}
                             </div>
-                            <div style={{ marginTop: '5px' }}></div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -1956,6 +1995,7 @@ export default function AddPurchaseRequisition() {
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
+                                        <span></span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>
@@ -2091,9 +2131,10 @@ export default function AddPurchaseRequisition() {
                             <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1', display: `${(pickinglistid != '' && status === '領料中') ? '' : 'none'}` }}>
                                 <div>
                                     <button onClick={() => { handleAddByHandKey() }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <span></span>
                                 <div>
                                     <input
                                         type="text"
@@ -2252,88 +2293,18 @@ export default function AddPurchaseRequisition() {
                                 </ul>
                             )}
                         </div>
-                        <div className={scss.body_foot1}>
+                        {/* <div className={scss.body_foot1}>
                             <div>
                                 (1).請確實填寫品名、規格與數量。<br />
                                 (2).如不知領取品項料號，可以利用查詢代入。<br />
-                                {/* {showSuggestions && (
-                                    <div
-                                        style={{
-                                            position: 'absolute',
-                                            zIndex: 1001,
-                                            backgroundColor: 'white',
-                                            border: '1px solid #ccc',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                                            width: '750px',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            fontSize: '16px',
-                                            left: `${position.x}px`,
-                                            top: `${position.y}px`,
-                                            cursor: 'default',
-                                        }}
-                                        onMouseDown={handleMouseDown}
-                                    >
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
-                                            <button
-                                                onClick={() => setShowSuggestions(false)}
-                                                style={{
-                                                    background: 'transparent',
-                                                    border: 'none',
-                                                    fontSize: '16px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 'bold',
-                                                    color: '#555',
-                                                    outline: 'none',
-                                                    transition: 'color 0.3s ease',
-
-                                                }}
-                                                onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
-                                                onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            {filteredData.length > 0 ? (
-                                                filteredData.map((item, index) => (
-                                                    <tr
-                                                        key={index}
-                                                        onClick={() => handleSelect(item)}
-                                                        style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
-                                                        onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                                                    >
-                                                        <td style={{ padding: '8px', width: '150px' }}>
-                                                            {item.productid}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '250px' }}>
-                                                            {item.name}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '350px' }}>
-                                                            {item.spec}
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                        沒有匹配的結果
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </table>
-                                    </div>
-                                )} */}
+                                
                             </div>
                             <div>
 
                             </div>
                             <div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 

@@ -44,7 +44,7 @@ import icon_history from 'public/image/icon/fc_history.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
-
+import icon_add from 'public/image/icon/fc_add2.svg';
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -1901,8 +1901,8 @@ export default function AddPurchaseOrder() {
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                {/* <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
@@ -2042,10 +2042,11 @@ export default function AddPurchaseOrder() {
 
                             <div className={scss.addbar} style={{ display: `${(purchaseorderid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
                                 <div>
-                                    <button onClick={() => { handleAddByHandKey() }} style={{ paddingLeft: '15px' }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    <button onClick={() => { handleAddByHandKey() }} >
+                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
                                 </div>
+                                <div></div>
                                 <div>
                                     <input
                                         type="text"
@@ -2392,7 +2393,6 @@ export default function AddPurchaseOrder() {
                                     >
                                         <option value="">全部</option>
                                         <option value="未送出">未送出</option>
-                                        <option value="已結案">已結案</option>
                                     </select>
 
                                 </div>
