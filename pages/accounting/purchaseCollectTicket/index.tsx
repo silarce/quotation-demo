@@ -10,6 +10,7 @@ import { Spin } from 'antd';
 
 // components
 import Detail from 'components/page/accounting/purchaseCollectTicket/detail';
+import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -42,7 +43,6 @@ import {
 
 // type
 import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
-import { set } from 'lodash';
 
 // ===========================================================================
 type Tquery = {
@@ -167,6 +167,26 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   }, [state]);
 
   // ------------------------------------------------------------
+
+  const handleSelectInvoice = () => {
+    const { unmount } = DragableModal.create({
+      children: (
+        <SearchModal_prodreceipt
+          onRowClick={(prodreceipt) => {
+            // console.log(prodreceipt);
+            State.changeInvoice({
+              //
+              invoiceNumber: prodreceipt.invoice,
+              // invoicePrice: prodreceipt.invoicePrice, // prodreceipt下沒有prodreceipt
+            });
+            unmount();
+          }}
+        />
+      ),
+    });
+  };
+
+  // ------------------------------------------------------------
   // MARK: RENDER
   // ------------------------------------------------------------
   return (
@@ -182,7 +202,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           // onConfirmClick={handleConfirm}
         />
         <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
-          <Profile disabled={disabled} classState={State} />
+          <Profile disabled={disabled} classState={State} onInovoiceBtnClick={handleSelectInvoice} />
           <div>
             <div>
               <span>明細資料</span>
@@ -253,9 +273,11 @@ const Profile = ({
   //
   disabled,
   classState,
+  onInovoiceBtnClick,
 }: {
   disabled: boolean;
   classState: TclassState;
+  onInovoiceBtnClick: () => void;
 }) => {
   const { optionArr_name, update } = useDepartments();
 
@@ -352,18 +374,17 @@ const Profile = ({
         showBaseline="invisible"
         inputProps={{
           props: {
+            value: classState.invoice_number,
             placeholder: '請選擇發票',
             readOnly: true,
           },
         }}
         suffix={
           <SquareBtn
-            // content="search"
+            className={classNames(disabled && 'invisible')}
             label="選擇發票"
             sharp="mini"
-            onClick={() => {
-              // handleSearchInvoice();
-            }}
+            onClick={onInovoiceBtnClick}
           />
         }
       />
@@ -607,11 +628,19 @@ class ClassState implements TclassState {
     return this;
   }
 
-  changeInvoice({ invoiceNumber, invoicePrice }: { invoiceNumber: string; invoicePrice: `${number}` | number }) {
+  changeInvoice({
+    //
+    invoiceNumber,
+  }: // invoicePrice,
+  {
+    invoiceNumber: string;
+    // 後端說invoicePrice不用管，
+    // invoicePrice: `${number}` | number;
+  }) {
     this.setState((state) => ({
       ...state,
       invoice_number: invoiceNumber,
-      invoice_price: `${invoicePrice}`,
+      // invoice_price: `${invoicePrice}`,
     }));
 
     return this;
@@ -755,3 +784,8 @@ class ClassState_detail implements TclassState_detail {
     return this;
   }
 } // ClassState_detail
+
+// ===============================================================================
+
+// 進貨收票的發票號碼與所有明細的發票號碼皆相同
+// 所以查詢進貨單只能選擇相同發票號碼的進貨單

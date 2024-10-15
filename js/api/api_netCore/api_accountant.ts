@@ -512,7 +512,7 @@ const apiGetPurchaseCollectTicketDetailByTicketId = async (id: string) => {
 };
 
 // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
-const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number: string) => {
+const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number?: string) => {
   const api = `/${subRoot}/SearchUnpaidProdreceiptByInvoiceNumber`;
   const params = {
     invoice_number,
@@ -714,7 +714,7 @@ const useGetPurchaseCollectTicketDetailByTicketId = (
 };
 
 const useGetUnpaidProdreceiptByInvoiceNumber = (
-  invoice_number: string,
+  invoice_number?: string,
   {
     callAlertOnError = true,
     autoUpdate = true,
@@ -793,6 +793,8 @@ export {
   useGetPurchaseCollectTicketById,
   useGetPurchaseCollectTicketDetailByTicketId,
   useGetUnpaidProdreceiptByInvoiceNumber,
+  //
+  Tprodreceipt_Dto,
 };
 
 export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed };

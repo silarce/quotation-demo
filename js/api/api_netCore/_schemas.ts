@@ -168,14 +168,14 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
 
 // region prodreceipt
 interface Tprodreceipt_Dto extends Tbase {
-  prodreceiptid: string;
+  prodreceiptid: number;
   supplieruuid: string;
-  invoice: string;
+  invoice: string | '';
   purchaseorderuuid: string;
   purchaseorderid: string;
-  inspected: string;
-  totalprice: string;
-  tax: string;
+  inspected: boolean;
+  totalprice: number;
+  tax: number;
   purchaseordercreate_at: string;
   purchaseordercreate_by: string;
   review_by: string;
