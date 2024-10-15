@@ -75,7 +75,8 @@ export default function EditWHPosition() {
     const [traycalledin, setTrayCalledin] = useState<boolean>(traycalled === 'true');
     const [traycallednamein, setTrayCalledNamein] = useState<string | undefined>(traycalledname?.toString() ?? "");
     const [sametrayornotin, setTrayorNotin] = useState<boolean>(whnamecalled === data1.whname && traycalledname === data1.trayname ? true : false);
-    const [traytransferin, setTrayTransferin] = useState<boolean>(traytransfer !== trayname ?? false);
+    const [traytransferin, setTrayTransferin] = useState<boolean>(traytransfer !== trayname);
+
 
     const [mouseX, setMouseX] = useState('0px');
     const [mouseY, setMouseY] = useState('0px');
@@ -120,7 +121,14 @@ export default function EditWHPosition() {
             },
         },
     ] : [
-
+        //先開放編輯功能
+        {
+            type: 'myButton',
+            label: '編輯',
+            onClick: () => {
+                setDisabled(false);
+            },
+        },
         {
             type: 'myButton',
             label: '返回',
