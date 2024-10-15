@@ -153,7 +153,7 @@ interface TpurchaseCollectTicketDetail_Dto extends Tbase {
   goods_spec: string | null; // 貨品規格
   unit: string | null; // 單位
   unit_price: number | null; // 單價
-  amount: string | null; // 應開金額
+  amount: number | null; // 應開金額
   note: string | null; // 摘要說明
 }
 

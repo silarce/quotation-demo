@@ -9,7 +9,7 @@ import Decimal from 'decimal.js';
 import { Spin } from 'antd';
 
 // components
-import Detail from 'components/page/accounting/purchaseCollectTicket/detail';
+import { Detail, Detail_thead } from 'components/page/accounting/purchaseCollectTicket/detail';
 import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 
 // layer
@@ -78,14 +78,14 @@ interface Tstate_detail {
   quantity: `${number}` | '';
   unit: string;
   unit_price: `${number}` | '';
-  amount: string;
+  amount: `${number}` | '';
   note: string;
   //
   goods_spec: string;
   prodreceipt_uuid: string | undefined;
 }
 
-type TclassState = Pick<
+type Interface_classState = Pick<
   Tstate,
   | 'serial_number'
   | 'applicant_department'
@@ -98,14 +98,14 @@ type TclassState = Pick<
 > & {
   agentName: string;
   invoice_price: string;
-  chagneAgent: (agent: TemployeeDto) => TclassState;
-  changeInvoice: (invoice: { invoiceNumber: string; invoicePrice: `${number}` | number }) => TclassState;
+  chagneAgent: (agent: TemployeeDto) => Interface_classState;
+  changeInvoice: (invoice: { invoiceNumber: string; invoicePrice: `${number}` | number }) => Interface_classState;
   //
-  detailArr: TclassState_detail[];
-  detailTotal: string;
+  detailArr: Interface_classState_detail[];
+  detailAmountTotal: string;
 };
 
-type TclassState_detail = Pick<
+type Interface_classState_detail = Pick<
   Tstate_detail,
   | 'updateCount'
   | 'item'
@@ -123,6 +123,8 @@ type TclassState_detail = Pick<
   // unit_price: string;
   // amount: string;
 };
+
+export type { Tstate, Tstate_detail, Interface_classState, Interface_classState_detail };
 
 // ===========================================================================
 
@@ -186,8 +188,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
-  // ------------------------------------------------------------
   // MARK: RENDER
+
   // ------------------------------------------------------------
   return (
     <SubLayer bodyPreStyle="style01">
@@ -209,8 +211,12 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               <SquareBtn label="查詢進貨單" sharp="mini" />
             </div>
             <div>
-              {/* <Detail_thead /> */}
-              {/* <Detail /> */}
+              <Detail_thead />
+              {State.detailArr.map((classDetail, index) => {
+                const identifyId = classDetail.identifyId;
+
+                return <Detail key={identifyId} indexNumber={index + 1} disabled={disabled} classState={classDetail} />;
+              })}
             </div>
           </div>
         </Spin>
@@ -276,7 +282,7 @@ const Profile = ({
   onInovoiceBtnClick,
 }: {
   disabled: boolean;
-  classState: TclassState;
+  classState: Interface_classState;
   onInovoiceBtnClick: () => void;
 }) => {
   const { optionArr_name, update } = useDepartments();
@@ -450,10 +456,10 @@ const useDefaultState = (
           item: detail.item || '',
           prodreceipt_number: detail.prodreceipt_number || '',
           transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
-          quantity: String(detail.quantity || '') as Tstate_detail['quantity'],
+          quantity: `${detail.quantity || ''}`,
           unit: detail.unit || '',
-          unit_price: String(detail.unit_price || '') as Tstate_detail['unit_price'],
-          amount: detail.amount || '',
+          unit_price: `${detail.unit_price || ''}`,
+          amount: `${detail.amount || ''}`,
           note: detail.note || '',
           goods_spec: detail.goods_spec || '',
           prodreceipt_uuid: detail.prodreceipt_uuid || '',
@@ -520,10 +526,10 @@ const emptyuState_detail = (): Tstate_detail => ({
 // =============================================================================
 
 // MARK:ClassState
-class ClassState implements TclassState {
+class ClassState implements Interface_classState {
   private readonly state;
   private readonly setState;
-  readonly detailArr: TclassState_detail[] = [];
+  readonly detailArr: Interface_classState_detail[] = [];
   //
   constructor(
     //
@@ -532,7 +538,7 @@ class ClassState implements TclassState {
     ClassDetail: new (
       state_datail: Tstate_detail,
       setState_detail: (state_detail: Tstate_detail) => void
-    ) => TclassState_detail
+    ) => Interface_classState_detail
   ) {
     this.state = state;
     this.setState = setState;
@@ -629,10 +635,8 @@ class ClassState implements TclassState {
   }
 
   changeInvoice({
-    //
     invoiceNumber,
-  }: // invoicePrice,
-  {
+  }: {
     invoiceNumber: string;
     // 後端說invoicePrice不用管，
     // invoicePrice: `${number}` | number;
@@ -646,15 +650,18 @@ class ClassState implements TclassState {
     return this;
   }
   // ------------------------------------------------------------
-  get detailTotal() {
-    // this.detailArr.forEach
-    return '';
+  get detailAmountTotal() {
+    let total = new Decimal(0);
+    this.detailArr.forEach(({ amount }) => {
+      total = total.add(amount);
+    });
+
+    return total.toNumber().toLocaleString();
   }
-  // get detailArr() {}
 } // ClassState
 
 // MARK:ClassState_detail
-class ClassState_detail implements TclassState_detail {
+class ClassState_detail implements Interface_classState_detail {
   state_datail;
   setState_detail;
   identifyId;

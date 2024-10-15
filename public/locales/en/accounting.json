@@ -24,5 +24,16 @@
     "accounting_subject": "Accounting Subject",
     "number": "Number",
     "note": "Note"
+  },
+  "purchaseCollectTicket": {
+    "item": "Item",
+    "prodreceipt_number": "Source Number",
+    "transaction_date": "Transaction Date",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "unit_price": "Unit Price",
+    "amount": "Amount",
+    "note": "Note",
+    "goods_spec": "Spec"
   }
 }

@@ -24,5 +24,16 @@
     "accounting_subject": "費用科目",
     "number": "發票號碼",
     "note": "摘要說明"
+  },
+  "purchaseCollectTicket": {
+    "item": "貨品名稱",
+    "prodreceipt_number": "來源單號",
+    "transaction_date": "交易日期",
+    "quantity": "本次數量",
+    "unit": "單位",
+    "unit_price": "單價",
+    "amount": "應該金額",
+    "note": "摘要說明",
+    "goods_spec": "規格"
   }
 }
