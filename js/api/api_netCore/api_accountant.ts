@@ -435,7 +435,6 @@ const useGetApplyPaymentDetail = (
 // region purchaseCollectTicket
 
 // 取得所有進貨收票
-// api未完成 // 猜測api並預接
 const apiGetPurchaseCollectTicket = async () => {
   const api = `/${subRoot}/GetPurchaseCollectTicket`;
   const params = {

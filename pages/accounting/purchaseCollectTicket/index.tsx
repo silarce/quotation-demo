@@ -11,6 +11,7 @@ import { Spin } from 'antd';
 // components
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/purchaseCollectTicket/detail';
 import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
+import { SearchModal_purchaseCollectTicket } from 'components/composition/searchModal/useSearchModal/useSearchModal_purchaseCollectTicket';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -215,6 +216,24 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     setDisabled(false);
   };
 
+  const handleSelectTicket = () => {
+    DragableModal.create({
+      children: (
+        <SearchModal_purchaseCollectTicket
+          limit={1}
+          onRowClick={(purchaseCollectTicket) => {
+            router.replace({
+              query: {
+                ...query,
+                purchaseCollectTicketId: purchaseCollectTicket.id,
+              },
+            });
+          }}
+        />
+      ),
+    });
+  };
+
   const handleSelectInvoice = () => {
     const { unmount } = DragableModal.create({
       children: (
@@ -324,7 +343,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
         <BtnBar
           disabled={disabled}
           isDataExist={!!raw_purchaseCollectTicket}
-          // onSearchClick={handleSearch}
+          onSearchClick={handleSelectTicket}
           onCancelClick={() => setDisabled(true)}
           onEditClick={() => setDisabled(false)}
           onAddClick={handleNewPurchaseCollectTicket}

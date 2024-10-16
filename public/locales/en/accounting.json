@@ -33,6 +33,7 @@
     "tax_deduction_category": "Tax Deduction Category",
     "journal_method": "Journal Method",
     "invoice_number": "Invoice Number",
+    "invoice_price": "Invoice Price",
     "note": "Note",
     "item": "Item",
     "prodreceipt_number": "Source Number",
