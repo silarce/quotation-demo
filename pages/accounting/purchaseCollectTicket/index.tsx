@@ -141,7 +141,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
 
   const router = useRouter();
-  const { purchaseCollectTicketId } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { purchaseCollectTicketId } = query as Tquery;
 
   const [disabled, setDisabled] = useState(true);
 
@@ -154,7 +155,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     update: update_purchaseCollectTicket,
     reqPatch,
     isFetching: isFetching_purchaseCollectTicket,
-  } = useGetPurchaseCollectTicketById(purchaseCollectTicketId ?? '88f78fe4-4ca0-4577-abcd-27dcced43e3a');
+  } = useGetPurchaseCollectTicketById(purchaseCollectTicketId);
   // "88f78fe4-4ca0-4577-abcd-27dcced43e3a"
   // "aa364336-1836-434f-af8f-de1b10f06057"
   // "5f34502e-0741-43c1-ba07-2191d709ba7b"
@@ -178,6 +179,15 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   // ------------------------------------------------------------
 
+  const handleNewPurchaseCollectTicket = () => {
+    const { purchaseCollectTicketId, ...rest } = query;
+
+    router.replace({
+      query: rest,
+    });
+    setDisabled(false);
+  };
+
   const handleSelectInvoice = () => {
     const { unmount } = DragableModal.create({
       children: (
@@ -189,6 +199,15 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             });
             unmount();
           }}
+          checkForbbiden={({ dto }) => {
+            if (!dto.invoice) {
+              return true;
+            }
+
+            if (State.invoice_number && State.invoice_number !== dto.invoice) {
+              return true;
+            }
+          }}
         />
       ),
     });
@@ -198,6 +217,25 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_prodreceipt
+          checkForbbiden={({ dto, dtoDirc }) => {
+            if (
+              //
+              !dto.invoice ||
+              (State.invoice_number && State.invoice_number !== dto.invoice)
+            ) {
+              return true;
+            }
+
+            const invoiceNumberArr = Object.values(dtoDirc).map((prodreceipt) => prodreceipt.invoice);
+
+            if (invoiceNumberArr.length === 0) {
+              return false;
+            }
+
+            if (!invoiceNumberArr.includes(dto.invoice)) {
+              return true;
+            }
+          }}
           onConfirm={(dict) => {
             const arr = Object.values(dict).map((prodreceipt) => {
               const { id, prodreceiptid, note } = prodreceipt;
@@ -237,10 +275,11 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
       <div>
         <BtnBar
           disabled={disabled}
+          isDataExist={!!raw_purchaseCollectTicket}
           // onSearchClick={handleSearch}
           onCancelClick={() => setDisabled(true)}
           onEditClick={() => setDisabled(false)}
-          // onAddClick={handleAdd}
+          onAddClick={handleNewPurchaseCollectTicket}
           // onConfirmClick={handleConfirm}
         />
         <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
@@ -274,6 +313,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 // MARK: BtnBar
 const BtnBar = ({
   disabled,
+  isDataExist,
   onSearchClick,
   onCancelClick,
   onEditClick,
@@ -281,6 +321,7 @@ const BtnBar = ({
   onConfirmClick,
 }: {
   disabled: boolean;
+  isDataExist: boolean;
   onSearchClick?: () => void;
   onCancelClick?: () => void;
   onEditClick?: () => void;
@@ -291,7 +332,7 @@ const BtnBar = ({
     <ThreePartBar>
       <>
         <SquareBtn content="search" onClick={onSearchClick} />
-        <SquareBtn content="export" />
+        {isDataExist && <SquareBtn content="export" />}
       </>
       <>
         {!disabled && (
@@ -304,7 +345,7 @@ const BtnBar = ({
         {disabled && (
           <>
             <SquareBtn content="add" onClick={onAddClick} />
-            <SquareBtn content="edit" onClick={onEditClick} />
+            {isDataExist && <SquareBtn content="edit" onClick={onEditClick} />}
           </>
         )}
       </>

@@ -63,6 +63,7 @@ const Detail_thead = ({ className }: { className?: string }) => {
 
 // MARK:Detail_tfoot
 const Detail_tfoot = ({ amountTotal, className }: { amountTotal: React.ReactNode; className?: string }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
   const { t: t_common } = useTranslation('common');
 
   return (
@@ -74,7 +75,7 @@ const Detail_tfoot = ({ amountTotal, className }: { amountTotal: React.ReactNode
         let value: React.ReactNode = '';
 
         if (keyArr[index + 1] === 'amount') {
-          value = t_common('total');
+          value = t('amount') + t_common('total');
         }
 
         if (key === 'amount') {
