@@ -9,7 +9,7 @@ import Decimal from 'decimal.js';
 import { Spin } from 'antd';
 
 // components
-import { Detail, Detail_thead } from 'components/page/accounting/purchaseCollectTicket/detail';
+import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/purchaseCollectTicket/detail';
 import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 
 // layer
@@ -21,6 +21,9 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
+
+// css
+import scss from './index.module.scss';
 
 // api
 import { useDepartments } from 'js/api/api_department';
@@ -63,7 +66,6 @@ interface Tstate {
   invoice_price: `${number}` | ''; // 發票金額
   note: string; // 備註
   //
-  // detailArr: (TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto)[];
   detailArr: Tstate_detail[];
 }
 
@@ -71,9 +73,10 @@ interface Tstate_detail {
   updateCount: number;
   //
   id: string | undefined; // detail_uuid
+  identifyId: string;
   //
   item: string;
-  prodreceipt_number: string;
+  prodreceipt_number: string | number;
   transaction_date: Moment | null;
   quantity: `${number}` | '';
   unit: string;
@@ -103,10 +106,13 @@ type Interface_classState = Pick<
   //
   detailArr: Interface_classState_detail[];
   detailAmountTotal: string;
+  addDetail: (state_detailArr: Tstate_detail[]) => Interface_classState;
+  deleteDetail: (identifyId: string) => Interface_classState;
 };
 
 type Interface_classState_detail = Pick<
   Tstate_detail,
+  | 'identifyId'
   | 'updateCount'
   | 'item'
   | 'prodreceipt_number'
@@ -118,10 +124,11 @@ type Interface_classState_detail = Pick<
   | 'note'
   | 'goods_spec'
 > & {
-  identifyId: string;
+  // identifyId: string;
   // quantity: string;
   // unit_price: string;
   // amount: string;
+  deleteSelf: () => Interface_classState_detail;
 };
 
 export type { Tstate, Tstate_detail, Interface_classState, Interface_classState_detail };
@@ -131,9 +138,8 @@ export type { Tstate, Tstate_detail, Interface_classState, Interface_classState_
 // MARK: START
 
 export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
-  //
   const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
-  //
+
   const router = useRouter();
   const { purchaseCollectTicketId } = router.query as Tquery;
 
@@ -155,6 +161,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // "8dce7a3c-b63c-44fa-a96f-e07647e61500"
   // "b94c34eb-0f88-4c8c-adaa-43f0aad0210a"
   // "d4c94da0-9a36-4f45-9af6-ff7a224c8e54"
+
   // console.log(raw_purchaseCollectTicket);
 
   // ------------------------------------------------------------
@@ -164,7 +171,6 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     userEmployee: userInfo.employee,
     disabled,
   });
-  // console.log('state', state);
 
   const State = useMemo(() => {
     return new ClassState(state, setState, ClassState_detail);
@@ -176,12 +182,10 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_prodreceipt
+          limit={1}
           onRowClick={(prodreceipt) => {
-            // console.log(prodreceipt);
             State.changeInvoice({
-              //
               invoiceNumber: prodreceipt.invoice,
-              // invoicePrice: prodreceipt.invoicePrice, // prodreceipt下沒有prodreceipt
             });
             unmount();
           }}
@@ -190,9 +194,43 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
-  // MARK: RENDER
+  const handleSelectDetail = () => {
+    const { unmount } = DragableModal.create({
+      children: (
+        <SearchModal_prodreceipt
+          onConfirm={(dict) => {
+            const arr = Object.values(dict).map((prodreceipt) => {
+              const { id, prodreceiptid, note } = prodreceipt;
+
+              const state_detail: Tstate_detail = {
+                updateCount: 0,
+                id: undefined,
+                identifyId: nanoid(),
+                item: '',
+                prodreceipt_uuid: id,
+                prodreceipt_number: prodreceiptid,
+                transaction_date: null,
+                quantity: '',
+                unit: '',
+                unit_price: '',
+                amount: '',
+                note,
+                goods_spec: '',
+              };
+
+              return state_detail;
+            });
+
+            State.addDetail(arr);
+            unmount();
+          }}
+        />
+      ),
+    });
+  };
 
   // ------------------------------------------------------------
+  // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag={t('purchaseCollectTicket')} />
@@ -210,15 +248,16 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           <div className="mt-2 ">
             <div>
               <span className="text-xl text-main mr-5">{t('detail')}</span>
-              <SquareBtn label={t('addDetail')} sharp="mini" />
+              {!disabled && <SquareBtn label={t('addDetail')} sharp="mini" onClick={handleSelectDetail} />}
             </div>
-            <div className="mt-2">
-              <Detail_thead />
+            <div className={classNames('mt-2', scss.table)}>
+              <Detail_thead className={scss.thead} />
               {State.detailArr.map((classDetail, index) => {
                 const identifyId = classDetail.identifyId;
 
                 return <Detail key={identifyId} indexNumber={index + 1} disabled={disabled} classState={classDetail} />;
               })}
+              <Detail_tfoot amountTotal={State.detailAmountTotal} className={scss.tfoot} />
             </div>
           </div>
         </Spin>
@@ -459,6 +498,7 @@ const useDefaultState = (
         const state_detail: Tstate_detail = {
           updateCount: 0,
           id: detail.id,
+          identifyId: detail.id,
           item: detail.item || '',
           prodreceipt_number: detail.prodreceipt_number || '',
           transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
@@ -512,22 +552,23 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
   detailArr: [],
 });
 
-const emptyuState_detail = (): Tstate_detail => ({
-  updateCount: 0,
-  id: undefined,
-  //
-  item: '',
-  prodreceipt_number: '',
-  transaction_date: null,
-  quantity: '',
-  unit: '',
-  unit_price: '',
-  amount: '',
-  note: '',
-  //
-  goods_spec: '',
-  prodreceipt_uuid: undefined,
-});
+// const emptyuState_detail = (): Tstate_detail => ({
+//   updateCount: 0,
+//   id: undefined,
+//   identifyId: nanoid(),
+//   //
+//   item: '',
+//   prodreceipt_number: '',
+//   transaction_date: null,
+//   quantity: '',
+//   unit: '',
+//   unit_price: '',
+//   amount: '',
+//   note: '',
+//   //
+//   goods_spec: '',
+//   prodreceipt_uuid: undefined,
+// });
 
 // =============================================================================
 
@@ -543,7 +584,8 @@ class ClassState implements Interface_classState {
     setState: React.Dispatch<React.SetStateAction<Tstate>>,
     ClassDetail: new (
       state_datail: Tstate_detail,
-      setState_detail: (state_detail: Tstate_detail) => void
+      setState_detail: (state_detail: Tstate_detail) => void,
+      parent: Interface_classState
     ) => Interface_classState_detail
   ) {
     this.state = state;
@@ -562,7 +604,7 @@ class ClassState implements Interface_classState {
         });
       };
 
-      return new ClassDetail(detail, setState_detail);
+      return new ClassDetail(detail, setState_detail, this);
     });
   } // constructor
   //
@@ -630,6 +672,15 @@ class ClassState implements Interface_classState {
     }));
   }
 
+  get detailAmountTotal() {
+    let total = new Decimal(0);
+    this.detailArr.forEach(({ amount }) => {
+      total = total.add(amount || 0);
+    });
+
+    return total.toNumber().toLocaleString();
+  }
+
   // ------------------------------------------------------------
   chagneAgent(agent: TemployeeDto) {
     this.setState((state) => ({
@@ -655,14 +706,28 @@ class ClassState implements Interface_classState {
 
     return this;
   }
-  // ------------------------------------------------------------
-  get detailAmountTotal() {
-    let total = new Decimal(0);
-    this.detailArr.forEach(({ amount }) => {
-      total = total.add(amount);
+
+  addDetail(newState_detailArr: Tstate_detail[]) {
+    this.setState((state) => {
+      return {
+        ...state,
+        detailArr: [...state.detailArr, ...newState_detailArr],
+      };
+    });
+    // 不需要做其他的操作，更新狀態就會重新建立class了
+
+    return this;
+  }
+
+  deleteDetail(identifyId: string) {
+    this.setState((state) => {
+      return {
+        ...state,
+        detailArr: state.detailArr.filter((classDetail) => classDetail.identifyId !== identifyId),
+      };
     });
 
-    return total.toNumber().toLocaleString();
+    return this;
   }
 } // ClassState
 
@@ -670,14 +735,21 @@ class ClassState implements Interface_classState {
 class ClassState_detail implements Interface_classState_detail {
   state_datail;
   setState_detail;
-  identifyId;
-
-  constructor(state_datail: Tstate_detail, setState_detail: (state_detail: Tstate_detail) => void) {
+  parent;
+  constructor(
+    //
+    state_datail: Tstate_detail,
+    setState_detail: (state_detail: Tstate_detail) => void,
+    parent: Interface_classState
+  ) {
     this.state_datail = state_datail;
     this.setState_detail = setState_detail;
-
-    this.identifyId = state_datail.id ?? nanoid();
+    this.parent = parent;
   } // constructor
+
+  get identifyId() {
+    return this.state_datail.identifyId;
+  }
 
   get updateCount() {
     return this.state_datail.updateCount;
@@ -793,6 +865,12 @@ class ClassState_detail implements Interface_classState_detail {
     });
 
     this.countUpdate();
+
+    return this;
+  }
+
+  deleteSelf() {
+    this.parent.deleteDetail(this.identifyId);
 
     return this;
   }

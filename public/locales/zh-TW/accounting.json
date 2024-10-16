@@ -40,7 +40,7 @@
     "quantity": "本次數量",
     "unit": "單位",
     "unit_price": "單價",
-    "amount": "應該金額",
+    "amount": "應開金額",
     "goods_spec": "規格",
     "detail": "明細資料",
     "addDetail": "新增明細資料",

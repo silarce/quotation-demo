@@ -28,5 +28,7 @@
   "searchCriteria": "Search Criteria",
   "count": "Count",
   "confirm": "Confirm",
-  "agent": "Agent"
+  "agent": "Agent",
+  "subtotal": "Subtotal",
+  "total": "Total"
 }

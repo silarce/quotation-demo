@@ -9,6 +9,7 @@ import Row, { Cell } from 'components/global/gear/table/row';
 import type { Interface_classState_detail } from 'pages/accounting/purchaseCollectTicket';
 
 import { useTranslation } from 'react-i18next';
+import { Icon_fc_delete } from 'public/image/icon/fcIconComponent/fcIcons';
 
 // ===============================================================================
 
@@ -38,12 +39,14 @@ type Tconfig = {
 };
 
 // ===============================================================================
-const Detail_thead = () => {
+// MARK:Detail_thead
+const Detail_thead = ({ className }: { className?: string }) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
   const { t: t_common } = useTranslation('common');
 
   return (
-    <Row thead={true}>
+    <Row thead={true} className={className}>
+      <Cell style={config_other.btnCell.style}></Cell>
       <Cell style={config_other.indexNumber.style}>{t_common(config_other.indexNumber.i18nKey)}</Cell>
       {keyArr.map((key) => {
         const { i18nKey, style } = config[key];
@@ -58,6 +61,37 @@ const Detail_thead = () => {
   );
 };
 
+// MARK:Detail_tfoot
+const Detail_tfoot = ({ amountTotal, className }: { amountTotal: React.ReactNode; className?: string }) => {
+  const { t: t_common } = useTranslation('common');
+
+  return (
+    <Row thead={true} className={className}>
+      <Cell style={config_other.btnCell.style}></Cell>
+      <Cell style={config_other.indexNumber.style}></Cell>
+      {keyArr.map((key, index) => {
+        const { style } = config[key];
+        let value: React.ReactNode = '';
+
+        if (keyArr[index + 1] === 'amount') {
+          value = t_common('total');
+        }
+
+        if (key === 'amount') {
+          value = amountTotal;
+        }
+
+        return (
+          <Cell key={key} style={style}>
+            {value}
+          </Cell>
+        );
+      })}
+    </Row>
+  );
+};
+
+// MARK:Detail
 const Detail = ({
   indexNumber,
   disabled,
@@ -69,6 +103,15 @@ const Detail = ({
 }) => {
   return (
     <Row>
+      <Cell style={config_other.btnCell.style}>
+        {!disabled && (
+          <Icon_fc_delete
+            //
+            className={'cursor-pointer translate-y-[-3px]'}
+            onClick={() => classState.deleteSelf()}
+          />
+        )}
+      </Cell>
       <Cell style={config_other.indexNumber.style} alignItems="flex-end">
         {indexNumber}
       </Cell>
@@ -88,16 +131,17 @@ const Detail = ({
 };
 
 // ===============================================================================
-
 const config_other = {
-  indexNumber: {
-    label: 'indexNumber',
-    i18nKey: 'indexNumber',
-    style: {
-      width: 50,
-    },
+  btnCell: {
+    label: '',
+    style: { width: 30, justifyContent: 'center' },
   },
-};
+  indexNumber: {
+    label: '序',
+    i18nKey: 'indexNumber02',
+    style: { width: 30 },
+  },
+} as const;
 
 const config: Tconfig = {
   item: {
@@ -359,4 +403,4 @@ const interceptor_money = (money: `${number}` | '' | null, disabled: boolean) =>
 
 // ===============================================================================
 
-export { Detail, Detail_thead };
+export { Detail, Detail_thead, Detail_tfoot };
