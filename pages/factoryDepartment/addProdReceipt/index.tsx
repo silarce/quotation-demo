@@ -568,21 +568,40 @@ export default function AddProdReceipt() {
             setSupplieraddressin(item.purchaseOrder.supplieraddress);
             setSupplierphonein(item.purchaseOrder.supplierphone);
             setSuppliertaxidin(item.purchaseOrder.suppliertaxid);
-            if (isChecked) {
-                // 如果勾選 checkbox，將新的 item 加入 data2
-                setData2(prevData2 => {
-                    const newDetails = item.details.filter((detail: any) =>
-                        !prevData2.some(existingDetail => existingDetail.id === detail.id)
-                    );
-                    return [...prevData2, ...newDetails];
-                });
-            } else {
-                // 如果取消勾選 checkbox，根據 id 從 data2 中移除對應的項目
-                setData2(prevData2 => prevData2.filter((existingDetail: any) =>
-                    !item.details.some((detail: any) => detail.id === existingDetail.id)
-                ));
+            if (status === "未儲存") {
+                if (isChecked) {
+                    // 如果勾選 checkbox，將新的 item 加入 data2
+                    setData2(prevData2 => {
+                        const newDetails = item.details.filter((detail: any) =>
+                            !prevData2.some(existingDetail => existingDetail.id === detail.id)
+                        );
+                        return [...prevData2, ...newDetails];
+                    });
+                } else {
+                    // 如果取消勾選 checkbox，根據 id 從 data2 中移除對應的項目
+                    setData2(prevData2 => prevData2.filter((existingDetail: any) =>
+                        !item.details.some((detail: any) => detail.id === existingDetail.id)
+                    ));
 
+                }
+            } else {
+                if (isChecked) {
+                    // 如果勾選 checkbox，將新的 item 加入 data2
+                    setData2(prevData2 => {
+                        const newDetails = item.details.filter((detail: any) =>
+                            !prevData2.some(existingDetail => existingDetail.purchaseorderid === detail.purchaseorderid)
+                        );
+                        return [...prevData2, ...newDetails];
+                    });
+                } else {
+                    // 如果取消勾選 checkbox，根據 id 從 data2 中移除對應的項目
+                    setData2(prevData2 => prevData2.filter((existingDetail: any) =>
+                        !item.details.some((detail: any) => detail.id === existingDetail.id)
+                    ));
+
+                }
             }
+
 
             // 更新勾選狀態
             setCheckedItems(prevCheckedItems => ({
@@ -591,7 +610,7 @@ export default function AddProdReceipt() {
             }));
 
 
-            
+
 
 
         } else {
