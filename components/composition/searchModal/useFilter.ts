@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import type { Tstate, Tconfig_filter } from './types';
+import type { Tstate_filter, Tconfig_filter } from './types';
 
 const useFilter = ({ config_filter }: { config_filter: Tconfig_filter }) => {
-  const [filter, setFilter] = useState<Tstate>({});
-  const [state, setState] = useState<Tstate>({});
+  const [filter, setFilter] = useState<Tstate_filter>();
+  const [state, setState] = useState<Tstate_filter>();
 
   const clearState = () => {
     setState((state) => {
@@ -22,11 +22,14 @@ const useFilter = ({ config_filter }: { config_filter: Tconfig_filter }) => {
   };
 
   useEffect(() => {
-    const state: Tstate = {};
+    const state: Tstate_filter = {};
     config_filter.forEach((item) => {
-      state[item.key] = '';
+      state[item.key] = item.defaultValue ?? '';
     });
-  }, []);
+
+    setState(state);
+    setFilter(state);
+  }, [config_filter]);
 
   return {
     state,
@@ -36,5 +39,16 @@ const useFilter = ({ config_filter }: { config_filter: Tconfig_filter }) => {
     confirmFilter,
   };
 }; // useFilter
+
+const createDefaultFilter = (config_filter: Tconfig_filter) => {
+  const state: Tstate_filter = {};
+  config_filter.forEach((item) => {
+    state[item.key] = item.defaultValue ?? '';
+  });
+
+  return state;
+};
+
+// ============================================================================
 
 export { useFilter };

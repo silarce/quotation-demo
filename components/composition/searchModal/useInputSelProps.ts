@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import moment from 'moment';
 
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import type { Tstate, Tconfig_filter } from './types';
+import type { Tstate_filter, Tconfig_filter } from './types';
 
 const useInputSelProps = ({
   config_filter,
@@ -10,8 +10,8 @@ const useInputSelProps = ({
   setState,
 }: {
   config_filter: Tconfig_filter;
-  state: Tstate;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  state: Tstate_filter | undefined;
+  setState: React.Dispatch<React.SetStateAction<Tstate_filter | undefined>>;
 }) => {
   const inputSelPropsArr: TinputSelProps[] = useMemo(() => {
     return config_filter.map((item, index) => {
@@ -32,13 +32,15 @@ const createInputSel = ({
   setState,
 }: {
   config: Tconfig_filter[number];
-  state: Tstate;
-  setState: React.Dispatch<React.SetStateAction<Tstate>>;
+  state: Tstate_filter | undefined;
+  setState: React.Dispatch<React.SetStateAction<Tstate_filter | undefined>>;
 }) => {
-  const { caption, key, type, selectOptions } = config;
+  const { caption, key, type, selectOptions, disabled, placeholder } = config;
 
   const inputSelProps: TinputSelProps = {
+    disabled,
     caption,
+    showBaseline: 'auto',
   };
 
   switch (type) {
@@ -46,7 +48,7 @@ const createInputSel = ({
       inputSelProps.inputProps = {
         props: {
           name: key,
-          value: state[key],
+          value: state?.[key] ?? '',
           onChange: (e) => {
             setState((prev) => {
               return {
@@ -57,6 +59,7 @@ const createInputSel = ({
           },
         },
       };
+      placeholder !== undefined && (inputSelProps.inputProps.props!.placeholder = placeholder);
       break;
 
     case 'select':
@@ -66,7 +69,7 @@ const createInputSel = ({
           name: key,
           placeholder: '請選擇',
           options: selectOptions,
-          value: selectOptions?.find((item) => item.value === state[key]) || null,
+          value: selectOptions?.find((item) => item.value === state?.[key]) || null,
           onChange: (option) => {
             setState((prev) => {
               return {
@@ -77,13 +80,14 @@ const createInputSel = ({
           },
         },
       };
+      placeholder !== undefined && (inputSelProps.selectProps.props!.placeholder = placeholder);
       break;
 
     case 'date':
       inputSelProps.datePickerProps = {
         props: {
           name: key,
-          value: state[key] ? moment(state[key]) : null,
+          value: state?.[key] ? moment(state[key]) : null,
           onChange: (date) => {
             const isoStr = date?.toISOString() || '';
 
@@ -96,6 +100,7 @@ const createInputSel = ({
           },
         },
       };
+      placeholder !== undefined && (inputSelProps.datePickerProps.props!.placeholder = placeholder);
 
     default:
       break;
