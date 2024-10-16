@@ -209,6 +209,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   const handleNewPurchaseCollectTicket = () => {
     const { purchaseCollectTicketId, ...rest } = query;
+    clear();
 
     router.replace({
       query: { ...rest },
