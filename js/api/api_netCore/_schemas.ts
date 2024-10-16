@@ -159,8 +159,12 @@ interface TpurchaseCollectTicketDetail_Dto extends Tbase {
 
 type TcreatePurchaseCollectTicketDetail_Dto = Pick<
   TpurchaseCollectTicketDetail_Dto,
-  'item' | 'goods_spec' | 'unit_price' | 'note' | 'transaction_date' | 'prodreceipt_uuid'
->;
+  'item' | 'goods_spec' | 'note' | 'transaction_date' | 'prodreceipt_uuid'
+> & {
+  // quantity: string;
+  unit_price: `${number}` | null;
+  // amount: string;
+};
 
 interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectTicketDetail_Dto {
   detail_uuid: string;

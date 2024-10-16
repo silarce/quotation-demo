@@ -85,7 +85,7 @@ interface Tstate_detail {
   note: string;
   //
   goods_spec: string;
-  prodreceipt_uuid: string | undefined;
+  prodreceipt_uuid: string;
 }
 
 type Interface_classState = Pick<
@@ -108,6 +108,8 @@ type Interface_classState = Pick<
   detailAmountTotal: string;
   addDetail: (state_detailArr: Tstate_detail[]) => Interface_classState;
   deleteDetail: (identifyId: string) => Interface_classState;
+  //
+  reqBody: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto;
 };
 
 type Interface_classState_detail = Pick<
@@ -129,6 +131,7 @@ type Interface_classState_detail = Pick<
   // unit_price: string;
   // amount: string;
   deleteSelf: () => Interface_classState_detail;
+  reqBody: TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto;
 };
 
 export type { Tstate, Tstate_detail, Interface_classState, Interface_classState_detail };
@@ -145,7 +148,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   const { purchaseCollectTicketId } = query as Tquery;
 
   const [disabled, setDisabled] = useState(true);
-
+  const [isFetching, setIsFetching] = useState(false);
   // ------------------------------------------------------------
 
   const {
@@ -178,6 +181,30 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   }, [state]);
 
   // ------------------------------------------------------------
+
+  // region REQUEST
+
+  const reqNewPurchaseCollectTicket = async () => {
+    const body: TcreatePurchaseCollectTicket_Dto = State.reqBody;
+    setIsFetching(true);
+    await apiPostAddPurchaseCollectTicket(body)
+      .then((id) => {
+        router.replace({
+          query: {
+            ...query,
+            purchaseCollectTicketId: id,
+          },
+        });
+        setDisabled(true);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------
+
+  // region Handle
 
   const handleNewPurchaseCollectTicket = () => {
     const { purchaseCollectTicketId, ...rest } = query;
@@ -267,6 +294,13 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
+  const handelConfirm = () => {
+    if (raw_purchaseCollectTicket) {
+    } else {
+      reqNewPurchaseCollectTicket();
+    }
+  };
+
   // ------------------------------------------------------------
   // MARK: RENDER
   return (
@@ -280,9 +314,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           onCancelClick={() => setDisabled(true)}
           onEditClick={() => setDisabled(false)}
           onAddClick={handleNewPurchaseCollectTicket}
-          // onConfirmClick={handleConfirm}
+          onConfirmClick={handelConfirm}
         />
-        <Spin spinning={isFetching_purchaseCollectTicket} delay={300}>
+        <Spin spinning={isFetching || isFetching_purchaseCollectTicket} delay={300}>
           <Profile disabled={disabled} classState={State} onInovoiceBtnClick={handleSelectInvoice} />
           <div className="mt-2 ">
             <div>
@@ -549,7 +583,7 @@ const useDefaultState = (
           amount: `${detail.amount || ''}`,
           note: detail.note || '',
           goods_spec: detail.goods_spec || '',
-          prodreceipt_uuid: detail.prodreceipt_uuid || '',
+          prodreceipt_uuid: detail.prodreceipt_uuid,
         };
 
         return state_detail;
@@ -722,6 +756,35 @@ class ClassState implements Interface_classState {
     return total.toNumber().toLocaleString();
   }
 
+  get reqBody() {
+    const {
+      id,
+      agent_employee,
+      applicant_department,
+      ticket_method,
+      tax_deduction_category,
+      journal_method,
+      invoice_number,
+      invoice_price,
+      note,
+    } = this.state;
+
+    const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
+      purchase_collect_ticket_uuid: id,
+      applicant_department: applicant_department,
+      agent_employee_id: agent_employee?.id || '',
+      ticket_method: ticket_method,
+      tax_deduction_category: tax_deduction_category,
+      journal_method: journal_method,
+      invoice_number: invoice_number,
+      invoice_price: Number(invoice_price),
+      note: note,
+      data: this.detailArr.map((classDetail) => classDetail.reqBody),
+    };
+
+    return body;
+  }
+
   // ------------------------------------------------------------
   chagneAgent(agent: TemployeeDto) {
     this.setState((state) => ({
@@ -886,6 +949,31 @@ class ClassState_detail implements Interface_classState_detail {
       ...this.state_datail,
       goods_spec: spec,
     });
+  }
+
+  get reqBody() {
+    const {
+      id,
+      prodreceipt_uuid,
+      //
+      item,
+      goods_spec,
+      unit_price,
+      note,
+      transaction_date,
+    } = this.state_datail;
+
+    const body: TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto = {
+      detail_uuid: id,
+      item: item,
+      goods_spec: goods_spec,
+      unit_price: unit_price || null,
+      note: note,
+      transaction_date: transaction_date?.toISOString() || null,
+      prodreceipt_uuid,
+    };
+
+    return body;
   }
 
   // ------------------------------------------------------------
