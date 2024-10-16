@@ -2145,12 +2145,6 @@ export default function AddPurchaseRequisition() {
                                     />
                                 </div>
                                 <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='請輸入品項名稱'
-                                        value={handinputname}
-                                        onChange={(e) => setHandinputname(e.target.value)}
-                                    /> */}
                                     <input
                                         type="text"
                                         placeholder="請輸入品項名稱"

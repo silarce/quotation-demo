@@ -92,7 +92,9 @@ export default function AddProdReceipt() {
     const [invoicein, setInvoicein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [supplieridin, setSupplieridin] = useState<string>("");
-
+    //紀錄進貨單回壓採購單
+    const [receiptid, setReceiptidin] = useState<string>("");
+    const [purchaseorderid, setPurchaseorderid] = useState<string>("");
 
     // 手key輸入
     const [handinputname, setHandinputname] = useState<string>("");
@@ -242,12 +244,18 @@ export default function AddProdReceipt() {
         if (editmain === true) {
 
         } else {
+            console.log(data2);
+            console.log(purchaseorderid);
+            // return;
             try {
                 // setIsLoading(true);
                 const conditionModel = {
                     create_at: create_atin,
                     create_by: create_byin,
-                    note: note
+                    note: note,
+                    data2: data2,
+                    username: userInfo?.username,
+                    purchaseorderid: purchaseorderid
                 };
 
                 var inputModel = {
@@ -281,6 +289,8 @@ export default function AddProdReceipt() {
                 setProdreceiptid(responsedata[0].prodreceiptid);
                 setProdreceiptuuid(responsedata[0].id);
                 setStatus("未送出");
+                getProdReceipt();
+                // getProdReceiptDetail();
                 // getPurchaseOrder();
                 // getProduct();
                 // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
@@ -334,6 +344,66 @@ export default function AddProdReceipt() {
         }
     };
 
+    //取對應的進貨明細
+    const getProdReceiptDetail = async (prodreceiptuuid: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                prodreceiptuuid: prodreceiptuuid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdReceiptDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData2(data);
+
+            // console.log(data);
+            // let totalprice = 0;
+            // data.forEach((element: { totalprice: any; }) => {
+            //     totalprice += element.totalprice;
+            // });
+            // setTotalPrice(totalprice.toLocaleString());
+            // const taxPrice = Math.round(totalprice * 0.05);
+            // setTaxPrice(taxPrice.toLocaleString());
+            // const totalPayPrice = totalprice + taxPrice;
+            // setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            // 進貨進度
+            // let totalentry = data.length; // 總數量
+            // let completeentry = 0; // 完成數量
+
+            // data.forEach((element: any) => {
+            //     // 將 alreadyinquantity 和 quantity 轉換為整數
+            //     const alreadyInQuantity = parseInt(element.alreadyinquantity, 10);
+            //     const quantity = parseInt(element.quantity, 10);
+
+            //     if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity >= quantity) {
+            //         completeentry += 1;
+            //     }
+            // });
+            // setTotalentry(totalentry);
+            // setCompleteentry(completeentry);
+
+
+
+        } catch (error: any) {
+            console.error("getProdReceiptDetail:" + error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
     //#endregion
 
@@ -404,12 +474,15 @@ export default function AddProdReceipt() {
         setOriginalSupplieraddressin(supplieraddressin);
         setOriginalcreate_atin(create_atin);
         setOriginalnote(note);
-        // setOriginaldata2(data2);
+        setOriginaldata2(data2);
         setEditmain(true);
         setPoopen(!poopen);
     };
 
     const handlecancelAddPR = () => {
+        // 取消所有 checkbox 的勾選
+        setCheckedItems({}); // 將所有勾選狀態重置為 false
+
         if (editmain === true) {
             setEditmain(false);
             setSuppliernamein(originalSuppliernamein);
@@ -417,28 +490,25 @@ export default function AddProdReceipt() {
             setSuppliertaxidin(originalSuppliertaxidin);
             setInvoicein(originalInvoicein);
             setSupplieraddressin(originalSupplieraddressin);
-            // setShippingaddressin(originalShippingaddressin);
             setCreate_atin(originalcreate_atin);
-            // setNeed_date(originalneed_date);
             setNote(originalnote);
-            // setData2(originaldata2);
             setPoopen(!poopen);
+            setData2(originaldata2);
         } else {
             setSuppliernamein("");
             setSupplierphonein("");
             setSuppliertaxidin("");
             setInvoicein("");
             setSupplieraddressin("");
-            // setShippingaddressin("");
             setEditmain(false);
             setProdreceiptid("");
             setStatus("");
-            // setData2([]);
             setNote("");
-            // setNeed_date(moment().toString());
             setPoopen(!poopen);
+            setData2([]);
         }
-    }
+    };
+
 
     // 手key加入
     const handleAddByHandKey = () => {
@@ -446,8 +516,9 @@ export default function AddProdReceipt() {
     }
 
     const handleChangeChose = (item: any) => {
+
         console.log(item);
-        handleRowClick(item.purchaseorderid);
+        handleRowClick(item.prodreceiptid);
         setData2([]);
         setProdreceiptid(item.prodreceiptid);
         setProdreceiptuuid(item.prodreceiptuuid);
@@ -456,18 +527,41 @@ export default function AddProdReceipt() {
         setCreate_atin(item.create_at);
         // setNeed_date(item.need_date);
         setSuppliernamein(item.suppliername);
-        // setSupplierphonein(item.supplierphone);
-        // setSuppliertaxidin(item.suppliertaxid);
+        setSupplierphonein(item.supplierphone);
+        setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
         // setShippingaddressin(item.shippingaddress);
         // setNeed_date(item.need_date);
         setCreate_byin(item.create_by);
         // getPurchaseOrderDetail(item.purchaseorderuuid);
+        getProdReceiptDetail(item.prodreceiptuuid);
     }
 
     const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
 
     const handleToggleProdreceiptdetail = async (item: any, isChecked: boolean) => {
+        // 確保 purchaseorderid 是字串並進行初始化
+        const currentPurchaseOrderStr = purchaseorderid?.toString() || '';
+
+        // 將現有的 purchaseorderid 拆分成陣列
+        let purchaseOrderArray = currentPurchaseOrderStr
+            ? currentPurchaseOrderStr.split(',').map((po: any) => po.trim()).filter((po: any) => po)
+            : [];
+
+        const newPurchaseOrderId = item.purchaseOrder.purchaseorderid?.toString().trim();
+
+        if (isChecked && newPurchaseOrderId) {
+            // 如果是勾選狀態且該 id 不存在於陣列中，則新增
+            if (!purchaseOrderArray.includes(newPurchaseOrderId)) {
+                purchaseOrderArray.push(newPurchaseOrderId);
+            }
+        } else if (!isChecked && newPurchaseOrderId) {
+            // 如果是取消勾選狀態且該 id 存在於陣列中，則移除
+            purchaseOrderArray = purchaseOrderArray.filter(po => po !== newPurchaseOrderId);
+        }
+
+        // 將陣列轉回字串，並存入 state 中
+        setPurchaseorderid(purchaseOrderArray.join(','));
 
         if (suppliernamein === '' || suppliernamein === null || suppliernamein === undefined || suppliernamein === item.purchaseOrder.suppliername) {
             setSuppliernamein(item.purchaseOrder.suppliername);
@@ -497,6 +591,9 @@ export default function AddProdReceipt() {
             }));
 
 
+            
+
+
         } else {
             // 非同一廠商，取消 checkbox 的選中狀態
             setCheckedItems(prevCheckedItems => ({
@@ -507,15 +604,17 @@ export default function AddProdReceipt() {
         }
     };
 
-    useEffect(() => {
-        // alert(data2.length);
-        if (data2.length === 0) {
-            setSuppliernamein('');
-            setSupplieraddressin('');
-            setSupplierphonein('');
-            setSuppliertaxidin('');
-        }
-    }, [data2]);
+    // useEffect(() => {
+    //     console.log(data2.length); // 使用 console.log 來查看長度
+    //     if (data2.length === 0) {
+    //         alert("true");
+    //         setSuppliernamein('');
+    //         setSupplieraddressin('');
+    //         setSupplierphonein('');
+    //         setSuppliertaxidin('');
+    //     }
+    // }, [data2]);
+
 
 
 
@@ -531,8 +630,8 @@ export default function AddProdReceipt() {
 
     //#region Tab頁籤切換
     //頁籤切換判斷
-    const [tabnow, setTabnow] = useState<string>("採購單據");
-    const [tabshow, setTabshow] = useState<string>("採購單據");
+    const [tabnow, setTabnow] = useState<string>("單據明細");
+    const [tabshow, setTabshow] = useState<string>("單據明細");
     const [tabnow2, setTabnow2] = useState<string>("單據明細");
     const [tabshow2, setTabshow2] = useState<string>("單據明細");
 
@@ -646,10 +745,10 @@ export default function AddProdReceipt() {
                                 查詢
                             </button>
                             &nbsp;
-                            {/* <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
+                            <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
                                 <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 採購
-                            </button> */}
+                            </button>
                         </div>
                         <div>
                             <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAdd() }} title="新增單據">
@@ -850,7 +949,7 @@ export default function AddProdReceipt() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red' },
-                                            // value: data2.length || ' ',
+                                            value: data2.length || ' ',
                                         },
                                     }}
                                 />
@@ -862,11 +961,19 @@ export default function AddProdReceipt() {
                             <span>
                                 <button
                                     className={scss.detailminitabbtn}
+                                    onClick={() => tabChosed('單據明細')}
+                                    style={getButtonStyle('單據明細')}
+                                >
+                                    單據明細
+                                </button>
+                                <button
+                                    className={scss.detailminitabbtn}
                                     onClick={() => tabChosed('採購單據')}
                                     style={getButtonStyle('採購單據')}
                                 >
                                     採購單據
                                 </button>
+
                             </span>
                             <span>
                             </span>
@@ -875,109 +982,125 @@ export default function AddProdReceipt() {
                     </div>
                     <div className={scss.tabbody}>
                         <div>
-                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                {/* <span> */}
-                                <div>
-                                    <Thead01 type={'PurchaseOrderForAddProdReceipt'} />
-                                    {data && (
-                                        data.map((_item: any, index: number) => (
-                                            <CellWithBar key={index} className={scss.panelHeader21}>
-                                                <div style={{ display: 'flex', alignItems: 'center' }}> {/* 新增一個容器包住箭頭和其他內容 */}
-                                                    <span style={{ paddingLeft: '20px' }}>
-                                                        {/* 添加阻止展開的事件 */}
-                                                        {/* <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-
-                                                                if (status === '未送出') {
-                                                                    handleAddProdreceiptdetail(_item);
-                                                                }
-                                                            }}
-                                                            disabled={status != '未送出'}
-                                                        >
-                                                            <img
-                                                                src={status === '未送出' ? icon_arrow_down.src : icon_arrow_down_gray.src} // 根據 poopen 狀態顯示不同的圖片
-                                                                alt="search"
-                                                                style={{ height: '20px', width: '20px' }}
-                                                            />
-                                                        </button> */}
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={checkedItems[_item.purchaseOrder.purchaseorderid] || false} // 使用狀態來控制 checkbox 是否勾選
-                                                            onChange={(e) => handleToggleProdreceiptdetail(_item, e.target.checked)}
-                                                            disabled={status !== '未送出'} // 當 status 不等於 "未送出" 時禁用 checkbox
-                                                            style={{
-                                                                transform: 'scale(1.5)', // 調整比例，1.5 表示比原來大 50%
-                                                                margin: '10px', // 增加 margin 讓 checkbox 有更大的空間
-                                                            }}
-                                                        />
-
-
+                            <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
+                                <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                    <Thead01 type={'AddPRe_ReqList'} />
+                                    {data2 && (
+                                        data2.map((_item: any, index: number) => (
+                                            <CellWithBar key={index} className={scss.panelHeader14}>
+                                                <div className={scss.row01}>
+                                                    <span>
+                                                        <button onClick={() => { alert(_item) }}>
+                                                            <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                            {/* <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
+                                                        </button>
                                                     </span>
-                                                    <Collapse defaultActiveKey={[]} onChange={() => onChange(_item)} className={scss.customCollapse} >
-                                                        <Panel
-                                                            style={{ backgroundColor: 'transparent', border: '0' }}
-                                                            key="1"
-                                                            showArrow={false}
-                                                            header={(
-                                                                <div
-                                                                    key={index}
-                                                                    className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                                >
-                                                                    <span>{index + 1}</span>
-                                                                    <span>{_item.purchaseOrder.purchaseorderid}</span>
-                                                                    <span>{_item.purchaseOrder.suppliername}</span>
-                                                                    <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
-                                                                    <span>{_item.purchaseOrder.totalprice?.toLocaleString()}</span>
-                                                                    <span>{_item.purchaseOrder.create_by}</span>
-                                                                    <span>{_item.purchaseOrder.status}</span>
-                                                                    <span>{_item.purchaseOrder.note}</span>
-                                                                    <span></span>
-                                                                </div>
-                                                            )}
-                                                        >
-                                                            <div>
-                                                                <table className={scss.detailTable}>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th style={{ width: '50px' }}>序</th>
-                                                                            <th style={{ width: '100px' }}>料號</th>
-                                                                            <th style={{ width: '300px' }}>名稱</th>
-                                                                            <th>規格</th>
-                                                                            {/* <th>已進</th> */}
-                                                                            <th>數量</th>
-                                                                            <th>單價</th>
-                                                                            <th>金額</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {_item.details.map((detail: any, detailIndex: number) => (
-                                                                            <tr key={detailIndex}>
-                                                                                <td style={{ width: '50px' }}>{detailIndex + 1}</td>
-                                                                                <td style={{ width: '100px' }}>{detail.productid}</td>
-                                                                                <td style={{ width: '300px' }}>{detail.name}</td>
-                                                                                <td>{detail.spec}</td>
-                                                                                {/* <td>{detail.alreadyinquantity}</td> */}
-                                                                                <td>{detail.quantity?.toLocaleString()}</td>
-                                                                                <td>{detail.unitprice?.toLocaleString()}</td>
-                                                                                <td>{detail.totalprice?.toLocaleString()}</td>
-                                                                            </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </Panel>
-                                                    </Collapse>
+                                                    <span>{index + 1}</span>
+                                                    <span>{_item.purchaseorderid}</span>
+                                                    <span>{_item.productid}</span>
+                                                    <span>{_item.name}</span>
+                                                    <span>{_item.spec}</span>
+                                                    <span>{_item.quantity?.toLocaleString()}</span>
+                                                    <span>{_item.unit}</span>
+                                                    <span>{_item.unitprice?.toLocaleString()}</span>
+                                                    <span>{_item.totalprice?.toLocaleString()}</span>
+                                                    <span className="truncate" title={_item.note}>{_item.note}</span>
                                                 </div>
                                             </CellWithBar>
                                         ))
                                     )}
                                 </div>
-                                {/* </span> */}
+                            </div>
+                            <div style={{ display: `${tabshow === "採購單據" ? '' : 'none'}` }}>
+                                <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                    {/* <span> */}
+                                    <div>
+                                        <Thead01 type={'PurchaseOrderForAddProdReceipt'} />
+                                        {data && (
+                                            data.map((_item: any, index: number) => (
+                                                <CellWithBar key={index} className={scss.panelHeader21}>
+                                                    <div style={{ display: 'flex', alignItems: 'center' }}> {/* 新增一個容器包住箭頭和其他內容 */}
+                                                        <span style={{ paddingLeft: '20px' }}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={checkedItems[_item.purchaseOrder.purchaseorderid] || false} // 使用狀態來控制 checkbox 是否勾選
+                                                                onChange={(e) => handleToggleProdreceiptdetail(_item, e.target.checked)}
+                                                                disabled={!(status === "未儲存" || (status === "未送出" && editmain === true))} // 當不是這兩個條件時禁用 checkbox
+                                                                style={{
+                                                                    transform: 'scale(1.5)', // 調整比例，1.5 表示比原來大 50%
+                                                                    margin: '10px', // 增加 margin 讓 checkbox 有更大的空間
+                                                                }}
+                                                            />
+
+
+
+
+                                                        </span>
+                                                        <Collapse defaultActiveKey={[]} onChange={() => onChange(_item)} className={scss.customCollapse} >
+                                                            <Panel
+                                                                style={{ backgroundColor: 'transparent', border: '0' }}
+                                                                key="1"
+                                                                showArrow={false}
+                                                                header={(
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                    >
+                                                                        <span>{index + 1}</span>
+                                                                        <span>{_item.purchaseOrder.purchaseorderid}</span>
+                                                                        <span>{_item.purchaseOrder.suppliername}</span>
+                                                                        <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
+                                                                        <span>{_item.purchaseOrder.totalprice?.toLocaleString()}</span>
+                                                                        <span>{_item.purchaseOrder.create_by}</span>
+                                                                        <span>{_item.purchaseOrder.status}</span>
+                                                                        <span>{_item.purchaseOrder.note}</span>
+                                                                        <span></span>
+                                                                    </div>
+                                                                )}
+                                                            >
+                                                                <div>
+                                                                    <table className={scss.detailTable}>
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th style={{ width: '50px' }}>序</th>
+                                                                                <th style={{ width: '100px' }}>料號</th>
+                                                                                <th style={{ width: '300px' }}>名稱</th>
+                                                                                <th>規格</th>
+                                                                                {/* <th>已進</th> */}
+                                                                                <th>數量</th>
+                                                                                <th>單價</th>
+                                                                                <th>金額</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {_item.details.map((detail: any, detailIndex: number) => (
+                                                                                <tr key={detailIndex}>
+                                                                                    <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                                                                    <td style={{ width: '100px' }}>{detail.productid}</td>
+                                                                                    <td style={{ width: '300px' }}>{detail.name}</td>
+                                                                                    <td>{detail.spec}</td>
+                                                                                    {/* <td>{detail.alreadyinquantity}</td> */}
+                                                                                    <td>{detail.quantity?.toLocaleString()}</td>
+                                                                                    <td>{detail.unitprice?.toLocaleString()}</td>
+                                                                                    <td>{detail.totalprice?.toLocaleString()}</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </Panel>
+                                                        </Collapse>
+                                                    </div>
+                                                </CellWithBar>
+                                            ))
+                                        )}
+                                    </div>
+                                    {/* </span> */}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className={scss.head_tab}>
+                    {/* <div className={scss.head_tab}>
                         <div>
                             <span>
                                 <button
@@ -991,38 +1114,12 @@ export default function AddProdReceipt() {
                             <span></span>
                         </div>
                         <div>{data2.length.toString()}</div>
-                    </div>
-                    <div className={scss.tabbody}>
+                    </div> */}
+                    {/* <div className={scss.tabbody}>
                         <div>
-                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                <Thead01 type={'AddPRe_ReqList'} />
-                                {data2 && (
-                                    data2.map((_item: any, index: number) => (
-                                        <CellWithBar key={index} className={scss.panelHeader14}>
-                                            <div className={scss.row01}>
-                                                <span>
-                                                    <button onClick={() => { alert(_item) }}>
-                                                        <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
-                                                        {/* <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
-                                                    </button>
-                                                </span>
-                                                <span>{index + 1}</span>
-                                                <span>{_item.purchaseorderid}</span>
-                                                <span>{_item.productid}</span>
-                                                <span>{_item.name}</span>
-                                                <span>{_item.spec}</span>
-                                                <span>{_item.quantity?.toLocaleString()}</span>
-                                                <span>{_item.unit}</span>
-                                                <span>{_item.unitprice?.toLocaleString()}</span>
-                                                <span>{_item.totalprice?.toLocaleString()}</span>
-                                                <span className="truncate" title={_item.note}>{_item.note}</span>
-                                            </div>
-                                        </CellWithBar>
-                                    ))
-                                )}
-                            </div>
+
                         </div>
-                    </div>
+                    </div> */}
                     <div className={scss.body_foot1}>
                         <div></div>
                         <div></div>
@@ -1217,7 +1314,7 @@ export default function AddProdReceipt() {
                                     <CellWithBar key={index} className={scss.panelHeader12}>
                                         <div
                                             key={index}
-                                            className={`${scss.row01} ${_item.purchaseorderid === selectedItemId ? scss.selectedRow : ''}`}
+                                            className={`${scss.row01} ${_item.prodreceiptid === selectedItemId ? scss.selectedRow : ''}`}
                                             onClick={() => { handleChangeChose(_item) }}>
                                             <span>{index + 1}</span>
                                             <span>{_item.prodreceiptid}</span>

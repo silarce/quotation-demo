@@ -1549,7 +1549,7 @@ export default function ProdEntryList() {
 
                             </div>
                             <div>
-                                <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${statusin === "入庫中" ? '' : 'none'}` }}>
                                     <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
                                         <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
@@ -1560,7 +1560,7 @@ export default function ProdEntryList() {
                                         <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         編輯
                                     </button>
-                                </span>
+                                </span> */}
                                 <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
                                     <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     儲存

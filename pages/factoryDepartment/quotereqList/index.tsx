@@ -2700,13 +2700,22 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
                                                 value={_item.detail_note !== undefined ? _item.detail_note : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // onChange={(e) => {
+                                                //     handleStringChange(index, "note", e.target.value);
+                                                // }}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "note", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newNote = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        detail_note: newNote
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>

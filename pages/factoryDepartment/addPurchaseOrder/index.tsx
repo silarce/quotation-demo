@@ -802,9 +802,18 @@ export default function AddPurchaseOrder() {
 
     // 從口袋清單移除
     const handleRemove = (index: number, item: any) => {
-        const updatedData = data2.filter((_, i) => i !== index);
-        setData2(updatedData);
-        RemovePurchaseOrderDetail(item.id);
+        myAlert.confirm({
+            title: '確定要移除嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+                    const updatedData = data2.filter((_, i) => i !== index);
+                    setData2(updatedData);
+                    RemovePurchaseOrderDetail(item.id);
+                }
+            }
+        })
     };
 
     // 改變數字口袋清單值
