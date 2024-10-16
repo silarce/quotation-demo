@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import moment from 'moment';
 
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
+import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,16 @@ import SearchModal, { Tprops_refine } from '..';
 
 // =====================================================================================
 
+interface TcustomFilter {
+  invoice?: {
+    value: string;
+    disabled?: boolean;
+    placeholder?: string;
+  };
+}
+
+// =====================================================================================
+
 // 由五個部分組成
 // useConfig_filter: 設定左側filter的欄位
 // useConfig_data: 設定table的欄位
@@ -26,8 +36,8 @@ import SearchModal, { Tprops_refine } from '..';
 // useInputSelProps: 將config_filter與狀態送入，建立inputSelProps
 // useData: 將filter送進去，取得資料
 
-const useSearchModal_prodreceipt = (): TuseSearchModal<Tprodreceipt_Dto> => {
-  const config_filter = useConfig_filter();
+const useSearchModal_prodreceipt = (customFilter?: TcustomFilter): TuseSearchModal<Tprodreceipt_Dto> => {
+  const config_filter = useConfig_filter(customFilter);
   const { dataConfig, dataKeyArr } = useConfig_data();
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
@@ -52,8 +62,9 @@ const useSearchModal_prodreceipt = (): TuseSearchModal<Tprodreceipt_Dto> => {
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate): TmodalData<Tprodreceipt_Dto> => {
-  const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber();
+const useData = (filter: Tstate_filter | undefined): TmodalData<Tprodreceipt_Dto> => {
+  const invoice = filter?.invoice?.trim();
+  const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
 
   const dataArr = useMemo(() => {
     let dataArr = res ?? [];
@@ -61,11 +72,11 @@ const useData = (filter: Tstate): TmodalData<Tprodreceipt_Dto> => {
     dataArr = dataArr.filter((data) => {
       let pass = true;
 
-      if (filter.invoice?.trim()) {
-        !data.invoice.includes(filter.invoice.trim()) && (pass = false);
-      }
+      // if (filter.invoice?.trim()) {
+      //   !data.invoice.includes(filter.invoice.trim()) && (pass = false);
+      // }
 
-      if (filter.prodreceiptid) {
+      if (filter?.prodreceiptid) {
         !String(data.prodreceiptid).includes(filter.prodreceiptid.trim()) && (pass = false);
       }
 
@@ -75,9 +86,9 @@ const useData = (filter: Tstate): TmodalData<Tprodreceipt_Dto> => {
     return dataArr;
   }, [res, filter]);
 
-  // useEffect(() => {
-  //   update();
-  // }, [params]);
+  useEffect(() => {
+    filter && update();
+  }, [filter]);
 
   return {
     dataArr,
@@ -175,10 +186,12 @@ const useConfig_data = () => {
 // =============================================================================
 
 // 要做i18n的處理，因此設定不能抽出hook
-const useConfig_filter = () => {
+const useConfig_filter = (fixedFilter?: TcustomFilter) => {
   const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
 
   return useMemo(() => {
+    const { invoice } = fixedFilter ?? {};
+
     const config_filter: Tconfig_filter = [
       {
         caption: 'prodreceiptid',
@@ -189,17 +202,28 @@ const useConfig_filter = () => {
         caption: t('invoiceNumber'),
         key: 'invoice',
         type: 'input',
+        defaultValue: invoice?.value,
+        disabled: invoice?.disabled,
+        placeholder: invoice?.placeholder,
       },
     ];
 
     return config_filter;
-  }, [i18n.language]);
+  }, [i18n.language, fixedFilter]);
 };
 
 // ============================================================================
 
-const SearchModal_prodreceipt = (props: Tprops_refine<Tprodreceipt_Dto>) => {
-  return <SearchModal {...props} useSearchModal={useSearchModal_prodreceipt} />;
+const SearchModal_prodreceipt = (
+  props: Tprops_refine<Tprodreceipt_Dto> & {
+    fixedFilter?: TcustomFilter;
+  }
+) => {
+  const { fixedFilter, ...rest } = props;
+
+  const instance = useSearchModal_prodreceipt(fixedFilter);
+
+  return <SearchModal {...rest} useSearchModal={() => instance} />;
 };
 
 // ============================================================================

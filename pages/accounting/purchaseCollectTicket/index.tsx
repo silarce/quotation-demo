@@ -210,7 +210,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const { purchaseCollectTicketId, ...rest } = query;
 
     router.replace({
-      query: rest,
+      query: { ...rest },
     });
     setDisabled(false);
   };
@@ -235,6 +235,13 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return true;
             }
           }}
+          fixedFilter={{
+            invoice: {
+              value: State.invoice_number,
+              disabled: true,
+              placeholder: '',
+            },
+          }}
         />
       ),
     });
@@ -244,6 +251,13 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_prodreceipt
+          fixedFilter={{
+            invoice: {
+              value: State.invoice_number,
+              disabled: true,
+              placeholder: '',
+            },
+          }}
           checkForbbiden={({ dto, dtoDirc }) => {
             if (
               //
@@ -1009,3 +1023,5 @@ class ClassState_detail implements Interface_classState_detail {
 
 // 進貨收票的發票號碼與所有明細的發票號碼皆相同
 // 所以查詢進貨單只能選擇相同發票號碼的進貨單
+
+// NE-99999999

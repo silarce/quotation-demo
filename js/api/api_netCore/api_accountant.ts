@@ -512,7 +512,7 @@ const apiGetPurchaseCollectTicketDetailByTicketId = async (id: string) => {
 };
 
 // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
-const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number?: string) => {
+const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number: string | undefined) => {
   const api = `/${subRoot}/SearchUnpaidProdreceiptByInvoiceNumber`;
   const params = {
     invoice_number,
@@ -522,8 +522,6 @@ const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number?: string) =
     .get<Tprodreceipt_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
-      myAlert.err({ title: '取得未結案進貨單失敗', content: err.message });
-
       return Promise.reject(err);
     });
 };
@@ -724,10 +722,13 @@ const useGetUnpaidProdreceiptByInvoiceNumber = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
+
   const [res, setRes] = useState<Tprodreceipt_Dto[]>();
 
   const update = useCallback(async () => {
     if (isFetching) {
+      myAlert.info({ title: '取得資料中' });
+
       return;
     }
 
