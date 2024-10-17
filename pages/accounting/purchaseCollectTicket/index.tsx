@@ -86,7 +86,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     res: raw_purchaseCollectTicket,
     // setRes,
     clear,
-    update: update_purchaseCollectTicket,
+    // update: update_purchaseCollectTicket,
     reqPatch,
     isFetching: isFetching_purchaseCollectTicket,
   } = useGetPurchaseCollectTicketById(purchaseCollectTicketId);
@@ -400,9 +400,9 @@ const BtnBar = ({
           </>
         )}
       </>
-      <>
+      {/* <>
         <SquareBtn content="delete" theme="danger" />
-      </>
+      </> */}
     </ThreePartBar>
   );
 };
