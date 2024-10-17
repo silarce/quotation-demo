@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import moment from 'moment';
 
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
+import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -49,22 +49,24 @@ const useSearchModal_customer = (): TuseSearchModal<TcustomerDto> => {
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate): TmodalData<TcustomerDto> => {
+const useData = (state_filter: Tstate_filter | undefined): TmodalData<TcustomerDto> => {
   const params: Tparams = useMemo(() => {
+    const filter = state_filter && {
+      name: {
+        $contains: state_filter.name,
+      },
+      customerNumber: {
+        $contains: state_filter.customerNumber,
+      },
+    };
+
     return {
       pageSize: 20,
       sort: 'customerNumber',
       order: 'ASC',
-      filter: {
-        name: {
-          $contains: filter.name,
-        },
-        customerNumber: {
-          $contains: filter.customerNumber,
-        },
-      },
+      filter,
     };
-  }, [filter]);
+  }, [state_filter]);
 
   const { dataArr, viewRef_bottom, isLoadingPage1, reset, meta } = useGetCustomers_infinite_2({
     customParams: params,

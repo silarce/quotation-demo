@@ -16,9 +16,9 @@ interface TnetCoreApiBody {
 
 interface Tbase {
   id: string;
-  create_by: string;
+  create_by: string | null;
   created_at: string;
-  update_by: string;
+  update_by: string | null;
   updated_at: string;
 }
 
@@ -87,6 +87,7 @@ interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
   id?: string;
 }
 
+// region TpurchaseInvoice_Dto
 interface TpurchaseInvoice_Dto extends Tbase {
   date: string | null; // 發票日期
   number: string | null; // 發票號碼
@@ -110,6 +111,91 @@ interface TpurchaseInvoice_Dto extends Tbase {
   accounting_subject: string | null; // 會計科目
 }
 
+// region purchaseCollectTicket
+interface TpurchaseCollectTicket_Dto extends Tbase {
+  serial_number: string; // 收票單號
+  applicant_department: string | null; // 申請單位
+  agent_employee_id: string; // 經辦人id
+  ticket_method: string | null; // 開票方式
+  tax_deduction_category: string | null; //  扣稅類別
+  journal_method: string | null; // 立帳方式
+  invoice_number: string | null; // 發票號碼
+  invoice_price: number | null; // 發票金額
+  note: string | null; // 備註
+}
+
+type TcreatePurchaseCollectTicket_Dto = Pick<
+  TpurchaseCollectTicket_Dto,
+  | 'applicant_department'
+  | 'agent_employee_id'
+  | 'ticket_method'
+  | 'tax_deduction_category'
+  | 'journal_method'
+  | 'invoice_number'
+  | 'invoice_price'
+  | 'note'
+> & {
+  data: TcreatePurchaseCollectTicketDetail_Dto[];
+};
+
+interface TupdatePurchaseCollectTicket_Dto extends TcreatePurchaseCollectTicket_Dto {
+  purchase_collect_ticket_uuid: string;
+  data: (TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto)[];
+}
+
+interface TpurchaseCollectTicketDetail_Dto extends Tbase {
+  purchase_collect_ticket_uuid: string; // 收票主檔uuid
+  item: string | null; // 項目名稱
+  prodreceipt_number: string | null; // 進貨單號
+  prodreceipt_uuid: string; // 進貨單uuid
+  transaction_date: string | null; // 交易日期
+  quantity: number | null; // 數量
+  goods_spec: string | null; // 貨品規格
+  unit: string | null; // 單位
+  unit_price: number | null; // 單價
+  amount: number | null; // 應開金額
+  note: string | null; // 摘要說明
+}
+
+type TcreatePurchaseCollectTicketDetail_Dto = Pick<
+  TpurchaseCollectTicketDetail_Dto,
+  'item' | 'goods_spec' | 'note' | 'transaction_date' | 'prodreceipt_uuid'
+> & {
+  // quantity: string;
+  unit_price: `${number}` | null;
+  // amount: string;
+};
+
+interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectTicketDetail_Dto {
+  detail_uuid: string;
+}
+
+// region prodreceipt
+interface Tprodreceipt_Dto extends Tbase {
+  prodreceiptid: number;
+  supplieruuid: string;
+  invoice: string | '';
+  purchaseorderuuid: string;
+  purchaseorderid: string;
+  inspected: boolean;
+  totalprice: number;
+  tax: number;
+  purchaseordercreate_at: string;
+  purchaseordercreate_by: string;
+  review_by: string;
+  review_at: string;
+  review_type: string;
+  status: string;
+  suppliername: string;
+  supplierphone: string;
+  supplieraddress: string;
+  suppliertaxid: string;
+  pay_status: string;
+  entry_status: string;
+  note: string;
+  batchid: string;
+}
+
 // ==============================================================================
 
 export type {
@@ -128,4 +214,12 @@ export type {
   TupdateApplyPayment_Dto,
   TpurchaseInvoice_Dto,
   //
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  //
+  Tprodreceipt_Dto,
 };

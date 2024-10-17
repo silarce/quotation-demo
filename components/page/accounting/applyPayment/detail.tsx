@@ -68,12 +68,20 @@ const Cell = (props: Tprops_cell) => <Cell_ori justifyContent="flex-start" align
 
 // ==============================================================================
 
-const DetailHeader = ({ disabled, onAddClick }: { disabled: boolean; onAddClick: () => void }) => {
+const DetailHeader = ({
+  className,
+  disabled,
+  onAddClick,
+}: {
+  className?: string;
+  disabled: boolean;
+  onAddClick: () => void;
+}) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
   const { t: t_commont } = useTranslation('common');
 
   return (
-    <Row thead={true}>
+    <Row thead={true} className={className}>
       <Cell {...config_other.btnCell}>
         {!disabled && <Icon_fc_add2 className="cursor-pointer translate-y-[-3px]" onClick={onAddClick} />}
       </Cell>
@@ -81,6 +89,39 @@ const DetailHeader = ({ disabled, onAddClick }: { disabled: boolean; onAddClick:
       {keyArr.map((key) => {
         const { i18nKey, style } = config[key]!;
         const label = t(i18nKey);
+
+        return (
+          <Cell key={key} style={style}>
+            {label}
+          </Cell>
+        );
+      })}
+    </Row>
+  );
+};
+
+const DetailFooter = ({ className, totalPrice }: { className?: string; totalPrice: React.ReactNode }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
+  const { t: t_common } = useTranslation('common');
+
+  return (
+    <Row thead={true} className={className}>
+      <Cell {...config_other.btnCell}></Cell>
+      <Cell {...config_other.indexNumber}></Cell>
+      {keyArr.map((key, index) => {
+        const { i18nKey, style } = config[key]!;
+
+        let label: React.ReactNode = '';
+
+        if (keyArr[index + 1] === 'amount_total') {
+          const i18nKey = config[keyArr[index + 1]]!.i18nKey;
+
+          label = t(i18nKey) + t_common('total');
+        }
+
+        if (key === 'amount_total') {
+          label = totalPrice;
+        }
 
         return (
           <Cell key={key} style={style}>
@@ -102,14 +143,19 @@ const Detail_pre = (
     disabled,
     indexNumber,
     onDeleteClick,
+    onStateUpdate,
   }: {
     raw_detail: TpurchaseInvoice_Dto | undefined;
     disabled: boolean;
     indexNumber: number;
     onDeleteClick: () => void;
+    onStateUpdate: (state: Tstate_detail) => void;
   },
   ref: React.Ref<TimperativeHandle>
 ) => {
+  // console.log('indexNumber', indexNumber);
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
   const { t } = useTranslation('accountant', { keyPrefix: 'applyPayment' });
 
   const { state, setState } = useDetail(raw_detail, disabled);
@@ -120,6 +166,11 @@ const Detail_pre = (
       state_detail: state,
     })
   );
+
+  useEffect(() => {
+    !isFirstRender && onStateUpdate(state);
+    setIsFirstRender(false);
+  }, [state]);
 
   return (
     <Row>
@@ -148,8 +199,6 @@ const Detail = forwardRef(Detail_pre);
 
 // MARK:useDetail
 const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) => {
-  const [state, setState] = useState<Tstate_detail>(emptyState_detail());
-
   const defaultState = useMemo(() => {
     if (!detail) {
       return emptyState_detail();
@@ -179,6 +228,10 @@ const useDetail = (detail: TpurchaseInvoice_Dto | undefined, disabled: boolean) 
 
     return defaultState;
   }, [detail]);
+
+  // 必須在這裡就把defaultState帶入，否則在mount的時候就會呼叫onStateUpdate
+  // 而且是每個detail都呼叫一次，效能浪費
+  const [state, setState] = useState<Tstate_detail>(defaultState);
 
   useEffect(() => {
     if (disabled) {
@@ -532,5 +585,5 @@ const emptyState_detail = (): Tstate_detail => ({
 // ==============================================================================
 
 export default Detail;
-export { DetailHeader };
+export { DetailHeader, DetailFooter };
 export type { TimperativeHandle };

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import _ from 'lodash';
 
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tconfig, TmodalData } from '../types';
+import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -52,7 +52,7 @@ const useSearchModal_applyPayment = (): TuseSearchModal<TapplyPayment_Dto> => {
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate): TmodalData<TapplyPayment_Dto> => {
+const useData = (state_filter: Tstate_filter | undefined): TmodalData<TapplyPayment_Dto> => {
   // const params: Tparams = useMemo(() => {
   //   return {
   //     pageSize: 20,

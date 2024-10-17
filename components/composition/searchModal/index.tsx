@@ -37,6 +37,7 @@ interface Tprops<Dto extends Tdto = Tdto> {
   style_table?: React.CSSProperties;
   //
   limit?: number;
+  checkForbbiden?: (props: { dto: Dto; dtoDirc: TdtoDirc<Dto> }) => boolean | void;
 }
 
 type Tprops_refine<Dto extends Tdto = Tdto> = Omit<Tprops<Dto>, 'useSearchModal'>;
@@ -55,6 +56,8 @@ export default function SearchModal<Dto extends Tdto>({
   className_table,
   style_table,
   limit,
+  //
+  checkForbbiden: checkForbbiden_ori,
 }: Tprops<Dto>) {
   const [dtoDirc, setDtoDirc] = useState<TdtoDirc<Dto>>({});
 
@@ -72,6 +75,9 @@ export default function SearchModal<Dto extends Tdto>({
   } = useSearchModal();
 
   const { t } = useTranslation('common');
+
+  // -------------------------------------------------------------------------
+  // region HANDLE
 
   const onSelect = (dto: Dto) => {
     const id = dto.id;
@@ -99,15 +105,25 @@ export default function SearchModal<Dto extends Tdto>({
     });
   };
 
-  const checkSelected = (dto: Dto) => {
-    return dto.id in dtoDirc;
-  };
-
   const onSelectedConfirm = onConfirm
     ? () => {
         onConfirm(dtoDirc);
       }
     : undefined;
+
+  // -------------------------------------------------------------------
+  // region CHECK
+  const checkSelected = (dto: Dto) => {
+    return dto.id in dtoDirc;
+  };
+
+  const checkForbbiden = (dto: Dto) => {
+    // console.log(!!checkForbbiden_ori?.({ dto, dtoDirc }));
+
+    return !!checkForbbiden_ori?.({ dto, dtoDirc });
+  };
+
+  // -------------------------------------------------------------------
 
   return (
     <div className={classNames(scss.container, className)} style={style}>
@@ -136,14 +152,19 @@ export default function SearchModal<Dto extends Tdto>({
             viewRef={viewRef}
             keyArr={dataKeyArr}
             config={dataConfig}
-            onRowClick={(dto) => {
+            onRowClick={({ dto, isSelected, isForbbiden, isError }) => {
+              if (isForbbiden) {
+                return;
+              }
+
               onRowClick?.(dto);
               onSelect(dto);
             }}
-            // onRowDoubleClick={(dto) => {
+            // onRowDoubleClick={({ dto, isSelected, isForbbiden, isError }) => {
             //   onRowDoubleClick?.(dto);
             // }}
             checkSelected={checkSelected}
+            checkForbbiden={checkForbbiden}
             className={className_table}
             style={style_table}
           />
@@ -211,6 +232,7 @@ function Table<Dto extends Tdto>({
   onRowDoubleClick,
   //
   checkSelected,
+  checkForbbiden,
   //
   className,
   style,
@@ -224,10 +246,11 @@ function Table<Dto extends Tdto>({
   keyArr: (keyof Tconfig<Dto>)[];
   config: Tconfig<Dto>;
   //
-  onRowClick?: (dto: Dto) => void;
-  onRowDoubleClick?: (dto: Dto) => void;
+  onRowClick?: (props: { dto: Dto; isSelected: boolean; isForbbiden: boolean; isError: boolean }) => void;
+  onRowDoubleClick?: (props: { dto: Dto; isSelected: boolean; isForbbiden: boolean; isError: boolean }) => void;
   //
   checkSelected: (dto: Dto) => boolean;
+  checkForbbiden: (dto: Dto) => boolean;
   //
   className?: string;
   style?: React.CSSProperties;
@@ -253,17 +276,35 @@ function Table<Dto extends Tdto>({
         const ref = index === dataArr.length - 6 ? viewRef : undefined;
 
         const isSelected = checkSelected(data);
+        const isForbbiden = checkForbbiden(data);
+        const isError = isSelected && isForbbiden;
 
         return (
           <Row
             key={id ?? index}
             ref={ref}
-            className={classNames(scss.row, isSelected && scss.seleted)}
+            className={classNames(
+              //
+              scss.row,
+              isSelected && scss.seleted,
+              isForbbiden && scss.forbidden,
+              isError && scss.error
+            )}
             onClick={() => {
-              onRowClick?.(data);
+              onRowClick?.({
+                dto: data,
+                isSelected,
+                isForbbiden,
+                isError,
+              });
             }}
             onDoubleClick={() => {
-              onRowDoubleClick?.(data);
+              onRowDoubleClick?.({
+                dto: data,
+                isSelected,
+                isForbbiden,
+                isError,
+              });
             }}
           >
             {keyArr.map((key) => {
