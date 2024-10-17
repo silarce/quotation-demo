@@ -756,9 +756,11 @@ export default function PurchaseRequisitionList() {
                 totalprice: (parseFloat(item.detail_unitprice) * parseFloat(quotereqquantity)).toFixed(2),
                 suppliername: item.detail_suppliername,
                 quotereqdetailuuid: item.detail_id,
-                suppliertaxid: item.main_suppliertaxid,
-                supplieraddress: item.main_supplieraddress,
-                supplierphone: item.main_supplierphone
+                suppliertaxid: item.detail_suppliertaxid,
+                supplieraddress: item.detail_supplieraddress,
+                supplierphone: item.detail_supplierphone,
+                suppliercontact:item.detail_suppliercontact,
+                supplierfax:item.detail_supplierfax
             };
 
             var inputModel = {
