@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import moment from 'moment';
+import _ from 'lodash';
 
 import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
@@ -22,6 +23,7 @@ import SearchModal, { Tprops_refine } from '..';
 interface Toptions {
   coverFilter?: Tconfig_filter;
   customKeyArr?: string[];
+  uniqInvoice?: boolean;
 }
 
 // =====================================================================================
@@ -39,7 +41,7 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
-  const { dataArr, viewRef, isLoading, qty } = useData(filter);
+  const { dataArr, viewRef, isLoading, qty } = useData(filter, options?.uniqInvoice);
 
   return {
     inputSelPropsArr,
@@ -59,7 +61,7 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate_filter | undefined): TmodalData<Tprodreceipt_Dto> => {
+const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): TmodalData<Tprodreceipt_Dto> => {
   const invoice = filter?.invoice?.trim();
   const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
 
@@ -79,6 +81,8 @@ const useData = (filter: Tstate_filter | undefined): TmodalData<Tprodreceipt_Dto
 
       return pass;
     });
+
+    uniqInvoice && (dataArr = _.uniqBy(dataArr, 'invoice'));
 
     return dataArr;
   }, [res, filter]);
