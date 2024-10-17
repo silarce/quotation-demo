@@ -68,6 +68,7 @@ type Interface_classState = Pick<
   detailAmountTotal: string;
   addDetail: (state_detailArr: Tstate_detail[]) => Interface_classState;
   deleteDetail: (identifyId: string) => Interface_classState;
+  clearDetail: () => Interface_classState;
   //
   reqBody: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto;
 };

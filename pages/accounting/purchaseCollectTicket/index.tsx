@@ -10,7 +10,10 @@ import { Spin } from 'antd';
 
 // components
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/purchaseCollectTicket/detail';
-import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
+import {
+  SearchModal_prodreceipt,
+  Tconfig_filter,
+} from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 import { SearchModal_purchaseCollectTicket } from 'components/composition/searchModal/useSearchModal/useSearchModal_purchaseCollectTicket';
 import { Profile } from 'components/page/accounting/purchaseCollectTicket/profile';
 // class
@@ -68,7 +71,8 @@ type Tquery = {
 // ===========================================================================
 
 // MARK: START
-
+// 進貨收票的發票號碼與所有明細的發票號碼皆相同
+// 所以查詢進貨單只能選擇相同發票號碼的進貨單
 export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
 
@@ -102,6 +106,11 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   const State = useMemo(() => {
     return new ClassState(state, setState, ClassState_detail);
   }, [state]);
+
+  // ------------------------------------------------------------
+
+  const customerFilter = useCustomerFilter();
+  const customerFilter_forDetail = useCustomerFilter_forDetail(State);
 
   // ------------------------------------------------------------
 
@@ -185,12 +194,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return true;
             }
           }}
-          fixedFilter={{
-            invoice: {
-              value: State.invoice_number,
-              disabled: true,
-              placeholder: '',
-            },
+          options={{
+            customKeyArr: ['indexNumber', 'invoice'],
+            coverFilter: customerFilter,
           }}
         />
       ),
@@ -215,12 +221,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_prodreceipt
-          fixedFilter={{
-            invoice: {
-              value: State.invoice_number,
-              disabled: true,
-              placeholder: '',
-            },
+          options={{
+            coverFilter: customerFilter_forDetail,
           }}
           checkForbbiden={({ dto, dtoDirc }) => {
             if (
@@ -478,25 +480,49 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
   detailArr: [],
 });
 
-// const emptyuState_detail = (): Tstate_detail => ({
-//   updateCount: 0,
-//   id: undefined,
-//   identifyId: nanoid(),
-//   //
-//   item: '',
-//   prodreceipt_number: '',
-//   transaction_date: null,
-//   quantity: '',
-//   unit: '',
-//   unit_price: '',
-//   amount: '',
-//   note: '',
-//   //
-//   goods_spec: '',
-//   prodreceipt_uuid: undefined,
-// });
-
 // =============================================================================
 
-// 進貨收票的發票號碼與所有明細的發票號碼皆相同
-// 所以查詢進貨單只能選擇相同發票號碼的進貨單
+const useCustomerFilter = () => {
+  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+
+  const confit_filter: Tconfig_filter = useMemo(() => {
+    return [
+      {
+        // caption: t('invoiceNumber'),
+        caption: '完整發票號碼',
+        key: 'invoice',
+        type: 'input',
+        // placeholder: '完整發票號碼',
+      },
+    ];
+  }, [i18n.language]);
+
+  return confit_filter;
+};
+
+const useCustomerFilter_forDetail = (State: Interface_classState) => {
+  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+
+  const config_filter: Tconfig_filter = useMemo(() => {
+    const filter: Tconfig_filter = [
+      {
+        caption: 'prodreceiptid',
+        key: 'prodreceiptid',
+        type: 'input',
+      },
+      {
+        // caption: t('invoiceNumber'),
+        caption: '完整發票號碼',
+        key: 'invoice',
+        type: 'input',
+        defaultValue: State.invoice_number,
+        disabled: !!State.invoice_number,
+        placeholder: '',
+      },
+    ];
+
+    return filter;
+  }, [State.invoice_number]);
+
+  return config_filter;
+};
