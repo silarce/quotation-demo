@@ -307,6 +307,19 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   };
 
   // ------------------------------------------------------------
+
+  if (!isAdmin) {
+    return (
+      <SubLayer bodyPreStyle="style01">
+        <PageHeader02 tag={t('purchaseCollectTicket')} />
+        <div>
+          <h1 className="text-5xl">施工中</h1>
+        </div>
+      </SubLayer>
+    );
+  }
+
+  // ------------------------------------------------------------
   // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
