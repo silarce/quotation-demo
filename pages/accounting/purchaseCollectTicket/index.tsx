@@ -26,6 +26,7 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './index.module.scss';
@@ -196,6 +197,19 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
+  // MARK:handleClearInvoice
+  const handleClearInvoice = () => {
+    myAlert.confirm({
+      title: '清除發票將一併清除明細資料',
+      props: {
+        onOk: () => {
+          State.invoice_number = '';
+          State.clearDetail();
+        },
+      },
+    });
+  };
+
   // MARK: handleSelectDetail
   const handleSelectDetail = () => {
     const { unmount } = DragableModal.create({
@@ -291,7 +305,17 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           onConfirmClick={handelConfirm}
         />
         <Spin spinning={isFetching || isFetching_purchaseCollectTicket} delay={300}>
-          <Profile disabled={disabled} classState={State} onInovoiceBtnClick={handleSelectInvoice} />
+          <Profile
+            //
+            disabled={disabled}
+            classState={State}
+            onInovoiceBtnClick={handleSelectInvoice}
+            invoiceBtn={{
+              onSelectClick: handleSelectInvoice,
+              onClearClick: handleClearInvoice,
+              status: State.invoice_number ? 'selected' : 'unselected',
+            }}
+          />
           <div className="mt-2 ">
             <div>
               <span className="text-xl text-main mr-5">{t('detail')}</span>

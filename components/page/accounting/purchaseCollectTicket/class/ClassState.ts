@@ -189,6 +189,17 @@ class ClassState implements Interface_classState {
 
     return this;
   }
+
+  clearDetail() {
+    this.setState((state) => {
+      return {
+        ...state,
+        detailArr: [],
+      };
+    });
+
+    return this;
+  }
 } // ClassState
 
 export { ClassState };

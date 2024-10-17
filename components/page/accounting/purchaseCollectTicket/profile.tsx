@@ -17,10 +17,16 @@ const Profile = ({
   disabled,
   classState,
   onInovoiceBtnClick,
+  invoiceBtn,
 }: {
   disabled: boolean;
   classState: Interface_classState;
   onInovoiceBtnClick: () => void;
+  invoiceBtn: {
+    onSelectClick: () => void;
+    onClearClick: () => void;
+    status: 'selected' | 'unselected';
+  };
 }) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
   const { t: t_common } = useTranslation('common');
@@ -129,9 +135,17 @@ const Profile = ({
         suffix={
           <SquareBtn
             className={classNames(disabled && 'invisible')}
-            label={t('selectInvoice')}
+            label={invoiceBtn.status === 'selected' ? t_common('clear') : t('selectInvoice')}
             sharp="mini"
-            onClick={onInovoiceBtnClick}
+            onClick={() => {
+              const { onSelectClick, onClearClick, status } = invoiceBtn;
+
+              if (status === 'selected') {
+                onClearClick();
+              } else {
+                onSelectClick();
+              }
+            }}
           />
         }
       />

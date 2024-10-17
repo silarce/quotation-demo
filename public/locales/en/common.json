@@ -30,5 +30,6 @@
   "confirm": "Confirm",
   "agent": "Agent",
   "subtotal": "Subtotal",
-  "total": "Total"
+  "total": "Total",
+  "clear": "Clear"
 }
