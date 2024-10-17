@@ -12,6 +12,10 @@ import { Spin } from 'antd';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/purchaseCollectTicket/detail';
 import { SearchModal_prodreceipt } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 import { SearchModal_purchaseCollectTicket } from 'components/composition/searchModal/useSearchModal/useSearchModal_purchaseCollectTicket';
+import { Profile } from 'components/page/accounting/purchaseCollectTicket/profile';
+// class
+import { ClassState } from 'components/page/accounting/purchaseCollectTicket/class/ClassState';
+import { ClassState_detail } from 'components/page/accounting/purchaseCollectTicket/class/ClassState_detail';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -160,12 +164,6 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     reqPatch,
     isFetching: isFetching_purchaseCollectTicket,
   } = useGetPurchaseCollectTicketById(purchaseCollectTicketId);
-  // "88f78fe4-4ca0-4577-abcd-27dcced43e3a"
-  // "aa364336-1836-434f-af8f-de1b10f06057"
-  // "5f34502e-0741-43c1-ba07-2191d709ba7b"
-  // "8dce7a3c-b63c-44fa-a96f-e07647e61500"
-  // "b94c34eb-0f88-4c8c-adaa-43f0aad0210a"
-  // "d4c94da0-9a36-4f45-9af6-ff7a224c8e54"
 
   // console.log(raw_purchaseCollectTicket);
 
@@ -206,7 +204,13 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // ------------------------------------------------------------
 
   // region Handle
-
+  //
+  //
+  //
+  //
+  //
+  //
+  // MARK:handleNewPurchaseCollectTicket
   const handleNewPurchaseCollectTicket = () => {
     const { purchaseCollectTicketId, ...rest } = query;
     clear();
@@ -217,6 +221,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     setDisabled(false);
   };
 
+  // MARK:handleSelectTicket
   const handleSelectTicket = () => {
     DragableModal.create({
       children: (
@@ -235,6 +240,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
+  // MARK:handleSelectInvoice
   const handleSelectInvoice = () => {
     const { unmount } = DragableModal.create({
       children: (
@@ -267,6 +273,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
+  // MARK: handleSelectDetail
   const handleSelectDetail = () => {
     const { unmount } = DragableModal.create({
       children: (
@@ -298,8 +305,16 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             }
           }}
           onConfirm={(dict) => {
+            let invoiceNumber = '';
             const arr = Object.values(dict).map((prodreceipt) => {
-              const { id, prodreceiptid, note } = prodreceipt;
+              const { id, prodreceiptid, note, invoice } = prodreceipt;
+              invoiceNumber = invoice; // 沒差錯的話所有prodreceipt.invoice都一樣
+
+              if (invoiceNumber && invoiceNumber !== invoice) {
+                console.log('invoice number is not the same', dict);
+
+                throw new Error('invoice number is not the same');
+              }
 
               const state_detail: Tstate_detail = {
                 updateCount: 0,
@@ -321,6 +336,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             });
 
             State.addDetail(arr);
+            State.invoice_number = invoiceNumber;
             unmount();
           }}
         />
@@ -328,6 +344,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
+  // MARK: handelConfirm
   const handelConfirm = () => {
     if (raw_purchaseCollectTicket) {
     } else {
@@ -421,153 +438,6 @@ const BtnBar = ({
         <SquareBtn content="delete" theme="danger" />
       </>
     </ThreePartBar>
-  );
-};
-
-// MARK: Profile
-const Profile = ({
-  //
-  disabled,
-  classState,
-  onInovoiceBtnClick,
-}: {
-  disabled: boolean;
-  classState: Interface_classState;
-  onInovoiceBtnClick: () => void;
-}) => {
-  const { t } = useTranslation('accounting', { keyPrefix: 'purchaseCollectTicket' });
-  const { t: t_common } = useTranslation('common');
-
-  const { optionArr_name, update } = useDepartments();
-
-  useEffect(() => {
-    update();
-  }, []);
-
-  return (
-    <div className="global_grid01">
-      <InputSel
-        caption={t('serial_number')}
-        showBaseline="invisible"
-        inputProps={{
-          props: {
-            defaultValue: classState.serial_number,
-            placeholder: '儲存後自動產生',
-            readOnly: true,
-          },
-        }}
-      />
-      <InputSel
-        caption={t('serial_number')}
-        showBaseline="auto"
-        disabled={disabled}
-        selectProps={{
-          props: {
-            placeholder: '請選擇支出部門',
-            options: optionArr_name,
-            value: classState.applicant_department
-              ? {
-                  value: classState.applicant_department,
-                  label: classState.applicant_department,
-                }
-              : null,
-            onChange: (option) => {
-              classState.applicant_department = option?.value ?? '';
-            },
-          },
-        }}
-      />
-      <InputSel caption={t_common('agent')} showBaseline="invisible" node={classState.agentName} />
-      <div />
-      {/*  */}
-      <InputSel
-        caption={t('ticket_method')}
-        disabled={disabled}
-        showBaseline="auto"
-        inputProps={{
-          props: {
-            value: classState.ticket_method,
-            onChange: (e) => {
-              classState.ticket_method = e.target.value;
-            },
-            readOnly: disabled,
-            disabled: false,
-          },
-        }}
-      />
-
-      <InputSel
-        caption={t('tax_deduction_category')}
-        disabled={disabled}
-        showBaseline="auto"
-        inputProps={{
-          props: {
-            value: classState.tax_deduction_category,
-            onChange: (e) => {
-              classState.tax_deduction_category = e.target.value;
-            },
-            readOnly: disabled,
-            disabled: false,
-          },
-        }}
-      />
-      <InputSel
-        caption={t('journal_method')}
-        showBaseline="auto"
-        disabled={disabled}
-        inputProps={{
-          props: {
-            value: classState.journal_method,
-            onChange: (e) => {
-              classState.journal_method = e.target.value;
-            },
-            readOnly: disabled,
-            disabled: false,
-          },
-        }}
-      />
-      <div />
-      {/*  */}
-
-      <InputSel
-        caption={t('invoice_number')}
-        showBaseline="invisible"
-        inputProps={{
-          props: {
-            value: classState.invoice_number,
-            placeholder: '請選擇發票',
-            readOnly: true,
-          },
-        }}
-        suffix={
-          <SquareBtn
-            className={classNames(disabled && 'invisible')}
-            label={t('selectInvoice')}
-            sharp="mini"
-            onClick={onInovoiceBtnClick}
-          />
-        }
-      />
-      <div />
-      <div />
-      <div />
-      {/*  */}
-      <InputSel
-        caption={t('note')}
-        disabled={disabled}
-        showBaseline="auto"
-        inputProps={{
-          props: {
-            value: classState.note,
-            onChange: (e) => {
-              classState.note = e.target.value;
-            },
-            readOnly: disabled,
-            disabled: false,
-          },
-        }}
-      />
-    </div>
   );
 };
 
@@ -681,367 +551,5 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
 
 // =============================================================================
 
-// MARK:ClassState
-class ClassState implements Interface_classState {
-  private readonly state;
-  private readonly setState;
-  readonly detailArr: Interface_classState_detail[] = [];
-  //
-  constructor(
-    //
-    state: Tstate,
-    setState: React.Dispatch<React.SetStateAction<Tstate>>,
-    ClassDetail: new (
-      state_datail: Tstate_detail,
-      setState_detail: (state_detail: Tstate_detail) => void,
-      parent: Interface_classState
-    ) => Interface_classState_detail
-  ) {
-    this.state = state;
-    this.setState = setState;
-
-    this.detailArr = state.detailArr.map((detail, index) => {
-      const setState_detail = (state_detail: Tstate_detail) => {
-        setState((state) => {
-          const newDetailArr = [...state.detailArr];
-          newDetailArr[index] = state_detail;
-
-          return {
-            ...state,
-            detailArr: newDetailArr,
-          };
-        });
-      };
-
-      return new ClassDetail(detail, setState_detail, this);
-    });
-  } // constructor
-  //
-  get agentName() {
-    return this.state.agent_employee?.chName ?? '';
-  }
-  get serial_number() {
-    return this.state.serial_number ?? '';
-  }
-  get applicant_department() {
-    return this.state.applicant_department;
-  }
-  set applicant_department(department: string) {
-    this.setState((state) => ({
-      ...state,
-      applicant_department: department,
-    }));
-  }
-  get ticket_method() {
-    return this.state.ticket_method;
-  }
-  set ticket_method(method: string) {
-    this.setState((state) => ({
-      ...state,
-      ticket_method: method,
-    }));
-  }
-  get tax_deduction_category() {
-    return this.state.tax_deduction_category;
-  }
-  set tax_deduction_category(category: string) {
-    this.setState((state) => ({
-      ...state,
-      tax_deduction_category: category,
-    }));
-  }
-  get journal_method() {
-    return this.state.journal_method;
-  }
-  set journal_method(method: string) {
-    this.setState((state) => ({
-      ...state,
-      journal_method: method,
-    }));
-  }
-  get invoice_number() {
-    return this.state.invoice_number;
-  }
-  set invoice_number(number: string) {
-    this.setState((state) => ({
-      ...state,
-      invoice_number: number,
-    }));
-  }
-  get invoice_price() {
-    return Number(this.state.invoice_price).toLocaleString();
-  }
-  get note() {
-    return this.state.note;
-  }
-  set note(note: string) {
-    this.setState((state) => ({
-      ...state,
-      note: note,
-    }));
-  }
-
-  get detailAmountTotal() {
-    let total = new Decimal(0);
-    this.detailArr.forEach(({ amount }) => {
-      total = total.add(amount || 0);
-    });
-
-    return total.toNumber().toLocaleString();
-  }
-
-  get reqBody() {
-    const {
-      id,
-      agent_employee,
-      applicant_department,
-      ticket_method,
-      tax_deduction_category,
-      journal_method,
-      invoice_number,
-      invoice_price,
-      note,
-    } = this.state;
-
-    const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
-      purchase_collect_ticket_uuid: id,
-      applicant_department: applicant_department,
-      agent_employee_id: agent_employee?.id || '',
-      ticket_method: ticket_method,
-      tax_deduction_category: tax_deduction_category,
-      journal_method: journal_method,
-      invoice_number: invoice_number,
-      invoice_price: Number(invoice_price),
-      note: note,
-      data: this.detailArr.map((classDetail) => classDetail.reqBody),
-    };
-
-    return body;
-  }
-
-  // ------------------------------------------------------------
-  chagneAgent(agent: TemployeeDto) {
-    this.setState((state) => ({
-      ...state,
-      agent_employee: agent,
-    }));
-
-    return this;
-  }
-
-  changeInvoice({
-    invoiceNumber,
-  }: {
-    invoiceNumber: string;
-    // 後端說invoicePrice不用管，
-    // invoicePrice: `${number}` | number;
-  }) {
-    this.setState((state) => ({
-      ...state,
-      invoice_number: invoiceNumber,
-      // invoice_price: `${invoicePrice}`,
-    }));
-
-    return this;
-  }
-
-  addDetail(newState_detailArr: Tstate_detail[]) {
-    this.setState((state) => {
-      return {
-        ...state,
-        detailArr: [...state.detailArr, ...newState_detailArr],
-      };
-    });
-    // 不需要做其他的操作，更新狀態就會重新建立class了
-
-    return this;
-  }
-
-  deleteDetail(identifyId: string) {
-    this.setState((state) => {
-      return {
-        ...state,
-        detailArr: state.detailArr.filter((classDetail) => classDetail.identifyId !== identifyId),
-      };
-    });
-
-    return this;
-  }
-} // ClassState
-
-// MARK:ClassState_detail
-class ClassState_detail implements Interface_classState_detail {
-  state_datail;
-  setState_detail;
-  parent;
-  constructor(
-    //
-    state_datail: Tstate_detail,
-    setState_detail: (state_detail: Tstate_detail) => void,
-    parent: Interface_classState
-  ) {
-    this.state_datail = state_datail;
-    this.setState_detail = setState_detail;
-    this.parent = parent;
-  } // constructor
-
-  get identifyId() {
-    return this.state_datail.identifyId;
-  }
-
-  get updateCount() {
-    return this.state_datail.updateCount;
-  }
-
-  get item() {
-    return this.state_datail.item;
-  }
-  set item(item: string) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      item: item,
-    });
-  }
-
-  get prodreceipt_number() {
-    return this.state_datail.prodreceipt_number;
-  }
-
-  get transaction_date() {
-    return this.state_datail.transaction_date;
-  }
-  set transaction_date(date: Moment | null) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      transaction_date: date,
-    });
-  }
-
-  get quantity() {
-    return this.state_datail.quantity;
-  }
-  set quantity(value) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      quantity: value,
-    });
-  }
-
-  get unit() {
-    return this.state_datail.unit;
-  }
-  set unit(unit: string) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      unit: unit,
-    });
-  }
-
-  get unit_price() {
-    return this.state_datail.unit_price;
-  }
-  set unit_price(price) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      unit_price: price,
-    });
-  }
-
-  get amount() {
-    return this.state_datail.amount;
-  }
-  set amount(amount) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      amount: amount,
-    });
-  }
-
-  get note() {
-    return this.state_datail.note;
-  }
-  set note(note) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      note: note,
-    });
-  }
-
-  get goods_spec() {
-    return this.state_datail.goods_spec;
-  }
-  set goods_spec(spec) {
-    this.countUpdate();
-    this.setState_detail({
-      ...this.state_datail,
-      goods_spec: spec,
-    });
-  }
-
-  get reqBody() {
-    const {
-      id,
-      prodreceipt_uuid,
-      //
-      item,
-      goods_spec,
-      unit_price,
-      note,
-      transaction_date,
-    } = this.state_datail;
-
-    const body: TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto = {
-      detail_uuid: id,
-      item: item,
-      goods_spec: goods_spec,
-      unit_price: unit_price || null,
-      note: note,
-      transaction_date: transaction_date?.toISOString() || null,
-      prodreceipt_uuid,
-    };
-
-    return body;
-  }
-
-  // ------------------------------------------------------------
-  private countUpdate() {
-    this.setState_detail({
-      ...this.state_datail,
-      updateCount: this.state_datail.updateCount + 1,
-    });
-
-    return this;
-  }
-
-  changeProdreceipt({ prodreceiptNumber, prodreceiptId }: { prodreceiptNumber: string; prodreceiptId: string }) {
-    this.setState_detail({
-      ...this.state_datail,
-      prodreceipt_number: prodreceiptNumber,
-      prodreceipt_uuid: prodreceiptId,
-    });
-
-    this.countUpdate();
-
-    return this;
-  }
-
-  deleteSelf() {
-    this.parent.deleteDetail(this.identifyId);
-
-    return this;
-  }
-} // ClassState_detail
-
-// ===============================================================================
-
 // 進貨收票的發票號碼與所有明細的發票號碼皆相同
 // 所以查詢進貨單只能選擇相同發票號碼的進貨單
-
-// NE-99999999
