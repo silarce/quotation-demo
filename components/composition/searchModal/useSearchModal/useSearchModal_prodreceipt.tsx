@@ -19,12 +19,9 @@ import SearchModal, { Tprops_refine } from '..';
 
 // =====================================================================================
 
-interface TcustomFilter {
-  invoice?: {
-    value: string;
-    disabled?: boolean;
-    placeholder?: string;
-  };
+interface Toptions {
+  coverFilter?: Tconfig_filter;
+  customKeyArr?: string[];
 }
 
 // =====================================================================================
@@ -36,9 +33,9 @@ interface TcustomFilter {
 // useInputSelProps: 將config_filter與狀態送入，建立inputSelProps
 // useData: 將filter送進去，取得資料
 
-const useSearchModal_prodreceipt = (customFilter?: TcustomFilter): TuseSearchModal<Tprodreceipt_Dto> => {
-  const config_filter = useConfig_filter(customFilter);
-  const { dataConfig, dataKeyArr } = useConfig_data();
+const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodreceipt_Dto> => {
+  const config_filter = useConfig_filter(options?.coverFilter);
+  const { dataConfig, dataKeyArr } = useConfig_data(options?.customKeyArr);
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
@@ -100,7 +97,7 @@ const useData = (filter: Tstate_filter | undefined): TmodalData<Tprodreceipt_Dto
 // =============================================================================
 
 // 要做i18n的處理，因此設定不能抽出hook
-const useConfig_data = () => {
+const useConfig_data = (customKeyArr?: string[]) => {
   const { t: t_common } = useTranslation('common');
   const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
 
@@ -169,7 +166,7 @@ const useConfig_data = () => {
     return config;
   }, [i18n.language]);
 
-  const dataKeyArr: string[] = [
+  const dataKeyArr: string[] = customKeyArr || [
     //
     'indexNumber',
     'prodreceiptid',
@@ -186,42 +183,38 @@ const useConfig_data = () => {
 // =============================================================================
 
 // 要做i18n的處理，因此設定不能抽出hook
-const useConfig_filter = (fixedFilter?: TcustomFilter) => {
+const useConfig_filter = (customerFilterConfig?: Tconfig_filter) => {
   const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
 
   return useMemo(() => {
-    const { invoice } = fixedFilter ?? {};
-
-    const config_filter: Tconfig_filter = [
+    const config_filter: Tconfig_filter = customerFilterConfig || [
       {
         caption: 'prodreceiptid',
         key: 'prodreceiptid',
         type: 'input',
       },
       {
-        caption: t('invoiceNumber'),
+        // caption: t('invoiceNumber'),
+        caption: '完整發票號碼',
         key: 'invoice',
         type: 'input',
-        defaultValue: invoice?.value,
-        disabled: invoice?.disabled,
-        placeholder: invoice?.placeholder,
       },
     ];
 
     return config_filter;
-  }, [i18n.language, fixedFilter]);
+  }, [i18n.language, customerFilterConfig]);
 };
 
 // ============================================================================
 
 const SearchModal_prodreceipt = (
   props: Tprops_refine<Tprodreceipt_Dto> & {
-    fixedFilter?: TcustomFilter;
+    options?: Toptions;
   }
 ) => {
-  const { fixedFilter, ...rest } = props;
+  const { options, ...rest } = props;
 
-  const instance = useSearchModal_prodreceipt(fixedFilter);
+  const instance = useSearchModal_prodreceipt(options);
 
   return <SearchModal {...rest} useSearchModal={() => instance} />;
 };
@@ -230,4 +223,4 @@ const SearchModal_prodreceipt = (
 
 // 進貨單
 export { useSearchModal_prodreceipt, SearchModal_prodreceipt };
-export type { Tprodreceipt_Dto };
+export type { Tprodreceipt_Dto, Tconfig_filter };
