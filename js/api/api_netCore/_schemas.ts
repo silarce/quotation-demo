@@ -178,7 +178,7 @@ interface Tpayment_order_Dto extends Tbase {
   beneficiaryName: string | null; // 廠商名稱
   applicantDate: string | null; // 申請日期
   applicantDepartment: string | null; // 申請單位
-  agentEmployeeId: string | null; // 經辦人Id
+  agentEmployeeId: string; // 經辦人Id
   offsetMethod: string | null; // 沖銷方式
   payableMethod: string | null; // 支付方式
   payableAmount: string | null; // 付款金額
@@ -186,26 +186,6 @@ interface Tpayment_order_Dto extends Tbase {
   deduction: number | null; // 折扣金額
   actualPaid: number | null; // 實付金額
   note: string | null; // 備註
-}
-
-interface Taccount_payable_Dto extends Tbase {
-  serialNumber: string | null; // 編號(單號)
-  invoiceTitle: string | null; // 發票抬頭
-  invoiceDate: string | null; // 發票日期
-  invoiceNumber: string | null; // 發票號碼
-  invoicePrice: number | null; // 發票金額
-  reviewStatus: string | null; // 審核狀態
-  paymentStatus: string | null; // 付款狀態
-  balance: number | null; // 未付款金額
-  note: string | null; // 備註
-  paymentOrderUuid: string | null; // 付款申請單uuid
-  paymentOrderSerialNumber: string | null; // 付款申請單號
-  purchase_invoice_uuid: string | null; // 進項發票uuid
-  supplier_uuid: string | null; // 廠商uuid,
-  supplier: string | null; // 廠商名
-  transaction_date: string | null; // 交易日期(付款日期?)
-  source_number: string | null; // 經辦人員
-  settled_amount: string | null; // 已付金額
 }
 
 interface TpaymentOrderDetail_Dto extends Tbase {
@@ -241,6 +221,26 @@ interface TcreatePaymentOrder_Dto {
   actualpaid: string | null;
   note: string | null;
   data: TcreatePaymentOrderDetail_Dto[];
+}
+
+interface Taccount_payable_Dto extends Tbase {
+  serialNumber: string | null; // 編號(單號)
+  invoiceTitle: string | null; // 發票抬頭
+  invoiceDate: string | null; // 發票日期
+  invoiceNumber: string | null; // 發票號碼
+  invoicePrice: number | null; // 發票金額
+  reviewStatus: string | null; // 審核狀態
+  paymentStatus: string | null; // 付款狀態
+  balance: number | null; // 未付款金額
+  note: string | null; // 備註
+  paymentOrderUuid: string | null; // 付款申請單uuid
+  paymentOrderSerialNumber: string | null; // 付款申請單號
+  purchase_invoice_uuid: string | null; // 進項發票uuid
+  supplier_uuid: string | null; // 廠商uuid,
+  supplier: string | null; // 廠商名
+  transaction_date: string | null; // 交易日期(付款日期?)
+  source_number: string | null; // 經辦人員
+  settled_amount: string | null; // 已付金額
 }
 
 // MARK: ============
