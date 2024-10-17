@@ -170,6 +170,88 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
   detail_uuid: string;
 }
 
+// MARK:payment_order
+
+interface Tpayment_order_Dto extends Tbase {
+  serialNumber: string | null; // 申請單編號
+  beneficiaryUuid: string | null; // 廠商uuid
+  beneficiaryName: string | null; // 廠商名稱
+  applicantDate: string | null; // 申請日期
+  applicantDepartment: string | null; // 申請單位
+  agentEmployeeId: string | null; // 經辦人Id
+  offsetMethod: string | null; // 沖銷方式
+  payableMethod: string | null; // 支付方式
+  payableAmount: string | null; // 付款金額
+  remittanceFee: number | null; // 匯費外加
+  deduction: number | null; // 折扣金額
+  actualPaid: number | null; // 實付金額
+  note: string | null; // 備註
+}
+
+interface Taccount_payable_Dto extends Tbase {
+  serialNumber: string | null; // 編號(單號)
+  invoiceTitle: string | null; // 發票抬頭
+  invoiceDate: string | null; // 發票日期
+  invoiceNumber: string | null; // 發票號碼
+  invoicePrice: number | null; // 發票金額
+  reviewStatus: string | null; // 審核狀態
+  paymentStatus: string | null; // 付款狀態
+  balance: number | null; // 未付款金額
+  note: string | null; // 備註
+  paymentOrderUuid: string | null; // 付款申請單uuid
+  paymentOrderSerialNumber: string | null; // 付款申請單號
+  purchase_invoice_uuid: string | null; // 進項發票uuid
+  supplier_uuid: string | null; // 廠商uuid,
+  supplier: string | null; // 廠商名
+  transaction_date: string | null; // 交易日期(付款日期?)
+  source_number: string | null; // 經辦人員
+  settled_amount: string | null; // 已付金額
+}
+
+interface TpaymentOrderDetail_Dto extends Tbase {
+  payment_order_id: string | null; // 付款申請單uuid
+  source_number: string | null; // 立帳來源單號
+  transaction_date: string | null; // 交易日期
+  payment_date: string | null; // 付款日期
+  payable_amount: number | null; // 應付帳款
+  invoice_number: string | null; // 發票號碼
+  settled_amount: number | null; // 已付帳款
+  balance: number | null; // 未付款餘額
+  note: string | null; // 備註
+  // payment_order_id: string; //付款申請主檔id
+  account_apayable_uuid: string; //應付帳款uuid
+}
+
+type TcreatePaymentOrderDetail_Dto = Pick<
+  TpaymentOrderDetail_Dto,
+  'source_number' | 'transaction_date' | 'payment_date' | 'invoice_number' | 'note' | 'payable_amount'
+> & {
+  account_payable_id: string;
+};
+
+interface TcreatePaymentOrder_Dto {
+  beneficiary_uuid: string | null;
+  applicant_date: string | null;
+  applicant_department: string | null;
+  agent_employee_id: string | null;
+  offset_method: string | null;
+  total: string | null;
+  remittance_fee: string | null;
+  deduction: string | null;
+  actualpaid: string | null;
+  note: string | null;
+  data: TcreatePaymentOrderDetail_Dto[];
+}
+
+// MARK: ============
+//
+//
+//
+// region =WareHouse=
+//
+//
+//
+
 // region prodreceipt
 interface Tprodreceipt_Dto extends Tbase {
   prodreceiptid: number;
@@ -220,6 +302,11 @@ export type {
   TpurchaseCollectTicketDetail_Dto,
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
+  Tpayment_order_Dto,
+  Taccount_payable_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
   //
   Tprodreceipt_Dto,
 };
