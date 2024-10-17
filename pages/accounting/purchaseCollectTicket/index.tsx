@@ -117,7 +117,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // region REQUEST
 
   const reqNewPurchaseCollectTicket = async () => {
-    const body: TcreatePurchaseCollectTicket_Dto = State.reqBody;
+    const body: TcreatePurchaseCollectTicket_Dto = State.reqBody.body_create;
     setIsFetching(true);
     await apiPostAddPurchaseCollectTicket(body)
       .then((id) => {
@@ -132,6 +132,21 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
       .finally(() => {
         setIsFetching(false);
       });
+  };
+
+  const reqUpdatePurchaseCollectTicket = async () => {
+    const body = State.reqBody.body_update;
+
+    if (!body) {
+      myAlert.err({ content: 'body為undefined' });
+
+      return;
+    }
+
+    setIsFetching(true);
+    await reqPatch(body).finally(() => {
+      setIsFetching(false);
+    });
   };
 
   // ------------------------------------------------------------
@@ -287,6 +302,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // MARK: handelConfirm
   const handelConfirm = () => {
     if (raw_purchaseCollectTicket) {
+      reqUpdatePurchaseCollectTicket();
     } else {
       reqNewPurchaseCollectTicket();
     }

@@ -70,7 +70,11 @@ type Interface_classState = Pick<
   deleteDetail: (identifyId: string) => Interface_classState;
   clearDetail: () => Interface_classState;
   //
-  reqBody: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto;
+  // reqBody: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto;
+  reqBody: {
+    body_create: TcreatePurchaseCollectTicket_Dto;
+    body_update: TupdatePurchaseCollectTicket_Dto | null;
+  };
 };
 
 type Interface_classState_detail = Pick<

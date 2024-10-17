@@ -138,7 +138,41 @@ class ClassState implements Interface_classState {
       data: this.detailArr.map((classDetail) => classDetail.reqBody),
     };
 
-    return body;
+    const body_create: TcreatePurchaseCollectTicket_Dto = {
+      applicant_department: applicant_department,
+      agent_employee_id: agent_employee?.id || '',
+      ticket_method: ticket_method,
+      tax_deduction_category: tax_deduction_category,
+      journal_method: journal_method,
+      invoice_number: invoice_number,
+      invoice_price: Number(invoice_price),
+      note: note,
+      data: this.detailArr.map((classDetail) => classDetail.reqBody),
+    };
+
+    const body_update: TupdatePurchaseCollectTicket_Dto | null = id
+      ? {
+          purchase_collect_ticket_uuid: id,
+          applicant_department: applicant_department,
+          agent_employee_id: agent_employee?.id || '',
+          ticket_method: ticket_method,
+          tax_deduction_category: tax_deduction_category,
+          journal_method: journal_method,
+          invoice_number: invoice_number,
+          invoice_price: Number(invoice_price),
+          note: note,
+          data: this.detailArr.map((classDetail) => classDetail.reqBody),
+        }
+      : null;
+
+    // if (id) {
+    //   return body as TupdatePurchaseCollectTicket_Dto;
+    // }
+
+    return {
+      body_create,
+      body_update,
+    };
   }
 
   // ------------------------------------------------------------

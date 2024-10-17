@@ -140,7 +140,7 @@ type TcreatePurchaseCollectTicket_Dto = Pick<
 
 interface TupdatePurchaseCollectTicket_Dto extends TcreatePurchaseCollectTicket_Dto {
   purchase_collect_ticket_uuid: string;
-  data: TupdatePurchaseCollectTicketDetail_Dto[];
+  data: (TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto)[];
 }
 
 interface TpurchaseCollectTicketDetail_Dto extends Tbase {
