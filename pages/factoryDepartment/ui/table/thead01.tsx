@@ -453,7 +453,6 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>已領</span>
         <span>數量</span>
         <span>單位</span>
-        <span></span>
         <span>領料人員</span>
         <span>備註</span>
         <span></span>
@@ -662,26 +661,41 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-    //#region 新增進貨單明細
-    else if (type === "AddPRe_ReqList") {
-      return (
-        <div className={style.thead41}>
-          <span></span>
-          <span>序</span>
-          <span>單號</span>
-          <span>料號</span>
-          <span>品名</span>
-          <span>規格</span>
-          <span>數量</span>
-          <span>單位</span>
-          <span>單價</span>
-          <span>金額</span>
-          <span>備註</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  //#region 新增進貨單明細
+  else if (type === "AddPRe_ReqList") {
+    return (
+      <div className={style.thead41}>
+        <span></span>
+        <span>序</span>
+        <span>單號</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>備註</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 新增進貨單明細
+  else if (type === "AddPRe_ReqList2") {
+    return (
+      <div className={style.thead42}>
+        <span></span>
+        <span>序</span>
+        <span>單號</span>
+        <span>廠商</span>
+        <span>金額</span>
+        <span>備註</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

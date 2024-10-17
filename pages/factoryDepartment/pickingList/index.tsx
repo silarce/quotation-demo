@@ -1995,7 +1995,22 @@ export default function AddPurchaseRequisition() {
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
-                                        <span></span>
+                                        <span>
+                                            {/* <button onClick={() => { handleinbox(_item) }}>
+                                                <img src={icon_tray_pick.src} alt="tray" style={{ width: '30px', height: '20px' }} />
+                                            </button> */}
+                                            <button
+                                                onClick={() => { handleinbox(_item) }}
+                                                disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
+                                            >
+                                                <img
+                                                    src={parseFloat(_item.quantity) === parseFloat(_item.picking_qty) ? icon_tray_out_gray.src : icon_tray_out.src}
+                                                    alt="tray"
+                                                    style={{ width: '30px', height: '20px' }}
+                                                />
+                                            </button>
+
+                                        </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>
@@ -2063,22 +2078,6 @@ export default function AddPurchaseRequisition() {
                                                     handleStringChange(index, "unit", e.target.value);
                                                 }}
                                             />
-                                        </span>
-                                        <span>
-                                            {/* <button onClick={() => { handleinbox(_item) }}>
-                                                <img src={icon_tray_pick.src} alt="tray" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button
-                                                onClick={() => { handleinbox(_item) }}
-                                                disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
-                                            >
-                                                <img
-                                                    src={parseFloat(_item.quantity) === parseFloat(_item.picking_qty) ? icon_tray_out_gray.src : icon_tray_out.src}
-                                                    alt="tray"
-                                                    style={{ width: '30px', height: '20px' }}
-                                                />
-                                            </button>
-
                                         </span>
                                         <span>
                                             <input
@@ -2186,7 +2185,6 @@ export default function AddPurchaseRequisition() {
                                         onChange={(e) => setHandinputunit(e.target.value)}
                                     />
                                 </div>
-                                <div></div>
                                 <div>
                                     <input
                                         type="text"
@@ -2650,12 +2648,13 @@ export default function AddPurchaseRequisition() {
                                             inputProps={{
                                                 props: {
                                                     type: "number",
-                                                    min: 0, // 設置最小值為0
-                                                    step: 1, // 設置步進值，默認為1
+                                                    // min: 0, // 設置最小值為0
+                                                    // step: 1, // 設置步進值，默認為1
                                                     max: parseInt(nowquantity) - parseInt(nowpickingqty), // 設置最大值
                                                     style: { color: 'red' },
-                                                    value: inboxquantity ? inboxquantity : 0,
-                                                    onChange: handleInputChange
+                                                    value: inboxquantity ? inboxquantity : '',
+                                                    // onChange: handleInputChange
+                                                    onChange: (e) => setInboxquantity(parseInt(e.target.value))
                                                 },
                                             }}
                                         />

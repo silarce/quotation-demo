@@ -1462,7 +1462,7 @@ export default function PurchaseOrderList() {
                                 </button>
                             </div>
                             <div>
-                                {quoterequuidin}
+                                {/* {quoterequuidin} */}
                             </div>
                             <div>
                                 {/* <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">

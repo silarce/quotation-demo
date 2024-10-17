@@ -31,6 +31,8 @@ import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
 import icon_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
+
 //日期
 import moment, { Moment } from "moment";
 import { Checkbox, Collapse } from "antd";
@@ -61,6 +63,7 @@ export default function AddProdReceipt() {
     const [searchbardata, setSearchBarData] = useState<any[]>([]); // 手key物料查詢
     const [data2, setData2] = useState<any[]>([]); // 進貨明細清單data
     const [data3, setData3] = useState<any[]>([]); // 進貨清單data
+    const [data4, setData4] = useState<any[]>([]); // 進貨清單的採購data
 
 
     // 搜尋
@@ -242,7 +245,57 @@ export default function AddProdReceipt() {
 
     const AddProdReceipt = async () => {
         if (editmain === true) {
+            try {
+                setIsLoading(true);
+                const conditionModel = {
+                    // purchaseorderuuid: purchaseorderuuid,
+                    create_at: create_atin,
+                    // need_date: moment(need_date).format('YYYY-MM-DD'),
+                    create_by: create_byin,
+                    note: note,
+                    suppliername: suppliernamein,
+                    supplierphone: supplierphonein,
+                    suppliertaxid: suppliertaxidin,
+                    supplieraddress: supplieraddressin,
+                    supplierid: supplieridin,
+                    // shippingaddress: shippingaddressin,
+                    data2: data2
+                };
 
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateAddPurchaseOrder`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                myAlert.success({ title: '更新成功' })
+
+                getProdReceipt();
+                getProdReceiptDetail(prodreceiptuuid);
+                setEditmain(false);
+
+            } catch (error: any) {
+                // setError(error.message);
+                console.error(error.message)
+            }
+            finally {
+                setIsLoading(false);
+            }
         } else {
             console.log(data2);
             console.log(purchaseorderid);
@@ -279,18 +332,21 @@ export default function AddProdReceipt() {
                     throw new Error('Failed to fetch data');
                 }
                 const responsedata = await response.json();
+
+                console.log(responsedata);
+
                 myAlert.info(
                     {
                         title: '單據新增成功',
-                        content: `進貨單據號碼為:${responsedata[0].prodreceiptid}`
+                        content: `進貨單據號碼為:${responsedata.prodreceiptid}`
                     })
 
                 setData2([]);
-                setProdreceiptid(responsedata[0].prodreceiptid);
-                setProdreceiptuuid(responsedata[0].id);
+                setProdreceiptid(responsedata.prodreceiptid);
+                setProdreceiptuuid(responsedata.id);
                 setStatus("未送出");
                 getProdReceipt();
-                // getProdReceiptDetail();
+                getProdReceiptDetail(responsedata.id);
                 // getPurchaseOrder();
                 // getProduct();
                 // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
@@ -365,8 +421,44 @@ export default function AddProdReceipt() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
-            setData2(data);
+            const responsedata = await response.json();
+            setData2(responsedata);
+
+            // 第一步：去重 responsedata 中的 purchaseorderid
+            const uniquePurchaseorderIds = responsedata
+                .filter((item: any, index: any, self: any[]) =>
+                    index === self.findIndex((t) => t.purchaseorderid === item.purchaseorderid)
+                )
+                .map((item: any) => item.purchaseorderid); // 只留下去重後的 purchaseorderid
+            console.log(uniquePurchaseorderIds);
+            // 第二步：過濾 data 中與去重的 purchaseorderid 相匹配的項目
+            const filteredData = data.filter(item =>
+                uniquePurchaseorderIds.includes(item.purchaseOrder.purchaseorderid.toString().trim())
+            );
+
+
+            // Step 3: 將篩選後的結果傳給 data4
+            setData4(filteredData);
+
+            console.log(filteredData);
+
+            // Step 4: 更新 checkedItems 狀態，讓篩選出的項目對應 checkbox 被勾選
+            const updatedCheckedItems = filteredData.reduce((acc: any, currentItem: any) => {
+                const purchaseOrderId = currentItem.purchaseOrder.purchaseorderid.toString().trim();
+                return {
+                    ...acc,
+                    [purchaseOrderId]: true // 將對應的 purchaseOrder.purchaseorderid 設置為 true 表示已勾選
+                };
+            }, {});
+
+            // Step 5: 使用 setCheckedItems 更新勾選狀態
+            setCheckedItems(prevCheckedItems => ({
+                ...prevCheckedItems,
+                ...updatedCheckedItems // 合併新勾選的項目
+            }));
+
+            console.log("Checked Items:", updatedCheckedItems);
+
 
             // console.log(data);
             // let totalprice = 0;
@@ -421,19 +513,21 @@ export default function AddProdReceipt() {
     //新增單據
     const handlePreAdd = () => {
         setCreate_byin(userInfo?.username as string);
-        // setSuppliernamein("");
-        // setSupplierphonein("");
-        // setSuppliertaxidin("");
+        setSuppliernamein("");
+        setSupplierphonein("");
+        setSuppliertaxidin("");
+        setPurchaseorderid('');
         // setInvoicein("");
-        // setSupplieraddressin("");
+        setSupplieraddressin("");
         // setShippingaddressin("台中市霧峰區峰北路666號");
         setProdreceiptid("儲存後產生");
         setStatus("未儲存");
         setNote("");
-        // setData2([]);
+        setData2([]);
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         // setNeed_date(moment().format('YYYY-MM-DD') || '');
         setPoopen(!poopen);
+        setCheckedItems({});
     }
 
     const handleAdd = () => {
@@ -525,6 +619,7 @@ export default function AddProdReceipt() {
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
+        setPurchaseorderid(item.purchaseorderid);
         // setNeed_date(item.need_date);
         setSuppliernamein(item.suppliername);
         setSupplierphonein(item.supplierphone);
@@ -535,6 +630,7 @@ export default function AddProdReceipt() {
         setCreate_byin(item.create_by);
         // getPurchaseOrderDetail(item.purchaseorderuuid);
         getProdReceiptDetail(item.prodreceiptuuid);
+        setCheckedItems({}); // 將所有勾選狀態重置為 false
     }
 
     const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
@@ -579,10 +675,15 @@ export default function AddProdReceipt() {
                     });
                 } else {
                     // 如果取消勾選 checkbox，根據 id 從 data2 中移除對應的項目
-                    setData2(prevData2 => prevData2.filter((existingDetail: any) =>
-                        !item.details.some((detail: any) => detail.id === existingDetail.id)
-                    ));
-
+                    setData2(prevData2 => {
+                        const updatedData2 = prevData2.filter((existingDetail: any) =>
+                            !item.details.some((detail: any) => detail.id === existingDetail.id)
+                        );
+                        if (updatedData2.length === 0) {
+                            setSuppliernamein(''); // 只有當更新後的 data2 為空時，才設為 ''
+                        }
+                        return updatedData2;
+                    });
                 }
             } else {
                 if (isChecked) {
@@ -595,10 +696,22 @@ export default function AddProdReceipt() {
                     });
                 } else {
                     // 如果取消勾選 checkbox，根據 id 從 data2 中移除對應的項目
-                    setData2(prevData2 => prevData2.filter((existingDetail: any) =>
-                        !item.details.some((detail: any) => detail.id === existingDetail.id)
-                    ));
-
+                    setData2(prevData2 => {
+                        const updatedData2 = prevData2.filter((existingDetail: any) =>
+                            !item.details.some((detail: any) =>
+                                detail.purchaseorderid === existingDetail.purchaseorderid &&
+                                detail.name === existingDetail.name &&
+                                detail.spec === existingDetail.spec
+                            )
+                        );
+                        if (updatedData2.length === 0) {
+                            setSuppliernamein(''); // 只有當更新後的 data2 為空時，才設為 ''
+                            setSupplieraddressin('');
+                            setSupplierphonein('');
+                            setSuppliertaxidin('');
+                        }
+                        return updatedData2;
+                    });
                 }
             }
 
@@ -634,7 +747,9 @@ export default function AddProdReceipt() {
     //     }
     // }, [data2]);
 
+    const handledele = async (item: any) => {
 
+    }
 
 
 
@@ -931,6 +1046,7 @@ export default function AddProdReceipt() {
                                     />
                                 </div>
                                 <div>
+                                    {purchaseorderid}
                                     {/* <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
@@ -1003,16 +1119,34 @@ export default function AddProdReceipt() {
                         <div>
                             <div style={{ display: `${tabshow === "單據明細" ? '' : 'none'}` }}>
                                 <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                    {/* <Thead01 type={'AddPRe_ReqList2'} />
+                                    {data4 && (
+                                        data4.map((_item: any, index: number) => (
+                                            <CellWithBar key={index} className={scss.panelHeader15}>
+                                                <div className={scss.row01}>
+                                                    <span>
+                                                        <button onClick={() => { handledele(_item) }}>
+                                                            <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                        </button>
+                                                    </span>
+                                                    <span>{index + 1}</span>
+                                                    <span>{_item.purchaseOrder.purchaseorderid}</span>
+                                                    <span>{_item.purchaseOrder.suppliername}</span>
+                                                    <span>{_item.purchaseOrder.totalprice}</span>
+                                                    <span>{_item.purchaseOrder.note}</span>
+                                                </div>
+                                            </CellWithBar>
+                                        ))
+                                    )} */}
                                     <Thead01 type={'AddPRe_ReqList'} />
                                     {data2 && (
                                         data2.map((_item: any, index: number) => (
                                             <CellWithBar key={index} className={scss.panelHeader14}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button onClick={() => { alert(_item) }}>
+                                                        {/* <button onClick={() => { alert(_item) }}>
                                                             <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
-                                                            {/* <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
-                                                        </button>
+                                                        </button> */}
                                                     </span>
                                                     <span>{index + 1}</span>
                                                     <span>{_item.purchaseorderid}</span>
@@ -1042,7 +1176,11 @@ export default function AddProdReceipt() {
                                                         <span style={{ paddingLeft: '20px' }}>
                                                             <input
                                                                 type="checkbox"
-                                                                checked={checkedItems[_item.purchaseOrder.purchaseorderid] || false} // 使用狀態來控制 checkbox 是否勾選
+                                                                // checked={checkedItems[_item.purchaseOrder.purchaseorderid] || false} // 使用狀態來控制 checkbox 是否勾選
+                                                                checked={
+                                                                    checkedItems[_item.purchaseOrder.purchaseorderid] ||
+                                                                    data2.some(detail => detail.purchaseorderid === _item.purchaseOrder.purchaseorderid)
+                                                                }
                                                                 onChange={(e) => handleToggleProdreceiptdetail(_item, e.target.checked)}
                                                                 disabled={!(status === "未儲存" || (status === "未送出" && editmain === true))} // 當不是這兩個條件時禁用 checkbox
                                                                 style={{
@@ -1050,6 +1188,9 @@ export default function AddProdReceipt() {
                                                                     margin: '10px', // 增加 margin 讓 checkbox 有更大的空間
                                                                 }}
                                                             />
+                                                            {/* <button onClick={() => { handleToggleProdreceiptdetail(_item, e.target.checked) }}>
+                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                            </button> */}
 
 
 

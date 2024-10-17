@@ -127,16 +127,24 @@ export default function AddPurchaseOrder() {
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
     const [supplieridin, setSupplieridin] = useState<string>("");
+    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
+    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
 
+    const [supplierid2in, setSupplierid2in] = useState<string>("");
     const [suppliername2in, setSuppliername2in] = useState<string>("");
     const [suppliertaxid2in, setSuppliertaxid2in] = useState<string>("");
     const [supplieraddress2in, setSupplieraddress2in] = useState<string>("");
     const [supplierphone2in, setSupplierphone2in] = useState<string>("");
+    const [suppliercontact2in, setSuppliercontact2in] = useState<string>("");
+    const [supplierfax2in, setSupplierfax2in] = useState<string>("");
 
+    const [supplierid3in, setSupplierid3in] = useState<string>("");
     const [suppliername3in, setSuppliername3in] = useState<string>("");
     const [suppliertaxid3in, setSuppliertaxid3in] = useState<string>("");
     const [supplieraddress3in, setSupplieraddress3in] = useState<string>("");
     const [supplierphone3in, setSupplierphone3in] = useState<string>("");
+    const [suppliercontact3in, setSuppliercontact3in] = useState<string>("");
+    const [supplierfax3in, setSupplierfax3in] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -498,15 +506,21 @@ export default function AddPurchaseOrder() {
                     supplierphone: supplierphonein,
                     suppliertaxid: suppliertaxidin,
                     supplieraddress: supplieraddressin,
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin,
                     shippingaddress: shippingaddressin,
                     suppliername2: suppliername2in,
                     supplierphone2: supplierphone2in,
                     suppliertaxid2: suppliertaxid2in,
                     supplieraddress2: supplieraddress2in,
+                    suppliercontact2: suppliercontact2in,
+                    supplierfax2: supplierfax2in,
                     suppliername3: suppliername3in,
                     supplierphone3: supplierphone3in,
                     suppliertaxid3: suppliertaxid3in,
                     supplieraddress3: supplieraddress3in,
+                    suppliercontact3: suppliercontact3in,
+                    supplierfax3: supplierfax3in,
                     data2: data2
 
                 };
@@ -567,15 +581,21 @@ export default function AddPurchaseOrder() {
                     supplierphone: supplierphonein,
                     suppliertaxid: suppliertaxidin,
                     supplieraddress: supplieraddressin,
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin,
                     shippingaddress: shippingaddressin,
                     suppliername2: suppliername2in,
                     supplierphone2: supplierphone2in,
                     suppliertaxid2: suppliertaxid2in,
                     supplieraddress2: supplieraddress2in,
+                    suppliercontact2: suppliercontact2in,
+                    supplierfax2: supplierfax2in,
                     suppliername3: suppliername3in,
                     supplierphone3: supplierphone3in,
                     suppliertaxid3: suppliertaxid3in,
                     supplieraddress3: supplieraddress3in,
+                    suppliercontact3: suppliercontact3in,
+                    supplierfax3: supplierfax3in
 
                 };
 
@@ -774,14 +794,17 @@ export default function AddPurchaseOrder() {
 
             try {
                 setIsLoading(true);
+
                 const conditionModel = {
                     quotereqid: quotereqid,
                     quoterequuid: quoterequuid,
-                    supplierid: supplieridin,
-                    suppliername: suppliernamein,
-                    supplieraddress: supplieraddressin,
-                    suppliertaxid: suppliertaxidin,
-                    supplierphone: supplierphonein,
+                    supplierid: `${tabnow === '廠商1' ? supplieridin : tabnow === '廠商2' ? supplierid2in : tabnow === '廠商3' ? supplierid3in : ''}`,
+                    suppliername: `${tabnow === '廠商1' ? suppliernamein : tabnow === '廠商2' ? suppliername2in : tabnow === '廠商3' ? suppliername3in : ''}`,
+                    supplieraddress: `${tabnow === '廠商1' ? supplieraddressin : tabnow === '廠商2' ? supplieraddress2in : tabnow === '廠商3' ? supplieraddress3in : ''}`,
+                    suppliertaxid: `${tabnow === '廠商1' ? suppliertaxidin : tabnow === '廠商2' ? suppliertaxid2in : tabnow === '廠商3' ? suppliertaxid3in : ''}`,
+                    supplierphone: `${tabnow === '廠商1' ? supplierphonein : tabnow === '廠商2' ? supplierphone2in : tabnow === '廠商3' ? supplierphone3in : ''}`,
+                    suppliercontact: `${tabnow === '廠商1' ? suppliercontactin : tabnow === '廠商2' ? suppliercontact2in : tabnow === '廠商3' ? suppliercontact3in : ''}`,
+                    supplierfax: `${tabnow === '廠商1' ? supplierfaxin : tabnow === '廠商2' ? supplierfax2in : tabnow === '廠商3' ? supplierfax3in : ''}`,
                     data: newEntry
                 };
 
@@ -1120,6 +1143,8 @@ export default function AddPurchaseOrder() {
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
+        setSuppliercontactin("");
+        setSupplierfaxin("");
         setInvoicein("");
         setSupplieraddressin("");
         setShippingaddressin("台中市霧峰區峰北路666號");
@@ -1131,11 +1156,15 @@ export default function AddPurchaseOrder() {
         setSupplierphone2in("");
         setSuppliertaxid2in("");
         setSupplieraddress2in("");
+        setSuppliercontact2in("");
+        setSupplierfax2in("");
 
         setSuppliername3in("");
         setSupplierphone3in("");
         setSuppliertaxid3in("");
         setSupplieraddress3in("");
+        setSuppliercontact3in("");
+        setSupplierfax3in("");
         setData2([]);
     }
 
@@ -1476,14 +1505,20 @@ export default function AddPurchaseOrder() {
         setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
         setShippingaddressin(item.shippingaddress);
+        setSuppliercontactin(item.suppliercontact);
+        setSupplierfaxin(item.supplierfax);
         setSuppliername2in(item.suppliername2);
         setSupplierphone2in(item.supplierphone2);
         setSuppliertaxid2in(item.suppliertaxid2);
         setSupplieraddress2in(item.supplieraddress2);
+        setSuppliercontact2in(item.suppliercontact2);
+        setSupplierfax2in(item.supplierfax2);
         setSuppliername3in(item.suppliername3);
         setSupplierphone3in(item.supplierphone3);
         setSuppliertaxid3in(item.suppliertaxid3);
         setSupplieraddress3in(item.supplieraddress3);
+        setSuppliercontact3in(item.suppliercontact3);
+        setSupplierfax3in(item.supplierfax3);
         setCreate_byin(item.create_by);
         switch (tabnow) {
             case "廠商1":
@@ -1583,9 +1618,12 @@ export default function AddPurchaseOrder() {
                 );
                 setSupplierphonein(item.phone ? item.phone : '');
                 setSuppliertaxidin(item.tax_id ? item.tax_id : '');
+                setSuppliercontactin(item.contact ? item.contact : '');
+                setSupplierfaxin(item.fax ? item.fax : '');
                 break;
             case "廠商2":
                 // setSupplierid2in(item?.customer_number);
+                setSupplierid2in(item?.customer_number);
                 setSuppliername2in(item?.name);
                 setSupplieraddress2in(
                     (item.county ? item.county : '') +
@@ -1594,9 +1632,11 @@ export default function AddPurchaseOrder() {
                 );
                 setSupplierphone2in(item.phone ? item.phone : '');
                 setSuppliertaxid2in(item.tax_id ? item.tax_id : '');
+                setSuppliercontact2in(item.contact ? item.contact : '')
+                setSupplierfax2in(item.fax ? item.fax : '');
                 break;
             case "廠商3":
-
+                setSupplierid3in(item?.customer_number);
                 setSuppliername3in(item?.name);
                 setSupplieraddress3in(
                     (item.county ? item.county : '') +
@@ -1605,6 +1645,8 @@ export default function AddPurchaseOrder() {
                 );
                 setSupplierphone3in(item.phone ? item.phone : '');
                 setSuppliertaxid3in(item.tax_id ? item.tax_id : '');
+                setSuppliercontact3in(item.contact ? item.contact : '')
+                setSupplierfax3in(item.fax ? item.fax : '');
                 break;
             default:
                 break;
@@ -2681,7 +2723,7 @@ export default function AddPurchaseOrder() {
                                             {/* {_item.detail_totalprice.toLocaleString()} */}
                                             <span>
                                                 {/* {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()} */}
-                                                <span>{_item.detail_totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                <span>{_item.detail_totalprice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                             </span>
                                         </span>
                                         <span>

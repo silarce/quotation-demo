@@ -1806,7 +1806,7 @@ export default function ProdEntryList() {
                             <div></div>
                             <div></div>
                         </div>
-                        <div className={scss.body_content1}>
+                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                             <Thead01 type={'ProdEntryDetail'} />
                             {/* <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                             {data1 && (
@@ -2314,12 +2314,14 @@ export default function ProdEntryList() {
                                         inputProps={{
                                             props: {
                                                 type: "number",
-                                                min: 0, // 設置最小值為0
-                                                step: 1, // 設置步進值，默認為1
+                                                // min: 0, // 設置最小值為0
+                                                // step: 1, // 設置步進值，默認為1
                                                 max: parseInt(nowquantity) - parseInt(nowentryqty), // 設置最大值
                                                 style: { color: 'red' },
-                                                value: inboxquantity ? inboxquantity : 0,
-                                                onChange: handleInputChange
+                                                value: inboxquantity ? inboxquantity : '',
+                                                // onChange: handleInputChange
+                                                onChange: (e) => setInboxquantity(parseInt(e.target.value)),
+
                                             },
                                         }}
                                     />
