@@ -1,20 +1,14 @@
 import { useEffect, useMemo } from 'react';
-import moment from 'moment';
 import _ from 'lodash';
 
 import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
-// import { useGetAccountReceivableInvoices_all_infinite, TaccountsReceivableInvoiceDto } from 'js/api/api_engineering';
 import { useGetUnpaidProdreceiptByInvoiceNumber, Tprodreceipt_Dto } from 'js/api/api_netCore/api_accountant';
-
-import type { Tparams } from 'js/api/dtoTypes';
 
 import { useFilter } from '../useFilter';
 import { useInputSelProps } from '../useInputSelProps';
-
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import SearchModal, { Tprops_refine } from '..';
 
@@ -71,10 +65,6 @@ const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): Tmod
     dataArr = dataArr.filter((data) => {
       let pass = true;
 
-      // if (filter.invoice?.trim()) {
-      //   !data.invoice.includes(filter.invoice.trim()) && (pass = false);
-      // }
-
       if (filter?.prodreceiptid) {
         !String(data.prodreceiptid).includes(filter.prodreceiptid.trim()) && (pass = false);
       }
@@ -103,7 +93,7 @@ const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): Tmod
 // 要做i18n的處理，因此設定不能抽出hook
 const useConfig_data = (customKeyArr?: string[]) => {
   const { t: t_common } = useTranslation('common');
-  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+  const { t, i18n } = useTranslation('accounting', { keyPrefix: 'prodreceipt' });
 
   const dataConfig = useMemo(() => {
     const config: Tconfig<Tprodreceipt_Dto> = {
@@ -117,31 +107,31 @@ const useConfig_data = (customKeyArr?: string[]) => {
         },
       },
       prodreceiptid: {
-        label: 'prodreceiptid',
+        label: t('prodreceiptid'),
         style: {
           width: '150px',
         },
       },
       invoice: {
-        label: t('invoiceNumber'),
+        label: t('invoice'),
         style: {
           width: '150px',
         },
       },
       status: {
-        label: 'status',
+        label: t('status'),
         style: {
           width: 100,
         },
       },
       pay_status: {
-        label: 'pay_status',
+        label: t('pay_status'),
         style: {
           width: 100,
         },
       },
       tax: {
-        label: 'tax',
+        label: t('tax'),
         style: {
           width: 100,
           justifyContent: 'flex-end',
@@ -153,7 +143,7 @@ const useConfig_data = (customKeyArr?: string[]) => {
         },
       },
       totalprice: {
-        label: 'totalprice',
+        label: t('totalprice'),
         style: {
           width: 150,
           justifyContent: 'flex-end',
@@ -188,18 +178,17 @@ const useConfig_data = (customKeyArr?: string[]) => {
 
 // 要做i18n的處理，因此設定不能抽出hook
 const useConfig_filter = (customerFilterConfig?: Tconfig_filter) => {
-  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+  const { t, i18n } = useTranslation('accounting', { keyPrefix: 'prodreceipt' });
 
   return useMemo(() => {
     const config_filter: Tconfig_filter = customerFilterConfig || [
       {
-        caption: 'prodreceiptid',
+        caption: t('prodreceiptid'),
         key: 'prodreceiptid',
         type: 'input',
       },
       {
-        // caption: t('invoiceNumber'),
-        caption: '完整發票號碼',
+        caption: t('wholeInvoiceNumber'),
         key: 'invoice',
         type: 'input',
       },

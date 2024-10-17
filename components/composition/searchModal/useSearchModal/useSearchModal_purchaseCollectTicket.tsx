@@ -1,27 +1,13 @@
-import { useEffect, useMemo } from 'react';
-import moment from 'moment';
+import { useMemo } from 'react';
 
 import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
-import {
-  TpurchaseCollectTicket_Dto,
-  TcreatePurchaseCollectTicket_Dto,
-  TupdatePurchaseCollectTicket_Dto,
-  TpurchaseCollectTicketDetail_Dto,
-  TcreatePurchaseCollectTicketDetail_Dto,
-  TupdatePurchaseCollectTicketDetail_Dto,
-  TpurchaseCollectTicket_Dto_detailed,
-  useGetPurchaseCollectTicket,
-} from 'js/api/api_netCore/api_accountant';
-
-import type { Tparams } from 'js/api/dtoTypes';
+import { TpurchaseCollectTicket_Dto, useGetPurchaseCollectTicket } from 'js/api/api_netCore/api_accountant';
 
 import { useFilter } from '../useFilter';
 import { useInputSelProps } from '../useInputSelProps';
-
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import SearchModal, { Tprops_refine } from '..';
 

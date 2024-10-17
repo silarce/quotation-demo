@@ -45,6 +45,25 @@
     "goods_spec": "規格",
     "detail": "明細資料",
     "addDetail": "新增明細資料",
-    "selectInvoice": "選擇發票"
+    "selectInvoice": "選擇發票",
+    "clearInvoiceWarning": "清除發票將一併清除明細資料"
+  },
+  "prodreceipt": {
+    "prodreceiptid": "進貨單號",
+    "invoice": "發票號碼",
+    "purchaseorderid": "purchaseorderid",
+    "inspected": "inspected",
+    "totalprice": "總金額",
+    "tax": "稅額",
+    "review_type": "review_type",
+    "status": "狀態",
+    "suppliername": "suppliername",
+    "supplierphone": "supplierphone",
+    "supplieraddress": "supplieraddress",
+    "suppliertaxid": "suppliertaxid",
+    "pay_status": "付款狀態",
+    "entry_status": "entry_status",
+    "note": "摘要說明",
+    "wholeInvoiceNumber": "完整發票號碼"
   }
 }

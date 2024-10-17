@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo, useRef, memo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
-import moment, { Moment } from 'moment';
-import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // antd
 import { Spin } from 'antd';
@@ -26,7 +25,6 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import ThreePartBar from 'components/global/container/bar/threePartBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -35,30 +33,16 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './index.module.scss';
 
 // api
-import { useDepartments } from 'js/api/api_department';
 import {
-  TpurchaseCollectTicket_Dto,
   TcreatePurchaseCollectTicket_Dto,
-  TupdatePurchaseCollectTicket_Dto,
-  TpurchaseCollectTicketDetail_Dto,
-  TcreatePurchaseCollectTicketDetail_Dto,
-  TupdatePurchaseCollectTicketDetail_Dto,
   TpurchaseCollectTicket_Dto_detailed,
   apiPostAddPurchaseCollectTicket,
-  useGetPurchaseCollectTicket,
   useGetPurchaseCollectTicketById,
-  useGetPurchaseCollectTicketDetailByTicketId,
-  useGetUnpaidProdreceiptByInvoiceNumber,
 } from 'js/api/api_netCore/api_accountant';
 
 // type
 import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
-import {
-  Tstate,
-  Tstate_detail,
-  Interface_classState,
-  Interface_classState_detail,
-} from 'components/page/accounting/purchaseCollectTicket/type';
+import { Tstate, Tstate_detail, Interface_classState } from 'components/page/accounting/purchaseCollectTicket/type';
 
 //
 import { useTranslation } from 'react-i18next';
@@ -138,7 +122,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     const body = State.reqBody.body_update;
 
     if (!body) {
-      myAlert.err({ content: 'body為undefined' });
+      myAlert.err({ content: 'body is undefined' });
 
       return;
     }
@@ -222,7 +206,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // MARK:handleClearInvoice
   const handleClearInvoice = () => {
     myAlert.confirm({
-      title: '清除發票將一併清除明細資料',
+      title: t('clearInvoiceWarning'),
       props: {
         onOk: () => {
           State.invoice_number = '';
@@ -500,13 +484,12 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
 // =============================================================================
 
 const useCustomerFilter = () => {
-  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+  const { t, i18n } = useTranslation('accounting', { keyPrefix: 'prodreceipt' });
 
   const confit_filter: Tconfig_filter = useMemo(() => {
     return [
       {
-        // caption: t('invoiceNumber'),
-        caption: '完整發票號碼',
+        caption: t('wholeInvoiceNumber'),
         key: 'invoice',
         type: 'input',
         // placeholder: '完整發票號碼',
@@ -518,18 +501,17 @@ const useCustomerFilter = () => {
 };
 
 const useCustomerFilter_forDetail = (State: Interface_classState) => {
-  const { t, i18n } = useTranslation('dto', { keyPrefix: 'accountsReceivableInvoice' });
+  const { t, i18n } = useTranslation('accounting', { keyPrefix: 'prodreceipt' });
 
   const config_filter: Tconfig_filter = useMemo(() => {
     const filter: Tconfig_filter = [
       {
-        caption: 'prodreceiptid',
+        caption: t('prodreceiptid'),
         key: 'prodreceiptid',
         type: 'input',
       },
       {
-        // caption: t('invoiceNumber'),
-        caption: '完整發票號碼',
+        caption: t('wholeInvoiceNumber'),
         key: 'invoice',
         type: 'input',
         defaultValue: State.invoice_number,
@@ -539,7 +521,7 @@ const useCustomerFilter_forDetail = (State: Interface_classState) => {
     ];
 
     return filter;
-  }, [State.invoice_number]);
+  }, [State.invoice_number, i18n.language]);
 
   return config_filter;
 };

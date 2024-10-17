@@ -1,16 +1,13 @@
 // gear
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
-import ThreePartBar from 'components/global/container/bar/threePartBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import Row, { Cell } from 'components/global/gear/table/row';
-
-import type { Interface_classState_detail } from 'pages/accounting/purchaseCollectTicket';
 
 import { useTranslation } from 'react-i18next';
 import { Icon_fc_delete } from 'public/image/icon/fcIconComponent/fcIcons';
 
+import type { Interface_classState_detail } from './type';
 // ===============================================================================
 
 interface TconfigItem {

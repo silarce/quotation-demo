@@ -45,6 +45,25 @@
     "goods_spec": "Spec",
     "detail": "Detail",
     "addDetail": "Add Detail",
-    "selectInvoice": "Select Invoice"
+    "selectInvoice": "Select Invoice",
+    "clearInvoiceWarning": "Clear Invoice will also clear the detail"
+  },
+  "prodreceipt": {
+    "prodreceiptid": "Prodreceipt ID",
+    "invoice": "Invoice",
+    "purchaseorderid": "Purchaseorder ID",
+    "inspected": "Inspected",
+    "totalprice": "TotalPrice",
+    "tax": "Tax",
+    "review_type": "Review Type",
+    "status": "Payment Status",
+    "suppliername": "Supplier Name",
+    "supplierphone": "Supplier Phone",
+    "supplieraddress": "Supplier Address",
+    "suppliertaxid": "Supplier Tax ID",
+    "pay_status": "Payment Status",
+    "entry_status": "Entry Status",
+    "note": "Note",
+    "wholeInvoiceNumber": "Whole Invoice Number"
   }
 }
