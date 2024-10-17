@@ -197,6 +197,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           options={{
             customKeyArr: ['indexNumber', 'invoice'],
             coverFilter: customerFilter,
+            uniqInvoice: true,
           }}
         />
       ),
