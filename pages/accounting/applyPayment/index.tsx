@@ -241,16 +241,16 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
   // --------------------------------------------------------------------------
 
-  if (!isAdmin) {
-    return (
-      <SubLayer bodyPreStyle="style01">
-        <PageHeader02 tag={t('applyPayment')} />
-        <div>
-          <h1 className="text-5xl">施工中</h1>
-        </div>
-      </SubLayer>
-    );
-  }
+  // if (!isAdmin) {
+  //   return (
+  //     <SubLayer bodyPreStyle="style01">
+  //       <PageHeader02 tag={t('applyPayment')} />
+  //       <div>
+  //         <h1 className="text-5xl">施工中</h1>
+  //       </div>
+  //     </SubLayer>
+  //   );
+  // }
 
   // --------------------------------------------------------------------------
 
