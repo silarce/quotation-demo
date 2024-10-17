@@ -659,6 +659,11 @@ const sidePathList: TsidePathList = {
               erpFeature: [accountsReceivable],
             },
             {
+              label: '進貨收票單',
+              path: path01 + '/purchaseCollectTicket',
+              erpFeature: [accountsReceivable],
+            },
+            {
               label: '付款申請',
               path: path01 + '/paymentApplication',
               erpFeature: [accountsReceivable],

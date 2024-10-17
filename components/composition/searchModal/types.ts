@@ -12,7 +12,7 @@ interface TuseSearchModal<Dto extends Tdto = Tdto> {
   dataKeyArr: string[];
 }
 
-type Tstate = {
+type Tstate_filter = {
   [key: string]: string;
 };
 
@@ -21,6 +21,9 @@ type Tconfig_filter = {
   key: string;
   type: 'input' | 'select' | 'date';
   selectOptions?: { value: string; label: string }[];
+  defaultValue?: string;
+  disabled?: boolean;
+  placeholder?: string;
 }[];
 
 type Tdto = {
@@ -43,4 +46,4 @@ type TmodalData<Dto extends Tdto = Tdto> = {
   isLoading?: boolean;
 };
 
-export type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData };
+export type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData };
