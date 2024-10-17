@@ -51,6 +51,11 @@
 
 // ===============================================================
 .table {
+  .thead,
+  .row {
+    padding-right: 15px;
+  }
+
   .thead {
     position: sticky;
     top: 0;
@@ -62,6 +67,17 @@
     }
     &.seleted {
       background-color: theme("colors.chosenBgc");
+    }
+    &.forbidden {
+      opacity: 0.5;
+      background-color: #ddd;
+      cursor: not-allowed;
+    }
+    &.error {
+      opacity: 1;
+      background-color: red;
+      // cursor: cursor;
+      cursor: not-allowed;
     }
   }
 }

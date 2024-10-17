@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import moment from 'moment';
 
-import type { TuseSearchModal, Tstate, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
+import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,6 @@ import { useInputSelProps } from '../useInputSelProps';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import SearchModal, { Tprops_refine } from '..';
-import { ru } from 'date-fns/locale';
 
 // =====================================================================================
 
@@ -52,44 +51,46 @@ const useSearchModal_invoice = (): TuseSearchModal<TaccountsReceivableInvoiceDto
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate): TmodalData<TaccountsReceivableInvoiceDto> => {
+const useData = (state_filter: Tstate_filter | undefined): TmodalData<TaccountsReceivableInvoiceDto> => {
   const params: Tparams = useMemo(() => {
+    const filter = state_filter && {
+      invoiceDate: (() => {
+        if (!state_filter.invoiceDate) {
+          return undefined;
+        } else {
+          return {
+            $gte: moment(state_filter.invoiceDate).startOf('day').toISOString(),
+            $lte: moment(state_filter.invoiceDate).endOf('day').toISOString(),
+          };
+        }
+      })(),
+      invoiceNumber: {
+        $contains: state_filter.invoiceNumber,
+      },
+      nameOfBusinessEntity: {
+        $contains: state_filter.nameOfBusinessEntity,
+      },
+      businessIdNumber: {
+        $contains: state_filter.businessIdNumber,
+      },
+      contractNumber: {
+        $contains: state_filter.contractNumber,
+      },
+      contractProjectName: {
+        $contains: state_filter.contractProjectName,
+      },
+      contractContractor: {
+        $contains: state_filter.contractContractor,
+      },
+    };
+
     return {
       pageSize: 20,
       sort: 'invoiceNumber',
       order: 'ASC',
-      filter: {
-        invoiceDate: (() => {
-          if (!filter.invoiceDate) {
-            return undefined;
-          } else {
-            return {
-              $gte: moment(filter.invoiceDate).startOf('day').toISOString(),
-              $lte: moment(filter.invoiceDate).endOf('day').toISOString(),
-            };
-          }
-        })(),
-        invoiceNumber: {
-          $contains: filter.invoiceNumber,
-        },
-        nameOfBusinessEntity: {
-          $contains: filter.nameOfBusinessEntity,
-        },
-        businessIdNumber: {
-          $contains: filter.businessIdNumber,
-        },
-        contractNumber: {
-          $contains: filter.contractNumber,
-        },
-        contractProjectName: {
-          $contains: filter.contractProjectName,
-        },
-        contractContractor: {
-          $contains: filter.contractContractor,
-        },
-      },
+      filter,
     };
-  }, [filter]);
+  }, [state_filter]);
 
   const { dataArr, viewRef_bottom, isLoadingPage1, reset, meta } = useGetAccountReceivableInvoices_all_infinite({
     customParams: params,

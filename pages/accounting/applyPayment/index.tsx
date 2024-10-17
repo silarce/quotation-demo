@@ -13,7 +13,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import { SearchModal_applyPayment } from 'components/composition/searchModal/useSearchModal/useSearchModal_applyPayment';
-import Detail, { DetailHeader, TimperativeHandle } from 'components/page/accounting/applyPayment/detail';
+import Detail, { DetailHeader, DetailFooter, TimperativeHandle } from 'components/page/accounting/applyPayment/detail';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
@@ -42,6 +42,8 @@ import type { TuserDto } from 'js/api/dtoTypes';
 
 import { useTranslation } from 'react-i18next';
 
+import scss from './index.module.scss';
+
 // ===================================================================================
 
 interface Tstate_applyPayment {
@@ -64,6 +66,8 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
   // --------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
   const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
+
+  const [totalPrice, setTotalPrice] = useState(0);
 
   // --------------------------------------------------------------------------
 
@@ -147,11 +151,12 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
       return dataItem;
     });
 
-    const total_price = data
-      .reduce((de, item) => {
-        return de.add(item.amount_total);
-      }, new Decimal(0))
-      .toString() as `${number}`;
+    // const total_price = data
+    //   .reduce((de, item) => {
+    //     return de.add(item.amount_total);
+    //   }, new Decimal(0))
+    //   .toString() as `${number}`;
+    const total_price = `${totalPrice}` as `${number}`;
 
     const body: Tbody = {
       payment_date: payment_date.toISOString(),
@@ -184,6 +189,22 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
   // --------------------------------------------------------------------------
 
+  // region HANDLE
+
+  const countTotalPrice = () => {
+    let totalPrice = new Decimal(0);
+
+    ref_detailArr.current.forEach((item) => {
+      if (item) {
+        const state_detail = item.state_detail;
+
+        totalPrice = totalPrice.add(state_detail.amount_total || 0);
+      }
+    });
+
+    setTotalPrice(totalPrice.toNumber());
+  };
+
   const handleConfirm = () => {
     if (apply_paymnet_id) {
       reqPatchApplyPayment();
@@ -214,16 +235,22 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
   // --------------------------------------------------------------------------
 
-  if (!isAdmin) {
-    return (
-      <SubLayer bodyPreStyle="style01">
-        <PageHeader02 tag={t('applyPayment')} />
-        <div>
-          <h1 className="text-5xl">施工中</h1>
-        </div>
-      </SubLayer>
-    );
-  }
+  useEffect(() => {
+    countTotalPrice();
+  }, [state_detailDict]);
+
+  // --------------------------------------------------------------------------
+
+  // if (!isAdmin) {
+  //   return (
+  //     <SubLayer bodyPreStyle="style01">
+  //       <PageHeader02 tag={t('applyPayment')} />
+  //       <div>
+  //         <h1 className="text-5xl">施工中</h1>
+  //       </div>
+  //     </SubLayer>
+  //   );
+  // }
 
   // --------------------------------------------------------------------------
 
@@ -249,8 +276,8 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
           <div>
             <span className="text-xl text-main mt-2 block">{t('paymentDetail')}</span>
 
-            <div>
-              <DetailHeader disabled={disabled} onAddClick={addDetail} />
+            <div className={scss.table}>
+              <DetailHeader className={scss.thead} disabled={disabled} onAddClick={addDetail} />
               {Object.entries(state_detailDict).map(([id, state_detail], index) => {
                 return (
                   <Detail
@@ -264,9 +291,11 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
                     onDeleteClick={() => {
                       removeDetail(id);
                     }}
+                    onStateUpdate={countTotalPrice}
                   />
                 );
               })}
+              <DetailFooter className={scss.tfoot} totalPrice={totalPrice.toLocaleString()} />
             </div>
           </div>
         </Spin>

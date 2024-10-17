@@ -194,6 +194,7 @@ export default function PurchaseOrderList() {
         if (!hasFetchedData.current) {
             getPurchaseOrder();
             GetReviewFlow();
+            
             hasFetchedData.current = true;
         }
     }, []);
@@ -246,6 +247,9 @@ export default function PurchaseOrderList() {
                 GetReviewById(data[0].purchaseorderuuid);
                 GetReviewHistory(data[0].purchaseorderid);
             }
+            console.log(typeof(quoterequuidin));
+            console.log(quoterequuidin);
+            console.log(quoterequuidin==='');
         } catch (error: any) {
             setError(error.message);
         }
@@ -1418,10 +1422,14 @@ export default function PurchaseOrderList() {
                                     單據
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "pc") }} title="比價Excel" style={{ display: `${(quoterequuidin === '' || quoterequuidin === undefined) ? 'none' : ''}` }}>
+                                <button className={scss.squarebtn}
+                                    onClick={() => { Excel(purchaseorderidin, "pc") }}
+                                    title="比價Excel"
+                                    style={{ display: `${(quoterequuidin === '' || quoterequuidin == null) ? 'none' : ''}` }}>
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
                                 </button>
+                                
                             </div>
                             <div>
                                 {/* <span>
@@ -1454,7 +1462,7 @@ export default function PurchaseOrderList() {
                                 </button>
                             </div>
                             <div>
-                                {quoterequuidin}
+                                {/* {quoterequuidin} */}
                             </div>
                             <div>
                                 {/* <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">

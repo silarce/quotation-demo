@@ -1,0 +1,16 @@
+.table {
+  position: relative;
+  width: fit-content;
+  max-height: 360px;
+  overflow: auto;
+  .thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .tfoot {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
+}
