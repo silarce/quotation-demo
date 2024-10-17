@@ -17,7 +17,12 @@ class ClassState_detail implements Interface_classState_detail {
     parent: Interface_classState
   ) {
     this.state_datail = state_datail;
-    this.setState_detail = setState_detail;
+
+    this.setState_detail = (state_detail: Tstate_detail) => {
+      state_detail.updateCount = this.state_datail.updateCount + 1;
+      setState_detail(state_detail);
+    };
+
     this.parent = parent;
   } // constructor
 
@@ -33,7 +38,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.item;
   }
   set item(item: string) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       item: item,
@@ -48,7 +53,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.transaction_date;
   }
   set transaction_date(date: Moment | null) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       transaction_date: date,
@@ -59,7 +64,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.quantity;
   }
   set quantity(value) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       quantity: value,
@@ -70,7 +75,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.unit;
   }
   set unit(unit: string) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       unit: unit,
@@ -81,7 +86,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.unit_price;
   }
   set unit_price(price) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       unit_price: price,
@@ -92,7 +97,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.amount;
   }
   set amount(amount) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       amount: amount,
@@ -103,7 +108,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.note;
   }
   set note(note) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       note: note,
@@ -114,7 +119,7 @@ class ClassState_detail implements Interface_classState_detail {
     return this.state_datail.goods_spec;
   }
   set goods_spec(spec) {
-    this.countUpdate();
+    // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,
       goods_spec: spec,
@@ -147,26 +152,26 @@ class ClassState_detail implements Interface_classState_detail {
   }
 
   // ------------------------------------------------------------
-  private countUpdate() {
-    this.setState_detail({
-      ...this.state_datail,
-      updateCount: this.state_datail.updateCount + 1,
-    });
+  // private countUpdate() {
+  //   this.setState_detail({
+  //     ...this.state_datail,
+  //     updateCount: this.state_datail.updateCount + 1,
+  //   });
 
-    return this;
-  }
+  //   return this;
+  // }
 
-  changeProdreceipt({ prodreceiptNumber, prodreceiptId }: { prodreceiptNumber: string; prodreceiptId: string }) {
-    this.setState_detail({
-      ...this.state_datail,
-      prodreceipt_number: prodreceiptNumber,
-      prodreceipt_uuid: prodreceiptId,
-    });
+  // changeProdreceipt({ prodreceiptNumber, prodreceiptId }: { prodreceiptNumber: string; prodreceiptId: string }) {
+  //   this.setState_detail({
+  //     ...this.state_datail,
+  //     prodreceipt_number: prodreceiptNumber,
+  //     prodreceipt_uuid: prodreceiptId,
+  //   });
 
-    this.countUpdate();
+  //   this.countUpdate();
 
-    return this;
-  }
+  //   return this;
+  // }
 
   deleteSelf() {
     this.parent.deleteDetail(this.identifyId);

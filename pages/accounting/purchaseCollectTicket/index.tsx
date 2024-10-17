@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
@@ -51,6 +51,20 @@ import { useTranslation } from 'react-i18next';
 type Tquery = {
   purchaseCollectTicketId: string | undefined;
 };
+
+// ===========================================================================
+
+const Detail_memo = memo(Detail, (prevProps, nextProps) => {
+  if (
+    prevProps.classState.updateCount !== nextProps.classState.updateCount ||
+    prevProps.classState.identifyId !== nextProps.classState.identifyId ||
+    prevProps.indexNumber !== nextProps.indexNumber
+  ) {
+    return false;
+  }
+
+  return true;
+});
 
 // ===========================================================================
 
@@ -329,7 +343,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               {State.detailArr.map((classDetail, index) => {
                 const identifyId = classDetail.identifyId;
 
-                return <Detail key={identifyId} indexNumber={index + 1} disabled={disabled} classState={classDetail} />;
+                return (
+                  <Detail_memo key={identifyId} indexNumber={index + 1} disabled={disabled} classState={classDetail} />
+                );
               })}
               <Detail_tfoot amountTotal={State.detailAmountTotal} className={scss.tfoot} />
             </div>
