@@ -35,6 +35,7 @@ import icon_export from 'public/image/icon/fc_export.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import icon_search2 from 'public/image/icon/search.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1527,7 +1528,7 @@ export default function ProductList() {
                     <div>
                         {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                         <button style={{ paddingRight: '10px', display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
-                            <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                            <img src={icon_clear.src} alt="clear" style={{ height: '20px', width: '20px' }} />
                         </button>
                         <input
                             type="text"
@@ -1550,7 +1551,11 @@ export default function ProductList() {
                             style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                             onChange={(e) => setKeyword4(e.target.value)}
                         />
+                        <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                            <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                        </span>
                     </div>
+
                 ]}
                 customeLeft={[
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1900,7 +1905,6 @@ export default function ProductList() {
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
                                     <div>
-                                        {/* <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>類別</span> */}
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
@@ -2090,41 +2094,53 @@ export default function ProductList() {
                             </div>
                             <div style={{ display: `${tabshow === "編碼" ? '' : 'none'}` }}>
                                 <div className={scss.foot_head3} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div>
+                                    <div style={{ width: '100%' }}>
                                         <input
                                             type="text"
                                             placeholder='搜尋類別'
                                             value={keywordclassification}
-                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            style={{ padding: '4px 5px', width: '85%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                             onChange={(e) => setKeywordclassification(e.target.value)}
                                         />
+                                        <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                                            <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        </span>
                                     </div>
-                                    <div>
+                                    <div style={{ width: '100%' }}>
                                         <input
                                             type="text"
                                             placeholder='搜尋細分'
                                             value={keywordcomponent}
-                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            style={{ padding: '4px 5px', width: '85%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                             onChange={(e) => setKeywordcomponent(e.target.value)}
                                         />
+                                        <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                                            <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        </span>
                                     </div>
-                                    <div>
+                                    <div style={{ width: '100%' }}>
                                         <input
                                             type="text"
                                             placeholder='搜尋材質'
                                             value={keywordmaterial}
-                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            style={{ padding: '4px 5px', width: '85%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                             onChange={(e) => setKeywordmaterial(e.target.value)}
                                         />
+                                        <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                                            <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        </span>
                                     </div>
-                                    <div>
+                                    <div style={{ width: '100%' }}>
                                         <input
                                             type="text"
                                             placeholder='搜尋表面'
                                             value={keywordsurface}
-                                            style={{ padding: '4px 5px', width: '100%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                            style={{ padding: '4px 5px', width: '85%', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                             onChange={(e) => setKeywordsurface(e.target.value)}
                                         />
+                                        <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                                            <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        </span>
                                     </div>
                                 </div>
                                 <div className={scss.foot_head3}>

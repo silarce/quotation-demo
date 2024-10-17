@@ -1494,7 +1494,7 @@ export default function ProdReceiptList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="採購單號"
                                             disabled={true}
@@ -1503,7 +1503,21 @@ export default function ProdReceiptList() {
                                                     value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
+                                        <span style={{ color: "#14256a", fontSize: '18px',marginRight:'25px'}}>
+                                            採購單號
+                                            </span>
+                                        <select
+                                            style={{ borderBottom: '1px solid #c1c1c1', fontSize: '18px' }}
+                                            onChange={(e) => e.preventDefault()} // 阻止選擇變更
+                                        >
+                                            {/* 如果是 string，先拆分；如果是 string[]，直接使用 */}
+                                            {(Array.isArray(purchaseorderidin) ? purchaseorderidin : (purchaseorderidin || '').split(',')).map((order, index) => (
+                                                <option key={index} value={order.trim()}>
+                                                    {order.trim() || '無資料'}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
                                         <InputSel

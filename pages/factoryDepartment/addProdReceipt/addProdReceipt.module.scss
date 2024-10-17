@@ -172,7 +172,7 @@ div.panelHeader21 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 130px 200px 100px 150px 100px 100px 250px 30px;
+    grid-template-columns: 33px 130px 300px 100px 150px 100px 100px 250px 30px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;
@@ -277,6 +277,34 @@ div.panelHeader14 {
 }
 
 //#endregion
+
+//#region 進貨明細的採購單
+div.panelHeader15 {
+  padding:10px 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 18px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 30px 150px 300px 100px 250px 30px;
+    gap: 15px;
+  }
+}
+
+//#endregion
+
 
 // 功能
 //#region 收折
