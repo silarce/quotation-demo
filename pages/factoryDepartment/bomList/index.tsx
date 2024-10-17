@@ -22,6 +22,9 @@ import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
 import { AppContext } from "pages/_app";
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_edit from 'public/image/icon/fc_edit.svg';
+import icon_delete from 'public/image/icon/fc_delete.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
+
 
 
 export default function BomList() {
@@ -676,51 +679,54 @@ export default function BomList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'BOM維護'} panelList={undefined} 
-            customeRight={
-                [
-                    <div>
-                        {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                        <input
-                            type="text"
-                            placeholder='請輸入料號'
-                            value={keyword2}
-                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                            onChange={(e) => setKeyword2(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder='請輸入名稱'
-                            value={keyword3}
-                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                            onChange={(e) => setKeyword3(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder='請輸入規格'
-                            value={keyword4}
-                            style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
-                            onChange={(e) => setKeyword4(e.target.value)}
-                        />
-                    </div>
-                    ]}
-                    customeLeft={[
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                <p style={{ color: '#14256a', fontSize: '16px' }}>
-                                    符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
-                                </p>
-                            </div>
-                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                <p style={{ color: '#14256a', fontSize: '16px' }}>
-                                    物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
-                                </p>
-                            </div>
+            <PageHeader02 tag={'BOM維護'} panelList={undefined}
+                customeRight={
+                    [
+                        <div>
+                            {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                            {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
+                                    <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                </button> */}
+                            <input
+                                type="text"
+                                placeholder='請輸入料號'
+                                value={keyword2}
+                                style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                onChange={(e) => setKeyword2(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder='請輸入名稱'
+                                value={keyword3}
+                                style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                onChange={(e) => setKeyword3(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder='請輸入規格'
+                                value={keyword4}
+                                style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                onChange={(e) => setKeyword4(e.target.value)}
+                            />
                         </div>
-    
-    
                     ]}
-                    />
+                customeLeft={[
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
+                            </p>
+                        </div>
+                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                            <p style={{ color: '#14256a', fontSize: '16px' }}>
+                                物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
+                            </p>
+                        </div>
+                    </div>
+
+
+                ]}
+            />
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
@@ -929,17 +935,18 @@ export default function BomList() {
                                         <div className={scss.row01}>
                                             <span>
                                                 <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
-                                                    <img src={icon_cancel3.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                    <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                                 <button onClick={() => { handleEdit(index) }}>
                                                     <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
-                                                    <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                </button>
                                                 <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
                                                     <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                 </button>
+                                                <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+
                                             </span>
                                             <span>{index + 1}</span>
                                             <span>{_item.product_id}</span>
@@ -981,15 +988,17 @@ export default function BomList() {
                             <div className={scss.addbar}>
                                 <div>
                                     <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? 'none' : ''}` }}>
-                                        <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
-                                    <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
-                                        <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                    </button>
-                                    &nbsp;
                                     <button onClick={() => { handleAddByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
                                         <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                     </button>
+                                    &nbsp;
+                                    <button onClick={() => { handleEditByHandKey() }} style={{ display: `${edithandkey ? '' : 'none'}` }}>
+                                        <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                    </button>
+
+
                                 </div>
                                 <div></div>
                                 <div>

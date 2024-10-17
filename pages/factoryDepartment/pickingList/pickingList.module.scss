@@ -19,7 +19,7 @@
 .container {
   display: flex;
   overflow-y: hidden;
-  height: 712px;
+  // height: 712px;
 }
 
 .left {
@@ -30,7 +30,7 @@
   gap: 15px;
   border: 1px solid #c1c1c1;
   overflow-y: auto;
-  height: 712px;
+  // height: 712px;
   margin-right: 15px;
 }
 
@@ -47,7 +47,7 @@
   top: 0;
   right: 0;
   z-index: 1000;
-  height: 712px;
+  // height: 712px;
 }
 
 .content {
@@ -117,11 +117,12 @@
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns: 45px 150px 415px 415px 65px 65px 40px 40px 65px 300px 70px ;
-//   gap: 15px;
+  grid-template-columns: 60px 30px 150px 415px 415px 65px 65px 40px 40px 65px 300px 70px;
+  //   gap: 15px;
   width: auto;
   // margin: 5px 20px;
-  height: 25.14px;
+  // height: 25.14px;
+  padding: 10px 20px;
 
   div {
     // border-bottom: 1px solid gray;
@@ -160,6 +161,7 @@
   margin-right: 20px;
   padding-bottom: 5px;
   border-bottom: 1px solid rgb(214, 214, 214);
+
   div {
     margin-right: 2px;
   }
@@ -188,7 +190,7 @@
   grid-template-columns: 600px 1fr 1fr;
   // gap: 15px;
   width: auto;
-//   margin-top: 5px;
+  //   margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
@@ -300,10 +302,11 @@ div.panelHeader19 {
 //新增請購單明細
 div.panelHeader20 {
   border-bottom: solid 1px $colorBorder01;
-  
+
   .row01,
   .row02 {
-    padding-left: 15px;
+    padding: 10px 20px;
+
     span {
       font-weight: 400;
       font-size: 16px;
@@ -317,7 +320,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 150px 415px 415px 65px 65px 40px 40px 65px 300px 150px ;
+    grid-template-columns: 60px 30px 150px 415px 415px 65px 65px 40px 40px 65px 300px 150px;
     //   gap: 15px;
     // gap: 5px;
   }
@@ -609,7 +612,7 @@ div.panelHeader20 {
   width: 100%;
   resize: none; // 禁用自由調整高度的功能
   margin-left: 70px;
-  
+
 }
 
 .squarebtn {
@@ -682,7 +685,7 @@ div.panelHeader20 {
     /* 調整圖標位置 */
     cursor: not-allowed;
     /* 添加這行使滑鼠顯示禁止符號 */
-}
+  }
 
   &:focus {
     background-color: $bgc01;
@@ -693,65 +696,66 @@ div.panelHeader20 {
 
 
 .modal_head_head1 {
-    display: grid;
-    grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    // margin-top: 5px;
-    margin-left: 10px;
-    // margin-right: 20px;  
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  margin-left: 10px;
+  // margin-right: 20px;  
 
 
 }
 
 .modal_head_content1 {
-    display: grid;
-    grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    // margin-top: 5px;
-    // margin-left: 20px;
-    // margin-right: 20px;
+  display: grid;
+  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
 
 
 }
 
 
 div.panelHeader6 {
-    // padding: 14px 30px;
-    border-bottom: solid 1px $colorBorder01;
-    
-    //   background-color: rgb(245, 104, 69);
-    .row01,
-    .row02 {
-      padding-left: 20px;
-      span {
-        font-weight: 400;
-        font-size: 16px;
-      }
-  
-      .clientName,
-      .country {
-        color: $colorMain;
-      }
+  // padding: 14px 30px;
+  border-bottom: solid 1px $colorBorder01;
+
+  //   background-color: rgb(245, 104, 69);
+  .row01,
+  .row02 {
+    padding-left: 20px;
+
+    span {
+      font-weight: 400;
+      font-size: 16px;
     }
-  
-    .row01 {
-      display: grid;
-      grid-template-columns: 120px 80px 80px 100px 50px;
-      gap: 15px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-  
-    .selectedRow {
-      background-color: #ecf1ff;
-      /* 當前選擇項目的背景顏色 */
+
+    .clientName,
+    .country {
+      color: $colorMain;
     }
   }
 
+  .row01 {
+    display: grid;
+    grid-template-columns: 120px 80px 80px 100px 50px;
+    gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
-  
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
+
+
+
 .traytable {
   width: 100%;
   max-width: 100%;
@@ -830,10 +834,11 @@ div.panelHeader6 {
 //#region 進貨單明細
 div.panelHeader26 {
   border-bottom: solid 1px $colorBorder01;
-  
+
   .row01,
   .row02 {
     padding-left: 20px;
+
     span {
       font-weight: 400;
       font-size: 16px;
