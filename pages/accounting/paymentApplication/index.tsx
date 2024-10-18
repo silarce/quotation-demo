@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
 
@@ -9,11 +10,28 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import Table_paymentApplication from 'components/page/accounting/paymentApplication/table_paymentApplication';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import { SearchModal_invoice } from 'components/composition/searchModal/useSearchModal/useSearchModal_invoice';
+import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+
+// api
+import {
+  Tpayment_order_Dto,
+  Taccount_payable_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
+  apiGetPaymentOrder,
+  apiGetPaymentOrderById,
+  apiPostAddPaymentOrder,
+  apiDeletePaymentOrderById,
+  useGetPaymentOrder,
+  useGetPaymentOrderById,
+  useGetAccountPayableBySupplierId,
+} from 'js/api/api_netCore/api_accountant';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -21,6 +39,10 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import scss from './index.module.scss';
 
 // =========================================================================
+
+type Tquery = {
+  id: string | undefined;
+};
 
 interface TfakeDto {
   id: string;
@@ -50,14 +72,41 @@ interface state {
 
 // =========================================================================
 export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { id } = query;
+
   const defaultState = useDefaultState(fakeData);
 
   const [disabled, setDisabled] = useState(true);
   const [state, setState] = useState<state>(defaultState);
 
-  // 主表資料要放在這一層，資料同時要送到Profile與Table_paymentApplication
+  // --------------------------------------------------------------------------
+  const { res: raw_paymentOrder } = useGetPaymentOrderById(id);
+  console.log(raw_paymentOrder);
 
   // --------------------------------------------------------------------------
+
+  // region HANDLE
+
+  const handleSearch = () => {
+    DragableModal.create({
+      children: (
+        <SearchModal_paymentOrder
+          limit={1}
+          onRowClick={(raw) => {
+            const id = raw.id;
+            router.replace({
+              query: {
+                ...query,
+                id,
+              },
+            });
+          }}
+        />
+      ),
+    });
+  };
 
   const onEdit = () => {
     setDisabled(false);
@@ -79,24 +128,32 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
   // --------------------------------------------------------------------------
 
-  if (!isAdmin) {
-    return (
-      <SubLayer bodyPreStyle="style01">
-        <PageHeader02 tag="付款申請" />
+  // if (!isAdmin) {
+  //   return (
+  //     <SubLayer bodyPreStyle="style01">
+  //       <PageHeader02 tag="付款申請" />
 
-        <div>
-          <h1 className="text-5xl">施工中</h1>
-        </div>
-      </SubLayer>
-    );
-  }
+  //       <div>
+  //         <h1 className="text-5xl">施工中</h1>
+  //       </div>
+  //     </SubLayer>
+  //   );
+  // }
 
   return (
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag="付款申請" />
 
       <div>
-        <BtnBar className="mb-5" disabled={disabled} onEdit={onEdit} onCancel={onCancel} onConfirm={onConfirm} />
+        <BtnBar
+          //
+          className="mb-5"
+          disabled={disabled}
+          onSearchClick={handleSearch}
+          onEdit={onEdit}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+        />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
         <Table_paymentApplication />
       </div>
@@ -108,6 +165,7 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
 const BtnBar = ({
   disabled,
+  onSearchClick,
   onEdit,
   onCancel,
   onConfirm,
@@ -115,6 +173,7 @@ const BtnBar = ({
 }: {
   disabled: boolean;
 
+  onSearchClick: () => void;
   onEdit: () => void;
   onCancel: () => void;
   onConfirm: () => void;
@@ -123,7 +182,7 @@ const BtnBar = ({
   return (
     <div className={classNames(scss.btnBar, className)}>
       <div>
-        <SquareBtn content="search" />
+        <SquareBtn content="search" onClick={onSearchClick} />
       </div>
       <div className="flex gap-1">
         {disabled && (
