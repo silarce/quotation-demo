@@ -89,6 +89,9 @@ export default function EditWHPosition() {
     const [disabled, setDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
+
+    const [editstatus, setEditstatus] = useState<string>("");
+
     //#region 右側功能按鈕區塊
     // const panelList: TpanelList = [
     //還沒編輯前功能紐
@@ -98,6 +101,7 @@ export default function EditWHPosition() {
             label: '編輯',
             onClick: () => {
                 setDisabled(false);
+                setEditstatus("編輯");
             },
         },
         {
@@ -124,9 +128,10 @@ export default function EditWHPosition() {
         //先開放編輯功能
         {
             type: 'myButton',
-            label: '編輯',
+            label: '修改',
             onClick: () => {
                 setDisabled(false);
+                setEditstatus("修改");
             },
         },
         {
@@ -159,26 +164,52 @@ export default function EditWHPosition() {
             type: 'redButton',
             label: '儲存',
             onClick: () => {
-                if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
-                    data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
-                    data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
-                    data1.spec === '' || data1.spec === undefined || data1.spec === null &&
-                    data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
-                ) {
-                    myAlert.warning({ title: '請確實填寫儲位資訊' });
-                } else {
-                    myAlert.confirm({
-                        title: '確定修改?',
-                        content: <>
-                            <h1>修改後無法再編輯</h1>
-                        </>,
-                        props: {
-                            onOk: () => {
-                                setDisabled(true);
-                                handleSave();
+                if (editstatus === "編輯") {
+
+
+                    if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
+                        data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
+                        data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
+                        data1.spec === '' || data1.spec === undefined || data1.spec === null &&
+                        data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
+                    ) {
+                        myAlert.warning({ title: '請確實填寫儲位資訊' });
+                    } else {
+                        myAlert.confirm({
+                            title: '確定修改?',
+                            content: <>
+                                <h1>修改後無法再編輯</h1>
+                            </>,
+                            props: {
+                                onOk: () => {
+                                    setDisabled(true);
+                                    handleSave();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                } else {
+                    if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
+                        data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
+                        data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
+                        data1.spec === '' || data1.spec === undefined || data1.spec === null &&
+                        data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
+                    ) {
+                        myAlert.warning({ title: '請確實填寫儲位資訊' });
+                    } else {
+                        myAlert.confirm({
+                            title: '確定修改?',
+                            content: <>
+                                <h1>修改後無法再編輯</h1>
+                            </>,
+                            props: {
+                                onOk: () => {
+                                    setDisabled(true);
+                                    handleSave();
+                                }
+                            }
+                        });
+                    }
                 }
             },
         },
@@ -329,56 +360,110 @@ export default function EditWHPosition() {
 
     //更新儲位資料 api
     const updateData = async (updatedData: WHPositionModel) => {
-        try {
-            setIsLoading(true);
+        if (editstatus === "編輯") {
+            try {
+                setIsLoading(true);
 
-            const conditionModel: {
-                data: any,
-                username: string | undefined,
-            } = {
-                username: userInfo?.username as string | undefined,
-                data: updatedData
-            };
+                const conditionModel: {
+                    data: any,
+                    username: string | undefined,
+                } = {
+                    username: userInfo?.username as string | undefined,
+                    data: updatedData
+                };
 
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'test',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+                const inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'test',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
 
-            console.log(inputModel);
+                console.log(inputModel);
 
-            const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionByID`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionByID`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to update data');
+                }
+
+                router.replace({
+                    pathname: `/factoryDepartment/editWHPosition`,
+                    query: {
+                        type: 'WHPosition',
+                        whid: whid,
+                        trayname: trayname,
+                        whname: whname,
+                        id: id
+                    },
+                });
+            } catch (error) {
+                console.error('Error updating data:', error);
+            } finally {
+                setIsLoading(false);
             }
+        } else {
+            try {
+                setIsLoading(true);
 
-            if (!response.ok) {
-                throw new Error('Failed to update data');
+                const conditionModel: {
+                    data: any,
+                    username: string | undefined,
+                } = {
+                    username: userInfo?.username as string | undefined,
+                    data: updatedData
+                };
+
+                const inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'test',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(inputModel);
+
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionAndInventoryByID`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to update data');
+                }
+
+                router.replace({
+                    pathname: `/factoryDepartment/editWHPosition`,
+                    query: {
+                        type: 'WHPosition',
+                        whid: whid,
+                        trayname: trayname,
+                        whname: whname,
+                        id: id
+                    },
+                });
+            } catch (error) {
+                console.error('Error updating data:', error);
+            } finally {
+                setIsLoading(false);
             }
-
-            router.replace({
-                pathname: `/factoryDepartment/editWHPosition`,
-                query: {
-                    type: 'WHPosition',
-                    whid: whid,
-                    trayname: trayname,
-                    whname: whname,
-                    id: id
-                },
-            });
-        } catch (error) {
-            console.error('Error updating data:', error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
