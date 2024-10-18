@@ -194,7 +194,7 @@ export default function PurchaseOrderList() {
         if (!hasFetchedData.current) {
             getPurchaseOrder();
             GetReviewFlow();
-            
+
             hasFetchedData.current = true;
         }
     }, []);
@@ -247,9 +247,9 @@ export default function PurchaseOrderList() {
                 GetReviewById(data[0].purchaseorderuuid);
                 GetReviewHistory(data[0].purchaseorderid);
             }
-            console.log(typeof(quoterequuidin));
+            console.log(typeof (quoterequuidin));
             console.log(quoterequuidin);
-            console.log(quoterequuidin==='');
+            console.log(quoterequuidin === '');
         } catch (error: any) {
             setError(error.message);
         }
@@ -342,6 +342,7 @@ export default function PurchaseOrderList() {
             setNeed_datein(need_date as string);
             setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
+            GetProdReceiptById(purchaseorderid as string);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
     //#endregion
@@ -1429,7 +1430,7 @@ export default function PurchaseOrderList() {
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
                                 </button>
-                                
+
                             </div>
                             <div>
                                 {/* <span>
