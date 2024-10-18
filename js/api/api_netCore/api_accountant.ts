@@ -54,7 +54,7 @@ interface TpurchaseCollectTicket_Dto_detailed extends TpurchaseCollectTicket_Dto
 
 interface Tpayment_order_Dto_detailed extends Tpayment_order_Dto {
   detailArr: TpaymentOrderDetail_Dto[];
-  agent_employee: TemployeeDto;
+  agent_employee: TemployeeDto | undefined;
 }
 
 // =================================================================================
@@ -798,7 +798,7 @@ const apiGetPaymentOrderById = async (id: string) => {
   };
 
   return axi2
-    .get<Tpayment_order_Dto[]>(api, { params })
+    .get<Tpayment_order_Dto>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       return Promise.reject(err);
@@ -911,12 +911,12 @@ const useGetPaymentOrderById = (
 
     return apiGetPaymentOrderById(id)
       .then((data) => {
-        return data[0];
+        return data;
       })
       .then(async (paymentOrder) => {
         const [detailArr, employee_snake] = await Promise.all([
           await apiGetPaymentOrderDetailByPaymentOrderId(id),
-          await apiGetEmployee_id(paymentOrder.agentEmployeeId),
+          await apiGetEmployee_id(paymentOrder.agent_employee_id),
         ]);
 
         const paymentOrder_detailed: Tpayment_order_Dto_detailed = {

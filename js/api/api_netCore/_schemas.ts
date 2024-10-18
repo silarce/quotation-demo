@@ -173,18 +173,18 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
 // MARK:payment_order
 
 interface Tpayment_order_Dto extends Tbase {
-  serialNumber: string | null; // 申請單編號
-  beneficiaryUuid: string | null; // 廠商uuid
-  beneficiaryName: string | null; // 廠商名稱
-  applicantDate: string | null; // 申請日期
-  applicantDepartment: string | null; // 申請單位
-  agentEmployeeId: string; // 經辦人Id
-  offsetMethod: string | null; // 沖銷方式
-  payableMethod: string | null; // 支付方式
-  payableAmount: string | null; // 付款金額
-  remittanceFee: number | null; // 匯費外加
+  serial_number: string | null; // 申請單編號
+  beneficiar_uuid: string | null; // 廠商uuid
+  beneficiary_name: string | null; // 廠商名稱
+  applicant_date: string | null; // 申請日期
+  applicant_department: string | null; // 申請單位
+  agent_employee_id: string; // 經辦人Id
+  offset_method: string | null; // 沖銷方式
+  payable_method: string | null; // 支付方式
+  payable_amount: string | null; // 付款金額
+  remittance_fee: number | null; // 匯費外加
   deduction: number | null; // 折扣金額
-  actualPaid: number | null; // 實付金額
+  actualpaid: number | null; // 實付金額
   note: string | null; // 備註
 }
 
