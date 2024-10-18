@@ -581,6 +581,7 @@ export default function AddProdReceipt() {
         setOriginaldata2(data2);
         setEditmain(true);
         setPoopen(!poopen);
+        setOriginalCheckedItems(checkedItems);
     };
 
     const handlecancelAddPR = () => {
@@ -598,6 +599,7 @@ export default function AddProdReceipt() {
             setNote(originalnote);
             setPoopen(!poopen);
             setData2(originaldata2);
+            setCheckedItems(OriginalcheckedItems);
         } else {
             setSuppliernamein("");
             setSupplierphonein("");
@@ -610,6 +612,7 @@ export default function AddProdReceipt() {
             setNote("");
             setPoopen(!poopen);
             setData2([]);
+            setCheckedItems({});
         }
     };
 
@@ -647,6 +650,7 @@ export default function AddProdReceipt() {
     }
 
     const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
+    const [OriginalcheckedItems, setOriginalCheckedItems] = useState<{ [key: string]: boolean }>({});
 
     const handleToggleProdreceiptdetail = async (item: any, isChecked: boolean) => {
         // console.log(item);
