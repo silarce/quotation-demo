@@ -6,6 +6,7 @@ import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
+import { apiGetCustomers_id, TcustomerDto } from '../api_customer';
 
 import type {
   //
@@ -55,6 +56,7 @@ interface TpurchaseCollectTicket_Dto_detailed extends TpurchaseCollectTicket_Dto
 interface Tpayment_order_Dto_detailed extends Tpayment_order_Dto {
   detailArr: TpaymentOrderDetail_Dto[];
   agent_employee: TemployeeDto | undefined;
+  beneficiary: TcustomerDto | undefined;
 }
 
 // =================================================================================
@@ -914,15 +916,25 @@ const useGetPaymentOrderById = (
         return data;
       })
       .then(async (paymentOrder) => {
-        const [detailArr, employee_snake] = await Promise.all([
+        const [detailArr, employee_snake, beneficiary] = await Promise.all([
           await apiGetPaymentOrderDetailByPaymentOrderId(id),
-          await apiGetEmployee_id(paymentOrder.agent_employee_id),
+          await apiGetEmployee_id(paymentOrder.agent_employee_id).catch((err: AxiosError) => {
+            console.log(err.response?.data);
+
+            return undefined;
+          }),
+          await apiGetCustomers_id(paymentOrder.beneficiary_uuid).catch((err: AxiosError) => {
+            console.log(err.response?.data);
+
+            return undefined;
+          }),
         ]);
 
         const paymentOrder_detailed: Tpayment_order_Dto_detailed = {
           ...paymentOrder,
           detailArr: detailArr,
           agent_employee: employee_snake,
+          beneficiary,
         };
 
         setRes(paymentOrder_detailed);

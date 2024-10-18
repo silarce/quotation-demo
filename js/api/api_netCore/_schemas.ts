@@ -174,7 +174,7 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
 
 interface Tpayment_order_Dto extends Tbase {
   serial_number: string | null; // 申請單編號
-  beneficiar_uuid: string | null; // 廠商uuid
+  beneficiary_uuid: string; // 廠商uuid
   beneficiary_name: string | null; // 廠商名稱
   applicant_date: string | null; // 申請日期
   applicant_department: string | null; // 申請單位

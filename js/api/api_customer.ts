@@ -348,7 +348,7 @@ export const useApiCustomersNumberExist = (customerNumber: string) => {
 // ============================================================
 // 取得個別客戶資料
 
-const apiGetCustomers_id = (id: string, params?: TapiGetCustomersParams) => {
+export const apiGetCustomers_id = (id: string, params?: TapiGetCustomersParams) => {
   const api = `/customers/${id}`;
 
   params = {
@@ -359,7 +359,7 @@ const apiGetCustomers_id = (id: string, params?: TapiGetCustomersParams) => {
   return axi
     .get<TcustomerDto_TC>(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err.message));
+    .catch((err) => Promise.reject(err));
 };
 
 export const useCustomersById = (id: string | undefined, params?: TapiGetCustomersParams) => {
