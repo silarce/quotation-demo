@@ -32,6 +32,7 @@ import icon_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
 
 //日期
 import moment, { Moment } from "moment";
@@ -95,9 +96,13 @@ export default function AddProdReceipt() {
     const [invoicein, setInvoicein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [supplieridin, setSupplieridin] = useState<string>("");
+    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
+    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
     //紀錄進貨單回壓採購單
     const [receiptid, setReceiptidin] = useState<string>("");
     const [purchaseorderid, setPurchaseorderid] = useState<string>("");
+    const [pocreate_by, setPocreate_by] = useState<string>("");
+    const [pocreate_at, setPocreate_at] = useState<string>("");
 
     // 手key輸入
     const [handinputname, setHandinputname] = useState<string>("");
@@ -248,7 +253,8 @@ export default function AddProdReceipt() {
             try {
                 setIsLoading(true);
                 const conditionModel = {
-                    // purchaseorderuuid: purchaseorderuuid,
+                    purchaseorderid: purchaseorderid,
+                    prodreceiptuuid: prodreceiptuuid,
                     create_at: create_atin,
                     // need_date: moment(need_date).format('YYYY-MM-DD'),
                     create_by: create_byin,
@@ -258,6 +264,8 @@ export default function AddProdReceipt() {
                     suppliertaxid: suppliertaxidin,
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
+                    supplierfax: supplierfaxin,
+                    suppliercontact: suppliercontactin,
                     // shippingaddress: shippingaddressin,
                     data2: data2
                 };
@@ -271,7 +279,7 @@ export default function AddProdReceipt() {
 
                 console.log(JSON.stringify(conditionModel));
 
-                const response = await fetch(`${setting.apipath}/WareHouse/UpdateAddPurchaseOrder`, {
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateAddProdReceipt`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -288,6 +296,7 @@ export default function AddProdReceipt() {
                 getProdReceipt();
                 getProdReceiptDetail(prodreceiptuuid);
                 setEditmain(false);
+                GetPurchaseOrderForAddProdReceipt();
 
             } catch (error: any) {
                 // setError(error.message);
@@ -347,6 +356,7 @@ export default function AddProdReceipt() {
                 setStatus("未送出");
                 getProdReceipt();
                 getProdReceiptDetail(responsedata.id);
+                GetPurchaseOrderForAddProdReceipt();
                 // getPurchaseOrder();
                 // getProduct();
                 // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
@@ -539,7 +549,7 @@ export default function AddProdReceipt() {
                 </>,
                 props: {
                     onOk: async () => {
-                        // AddProdReceipt();
+                        AddProdReceipt();
                     }
                 }
             })
@@ -620,11 +630,14 @@ export default function AddProdReceipt() {
         setNote(item.note);
         setCreate_atin(item.create_at);
         setPurchaseorderid(item.purchaseorderid);
+
         // setNeed_date(item.need_date);
         setSuppliernamein(item.suppliername);
         setSupplierphonein(item.supplierphone);
         setSuppliertaxidin(item.suppliertaxid);
         setSupplieraddressin(item.supplieraddress);
+        setSuppliercontactin(item.suppliercontact);
+        setSupplierfaxin(item.supplierfax);
         // setShippingaddressin(item.shippingaddress);
         // setNeed_date(item.need_date);
         setCreate_byin(item.create_by);
@@ -636,6 +649,10 @@ export default function AddProdReceipt() {
     const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
 
     const handleToggleProdreceiptdetail = async (item: any, isChecked: boolean) => {
+        // console.log(item);
+        setSuppliercontactin(item.purchaseOrder.suppliercontact);
+        setSupplierfaxin(item.purchaseOrder.supplierfax);
+
         // 確保 purchaseorderid 是字串並進行初始化
         const currentPurchaseOrderStr = purchaseorderid?.toString() || '';
 
@@ -658,6 +675,30 @@ export default function AddProdReceipt() {
 
         // 將陣列轉回字串，並存入 state 中
         setPurchaseorderid(purchaseOrderArray.join(','));
+
+
+        const currentPocreate_atStr = pocreate_at?.toString() || '';
+
+        // 將現有的 purchaseorderid 拆分成陣列
+        let pocreate_atArray = currentPocreate_atStr
+            ? currentPocreate_atStr.split(',').map((po: any) => po.trim()).filter((po: any) => po)
+            : [];
+
+        const newPocreate_at = item.purchaseOrder.create_at?.toString().trim();
+
+        if (isChecked && newPocreate_at) {
+            // 如果是勾選狀態且該 id 不存在於陣列中，則新增
+            if (!pocreate_atArray.includes(newPocreate_at)) {
+                pocreate_atArray.push(newPocreate_at);
+            }
+        } else if (!isChecked && newPocreate_at) {
+            // 如果是取消勾選狀態且該 id 存在於陣列中，則移除
+            pocreate_atArray = pocreate_atArray.filter(po => po !== newPocreate_at);
+        }
+        setPocreate_at(pocreate_atArray.join(','));
+
+
+
 
         if (suppliernamein === '' || suppliernamein === null || suppliernamein === undefined || suppliernamein === item.purchaseOrder.suppliername) {
             setSuppliernamein(item.purchaseOrder.suppliername);
@@ -747,10 +788,125 @@ export default function AddProdReceipt() {
     //     }
     // }, [data2]);
 
-    const handledele = async (item: any) => {
+    const handleDelete = async () => {
+        myAlert.confirm({
+            title: '確定要刪除這筆單據嗎?',
+            content: <>
+                <h1>刪除後將無法復原</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            id: prodreceiptuuid
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/DeleteProdReceipt?${queryParams}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const responseData = await response.text();
+
+                        myAlert.success({ title: '刪除成功' });
+
+                        getProdReceipt();
+                        setData2([]);
+                        setCheckedItems({});
+                        setProdreceiptid('');
+                        setSuppliernamein('');
+                        setSupplieraddressin('');
+                        setSupplierphonein('');
+                        setSuppliertaxidin('');
+                        setSuppliercontactin('');
+                        setSupplierfaxin('');
+                        setStatus('');
+                        setNote('');
+                        setPurchaseorderid('')
+                        setPocreate_at('');//目前沒用
+                        setPocreate_by('');//目前沒用
+
+
+
+                    } catch (error: any) {
+                        console.error(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+
+                }
+            }
+        })
+
+
 
     }
 
+    const handlesent = async () => {
+        // console.log(data2);
+        // return;
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                prodreceiptid: prodreceiptid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/SentProdReceipt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.text();
+
+            getProdReceipt();
+            setData2([]);
+            setCheckedItems({});
+            setProdreceiptid('');
+            setSuppliernamein('');
+            setSupplieraddressin('');
+            setSupplierphonein('');
+            setSuppliertaxidin('');
+            setSuppliercontactin('');
+            setSupplierfaxin('');
+            setStatus('');
+            setNote('');
+            setPurchaseorderid('')
+            setPocreate_at('');//目前沒用
+            setPocreate_by('');//目前沒用
+            GetPurchaseOrderForAddProdReceipt();
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.error(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
 
     //#endregion
@@ -929,8 +1085,18 @@ export default function AddProdReceipt() {
                                 取消
                             </button>
                         </div>
-                        <div></div>
-                        <div></div>
+                        <div>
+                            <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handleDelete() }} title="單據刪除">
+                                <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                刪除
+                            </button>
+                        </div>
+                        <div>
+                            <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlesent() }} title="單據申請">
+                                <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                送出
+                            </button>
+                        </div>
                     </div>
                     <div className={scss.head_body}>
                         <div>
@@ -1047,6 +1213,10 @@ export default function AddProdReceipt() {
                                 </div>
                                 <div>
                                     {purchaseorderid}
+                                    <br />
+                                    {suppliercontactin}
+                                    <br />
+                                    {supplierfaxin}
                                     {/* <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
@@ -1225,8 +1395,8 @@ export default function AddProdReceipt() {
                                                                                 <th style={{ width: '50px' }}>序</th>
                                                                                 <th style={{ width: '100px' }}>料號</th>
                                                                                 <th style={{ width: '300px' }}>名稱</th>
-                                                                                <th>規格</th>
-                                                                                {/* <th>已進</th> */}
+                                                                                <th style={{ width: '400px' }}>規格</th>
+                                                                                <th>已進</th>
                                                                                 <th>數量</th>
                                                                                 <th>單價</th>
                                                                                 <th>金額</th>
@@ -1238,8 +1408,8 @@ export default function AddProdReceipt() {
                                                                                     <td style={{ width: '50px' }}>{detailIndex + 1}</td>
                                                                                     <td style={{ width: '100px' }}>{detail.productid}</td>
                                                                                     <td style={{ width: '300px' }}>{detail.name}</td>
-                                                                                    <td>{detail.spec}</td>
-                                                                                    {/* <td>{detail.alreadyinquantity}</td> */}
+                                                                                    <td style={{ width: '400px' }}>{detail.spec}</td>
+                                                                                    <td style={{color:'#ea1833'}}>{detail.alreadyinquantity}</td>
                                                                                     <td>{detail.quantity?.toLocaleString()}</td>
                                                                                     <td>{detail.unitprice?.toLocaleString()}</td>
                                                                                     <td>{detail.totalprice?.toLocaleString()}</td>
