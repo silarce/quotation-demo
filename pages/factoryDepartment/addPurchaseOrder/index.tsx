@@ -580,7 +580,6 @@ export default function AddPurchaseOrder() {
                 setPurchaseorderuuid(data[0].id);
                 setStatus("未送出");
                 getPurchaseOrder();
-                setStatus("未送出");
                 console.log(data);
 
                 // getProduct();

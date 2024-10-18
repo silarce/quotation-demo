@@ -2685,7 +2685,7 @@ export default function AddPurchaseOrder() {
                                                 }}
                                             />
                                         </span>
-                                        <span>
+                                        {/* <span>
                                             <button
                                                 onClick={() => {
                                                     setQuotereqcanedit(false);
@@ -2694,7 +2694,7 @@ export default function AddPurchaseOrder() {
                                             >
                                                 <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                             </button>
-                                        </span>
+                                        </span> */}
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
@@ -2835,7 +2835,7 @@ export default function AddPurchaseOrder() {
                                         onChange={(e) => setHandinputunit(e.target.value)}
                                     />
                                 </div>
-                                <div>
+                                {/* <div>
                                     <button
                                         onClick={() => {
                                             prQuotereqModalOpen(true, handinputproductid)
@@ -2843,7 +2843,7 @@ export default function AddPurchaseOrder() {
                                     >
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                     </button>
-                                </div>
+                                </div> */}
                                 <div>
                                     <input
                                         type="text"
@@ -3115,7 +3115,8 @@ export default function AddPurchaseOrder() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.detail_id === selectedItemId ? scss.selectedRow : ''}`}
-                                            onClick={() => { handlechangepo(_item) }}>
+                                            // onClick={() => { handlechangepo(_item) }}
+                                            >
                                             <span>{index + 1}</span>
                                             <span>{_item.detail_productid}</span>
                                             <span>{_item.detail_name}</span>

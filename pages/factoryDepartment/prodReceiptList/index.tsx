@@ -235,19 +235,19 @@ export default function ProdReceiptList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增進貨單',
-        //     onClick: () => {
-        //         // setOpen(true);
-        //         router.push({
-        //             pathname: `/factoryDepartment/addProdReceipt`,
-        //             query: {
-        //                 type: 'addProdreceipt',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增進貨單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addProdReceipt`,
+                    query: {
+                        type: 'addProdreceipt',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -1504,20 +1504,19 @@ export default function ProdReceiptList() {
                                                 },
                                             }}
                                         /> */}
-                                        <span style={{ color: "#14256a", fontSize: '18px',marginRight:'25px'}}>
+                                        {/* <span style={{ color: "#14256a", fontSize: '18px',marginRight:'25px'}}>
                                             採購單號
                                             </span>
                                         <select
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '18px' }}
-                                            onChange={(e) => e.preventDefault()} // 阻止選擇變更
+                                            onChange={(e) => e.preventDefault()}
                                         >
-                                            {/* 如果是 string，先拆分；如果是 string[]，直接使用 */}
                                             {(Array.isArray(purchaseorderidin) ? purchaseorderidin : (purchaseorderidin || '').split(',')).map((order, index) => (
                                                 <option key={index} value={order.trim()}>
                                                     {order.trim() || '無資料'}
                                                 </option>
                                             ))}
-                                        </select>
+                                        </select> */}
                                     </div>
                                     <div>
                                         <InputSel
@@ -1530,7 +1529,7 @@ export default function ProdReceiptList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="採購日期"
                                             disabled={true}
@@ -1539,7 +1538,7 @@ export default function ProdReceiptList() {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                     <div>
                                         <InputSel
@@ -1552,7 +1551,7 @@ export default function ProdReceiptList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="採購人員"
                                             disabled={true}
@@ -1561,7 +1560,7 @@ export default function ProdReceiptList() {
                                                     value: (checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
 
                                 </div>
