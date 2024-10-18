@@ -8,7 +8,7 @@
 
 .profile {
   display: grid;
-  grid-template-columns: 400px repeat(2, 300px);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   padding: 20px;
   border: solid 1px theme("colors.border");

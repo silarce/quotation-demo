@@ -918,16 +918,20 @@ const useGetPaymentOrderById = (
       .then(async (paymentOrder) => {
         const [detailArr, employee_snake, beneficiary] = await Promise.all([
           await apiGetPaymentOrderDetailByPaymentOrderId(id),
-          await apiGetEmployee_id(paymentOrder.agent_employee_id).catch((err: AxiosError) => {
-            console.log(err.response?.data);
+          paymentOrder.agent_employee_id
+            ? await apiGetEmployee_id(paymentOrder.agent_employee_id).catch((err: AxiosError) => {
+                console.log(err.response?.data);
 
-            return undefined;
-          }),
-          await apiGetCustomers_id(paymentOrder.beneficiary_uuid).catch((err: AxiosError) => {
-            console.log(err.response?.data);
+                return undefined;
+              })
+            : undefined,
+          paymentOrder.beneficiary_uuid
+            ? await apiGetCustomers_id(paymentOrder.beneficiary_uuid).catch((err: AxiosError) => {
+                console.log(err.response?.data);
 
-            return undefined;
-          }),
+                return undefined;
+              })
+            : undefined,
         ]);
 
         const paymentOrder_detailed: Tpayment_order_Dto_detailed = {

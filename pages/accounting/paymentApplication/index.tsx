@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-
+import moment, { Moment } from 'moment';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
+// layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
@@ -31,10 +33,13 @@ import {
   useGetPaymentOrder,
   useGetPaymentOrderById,
   useGetAccountPayableBySupplierId,
+  Tpayment_order_Dto_detailed,
 } from 'js/api/api_netCore/api_accountant';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { TemployeeDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import scss from './index.module.scss';
 
@@ -44,31 +49,44 @@ type Tquery = {
   id: string | undefined;
 };
 
-interface TfakeDto {
-  id: string;
+interface Tstate {
+  id: string | undefined;
+  serial_number: string | ''; // 申請單編號
+  applicant_department: string | ''; // 申請單位
+  offset_method: string | ''; // 沖銷方式
+  payable_method: string | ''; // 支付方式
+  note: string | ''; // 備註
 
-  付款申請單號: string;
-  申請日期: string;
-  經辦人員: string;
-  廠商代號: string;
-  扣款類別: string;
-  立帳方式: string;
-  發票號碼: string;
+  remittance_fee: `${number}` | ''; // 匯費外加
+  deduction: `${number}` | ''; // 折扣金額
+  actualpaid: `${number}` | ''; // 實付金額
+  total: `${number}` | ''; // 總金額
+
+  applicant_date: Moment | null; // 申請日期
+
+  beneficiary: TcustomerDto | undefined; // 廠商
+  agent: TemployeeDto | undefined; // 經辦人
+
+  detailArr: TstateDetail[];
 }
 
-interface state {
-  id?: string;
+interface TstateDetail {
+  id: string | undefined;
 
-  付款申請單號: string;
-  申請日期: string;
-  經辦人員: string;
-  廠商代號: string;
-  扣款類別: string;
-  立帳方式: string;
-  發票號碼: string;
+  source_number: string | ''; // 立帳來源單號
+  invoice_number: string | ''; // 發票號碼
+  note: string | ''; // 備註
+  //
+  payable_amount: `${number}` | ''; // 應付帳款
+  settled_amount: `${number}` | ''; // 已付帳款
+  balance: `${number}` | ''; // 未付款餘額
+
+  payment_date: Moment | null; // 付款日期
+  transaction_date: Moment | null; // 交易日期
+  //
+  // payment_order_id: string | null; // 付款申請單uuid
+  account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
 }
-
-// interface TinputSelPr
 
 // =========================================================================
 export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
@@ -76,14 +94,15 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   const query = router.query as Tquery;
   const { id } = query;
 
-  const defaultState = useDefaultState(fakeData);
-
   const [disabled, setDisabled] = useState(true);
-  const [state, setState] = useState<state>(defaultState);
 
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder } = useGetPaymentOrderById(id);
   // console.log(raw_paymentOrder);
+
+  // --------------------------------------------------------------------------
+
+  const { state, setState, createSetDetail } = usePaymentOrder(raw_paymentOrder, disabled);
 
   // --------------------------------------------------------------------------
 
@@ -121,10 +140,6 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   };
 
   // --------------------------------------------------------------------------
-
-  useEffect(() => {
-    setState(defaultState);
-  }, [defaultState, disabled]);
 
   // --------------------------------------------------------------------------
 
@@ -205,6 +220,7 @@ const BtnBar = ({
   );
 };
 
+// MARK:Profile
 const Profile = ({
   //
   disabled,
@@ -214,8 +230,8 @@ const Profile = ({
 }: {
   disabled: boolean;
   className?: string;
-  state: state;
-  setState: React.Dispatch<React.SetStateAction<state>>;
+  state: Tstate;
+  setState: React.Dispatch<React.SetStateAction<Tstate>>;
 }) => {
   const inputSelConfig_profile: TinputSelProps = {
     disabled,
@@ -232,22 +248,7 @@ const Profile = ({
         <SearchModal_customer
           onRowClick={(customer) => {
             setState((prev) => {
-              return { ...prev, 廠商代號: customer.customerNumber };
-            });
-            unmount();
-          }}
-        />
-      ),
-    });
-  };
-
-  const selectInvoice = () => {
-    const { unmount } = DragableModal.create({
-      children: (
-        <SearchModal_invoice
-          onRowClick={(invoice) => {
-            setState((prev) => {
-              return { ...prev, 發票號碼: invoice.invoiceNumber };
+              return { ...prev, beneficiary: customer };
             });
             unmount();
           }}
@@ -257,16 +258,25 @@ const Profile = ({
   };
 
   return (
-    <div className={classNames(scss.profile, className)}>
-      <InputSel {...inputSelConfig_profile} caption="付款申請單號" showBaseline="invisible" node={state.付款申請單號} />
+    <div className={classNames('global_grid01', className)}>
+      <InputSel
+        {...inputSelConfig_profile}
+        caption="付款申請單號"
+        showBaseline="invisible"
+        node={state.serial_number}
+      />
+
       <InputSel
         {...inputSelConfig_profile}
         caption="申請日期"
         showBaseline="invisible"
-        node={getTaiwanDateStr(state.申請日期)}
+        node={getTaiwanDateStr(state.applicant_date?.toISOString() || null)}
       />
-      <InputSel {...inputSelConfig_profile} caption="經辦人員" showBaseline="invisible" node={state.經辦人員} />
 
+      <InputSel {...inputSelConfig_profile} caption="經辦人員" showBaseline="invisible" node={state.agent?.chName} />
+
+      <div></div>
+      {/*  */}
       <InputSel
         {...inputSelConfig_profile}
         caption="廠商代號"
@@ -280,31 +290,29 @@ const Profile = ({
             onClick={selectCustomer}
           />
         }
-        node={state.廠商代號}
+        node={<div>{state.beneficiary?.customerNumber}</div>}
       />
+
       <InputSel
         {...inputSelConfig_profile}
-        caption="扣稅類別"
-        inputProps={{
-          props: {
-            value: state.扣款類別,
-            onChange: (e) => {
-              setState((prev) => {
-                return { ...prev, 扣款類別: e.target.value };
-              });
-            },
-          },
-        }}
+        caption="廠商名稱"
+        htmlFor=""
+        showBaseline="invisible"
+        node={state.beneficiary?.name}
       />
+
+      <div></div>
+      <div></div>
+      {/*  */}
       <InputSel
         {...inputSelConfig_profile}
-        caption="立帳方式"
+        caption="沖銷方式"
         inputProps={{
           props: {
-            value: state.立帳方式,
+            value: state.offset_method,
             onChange: (e) => {
               setState((prev) => {
-                return { ...prev, 立帳方式: e.target.value };
+                return { ...prev, offset_method: e.target.value };
               });
             },
           },
@@ -313,18 +321,17 @@ const Profile = ({
 
       <InputSel
         {...inputSelConfig_profile}
-        caption="發票號碼"
-        htmlFor=""
-        showBaseline="invisible"
-        suffix={
-          <SquareBtn
-            className={classNames('mr-2', disabled && 'invisible')}
-            sharp="mini"
-            label="選擇發票"
-            onClick={selectInvoice}
-          />
-        }
-        node={state.發票號碼}
+        caption="支付方式"
+        inputProps={{
+          props: {
+            value: state.payable_method,
+            onChange: (e) => {
+              setState((prev) => {
+                return { ...prev, payable_method: e.target.value };
+              });
+            },
+          },
+        }}
       />
     </div>
   );
@@ -332,24 +339,111 @@ const Profile = ({
 
 // =========================================================================
 
-const useDefaultState = (fakeData: TfakeDto) => {
-  const defaultState: state = useMemo(() => {
-    return { ...fakeData };
-  }, [fakeData]);
-
-  return defaultState;
-};
+// =========================================================================
 
 // =========================================================================
 
-const fakeData: TfakeDto = {
-  id: '1',
+// MARK:usePaymentOrder
+const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefined, disabled: boolean) => {
+  const defaultState: Tstate = useMemo(() => {
+    if (raw_paymentOrder === undefined) {
+      return emptyState();
+    }
 
-  付款申請單號: '123',
-  申請日期: '2021/01/01',
-  經辦人員: 'larry',
-  廠商代號: '456',
-  扣款類別: '789',
-  立帳方式: '101112',
-  發票號碼: '131415',
+    const detailArr: TstateDetail[] = raw_paymentOrder.detailArr.map((detail) => createStateDetail(detail));
+
+    const state: Tstate = {
+      id: raw_paymentOrder.id,
+      serial_number: raw_paymentOrder.serial_number || '',
+      applicant_department: raw_paymentOrder.applicant_department || '',
+      offset_method: raw_paymentOrder.offset_method || '',
+      payable_method: raw_paymentOrder.payable_method || '',
+      note: raw_paymentOrder.note || '',
+
+      remittance_fee: `${raw_paymentOrder.remittance_fee ?? ''}`,
+      deduction: `${raw_paymentOrder.deduction ?? ''}`,
+      actualpaid: `${raw_paymentOrder.actualpaid ?? ''}`,
+      total: `${raw_paymentOrder.total ?? ''}`,
+
+      applicant_date: raw_paymentOrder.applicant_date ? moment(raw_paymentOrder.applicant_date) : null,
+      beneficiary: raw_paymentOrder.beneficiary,
+      agent: raw_paymentOrder.agent_employee,
+      detailArr,
+    };
+
+    return state;
+  }, [raw_paymentOrder]);
+
+  const [state, setState] = useState<Tstate>(defaultState);
+
+  const createSetDetail = (index: number) => {
+    return (detail: TstateDetail) => {
+      setState((state) => {
+        const copy_stateDetail = [...state.detailArr];
+        let total = state.total;
+
+        const shouldCalcTotal = copy_stateDetail[index].payable_amount !== detail.payable_amount;
+
+        if (shouldCalcTotal) {
+          total = copy_stateDetail
+            .reduce((acc, cur) => {
+              return acc.add(cur.payable_amount || 0);
+            }, new Decimal(0))
+            .toString() as `${number}`;
+        }
+
+        copy_stateDetail[index] = detail;
+
+        return { ...state, total, detailArr: copy_stateDetail };
+      });
+    };
+  };
+
+  useEffect(() => {
+    setState(defaultState);
+  }, [defaultState, disabled]);
+
+  return { state, setState, createSetDetail };
+};
+// region =========================================================================
+// region =========================================================================
+// region =========================================================================
+
+const emptyState = (): Tstate => ({
+  id: undefined,
+
+  serial_number: '',
+  applicant_department: '',
+  offset_method: '',
+  payable_method: '',
+  note: '',
+
+  remittance_fee: '',
+  deduction: '',
+  actualpaid: '',
+  total: '',
+
+  applicant_date: null,
+
+  beneficiary: undefined,
+  agent: undefined,
+
+  detailArr: [],
+});
+
+const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
+  const stateDetail: TstateDetail = {
+    id: detail.id,
+    source_number: detail.source_number || '',
+    invoice_number: detail.invoice_number || '',
+    note: detail.note || '',
+    payable_amount: `${detail.payable_amount || ''}`,
+    settled_amount: `${detail.settled_amount || ''}`,
+    balance: `${detail.balance || ''}`,
+    payment_date: detail.payment_date ? moment(detail.payment_date) : null,
+    transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
+    account_payable_id: detail.account_payable_id,
+  };
+
+  return stateDetail;
 };

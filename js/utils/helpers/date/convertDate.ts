@@ -39,7 +39,7 @@ export const convertDate_add1911 = (ISOString: string) => {
 };
 
 export const getTaiwanDateStr = (
-  ISOString: string | null,
+  ISOString: string | null | undefined,
   {
     withUnit,
     customFormat,

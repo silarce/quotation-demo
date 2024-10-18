@@ -174,18 +174,18 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
 
 interface Tpayment_order_Dto extends Tbase {
   serial_number: string | null; // 申請單編號
-  beneficiary_uuid: string; // 廠商uuid
+  beneficiary_uuid: string | null; // 廠商uuid
   beneficiary_name: string | null; // 廠商名稱
   applicant_date: string | null; // 申請日期
   applicant_department: string | null; // 申請單位
-  agent_employee_id: string; // 經辦人Id
+  agent_employee_id: string | null; // 經辦人Id
   offset_method: string | null; // 沖銷方式
   payable_method: string | null; // 支付方式
-  payable_amount: string | null; // 付款金額
   remittance_fee: number | null; // 匯費外加
   deduction: number | null; // 折扣金額
   actualpaid: number | null; // 實付金額
   note: string | null; // 備註
+  total: number | null;
 }
 
 interface TpaymentOrderDetail_Dto extends Tbase {
@@ -199,14 +199,15 @@ interface TpaymentOrderDetail_Dto extends Tbase {
   balance: number | null; // 未付款餘額
   note: string | null; // 備註
   // payment_order_id: string; //付款申請主檔id
-  account_apayable_uuid: string; //應付帳款uuid
+  account_payable_id: string | null; //應付帳款uuid
 }
 
 type TcreatePaymentOrderDetail_Dto = Pick<
   TpaymentOrderDetail_Dto,
-  'source_number' | 'transaction_date' | 'payment_date' | 'invoice_number' | 'note' | 'payable_amount'
+  'source_number' | 'transaction_date' | 'payment_date' | 'invoice_number' | 'note'
 > & {
   account_payable_id: string;
+  payable_amount: `${number}` | null;
 };
 
 interface TcreatePaymentOrder_Dto {
@@ -215,10 +216,10 @@ interface TcreatePaymentOrder_Dto {
   applicant_department: string | null;
   agent_employee_id: string | null;
   offset_method: string | null;
-  total: string | null;
-  remittance_fee: string | null;
-  deduction: string | null;
-  actualpaid: string | null;
+  total: `${number}` | null;
+  remittance_fee: `${number}` | null;
+  deduction: `${number}` | null;
+  actualpaid: `${number}` | null;
   note: string | null;
   data: TcreatePaymentOrderDetail_Dto[];
 }
