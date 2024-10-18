@@ -65,5 +65,18 @@
     "entry_status": "entry_status",
     "note": "摘要說明",
     "wholeInvoiceNumber": "完整發票號碼"
+  },
+  "paymentOrder": {
+    "serial_number": "申請單編號",
+    "beneficiary_name": "廠商名稱",
+    "applicant_date": "申請日期",
+    "applicant_department": "申請單位",
+    "offset_method": "沖銷方式",
+    "payable_method": "支付方式",
+    "payable_amount": "付款金額",
+    "remittance_fee": "匯費外加",
+    "deduction": "折扣金額",
+    "actualpaid": "實付金額",
+    "note": "備註"
   }
 }
