@@ -13,6 +13,7 @@ import Table_paymentApplication from 'components/page/accounting/paymentApplicat
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import { SearchModal_invoice } from 'components/composition/searchModal/useSearchModal/useSearchModal_invoice';
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
+import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
@@ -42,6 +43,7 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { TemployeeDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import scss from './index.module.scss';
+import { nanoid } from 'nanoid';
 
 // =========================================================================
 
@@ -72,21 +74,26 @@ interface Tstate {
 
 interface TstateDetail {
   id: string | undefined;
+  identifier: string; // 識別碼
 
   source_number: string | ''; // 立帳來源單號
   invoice_number: string | ''; // 發票號碼
-  note: string | ''; // 備註
+  note: string | ''; // 備註 // 摘要說明
   //
-  payable_amount: `${number}` | ''; // 應付帳款
-  settled_amount: `${number}` | ''; // 已付帳款
-  balance: `${number}` | ''; // 未付款餘額
+  payable_amount: `${number}` | ''; // 應付帳款 // 本次沖銷
 
   payment_date: Moment | null; // 付款日期
   transaction_date: Moment | null; // 交易日期
   //
-  // payment_order_id: string | null; // 付款申請單uuid
   account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
+  //
+  // 虛值，get沒給也不會傳到後端
+  // 這兩個值來自account_payable，新增時才會從account_payable取得
+  settled_amount: `${number}` | '' | null; // account_payable已付帳款
+  balance: `${number}` | '' | null; // account_payable餘額 // 未沖餘額
 }
+
+export type { TstateDetail };
 
 // =========================================================================
 export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
@@ -170,7 +177,27 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
           onConfirm={onConfirm}
         />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
-        <Table_paymentApplication />
+
+        <div>
+          <Detail_thead />
+          {state.detailArr.map((stateDetail, index) => {
+            const setStateDetail = createSetDetail(index);
+
+            return (
+              <Detail
+                key={stateDetail.identifier}
+                disabled={disabled}
+                stateDetail={stateDetail}
+                setStateDetail={setStateDetail}
+                indexNumber={index + 1}
+              />
+            );
+          })}
+
+          <Detail_tfoot total={Number(state.total || 0).toLocaleString()} />
+        </div>
+
+        {/* <Table_paymentApplication /> */}
       </div>
     </SubLayer>
   );
@@ -339,10 +366,6 @@ const Profile = ({
 
 // =========================================================================
 
-// =========================================================================
-
-// =========================================================================
-
 // MARK:usePaymentOrder
 const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefined, disabled: boolean) => {
   const defaultState: Tstate = useMemo(() => {
@@ -377,10 +400,15 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
   const [state, setState] = useState<Tstate>(defaultState);
 
   const createSetDetail = (index: number) => {
-    return (detail: TstateDetail) => {
-      setState((state) => {
-        const copy_stateDetail = [...state.detailArr];
-        let total = state.total;
+    const setDetail: React.Dispatch<React.SetStateAction<TstateDetail>> = (
+      // dispatch: ((detail: TstateDetail) => TstateDetail) | TstateDetail
+      dispatch
+    ) => {
+      setState((state_prev) => {
+        const detail = typeof dispatch === 'function' ? dispatch(state_prev.detailArr[index]) : dispatch;
+
+        const copy_stateDetail = [...state_prev.detailArr];
+        let total = state_prev.total;
 
         const shouldCalcTotal = copy_stateDetail[index].payable_amount !== detail.payable_amount;
 
@@ -394,9 +422,11 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
 
         copy_stateDetail[index] = detail;
 
-        return { ...state, total, detailArr: copy_stateDetail };
+        return { ...state_prev, total, detailArr: copy_stateDetail };
       });
     };
+
+    return setDetail;
   };
 
   useEffect(() => {
@@ -405,9 +435,10 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
 
   return { state, setState, createSetDetail };
 };
+
 // region =========================================================================
 // region =========================================================================
-// region =========================================================================
+// region ===========
 
 const emptyState = (): Tstate => ({
   id: undefined,
@@ -434,15 +465,17 @@ const emptyState = (): Tstate => ({
 const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
   const stateDetail: TstateDetail = {
     id: detail.id,
+    identifier: detail.id || `identifier-${nanoid()}`,
     source_number: detail.source_number || '',
     invoice_number: detail.invoice_number || '',
     note: detail.note || '',
     payable_amount: `${detail.payable_amount || ''}`,
-    settled_amount: `${detail.settled_amount || ''}`,
-    balance: `${detail.balance || ''}`,
     payment_date: detail.payment_date ? moment(detail.payment_date) : null,
     transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
     account_payable_id: detail.account_payable_id,
+
+    settled_amount: null,
+    balance: null,
   };
 
   return stateDetail;

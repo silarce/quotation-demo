@@ -189,17 +189,18 @@ interface Tpayment_order_Dto extends Tbase {
 }
 
 interface TpaymentOrderDetail_Dto extends Tbase {
+  account_payable_id: string | null; //應付帳款uuid
+  invoice_number: string | null; // 發票號碼
+  note: string | null; // 備註
+  payable_amount: number | null; // 應付帳款
+  payment_date: string | null; // 付款日期
   payment_order_id: string | null; // 付款申請單uuid
   source_number: string | null; // 立帳來源單號
   transaction_date: string | null; // 交易日期
-  payment_date: string | null; // 付款日期
-  payable_amount: number | null; // 應付帳款
-  invoice_number: string | null; // 發票號碼
-  settled_amount: number | null; // 已付帳款
-  balance: number | null; // 未付款餘額
-  note: string | null; // 備註
+
+  // settled_amount: number | null; // 已付帳款
+  // balance: number | null; // 未付款餘額
   // payment_order_id: string; //付款申請主檔id
-  account_payable_id: string | null; //應付帳款uuid
 }
 
 type TcreatePaymentOrderDetail_Dto = Pick<

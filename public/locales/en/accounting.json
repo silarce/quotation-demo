@@ -77,6 +77,11 @@
     "remittance_fee": "Remittance Fee",
     "deduction": "Deduction",
     "actualpaid": "Actual Paid",
-    "note": "Note"
+    "note": "Note",
+    "source_number": "Source Number",
+    "invoice_number": "Invoice Number",
+    "settled_amount": "Settled Amount",
+    "balance": "Balance",
+    "transaction_date": "Transaction Date"
   }
 }
