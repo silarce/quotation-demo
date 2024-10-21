@@ -697,7 +697,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 260px 40px;
+  grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 50px 180px 40px 40px;
   gap: 5px;
   height: 30px;
   padding: 0px 20px;
@@ -945,7 +945,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 500px 30px;
+  grid-template-columns:60px 30px 150px 800px 30px;
   gap: 15px;
   height: 30px;
   padding: 0 20px;
@@ -976,7 +976,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 100px 140px 100px 30px;
+  grid-template-columns: 60px 60px 100px 140px 140px 30px;
   gap: 15px;
   height: 30px;
   padding: 0 20px;
@@ -1096,7 +1096,7 @@
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
   width: 1415px;
-  grid-template-columns: 30px 130px 250px 250px 80px 50px 50px 80px 80px 200px 30px;
+  grid-template-columns: 30px 130px 250px 250px 80px 50px 50px 80px 80px 50px 200px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -1338,5 +1338,37 @@
     color: #979797;
   }
 }
+
+//#endregion
+//#region 入庫明細
+.thead43 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 150px 150px 150px 150px;
+  // gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 16px;
+    color: #979797;
+  }
+}
+
+
 
 //#endregion
