@@ -852,11 +852,12 @@ div.panelHeader16 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 20px 130px 250px 250px 80px 50px 50px 80px 80px 200px 30px;
+    grid-template-columns: 20px 130px 250px 250px 80px 50px 50px 80px 80px 50px 200px 30px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    padding: 0 20px;
   }
 
   .selectedRow {

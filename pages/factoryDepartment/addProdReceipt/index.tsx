@@ -1039,10 +1039,10 @@ export default function AddProdReceipt() {
                                 查詢
                             </button>
                             &nbsp;
-                            <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
+                            {/* <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
                                 <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 採購
-                            </button>
+                            </button> */}
                         </div>
                         <div>
                             <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAdd() }} title="新增單據">

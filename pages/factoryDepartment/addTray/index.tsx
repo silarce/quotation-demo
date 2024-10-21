@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { useContext, useEffect, useState } from 'react';
+import { JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { setting } from '../wareHouseList/index';
 import { userInfo } from 'os';
@@ -58,6 +58,7 @@ export default function AddTray() {
     const [traychildlayout, setTrayChildLayOut] = useState<any[]>([]);
     const [totaltraychildlayout, setTotalTrayChildLayOut] = useState<any[]>([]);
     const [trayname, setTrayName] = useState<string | null>(null);
+    const [data12, setData12] = useState<any[]>([]);
 
     const [length, setLength] = useState<number | null>(1);
     const [width, setWidth] = useState<number | null>(1);
@@ -554,6 +555,110 @@ export default function AddTray() {
         }
     };
 
+    const handlechildKeyDown2 = (e: any) => {
+        if (e.key === 'ArrowUp') {
+            setChildWidth(prev => {
+                const newWidth = prev !== null ? prev + 1 : 1;
+                handleAdd(e.target.value);
+                return newWidth;
+            });
+        } else if (e.key === 'ArrowDown') {
+            setChildWidth(prev => {
+                const newWidth = prev !== null && prev > 0 ? prev - 1 : 0;
+                handleRemove()
+                return newWidth;
+            });
+        }
+
+    }
+
+    const handleAdd = (value: any) => {
+        const newchildwidth = parseInt(value) + 1; // 新的 childwidth
+        console.log(data12[0]?.matchedItem.length); // 使用 optional chaining
+
+        // 取得 data12 的第一筆資料
+        const firstItem = data12[0];
+
+        // 建立新資料模型
+        const newDataItem = {
+            id: null, // 可以根據需要設置 ID
+            whpname: "",
+            whid: firstItem.matchedItem.whid,
+            volume: 0,
+            spec: "",
+            trayid: null,
+            length: firstItem.matchedItem.length, // 使用相同的 length
+            width: firstItem.matchedItem.width, // 使用相同的 width
+            childlength: firstItem.matchedItem.childlength, // 繼續使用相同的 childlength
+            childwidth: newchildwidth, // 使用新的 childwidth
+            materialnumber: '',
+            batchnumber: '',
+            unit: '',
+            quantity: 0,
+            whname: firstItem.matchedItem.whname,
+            trayname: firstItem.matchedItem.trayname,
+            color: "#FFFFFF", // 預設顏色，可以根據需要改變
+        };
+
+        // 將新的資料加入到 data12 的索引 0 的 childtraylayoutmodel
+        setData12(prevData12 => {
+            const updatedData = [...prevData12];
+
+            // 確保 childtraylayoutmodel 存在
+            if (!updatedData[0].matchedItem.childtraylayoutmodel) {
+                updatedData[0].matchedItem.childtraylayoutmodel = [];
+            }
+
+            // 將新的 childwidthdata 加入到 childtraylayoutmodel 中
+            updatedData[0].matchedItem.childtraylayoutmodel[0].childwidthdata.push(newDataItem);
+
+            return updatedData; // 返回更新後的資料
+        });
+
+        console.log(newDataItem);
+        console.log(data12); // 輸出更新後的 data12
+    };
+
+
+    const handleRemove = () => {
+        setData12(prevData12 => {
+            // 確保 data12 有資料可移除
+            if (prevData12.length > 0) {
+                // 找到 childwidth 最大的索引
+                const maxChildWidthIndex = prevData12[0].matchedItem.childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: string | number, currentItem: { childwidth: number; }, index: any, array: { [x: string]: { childwidth: number; }; }) => {
+                    return currentItem.childwidth > array[maxIndex].childwidth ? index : maxIndex;
+                }, 0);
+    
+                // 移除 childwidth 最大的項目
+                const updatedChildWidthData = prevData12[0].matchedItem.childtraylayoutmodel[0].childwidthdata.filter((_: any, index: any) => index !== maxChildWidthIndex);
+    
+                // 返回更新後的資料
+                return [{
+                    ...prevData12[0],
+                    matchedItem: {
+                        ...prevData12[0].matchedItem,
+                        childtraylayoutmodel: [{
+                            ...prevData12[0].matchedItem.childtraylayoutmodel[0],
+                            childwidthdata: updatedChildWidthData
+                        }]
+                    }
+                }];
+            }
+            return prevData12; // 如果沒有資料可以移除，返回原資料
+        });
+    };
+    
+
+
+
+
+    // 如果您希望在 data12 更新後執行某些操作，可以使用 useEffect 來監聽 data12 的變化
+    useEffect(() => {
+        console.log('data12 updated:', data12);
+    }, [data12]);
+
+
+
     const handlechildKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, type: 'length' | 'width') => {
         if (type === 'length') {
             if (e.key === 'ArrowUp') {
@@ -617,6 +722,37 @@ export default function AddTray() {
             },
         });
     };
+
+    // const getLaychildOutBywhpositin = async (length: any, width: any, childlength: any, childwidth: any) => {
+    const getLaychildOutBywhpositin = async (length: any, width: any) => {
+        const typedData11 = data11 as { widthdata: any[] }[];
+
+        const resultArray: any[] = [];
+
+        typedData11.forEach(item => {
+            const matchingItems = item.widthdata.filter((x: any) => x.length === length && x.width === width);
+
+            matchingItems.forEach((matchedItem: any) => {
+                resultArray.push({
+                    matchedItem
+                    // length: matchedItem.length,
+                    // width: matchedItem.width,
+                    // childlength: matchedItem.childlength,
+                    // childwidth: matchedItem.childwidth
+                });
+            });
+        });
+        // setChildWidth(resultArray[0].childtraylayoutmodel.childwidth);
+        console.log(resultArray);
+        setChildWidth(resultArray[0].matchedItem.childtraylayoutmodel[0].childwidthdata[0].childwidth);
+
+        // 將結果存入 state
+        setData12(resultArray);
+        
+    };
+
+
+
 
 
 
@@ -690,9 +826,12 @@ export default function AddTray() {
                                                                                 setChildParentWidth(childDataItem.width);
                                                                                 setLastChildParentLength(childparentlength);
                                                                                 setLastChildParentWidth(childparentwidth);
-                                                                                setChildLength(1);
-                                                                                setChildWidth(1);
-                                                                                goToAddChildTray(childDataItem.whid, childDataItem.whname, childDataItem.length, childDataItem.width);
+                                                                                // setChildLength(1);
+                                                                                // setChildWidth(1);
+                                                                                // getLaychildOutBywhpositin(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth);
+                                                                                getLaychildOutBywhpositin(childDataItem.length, childDataItem.width);
+
+                                                                                // goToAddChildTray(childDataItem.whid, childDataItem.whname, childDataItem.length, childDataItem.width);
                                                                                 // console.log("check" + JSON.stringify(data11);
                                                                             }}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
@@ -711,6 +850,76 @@ export default function AddTray() {
                                 </tbody>
                             </table>
                         ))}
+                    </div>
+                </div>
+                <div className={scss.left}>
+                    <div className={scss.top}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="儲位編號"
+                            disabled={false}
+                            inputProps={{
+                                props: {
+                                    value: childwhposition ?? " ",
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="寬"
+                            disabled={false}
+                            inputProps={{
+                                props: {
+                                    value: childwidth ?? 0,
+                                    // onChange: (e) => handleWidthLengthChange(e, "width"),
+                                    onKeyDown: (e) => handlechildKeyDown2(e)
+                                },
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className={scss.right}>
+                    <div className={scss.content}>
+                        <input type='text' value='' />
+                        {/* 渲染一個 table 類似於 data11 的顯示方式 */}
+                        {data12.map((dataItem, index) => (
+                            <table className={scss.traytable} style={{ border: 'solid 1px black' }} key={index}>
+                                <tbody>
+                                    <tr className={scss.tr}>
+                                        <td className={scss.td} style={{ backgroundColor: dataItem.matchedItem.color || 'lightgrey' }}>
+
+                                            {dataItem.matchedItem.childtraylayoutmodel.map((childLayout: any, layoutIndex: any) => (
+                                                <div key={layoutIndex}>
+                                                    <table className={scss.childtraytable}>
+                                                        <tbody>
+                                                            <tr className={scss.childtraytabletr}>
+                                                                {childLayout.childwidthdata.map((childDataItem: any, childIndex: any) => (
+                                                                    <td
+                                                                        className={scss.childtraytabletd}
+                                                                        key={childDataItem.id || childIndex} // 使用 id 或索引作為 key
+                                                                        style={{ backgroundColor: childDataItem.color || '#FFFFFF', height: '50px' }}
+                                                                    >
+                                                                        <button
+                                                                            className={scss.childtraytabletdButton}
+                                                                            onClick={() => {
+                                                                                alert(`Child Length: ${childDataItem.length}, Child Width: ${childDataItem.width}`);
+                                                                            }}
+                                                                        >
+                                                                            {childDataItem.width}
+                                                                        </button>
+                                                                    </td>
+                                                                ))}
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            ))}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        ))}
+
                     </div>
                 </div>
             </div>
