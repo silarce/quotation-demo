@@ -263,7 +263,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
         />
       </div>
 
-      <div>
+      <div className={classNames('mt-5', disabled && 'invisible')}>
         <Radio.Group
           value={calcTarget}
           onChange={(value) => {
@@ -273,17 +273,17 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           <Radio value="fullWidth">以全寬計算</Radio>
           <Radio value="WG">以WG計算</Radio>
         </Radio.Group>
-      </div>
 
-      <MyButton_v2
-        //
-        className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
-        preImg="upload"
-        px="px32"
-        onClick={calcData}
-      >
-        計算
-      </MyButton_v2>
+        <MyButton_v2
+          //
+          className={classNames('')}
+          preImg="upload"
+          px="px32"
+          onClick={calcData}
+        >
+          計算
+        </MyButton_v2>
+      </div>
     </div>
   );
 }
