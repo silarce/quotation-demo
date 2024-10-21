@@ -148,6 +148,8 @@ type Tworksheet = {
     area: string;
     volume: string; // 才數
 
+    calcTarget: 'fullWidth' | 'WG';
+
     setBasicSpec_quoteType: (value: string) => void;
     setBasicSpec_doorModelName: (value: string) => void;
     setBasicSpec_itemName: (value: string) => void;
@@ -158,6 +160,8 @@ type Tworksheet = {
     setBasicSpec_height: (value: string) => void;
     setBasicSpec_fullWidth_simple: (value: string) => void;
     setBasicSpec_WG_simple: (value: string) => void;
+
+    setBasicSpec_calcTarget: (value: 'fullWidth' | 'WG') => void;
   };
 
   ABCD: {
@@ -391,6 +395,9 @@ const useWorksheet = create<Tworksheet>(
       isAntiTyphoon: false,
       area: '',
       volume: '',
+
+      calcTarget: 'fullWidth',
+
       setBasicSpec_quoteType: (value) => {
         get().setDoorModelInfo(undefined);
         set(
@@ -491,6 +498,13 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.basicSpec.WG = str;
+          })
+        );
+      },
+      setBasicSpec_calcTarget: (value) => {
+        set(
+          produce((state) => {
+            state.basicSpec.calcTarget = value;
           })
         );
       },

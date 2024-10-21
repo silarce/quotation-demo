@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // antd
-import { Checkbox } from 'antd';
+import { Checkbox, Radio } from 'antd';
 
 // gear
 import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -150,6 +150,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.fullWidth,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_fullWidth(e.target.value);
+                basicSpec.setBasicSpec_calcTarget('fullWidth');
               },
             },
           }}
@@ -176,6 +177,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.WG,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_WG(e.target.value);
+                basicSpec.setBasicSpec_calcTarget('WG');
               },
             },
           }}
@@ -233,6 +235,19 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           }}
         />
       </div>
+
+      <div>
+        <Radio.Group
+          value={basicSpec.calcTarget}
+          onChange={(value) => {
+            basicSpec.setBasicSpec_calcTarget(value.target.value);
+          }}
+        >
+          <Radio value="fullWidth">以全寬計算</Radio>
+          <Radio value="WG">以WG計算</Radio>
+        </Radio.Group>
+      </div>
+
       <MyButton_v2
         //
         className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
