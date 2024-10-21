@@ -27,10 +27,10 @@ export const setting = {
     // apipath: 'https://new-erp-api.beta.san-jeou.com.tw',
 
 
-    apipath:`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`,
-    // apipath: 'https://localhost:44383',
-    env: 'prod',
-    // env: 'local',
+    // apipath:`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`,
+    apipath: 'https://localhost:44383',
+    // env: 'prod',
+    env: 'local',
     warehouse1: '192.168.1.226',
     warehouse2: '192.168.1.227',
     warehouse3: '192.168.1.228',

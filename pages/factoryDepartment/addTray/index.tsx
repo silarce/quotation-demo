@@ -617,6 +617,8 @@ export default function AddTray() {
 
         console.log(newDataItem);
         console.log(data12); // 輸出更新後的 data12
+
+        console.log(data11);
     };
 
 
