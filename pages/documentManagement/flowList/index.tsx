@@ -39,6 +39,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
 import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
 
 export default function FlowList() {
 
@@ -734,6 +735,11 @@ export default function FlowList() {
                                                 className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
                                                 onClick={() => { }}
                                             >
+                                                <span>
+                                                    <button onClick={() => handleRemoveFlow(_item)}>
+                                                        <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                    </button>
+                                                </span>
                                                 <span>{index + 1}</span>
                                                 <span>{_item.name}</span>
                                                 <span>
@@ -754,11 +760,7 @@ export default function FlowList() {
                                                         ))}
                                                     </div>
                                                 </span>
-                                                <span>
-                                                    <button onClick={() => handleRemoveFlow(_item)}>
-                                                        <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                </span>
+
                                             </div>
                                         </CellWithBar>
                                     ))
@@ -849,6 +851,10 @@ export default function FlowList() {
                                             onDragOver={handleDragOver}
                                             onDrop={handleDrop}
                                         >
+                                            <span>
+                                                {/* <button onClick={() => handleRemoveFromData2(index)}>移除</button> */}
+                                                <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} onClick={() => handleRemoveFromData2(index)} />
+                                            </span>
                                             <span>{index + 1}</span>
                                             <span>
                                                 <select
@@ -860,23 +866,31 @@ export default function FlowList() {
                                                     <option value="審查">審查</option>
                                                     <option value="核准">核准</option>
                                                 </select>
+
                                             </span>
                                             <span>{_item.stage_user_title}</span>
                                             <span>{_item.stage_user_name}</span>
                                             {/* <span>{_item.stage_user_title}</span> */}
-                                            <span>
-                                                {/* <button onClick={() => handleRemoveFromData2(index)}>移除</button> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} onClick={() => handleRemoveFromData2(index)} />
-                                            </span>
+
                                         </div>
                                     </CellWithBar>
                                 ))}
                             </span>
                             <div style={{ display: `${status !== "" ? '' : 'none'}` }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '18px', borderBottom: '1px solid #ccc', borderTop: '1px solid #ccc' }}>
-                                    <div style={{ width: '70px', padding: '0px 15px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '0px 20px', fontSize: '18px', borderBottom: '1px solid #ccc', borderTop: '1px solid #ccc' }}>
+                                    <div style={{ width: '60px' }}>
+                                        {/* <button onClick={() => { handleClearNewUserName() }} style={{ display: `${newUserName || newUserTitle ? '' : 'none'}` }}>
+                                            <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
+                                        </button> */}
+
+                                        <button>
+                                            <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
+                                        </button>
+
                                     </div>
-                                    <div style={{ width: '105px', padding: '0px 15px' }}>
+                                    <div style={{ width: '60px' }}>
+                                    </div>
+                                    <div style={{ width: '100px' }}>
                                         <select
                                             value={newReviewType}
                                             onChange={(e) => setNewReviewType(e.target.value)}
@@ -887,7 +901,7 @@ export default function FlowList() {
                                             <option value="核准">核准</option>
                                         </select>
                                     </div>
-                                    <div style={{ width: '145px', padding: '0px 15px' }}>
+                                    <div style={{ width: '140px' }}>
                                         <input
                                             type="text"
                                             placeholder="職稱"
@@ -896,7 +910,7 @@ export default function FlowList() {
                                             onChange={handleNewUserTitleChange}
                                         />
                                     </div>
-                                    <div style={{ width: '150px', padding: '0px 15px' }}>
+                                    <div style={{ width: '140px' }}>
                                         <input
                                             type="text"
                                             placeholder="姓名"
@@ -905,8 +919,8 @@ export default function FlowList() {
                                             onChange={handleNewUserNameChange}
                                         />
                                     </div>
-                                    <div style={{ width: '150px', padding: '0px 10px' }}>
-                                        <button>
+                                    <div style={{ width: '30px', padding: '0px 10px' }}>
+                                        {/* <button>
                                             <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
                                         </button>
                                         &nbsp;
@@ -914,7 +928,7 @@ export default function FlowList() {
                                         &nbsp;
                                         <button onClick={() => { handleClearNewUserName() }} style={{ display: `${newUserName || newUserTitle ? '' : 'none'}` }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </div>
                                 <div>

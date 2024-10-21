@@ -581,6 +581,7 @@ export default function AddProdReceipt() {
         setOriginaldata2(data2);
         setEditmain(true);
         setPoopen(!poopen);
+        setOriginalCheckedItems(checkedItems);
     };
 
     const handlecancelAddPR = () => {
@@ -598,6 +599,7 @@ export default function AddProdReceipt() {
             setNote(originalnote);
             setPoopen(!poopen);
             setData2(originaldata2);
+            setCheckedItems(OriginalcheckedItems);
         } else {
             setSuppliernamein("");
             setSupplierphonein("");
@@ -610,6 +612,7 @@ export default function AddProdReceipt() {
             setNote("");
             setPoopen(!poopen);
             setData2([]);
+            setCheckedItems({});
         }
     };
 
@@ -647,6 +650,7 @@ export default function AddProdReceipt() {
     }
 
     const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
+    const [OriginalcheckedItems, setOriginalCheckedItems] = useState<{ [key: string]: boolean }>({});
 
     const handleToggleProdreceiptdetail = async (item: any, isChecked: boolean) => {
         // console.log(item);
@@ -1035,10 +1039,10 @@ export default function AddProdReceipt() {
                                 查詢
                             </button>
                             &nbsp;
-                            <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
+                            {/* <button className={scss.squarebtn} onClick={() => { setPoopen(!poopen) }} title="查尋單據">
                                 <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 採購
-                            </button>
+                            </button> */}
                         </div>
                         <div>
                             <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAdd() }} title="新增單據">

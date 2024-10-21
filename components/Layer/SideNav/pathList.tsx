@@ -846,7 +846,7 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '單據管理',
+          label: '審核管理',
           erpFeature: [fac],
           list: [
             {

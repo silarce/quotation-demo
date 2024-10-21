@@ -256,19 +256,19 @@ export default function PurchaseRequisitionList() {
             setData1Restore(data);
             setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
-            if (data.length > 0 && checkfirstin === 0) {
-                getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
-                setCreate_atin(data[0].create_at);
-                setPurchaserequisitionuuidin(data[0].purchaserequisitionuuid);
-                setPurchaserequisitionidin(data[0].purchaserequisitionid);
-                setCreate_byin(data[0].create_by);
-                setApprovedin(data[0].approved);
-                setStatusin(data[0].status);
-                setNeed_datein(data[0].need_date);
-                setNotein(data[0].note);
-                GetReviewById(data[0].purchaserequisitionuuid);//審核
-                GetReviewHistory(data[0].purchaserequisitionid);
-            }
+            // if (data.length > 0 && checkfirstin === 0) {
+            //     getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
+            //     setCreate_atin(data[0].create_at);
+            //     setPurchaserequisitionuuidin(data[0].purchaserequisitionuuid);
+            //     setPurchaserequisitionidin(data[0].purchaserequisitionid);
+            //     setCreate_byin(data[0].create_by);
+            //     setApprovedin(data[0].approved);
+            //     setStatusin(data[0].status);
+            //     setNeed_datein(data[0].need_date);
+            //     setNotein(data[0].note);
+            //     GetReviewById(data[0].purchaserequisitionuuid);//審核
+            //     GetReviewHistory(data[0].purchaserequisitionid);
+            // }
         } catch (error: any) {
             // console.log(error.message);
         }
@@ -1026,6 +1026,7 @@ export default function PurchaseRequisitionList() {
 
             getPurchaseRequisition();
             getPurchaseRequisitionDetail(purchaserequisitionidin);
+            setStatusin("已結案");
 
         } catch (error: any) {
             console.log(error.message);
@@ -2002,6 +2003,7 @@ export default function PurchaseRequisitionList() {
                                         <span>{_item.detail_unit}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                        <span>{_item.pricetype}</span>
                                         <span>{_item.main_quotereqid}</span>
                                         <span></span>
                                         {/* <span></span> */}

@@ -3105,6 +3105,7 @@ export default function AddPurchaseOrder() {
                         <div style={{
                             maxHeight: '465.81px',
                             overflowY: 'auto',
+                            overflowX: 'auto',
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'Quotereq4'} />
@@ -3126,6 +3127,7 @@ export default function AddPurchaseOrder() {
                                             <span>{_item.detail_unit}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                            <span>{_item.pricetype}</span>
                                             <span>{_item.detail_suppliername}</span>                                        </div>
                                     </CellWithBar>
                                 ))
