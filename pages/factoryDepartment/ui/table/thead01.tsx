@@ -362,7 +362,9 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
+        <span>類別</span>
         <span>單號</span>
+        <span></span>
         <span>選擇</span>
         <span></span>
       </div>
@@ -494,6 +496,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "FlowList") {
     return (
       <div className={style.thead31}>
+        <span></span>
         <span>序</span>
         <span>名稱</span>
         <span>審核流程</span>
@@ -508,6 +511,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "FlowDetailList") {
     return (
       <div className={style.thead32}>
+        <span></span>
         <span>關卡</span>
         <span>流程</span>
         <span>職稱</span>
@@ -587,6 +591,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單位</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>單價</span>
         <span style={{ textAlign: 'right', margin: 'auto 0' }}>總價</span>
+        <span>類別</span>
         <span>廠商名稱</span>
         <span></span>
       </div>
@@ -690,6 +695,20 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商</span>
         <span>金額</span>
         <span>備註</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 審核紀錄
+  else if (type === "ProdEntryHistory") {
+    return (
+      <div className={style.thead43}>
+        <span>序</span>
+        <span>入庫單號</span>
+        <span>入庫日期</span>
+        <span>單據狀態</span>
+        <span>單據備註</span>
         <span></span>
       </div>
     )

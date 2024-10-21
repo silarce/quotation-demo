@@ -96,6 +96,7 @@ export default function ProdReceiptList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [data3, setData3] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -290,30 +291,30 @@ export default function ProdReceiptList() {
             setSearchdata(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
-            if (data.length > 0 && checkfirstin === 0) {
-                getProdReceiptDetail(data[0].prodreceiptuuid);
-                // GetProdReceiptDetailByPurchaseOrderId(data[0].prodreceiptuuid);
-                setCreate_atin(data[0].create_at);
-                setPurchaseorderuuidin(data[0].purchaseorderuuid);
-                setPurchaseorderidin(data[0].purchaseorderid);
-                setProdreceiptuuidin(data[0].prodreceiptuuid);
-                setProdreceiptidin(data[0].prodreceiptid);
-                setCreate_byin(data[0].create_by);
-                setPurchaseordercreate_atin(data[0].purchaseordercreate_at);
-                setPurchaseordercreate_byin(data[0].purchaseordercreate_by);
-                setSuppliernamein(data[0].suppliername);
-                setSuppliertaxidin(data[0].suppliertaxid);
-                setInspectedin(data[0].inspected.toString());
-                setSupplieraddressin(data[0].supplieraddress);
-                setStatusin(data[0].status);
-                setSupplierphonein(data[0].supplierphone);
-                setInvoicein(data[0].invoice);
-                setEntrystatusin(data[0].entry_status);
-                setPaystatusin(data[0].pay_status);
-                setNotein(data[0].note);
-                GetReviewById(data[0].prodreceiptuuid);//審核
-                GetReviewHistory(data[0].prodreceiptid)
-            }
+            // if (data.length > 0 && checkfirstin === 0) {
+            //     getProdReceiptDetail(data[0].prodreceiptuuid);
+            //     // GetProdReceiptDetailByPurchaseOrderId(data[0].prodreceiptuuid);
+            //     setCreate_atin(data[0].create_at);
+            //     setPurchaseorderuuidin(data[0].purchaseorderuuid);
+            //     setPurchaseorderidin(data[0].purchaseorderid);
+            //     setProdreceiptuuidin(data[0].prodreceiptuuid);
+            //     setProdreceiptidin(data[0].prodreceiptid);
+            //     setCreate_byin(data[0].create_by);
+            //     setPurchaseordercreate_atin(data[0].purchaseordercreate_at);
+            //     setPurchaseordercreate_byin(data[0].purchaseordercreate_by);
+            //     setSuppliernamein(data[0].suppliername);
+            //     setSuppliertaxidin(data[0].suppliertaxid);
+            //     setInspectedin(data[0].inspected.toString());
+            //     setSupplieraddressin(data[0].supplieraddress);
+            //     setStatusin(data[0].status);
+            //     setSupplierphonein(data[0].supplierphone);
+            //     setInvoicein(data[0].invoice);
+            //     setEntrystatusin(data[0].entry_status);
+            //     setPaystatusin(data[0].pay_status);
+            //     setNotein(data[0].note);
+            //     GetReviewById(data[0].prodreceiptuuid);//審核
+            //     GetReviewHistory(data[0].prodreceiptid)
+            // }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
         }
@@ -428,6 +429,7 @@ export default function ProdReceiptList() {
             setEntrystatusin(entrystatus as string);
             setPaystatusin(paystatus as string);
             setNotein(note as string);
+            GetProdEntryByProdReceiptId(prodreceiptid as string);
             // GetReviewById(prodreceiptuuid);//審核
             // GetReviewHistory(prodreceiptid as string);
         }
@@ -537,7 +539,40 @@ export default function ProdReceiptList() {
         }
     };
 
+    const GetProdEntryByProdReceiptId = async (prodreceiptidin: any) => {
+        try {
+            // alert(checkfirstin);
+            setIsLoading(true);
+            const conditionModel = {
+                prodreceiptid: prodreceiptidin
+            };
 
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProdEntryByProdReceiptId?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responsedata = await response.json();
+
+            setData3(responsedata);
+
+        } catch (error: any) {
+            setError("getProdReceipt:" + error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
 
     //#endregion
@@ -1348,8 +1383,22 @@ export default function ProdReceiptList() {
     };
 
     const tabChosed = (tabName: string) => {
-        setTabnow(tabName);
-        setTabshow(tabName);
+        switch (tabName) {
+            case "單據明細":
+            case "審核明細":
+                setTabnow(tabName);
+                setTabshow(tabName);
+                break;
+            case "入庫明細":
+                setTabnow(tabName);
+                setTabshow(tabName);
+                GetProdEntryByProdReceiptId(prodreceiptidin);
+                break;
+            default:
+                setTabnow(tabName);
+                setTabshow(tabName);
+                break;
+        }
     };
 
     //#endregion
@@ -1462,11 +1511,11 @@ export default function ProdReceiptList() {
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
-
-                                <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                    */}
+                                <button style={{ display: `${completeentry === parseInt(totalentry) && statusin === '進貨中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
-                                </button> */}
+                                </button>
                                 <button style={{ display: `${completeentry != parseInt(totalentry) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
                                     <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     未結
@@ -1696,13 +1745,13 @@ export default function ProdReceiptList() {
                                     </button>
                                 </span>
                                 <span>
-                                    {/* <button
+                                    <button
                                         className={scss.detailminitabbtn}
-                                        onClick={() => tabChosed('審核明細')}
-                                        style={getButtonStyle('審核明細')}
+                                        onClick={() => tabChosed('入庫明細')}
+                                        style={getButtonStyle('入庫明細')}
                                     >
-                                        審核明細
-                                    </button> */}
+                                        入庫明細
+                                    </button>
                                 </span>
                             </div>
                             <div></div>
@@ -1748,7 +1797,7 @@ export default function ProdReceiptList() {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
+                                {/* <div style={{ display: `${tabshow === "審核明細" ? '' : 'none'}` }}>
                                     <div className={scss.body_content1} >
                                         <div style={{ overflowX: 'auto' }}>
                                             <Thead01 type={'ReviewHistory'} />
@@ -1762,6 +1811,26 @@ export default function ProdReceiptList() {
                                                             <span>{_item.current_stage}</span>
                                                             <span>{_item.review_person}</span>
                                                             <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div> */}
+                                <div style={{ display: `${tabshow === "入庫明細" ? '' : 'none'}` }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ProdEntryHistory'} />
+                                            {data3 && (
+                                                data3.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader19} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.prodreceiptid}</span>
+                                                            <span>{_item.status}</span>
+                                                            <span>{_item.note}</span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))

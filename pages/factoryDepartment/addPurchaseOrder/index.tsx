@@ -1245,6 +1245,7 @@ export default function AddPurchaseOrder() {
 
     const handlechangepo = (item: any) => {
         console.log(item);
+        setEditmain(false);
         handleRowClick(item.purchaseorderid);
         setData2([]);
         setPurchaseorderid(item.purchaseorderid);
@@ -1453,7 +1454,7 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         // setHandinputquantity(item.detail_quantity);
-        setHandinputtotalprice((parseFloat(handinputunitprice || '0') * parseFloat(handinputquantity || '0')).toString());
+        setHandinputtotalprice((parseFloat(item.detail_unitprice || '0') * parseFloat(handinputquantity || '0')).toString());
         setQuoterequuid(item.main_id);
         // UpdatePurchaseOrderDetail(item);
     };
@@ -2594,6 +2595,7 @@ export default function AddPurchaseOrder() {
                                         <span>{_item.detail_unit}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                        <span>{_item.pricetype}</span>
                                         <span>{_item.main_quotereqid}</span>
                                         <span></span>
                                         {/* <span></span> */}
