@@ -74,23 +74,19 @@ interface Tstate {
 
 interface TstateDetail {
   id: string | undefined;
+  account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
   identifier: string; // 識別碼
-
+  //
   source_number: string | ''; // 立帳來源單號
+  transaction_date: Moment | null; // 交易日期
+  應付帳款: `${number}` | ''; // ???? // 應付帳款 // 不送後端
+  payable_amount: `${number}` | ''; // account_payable.invoice_price  // 本次沖銷
   invoice_number: string | ''; // 發票號碼
+  balance: `${number}` | '' | null; // account_payable.balance // 未沖餘額 // 不送後端
   note: string | ''; // 備註 // 摘要說明
   //
-  payable_amount: `${number}` | ''; // 應付帳款 // 本次沖銷
-
-  payment_date: Moment | null; // 付款日期
-  transaction_date: Moment | null; // 交易日期
+  payment_date: Moment | null; // 付款日期 // 無欄位
   //
-  account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
-  //
-  // 虛值，get沒給也不會傳到後端
-  // 這兩個值來自account_payable，新增時才會從account_payable取得
-  settled_amount: `${number}` | '' | null; // account_payable已付帳款
-  balance: `${number}` | '' | null; // account_payable餘額 // 未沖餘額
 }
 
 export type { TstateDetail };
@@ -410,12 +406,12 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
         const copy_stateDetail = [...state_prev.detailArr];
         let total = state_prev.total;
 
-        const shouldCalcTotal = copy_stateDetail[index].payable_amount !== detail.payable_amount;
+        const shouldCalcTotal = copy_stateDetail[index].應付帳款 !== detail.應付帳款;
 
         if (shouldCalcTotal) {
           total = copy_stateDetail
             .reduce((acc, cur) => {
-              return acc.add(cur.payable_amount || 0);
+              return acc.add(cur.應付帳款 || 0);
             }, new Decimal(0))
             .toString() as `${number}`;
         }
@@ -465,18 +461,61 @@ const emptyState = (): Tstate => ({
 const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
   const stateDetail: TstateDetail = {
     id: detail.id,
-    identifier: detail.id || `identifier-${nanoid()}`,
-    source_number: detail.source_number || '',
-    invoice_number: detail.invoice_number || '',
-    note: detail.note || '',
-    payable_amount: `${detail.payable_amount || ''}`,
-    payment_date: detail.payment_date ? moment(detail.payment_date) : null,
-    transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
     account_payable_id: detail.account_payable_id,
-
-    settled_amount: null,
+    identifier: detail.id || `identifier-${nanoid()}`,
+    //
+    source_number: detail.source_number || '',
+    transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
+    應付帳款: '',
+    payable_amount: `${detail.payable_amount || ''}`,
+    invoice_number: detail.invoice_number || '',
     balance: null,
+    note: detail.note || '',
+    //
+    payment_date: detail.payment_date ? moment(detail.payment_date) : null,
   };
 
   return stateDetail;
 };
+
+// interface AddPaymentOrderBody {
+//   beneficiary_uuid: string | null; // 廠商 customerDto.id
+//   applicant_date: string | null; // 申請日期 ISOstring
+//   agent_employee_id: string | null; // 經辦人員 employeeDto.id
+//   total: string | null; // 發票金額加總 所有data.payable_amout的總和
+//   data: DataBody[];
+//   //
+//   // warning ----------------
+//   offset_method: string | null; // 支付方式 有欄位無property
+//   // warning ----------------
+//   //
+//   payable_method: string | null; // 無欄位 送null
+//   deduction: string | null; // 無欄位 送null
+//   actualpaid: string | null; // 無欄位 送null
+//   note: string | null; // 無欄位 送null
+//   remittance_fee: string | null; // 無欄位 送null
+//   applicant_department: string | null; // 無欄位 送null
+// }
+
+// interface DataBody {
+//   account_payable_id: string; // account_payable.id
+//   source_number: string; // 立帳來源單號
+//   transaction_date: string; // 交易日期
+//   invoice_number: string; // 發票號碼
+//   note: string; // 摘要說明
+//   payable_amount: string; // 本次沖銷
+//   //
+//   payment_date: string; // 無欄位 送null
+// }
+
+/*
+account_payable.id               > 　　　　　　      > DataBody.account_payable_id
+account_payable.source_number    > 立帳來源單號      > DataBody.source_number
+account_payable.transaction_date > 交易日期 (可編輯) > DataBody.transaction_date
+????                             > 應付帳款          > 只顯示
+account_payable.invoice_price    > 本次沖銷 (可編輯) > DataBody.payable_amount
+account_payable.invoice_number   > 發票號碼　　      > DataBody.invoice_number
+account_payable.balance          > 未充餘額　　      > 只顯示
+account_payable.note             > 摘要說明 (可編輯) > DataBody.note
+// ????                             > ？？？？　　      > DataBody.payment_date
+*/

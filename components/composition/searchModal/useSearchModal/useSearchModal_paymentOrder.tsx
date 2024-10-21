@@ -146,12 +146,12 @@ const useConfig_data = () => {
           width: '100px',
         },
       },
-      payable_amount: {
-        label: t('payable_amount'),
-        style: {
-          width: '100px',
-        },
-      },
+      // payable_amount: {
+      //   label: t('payable_amount'),
+      //   style: {
+      //     width: '100px',
+      //   },
+      // },
       remittance_fee: {
         label: t('remittance_fee'),
         style: {
@@ -189,7 +189,7 @@ const useConfig_data = () => {
     'applicant_department',
     'offset_method',
     'payable_method',
-    'payable_amount',
+    // 'payable_amount',
     'remittance_fee',
     'deduction',
     'actualpaid',

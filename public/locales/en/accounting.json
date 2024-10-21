@@ -68,20 +68,21 @@
   },
   "paymentOrder": {
     "serial_number": "Serial Number",
-    "beneficiary_name": "Beneficiary Name",
-    "applicant_date": "Applicant Date",
     "applicant_department": "Applicant Department",
     "offset_method": "Offset Method",
     "payable_method": "Payable Method",
-    "payable_amount": "Payable Amount",
+    "applicant_date": "Applicant Date",
+    "beneficiaryNumber": "Beneficiary Number",
+    "beneficiary_name": "Beneficiary Name",
     "remittance_fee": "Remittance Fee",
     "deduction": "Deduction",
     "actualpaid": "Actual Paid",
-    "note": "Note",
+    "total": "Total",
     "source_number": "Source Number",
+    "transaction_date": "Transaction Date",
+    "payable_amount": "Payable Amount",
     "invoice_number": "Invoice Number",
-    "settled_amount": "Settled Amount",
     "balance": "Balance",
-    "transaction_date": "Transaction Date"
+    "note": "Note"
   }
 }

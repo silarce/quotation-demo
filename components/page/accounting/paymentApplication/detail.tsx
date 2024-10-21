@@ -31,12 +31,12 @@ interface TconfigItem {
 
 type Tkey =
   | 'source_number'
-  | 'invoice_number'
-  | 'note'
+  | 'transaction_date'
+  | '應付帳款'
   | 'payable_amount'
-  | 'settled_amount'
+  | 'invoice_number'
   | 'balance'
-  | 'transaction_date';
+  | 'note';
 
 type Tconfig = {
   [key in Tkey]: TconfigItem;
@@ -131,20 +131,21 @@ function Detail({
 // MARK:config
 
 const keyArr_paymentOrder: Tkey[] = [
-  //
   'source_number',
-  'invoice_number',
   'transaction_date',
+  // '應付帳款',
   'payable_amount',
+  'invoice_number',
+  // 'balance',
   'note',
 ];
 
 const keyArr_accountPayable: Tkey[] = [
   'source_number',
-  'invoice_number',
   'transaction_date',
+  '應付帳款',
   'payable_amount',
-  'settled_amount',
+  'invoice_number',
   'balance',
   'note',
 ];
@@ -221,30 +222,17 @@ const config: Tconfig = {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.payable_amount;
+      const { value, type } = interceptor_money(stateDetail.payable_amount, disabled);
 
-      return {
-        node,
-      };
-    },
-  },
-
-  settled_amount: {
-    label: 'settled_amount',
-    style: {
-      width: '100px',
-    },
-    createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const { value, type } = interceptor_money(stateDetail.settled_amount, disabled);
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
-          value: value ?? '',
-          type: type,
+          type,
           readOnly: disabled,
+          value: value ?? '',
           onChange: ({ target: { value } }) => {
             setStateDetail((prev) => ({
               ...prev,
-              settled_amount: value as `${number}`,
+              payable_amount: value as `${number}`,
             }));
           },
         },
@@ -258,19 +246,34 @@ const config: Tconfig = {
     },
   },
 
-  balance: {
-    label: 'balance',
-    style: {
-      width: '100px',
-    },
-    createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.balance;
+  // settled_amount: {
+  //   label: 'settled_amount',
+  //   style: {
+  //     width: '100px',
+  //   },
+  //   createProps: ({ disabled, stateDetail, setStateDetail }) => {
+  //     const { value, type } = interceptor_money(stateDetail.settled_amount, disabled);
+  //     const inputProps: TinputSelProps['inputProps'] = {
+  //       props: {
+  //         value: value ?? '',
+  //         type: type,
+  //         readOnly: disabled,
+  //         onChange: ({ target: { value } }) => {
+  //           setStateDetail((prev) => ({
+  //             ...prev,
+  //             settled_amount: value as `${number}`,
+  //           }));
+  //         },
+  //       },
+  //     };
 
-      return {
-        node,
-      };
-    },
-  },
+  //     return {
+  //       disabled,
+  //       showBaseline: 'auto',
+  //       inputProps,
+  //     };
+  //   },
+  // },
 
   transaction_date: {
     label: 'transaction_date',
@@ -294,6 +297,34 @@ const config: Tconfig = {
         disabled,
         showBaseline: 'auto',
         datePickerProps,
+      };
+    },
+  },
+  //
+
+  balance: {
+    label: 'balance',
+    style: {
+      width: '100px',
+    },
+    createProps: ({ disabled, stateDetail, setStateDetail }) => {
+      const node = stateDetail.balance;
+
+      return {
+        node,
+      };
+    },
+  },
+  應付帳款: {
+    label: '應付帳款',
+    style: {
+      width: '100px',
+    },
+    createProps: ({ disabled, stateDetail, setStateDetail }) => {
+      const node = stateDetail.balance;
+
+      return {
+        node,
       };
     },
   },
