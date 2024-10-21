@@ -170,6 +170,90 @@ interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectT
   detail_uuid: string;
 }
 
+// MARK:payment_order
+
+interface Tpayment_order_Dto extends Tbase {
+  serial_number: string | null; // 申請單編號
+  beneficiary_uuid: string | null; // 廠商uuid
+  beneficiary_name: string | null; // 廠商名稱
+  applicant_date: string | null; // 申請日期
+  applicant_department: string | null; // 申請單位
+  agent_employee_id: string | null; // 經辦人Id
+  offset_method: string | null; // 沖銷方式
+  payable_method: string | null; // 支付方式
+  remittance_fee: number | null; // 匯費外加
+  deduction: number | null; // 折扣金額
+  actualpaid: number | null; // 實付金額
+  note: string | null; // 備註
+  total: number | null;
+}
+
+interface TpaymentOrderDetail_Dto extends Tbase {
+  account_payable_id: string | null; //應付帳款uuid
+  invoice_number: string | null; // 發票號碼
+  note: string | null; // 備註
+  payable_amount: number | null; // 應付帳款
+  payment_date: string | null; // 付款日期
+  payment_order_id: string | null; // 付款申請單uuid
+  source_number: string | null; // 立帳來源單號
+  transaction_date: string | null; // 交易日期
+
+  // settled_amount: number | null; // 已付帳款
+  // balance: number | null; // 未付款餘額
+  // payment_order_id: string; //付款申請主檔id
+}
+
+type TcreatePaymentOrderDetail_Dto = Pick<
+  TpaymentOrderDetail_Dto,
+  'source_number' | 'transaction_date' | 'payment_date' | 'invoice_number' | 'note'
+> & {
+  account_payable_id: string;
+  payable_amount: `${number}` | null;
+};
+
+interface TcreatePaymentOrder_Dto {
+  beneficiary_uuid: string | null;
+  applicant_date: string | null;
+  applicant_department: string | null;
+  agent_employee_id: string | null;
+  offset_method: string | null;
+  total: `${number}` | null;
+  remittance_fee: `${number}` | null;
+  deduction: `${number}` | null;
+  actualpaid: `${number}` | null;
+  note: string | null;
+  data: TcreatePaymentOrderDetail_Dto[];
+}
+
+interface Taccount_payable_Dto extends Tbase {
+  serialNumber: string | null; // 編號(單號)
+  invoiceTitle: string | null; // 發票抬頭
+  invoiceDate: string | null; // 發票日期
+  invoiceNumber: string | null; // 發票號碼
+  invoicePrice: number | null; // 發票金額
+  reviewStatus: string | null; // 審核狀態
+  paymentStatus: string | null; // 付款狀態
+  balance: number | null; // 未付款金額
+  note: string | null; // 備註
+  paymentOrderUuid: string | null; // 付款申請單uuid
+  paymentOrderSerialNumber: string | null; // 付款申請單號
+  purchase_invoice_uuid: string | null; // 進項發票uuid
+  supplier_uuid: string | null; // 廠商uuid,
+  supplier: string | null; // 廠商名
+  transaction_date: string | null; // 交易日期(付款日期?)
+  source_number: string | null; // 經辦人員
+  settled_amount: string | null; // 已付金額
+}
+
+// MARK: ============
+//
+//
+//
+// region =WareHouse=
+//
+//
+//
+
 // region prodreceipt
 interface Tprodreceipt_Dto extends Tbase {
   prodreceiptid: number;
@@ -220,6 +304,11 @@ export type {
   TpurchaseCollectTicketDetail_Dto,
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
+  Tpayment_order_Dto,
+  Taccount_payable_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
   //
   Tprodreceipt_Dto,
 };

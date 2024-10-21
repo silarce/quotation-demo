@@ -161,17 +161,17 @@ const useConfig_filter = () => {
         key: 'name',
         type: 'input',
       },
-      {
-        caption: t('type02'),
-        key: 'type',
-        type: 'select',
-        selectOptions: [
-          { value: 'construction', label: t('construction') },
-          { value: 'firm', label: t('firm') },
-          { value: 'propertyOwner', label: t('propertyOwner') },
-          { value: 'contractor', label: t('contractor') },
-        ],
-      },
+      // {
+      //   caption: t('type02'),
+      //   key: 'type',
+      //   type: 'select',
+      //   selectOptions: [
+      //     { value: 'construction', label: t('construction') },
+      //     { value: 'firm', label: t('firm') },
+      //     { value: 'propertyOwner', label: t('propertyOwner') },
+      //     { value: 'contractor', label: t('contractor') },
+      //   ],
+      // },
     ];
 
     return config_filter;
