@@ -53,6 +53,29 @@ const options_doorType = optionsCreator_quoteType();
 function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
   // --------------------------------------------------
 
+  // const {
+  //   //
+  //   basicSpec,
+  //   setDoorModelInfo,
+  //   getOptions_material,
+  //   calcData,
+  //   isAntiTyphoonLock,
+  //   getOptions_doorModelInfo,
+  //   isSpecialProd,
+  // } = useWorksheet(
+  //   useShallow((state) => ({
+  //     doorModelInfo: state.doorModelInfo,
+  //     basicSpec: state.basicSpec,
+  //     setDoorModelInfo: state.setDoorModelInfo,
+  //     getOptions_material: state.getOptions_material,
+  //     calcData: state.calcData,
+  //     isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
+  //     getOptions_doorModelInfo: state.getOptions_doorModelInfo,
+  //     isSpecialProd: state.getIsSpecialProd(),
+  //     generalSpec: state.generalSpec, // 用於更新getOptions
+  //     // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+  //   }))
+  // );
   const {
     //
     basicSpec,
@@ -62,6 +85,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     isAntiTyphoonLock,
     getOptions_doorModelInfo,
     isSpecialProd,
+    calcTarget,
+    setCalcTarget,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -74,6 +99,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+      calcTarget: state.calcTarget,
+      setCalcTarget: state.setCalcTarget,
     }))
   );
 
@@ -150,7 +177,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.fullWidth,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_fullWidth(e.target.value);
-                basicSpec.setBasicSpec_calcTarget('fullWidth');
+                setCalcTarget('fullWidth');
               },
             },
           }}
@@ -177,7 +204,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.WG,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_WG(e.target.value);
-                basicSpec.setBasicSpec_calcTarget('WG');
+                setCalcTarget('WG');
               },
             },
           }}
@@ -238,9 +265,9 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
 
       <div>
         <Radio.Group
-          value={basicSpec.calcTarget}
+          value={calcTarget}
           onChange={(value) => {
-            basicSpec.setBasicSpec_calcTarget(value.target.value);
+            setCalcTarget(value.target.value);
           }}
         >
           <Radio value="fullWidth">以全寬計算</Radio>
