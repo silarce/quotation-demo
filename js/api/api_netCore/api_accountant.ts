@@ -6,6 +6,7 @@ import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
+import { apiGetCustomers_id, TcustomerDto } from '../api_customer';
 
 import type {
   //
@@ -27,6 +28,12 @@ import type {
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
   //
+  Tpayment_order_Dto,
+  Taccount_payable_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
+  //
   Tprodreceipt_Dto,
 } from './_schemas';
 
@@ -44,6 +51,12 @@ interface TapplyPayment_Dto_detailed extends TapplyPayment_Dto {
 interface TpurchaseCollectTicket_Dto_detailed extends TpurchaseCollectTicket_Dto {
   detailArr: TpurchaseCollectTicketDetail_Dto[];
   agent_employee: TemployeeDto;
+}
+
+interface Tpayment_order_Dto_detailed extends Tpayment_order_Dto {
+  detailArr: TpaymentOrderDetail_Dto[];
+  agent_employee: TemployeeDto | undefined;
+  beneficiary: TcustomerDto | undefined;
 }
 
 // =================================================================================
@@ -762,6 +775,269 @@ const useGetUnpaidProdreceiptByInvoiceNumber = (
 
 // =================================================================================
 
+// region paymentOrder
+
+// 取得付款申請單
+const apiGetPaymentOrder = async () => {
+  const api = `/${subRoot}/GetPaymentOrder`;
+  const params = {
+    id: 'all',
+  };
+
+  return axi2
+    .get<Tpayment_order_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+// 取得單一付款申請單
+const apiGetPaymentOrderById = async (id: string) => {
+  const api = `/${subRoot}/GetPaymentOrderById`;
+  const params = {
+    id,
+  };
+
+  return axi2
+    .get<Tpayment_order_Dto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+// 新增付款申請
+// POST /AddPaymentOrder
+const apiPostAddPaymentOrder = async (body: TcreatePaymentOrder_Dto) => {
+  const api = `/${subRoot}/AddPaymentOrder`;
+
+  return axi2
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+// 刪除付款申請單
+const apiDeletePaymentOrderById = async (id: string) => {
+  const api = `/${subRoot}/DeletePaymentOrderById`;
+  const body = {
+    id,
+  };
+
+  return axi2.post(api, body).catch((err: AxiosError) => {
+    return Promise.reject(err);
+  });
+};
+
+// 取得付款申請明細
+const apiGetPaymentOrderDetailByPaymentOrderId = async (payment_order_id: string) => {
+  const api = `/${subRoot}/GetPaymentOrderDetailByPaymentOrderId`;
+  const params = {
+    payment_order_id,
+  };
+
+  return axi2
+    .get<TpaymentOrderDetail_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+const useGetPaymentOrder = ({
+  callAlertOnError = true,
+  autoUpdate = true,
+}: {
+  callAlertOnError?: boolean;
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<Tpayment_order_Dto[]>();
+
+  const update = useCallback(async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetPaymentOrder()
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得付款申請單列表失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, []);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
+const useGetPaymentOrderById = (
+  id: string | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<Tpayment_order_Dto_detailed>();
+
+  const update = useCallback(() => {
+    if (isFetching || !id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return apiGetPaymentOrderById(id)
+      .then((data) => {
+        return data;
+      })
+      .then(async (paymentOrder) => {
+        const [detailArr, employee_snake, beneficiary] = await Promise.all([
+          await apiGetPaymentOrderDetailByPaymentOrderId(id),
+          paymentOrder.agent_employee_id
+            ? await apiGetEmployee_id(paymentOrder.agent_employee_id).catch((err: AxiosError) => {
+                console.log(err.response?.data);
+
+                return undefined;
+              })
+            : undefined,
+          paymentOrder.beneficiary_uuid
+            ? await apiGetCustomers_id(paymentOrder.beneficiary_uuid).catch((err: AxiosError) => {
+                console.log(err.response?.data);
+
+                return undefined;
+              })
+            : undefined,
+        ]);
+
+        const paymentOrder_detailed: Tpayment_order_Dto_detailed = {
+          ...paymentOrder,
+          detailArr: detailArr,
+          agent_employee: employee_snake,
+          beneficiary,
+        };
+
+        setRes(paymentOrder_detailed);
+
+        return paymentOrder;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得付款申請單失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [id]);
+
+  const clear = () => {
+    setRes(undefined);
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [id]);
+
+  return {
+    res,
+    setRes,
+    clear,
+    update,
+    isFetching,
+  };
+};
+
+// =================================================================================
+
+// 以廠商id(等同於客戶id)取得應付帳款
+const apiGetAccountPayableBySupplierId = async (supplier_uuid: string) => {
+  // api名稱與需要的id不吻合，怪怪的
+  const api = `/${subRoot}/GetPaymentOrderDetailByPaymentOrderId`;
+  const params = {
+    supplier_uuid,
+  };
+
+  return axi2
+    .get<Taccount_payable_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+const useGetAccountPayableBySupplierId = (
+  supplier_uuid: string | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<Taccount_payable_Dto[]>();
+
+  const update = useCallback(async () => {
+    if (isFetching || !supplier_uuid) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetAccountPayableBySupplierId(supplier_uuid)
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得應付帳款失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [supplier_uuid]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [supplier_uuid]);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
+// =================================================================================
+
 export {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
@@ -795,6 +1071,19 @@ export {
   useGetUnpaidProdreceiptByInvoiceNumber,
   //
   Tprodreceipt_Dto,
+  //
+  Tpayment_order_Dto,
+  Taccount_payable_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
+  apiGetPaymentOrder,
+  apiGetPaymentOrderById,
+  apiPostAddPaymentOrder,
+  apiDeletePaymentOrderById,
+  useGetPaymentOrder,
+  useGetPaymentOrderById,
+  useGetAccountPayableBySupplierId,
 };
 
-export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed };
+export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed, Tpayment_order_Dto_detailed };

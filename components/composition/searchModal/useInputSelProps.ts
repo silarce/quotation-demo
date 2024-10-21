@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import moment from 'moment';
+import classNames from 'classnames';
 
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import type { Tstate_filter, Tconfig_filter } from './types';
+import scss from './searchModal.module.scss';
 
 const useInputSelProps = ({
   config_filter,
@@ -65,6 +67,9 @@ const createInputSel = ({
     case 'select':
       inputSelProps.selectProps = {
         props: {
+          classNames: {
+            menuPortal: () => classNames(scss.select_menuPortal, scss.plus),
+          },
           isClearable: true,
           name: key,
           placeholder: '請選擇',

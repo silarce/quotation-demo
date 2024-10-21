@@ -227,26 +227,26 @@ export default function PurchaseOrderList() {
             setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            if (data.length > 0 && checkfirstin === 0) {
-                getPurchaseOrderDetail(data[0].purchaseorderuuid);
-                setCreate_atin(data[0].create_at);
-                setPurchaseorderuuidin(data[0].purchaseorderuuid);
-                setPurchaseorderidin(data[0].purchaseorderid);
-                setCreate_byin(data[0].create_by);
-                setSuppliernamein(data[0].suppliername);
-                setSuppliertaxidin(data[0].suppliertaxid);
-                setReceiptedin(data[0].receipted.toString());
-                setSupplieraddressin(data[0].supplieraddress);
-                setInvoicein(data[0].invoice);
-                setSupplierphonein(data[0].supplierphone);
-                setNotein(data[0].note);
-                setStatusin(data[0].status);
-                setShippingaddressin(data[0].shippingaddress);
-                setNeed_datein(data[0].need_date);
-                setQuoterequuidin(data[0].quoterequuid);
-                GetReviewById(data[0].purchaseorderuuid);
-                GetReviewHistory(data[0].purchaseorderid);
-            }
+            // if (data.length > 0 && checkfirstin === 0) {
+            //     getPurchaseOrderDetail(data[0].purchaseorderuuid);
+            //     setCreate_atin(data[0].create_at);
+            //     setPurchaseorderuuidin(data[0].purchaseorderuuid);
+            //     setPurchaseorderidin(data[0].purchaseorderid);
+            //     setCreate_byin(data[0].create_by);
+            //     setSuppliernamein(data[0].suppliername);
+            //     setSuppliertaxidin(data[0].suppliertaxid);
+            //     setReceiptedin(data[0].receipted.toString());
+            //     setSupplieraddressin(data[0].supplieraddress);
+            //     setInvoicein(data[0].invoice);
+            //     setSupplierphonein(data[0].supplierphone);
+            //     setNotein(data[0].note);
+            //     setStatusin(data[0].status);
+            //     setShippingaddressin(data[0].shippingaddress);
+            //     setNeed_datein(data[0].need_date);
+            //     setQuoterequuidin(data[0].quoterequuid);
+            //     GetReviewById(data[0].purchaseorderuuid);
+            //     GetReviewHistory(data[0].purchaseorderid);
+            // }
             console.log(typeof (quoterequuidin));
             console.log(quoterequuidin);
             console.log(quoterequuidin === '');
@@ -343,6 +343,7 @@ export default function PurchaseOrderList() {
             setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
             GetProdReceiptById(purchaseorderid as string);
+            
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
     //#endregion
@@ -923,6 +924,7 @@ export default function PurchaseOrderList() {
 
             getPurchaseOrder();
             getPurchaseOrderDetail(purchaseorderidin);
+            setStatusin("已結案");
 
         } catch (error: any) {
             console.log(error.message);
@@ -1521,26 +1523,31 @@ export default function PurchaseOrderList() {
                                     <img src={icon_sent_review_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     送審
                                 </button>
-
-                                &nbsp;
                                 <button className={scss.squarebtn} style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} title="單據送審" onClick={() => { handleGetReviewBack() }}>
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
-
-                                <button style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    結案
-                                </button>
-                                <button style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
-                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    未結
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
-                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    已結
-                                </button>
+                                <span style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                    &nbsp;
+                                    <button className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                        <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        結案
+                                    </button>
+                                </span>
+                                <span style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                    &nbsp;
+                                    <button className={scss.disablesquarebtn} title="單據未結">
+                                        <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        未結
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
+                                    &nbsp;
+                                    <button className={scss.disablesquarebtn} title="單據已結">
+                                        <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        已結
+                                    </button>
+                                </span>
                             </div>
                         </div>
                         <div className={scss.head_body}>

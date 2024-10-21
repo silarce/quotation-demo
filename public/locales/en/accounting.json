@@ -65,5 +65,24 @@
     "entry_status": "Entry Status",
     "note": "Note",
     "wholeInvoiceNumber": "Whole Invoice Number"
+  },
+  "paymentOrder": {
+    "serial_number": "Serial Number",
+    "applicant_department": "Applicant Department",
+    "offset_method": "Offset Method",
+    "payable_method": "Payable Method",
+    "applicant_date": "Applicant Date",
+    "beneficiaryNumber": "Beneficiary Number",
+    "beneficiary_name": "Beneficiary Name",
+    "remittance_fee": "Remittance Fee",
+    "deduction": "Deduction",
+    "actualpaid": "Actual Paid",
+    "total": "Total",
+    "source_number": "Source Number",
+    "transaction_date": "Transaction Date",
+    "payable_amount": "Payable Amount",
+    "invoice_number": "Invoice Number",
+    "balance": "Balance",
+    "note": "Note"
   }
 }

@@ -122,7 +122,7 @@
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 }
 
@@ -164,6 +164,7 @@
   // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
+
   div {
     margin-right: 2px;
   }
@@ -206,6 +207,7 @@
   padding-right: 20px;
   // background-color: gray;
 }
+
 .body_foot2 {
   margin-top: 10px;
   margin-left: 20px;
@@ -277,7 +279,7 @@
 
 div.panelHeader13 {
   // padding-left: 20px;
-  padding:10px 20px;
+  padding: 10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -295,7 +297,7 @@ div.panelHeader13 {
 
   .row01 {
     display: grid;
-    grid-template-columns:30px 30px 150px 300px 80px 80px 40px 100px 150px 250px ;
+    grid-template-columns: 30px 30px 150px 300px 80px 80px 40px 100px 150px 250px;
     gap: 5px;
   }
 }
@@ -589,7 +591,7 @@ div.panelHeader13 {
 //#region 進貨單明細
 div.panelHeader14 {
   // padding-left: 20px;
-  padding:10px 20px;
+  padding: 10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -607,7 +609,7 @@ div.panelHeader14 {
 
   .row01 {
     display: grid;
-    grid-template-columns:30px 30px 150px 415px 415px 100px 100px 40px 100px 150px 250px;
+    grid-template-columns: 30px 30px 150px 415px 415px 100px 100px 40px 100px 150px 250px;
     gap: 5px;
   }
 }
@@ -708,7 +710,7 @@ div.panelHeader14 {
     /* 調整圖標位置 */
     cursor: not-allowed;
     /* 添加這行使滑鼠顯示禁止符號 */
-}
+  }
 
   &:focus {
     background-color: $bgc01;
@@ -721,11 +723,13 @@ div.panelHeader14 {
 //判斷字串是否過長
 .truncate {
   display: inline-block;
-  max-width: 200px; /* 設定你希望的最大寬度 */
+  max-width: 200px;
+  /* 設定你希望的最大寬度 */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  vertical-align: middle; /* 可選，根據需要對齊文本 */
+  vertical-align: middle;
+  /* 可選，根據需要對齊文本 */
 }
 
 .head_body {
@@ -739,53 +743,55 @@ div.panelHeader14 {
   margin-bottom: 5px;
 }
 
-  // #region 明細頁籤
+// #region 明細頁籤
 
-  .head_tab {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  
-    width: auto;
-    // margin-left: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    div {
-      margin-right: 2px;
-    }
+.head_tab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  width: auto;
+  // margin-left: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
+    margin-right: 2px;
   }
+}
+
 .detailminitabbtn {
-    height: 30px;
-    // width: 36px;
-    // padding: 0px 40px;
-    // border: solid 1px #c1c1c1;
-    border-bottom: 0px;
-    // border-bottom: 0px;
-    background-color: #f5f5f5;
-    padding: 0px 8px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 400;
-    font-size: 16px;
-    // color: #14256a;
-    color: #14256a;
-    transform: translateY(2px);
-    width: 100px;
-  
-    // &:hover {
-    //   border: solid 1px #c1c1c1;
-    //   border-bottom: 0px;
-    //   color: #14256a;
-    //   background-color: #c1c1c17c
-    // }
-  }
+  height: 30px;
+  // width: 36px;
+  // padding: 0px 40px;
+  // border: solid 1px #c1c1c1;
+  border-bottom: 0px;
+  // border-bottom: 0px;
+  background-color: #f5f5f5;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 400;
+  font-size: 16px;
+  // color: #14256a;
+  color: #14256a;
+  transform: translateY(2px);
+  width: 100px;
+
+  // &:hover {
+  //   border: solid 1px #c1c1c1;
+  //   border-bottom: 0px;
+  //   color: #14256a;
+  //   background-color: #c1c1c17c
+  // }
+}
 
 
-  // #endregion
+// #endregion
 
-  //#region 請購單明細
+//#region 審核明細
 div.panelHeader18 {
   // padding-left: 20px;
-  padding:10px 20px;
+  padding: 10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -804,6 +810,35 @@ div.panelHeader18 {
   .row01 {
     display: grid;
     grid-template-columns: 30px 150px 150px 150px 150px 450px 450px;
+    // gap: 5px;
+  }
+}
+
+//#endregion
+
+
+//#region 入庫明細
+div.panelHeader19 {
+  // padding-left: 20px;
+  padding: 10px 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 150px 150px 150px 450px 450px;
     // gap: 5px;
   }
 }
