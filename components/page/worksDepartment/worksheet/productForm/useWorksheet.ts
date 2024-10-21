@@ -314,7 +314,7 @@ type Tworksheet = {
   getOptions_accessories: () => Toption[];
 
   // -----------------------------------------------------------------------------
-  reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto | undefined>;
+  reqGeneralSpec: (calcTarget?: 'fullWidth' | 'WG') => Promise<TdoorGeneralSpecsDto | undefined>;
   update_generalSpec: () => Promise<void>;
   update_availableComponents: () => Promise<void>;
 
@@ -394,26 +394,6 @@ const useWorksheet = create<Tworksheet>(
         })
       );
     },
-    // calcFullWidth: () => {
-    //   const { ABCD, getWG_mm } = get();
-    //   const fullWidth_mm = new Decimal(getWG_mm()) //
-    //     .add(ABCD.getGapA())
-    //     .add(ABCD.getGapC())
-    //     .toNumber();
-
-    //   // basicSpec.fullWidth = new Decimal(fullWidth_mm).div(1000).toString();
-    //   return new Decimal(fullWidth_mm).div(1000).toString() as `${number}`;
-    // },
-    // calcWG: () => {
-    //   const { ABCD, getFullWidth_mm } = get();
-    //   const WG_mm = new Decimal(getFullWidth_mm()) //
-    //     .minus(ABCD.getGapA())
-    //     .minus(ABCD.getGapC())
-    //     .toNumber();
-
-    //   // basicSpec.WG = new Decimal(WG_mm).div(1000).toString();
-    //   return new Decimal(WG_mm).div(1000).toString() as `${number}`;
-    // },
 
     // ---------------------------------------------------------------------
 
@@ -1116,7 +1096,7 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
     // MARK: reqGeneralSpec
-    reqGeneralSpec: async (calcTarget: 'fullWidth' | 'WG' = get().calcTarget) => {
+    reqGeneralSpec: async (calcTarget = get().calcTarget) => {
       type Tbody = {
         modelName: string;
         fullWidth: number | undefined;
@@ -1441,26 +1421,26 @@ const useWorksheet = create<Tworksheet>(
       // ______________________________________________________________________
 
       // 計算fullWidth或WG
-      set(
-        produce<Tworksheet>((state) => {
-          const { basicSpec, ABCD, getFullWidth_mm, getWG_mm } = state;
+      // 沒有必要，在calcData與編輯gapA或gapC時就計算了
+      // set(
+      //   produce<Tworksheet>((state) => {
+      //     const calcTarget = state.calcTarget;
 
-          if (basicSpec.fullWidth) {
-            const WG_mm = new Decimal(getFullWidth_mm()) //
-              .minus(ABCD.getGapA())
-              .minus(ABCD.getGapC())
-              .toNumber();
-            basicSpec.WG = new Decimal(WG_mm).div(1000).toString();
-          } else if (basicSpec.WG) {
-            const fullWidth_mm = new Decimal(getWG_mm()) //
-              .add(ABCD.getGapA())
-              .add(ABCD.getGapC())
-              .toNumber();
-            basicSpec.fullWidth = new Decimal(fullWidth_mm).div(1000).toString();
-          }
-          //
-        })
-      );
+      //     if (calcTarget === 'fullWidth') {
+      //       state.basicSpec.WG = calcWG_M({
+      //         fullWidth_M: Number(state.basicSpec.fullWidth),
+      //         gapA: state.generalSpec?.gapA ?? 0,
+      //         gapC: state.generalSpec?.gapC ?? 0,
+      //       }).toString();
+      //     } else if (calcTarget === 'WG') {
+      //       state.basicSpec.fullWidth = calcFullWidth_M({
+      //         WG: Number(state.basicSpec.WG),
+      //         gapA: state.generalSpec?.gapA ?? 0,
+      //         gapC: state.generalSpec?.gapC ?? 0,
+      //       }).toString();
+      //     }
+      //   })
+      // );
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1549,14 +1529,29 @@ const useWorksheet = create<Tworksheet>(
       // ______________________________________________________________________
       // ______________________________________________________________________
 
+      const { slatLength } = (await get().reqGeneralSpec('WG')) ?? {};
+
+      if (!slatLength) {
+        myAlert.warning({ title: '取得門片長度失敗' });
+
+        return;
+      }
+
+      set(
+        produce((state) => {
+          state.generalSpec.slatLength = slatLength;
+        })
+      );
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+
       const generateDoorProductBom = takeGenerateDoorProductBom({
         worksheet: worksheet,
         avalibleComponentIdList,
       });
 
       let doorProductBom: TdoorProductBomDto | undefined = undefined;
-
-      // if()
 
       if (generateDoorProductBom) {
         try {
