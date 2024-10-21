@@ -36,6 +36,7 @@
   padding: 30px 30px 10px 30px;
 
   .inputPanel {
+    position: relative;
     display: grid;
     gap: 20px;
     margin-bottom: 50px;
@@ -80,4 +81,11 @@
       cursor: not-allowed;
     }
   }
+}
+
+// ===============================================================
+
+// inputSel
+.select_menuPortal.plus {
+  z-index: 6;
 }
