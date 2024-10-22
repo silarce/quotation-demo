@@ -13,6 +13,7 @@ import Profile, {
   TprojectPatternStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 import ProjectPattern, {
   ThasPattern,
   TpatternReviewProcessGroup,
@@ -193,9 +194,13 @@ function PreWorkContactDoc_component(
     prodCellConfig,
     prodKeyArr,
     changeProdKeyArr,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
   } = useProductList({
     productArr: productArr,
-    others: [],
+    others: contract?.content.others ?? [],
     averageDiscount: null,
     resetTrigger: productArr,
     quotationDiscount: Number(latestQuotationDiscount) || 100,
@@ -848,6 +853,16 @@ function PreWorkContactDoc_component(
             isShowDndBtn={false}
             discountRate={''} // 報價單總折數
             changeDiscountRate={(v) => {}}
+          />
+          <Table_others
+            disabled={disabled}
+            list={othersList}
+            cellConfig={othersCellConfig}
+            keyArr={othersKeyArr}
+            changeKeyArr={() => {}}
+            add={() => {}}
+            isShowDndBtn={false}
+            isDisplayInPage="worksDepartment"
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>

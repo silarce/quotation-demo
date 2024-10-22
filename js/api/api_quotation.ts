@@ -1692,7 +1692,7 @@ const lookpu_contractPopulate = {
   ],
 
   worksDepartment: ['content', 'accountReceivable', 'content.verifyForm'],
-  worksDepartment02: ['content', 'subContracts.content.products.rootProductId'],
+  worksDepartment02: ['content.others', 'subContracts.content.products.rootProductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
 

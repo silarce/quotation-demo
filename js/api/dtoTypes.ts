@@ -915,12 +915,14 @@ export type TquotationContentOtherDto = {
   notes: string;
   // 尺寸規格
   spec: string | null;
+  // 是否可以在工務部揭露金額
+  isDisplayedOnAccountReceivable: boolean;
 };
 
 // export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 export type TcreateQuotationContentOtherDto = Pick<
   TquotationContentOtherDto,
-  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec'
+  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec' | 'isDisplayedOnAccountReceivable'
 > & {
   quantity: `${number}`;
   totalPrice: `${number}`;

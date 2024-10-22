@@ -19,6 +19,8 @@ export default function Table_others({
   keyArr,
   changeKeyArr,
   add,
+  isShowDndBtn = true,
+  isDisplayInPage,
 }: {
   disabled: boolean;
   list: TothersList;
@@ -26,6 +28,8 @@ export default function Table_others({
   keyArr: TothersKey[];
   changeKeyArr: (arr: TothersKey[]) => void;
   add: () => void;
+  isShowDndBtn?: boolean;
+  isDisplayInPage?: string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -33,9 +37,11 @@ export default function Table_others({
     <div className={scss.tableContainer}>
       <div className={scss.header}>
         <h2>其他設定</h2>
-        <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
-          {allowMove ? '確定排序' : '設定排序'}
-        </button>
+        {isShowDndBtn && (
+          <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
+            {allowMove ? '確定排序' : '設定排序'}
+          </button>
+        )}
       </div>
       {/*  */}
       <div className={scss.main}>
@@ -60,6 +66,7 @@ export default function Table_others({
             keyArr={keyArr}
             prodCellConfig={cellConfig}
             onRowClick={(obj) => {}}
+            isDisplayInPage={isDisplayInPage}
           />
 
           {!disabled && (
