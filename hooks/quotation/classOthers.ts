@@ -156,6 +156,15 @@ class Class_other {
     this.reRender();
   }
 
+  get isDisplayedOnAccountReceivable() {
+    return this._data.isDisplayedOnAccountReceivable;
+  }
+
+  set isDisplayedOnAccountReceivable(v) {
+    this._data.isDisplayedOnAccountReceivable = v;
+    this.reRender();
+  }
+
   // ---------------------------------------------------------
 
   get body() {
@@ -180,6 +189,7 @@ type Tothers = {
   totalPrice: number;
   notes: string;
   unit: string | null;
+  isDisplayedOnAccountReceivable: boolean;
 };
 
 // type TothersKey = Exclude<keyof Tothers, 'id'>;
@@ -197,6 +207,7 @@ const othersKeyArrOri: () => TothersKey[] = () => {
     'unitPrice_locale',
     'totalPrice_locale',
     'notes',
+    'isDisplayedOnAccountReceivable',
   ];
 };
 
@@ -303,6 +314,15 @@ const othersCellConfig: TcellConfig = {
       },
     },
   },
+  isDisplayedOnAccountReceivable: {
+    label: '是否在應收帳款揭露金額',
+    inputSelProps: {
+      wrapperStyle: { width: '210px' },
+      checkBoxProps: {
+        propsArr: [{ key: 'isDisplayedOnAccountReceivable' }],
+      },
+    },
+  },
 };
 
 // ============================================================================
@@ -316,6 +336,7 @@ const emptyOthersOri: () => Tothers = () => {
     totalPrice: 0,
     notes: '',
     unit: '',
+    isDisplayedOnAccountReceivable: false,
   };
 };
 
