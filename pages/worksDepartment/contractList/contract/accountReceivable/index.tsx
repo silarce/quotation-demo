@@ -581,7 +581,8 @@ export default function AccountReceivable({
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
             readonly={readonly}
-            currency={currency}
+            // currency={currency}
+            currency={'TWD'}
             contractId={contractId}
           />
         </AccountReceivableContext.Provider>
