@@ -519,9 +519,9 @@ export default function EditWHPosition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (whname === "101") ? `https://${setting.warehouse1}/` :
-                    (whname === "102") ? `https://${setting.warehouse2}/` :
-                        (whname === "103") ? `https://${setting.warehouse3}/` : ""
+                (whname === "101") ? `https://${setting.warehouse1}/sjwms/` :
+                    (whname === "102") ? `https://${setting.warehouse2}/sjwms/` :
+                        (whname === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
