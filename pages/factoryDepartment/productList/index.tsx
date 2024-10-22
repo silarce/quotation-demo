@@ -1594,7 +1594,7 @@ export default function ProductList() {
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <div className={scss.content}>
+                    <div className={scss.content}  style={{ overflowY:'hidden'}}>
                         <div
                             style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <div className={scss.head_head1}>
