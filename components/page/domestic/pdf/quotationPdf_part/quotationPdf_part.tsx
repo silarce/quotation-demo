@@ -226,7 +226,11 @@ const extractPdfPartFromClassProduct = ({
         unit_str = list_acce.unit as string;
       }
 
-      const partName = acce.name.replaceAll('60A', '');
+      let partName = acce.name.replaceAll('60A', '');
+
+      if (partName === '氟碳烤漆' || partName === '粉體烤漆') {
+        partName = '烤漆';
+      }
 
       return {
         partName,
