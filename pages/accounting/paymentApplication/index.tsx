@@ -101,7 +101,12 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder } = useGetPaymentOrderById(id);
-  // console.log(raw_paymentOrder);
+  const { res: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBySupplierId(
+    raw_paymentOrder?.beneficiary_uuid,
+    {
+      autoUpdate: false,
+    }
+  );
 
   // --------------------------------------------------------------------------
 
@@ -130,6 +135,25 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
     });
   };
 
+  // const handleSearch_accountPayable = () => {
+  //   DragableModal.create({
+  //     children: (
+  //       <SearchModal_accountPayable
+  //         limit={1}
+  //         onRowClick={(raw) => {
+  //           // const id = raw.id;
+  //           // router.replace({
+  //           //   query: {
+  //           //     ...query,
+  //           //     id,
+  //           //   },
+  //           // });
+  //         }}
+  //       />
+  //     ),
+  //   });
+  // };
+
   const onEdit = () => {
     setDisabled(false);
   };
@@ -143,6 +167,9 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   };
 
   // --------------------------------------------------------------------------
+  useEffect(() => {
+    update_accountPayable();
+  }, [raw_paymentOrder]);
 
   // --------------------------------------------------------------------------
 
@@ -163,6 +190,8 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
       <PageHeader02 tag="付款申請" />
 
       <div>
+        {/* <button onClick={handleSearch_accountPayable}>test</button> */}
+
         <BtnBar
           //
           className="mb-5"
@@ -192,8 +221,6 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
           <Detail_tfoot total={Number(state.total || 0).toLocaleString()} />
         </div>
-
-        {/* <Table_paymentApplication /> */}
       </div>
     </SubLayer>
   );

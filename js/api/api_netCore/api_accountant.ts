@@ -976,7 +976,8 @@ const useGetPaymentOrderById = (
 // 以廠商id(等同於客戶id)取得應付帳款
 const apiGetAccountPayableBySupplierId = async (supplier_uuid: string) => {
   // api名稱與需要的id不吻合，怪怪的
-  const api = `/${subRoot}/GetPaymentOrderDetailByPaymentOrderId`;
+  // const api = `/${subRoot}/GetPaymentOrderDetailByPaymentOrderId`;
+  const api = `/${subRoot}/GetAccountPayableBySupplierId`;
   const params = {
     supplier_uuid,
   };
@@ -990,7 +991,7 @@ const apiGetAccountPayableBySupplierId = async (supplier_uuid: string) => {
 };
 
 const useGetAccountPayableBySupplierId = (
-  supplier_uuid: string | undefined,
+  supplier_uuid: string | undefined | null,
   {
     callAlertOnError = true,
     autoUpdate = true,
