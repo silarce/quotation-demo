@@ -490,8 +490,8 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
-                    suppliercontact:suppliercontactin,
-                    supplierfax:supplierfaxin,
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin,
                     data2: data2
                 };
 
@@ -542,8 +542,8 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
-                    suppliercontact:suppliercontactin,
-                    supplierfax:supplierfaxin
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin
                 };
 
 
@@ -1532,6 +1532,68 @@ export default function AddPurchaseOrder() {
         setEditmain(true);
     };
 
+
+    const handleDeletePO = async (id: any) => {
+
+        myAlert.confirm({
+            title: '確定要刪除這筆單據嗎?',
+            content: <>
+                <h1>刪除後將無法復原</h1>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            id: id
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/DeletePurchaseOrder?${queryParams}`);
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const responseData = await response.text();
+
+                        myAlert.success({ title: '刪除成功' });
+
+                        setPurchaseorderid('');
+                        setCreate_atin('');
+                        setNeed_date('');
+                        setNote('');
+                        setCreate_byin('');
+                        setStatus('');
+                        setData2([]);
+                        setSuppliernamein('');
+                        setSupplieraddressin('');
+                        setSupplierphonein('');
+                        setSuppliertaxidin('');
+                        setShippingaddressin('');
+                        getPurchaseOrder();
+                        
+
+
+
+                    } catch (error: any) {
+                        setError(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+
+                }
+            }
+        })
+    }
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1598,7 +1660,12 @@ export default function AddPurchaseOrder() {
                                     取消
                                 </button>
                             </div>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handleDeletePO(purchaseorderuuid) }} title="單據刪除">
+                                    <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    刪除
+                                </button>
+                            </div>
                             <div>
                                 <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddDetail() }} title="單據申請">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
@@ -1813,6 +1880,9 @@ export default function AddPurchaseOrder() {
                                                         </span>
                                                         <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
                                                             {item.phone}
+                                                        </span>
+                                                        <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                            {item.contact}
                                                         </span>
                                                     </li>
                                                 ))}

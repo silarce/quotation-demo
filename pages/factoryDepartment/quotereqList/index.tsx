@@ -2497,6 +2497,9 @@ export default function AddPurchaseOrder() {
                                                         <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
                                                             {item.phone}
                                                         </span>
+                                                        <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                            {item.contact}
+                                                        </span>
                                                     </li>
                                                 ))}
                                             </ul>

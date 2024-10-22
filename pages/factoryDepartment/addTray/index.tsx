@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useState } from 'react';
+import { JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useRef, useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { setting } from '../wareHouseList/index';
 import { userInfo } from 'os';
@@ -59,6 +59,7 @@ export default function AddTray() {
     const [totaltraychildlayout, setTotalTrayChildLayOut] = useState<any[]>([]);
     const [trayname, setTrayName] = useState<string | null>(null);
     const [data12, setData12] = useState<any[]>([]);
+    const [originaldata11, setOriginalData11] = useState<any[]>([]);
 
     const [length, setLength] = useState<number | null>(1);
     const [width, setWidth] = useState<number | null>(1);
@@ -555,27 +556,38 @@ export default function AddTray() {
         }
     };
 
-    const handlechildKeyDown2 = (e: any) => {
-        if (e.key === 'ArrowUp') {
-            setChildWidth(prev => {
-                const newWidth = prev !== null ? prev + 1 : 1;
-                handleAdd(e.target.value);
-                return newWidth;
-            });
-        } else if (e.key === 'ArrowDown') {
-            setChildWidth(prev => {
-                const newWidth = prev !== null && prev > 0 ? prev - 1 : 0;
-                handleRemove()
-                return newWidth;
-            });
-        }
+    const isHandlingRef = useRef(false);
 
-    }
+    const handleChildKeyDown2 = (e: any) => {
+
+        const value = e.target.value;
+        if (Number(value) < (childwidth || 1)) {
+            handleRemove();
+        } else if (Number(value) > (childwidth || 1)) {
+            handleAdd(value);
+        }
+        setChildWidth(value);
+    };
+
+
+
+
+
+
+
+
+
 
     const handleAdd = (value: any) => {
-        const newchildwidth = parseInt(value) + 1; // 新的 childwidth
-        console.log(data12[0]?.matchedItem.length); // 使用 optional chaining
 
+        const newchildwidth = parseInt(value); // 新的 childwidth
+
+
+        // alert(value);
+        console.log(value);
+
+        console.log(data12);
+        // return;
         // 取得 data12 的第一筆資料
         const firstItem = data12[0];
 
@@ -583,20 +595,20 @@ export default function AddTray() {
         const newDataItem = {
             id: null, // 可以根據需要設置 ID
             whpname: "",
-            whid: firstItem.matchedItem.whid,
+            whid: firstItem.widthdata.whid,
             volume: 0,
             spec: "",
             trayid: null,
-            length: firstItem.matchedItem.length, // 使用相同的 length
-            width: firstItem.matchedItem.width, // 使用相同的 width
-            childlength: firstItem.matchedItem.childlength, // 繼續使用相同的 childlength
+            length: firstItem.widthdata.length, // 使用相同的 length
+            width: firstItem.widthdata.width, // 使用相同的 width
+            childlength: firstItem.widthdata.childlength, // 繼續使用相同的 childlength
             childwidth: newchildwidth, // 使用新的 childwidth
             materialnumber: '',
             batchnumber: '',
             unit: '',
             quantity: 0,
-            whname: firstItem.matchedItem.whname,
-            trayname: firstItem.matchedItem.trayname,
+            whname: firstItem.widthdata.whname,
+            trayname: firstItem.widthdata.trayname,
             color: "#FFFFFF", // 預設顏色，可以根據需要改變
         };
 
@@ -605,40 +617,54 @@ export default function AddTray() {
             const updatedData = [...prevData12];
 
             // 確保 childtraylayoutmodel 存在
-            if (!updatedData[0].matchedItem.childtraylayoutmodel) {
-                updatedData[0].matchedItem.childtraylayoutmodel = [];
+            if (!updatedData[0].widthdata.childtraylayoutmodel) {
+                updatedData[0].widthdata.childtraylayoutmodel = [];
             }
 
-            // 將新的 childwidthdata 加入到 childtraylayoutmodel 中
-            updatedData[0].matchedItem.childtraylayoutmodel[0].childwidthdata.push(newDataItem);
+            // 檢查是否已存在相同的 childwidthdata
+            const exists = updatedData[0].widthdata.childtraylayoutmodel[0].childwidthdata.some((item: any) =>
+                item.childwidth === newDataItem.childwidth &&
+                item.length === newDataItem.length // 可以根據需要檢查其他字段
+            );
+
+            // 如果不存在，則添加新的 childwidthdata
+            if (!exists) {
+                updatedData[0].widthdata.childtraylayoutmodel[0].childwidthdata.push(newDataItem);
+            }
 
             return updatedData; // 返回更新後的資料
         });
 
+
         console.log(newDataItem);
         console.log(data12); // 輸出更新後的 data12
+
+        console.log(data11);
     };
 
 
     const handleRemove = () => {
+        console.log(data11);
+
+        // 更新 data12
         setData12(prevData12 => {
             // 確保 data12 有資料可移除
             if (prevData12.length > 0) {
                 // 找到 childwidth 最大的索引
-                const maxChildWidthIndex = prevData12[0].matchedItem.childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: string | number, currentItem: { childwidth: number; }, index: any, array: { [x: string]: { childwidth: number; }; }) => {
+                const maxChildWidthIndex = prevData12[0].widthdata.childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: number, currentItem: { childwidth: number; }, index: number, array: { childwidth: number; }[]) => {
                     return currentItem.childwidth > array[maxIndex].childwidth ? index : maxIndex;
                 }, 0);
-    
+
                 // 移除 childwidth 最大的項目
-                const updatedChildWidthData = prevData12[0].matchedItem.childtraylayoutmodel[0].childwidthdata.filter((_: any, index: any) => index !== maxChildWidthIndex);
-    
+                const updatedChildWidthData = prevData12[0].widthdata.childtraylayoutmodel[0].childwidthdata.filter((_: any, index: number) => index !== maxChildWidthIndex);
+
                 // 返回更新後的資料
                 return [{
                     ...prevData12[0],
-                    matchedItem: {
-                        ...prevData12[0].matchedItem,
+                    widthdata: {
+                        ...prevData12[0].widthdata,
                         childtraylayoutmodel: [{
-                            ...prevData12[0].matchedItem.childtraylayoutmodel[0],
+                            ...prevData12[0].widthdata.childtraylayoutmodel[0],
                             childwidthdata: updatedChildWidthData
                         }]
                     }
@@ -646,8 +672,47 @@ export default function AddTray() {
             }
             return prevData12; // 如果沒有資料可以移除，返回原資料
         });
+
+        // 更新 data11
+        setData11(prevData11 => {
+            if (prevData11.length > 0) {
+                const maxChildWidthIndex = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: number, currentItem: { childwidth: number; }, index: number, array: { childwidth: number; }[]) => {
+                    return currentItem.childwidth > array[maxIndex].childwidth ? index : maxIndex;
+                }, 0);
+
+                // 更新 childwidthdata，移除最大的項目
+                const updatedChildWidthData = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.filter((_: any, index: number) => index !== maxChildWidthIndex);
+
+                console.log(updatedChildWidthData);
+                // 確保返回正確的資料結構
+                return [{
+                    ...prevData11[0], // 保留原始的第一個元素
+                    widthdata: [{
+                        ...prevData11[0].widthdata[0],
+                        childtraylayoutmodel: [{
+                            ...prevData11[0].widthdata[0].childtraylayoutmodel[0],
+                            childwidthdata: updatedChildWidthData // 使用更新後的 childwidthdata
+                        }]
+                    }]
+                }];
+            }
+            return prevData11; // 如果沒有資料可以移除，返回原資料
+        });
+
+
+        
+        console.log(`data11-${data11}`); // 這裡會顯示舊的值
+        console.log(data11);
+        console.log(`data12-${data12}`); // 這裡會顯示舊的值
+        console.log(data12);
+
+        // setData11(data12);
     };
-    
+
+    // 如果您希望在 data12 更新後執行某些操作，可以使用 useEffect 來監聽 data12 的變化
+    useEffect(() => {
+        console.log('data11 updated:', data11);
+    }, [data11]);
 
 
 
@@ -701,15 +766,15 @@ export default function AddTray() {
         TotalLayOut();
     }, [traylayout, traychildlayout]);
 
-    useEffect(() => {
-        // 這段程式碼將在 data11 發生變化時執行
-        console.log("data11 目前的值：", data11);
-        // 在這裡可以做任何想要在 data11 變化時執行的處理
+    // useEffect(() => {
+    //     // 這段程式碼將在 data11 發生變化時執行
+    //     console.log("data11 目前的值：", data11);
+    //     // 在這裡可以做任何想要在 data11 變化時執行的處理
 
-        // 如果需要在 data11 變化後執行特定函數，可以在這裡呼叫它們
-        // 例如：layoutChildLengthAndWidth(whid, whname, data11);
+    //     // 如果需要在 data11 變化後執行特定函數，可以在這裡呼叫它們
+    //     // 例如：layoutChildLengthAndWidth(whid, whname, data11);
 
-    }, [data11, traychildlayout]);
+    // }, [data11, traychildlayout]);
 
     const goToAddChildTray = (whid: any, whname: any, length: any, width: any) => {
         router.push({
@@ -725,16 +790,18 @@ export default function AddTray() {
 
     // const getLaychildOutBywhpositin = async (length: any, width: any, childlength: any, childwidth: any) => {
     const getLaychildOutBywhpositin = async (length: any, width: any) => {
-        const typedData11 = data11 as { widthdata: any[] }[];
+        // alert(`${length}_${width}`);
+        // const typedData11 = data11 as { widthdata: any[] }[];
+        const typedData11 = data11 as any[];
 
         const resultArray: any[] = [];
 
         typedData11.forEach(item => {
             const matchingItems = item.widthdata.filter((x: any) => x.length === length && x.width === width);
 
-            matchingItems.forEach((matchedItem: any) => {
+            matchingItems.forEach((widthdata: any) => {
                 resultArray.push({
-                    matchedItem
+                    widthdata: widthdata
                     // length: matchedItem.length,
                     // width: matchedItem.width,
                     // childlength: matchedItem.childlength,
@@ -744,11 +811,16 @@ export default function AddTray() {
         });
         // setChildWidth(resultArray[0].childtraylayoutmodel.childwidth);
         console.log(resultArray);
-        setChildWidth(resultArray[0].matchedItem.childtraylayoutmodel[0].childwidthdata[0].childwidth);
+        setChildWidth(parseInt(resultArray[0].widthdata.childtraylayoutmodel[0].childwidthdata.length));
+        console.log(resultArray[0].widthdata.childtraylayoutmodel[0].childwidthdata.length);
+
+
+
+
 
         // 將結果存入 state
         setData12(resultArray);
-        
+
     };
 
 
@@ -803,18 +875,18 @@ export default function AddTray() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        {data11.map((Data) => (
-                            <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
+                        {data11.map((Data, index) => (
+                            <table key={index} className={scss.traytable} style={{ border: 'solid 1px black' }}>
                                 <tbody>
                                     <tr className={scss.tr}>
-                                        {Data.widthdata.map((item: any) => (
-                                            <td className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
-                                                {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any) => (
-                                                    <table className={scss.childtraytable} key={item.childlengthid}>
+                                        {Data.widthdata.map((item: any, index: any) => (
+                                            <td key={index} className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
+                                                {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any, index: any) => (
+                                                    <table key={index} className={scss.childtraytable}>
                                                         <tbody>
                                                             <tr className={scss.childtraytabletr}>
-                                                                {childitem.childwidthdata.map((childDataItem: any) => (
-                                                                    <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
+                                                                {childitem.childwidthdata.map((childDataItem: any, index: any) => (
+                                                                    <td className={scss.childtraytabletd} key={index} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
                                                                         <button className={scss.childtraytabletdButton}
                                                                             // onClick={() => layoutChildLengthAndWidth(whid, whname, childDataItem.length, childDataItem.width, data11)}
                                                                             onClick={() => {
@@ -870,25 +942,30 @@ export default function AddTray() {
                             disabled={false}
                             inputProps={{
                                 props: {
-                                    value: childwidth ?? 0,
-                                    // onChange: (e) => handleWidthLengthChange(e, "width"),
-                                    onKeyDown: (e) => handlechildKeyDown2(e)
+                                    type: 'number',
+                                    value: childwidth ?? 1,
+                                    min: 1, // 設定最小值為1
+                                    onChange: (e) => {
+                                        // const value = Math.max(1, Number(e.target.value)); // 確保值不小於1
+                                        handleChildKeyDown2(e); // 傳入正確的數值
+                                    }
                                 },
                             }}
                         />
+
                     </div>
                 </div>
-                <div className={scss.right}>
+                <div className={scss.left}>
                     <div className={scss.content}>
                         <input type='text' value='' />
                         {/* 渲染一個 table 類似於 data11 的顯示方式 */}
                         {data12.map((dataItem, index) => (
-                            <table className={scss.traytable} style={{ border: 'solid 1px black' }} key={index}>
+                            <table key={index} className={scss.traytable} style={{ border: 'solid 1px black' }}>
                                 <tbody>
                                     <tr className={scss.tr}>
-                                        <td className={scss.td} style={{ backgroundColor: dataItem.matchedItem.color || 'lightgrey' }}>
+                                        <td className={scss.td} style={{ backgroundColor: dataItem.widthdata.color || 'lightgrey' }}>
 
-                                            {dataItem.matchedItem.childtraylayoutmodel.map((childLayout: any, layoutIndex: any) => (
+                                            {dataItem.widthdata.childtraylayoutmodel.map((childLayout: any, layoutIndex: any) => (
                                                 <div key={layoutIndex}>
                                                     <table className={scss.childtraytable}>
                                                         <tbody>

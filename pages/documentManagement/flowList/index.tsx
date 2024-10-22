@@ -959,7 +959,6 @@ export default function FlowList() {
                                                         alignItems: 'center'// 垂直置中
                                                     }}
                                                 >
-
                                                     <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                                                         <span style={{ width: '155px' }}>
                                                             {emp.title}
@@ -971,8 +970,6 @@ export default function FlowList() {
                                                             {emp.department}
                                                         </span>
                                                     </div>
-
-
                                                 </li>
                                             ))}
                                         </ul>
