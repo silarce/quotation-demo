@@ -1241,26 +1241,6 @@ const useWorksheet = create<Tworksheet>(
         return;
       }
 
-      set(
-        produce<Tworksheet>((state) => {
-          const calcTarget = state.calcTarget;
-
-          if (calcTarget === 'fullWidth') {
-            state.basicSpec.WG = calcWG_M({
-              fullWidth_M: Number(state.basicSpec.fullWidth),
-              gapA: state.generalSpec?.gapA ?? 0,
-              gapC: state.generalSpec?.gapC ?? 0,
-            }).toString();
-          } else if (calcTarget === 'WG') {
-            state.basicSpec.fullWidth = calcFullWidth_M({
-              WG: Number(state.basicSpec.WG),
-              gapA: state.generalSpec?.gapA ?? 0,
-              gapC: state.generalSpec?.gapC ?? 0,
-            }).toString();
-          }
-        })
-      );
-
       // ___________________________________________________________________
       // ___________________________________________________________________
 
@@ -1340,6 +1320,26 @@ const useWorksheet = create<Tworksheet>(
           // 為了更新fullWidth或WG
           state.ABCD.setGapA(state.generalSpec.gapA);
           state.ABCD.setGapC(state.generalSpec.gapC);
+        })
+      );
+
+      set(
+        produce<Tworksheet>((state) => {
+          const calcTarget = state.calcTarget;
+
+          if (calcTarget === 'fullWidth') {
+            state.basicSpec.WG = calcWG_M({
+              fullWidth_M: Number(state.basicSpec.fullWidth),
+              gapA: state.generalSpec?.gapA ?? 0,
+              gapC: state.generalSpec?.gapC ?? 0,
+            }).toString();
+          } else if (calcTarget === 'WG') {
+            state.basicSpec.fullWidth = calcFullWidth_M({
+              WG: Number(state.basicSpec.WG),
+              gapA: state.generalSpec?.gapA ?? 0,
+              gapC: state.generalSpec?.gapC ?? 0,
+            }).toString();
+          }
         })
       );
 
