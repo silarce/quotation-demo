@@ -559,29 +559,20 @@ export default function AddTray() {
     const isHandlingRef = useRef(false);
 
     const handleChildKeyDown2 = (e: any) => {
-        if (isHandlingRef.current) return;
 
-        isHandlingRef.current = true; // 設置為正在處理
-        if (e.key === 'ArrowUp') {
-            // alert(e.target.value);
-            setChildWidth(prev => {
-                const newWidth = prev !== null ? prev + 1 : 1;
-                handleAdd(newWidth);
-                return newWidth;
-            });
-        } else if (e.key === 'ArrowDown') {
-            setChildWidth(prev => {
-                const newWidth = prev !== null && prev > 1 ? prev - 1 : 1;
-                if (newWidth === 1) { }
-                handleRemove();
-                return newWidth;
-            });
+        const value = e.target.value;
+        if (Number(value) < (childwidth || 1)) {
+            handleRemove();
+        } else if (Number(value) > (childwidth || 1)) {
+            handleAdd(value);
         }
-
-        setTimeout(() => {
-            isHandlingRef.current = false; // 重置處理狀態
-        }, 100); // 100 毫秒後重置
+        setChildWidth(value);
     };
+
+
+
+
+
 
 
 
@@ -590,7 +581,7 @@ export default function AddTray() {
     const handleAdd = (value: any) => {
 
         const newchildwidth = parseInt(value); // 新的 childwidth
-        
+
 
         // alert(value);
         console.log(value);
@@ -683,34 +674,37 @@ export default function AddTray() {
         });
 
         // 更新 data11
-        // setData11(prevData11 => {
-        //     if (prevData11.length > 0) {
-        //         const maxChildWidthIndex = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: number, currentItem: { childwidth: number; }, index: number, array: { childwidth: number; }[]) => {
-        //             return currentItem.childwidth > array[maxIndex].childwidth ? index : maxIndex;
-        //         }, 0);
+        setData11(prevData11 => {
+            if (prevData11.length > 0) {
+                const maxChildWidthIndex = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.reduce((maxIndex: number, currentItem: { childwidth: number; }, index: number, array: { childwidth: number; }[]) => {
+                    return currentItem.childwidth > array[maxIndex].childwidth ? index : maxIndex;
+                }, 0);
 
-        //         // 更新 childwidthdata，移除最大的項目
-        //         const updatedChildWidthData = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.filter((_: any, index: number) => index !== maxChildWidthIndex);
+                // 更新 childwidthdata，移除最大的項目
+                const updatedChildWidthData = prevData11[0].widthdata[0].childtraylayoutmodel[0].childwidthdata.filter((_: any, index: number) => index !== maxChildWidthIndex);
 
-        //         console.log(updatedChildWidthData);
-        //         // 確保返回正確的資料結構
-        //         return [{
-        //             ...prevData11[0], // 保留原始的第一個元素
-        //             widthdata: [{
-        //                 ...prevData11[0].widthdata[0],
-        //                 childtraylayoutmodel: [{
-        //                     ...prevData11[0].widthdata[0].childtraylayoutmodel[0],
-        //                     childwidthdata: updatedChildWidthData // 使用更新後的 childwidthdata
-        //                 }]
-        //             }]
-        //         }];
-        //     }
-        //     return prevData11; // 如果沒有資料可以移除，返回原資料
-        // });
+                console.log(updatedChildWidthData);
+                // 確保返回正確的資料結構
+                return [{
+                    ...prevData11[0], // 保留原始的第一個元素
+                    widthdata: [{
+                        ...prevData11[0].widthdata[0],
+                        childtraylayoutmodel: [{
+                            ...prevData11[0].widthdata[0].childtraylayoutmodel[0],
+                            childwidthdata: updatedChildWidthData // 使用更新後的 childwidthdata
+                        }]
+                    }]
+                }];
+            }
+            return prevData11; // 如果沒有資料可以移除，返回原資料
+        });
 
+
+        
         console.log(`data11-${data11}`); // 這裡會顯示舊的值
-
+        console.log(data11);
         console.log(`data12-${data12}`); // 這裡會顯示舊的值
+        console.log(data12);
 
         // setData11(data12);
     };
@@ -948,12 +942,17 @@ export default function AddTray() {
                             disabled={false}
                             inputProps={{
                                 props: {
+                                    type: 'number',
                                     value: childwidth ?? 1,
-                                    // onChange: (e) => handleWidthLengthChange(e, "width"),
-                                    onKeyUp: (e) => { handleChildKeyDown2(e) }
+                                    min: 1, // 設定最小值為1
+                                    onChange: (e) => {
+                                        // const value = Math.max(1, Number(e.target.value)); // 確保值不小於1
+                                        handleChildKeyDown2(e); // 傳入正確的數值
+                                    }
                                 },
                             }}
                         />
+
                     </div>
                 </div>
                 <div className={scss.left}>
