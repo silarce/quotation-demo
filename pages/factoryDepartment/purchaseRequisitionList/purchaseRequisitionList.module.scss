@@ -315,7 +315,8 @@
 
 
 div.panelHeader21 {
-  padding-left: 20px;
+  // padding-left: 20px;
+  padding:10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -345,7 +346,8 @@ div.panelHeader21 {
 
 //#region 請購單明細
 div.panelHeader16 {
-  padding-left: 20px;
+  // padding-left: 20px;
+  padding:10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,
@@ -393,7 +395,7 @@ div.panelHeader17 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 220px 40px 40px;
+    grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 50px 180px 40px 40px;
     gap: 5px;
   }
 }
@@ -853,7 +855,8 @@ div.panelHeader17 {
 
 //#region 請購單明細
 div.panelHeader18 {
-  padding-left: 20px;
+  // padding-left: 20px;
+  padding:10px 20px;
   border-bottom: solid 1px $colorBorder01;
 
   .row01,

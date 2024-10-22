@@ -272,7 +272,8 @@
 
 //#region 採購單明細
 div.panelHeader11 {
-    padding-left: 20px;
+    // padding-left: 20px;
+    padding:10px 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,
@@ -296,7 +297,8 @@ div.panelHeader11 {
 }
 
 div.panelHeader13 {
-    padding-left: 20px;
+    // padding-left: 20px;
+    padding:10px 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,
@@ -765,7 +767,8 @@ div.panelHeader10 {
 
 //#region 審核明細
 div.panelHeader18 {
-    padding-left: 20px;
+    // padding-left: 20px;
+    padding:10px 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,
@@ -793,7 +796,8 @@ div.panelHeader18 {
 
 //#region 進貨明細
 div.panelHeader19 {
-    padding-left: 20px;
+    // padding-left: 20px;
+    padding:10px 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,
@@ -811,7 +815,7 @@ div.panelHeader19 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 30px 150px 150px 150px 150px 450px 450px;
+        grid-template-columns: 30px 150px 150px 150px 450px 450px 450px;
         // gap: 5px;
     }
 }

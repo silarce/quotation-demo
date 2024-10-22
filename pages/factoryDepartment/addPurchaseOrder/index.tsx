@@ -119,6 +119,8 @@ export default function AddPurchaseOrder() {
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [supplieridin, setSupplieridin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
+    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
+    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -488,6 +490,8 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
+                    suppliercontact:suppliercontactin,
+                    supplierfax:supplierfaxin,
                     data2: data2
                 };
 
@@ -538,6 +542,8 @@ export default function AddPurchaseOrder() {
                     supplieraddress: supplieraddressin,
                     supplierid: supplieridin,
                     shippingaddress: shippingaddressin,
+                    suppliercontact:suppliercontactin,
+                    supplierfax:supplierfaxin
                 };
 
 
@@ -574,7 +580,6 @@ export default function AddPurchaseOrder() {
                 setPurchaseorderuuid(data[0].id);
                 setStatus("未送出");
                 getPurchaseOrder();
-                setStatus("未送出");
                 console.log(data);
 
                 // getProduct();
@@ -802,9 +807,18 @@ export default function AddPurchaseOrder() {
 
     // 從口袋清單移除
     const handleRemove = (index: number, item: any) => {
-        const updatedData = data2.filter((_, i) => i !== index);
-        setData2(updatedData);
-        RemovePurchaseOrderDetail(item.id);
+        myAlert.confirm({
+            title: '確定要移除嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+                    const updatedData = data2.filter((_, i) => i !== index);
+                    setData2(updatedData);
+                    RemovePurchaseOrderDetail(item.id);
+                }
+            }
+        })
     };
 
     // 改變數字口袋清單值
@@ -1231,6 +1245,7 @@ export default function AddPurchaseOrder() {
 
     const handlechangepo = (item: any) => {
         console.log(item);
+        setEditmain(false);
         handleRowClick(item.purchaseorderid);
         setData2([]);
         setPurchaseorderid(item.purchaseorderid);
@@ -1312,6 +1327,8 @@ export default function AddPurchaseOrder() {
         setSupplierphonein(item.phone ? item.phone : '');
         setSuppliertaxidin(item.tax_id ? item.tax_id : '');
         setSupplieridin(item.customer_number);
+        setSuppliercontactin(item.contact ? item.contact : '');
+        setSupplierfaxin(item.fax ? item.fax : '');
 
 
         setcustomersShowSuggestions(false);
@@ -1437,7 +1454,7 @@ export default function AddPurchaseOrder() {
         setSelectedsupplier(item.detail_id);
         setHandinputunitprice(item.detail_unitprice);
         // setHandinputquantity(item.detail_quantity);
-        setHandinputtotalprice((parseFloat(handinputunitprice || '0') * parseFloat(handinputquantity || '0')).toString());
+        setHandinputtotalprice((parseFloat(item.detail_unitprice || '0') * parseFloat(handinputquantity || '0')).toString());
         setQuoterequuid(item.main_id);
         // UpdatePurchaseOrderDetail(item);
     };
@@ -2578,6 +2595,7 @@ export default function AddPurchaseOrder() {
                                         <span>{_item.detail_unit}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                         <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                        <span>{_item.pricetype}</span>
                                         <span>{_item.main_quotereqid}</span>
                                         <span></span>
                                         {/* <span></span> */}
