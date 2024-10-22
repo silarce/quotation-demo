@@ -101,12 +101,13 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder } = useGetPaymentOrderById(id);
-  const { res: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBySupplierId(
-    raw_paymentOrder?.beneficiary_uuid,
-    {
-      autoUpdate: false,
-    }
-  );
+
+  // const { res: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBySupplierId(
+  //   raw_paymentOrder?.beneficiary_uuid,
+  //   {
+  //     autoUpdate: false,
+  //   }
+  // );
 
   // --------------------------------------------------------------------------
 
@@ -167,9 +168,9 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   };
 
   // --------------------------------------------------------------------------
-  useEffect(() => {
-    update_accountPayable();
-  }, [raw_paymentOrder]);
+  // useEffect(() => {
+  //   update_accountPayable();
+  // }, [raw_paymentOrder]);
 
   // --------------------------------------------------------------------------
 
