@@ -519,9 +519,9 @@ export default function EditWHPosition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (whname === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (whname === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (whname === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (whname === "101") ? `https://${setting.warehouse1}/` :
+                    (whname === "102") ? `https://${setting.warehouse2}/` :
+                        (whname === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -537,7 +537,7 @@ export default function EditWHPosition() {
             setTrayCalledin(true);
             setTrayCalledNamein(data1.trayname);
 
-            alert(url);
+            // alert(url);
             // return;
 
             // 呼叫 traycommand API
@@ -574,7 +574,7 @@ export default function EditWHPosition() {
             setTrayCalledNamein(data1.trayname);
 
         } catch (error: any) {
-            myAlert.warning(error.message);
+            // myAlert.warning(error.message);
             console.error;
         } finally {
             setIsLoading(false);
@@ -593,9 +593,9 @@ export default function EditWHPosition() {
             const traynumber = traycallednamein;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whnamecalledin === "101") ? `https://${setting.warehouse1}/sjwms/` :
-                    (whnamecalledin === "102") ? `https://${setting.warehouse2}/sjwms/` :
-                        (whnamecalledin === "103") ? `https://${setting.warehouse3}/sjwms/` : ""
+                (whnamecalledin === "101") ? `https://${setting.warehouse1}/` :
+                    (whnamecalledin === "102") ? `https://${setting.warehouse2}/` :
+                        (whnamecalledin === "103") ? `https://${setting.warehouse3}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數
@@ -606,7 +606,7 @@ export default function EditWHPosition() {
             setWhnameCalledin('');
             setTrayCalledin(false);
             setTrayCalledNamein('');
-            alert(url);
+            // alert(url);
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
@@ -643,7 +643,7 @@ export default function EditWHPosition() {
 
         } catch (error: any) {
             // 處理錯誤，顯示警告
-            myAlert.warning(error.message);
+            // myAlert.warning(error.message);
             console.error(error); // 這裡需要傳遞錯誤對象
         } finally {
             setIsLoading(false);
