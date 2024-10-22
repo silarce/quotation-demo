@@ -537,7 +537,7 @@ export default function EditWHPosition() {
             setTrayCalledin(true);
             setTrayCalledNamein(data1.trayname);
 
-            alert(url);
+            // alert(url);
             // return;
 
             // 呼叫 traycommand API
@@ -606,7 +606,7 @@ export default function EditWHPosition() {
             setWhnameCalledin('');
             setTrayCalledin(false);
             setTrayCalledNamein('');
-            alert(url);
+            // alert(url);
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
