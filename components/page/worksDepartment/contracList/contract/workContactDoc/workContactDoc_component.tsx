@@ -862,6 +862,7 @@ function PreWorkContactDoc_component(
             changeKeyArr={() => {}}
             add={() => {}}
             isShowDndBtn={false}
+            isDisplayInPage="worksDepartment"
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>

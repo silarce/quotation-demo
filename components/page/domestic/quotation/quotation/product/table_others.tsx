@@ -20,6 +20,7 @@ export default function Table_others({
   changeKeyArr,
   add,
   isShowDndBtn = true,
+  isDisplayInPage,
 }: {
   disabled: boolean;
   list: TothersList;
@@ -28,6 +29,7 @@ export default function Table_others({
   changeKeyArr: (arr: TothersKey[]) => void;
   add: () => void;
   isShowDndBtn?: boolean;
+  isDisplayInPage?: string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
 
@@ -64,6 +66,7 @@ export default function Table_others({
             keyArr={keyArr}
             prodCellConfig={cellConfig}
             onRowClick={(obj) => {}}
+            isDisplayInPage={isDisplayInPage}
           />
 
           {!disabled && (

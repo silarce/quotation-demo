@@ -657,6 +657,7 @@ export default function AccountReceivable({
           changeKeyArr={() => {}}
           add={() => {}}
           isShowDndBtn={false}
+          isDisplayInPage="worksDepartment"
         />
       </div>
     </SubLayer>

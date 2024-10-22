@@ -317,7 +317,7 @@ const othersCellConfig: TcellConfig = {
   isDisplayedOnAccountReceivable: {
     label: '是否在應收帳款揭露金額',
     inputSelProps: {
-      wrapperStyle: { width: '180px' },
+      wrapperStyle: { width: '210px' },
       checkBoxProps: {
         propsArr: [{ key: 'isDisplayedOnAccountReceivable' }],
       },
