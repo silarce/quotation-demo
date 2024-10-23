@@ -1,4 +1,5 @@
 import { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 import { Tstate_detail, Interface_classState, Interface_classState_detail } from '../type';
 import {
@@ -65,10 +66,14 @@ class ClassState_detail implements Interface_classState_detail {
   }
   set quantity(value) {
     // this.countUpdate();
-    this.setState_detail({
+
+    const state_detail = {
       ...this.state_datail,
       quantity: value,
-    });
+    };
+    state_detail.amount = `${this.calcAmount(state_detail)}`;
+
+    this.setState_detail(state_detail);
   }
 
   get unit() {
@@ -87,10 +92,14 @@ class ClassState_detail implements Interface_classState_detail {
   }
   set unit_price(price) {
     // this.countUpdate();
-    this.setState_detail({
+
+    const state_detail = {
       ...this.state_datail,
       unit_price: price,
-    });
+    };
+    state_detail.amount = `${this.calcAmount(state_detail)}`;
+
+    this.setState_detail(state_detail);
   }
 
   get amount() {
@@ -172,6 +181,13 @@ class ClassState_detail implements Interface_classState_detail {
 
   //   return this;
   // }
+
+  private calcAmount(state_datail: Tstate_detail) {
+    const { quantity, unit_price } = state_datail;
+    const amount = new Decimal(quantity || 0).mul(unit_price || 0).toNumber();
+
+    return amount;
+  }
 
   deleteSelf() {
     this.parent.deleteDetail(this.identifyId);

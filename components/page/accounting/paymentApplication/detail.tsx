@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // gear
 import Row, { Cell, Tprops_cell } from 'components/global/gear/table/row';
@@ -30,12 +31,13 @@ interface TconfigItem {
 }
 
 type Tkey =
+  | 'checked'
   | 'source_number'
   | 'transaction_date'
-  | '應付帳款'
+  | 'accountsPayableInvoicePrice'
   | 'payable_amount'
   | 'invoice_number'
-  | 'balance'
+  | 'unappliedBalance'
   | 'note';
 
 type Tconfig = {
@@ -43,14 +45,14 @@ type Tconfig = {
 };
 // ============================================================================
 
-function Detail_thead() {
-  const keyArr = keyArr_accountPayable;
+function Detail_thead({ className, disabled }: { className?: string; disabled: boolean }) {
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   const { t: t_common } = useTranslation('common');
   const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   return (
-    <Row>
+    <Row thead={true} className={className} sticky="top">
       <Cell style={config_other.indexNumber.style}>{t_common(config_other.indexNumber.label)}</Cell>
 
       {keyArr.map((key) => {
@@ -66,11 +68,20 @@ function Detail_thead() {
   );
 }
 
-function Detail_tfoot({ total }: { total: React.ReactNode }) {
-  const keyArr = keyArr_accountPayable;
+function Detail_tfoot({
+  className,
+  disabled,
+  total,
+}: {
+  className?: string;
+  disabled: boolean;
+  total: React.ReactNode;
+}) {
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
+  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   return (
-    <Row>
+    <Row className={className} thead={true} sticky="bottom">
       <Cell style={config_other.indexNumber.style} />
 
       {keyArr.map((key, index) => {
@@ -78,7 +89,7 @@ function Detail_tfoot({ total }: { total: React.ReactNode }) {
         const { style } = config[key];
 
         if (keyArr[index + 1] === 'payable_amount') {
-          value = '合計';
+          value = t('invoicePriceTotal');
         }
 
         if (key === 'payable_amount') {
@@ -106,10 +117,10 @@ function Detail({
   setStateDetail: TsetStateDetail;
   indexNumber: React.ReactNode;
 }) {
-  const keyArr = keyArr_accountPayable;
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   return (
-    <Row>
+    <Row style={{ alignItems: 'flex-end' }}>
       <Cell style={config_other.indexNumber.style}>{indexNumber}</Cell>
       {keyArr.map((key) => {
         const { style, createProps } = config[key];
@@ -118,7 +129,7 @@ function Detail({
 
         return (
           <Cell key={key} style={style}>
-            <InputSel showBaseline="invisible" {...inputSelProps} />
+            <InputSel showBaseline="invisible" disabled={disabled} {...inputSelProps} />
           </Cell>
         );
       })}
@@ -141,12 +152,13 @@ const keyArr_paymentOrder: Tkey[] = [
 ];
 
 const keyArr_accountPayable: Tkey[] = [
+  'checked',
   'source_number',
   'transaction_date',
-  '應付帳款',
+  'accountsPayableInvoicePrice',
   'payable_amount',
   'invoice_number',
-  'balance',
+  'unappliedBalance',
   'note',
 ];
 
@@ -160,6 +172,35 @@ const config_other = {
 };
 
 const config: Tconfig = {
+  checked: {
+    label: 'writeOff',
+    style: {
+      width: '40px',
+    },
+    createProps: ({ disabled, stateDetail, setStateDetail }) => {
+      const checkBoxProps_v2: TinputSelProps['checkBoxProps_v2'] = {
+        props: {
+          value: [stateDetail.checked && 'checked'],
+        },
+        checkBoxPropsArr: [
+          {
+            value: 'checked',
+            onChange: (e) => {
+              setStateDetail({
+                ...stateDetail,
+                checked: e.target.checked,
+              });
+            },
+          },
+        ],
+      };
+
+      return {
+        wrapperStyle: { justifyContent: 'center' },
+        checkBoxProps_v2,
+      };
+    },
+  },
   source_number: {
     label: 'source_number',
     style: {
@@ -191,7 +232,7 @@ const config: Tconfig = {
   note: {
     label: 'note',
     style: {
-      width: '100px',
+      width: '200px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
       const textareaProps: TinputSelProps['textareaProps'] = {
@@ -230,10 +271,14 @@ const config: Tconfig = {
           readOnly: disabled,
           value: value ?? '',
           onChange: ({ target: { value } }) => {
-            setStateDetail((prev) => ({
-              ...prev,
-              payable_amount: value as `${number}`,
-            }));
+            setStateDetail((prev) => {
+              const copy = { ...prev };
+              copy.payable_amount = value as `${number}`;
+              const balance = calcBalace(copy);
+              copy.unappliedBalance = `${balance}`;
+
+              return copy;
+            });
           },
         },
       };
@@ -245,35 +290,6 @@ const config: Tconfig = {
       };
     },
   },
-
-  // settled_amount: {
-  //   label: 'settled_amount',
-  //   style: {
-  //     width: '100px',
-  //   },
-  //   createProps: ({ disabled, stateDetail, setStateDetail }) => {
-  //     const { value, type } = interceptor_money(stateDetail.settled_amount, disabled);
-  //     const inputProps: TinputSelProps['inputProps'] = {
-  //       props: {
-  //         value: value ?? '',
-  //         type: type,
-  //         readOnly: disabled,
-  //         onChange: ({ target: { value } }) => {
-  //           setStateDetail((prev) => ({
-  //             ...prev,
-  //             settled_amount: value as `${number}`,
-  //           }));
-  //         },
-  //       },
-  //     };
-
-  //     return {
-  //       disabled,
-  //       showBaseline: 'auto',
-  //       inputProps,
-  //     };
-  //   },
-  // },
 
   transaction_date: {
     label: 'transaction_date',
@@ -302,32 +318,40 @@ const config: Tconfig = {
   },
   //
 
-  balance: {
-    label: 'balance',
+  unappliedBalance: {
+    label: 'unappliedBalance',
     style: {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.balance;
+      const node = stateDetail.unappliedBalance;
 
       return {
         node,
       };
     },
   },
-  應付帳款: {
-    label: '應付帳款',
+  accountsPayableInvoicePrice: {
+    label: 'accountsPayable',
     style: {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.balance;
+      const node = stateDetail.accountsPayableInvoicePrice;
 
       return {
         node,
       };
     },
   },
+};
+
+const calcBalace = (stateDetail: TstateDetail) => {
+  const balance = new Decimal(stateDetail.accountsPayableInvoicePrice || 0)
+    .minus(stateDetail.payable_amount || 0)
+    .toNumber();
+
+  return balance;
 };
 
 // ============================================================================
