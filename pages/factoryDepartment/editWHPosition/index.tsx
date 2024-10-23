@@ -513,15 +513,17 @@ export default function EditWHPosition() {
             // 寫死
             const deviceName =
                 (whname === "101") ? "Device1" :
-                    (whname === "102") ? "Device2" :
-                        (whname === "103") ? "Device3" : "";
+                    (whname === "102") ? "Device1" :
+                        (whname === "103") ? "Device1" :
+                            (whname === "104") ? "Device1" : "";
             const traynumber = trayname;
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
                 (whname === "101") ? `https://${setting.warehouse1}/` :
                     (whname === "102") ? `https://${setting.warehouse2}/` :
-                        (whname === "103") ? `https://${setting.warehouse3}/` : ""
+                        (whname === "103") ? `https://${setting.warehouse3}/` :
+                            (whname === "104") ? `https://${setting.warehouse4}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -588,14 +590,16 @@ export default function EditWHPosition() {
             // 根據 whname 設置 deviceName
             const deviceName =
                 (whnamecalledin === "101") ? "Device1" :
-                    (whnamecalledin === "102") ? "Device2" :
-                        (whnamecalledin === "103") ? "Device3" : "";
+                    (whnamecalledin === "102") ? "Device1" :
+                        (whnamecalledin === "103") ? "Device1" :
+                            (whnamecalledin === "104") ? "Device1" : "";
             const traynumber = traycallednamein;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
                 (whnamecalledin === "101") ? `https://${setting.warehouse1}/` :
                     (whnamecalledin === "102") ? `https://${setting.warehouse2}/` :
-                        (whnamecalledin === "103") ? `https://${setting.warehouse3}/` : ""
+                        (whnamecalledin === "103") ? `https://${setting.warehouse3}/` :
+                            (whnamecalledin === "104") ? `https://${setting.warehouse4}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數
