@@ -34,6 +34,7 @@ export const setting = {
     warehouse1: '192.168.1.226',
     warehouse2: '192.168.1.227',
     warehouse3: '192.168.1.228',
+    warehouse4: '192.168.1.229',
 };
 
 
