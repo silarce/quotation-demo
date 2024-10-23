@@ -31,7 +31,7 @@ import {
   // apiGetPaymentOrder,
   // apiGetPaymentOrderById,
   apiPostAddPaymentOrder,
-  // apiDeletePaymentOrderById,
+  apiDeletePaymentOrderById,
   apiGetAccountPayableBySupplierId,
   // useGetPaymentOrder,
   useGetPaymentOrderById,
@@ -232,6 +232,18 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
     });
   };
 
+  const reqDelete = async () => {
+    if (!state.id) {
+      return;
+    }
+
+    await apiDeletePaymentOrderById(state.id).then(() => {
+      const { id, ...rest } = query;
+      router.replace({
+        query: rest as Tquery,
+      });
+    });
+  };
   // --------------------------------------------------------------------------
 
   // region HANDLE
@@ -252,6 +264,15 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
           }}
         />
       ),
+    });
+  };
+
+  const handleDelete = () => {
+    myAlert.confirm({
+      title: '確認刪除?',
+      props: {
+        onOk: reqDelete,
+      },
     });
   };
 
@@ -300,6 +321,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
           onAdd={onAdd}
           onCancel={onCancel}
           onConfirm={onConfirm}
+          onDelete={handleDelete}
         />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
 
@@ -335,6 +357,7 @@ const BtnBar = ({
   onAdd,
   onCancel,
   onConfirm,
+  onDelete,
   className,
 }: {
   disabled: boolean;
@@ -342,6 +365,7 @@ const BtnBar = ({
   onAdd: () => void;
   onCancel: () => void;
   onConfirm: () => void;
+  onDelete: () => void;
   className?: string;
 }) => {
   return (
@@ -364,7 +388,7 @@ const BtnBar = ({
         )}
       </div>
       <div>
-        <SquareBtn content="delete" theme="danger" />
+        <SquareBtn content="delete" theme="danger" onClick={onDelete} />
       </div>
     </div>
   );
