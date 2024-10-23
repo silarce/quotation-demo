@@ -104,16 +104,16 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   const query = router.query as Tquery;
   const { id } = query;
 
+  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
+
   const [disabled, setDisabled] = useState(true);
 
-  // --------------------------------------------------------------------------
-  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder, clear: clear_paymentOrder } = useGetPaymentOrderById(id);
 
   // --------------------------------------------------------------------------
 
-  const { state, setState, createSetDetail } = usePaymentOrder(
+  const { state, setState, createSetDetail, selectAllDetail } = usePaymentOrder(
     //
     raw_paymentOrder,
     disabled,
@@ -268,14 +268,24 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
     });
   };
 
-  const handleDelete = () => {
-    myAlert.confirm({
-      title: '確認刪除?',
-      props: {
-        onOk: reqDelete,
-      },
-    });
-  };
+  // const handleDelete = () => {
+  //   myAlert.confirm({
+  //     title: '確認刪除?',
+  //     props: {
+  //       onOk: reqDelete,
+  //     },
+  //   });
+  // };
+  const handleDelete = state.id
+    ? () => {
+        myAlert.confirm({
+          title: '確認刪除?',
+          props: {
+            onOk: reqDelete,
+          },
+        });
+      }
+    : null;
 
   const onAdd = () => {
     const { id, ...rest } = query;
@@ -326,7 +336,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
 
-        <SquareBtn className={classNames('mb-2', disabled && 'invisible')} sharp="mini">
+        <SquareBtn className={classNames('mb-2', disabled && 'invisible')} sharp="mini" onClick={selectAllDetail}>
           全選
         </SquareBtn>
         <div className={scss.table}>
@@ -375,7 +385,7 @@ const BtnBar = ({
   onAdd: () => void;
   onCancel: () => void;
   onConfirm: () => void;
-  onDelete: () => void;
+  onDelete: null | (() => void);
   className?: string;
 }) => {
   return (
@@ -397,9 +407,7 @@ const BtnBar = ({
           </>
         )}
       </div>
-      <div>
-        <SquareBtn content="delete" theme="danger" onClick={onDelete} />
-      </div>
+      <div>{onDelete && <SquareBtn content="delete" theme="danger" onClick={onDelete} />}</div>
     </div>
   );
 };
@@ -578,6 +586,17 @@ const usePaymentOrder = (
   const [state, setState] = useState<Tstate>(defaultState);
   // --------------------------------------------------------------------------
 
+  const selectAllDetail = () => {
+    setState((prev) => {
+      const copy = { ...prev };
+      copy.detailArr = copy.detailArr.map((detail) => {
+        return { ...detail, checked: true };
+      });
+
+      return copy;
+    });
+  };
+
   const createSetDetail = (index: number) => {
     const setDetail: React.Dispatch<React.SetStateAction<TstateDetail>> = (
       // dispatch: ((detail: TstateDetail) => TstateDetail) | TstateDetail
@@ -614,6 +633,8 @@ const usePaymentOrder = (
     return setDetail;
   };
 
+  // --------------------------------------------------------------------------
+
   useEffect(() => {
     const theDefaultState = {
       ...defaultState,
@@ -629,7 +650,8 @@ const usePaymentOrder = (
     setState(theDefaultState);
   }, [defaultState, disabled]);
 
-  return { state, setState, createSetDetail };
+  // --------------------------------------------------------------------------
+  return { state, setState, createSetDetail, selectAllDetail };
 };
 
 // region =========================================================================
