@@ -19,6 +19,7 @@ import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/p
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
@@ -42,7 +43,7 @@ import { useCustomersById } from 'js/api/api_customer';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import { TemployeeDto, TcustomerDto } from 'js/api/dtoTypes';
+import { TuserDto, TemployeeDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import scss from './index.module.scss';
 import { nanoid } from 'nanoid';
@@ -76,6 +77,7 @@ interface Tstate {
 
 interface TstateDetail {
   id: string | undefined;
+  // account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
   account_payable_id: string | null; //應付帳款uuid // 實際上不應該null
   identifier: string; // 識別碼
   //
@@ -94,7 +96,7 @@ interface TstateDetail {
 export type { TstateDetail };
 
 // =========================================================================
-export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
+export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { id } = query;
@@ -123,7 +125,119 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
   // --------------------------------------------------------------------------
 
-  const { state, setState, createSetDetail } = usePaymentOrder(raw_paymentOrder, disabled);
+  const { state, setState, createSetDetail } = usePaymentOrder(
+    //
+    raw_paymentOrder,
+    disabled,
+    userInfo
+  );
+
+  // --------------------------------------------------------------------------
+
+  // region API
+
+  const reqAdd = async () => {
+    const {
+      // id,
+      // serial_number,
+      applicant_department,
+      offset_method,
+      // payable_method,
+      note,
+
+      remittance_fee,
+      deduction,
+      actualpaid,
+      total,
+
+      applicant_date,
+
+      beneficiary,
+      agent,
+
+      detailArr,
+    } = state;
+
+    if (!beneficiary) {
+      myAlert.info({ title: '請選擇廠商' });
+
+      return;
+    }
+
+    if (!agent) {
+      myAlert.info({ title: '沒有經辦人員' });
+
+      return;
+    }
+
+    let isWrong = false;
+
+    const data = detailArr.map((detail) => {
+      const {
+        // id,
+        account_payable_id,
+        // identifier,
+
+        source_number,
+        transaction_date,
+        // 應付帳款,
+        payable_amount,
+        invoice_number,
+        // balance,
+        note,
+
+        payment_date,
+      } = detail;
+
+      if (!account_payable_id) {
+        isWrong = true;
+
+        return null;
+      }
+
+      const detailBody: TcreatePaymentOrderDetail_Dto = {
+        account_payable_id,
+        source_number: source_number || null,
+        transaction_date: transaction_date && transaction_date.toISOString(),
+        payment_date: payment_date && payment_date.toISOString(),
+        invoice_number,
+        note,
+        payable_amount: payable_amount || null,
+      };
+
+      return detailBody;
+    });
+
+    if (isWrong) {
+      myAlert.err({ title: '至少一筆detail沒有account_payable_id' });
+      console.log('至少一筆detail沒有account_payable_id', state);
+
+      return;
+    }
+
+    const body: TcreatePaymentOrder_Dto = {
+      beneficiary_uuid: beneficiary.id,
+      applicant_date: applicant_date && applicant_date.toISOString(),
+      applicant_department: applicant_department || null,
+      agent_employee_id: agent.id || null,
+      offset_method,
+      total: total || null,
+      remittance_fee: remittance_fee || null,
+      deduction: deduction || null,
+      actualpaid: actualpaid || null,
+      note: note || null,
+      data: data as TcreatePaymentOrderDetail_Dto[],
+    };
+
+    await apiPostAddPaymentOrder(body).then((id) => {
+      router.replace({
+        query: {
+          ...query,
+          id,
+        },
+      });
+    });
+  };
 
   // --------------------------------------------------------------------------
 
@@ -168,7 +282,12 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   // };
 
   const onAdd = () => {
+    const { id, ...rest } = query;
+
     clear_paymentOrder();
+    router.replace({
+      query: rest,
+    });
     setDisabled(false);
   };
 
@@ -177,13 +296,8 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const onConfirm = () => {
-    // setDisabled(true);
+    reqAdd();
   };
-
-  // --------------------------------------------------------------------------
-  // useEffect(() => {
-  //   update_accountPayable();
-  // }, [raw_paymentOrder]);
 
   // --------------------------------------------------------------------------
 
@@ -198,6 +312,8 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   //     </SubLayer>
   //   );
   // }
+
+  console.log(state);
 
   // MARK: RENDER
   return (
@@ -412,7 +528,12 @@ const Profile = ({
 // =========================================================================
 
 // MARK:usePaymentOrder
-const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefined, disabled: boolean) => {
+const usePaymentOrder = (
+  //
+  raw_paymentOrder: Tpayment_order_Dto_detailed | undefined,
+  disabled: boolean,
+  userInfo: TuserDto
+) => {
   //
   const defaultState: Tstate = useMemo(() => {
     if (raw_paymentOrder === undefined) {
@@ -457,17 +578,17 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
         const copy_stateDetail = [...state_prev.detailArr];
         let total = state_prev.total;
 
-        const shouldCalcTotal = copy_stateDetail[index].應付帳款 !== detail.應付帳款;
+        const shouldCalcTotal = copy_stateDetail[index].payable_amount !== detail.payable_amount;
+
+        copy_stateDetail[index] = detail;
 
         if (shouldCalcTotal) {
           total = copy_stateDetail
             .reduce((acc, cur) => {
-              return acc.add(cur.應付帳款 || 0);
+              return acc.add(cur.payable_amount || 0);
             }, new Decimal(0))
             .toString() as `${number}`;
         }
-
-        copy_stateDetail[index] = detail;
 
         return { ...state_prev, total, detailArr: copy_stateDetail };
       });
@@ -477,7 +598,18 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
   };
 
   useEffect(() => {
-    setState(defaultState);
+    const theDefaultState = {
+      ...defaultState,
+    };
+
+    if (!theDefaultState.id && !disabled) {
+      const agent = userInfo.employee;
+      !agent && myAlert.warning({ title: 'userInfo.employee為undefined', content: '將無法新增資料' });
+      theDefaultState.agent = agent;
+      theDefaultState.applicant_date = moment();
+    }
+
+    setState(theDefaultState);
   }, [defaultState, disabled]);
 
   return { state, setState, createSetDetail };

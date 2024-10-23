@@ -959,7 +959,7 @@ const useGetPaymentOrderById = (
   };
 
   useEffect(() => {
-    autoUpdate && update();
+    autoUpdate && (!id ? setRes(undefined) : update());
   }, [id]);
 
   return {
