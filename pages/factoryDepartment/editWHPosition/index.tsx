@@ -513,8 +513,8 @@ export default function EditWHPosition() {
             // 寫死
             const deviceName =
                 (whname === "101") ? "Device1" :
-                    (whname === "102") ? "Device2" :
-                        (whname === "103") ? "Device3" : "";
+                    (whname === "102") ? "Device1" :
+                        (whname === "103") ? "Device1" : "";
             const traynumber = trayname;
             const traycommand = "100";
 
@@ -588,8 +588,8 @@ export default function EditWHPosition() {
             // 根據 whname 設置 deviceName
             const deviceName =
                 (whnamecalledin === "101") ? "Device1" :
-                    (whnamecalledin === "102") ? "Device2" :
-                        (whnamecalledin === "103") ? "Device3" : "";
+                    (whnamecalledin === "102") ? "Device1" :
+                        (whnamecalledin === "103") ? "Device1" : "";
             const traynumber = traycallednamein;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (

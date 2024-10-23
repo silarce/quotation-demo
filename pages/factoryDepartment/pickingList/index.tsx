@@ -1269,8 +1269,8 @@ export default function AddPurchaseRequisition() {
             // 寫死
             const deviceName =
                 (nowwhname === "101") ? "Device1" :
-                    (nowwhname === "102") ? "Device2" :
-                        (nowwhname === "103") ? "Device3" : "";
+                    (nowwhname === "102") ? "Device1" :
+                        (nowwhname === "103") ? "Device1" : "";
             const traynumber = nowtrayname;
             const traycommand = "100";
 
@@ -1346,8 +1346,8 @@ export default function AddPurchaseRequisition() {
             // 根據 whname 設置 deviceName
             const deviceName =
                 (whnamecalled === "101") ? "Device1" :
-                    (whnamecalled === "102") ? "Device2" :
-                        (whnamecalled === "103") ? "Device3" : "";
+                    (whnamecalled === "102") ? "Device1" :
+                        (whnamecalled === "103") ? "Device1" : "";
             const traynumber = traynamecalled;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
