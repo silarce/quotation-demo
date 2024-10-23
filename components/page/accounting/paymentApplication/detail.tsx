@@ -45,14 +45,14 @@ type Tconfig = {
 };
 // ============================================================================
 
-function Detail_thead({ disabled }: { disabled: boolean }) {
+function Detail_thead({ className, disabled }: { className?: string; disabled: boolean }) {
   const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   const { t: t_common } = useTranslation('common');
   const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   return (
-    <Row>
+    <Row thead={true} className={className} sticky="top">
       <Cell style={config_other.indexNumber.style}>{t_common(config_other.indexNumber.label)}</Cell>
 
       {keyArr.map((key) => {
@@ -68,12 +68,20 @@ function Detail_thead({ disabled }: { disabled: boolean }) {
   );
 }
 
-function Detail_tfoot({ disabled, total }: { disabled: boolean; total: React.ReactNode }) {
+function Detail_tfoot({
+  className,
+  disabled,
+  total,
+}: {
+  className?: string;
+  disabled: boolean;
+  total: React.ReactNode;
+}) {
   const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
   const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   return (
-    <Row>
+    <Row className={className} thead={true} sticky="bottom">
       <Cell style={config_other.indexNumber.style} />
 
       {keyArr.map((key, index) => {

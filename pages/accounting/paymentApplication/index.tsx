@@ -261,6 +261,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
                 id,
               },
             });
+            setDisabled(true);
           }}
         />
       ),
@@ -325,8 +326,14 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
 
-        <div>
+        <SquareBtn className={classNames('mb-2', disabled && 'invisible')} sharp="mini">
+          全選
+        </SquareBtn>
+        <div className={scss.table}>
           <Detail_thead disabled={disabled} />
+          {/*  */}
+          {/*  */}
+          {/*  */}
           {state.detailArr.map((stateDetail, index) => {
             const setStateDetail = createSetDetail(index);
 
@@ -340,6 +347,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
               />
             );
           })}
+          {/*  */}
+          {/*  */}
+          {/*  */}
 
           <Detail_tfoot disabled={disabled} total={Number(state.total || 0).toLocaleString()} />
         </div>
