@@ -31,11 +31,13 @@ import {
   apiGetPaymentOrderById,
   apiPostAddPaymentOrder,
   apiDeletePaymentOrderById,
+  apiGetAccountPayableBySupplierId,
   useGetPaymentOrder,
   useGetPaymentOrderById,
   useGetAccountPayableBySupplierId,
   Tpayment_order_Dto_detailed,
 } from 'js/api/api_netCore/api_accountant';
+import { useCustomersById } from 'js/api/api_customer';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -79,7 +81,7 @@ interface TstateDetail {
   //
   source_number: string | ''; // 立帳來源單號
   transaction_date: Moment | null; // 交易日期
-  應付帳款: `${number}` | ''; // ???? // 應付帳款 // 不送後端
+  應付帳款: `${number}` | ''; // accountPayable.invoice_price // 應付帳款 // 不送後端
   payable_amount: `${number}` | ''; // account_payable.invoice_price  // 本次沖銷
   invoice_number: string | ''; // 發票號碼
   balance: `${number}` | '' | null; // account_payable.balance // 未沖餘額 // 不送後端
@@ -100,14 +102,24 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
-  const { res: raw_paymentOrder } = useGetPaymentOrderById(id);
+  const { res: raw_paymentOrder, clear: clear_paymentOrder } = useGetPaymentOrderById(id);
 
   // const { res: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBySupplierId(
-  //   raw_paymentOrder?.beneficiary_uuid,
-  //   {
-  //     autoUpdate: false,
-  //   }
+  //   // raw_paymentOrder?.beneficiary_uuid,
+  //   '948622ce-3eb7-4733-8667-c752c7ea0e71'
+  //   // {
+  //   //   autoUpdate: false,
+  //   // }
   // );
+
+  // const { data, setData, update } = useCustomersById('948622ce-3eb7-4733-8667-c752c7ea0e71');
+
+  // console.log(data);
+  // useEffect(() => {
+  //   update();
+  // }, []);
+
+  // customerNumber: "CT-02516"
 
   // --------------------------------------------------------------------------
 
@@ -155,7 +167,8 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   //   });
   // };
 
-  const onEdit = () => {
+  const onAdd = () => {
+    clear_paymentOrder();
     setDisabled(false);
   };
 
@@ -164,7 +177,7 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const onConfirm = () => {
-    setDisabled(true);
+    // setDisabled(true);
   };
 
   // --------------------------------------------------------------------------
@@ -186,6 +199,7 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
   //   );
   // }
 
+  // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
       <PageHeader02 tag="付款申請" />
@@ -198,7 +212,7 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
           className="mb-5"
           disabled={disabled}
           onSearchClick={handleSearch}
-          onEdit={onEdit}
+          onAdd={onAdd}
           onCancel={onCancel}
           onConfirm={onConfirm}
         />
@@ -229,18 +243,18 @@ export default function PaymentApplication({ isAdmin }: { isAdmin: boolean }) {
 
 // =========================================================================
 
+// region BtnBar
 const BtnBar = ({
   disabled,
   onSearchClick,
-  onEdit,
+  onAdd,
   onCancel,
   onConfirm,
   className,
 }: {
   disabled: boolean;
-
   onSearchClick: () => void;
-  onEdit: () => void;
+  onAdd: () => void;
   onCancel: () => void;
   onConfirm: () => void;
   className?: string;
@@ -254,13 +268,13 @@ const BtnBar = ({
         {disabled && (
           <>
             <SquareBtn className="invisible" />
-            <SquareBtn content="edit" onClick={onEdit} />
+            <SquareBtn content="add" onClick={onAdd} />
           </>
         )}
         {!disabled && (
           <>
-            <SquareBtn content="save" onClick={onConfirm} />
-            <SquareBtn content="cancel" theme="danger" onClick={onCancel} />
+            <SquareBtn content="save" theme="danger" onClick={onConfirm} />
+            <SquareBtn content="cancel" onClick={onCancel} />
           </>
         )}
       </div>
@@ -297,10 +311,17 @@ const Profile = ({
     const { unmount } = DragableModal.create({
       children: (
         <SearchModal_customer
-          onRowClick={(customer) => {
-            setState((prev) => {
-              return { ...prev, beneficiary: customer };
+          onRowClick={async (customer) => {
+            await apiGetAccountPayableBySupplierId(customer.id).then((raw_accountPayable) => {
+              const stateDetailArr = raw_accountPayable.map((accountPayable) => {
+                return createStateDetail_byAccountPayable(accountPayable);
+              });
+
+              setState((prev) => {
+                return { ...prev, beneficiary: customer, detailArr: stateDetailArr };
+              });
             });
+
             unmount();
           }}
         />
@@ -392,6 +413,7 @@ const Profile = ({
 
 // MARK:usePaymentOrder
 const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefined, disabled: boolean) => {
+  //
   const defaultState: Tstate = useMemo(() => {
     if (raw_paymentOrder === undefined) {
       return emptyState();
@@ -422,6 +444,7 @@ const usePaymentOrder = (raw_paymentOrder: Tpayment_order_Dto_detailed | undefin
   }, [raw_paymentOrder]);
 
   const [state, setState] = useState<Tstate>(defaultState);
+  // --------------------------------------------------------------------------
 
   const createSetDetail = (index: number) => {
     const setDetail: React.Dispatch<React.SetStateAction<TstateDetail>> = (
@@ -506,6 +529,27 @@ const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
   return stateDetail;
 };
 
+const createStateDetail_byAccountPayable = (accountPayable: Taccount_payable_Dto): TstateDetail => {
+  const stateDetail: TstateDetail = {
+    id: undefined,
+    account_payable_id: accountPayable.id,
+    identifier: `identifier-${nanoid()}`,
+    //
+    source_number: accountPayable.source_number || '',
+    transaction_date: accountPayable.transaction_date ? moment(accountPayable.transaction_date) : null,
+    應付帳款: `${accountPayable.invoice_price ?? ''}`,
+    payable_amount: `${accountPayable.invoice_price ?? ''}`,
+    invoice_number: accountPayable.invoice_number || '',
+    // balance: `${accountPayable.balance ?? ''}`,
+    balance: '0',
+    note: accountPayable.note || '',
+    //
+    payment_date: null,
+  };
+
+  return stateDetail;
+};
+
 // interface AddPaymentOrderBody {
 //   beneficiary_uuid: string | null; // 廠商 customerDto.id
 //   applicant_date: string | null; // 申請日期 ISOstring
@@ -540,10 +584,16 @@ const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
 account_payable.id               > 　　　　　　      > DataBody.account_payable_id
 account_payable.source_number    > 立帳來源單號      > DataBody.source_number
 account_payable.transaction_date > 交易日期 (可編輯) > DataBody.transaction_date
-????                             > 應付帳款          > 只顯示
+account_payable.invoice_price    > 應付帳款          > 只顯示
 account_payable.invoice_price    > 本次沖銷 (可編輯) > DataBody.payable_amount
 account_payable.invoice_number   > 發票號碼　　      > DataBody.invoice_number
-account_payable.balance          > 未充餘額　　      > 只顯示
+// account_payable.balance          > 未充餘額　　      > 只顯示
+                                 > 未充餘額　　      > 只顯示
 account_payable.note             > 摘要說明 (可編輯) > DataBody.note
-// ????                             > ？？？？　　      > DataBody.payment_date
+null                             > ？？？？　　      > DataBody.payment_date
 */
+
+// 應付帳款 是否可帶入 發票金額  也就是這一筆明細 應該要付的金額
+// detail 我確實沒有放 我原本好像是預設你可以從應付帳款拿 不過加上去可能比較好處理
+
+// 支付方式 需要再加欄位

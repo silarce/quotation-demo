@@ -1037,6 +1037,23 @@ const useGetAccountPayableBySupplierId = (
   };
 };
 
+// /Accountant/GetAccountPayable
+// const apiGetAccountPayable = async () => {
+//   const api = `/${subRoot}/GetAccountPayable`;
+//   const params = {
+//     date: '2024-10',
+//   };
+
+//   return axi2
+//     .get<Taccount_payable_Dto[]>(api, { params })
+//     .then(({ data }) => data)
+//     .catch((err: AxiosError) => {
+//       return Promise.reject(err);
+//     });
+// };
+
+// apiGetAccountPayable();
+
 // =================================================================================
 
 export {
@@ -1082,6 +1099,7 @@ export {
   apiGetPaymentOrderById,
   apiPostAddPaymentOrder,
   apiDeletePaymentOrderById,
+  apiGetAccountPayableBySupplierId,
   useGetPaymentOrder,
   useGetPaymentOrderById,
   useGetAccountPayableBySupplierId,

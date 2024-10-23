@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // gear
 import Row, { Cell, Tprops_cell } from 'components/global/gear/table/row';
@@ -78,7 +79,7 @@ function Detail_tfoot({ total }: { total: React.ReactNode }) {
         const { style } = config[key];
 
         if (keyArr[index + 1] === 'payable_amount') {
-          value = '合計';
+          value = '發票金額加總';
         }
 
         if (key === 'payable_amount') {
@@ -109,7 +110,7 @@ function Detail({
   const keyArr = keyArr_accountPayable;
 
   return (
-    <Row>
+    <Row style={{ alignItems: 'flex-end' }}>
       <Cell style={config_other.indexNumber.style}>{indexNumber}</Cell>
       {keyArr.map((key) => {
         const { style, createProps } = config[key];
@@ -191,7 +192,7 @@ const config: Tconfig = {
   note: {
     label: 'note',
     style: {
-      width: '100px',
+      width: '200px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
       const textareaProps: TinputSelProps['textareaProps'] = {
@@ -230,10 +231,14 @@ const config: Tconfig = {
           readOnly: disabled,
           value: value ?? '',
           onChange: ({ target: { value } }) => {
-            setStateDetail((prev) => ({
-              ...prev,
-              payable_amount: value as `${number}`,
-            }));
+            setStateDetail((prev) => {
+              const copy = { ...prev };
+              copy.payable_amount = value as `${number}`;
+              const balance = calcBalace(copy);
+              copy.balance = `${balance}`;
+
+              return copy;
+            });
           },
         },
       };
@@ -245,35 +250,6 @@ const config: Tconfig = {
       };
     },
   },
-
-  // settled_amount: {
-  //   label: 'settled_amount',
-  //   style: {
-  //     width: '100px',
-  //   },
-  //   createProps: ({ disabled, stateDetail, setStateDetail }) => {
-  //     const { value, type } = interceptor_money(stateDetail.settled_amount, disabled);
-  //     const inputProps: TinputSelProps['inputProps'] = {
-  //       props: {
-  //         value: value ?? '',
-  //         type: type,
-  //         readOnly: disabled,
-  //         onChange: ({ target: { value } }) => {
-  //           setStateDetail((prev) => ({
-  //             ...prev,
-  //             settled_amount: value as `${number}`,
-  //           }));
-  //         },
-  //       },
-  //     };
-
-  //     return {
-  //       disabled,
-  //       showBaseline: 'auto',
-  //       inputProps,
-  //     };
-  //   },
-  // },
 
   transaction_date: {
     label: 'transaction_date',
@@ -321,13 +297,19 @@ const config: Tconfig = {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.balance;
+      const node = stateDetail.應付帳款;
 
       return {
         node,
       };
     },
   },
+};
+
+const calcBalace = (stateDetail: TstateDetail) => {
+  const balance = new Decimal(stateDetail.應付帳款 || 0).minus(stateDetail.payable_amount || 0).toNumber();
+
+  return balance;
 };
 
 // ============================================================================
