@@ -34,10 +34,10 @@ type Tkey =
   | 'checked'
   | 'source_number'
   | 'transaction_date'
-  | '應付帳款'
+  | 'accountsPayableInvoicePrice'
   | 'payable_amount'
   | 'invoice_number'
-  | 'balance'
+  | 'unappliedBalance'
   | 'note';
 
 type Tconfig = {
@@ -70,6 +70,7 @@ function Detail_thead({ disabled }: { disabled: boolean }) {
 
 function Detail_tfoot({ disabled, total }: { disabled: boolean; total: React.ReactNode }) {
   const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
+  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   return (
     <Row>
@@ -80,7 +81,7 @@ function Detail_tfoot({ disabled, total }: { disabled: boolean; total: React.Rea
         const { style } = config[key];
 
         if (keyArr[index + 1] === 'payable_amount') {
-          value = '發票金額加總';
+          value = t('invoicePriceTotal');
         }
 
         if (key === 'payable_amount') {
@@ -146,10 +147,10 @@ const keyArr_accountPayable: Tkey[] = [
   'checked',
   'source_number',
   'transaction_date',
-  '應付帳款',
+  'accountsPayableInvoicePrice',
   'payable_amount',
   'invoice_number',
-  'balance',
+  'unappliedBalance',
   'note',
 ];
 
@@ -266,7 +267,7 @@ const config: Tconfig = {
               const copy = { ...prev };
               copy.payable_amount = value as `${number}`;
               const balance = calcBalace(copy);
-              copy.balance = `${balance}`;
+              copy.unappliedBalance = `${balance}`;
 
               return copy;
             });
@@ -309,26 +310,26 @@ const config: Tconfig = {
   },
   //
 
-  balance: {
-    label: 'balance',
+  unappliedBalance: {
+    label: 'unappliedBalance',
     style: {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.balance;
+      const node = stateDetail.unappliedBalance;
 
       return {
         node,
       };
     },
   },
-  應付帳款: {
-    label: '應付帳款',
+  accountsPayableInvoicePrice: {
+    label: 'accountsPayable',
     style: {
       width: '100px',
     },
     createProps: ({ disabled, stateDetail, setStateDetail }) => {
-      const node = stateDetail.應付帳款;
+      const node = stateDetail.accountsPayableInvoicePrice;
 
       return {
         node,
@@ -338,7 +339,9 @@ const config: Tconfig = {
 };
 
 const calcBalace = (stateDetail: TstateDetail) => {
-  const balance = new Decimal(stateDetail.應付帳款 || 0).minus(stateDetail.payable_amount || 0).toNumber();
+  const balance = new Decimal(stateDetail.accountsPayableInvoicePrice || 0)
+    .minus(stateDetail.payable_amount || 0)
+    .toNumber();
 
   return balance;
 };

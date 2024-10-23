@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import { nanoid } from 'nanoid';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -11,7 +12,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 // component
 import Table_paymentApplication from 'components/page/accounting/paymentApplication/table_paymentApplication';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
-import { SearchModal_invoice } from 'components/composition/searchModal/useSearchModal/useSearchModal_invoice';
+
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
 
@@ -23,30 +24,31 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
-  Tpayment_order_Dto,
+  // Tpayment_order_Dto,
   Taccount_payable_Dto,
   TpaymentOrderDetail_Dto,
   TcreatePaymentOrderDetail_Dto,
   TcreatePaymentOrder_Dto,
-  apiGetPaymentOrder,
-  apiGetPaymentOrderById,
+  // apiGetPaymentOrder,
+  // apiGetPaymentOrderById,
   apiPostAddPaymentOrder,
-  apiDeletePaymentOrderById,
+  // apiDeletePaymentOrderById,
   apiGetAccountPayableBySupplierId,
-  useGetPaymentOrder,
+  // useGetPaymentOrder,
   useGetPaymentOrderById,
-  useGetAccountPayableBySupplierId,
+  // useGetAccountPayableBySupplierId,
   Tpayment_order_Dto_detailed,
 } from 'js/api/api_netCore/api_accountant';
-import { useCustomersById } from 'js/api/api_customer';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
+// type
 import { TuserDto, TemployeeDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import scss from './index.module.scss';
-import { nanoid } from 'nanoid';
+
+import { useTranslation } from 'react-i18next';
 
 // =========================================================================
 
@@ -83,10 +85,10 @@ interface TstateDetail {
   //
   source_number: string | ''; // 立帳來源單號
   transaction_date: Moment | null; // 交易日期
-  應付帳款: `${number}` | ''; // accountPayable.invoice_price // 應付帳款 // 不送後端
+  accountsPayableInvoicePrice: `${number}` | ''; // accountPayable.invoice_price // 應付帳款 // 不送後端
   payable_amount: `${number}` | ''; // account_payable.invoice_price  // 本次沖銷
   invoice_number: string | ''; // 發票號碼
-  balance: `${number}` | '' | null; // account_payable.balance // 未沖餘額 // 不送後端
+  unappliedBalance: `${number}` | '' | null; // account_payable.balance // 未沖餘額 // 不送後端
   note: string | ''; // 備註 // 摘要說明
   //
   payment_date: Moment | null; // 付款日期 // 無欄位
@@ -106,24 +108,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
+  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
+  // --------------------------------------------------------------------------
   const { res: raw_paymentOrder, clear: clear_paymentOrder } = useGetPaymentOrderById(id);
-
-  // const { res: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBySupplierId(
-  //   // raw_paymentOrder?.beneficiary_uuid,
-  //   '948622ce-3eb7-4733-8667-c752c7ea0e71'
-  //   // {
-  //   //   autoUpdate: false,
-  //   // }
-  // );
-
-  // const { data, setData, update } = useCustomersById('948622ce-3eb7-4733-8667-c752c7ea0e71');
-
-  // console.log(data);
-  // useEffect(() => {
-  //   update();
-  // }, []);
-
-  // customerNumber: "CT-02516"
 
   // --------------------------------------------------------------------------
 
@@ -181,7 +168,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         // identifier,
         source_number,
         transaction_date,
-        // 應付帳款,
+        // accountsPayableInvoicePrice,
         payable_amount,
         invoice_number,
         // balance,
@@ -269,25 +256,6 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
     });
   };
 
-  // const handleSearch_accountPayable = () => {
-  //   DragableModal.create({
-  //     children: (
-  //       <SearchModal_accountPayable
-  //         limit={1}
-  //         onRowClick={(raw) => {
-  //           // const id = raw.id;
-  //           // router.replace({
-  //           //   query: {
-  //           //     ...query,
-  //           //     id,
-  //           //   },
-  //           // });
-  //         }}
-  //       />
-  //     ),
-  //   });
-  // };
-
   const onAdd = () => {
     const { id, ...rest } = query;
 
@@ -320,18 +288,13 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   //   );
   // }
 
-  console.log(state);
-
   // MARK: RENDER
   return (
     <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag="付款申請" />
+      <PageHeader02 tag={t('paymentApplication')} />
 
       <div>
-        {/* <button onClick={handleSearch_accountPayable}>test</button> */}
-
         <BtnBar
-          //
           className="mb-5"
           disabled={disabled}
           onSearchClick={handleSearch}
@@ -421,6 +384,9 @@ const Profile = ({
   state: Tstate;
   setState: React.Dispatch<React.SetStateAction<Tstate>>;
 }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
+  const { t: t_common } = useTranslation('common');
+
   const inputSelConfig_profile: TinputSelProps = {
     disabled,
     showBaseline: 'auto',
@@ -456,32 +422,37 @@ const Profile = ({
     <div className={classNames('global_grid01', className)}>
       <InputSel
         {...inputSelConfig_profile}
-        caption="付款申請單號"
+        caption={t('serial_number')}
         showBaseline="invisible"
         node={state.serial_number}
       />
 
       <InputSel
         {...inputSelConfig_profile}
-        caption="申請日期"
+        caption={t('applicant_department')}
         showBaseline="invisible"
         node={getTaiwanDateStr(state.applicant_date?.toISOString() || null)}
       />
 
-      <InputSel {...inputSelConfig_profile} caption="經辦人員" showBaseline="invisible" node={state.agent?.chName} />
+      <InputSel
+        {...inputSelConfig_profile}
+        caption={t_common('agent')}
+        showBaseline="invisible"
+        node={state.agent?.chName}
+      />
 
       <div></div>
       {/*  */}
       <InputSel
         {...inputSelConfig_profile}
-        caption="廠商代號"
+        caption={t('beneficiaryNumber')}
         htmlFor=""
         showBaseline="invisible"
         suffix={
           <SquareBtn
             className={classNames('mr-2', disabled && 'invisible')}
             sharp="mini"
-            label="選擇廠商"
+            label={t('selectBeneficiary')}
             onClick={selectCustomer}
           />
         }
@@ -490,7 +461,7 @@ const Profile = ({
 
       <InputSel
         {...inputSelConfig_profile}
-        caption="廠商名稱"
+        caption={t('beneficiary_name')}
         htmlFor=""
         showBaseline="invisible"
         node={state.beneficiary?.name}
@@ -501,7 +472,7 @@ const Profile = ({
       {/*  */}
       <InputSel
         {...inputSelConfig_profile}
-        caption="沖銷方式"
+        caption={t('applicant_date')}
         inputProps={{
           props: {
             value: state.offset_method,
@@ -514,9 +485,9 @@ const Profile = ({
         }}
       />
 
-      <InputSel
+      {/* <InputSel
         {...inputSelConfig_profile}
-        caption="支付方式"
+        caption={t('payable_method')}
         inputProps={{
           props: {
             value: state.payable_method,
@@ -527,7 +498,7 @@ const Profile = ({
             },
           },
         }}
-      />
+      /> */}
     </div>
   );
 };
@@ -662,10 +633,10 @@ const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
     //
     source_number: detail.source_number || '',
     transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
-    應付帳款: '',
+    accountsPayableInvoicePrice: '',
     payable_amount: `${detail.payable_amount || ''}`,
     invoice_number: detail.invoice_number || '',
-    balance: null,
+    unappliedBalance: null,
     note: detail.note || '',
     //
     payment_date: detail.payment_date ? moment(detail.payment_date) : null,
@@ -684,11 +655,11 @@ const createStateDetail_byAccountPayable = (accountPayable: Taccount_payable_Dto
     //
     source_number: accountPayable.source_number || '',
     transaction_date: accountPayable.transaction_date ? moment(accountPayable.transaction_date) : null,
-    應付帳款: `${accountPayable.invoice_price ?? ''}`,
+    accountsPayableInvoicePrice: `${accountPayable.invoice_price ?? ''}`,
     payable_amount: `${accountPayable.invoice_price ?? ''}`,
     invoice_number: accountPayable.invoice_number || '',
     // balance: `${accountPayable.balance ?? ''}`,
-    balance: '0',
+    unappliedBalance: '0',
     note: accountPayable.note || '',
     //
     payment_date: null,

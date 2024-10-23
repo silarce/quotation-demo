@@ -67,6 +67,7 @@
     "wholeInvoiceNumber": "Whole Invoice Number"
   },
   "paymentOrder": {
+    "paymentApplication": "Payment Application",
     "serial_number": "Serial Number",
     "applicant_department": "Applicant Department",
     "offset_method": "Offset Method",
@@ -82,8 +83,11 @@
     "transaction_date": "Transaction Date",
     "payable_amount": "Payable Amount",
     "invoice_number": "Invoice Number",
-    "balance": "Balance",
+    "unappliedBalance": "Unapplied Balance",
     "note": "Note",
-    "writeOff": "Write Off"
+    "writeOff": "Write Off",
+    "accountsPayable": "Accounts Payable",
+    "invoicePriceTotal": "Invoice Price Total",
+    "selectBeneficiary": "Select Beneficiary"
   }
 }
