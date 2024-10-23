@@ -736,11 +736,23 @@ const cellPropsList_summon: TcellPropsList_summon = {
             onChange: (e) => {
               setState_incomeBillSerial((state) => {
                 const copy = { ...state };
-                copy.receivablePayment = e.target.value;
-                copy.unpaidPayment = calcUnpaidPayment(copy);
-                copy.exchangeBenefits = calcExchangeBebefits(copy);
 
-                return copy;
+                copy.receivablePayment = e.target.value;
+
+                const {
+                  //
+                  // receivablePayment,
+                  receivableCurrencyPayment,
+                  unpaidPayment,
+                  exchangeBenefits,
+                } = calcRelation_receivablePayment(copy);
+
+                return {
+                  ...copy,
+                  receivableCurrencyPayment,
+                  unpaidPayment,
+                  exchangeBenefits,
+                };
               });
             },
           },
@@ -1254,7 +1266,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
         inputProps: {
           props: {
             // className: 'text-right',
-
+            type: 'number',
             value: state_incomeBillSerial.receivableExchangeRate ?? '',
             onChange: (e) => {
               setState_incomeBillSerial((state) => {
@@ -1309,9 +1321,17 @@ const cellPropsList_summon: TcellPropsList_summon = {
                   exchangeRate: (copy.receivableExchangeRate || 0) as `${number}`,
                   foreignPayment: (copy.receivableCurrencyPayment || 0) as `${number}`,
                 });
-                copy.receivablePayment = receivablePayment_num.toString();
 
-                return copy;
+                copy.receivablePayment = receivablePayment_num.toString();
+                const { receivableCurrencyPayment, unpaidPayment, exchangeBenefits } =
+                  calcRelation_receivablePayment(copy);
+
+                return {
+                  ...copy,
+                  receivableCurrencyPayment,
+                  unpaidPayment,
+                  exchangeBenefits,
+                };
               });
             },
           },
@@ -1508,9 +1528,13 @@ const calc_twToForeign = ({
   exchangeRate,
   twPayment,
 }: {
-  exchangeRate: `${number}`;
+  exchangeRate: number | `${number}`;
   twPayment: number | `${number}`;
 }) => {
+  if (Number(exchangeRate) === 0) {
+    return 0;
+  }
+
   return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(0).toNumber();
 };
 
@@ -1521,7 +1545,7 @@ const calc_foreignToTw = ({
   exchangeRate: number | `${number}`;
   foreignPayment: number | `${number}`;
 }) => {
-  return new Decimal(foreignPayment).times(exchangeRate).toDecimalPlaces(2).toNumber();
+  return new Decimal(foreignPayment).times(exchangeRate).toDecimalPlaces(0).toNumber();
 };
 
 const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
@@ -1529,6 +1553,25 @@ const getKeyArr = ({ isForeign }: { isForeign?: boolean } = {}) => {
   isForeign && (keyArr = keyArr_foreign);
 
   return keyArr;
+};
+
+const calcRelation_receivablePayment = (state: Tstate_incomeBillSerial) => {
+  const receivablePayment = state.receivablePayment;
+
+  const receivableCurrencyPayment = calc_twToForeign({
+    exchangeRate: (state.receivableExchangeRate || 0) as `${number}`,
+    twPayment: Number(receivablePayment || 0),
+  }).toString();
+
+  const unpaidPayment = calcUnpaidPayment(state);
+  const exchangeBenefits = calcExchangeBebefits(state);
+
+  return {
+    receivablePayment,
+    receivableCurrencyPayment,
+    unpaidPayment,
+    exchangeBenefits,
+  };
 };
 
 // =============================================================================
