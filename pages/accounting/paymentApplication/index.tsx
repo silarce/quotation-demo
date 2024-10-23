@@ -91,6 +91,8 @@ interface TstateDetail {
   //
   payment_date: Moment | null; // 付款日期 // 無欄位
   //
+  checked: boolean;
+  //
 }
 
 export type { TstateDetail };
@@ -172,12 +174,11 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
     let isWrong = false;
 
-    const data = detailArr.map((detail) => {
+    const data_pre = detailArr.map((detail) => {
       const {
         // id,
         account_payable_id,
         // identifier,
-
         source_number,
         transaction_date,
         // 應付帳款,
@@ -185,13 +186,17 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         invoice_number,
         // balance,
         note,
-
         payment_date,
+        checked,
       } = detail;
 
       if (!account_payable_id) {
         isWrong = true;
 
+        return undefined;
+      }
+
+      if (!checked) {
         return null;
       }
 
@@ -215,6 +220,8 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       return;
     }
 
+    const data = data_pre.filter((item) => !!item);
+
     const body: TcreatePaymentOrder_Dto = {
       beneficiary_uuid: beneficiary.id,
       applicant_date: applicant_date && applicant_date.toISOString(),
@@ -226,7 +233,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       deduction: deduction || null,
       actualpaid: actualpaid || null,
       note: note || null,
-      data: data as TcreatePaymentOrderDetail_Dto[],
+      data,
     };
 
     await apiPostAddPaymentOrder(body).then((id) => {
@@ -578,14 +585,20 @@ const usePaymentOrder = (
         const copy_stateDetail = [...state_prev.detailArr];
         let total = state_prev.total;
 
-        const shouldCalcTotal = copy_stateDetail[index].payable_amount !== detail.payable_amount;
+        const shouldCalcTotal =
+          copy_stateDetail[index].payable_amount !== detail.payable_amount ||
+          copy_stateDetail[index].checked !== detail.checked;
 
         copy_stateDetail[index] = detail;
 
         if (shouldCalcTotal) {
           total = copy_stateDetail
             .reduce((acc, cur) => {
-              return acc.add(cur.payable_amount || 0);
+              if (cur.checked) {
+                return acc.add(cur.payable_amount || 0);
+              }
+
+              return acc;
             }, new Decimal(0))
             .toString() as `${number}`;
         }
@@ -656,6 +669,8 @@ const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
     note: detail.note || '',
     //
     payment_date: detail.payment_date ? moment(detail.payment_date) : null,
+    //
+    checked: true,
   };
 
   return stateDetail;
@@ -677,6 +692,8 @@ const createStateDetail_byAccountPayable = (accountPayable: Taccount_payable_Dto
     note: accountPayable.note || '',
     //
     payment_date: null,
+    //
+    checked: false,
   };
 
   return stateDetail;

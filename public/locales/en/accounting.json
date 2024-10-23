@@ -83,6 +83,7 @@
     "payable_amount": "Payable Amount",
     "invoice_number": "Invoice Number",
     "balance": "Balance",
-    "note": "Note"
+    "note": "Note",
+    "writeOff": "Write Off"
   }
 }

@@ -31,6 +31,7 @@ interface TconfigItem {
 }
 
 type Tkey =
+  | 'checked'
   | 'source_number'
   | 'transaction_date'
   | '應付帳款'
@@ -119,7 +120,7 @@ function Detail({
 
         return (
           <Cell key={key} style={style}>
-            <InputSel showBaseline="invisible" {...inputSelProps} />
+            <InputSel showBaseline="invisible" disabled={disabled} {...inputSelProps} />
           </Cell>
         );
       })}
@@ -142,6 +143,7 @@ const keyArr_paymentOrder: Tkey[] = [
 ];
 
 const keyArr_accountPayable: Tkey[] = [
+  'checked',
   'source_number',
   'transaction_date',
   '應付帳款',
@@ -161,6 +163,35 @@ const config_other = {
 };
 
 const config: Tconfig = {
+  checked: {
+    label: 'writeOff',
+    style: {
+      width: '40px',
+    },
+    createProps: ({ disabled, stateDetail, setStateDetail }) => {
+      const checkBoxProps_v2: TinputSelProps['checkBoxProps_v2'] = {
+        props: {
+          value: [stateDetail.checked && 'checked'],
+        },
+        checkBoxPropsArr: [
+          {
+            value: 'checked',
+            onChange: (e) => {
+              setStateDetail({
+                ...stateDetail,
+                checked: e.target.checked,
+              });
+            },
+          },
+        ],
+      };
+
+      return {
+        wrapperStyle: { justifyContent: 'center' },
+        checkBoxProps_v2,
+      };
+    },
+  },
   source_number: {
     label: 'source_number',
     style: {

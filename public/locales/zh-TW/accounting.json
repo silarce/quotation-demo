@@ -83,6 +83,7 @@
     "payable_amount": "本次沖銷",
     "invoice_number": "發票號碼",
     "balance": "未沖餘額",
-    "note": "摘要說明"
+    "note": "摘要說明",
+    "writeOff": "沖銷"
   }
 }
