@@ -229,9 +229,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       agent_employee_id: agent.id || null,
       offset_method,
       total: total || null,
-      remittance_fee: remittance_fee || null,
-      deduction: deduction || null,
-      actualpaid: actualpaid || null,
+      remittance_fee: remittance_fee || '0',
+      deduction: deduction || '0',
+      actualpaid: actualpaid || '0',
       note: note || null,
       data,
     };
@@ -342,7 +342,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
 
         <div>
-          <Detail_thead />
+          <Detail_thead disabled={disabled} />
           {state.detailArr.map((stateDetail, index) => {
             const setStateDetail = createSetDetail(index);
 
@@ -357,7 +357,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
             );
           })}
 
-          <Detail_tfoot total={Number(state.total || 0).toLocaleString()} />
+          <Detail_tfoot disabled={disabled} total={Number(state.total || 0).toLocaleString()} />
         </div>
       </div>
     </SubLayer>

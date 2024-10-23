@@ -45,8 +45,8 @@ type Tconfig = {
 };
 // ============================================================================
 
-function Detail_thead() {
-  const keyArr = keyArr_accountPayable;
+function Detail_thead({ disabled }: { disabled: boolean }) {
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   const { t: t_common } = useTranslation('common');
   const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
@@ -68,8 +68,8 @@ function Detail_thead() {
   );
 }
 
-function Detail_tfoot({ total }: { total: React.ReactNode }) {
-  const keyArr = keyArr_accountPayable;
+function Detail_tfoot({ disabled, total }: { disabled: boolean; total: React.ReactNode }) {
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   return (
     <Row>
@@ -108,7 +108,7 @@ function Detail({
   setStateDetail: TsetStateDetail;
   indexNumber: React.ReactNode;
 }) {
-  const keyArr = keyArr_accountPayable;
+  const keyArr = disabled ? keyArr_paymentOrder : keyArr_accountPayable;
 
   return (
     <Row style={{ alignItems: 'flex-end' }}>

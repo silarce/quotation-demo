@@ -218,9 +218,9 @@ interface TcreatePaymentOrder_Dto {
   agent_employee_id: string | null;
   offset_method: string | null;
   total: `${number}` | null;
-  remittance_fee: `${number}` | null;
-  deduction: `${number}` | null;
-  actualpaid: `${number}` | null;
+  remittance_fee: `${number}`;
+  deduction: `${number}`;
+  actualpaid: `${number}`;
   note: string | null;
   data: TcreatePaymentOrderDetail_Dto[];
 }
