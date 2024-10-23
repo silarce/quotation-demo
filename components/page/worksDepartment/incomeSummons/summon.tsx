@@ -1535,7 +1535,7 @@ const calc_twToForeign = ({
     return 0;
   }
 
-  return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(0).toNumber();
+  return new Decimal(twPayment).div(exchangeRate).toDecimalPlaces(2).toNumber();
 };
 
 const calc_foreignToTw = ({
