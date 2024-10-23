@@ -10,7 +10,6 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Table_paymentApplication from 'components/page/accounting/paymentApplication/table_paymentApplication';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
@@ -53,7 +52,7 @@ import { useTranslation } from 'react-i18next';
 // =========================================================================
 
 type Tquery = {
-  id: string | undefined;
+  id?: string | undefined;
 };
 
 interface Tstate {
@@ -207,7 +206,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       return;
     }
 
-    const data = data_pre.filter((item) => !!item);
+    const data = data_pre.filter((item) => !!item) as TcreatePaymentOrderDetail_Dto[];
 
     const body: TcreatePaymentOrder_Dto = {
       beneficiary_uuid: beneficiary.id,
@@ -261,7 +260,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
     clear_paymentOrder();
     router.replace({
-      query: rest,
+      query: rest as Tquery,
     });
     setDisabled(false);
   };
