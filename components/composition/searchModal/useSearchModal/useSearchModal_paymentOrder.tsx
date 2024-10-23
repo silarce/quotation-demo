@@ -101,7 +101,7 @@ const useConfig_data = () => {
       indexNumber: {
         label: t_common('indexNumber02'),
         style: {
-          width: '30px',
+          width: '50px',
         },
         reducer: (_, { index }) => {
           return index + 1;
