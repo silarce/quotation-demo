@@ -25,6 +25,17 @@
   &.style01 {
     padding: 0 10px;
   }
+
+  &.stickyTop {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  &.stickyBottom {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
 }
 
 .cell {
