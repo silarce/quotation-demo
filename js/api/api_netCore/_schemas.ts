@@ -218,31 +218,34 @@ interface TcreatePaymentOrder_Dto {
   agent_employee_id: string | null;
   offset_method: string | null;
   total: `${number}` | null;
-  remittance_fee: `${number}` | null;
-  deduction: `${number}` | null;
-  actualpaid: `${number}` | null;
+  remittance_fee: `${number}`;
+  deduction: `${number}`;
+  actualpaid: `${number}`;
   note: string | null;
   data: TcreatePaymentOrderDetail_Dto[];
 }
 
 interface Taccount_payable_Dto extends Tbase {
-  serialNumber: string | null; // 編號(單號)
-  invoiceTitle: string | null; // 發票抬頭
-  invoiceDate: string | null; // 發票日期
-  invoiceNumber: string | null; // 發票號碼
-  invoicePrice: number | null; // 發票金額
-  reviewStatus: string | null; // 審核狀態
-  paymentStatus: string | null; // 付款狀態
-  balance: number | null; // 未付款金額
-  note: string | null; // 備註
-  paymentOrderUuid: string | null; // 付款申請單uuid
-  paymentOrderSerialNumber: string | null; // 付款申請單號
-  purchase_invoice_uuid: string | null; // 進項發票uuid
-  supplier_uuid: string | null; // 廠商uuid,
-  supplier: string | null; // 廠商名
-  transaction_date: string | null; // 交易日期(付款日期?)
-  source_number: string | null; // 經辦人員
-  settled_amount: string | null; // 已付金額
+  serial_number: string | null; // varchar(50) - 序號
+  review_status: string | null; // varchar(50) - 審核狀態
+  note: string | null; // varchar(200) - 摘要說明
+  agent_employee_id: string | null; // varchar - 經辦人員
+  invoice_title: string | null; // varchar - 發票抬頭
+  invoice_date: string | null; // timestamp - 發票日期
+  invoice_number: string | null; // varchar - 發票號碼
+  invoice_price: number | null; // int4 - 發票金額
+  payment_account: string | null; // 付款帳戶名稱
+  payment_account_uuid: string | null; // 付款帳戶id
+  payment_status: string | null; // varchar - 付款狀態
+  payment_order_uuid: string | null; // uuid - 付款申請單uuid
+  payment_order_serial_number: string | null; // varchar - 付款申請單號
+  purchase_invoice_uuid: string | null; // uuid - 進項發票uuid
+  supplier_uuid: string | null; // uuid - 廠商uuid
+  transaction_date: string | null; // timestamp - 交易日期(付款日期)
+  source_number: string | null; // varchar - 立帳單號
+  settled_amount: number | null; // int4 - 已付金額
+  balance: number | null; // int4 - 餘額
+  supplier: string | null; // varchar - 廠商名
 }
 
 // MARK: ============

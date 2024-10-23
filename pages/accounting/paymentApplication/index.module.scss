@@ -13,3 +13,10 @@
   padding: 20px;
   border: solid 1px theme("colors.border");
 }
+
+.table {
+  max-height: 380px;
+  overflow: auto;
+  width: fit-content;
+  max-width: 100%;
+}
