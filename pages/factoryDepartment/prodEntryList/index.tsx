@@ -631,15 +631,17 @@ export default function ProdEntryList() {
             // 寫死
             const deviceName =
                 (nowwhname === "101") ? "Device1" :
-                    (nowwhname === "102") ? "Device2" :
-                        (nowwhname === "103") ? "Device3" : "";
+                    (nowwhname === "102") ? "Device1" :
+                        (nowwhname === "103") ? "Device1" :
+                            (nowwhname === "104") ? "Device1" : "";
             const traynumber = nowtrayname;
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
                 (nowwhname === "101") ? `https://${setting.warehouse1}/` :
                     (nowwhname === "102") ? `https://${setting.warehouse2}/` :
-                        (nowwhname === "103") ? `https://${setting.warehouse3}/` : ""
+                        (nowwhname === "103") ? `https://${setting.warehouse3}/` :
+                            (nowwhname === "104") ? `https://${setting.warehouse4}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -708,14 +710,16 @@ export default function ProdEntryList() {
             // 根據 whname 設置 deviceName
             const deviceName =
                 (whnamecalled === "101") ? "Device1" :
-                    (whnamecalled === "102") ? "Device2" :
-                        (whnamecalled === "103") ? "Device3" : "";
+                    (whnamecalled === "102") ? "Device1" :
+                        (whnamecalled === "103") ? "Device1" :
+                            (whnamecalled === "104") ? "Device1" : "";
             const traynumber = traynamecalled;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
                 (whnamecalled === "101") ? `https://${setting.warehouse1}/` :
                     (whnamecalled === "102") ? `https://${setting.warehouse2}/` :
-                        (whnamecalled === "103") ? `https://${setting.warehouse3}/` : ""
+                        (whnamecalled === "103") ? `https://${setting.warehouse3}/` :
+                            (whnamecalled === "104") ? `https://${setting.warehouse4}/` : ""
             ) : "https://localhost:44383/WareHouse/";
 
             // execcommand 的參數
