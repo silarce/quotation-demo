@@ -1768,67 +1768,60 @@ const checkIsReviewer = ({
   quotationContent: TquotationContentDto | undefined;
 }) => {
   const {
-    //
-    reviewManagerEmployee,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+
+    supervisorReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
     managerReviewedAt,
 
-    reviewWorkDirectorEmployee,
-    workDirectorReviewedAt,
-
-    reviewCashierEmployee,
-    toCashierAt,
-
-    // reviewSalesManagerEmployee,
-    // salesManagerReviewedAt,
-
     reviewSupervisorEmployee,
-    supervisorReviewedAt,
+    reviewWorkDirectorEmployee,
+    reviewCashierEmployee,
+    reviewManagerEmployee,
   } = quotationContent ?? {};
 
-  let isSupervisor = reviewSupervisorEmployee && reviewSupervisorEmployee?.id === userInfo?.employee?.id;
-  // let isSalesManager = reviewSalesManagerEmployee && reviewSalesManagerEmployee?.id === userInfo?.employee?.id;
-  let isWorkDirector = reviewWorkDirectorEmployee && reviewWorkDirectorEmployee?.id === userInfo?.employee?.id;
-  let isCashier = reviewCashierEmployee && reviewCashierEmployee?.id === userInfo?.employee?.id;
-  let isManager = reviewManagerEmployee && reviewManagerEmployee?.id === userInfo?.employee?.id;
+  const userId = userInfo?.employee?.id;
+
+  let isSupervisor = reviewSupervisorEmployee?.id && reviewSupervisorEmployee.id === userId;
+  let isWorkDirector = reviewWorkDirectorEmployee?.id && reviewWorkDirectorEmployee.id === userId;
+  let isCashier = reviewCashierEmployee?.id && reviewCashierEmployee.id === userId;
+  let isManager = reviewManagerEmployee?.id && reviewManagerEmployee.id === userId;
 
   let isReviewer = false;
 
-  if (!supervisorReviewedAt) {
-    isSupervisor && (isReviewer = true);
-    // isSalesManager = false;
-    isWorkDirector = false;
-    isCashier = false;
-    isManager = false;
-  }
-  // else if (!salesManagerReviewedAt) {
-  //   isSalesManager && (isReviewer = true);
-  //   isSupervisor = false;
-  //   isWorkDirector = false;
-  //   isCashier = false;
-  //   isManager = false;
-  // }
-  else if (!workDirectorReviewedAt) {
-    isWorkDirector && (isReviewer = true);
-    // isSalesManager = false;
-    isSupervisor = false;
-    isCashier = false;
-    isManager = false;
-  } else if (toCashierAt) {
-    isCashier && (isReviewer = true);
-    // isSalesManager = false;
-    isSupervisor = false;
-    isWorkDirector = false;
-    isManager = false;
-  } else if (!managerReviewedAt) {
-    isManager && (isReviewer = true);
-    // isSalesManager = false;
+  const reset = () => {
     isSupervisor = false;
     isWorkDirector = false;
     isCashier = false;
+    isManager = false;
+  };
+
+  if (isSupervisor && toSupervisorAt) {
+    reset();
+    isReviewer = true;
+    isSupervisor = true;
+  } else if (isWorkDirector && toWorkDirectorAt) {
+    reset();
+    isReviewer = true;
+    isWorkDirector = true;
+  } else if (isCashier && toCashierAt) {
+    reset();
+    isReviewer = true;
+    isCashier = true;
+  } else if (isManager && toManagerAt) {
+    reset();
+    isReviewer = true;
+    isManager = true;
   }
 
-  // isSupervisor && !supervisorReviewedAt && (isReviewer = true);
-  // isCashier && !toCashierAt && supervisorReviewedAt && (isReviewer = true);
+  if (supervisorReviewedAt && workDirectorReviewedAt && cashierReviewedAt && managerReviewedAt) {
+    reset();
+    isReviewer = false;
+  }
 
   return {
     isReviewer,
@@ -1836,9 +1829,90 @@ const checkIsReviewer = ({
     isWorkDirector,
     isCashier,
     isSupervisor,
-    // isSalesManager,
   };
 };
+
+// const checkIsReviewer = ({
+//   userInfo,
+//   // reviewerList,
+//   quotationContent,
+// }: {
+//   userInfo: TuserDto | undefined;
+//   // reviewerList: TreviewerList;
+//   quotationContent: TquotationContentDto | undefined;
+// }) => {
+//   const {
+//     //
+//     reviewManagerEmployee,
+//     managerReviewedAt,
+
+//     reviewWorkDirectorEmployee,
+//     workDirectorReviewedAt,
+
+//     reviewCashierEmployee,
+//     toCashierAt,
+
+//     // reviewSalesManagerEmployee,
+//     // salesManagerReviewedAt,
+
+//     reviewSupervisorEmployee,
+//     supervisorReviewedAt,
+//   } = quotationContent ?? {};
+
+//   let isSupervisor = reviewSupervisorEmployee && reviewSupervisorEmployee?.id === userInfo?.employee?.id;
+//   // let isSalesManager = reviewSalesManagerEmployee && reviewSalesManagerEmployee?.id === userInfo?.employee?.id;
+//   let isWorkDirector = reviewWorkDirectorEmployee && reviewWorkDirectorEmployee?.id === userInfo?.employee?.id;
+//   let isCashier = reviewCashierEmployee && reviewCashierEmployee?.id === userInfo?.employee?.id;
+//   let isManager = reviewManagerEmployee && reviewManagerEmployee?.id === userInfo?.employee?.id;
+
+//   let isReviewer = false;
+
+//   if (!supervisorReviewedAt) {
+//     isSupervisor && (isReviewer = true);
+//     // isSalesManager = false;
+//     isWorkDirector = false;
+//     isCashier = false;
+//     isManager = false;
+//   }
+//   // else if (!salesManagerReviewedAt) {
+//   //   isSalesManager && (isReviewer = true);
+//   //   isSupervisor = false;
+//   //   isWorkDirector = false;
+//   //   isCashier = false;
+//   //   isManager = false;
+//   // }
+//   else if (!workDirectorReviewedAt) {
+//     isWorkDirector && (isReviewer = true);
+//     // isSalesManager = false;
+//     isSupervisor = false;
+//     isCashier = false;
+//     isManager = false;
+//   } else if (toCashierAt) {
+//     isCashier && (isReviewer = true);
+//     // isSalesManager = false;
+//     isSupervisor = false;
+//     isWorkDirector = false;
+//     isManager = false;
+//   } else if (!managerReviewedAt) {
+//     isManager && (isReviewer = true);
+//     // isSalesManager = false;
+//     isSupervisor = false;
+//     isWorkDirector = false;
+//     isCashier = false;
+//   }
+
+//   // isSupervisor && !supervisorReviewedAt && (isReviewer = true);
+//   // isCashier && !toCashierAt && supervisorReviewedAt && (isReviewer = true);
+
+//   return {
+//     isReviewer,
+//     isManager,
+//     isWorkDirector,
+//     isCashier,
+//     isSupervisor,
+//     // isSalesManager,
+//   };
+// };
 
 const creEmptyMethod = () => {
   return {
