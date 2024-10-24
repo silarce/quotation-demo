@@ -102,6 +102,17 @@ export default function AddPurchaseOrder() {
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
+    const supplier1nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier1unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier1awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [searchproduct, setSearchProduct] = useState<string>("");
@@ -183,6 +194,20 @@ export default function AddPurchaseOrder() {
     const [handinputunitprice, setHandinputunitprice] = useState<string>("");
     const [handinputtotalprice, setHandinputtotalprice] = useState<string>("");
     const [handinputsuppliername, setHandinputsuppliername] = useState<string>("");
+
+
+
+    const [handinputsupplier1_name, setHandinputsupplier1_name] = useState<string>("");//從標頭取
+
+    const [handinputsupplier1_unitprice, setHandinputsupplier1_price] = useState<string>("");
+    const [handinputsupplier1_awarded, setHandinputsupplier1_awarded] = useState<boolean>(false);
+    const [handinputsupplier2_name, setHandinputsupplier2_name] = useState<string>("");//從標頭取
+    const [handinputsupplier2_unitprice, setHandinputsupplier2_price] = useState<string>("");
+    const [handinputsupplier2_awarded, setHandinputsupplier2_awarded] = useState<boolean>(false);
+    const [handinputsupplier3_name, setHandinputsupplier3_name] = useState<string>("");//從標頭取
+    const [handinputsupplier3_unitprice, setHandinputsupplier3_price] = useState<string>("");
+    const [handinputsupplier3_awarded, setHandinputsupplier3_awarded] = useState<boolean>(false);
+
 
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
@@ -652,11 +677,18 @@ export default function AddPurchaseOrder() {
         }
     };
 
-    const RemoveQuotereqDetail = async (id: any) => {
+    const RemoveQuotereqDetail = async (item: any) => {
         try {
             setIsLoading(true);
+            // 將 detailid 組成陣列並過濾掉空值或 undefined
+            const ids = [
+                item.supplier1_detailid,
+                item.supplier2_detailid,
+                item.supplier3_detailid
+            ].filter(id => id);  // 過濾掉空的 id
+
             const conditionModel = {
-                id: id
+                id: ids.join(',') // 將有效的 id 用逗號拼接
             };
 
 
@@ -779,7 +811,15 @@ export default function AddPurchaseOrder() {
                 note: handinputnote,
                 unitprice: handinputunitprice,
                 totalprice: handinputtotalprice,
-                suppliername: handinputsuppliername
+                suppliername1: suppliernamein,
+                supplierunitprice1: handinputsupplier1_unitprice,
+                supplierawarded1: handinputsupplier1_awarded,
+                suppliername2: suppliername2in,
+                supplierunitprice2: handinputsupplier2_unitprice,
+                supplierawarded2: handinputsupplier2_awarded,
+                suppliername3: suppliername3in,
+                supplierunitprice3: handinputsupplier3_unitprice,
+                supplierawarded3: handinputsupplier3_awarded,
             };
 
             setHandinputproductuuid('');
@@ -791,20 +831,39 @@ export default function AddPurchaseOrder() {
             setHandinputnote('');
             setHandinputunitprice('');
             setHandinputtotalprice('');
-
+            setHandinputsupplier1_price('');
+            setHandinputsupplier1_awarded(false);
+            setHandinputsupplier2_price('');
+            setHandinputsupplier2_awarded(false);
+            setHandinputsupplier3_price('');
+            setHandinputsupplier3_awarded(false);
             try {
                 setIsLoading(true);
 
                 const conditionModel = {
                     quotereqid: quotereqid,
                     quoterequuid: quoterequuid,
-                    supplierid: `${tabnow === '廠商1' ? supplieridin : tabnow === '廠商2' ? supplierid2in : tabnow === '廠商3' ? supplierid3in : ''}`,
-                    suppliername: `${tabnow === '廠商1' ? suppliernamein : tabnow === '廠商2' ? suppliername2in : tabnow === '廠商3' ? suppliername3in : ''}`,
-                    supplieraddress: `${tabnow === '廠商1' ? supplieraddressin : tabnow === '廠商2' ? supplieraddress2in : tabnow === '廠商3' ? supplieraddress3in : ''}`,
-                    suppliertaxid: `${tabnow === '廠商1' ? suppliertaxidin : tabnow === '廠商2' ? suppliertaxid2in : tabnow === '廠商3' ? suppliertaxid3in : ''}`,
-                    supplierphone: `${tabnow === '廠商1' ? supplierphonein : tabnow === '廠商2' ? supplierphone2in : tabnow === '廠商3' ? supplierphone3in : ''}`,
-                    suppliercontact: `${tabnow === '廠商1' ? suppliercontactin : tabnow === '廠商2' ? suppliercontact2in : tabnow === '廠商3' ? suppliercontact3in : ''}`,
-                    supplierfax: `${tabnow === '廠商1' ? supplierfaxin : tabnow === '廠商2' ? supplierfax2in : tabnow === '廠商3' ? supplierfax3in : ''}`,
+                    supplierid: supplieridin,
+                    suppliername: suppliernamein,
+                    supplieraddress: supplieraddressin,
+                    suppliertaxid: suppliertaxidin,
+                    supplierphone: supplierphonein,
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin,
+                    supplierid2: supplierid2in,
+                    suppliername2: suppliername2in,
+                    supplieraddress2: supplieraddress2in,
+                    suppliertaxid2: suppliertaxid2in,
+                    supplierphone2: supplierphone2in,
+                    suppliercontact2: suppliercontact2in,
+                    supplierfax2: supplierfax2in,
+                    supplierid3: supplierid3in,
+                    suppliername3: suppliername3in,
+                    supplieraddress3: supplieraddress3in,
+                    suppliertaxid3: suppliertaxid3in,
+                    supplierphone3: supplierphone3in,
+                    suppliercontact3: suppliercontact3in,
+                    supplierfax3: supplierfax3in,
                     data: newEntry
                 };
 
@@ -874,7 +933,8 @@ export default function AddPurchaseOrder() {
                 onOk: async () => {
                     const updatedData = data2.filter((_, i) => i !== index);
                     setData2(updatedData);
-                    RemoveQuotereqDetail(item.detail_id);
+
+                    RemoveQuotereqDetail(item);
                 }
             }
         })
@@ -2655,7 +2715,7 @@ export default function AddPurchaseOrder() {
                                                 type="text"
                                                 // maxLength={5}
                                                 value={_item.detail_quantity !== undefined ? _item.detail_quantity.toLocaleString() : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(editmain === true)}
                                                 // readOnly
                                                 // onChange={(e) => {
                                                 //     handleNumberChange(index, "quantity", e.target.value);
@@ -2688,57 +2748,146 @@ export default function AddPurchaseOrder() {
                                                 }}
                                             />
                                         </span>
-                                        {/* <span>
-                                            <button
-                                                onClick={() => {
-                                                    setQuotereqcanedit(false);
-                                                    prQuotereqModalOpen(false, _item)
-                                                }}
-                                            >
-                                                <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
-                                            </button>
-                                        </span> */}
                                         <span>
                                             <input
-                                                ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                ref={supplier1nameRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+                                                type="text"
+                                                value={(_item.supplier1_name !== undefined && _item.supplier1_name !== '') ? _item.supplier1_name : suppliernamein}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier1unitpriceRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
-                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice.toLocaleString() : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                // readOnly
-                                                // onChange={(e) => {
-                                                //     handleStringChange(index, "unitprice", e.target.value);
-                                                // }}
+                                                value={_item.supplier1_unitprice !== undefined ? _item.supplier1_unitprice : ''}
+                                                readOnly={!(editmain === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     const newUnitPrice = e.target.value;
                                                     newData[index] = {
                                                         ...newData[index],
-                                                        detail_unitprice: newUnitPrice,
-                                                        detail_totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].detail_quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                        supplier1_unitprice: newUnitPrice,
                                                     };
                                                     setData2(newData);
                                                 }}
                                             />
                                         </span>
                                         <span>
-                                            {/* {_item.detail_totalprice.toLocaleString()} */}
-                                            <span>
-                                                {/* {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()} */}
-                                                <span>{_item.detail_totalprice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </span>
+                                            <input
+                                                ref={supplier1awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier1_awarded === true}  // 根據 supplier1_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: newAwardedValue,  // 更新 supplier1_awarded
+                                                        supplier2_awarded: false,  // 取消其他兩個勾選
+                                                        supplier3_awarded: false,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+
                                         </span>
                                         <span>
                                             <input
-                                                ref={noteRefs.current[index]}
+                                                ref={supplier2nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+
                                                 type="text"
-                                                value={_item.detail_suppliername !== undefined ? _item.detail_suppliername : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                value={(_item.supplier2_name !== undefined && _item.supplier2_name !== '') ? _item.supplier2_name : suppliername2in}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier2unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                type="text"
+                                                value={_item.supplier2_unitprice !== undefined ? _item.supplier2_unitprice : ''}
+                                                readOnly={!(editmain === true)}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "suppliername", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier2_unitprice: newUnitPrice,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier2awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier2_awarded === true}  // 根據 supplier2_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: false,  // 取消其他兩個勾選
+                                                        supplier2_awarded: newAwardedValue,  // 更新 supplier2_awarded
+                                                        supplier3_awarded: false,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3nameRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+
+                                                type="text"
+                                                value={(_item.supplier3_name !== undefined && _item.supplier3_name !== '') ? _item.supplier3_name : suppliername3in}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                type="text"
+                                                value={_item.supplier3_unitprice !== undefined ? _item.supplier3_unitprice : ''}
+                                                readOnly={!(editmain === true)}
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier3_unitprice: newUnitPrice,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier3_awarded === true}  // 根據 supplier3_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: false,  // 取消其他兩個勾選
+                                                        supplier2_awarded: false,
+                                                        supplier3_awarded: newAwardedValue,  // 更新 supplier3_awarded
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>
@@ -2847,7 +2996,7 @@ export default function AddPurchaseOrder() {
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                     </button>
                                 </div> */}
-                                <div>
+                                {/* <div>
                                     <input
                                         type="text"
                                         placeholder='單價'
@@ -2863,8 +3012,8 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
-                                </div>
-                                <div>
+                                </div> */}
+                                {/* <div>
                                     <input
                                         type="text"
                                         placeholder='金額'
@@ -2873,13 +3022,104 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(e.target.value.toString())
                                         }}
                                     />
+                                </div> */}
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商1'
+                                        value={suppliernamein}
+                                    // onChange={(e) => handleSuppliernow()}
+                                    />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
-                                        placeholder='廠商'
-                                        value={handinputsuppliername}
+                                        placeholder='單價1'
+                                        value={handinputsupplier1_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier1_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier1_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(e.target.checked);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier2_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier3_awarded(false);      // 將其他狀態設為 false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商2'
+                                        value={suppliername2in}
                                     // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單價'
+                                        value={handinputsupplier2_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier2_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier2_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier2_awarded(e.target.checked);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier3_awarded(false);      // 將其他狀態設為 false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商3'
+                                        value={suppliername3in}
+                                    // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單價'
+                                        value={handinputsupplier3_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier3_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier3_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier2_awarded(false);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier3_awarded(e.target.checked);      // 將其他狀態設為 false
+                                        }}
                                     />
                                 </div>
                                 <div>
@@ -3119,8 +3359,8 @@ export default function AddPurchaseOrder() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.detail_id === selectedItemId ? scss.selectedRow : ''}`}
-                                            // onClick={() => { handlechangepo(_item) }}
-                                            >
+                                        // onClick={() => { handlechangepo(_item) }}
+                                        >
                                             <span>{index + 1}</span>
                                             <span>{_item.detail_productid}</span>
                                             <span>{_item.detail_name}</span>

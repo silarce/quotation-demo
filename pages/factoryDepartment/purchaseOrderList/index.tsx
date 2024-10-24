@@ -247,6 +247,7 @@ export default function PurchaseOrderList() {
             //     GetReviewById(data[0].purchaseorderuuid);
             //     GetReviewHistory(data[0].purchaseorderid);
             // }
+            
             console.log(typeof (quoterequuidin));
             console.log(quoterequuidin);
             console.log(quoterequuidin === '');
@@ -343,6 +344,7 @@ export default function PurchaseOrderList() {
             setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
             GetProdReceiptById(purchaseorderid as string);
+            GetReviewHistory(purchaseorderid as string);
             
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);

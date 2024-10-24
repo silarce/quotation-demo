@@ -569,9 +569,15 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>規格</span>
         <span>數量</span>
         <span>單位</span>
-        <span>單價</span>
-        <span>金額</span>
-        <span>廠商</span>
+        <span>廠商1</span>
+        <span>單價1</span>
+        <span>成交否1</span>
+        <span>廠商2</span>
+        <span>單價2</span>
+        <span>成交否2</span>
+        <span>廠商3</span>
+        <span>單價3</span>
+        <span>成交否3</span>
         <span>備註</span>
         <span></span>
       </div>
