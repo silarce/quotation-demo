@@ -179,8 +179,6 @@ export default function OrderTable({
   // -------------------------------------------------------------------------------
 
   const { totalImplementationQty, totalImplementationVolume, totalVolume } = useMemo(() => {
-    console.log(rowPropsArr);
-
     const totalImplementation = rowPropsArr.reduce(
       (
         { totalImplementationQty, totalImplementationVolume, totalVolume },
