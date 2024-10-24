@@ -29,7 +29,7 @@ import scss from './index.module.scss';
 // ================================================================================
 
 // MARK: START
-export default function AccountsPayableDetails() {
+export default function AccountsPayableDetailList() {
   // MARK: DATA
   // MARK: API
   // MARK: HANDLE

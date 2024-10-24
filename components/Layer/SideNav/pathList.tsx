@@ -670,7 +670,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: '應付帳款明細表',
-              path: path01 + '/accountsPayableDetails',
+              path: path01 + '/accountsPayableDetailList',
               erpFeature: [accountsReceivable],
             },
           ],
