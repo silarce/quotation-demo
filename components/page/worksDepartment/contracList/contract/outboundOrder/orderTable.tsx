@@ -178,23 +178,26 @@ export default function OrderTable({
 
   // -------------------------------------------------------------------------------
 
-  const { totalImplementationQty, totalImplementationVolume } = useMemo(() => {
+  const { totalImplementationQty, totalImplementationVolume, totalVolume } = useMemo(() => {
     const totalImplementation = rowPropsArr.reduce(
       (
-        { totalImplementationQty, totalImplementationVolume },
-        { left: { implementationQty, implementationVolume } = {} }
+        { totalImplementationQty, totalImplementationVolume, totalVolume },
+        { left: { implementationQty, implementationVolume } = {}, center: { volume } = {} }
       ) => {
         const implementationQty_num = typeof implementationQty === 'number' ? implementationQty : 0;
         const implementationVolume_num = typeof implementationVolume === 'number' ? implementationVolume : 0;
+        const volume_num = Number(volume) || 0;
 
         return {
           totalImplementationQty: new Decimal(totalImplementationQty).add(implementationQty_num).toNumber(),
           totalImplementationVolume: new Decimal(totalImplementationVolume).add(implementationVolume_num).toNumber(),
+          totalVolume: new Decimal(totalVolume).add(volume_num).toNumber(),
         };
       },
       {
         totalImplementationQty: 0,
         totalImplementationVolume: 0,
+        totalVolume: 0,
       }
     );
 
@@ -263,6 +266,7 @@ export default function OrderTable({
         <TotalRow
           totalImplementationQty={totalImplementationQty}
           totalImplementationVolume={totalImplementationVolume}
+          totalVolume={totalVolume}
         />
       </div>
     </div>
@@ -481,9 +485,11 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 const TotalRow = ({
   totalImplementationQty,
   totalImplementationVolume,
+  totalVolume,
 }: {
   totalImplementationQty: number | string;
   totalImplementationVolume: number | string;
+  totalVolume: number | string;
 }) => {
   return (
     <div className={scss.totalRow}>
@@ -492,11 +498,17 @@ const TotalRow = ({
           implementationQty: '總實作數量',
           implementationVolume: '總實作才數',
         }}
+        center={{
+          volume: '總才數',
+        }}
       />
       <Row
         left={{
           implementationQty: totalImplementationQty,
           implementationVolume: totalImplementationVolume,
+        }}
+        center={{
+          volume: totalVolume,
         }}
       />
     </div>
