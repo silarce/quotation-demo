@@ -24,7 +24,7 @@ const ReviewFlow = (props: { document_uuid?: string | undefined; className?: str
         const isReviewed = review_time !== '0001-01-01T00:00:00';
 
         return (
-          <div key={index} className="min-w-52 flex-none">
+          <div key={index} className="min-w-[150px] flex-none">
             <span className="text-lg text-main">{review_title}</span>
             <br />
             <span className=" text-base align-middle">{review_person}</span>
