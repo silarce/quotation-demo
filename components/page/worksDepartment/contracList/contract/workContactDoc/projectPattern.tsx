@@ -165,7 +165,6 @@ export default function ProjectPattern({
     floor: { floorManagerReviewedAt },
     design: { designManagerReviewedAt },
   } = patternReviewStatus.pattern;
-  console.log(patternReviewStatus.pattern);
 
   // -----------------------------------------------------------------------
   const [isUploading, setIsUploading] = useState<TisUploading>({
