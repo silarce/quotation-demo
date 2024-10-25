@@ -13,7 +13,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
-import ReviewFlow from 'components/composition/review/reviewFlow';
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelecor';
 
 // gear
@@ -112,6 +112,10 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   const { t } = useTranslation('accounting', { keyPrefix: 'paymentOrder' });
 
   const [disabled, setDisabled] = useState(true);
+
+  // --------------------------------------------------------------------------
+
+  const { ReviewFlow, update: update_reviewFlow } = useReviewFlow();
 
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder, clear: clear_paymentOrder } = useGetPaymentOrderById(id);
@@ -337,9 +341,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         const { unmount } = ReviewFlowSelector.open({
           username: username,
           onConfirm: async ({ reviewFlowId, purpose }) => {
-            console.log(reviewFlowId, purpose);
-
-            reviewFlowId && (await reqAddReview(reviewFlowId, purpose));
+            reviewFlowId && (await reqAddReview(reviewFlowId, purpose).then(update_reviewFlow));
             unmount();
           },
         });
@@ -349,9 +351,11 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   const handleSentReviewStop = raw_paymentOrder
     ? () => {
         myAlert.confirm({
-          title: '確認退回?',
+          title: '確認抽單?',
           props: {
-            onOk: reqReviewBack,
+            onOk: async () => {
+              reqReviewBack().then(update_reviewFlow);
+            },
           },
         });
       }
