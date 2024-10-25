@@ -537,20 +537,20 @@ function DndRow({
                 const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
                 const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
-                if (
-                  // 其他設定用的
-                  isDisplayInPage === 'worksDepartment' &&
-                  item.isDisplayedOnAccountReceivable === false &&
-                  (key === 'unitPrice_locale' || key === 'totalPrice_locale')
-                ) {
-                  return (
-                    <div
-                      key={key}
-                      className={classNames(scss.column, isHidden && scss.hidden)}
-                      style={{ width: inputSelProps.wrapperStyle?.width }}
-                    ></div>
-                  );
-                }
+                // if (
+                //   // 其他設定用的
+                //   isDisplayInPage === 'worksDepartment' &&
+                //   item.isDisplayedOnAccountReceivable === false &&
+                //   (key === 'unitPrice_locale' || key === 'totalPrice_locale')
+                // ) {
+                //   return (
+                //     <div
+                //       key={key}
+                //       className={classNames(scss.column, isHidden && scss.hidden)}
+                //       style={{ width: inputSelProps.wrapperStyle?.width }}
+                //     ></div>
+                //   );
+                // }
 
                 if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
                   return (
