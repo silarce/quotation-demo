@@ -11,9 +11,10 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
-
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
+import ReviewFlow from 'components/composition/review/reviewFlow';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelecor';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
@@ -38,6 +39,8 @@ import {
   // useGetAccountPayableBySupplierId,
   Tpayment_order_Dto_detailed,
 } from 'js/api/api_netCore/api_accountant';
+
+import { TaddReivew, apiAddReivew, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -100,6 +103,8 @@ export type { TstateDetail };
 
 // =========================================================================
 export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
+  const username = userInfo.username;
+
   const router = useRouter();
   const query = router.query as Tquery;
   const { id } = query;
@@ -124,6 +129,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
   // region API
 
+  // region reqAdd
   const reqAdd = async () => {
     const {
       // id,
@@ -232,6 +238,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
     });
   };
 
+  // region reqDelete
   const reqDelete = async () => {
     if (!state.id) {
       return;
@@ -244,6 +251,44 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       });
     });
   };
+
+  // region reqAddReview
+  const reqAddReview = async (review_id: string, title: string) => {
+    if (!state) {
+      return;
+    }
+
+    if (!state.id) {
+      myAlert.warning({ title: '狀態無id' });
+
+      return;
+    }
+
+    const body: TaddReivew = {
+      review_id,
+      document_id: state.serial_number,
+      document_uuid: state.id,
+      document_type: '付款申請',
+      username: username,
+      document_title: title,
+      query: {
+        id: state.id,
+      },
+    };
+
+    await apiAddReivew(body);
+  };
+
+  const reqReviewBack = async () => {
+    if (!state.id) {
+      myAlert.warning({ title: '狀態無id' });
+
+      return;
+    }
+
+    await apiGetReviewBack(state.id);
+  };
+
   // --------------------------------------------------------------------------
 
   // region HANDLE
@@ -282,6 +327,31 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
           title: '確認刪除?',
           props: {
             onOk: reqDelete,
+          },
+        });
+      }
+    : null;
+
+  const handleSentReview = raw_paymentOrder
+    ? () => {
+        const { unmount } = ReviewFlowSelector.open({
+          username: username,
+          onConfirm: async ({ reviewFlowId, purpose }) => {
+            console.log(reviewFlowId, purpose);
+
+            reviewFlowId && (await reqAddReview(reviewFlowId, purpose));
+            unmount();
+          },
+        });
+      }
+    : null;
+
+  const handleSentReviewStop = raw_paymentOrder
+    ? () => {
+        myAlert.confirm({
+          title: '確認退回?',
+          props: {
+            onOk: reqReviewBack,
           },
         });
       }
@@ -333,6 +403,8 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
           onCancel={onCancel}
           onConfirm={onConfirm}
           onDelete={handleDelete}
+          onSentReview={handleSentReview}
+          onSentReviewStop={handleSentReviewStop}
         />
         <Profile className="mb-5" disabled={disabled} state={state} setState={setState} />
 
@@ -341,9 +413,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
         </SquareBtn>
         <div className={scss.table}>
           <Detail_thead disabled={disabled} />
-          {/*  */}
-          {/*  */}
-          {/*  */}
+
           {state.detailArr.map((stateDetail, index) => {
             const setStateDetail = createSetDetail(index);
 
@@ -357,12 +427,11 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
               />
             );
           })}
-          {/*  */}
-          {/*  */}
-          {/*  */}
 
           <Detail_tfoot disabled={disabled} total={Number(state.total || 0).toLocaleString()} />
         </div>
+        <br />
+        <ReviewFlow />
       </div>
     </SubLayer>
   );
@@ -378,6 +447,8 @@ const BtnBar = ({
   onCancel,
   onConfirm,
   onDelete,
+  onSentReview,
+  onSentReviewStop,
   className,
 }: {
   disabled: boolean;
@@ -386,6 +457,8 @@ const BtnBar = ({
   onCancel: () => void;
   onConfirm: () => void;
   onDelete: null | (() => void);
+  onSentReview: null | (() => void);
+  onSentReviewStop: null | (() => void);
   className?: string;
 }) => {
   return (
@@ -407,7 +480,11 @@ const BtnBar = ({
           </>
         )}
       </div>
-      <div>{onDelete && <SquareBtn content="delete" theme="danger" onClick={onDelete} />}</div>
+      <div className="flex gap-1">
+        {onDelete && <SquareBtn content="delete" theme="danger" onClick={onDelete} />}
+        {onSentReview && <SquareBtn content="sentReview" onClick={onSentReview} />}
+        {onSentReviewStop && <SquareBtn content="sentReviewStop" onClick={onSentReviewStop} />}
+      </div>
     </div>
   );
 };
