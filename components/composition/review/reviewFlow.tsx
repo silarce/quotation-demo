@@ -1,3 +1,4 @@
+import { useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Image from 'next/image';
@@ -6,25 +7,43 @@ import { useGetReivewById } from 'js/api/api_netCore/api_review';
 
 import icon_review from 'public/image/icon/review.svg';
 
-const ReviewFlow = (
-  props: {
-    //
-    document_uuid?: string | undefined;
-    className?: string;
-    className_stage?: string;
-  } = {}
-) => {
+// ======================================================================
+
+interface TimperativeHandle {
+  update: () => void;
+}
+
+interface Tprops {
+  document_uuid?: string | undefined;
+  className?: string;
+  className_stage?: string;
+}
+
+// ======================================================================
+const ReviewFlow_pre = (props: Tprops = {}, ref: React.ForwardedRef<TimperativeHandle>) => {
+  // const ref = useRef<TimperativeHandle>(null);
+
   const { className, className_stage } = props;
 
   const router = useRouter();
   const query = router.query as { id?: string | undefined };
   const document_uuid = props.document_uuid || query.id;
 
-  const { raw } = useGetReivewById(document_uuid);
+  const { raw, update } = useGetReivewById(document_uuid);
 
   const reviewFlow = raw?.[0];
   const haveReviewFlow = !!reviewFlow && reviewFlow.stages.length > 0;
 
+  // ----------------------------------------------------------------------
+
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      update,
+    })
+  );
+
+  // ----------------------------------------------------------------------
   return (
     <div className={classNames('border-b border-border flex flex-wrap gap-5', className)}>
       {!haveReviewFlow && <span className="text-lg text-border">無審核流程</span>}
@@ -45,4 +64,20 @@ const ReviewFlow = (
   );
 };
 
+const ReviewFlow = forwardRef(ReviewFlow_pre);
+
+const useReviewFlow = () => {
+  const ref = useRef<TimperativeHandle>(null);
+
+  const ReviewFlow_ref = useCallback((props: Tprops = {}) => {
+    return <ReviewFlow {...props} ref={ref} />;
+  }, []);
+
+  return {
+    ReviewFlow: ReviewFlow_ref,
+    update: ref.current?.update,
+  };
+};
+
 export default ReviewFlow;
+export { useReviewFlow };

@@ -48,7 +48,11 @@ const btnLookup: {
   },
   sentReview: {
     Icon: Icons.Icon_fc_sentReview,
-    // i18nKey: 'sentReview',
+    i18nKey: 'sentReview',
+  },
+  sentReviewStop: {
+    Icon: Icons.Icon_fc_sentReviewStop,
+    i18nKey: 'sentReviewStop',
   },
 };
 
