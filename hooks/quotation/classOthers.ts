@@ -207,7 +207,7 @@ const othersKeyArrOri: () => TothersKey[] = () => {
     'unitPrice_locale',
     'totalPrice_locale',
     'notes',
-    'isDisplayedOnAccountReceivable',
+    // 'isDisplayedOnAccountReceivable',
   ];
 };
 

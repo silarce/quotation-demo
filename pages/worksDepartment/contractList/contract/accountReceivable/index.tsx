@@ -26,8 +26,8 @@ import DeductionDetail from 'components/page/worksDepartment/contracList/contrac
 import IncomeBillSorting, {
   Tstate_incomeBillSorting,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillSorting';
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -60,7 +60,7 @@ import { AxiosError } from 'axios';
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
 // hook
-import { useProductList } from 'hooks/quotation/useProduct';
+// import { useProductList } from 'hooks/quotation/useProduct';
 
 // ========================================================================
 
@@ -131,7 +131,7 @@ export default function AccountReceivable({
     ],
   });
 
-  const { engineeringContact, accountReceivable } = contract ?? {};
+  const { engineeringContact, accountReceivable, content } = contract ?? {};
 
   // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
   const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
@@ -161,40 +161,37 @@ export default function AccountReceivable({
     };
   }, [accountReceivable?.incomeBillList]);
 
-  const { productArr, latestQuotationDiscount } = useProdArr(contract);
+  // const { productArr, latestQuotationDiscount } = useProdArr(contract);
 
   // --------------------------------------------------------------------------
 
-  const {
-    //
-    productList,
-    prodCellConfig,
-    prodKeyArr,
-    changeProdKeyArr,
-    //
-    othersKeyArr,
-    othersList,
-    othersCellConfig,
-  } = useProductList({
-    productArr: productArr,
-    others: contract?.content.others ?? [],
-    averageDiscount: null,
-    resetTrigger: productArr,
-    quotationDiscount: Number(latestQuotationDiscount) || 100,
-    discount_fromData: Number(latestQuotationDiscount) || 100,
-  });
+  // const {
+  //   //
+  //   productList,
+  //   prodCellConfig,
+  //   prodKeyArr,
+  //   changeProdKeyArr,
+  //   //
+  //   othersKeyArr,
+  //   othersList,
+  //   othersCellConfig,
+  // } = useProductList({
+  //   productArr: productArr,
+  //   others: contract?.content.others ?? [],
+  //   averageDiscount: null,
+  //   resetTrigger: productArr,
+  //   quotationDiscount: Number(latestQuotationDiscount) || 100,
+  //   discount_fromData: Number(latestQuotationDiscount) || 100,
+  // });
 
-  console.log(productArr);
-  console.log(productList);
+  // // 把金額隱藏
+  // const filteredProdKeyArr = prodKeyArr.filter((key) => {
+  //   if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
+  //     return false;
+  //   }
 
-  // 把金額隱藏
-  const filteredProdKeyArr = prodKeyArr.filter((key) => {
-    if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
-      return false;
-    }
-
-    return true;
-  });
+  //   return true;
+  // });
 
   // --------------------------------------------------------------------------
 
@@ -620,6 +617,7 @@ export default function AccountReceivable({
             className="mt-10 "
             data_finalProdcut={data_finalProdcut}
             data_period={accountReceivable.periods}
+            data_otherArr={content?.others}
             onAddConfirm={reqAddInvoice}
             reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
             reqDeleteInvoice={reqDeleteInvoice}
@@ -634,7 +632,7 @@ export default function AccountReceivable({
         <br />
         <br />
         {/* 主產品與其他設定 */}
-        <Table_prod
+        {/* <Table_prod
           disabled={true}
           prodList={productList}
           prodCellConfig={prodCellConfig}
@@ -659,7 +657,7 @@ export default function AccountReceivable({
           add={() => {}}
           isShowDndBtn={false}
           isDisplayInPage="worksDepartment"
-        />
+        /> */}
       </div>
     </SubLayer>
   );
@@ -684,26 +682,26 @@ const EmptyMain = () => {
 
 // ========================================================================
 
-const useProdArr = (contract: TquotationContractDto | undefined) => {
-  return useMemo(() => {
-    const list: { [key: string]: TquotationProductDto } = {};
+// const useProdArr = (contract: TquotationContractDto | undefined) => {
+//   return useMemo(() => {
+//     const list: { [key: string]: TquotationProductDto } = {};
 
-    const subContractArr = contract?.subContracts ?? [];
-    const orderedSubContracts = _.sortBy(subContractArr, 'version');
+//     const subContractArr = contract?.subContracts ?? [];
+//     const orderedSubContracts = _.sortBy(subContractArr, 'version');
 
-    orderedSubContracts.forEach((contract) => {
-      const prodArr = contract.content.products;
+//     orderedSubContracts.forEach((contract) => {
+//       const prodArr = contract.content.products;
 
-      prodArr.forEach((prod) => {
-        list[prod.rootProductId] = prod;
-      });
-    });
+//       prodArr.forEach((prod) => {
+//         list[prod.rootProductId] = prod;
+//       });
+//     });
 
-    const productArr = Object.values(list);
-    const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
+//     const productArr = Object.values(list);
+//     const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
 
-    const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
+//     const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
 
-    return { productArr, latestQuotationDiscount };
-  }, [contract]);
-};
+//     return { productArr, latestQuotationDiscount };
+//   }, [contract]);
+// };

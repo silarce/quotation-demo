@@ -5,5 +5,7 @@
   "edit": "EDIT",
   "export": "EXPORT",
   "save": "SAVE",
-  "search": "SEARCH"
+  "search": "SEARCH",
+  "sentReview": "SENT REVIEW",
+  "sentReviewStop": "SENT REVIEW STOP"
 }

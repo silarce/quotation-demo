@@ -24,6 +24,73 @@ interface Tbase {
 
 // ==============================================================================
 
+// MARK: ============
+//
+//
+//
+// region =Review=
+//
+//
+//
+
+interface TreviewFlow {
+  id: string;
+  name: string;
+  enable: boolean;
+  stage_counter: number;
+  user_id: string;
+  created_at: string;
+  update_at: string;
+  stages: {
+    stage_uid: string;
+    stage_order: number;
+    stage_user_name: string;
+    stage_user_title: string;
+    review_id: string;
+    review_type: string;
+  }[];
+}
+
+interface TgetReivewById {
+  id: string;
+  create_at: string;
+  create_by: string;
+
+  document_uuid: string;
+  document_id: string;
+  current_stage: `${number}`;
+  document_status: string;
+  document_title: string;
+  document_type: string;
+  prestage_review: string;
+  query: string;
+  review_id: string;
+  stages: {
+    review_id: string;
+    review_order: number;
+    review_memo: string;
+    review_person: string;
+    review_status: string;
+    review_time: string | '0001-01-01T00:00:00'; // '0001-01-01T00:00:00'代表未審核
+    review_title: string;
+  }[];
+}
+
+interface TaddReivew {
+  review_id: string; // 審核流程id
+  document_id: string; // 單號
+  document_uuid: string; // 唯一識別id
+  document_type: string; // ex:請購單
+  username: string;
+  document_title: string; // ex:請購單20241024
+  // 取得資料用的query
+  query: {
+    [key: string]: string | number;
+  };
+}
+
+// ==============================================================================
+
 // region =Accountant=
 //
 //
@@ -289,6 +356,10 @@ export type {
   //
   TnetCoreApiBody,
   Tbase,
+  //
+  TreviewFlow,
+  TaddReivew,
+  TgetReivewById,
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
