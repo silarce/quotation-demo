@@ -131,7 +131,7 @@ export default function AccountReceivable({
     ],
   });
 
-  const { engineeringContact, accountReceivable } = contract ?? {};
+  const { engineeringContact, accountReceivable, content } = contract ?? {};
 
   // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
   const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
@@ -183,9 +183,6 @@ export default function AccountReceivable({
     quotationDiscount: Number(latestQuotationDiscount) || 100,
     discount_fromData: Number(latestQuotationDiscount) || 100,
   });
-
-  console.log(productArr);
-  console.log(productList);
 
   // 把金額隱藏
   const filteredProdKeyArr = prodKeyArr.filter((key) => {
@@ -620,6 +617,7 @@ export default function AccountReceivable({
             className="mt-10 "
             data_finalProdcut={data_finalProdcut}
             data_period={accountReceivable.periods}
+            data_otherArr={content?.others}
             onAddConfirm={reqAddInvoice}
             reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
             reqDeleteInvoice={reqDeleteInvoice}

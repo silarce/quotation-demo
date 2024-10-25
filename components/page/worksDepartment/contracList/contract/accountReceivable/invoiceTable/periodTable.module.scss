@@ -1,10 +1,11 @@
 $invoicePadding: 10px 20px;
 $gridWidth_itemName: 80px;
-$gridTemplateColumns_left: $gridWidth_itemName 150px 50px 100px;
+$gridTemplateColumns_left: $gridWidth_itemName 150px 50px 120px;
 $gridTemplateColumns_center: 130px 150px;
 $gridTemplateColumns_center_row: 130px 150px $gridWidth_itemName;
 $fontSize: 16px;
 $fontWeight: 500;
+
 $rowGap: 10px;
 // $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
 $invoiceHeight: fit-content;
@@ -116,6 +117,7 @@ $deleteBarHeight: 36px;
   // min-height: 30px; // 設了這個
   // height: fit-content;
   font-size: $fontSize;
+
   // border: solid 1px black;
 }
 
@@ -143,7 +145,7 @@ $deleteBarHeight: 36px;
     overflow: hidden;
     align-items: flex-start;
     > span {
-      border-bottom: solid 1px transparent;
+      // border-bottom: solid 1px transparent;
     }
     > input {
       // @extend .theInput;
