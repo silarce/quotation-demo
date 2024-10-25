@@ -153,6 +153,8 @@ export default function PurchaseOrderList() {
     const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
     const [originaldata1, setOriginaldata1] = useState<any[]>([]);
     const [originalnote, setOriginalnote] = useState(notein);
+    const [originalcreate_at, setOriginalcreate_at] = useState(notein);
+    const [originalneed_date, setOriginalneed_date] = useState(notein);
 
     //進貨總數
     const [totalreq, setTotalreq] = useState<string>("");
@@ -620,6 +622,8 @@ export default function PurchaseOrderList() {
         setOriginalShippingaddressin(shippingaddressin);
         setOriginaldata1(data1);
         setOriginalnote(notein);
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
         setEditmain(true);
     };
 
@@ -641,6 +645,8 @@ export default function PurchaseOrderList() {
                     setData1(originaldata1);
                     setEditmain(false);
                     setNotein(originalnote);
+                    setCreate_atin(originalcreate_at);
+                    setNeed_datein(originalneed_date);
                 }
             }
         });
@@ -1529,20 +1535,27 @@ export default function PurchaseOrderList() {
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
-                                <span style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                    &nbsp;
+                                    <button className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                        <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        結案
+                                    </button>
+                                </span> */}
+                                <span style={{ display: `${statusin === '已核准' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                         <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         結案
                                     </button>
                                 </span>
-                                <span style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.disablesquarebtn} title="單據未結">
                                         <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         未結
                                     </button>
-                                </span>
+                                </span> */}
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.disablesquarebtn} title="單據已結">

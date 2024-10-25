@@ -57,6 +57,7 @@ import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 export default function PurchaseRequisitionList() {
 
@@ -153,6 +154,21 @@ export default function PurchaseRequisitionList() {
             setCheckFirstIn(parseInt(firstin as string) || 0);
         }
     }, [firstin]);
+
+
+    const [editmain, setEditmain] = useState<boolean>(false);
+
+    // 保存原始值
+    const [originalSuppliernamein, setOriginalSuppliernamein] = useState('');
+    const [originalSupplierphonein, setOriginalSupplierphonein] = useState('');
+    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState('');
+    const [originalInvoicein, setOriginalInvoicein] = useState('');
+    const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState('');
+    const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
+    const [originaldata1, setOriginaldata1] = useState<any[]>([]);
+    const [originalnote, setOriginalnote] = useState('');
+    const [originalcreate_at, setOriginalcreate_at] = useState(notein);
+    const [originalneed_date, setOriginalneed_date] = useState(notein);
 
 
     //#region 上方功能列
@@ -414,6 +430,8 @@ export default function PurchaseRequisitionList() {
             setNotein(note as string);
             GetReviewById(purchaserequisitionuuid);
             GetReviewHistory(purchaserequisitionid as string);
+            setPrquotereqmodalopen(false);
+            setEditmain(false);
         }
     }, [purchaserequisitionuuid]);
 
@@ -759,8 +777,8 @@ export default function PurchaseRequisitionList() {
                 suppliertaxid: item.detail_suppliertaxid,
                 supplieraddress: item.detail_supplieraddress,
                 supplierphone: item.detail_supplierphone,
-                suppliercontact:item.detail_suppliercontact,
-                supplierfax:item.detail_supplierfax
+                suppliercontact: item.detail_suppliercontact,
+                supplierfax: item.detail_supplierfax
             };
 
             var inputModel = {
@@ -795,6 +813,49 @@ export default function PurchaseRequisitionList() {
         }
 
     };
+
+    const clearPurchaseRequisitionDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaserequisitiondetailuuid: purchaserequisitiondetailuuid,
+                unitprice: '',
+                totalprice: '',
+                suppliername: '',
+                quotereqdetailuuid: '',
+                suppliertaxid: '',
+                supplieraddress: '',
+                supplierphone: '',
+                suppliercontact: '',
+                supplierfax: '',
+            };
+    
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+    
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaserequisitionDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+    
+            const responseData = await response.json();
+            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
+
+
     // useEffect(() => {
     //     if (selectedsupplier) {
     //         // updateQuotereqDetail(selectedsupplier, lastselectedsupplier);
@@ -1355,10 +1416,17 @@ export default function PurchaseRequisitionList() {
     }
 
     const handleCheckboxChange = (item: any) => {
-        // 更新選中的供應商
-        setLastselectedsupplier(selectedsupplier);
-        setSelectedsupplier(item.detail_id);
-        UpdatePurchaserequisitionDetail(item);
+        // 判斷當前選中的 supplier 是否與點擊的相同
+        if (selectedsupplier === item.detail_id) {
+            // 如果相同，清空選擇
+            setSelectedsupplier('');
+            clearPurchaseRequisitionDetail(item); // 呼叫清空資料的函數
+        } else {
+            // 如果不同，更新選中的供應商
+            setLastselectedsupplier(selectedsupplier);
+            setSelectedsupplier(item.detail_id);
+            UpdatePurchaserequisitionDetail(item);
+        }
     };
 
     const GoToQuotereq = async () => {
@@ -1472,6 +1540,95 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        // setOriginalSuppliernamein(suppliernamein);
+        // setOriginalSupplierphonein(supplierphonein);
+        // setOriginalSuppliertaxidin(suppliertaxidin);
+        // setOriginalInvoicein(invoicein);
+        // setOriginalSupplieraddressin(supplieraddressin);
+        // setOriginalShippingaddressin(shippingaddressin);
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginaldata1(data1);
+        setOriginalnote(notein);
+        setEditmain(true);
+    };
+
+    const handleSave = async () => {
+        // 顯示確認對話框
+        myAlert.confirm({
+            title: '確定要儲存異動的資料嗎?',
+            content: null,
+            props: {
+                onOk: async () => {
+                    console.log(create_atin);
+                    console.log(need_datein);
+                    try {
+                        // 打印數據到控制台以供調試
+                        console.log(data);
+                        // return;
+
+                        const conditionModel = {
+                            purchaserequisitionuuid: purchaserequisitionuuidin,
+                            create_at: create_atin,
+                            need_date: need_datein,
+                            note: notein,
+                            data1: data1
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+
+
+                        // 發送數據到 API
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdatePR`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel),
+                        });
+
+                        if (!response.ok) {
+                            myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` })
+
+                        }
+                        // 解析 API 響應
+                        const result = await response.json();
+
+                        // 顯示成功提示
+                        myAlert.success({ title: '更新成功' })
+                        setEditmain(false);
+                        getPurchaseRequisition();
+
+                        // 更新狀態或執行其他操作
+                        console.log(result);
+                    } catch (error: any) {
+                        // 顯示錯誤信息
+                        myAlert.err({ title: 'FunctionError', content: error.message },)
+                    }
+                }
+            }
+        });
+    }
+
+    const handleCancel = async () => {
+        setData1(originaldata1);
+        setNotein(originalnote);
+        setCreate_atin(originalcreate_at);
+        setNeed_datein(originalneed_date);
+        setOriginalneed_date(need_datein);
+        setEditmain(false);
+    }
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
@@ -1500,7 +1657,29 @@ export default function PurchaseRequisitionList() {
                                     單據
                                 </button> */}
                             </div>
-                            <div></div>
+                            <div>
+                                <span style={{ display: `${(statusin === "詢價中") ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${(statusin === "已結案" || statusin === "已核准" || statusin === "審核中") ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+                            </div>
                             <div></div>
                             <div>
                                 <button
@@ -1583,31 +1762,51 @@ export default function PurchaseRequisitionList() {
                                         />
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="請購日期"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                                     // value: checkfirstin
                                                 },
                                             }}
+                                        /> */}
+                                        <InputSel
+                                            caption="請購日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
                                         />
-
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="需用日期"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
                                                 },
                                             }}
+                                        /> */}
+                                        <InputSel
+                                            caption="需用日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
                                         />
-
                                     </div>
                                     <div>
                                         <InputSel
@@ -1627,10 +1826,11 @@ export default function PurchaseRequisitionList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                                    value: notein ? notein : ' ',
+                                                    onChange: (e) => { setNotein(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1725,7 +1925,27 @@ export default function PurchaseRequisitionList() {
                                                             <span>{_item.productid}</span>
                                                             <span>{_item.name}</span>
                                                             <span>{_item.spec}</span>
-                                                            <span>{_item.quantity.toLocaleString()}</span>
+                                                            <span>
+                                                                {/* {_item.quantity.toLocaleString()} */}
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
+                                                                    readOnly={!(editmain === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newQuantity = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            quantity: newQuantity.toString(),
+                                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                             <span>{_item.unit}</span>
                                                             <span>
                                                                 <button
@@ -1736,15 +1956,52 @@ export default function PurchaseRequisitionList() {
                                                                     }}
                                                                     disabled={_item.reviewtype === 'review'}
                                                                 >
-                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
                                                                 </button>
 
                                                             </span>
-                                                            <span>{_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                            <span>
+                                                                {/* {_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    value={_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    readOnly={!(editmain === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newUnitPrice = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            unitprice: newUnitPrice.toString(),
+                                                                            totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                             <span>{_item.totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                             <span>{_item.suppliername}</span>
 
-                                                            <span title={_item.note}>{_item.note}</span>
+                                                            <span>
+                                                                <input
+                                                                    ref={noteRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    type="text"
+                                                                    value={_item.note}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newNote = e.target.value
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            note: newNote
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))
@@ -1992,35 +2249,37 @@ export default function PurchaseRequisitionList() {
                     {/* {selectedsupplier} */}
                     <div>
                         <Thead01 type={'Quotereq2'} />
-                        {prquotereqdata && (
-                            prquotereqdata.map((_item: any, index: number) => (
-                                <CellWithBar key={index} className={scss.panelHeader17}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.detail_suppliername}</span>
-                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
-                                        <span>{_item.detail_unit}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                        <span>{_item.pricetype}</span>
-                                        <span>{_item.main_quotereqid}</span>
-                                        <span></span>
-                                        {/* <span></span> */}
-                                        <span>
-                                            <input
-                                                disabled={['已核准', '審核中', '已結案'].includes(statusin)}
-                                                className={scss.quotereqdetail_checkbox}
-                                                type='checkbox'
-                                                checked={selectedsupplier === _item.detail_id}
-                                                onChange={() => handleCheckboxChange(_item)}
-                                            />
+                        <div style={{ height: '300px', overflowY: 'auto' }}>
+                            {prquotereqdata && (
+                                prquotereqdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader17}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.detail_suppliername}</span>
+                                            <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                            <span>{_item.detail_unit}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                            <span>{_item.pricetype}</span>
+                                            <span>{_item.main_quotereqid}</span>
+                                            <span></span>
+                                            {/* <span></span> */}
+                                            <span>
+                                                <input
+                                                    style={{ backgroundColor: 'transparent', width: '100%', height: '20px' }}
+                                                    disabled={!(editmain && statusin !== '已核准' && statusin !== '已結案')}
+                                                    type='checkbox'
+                                                    checked={selectedsupplier === _item.detail_id}
+                                                    onChange={() => handleCheckboxChange(_item)}
+                                                />
 
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))
-                        )}
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </DragableModal>
 
