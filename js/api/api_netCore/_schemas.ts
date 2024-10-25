@@ -71,7 +71,7 @@ interface TgetReivewById {
     review_memo: string;
     review_person: string;
     review_status: string;
-    review_time: string;
+    review_time: string | '0001-01-01T00:00:00'; // '0001-01-01T00:00:00'代表未審核
     review_title: string;
   }[];
 }

@@ -36,7 +36,7 @@ const apiGetReviewById = (document_uuid: string) => {
   };
 
   return axi2
-    .get<TgetReivewById>(api, { params })
+    .get<TgetReivewById[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       return Promise.reject(err);
@@ -170,7 +170,7 @@ const useGetReivewById = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [raw, setRaw] = useState<TgetReivewById>();
+  const [raw, setRaw] = useState<TgetReivewById[]>();
 
   const update = async () => {
     if (!document_uuid) {
