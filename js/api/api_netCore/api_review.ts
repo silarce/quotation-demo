@@ -265,4 +265,4 @@ export {
   apiGetReviewBack,
   useGetReviewHistory,
 };
-export type { TgetReivewById, TaddReivew };
+export type { TreviewFlow, TgetReivewById, TaddReivew };
