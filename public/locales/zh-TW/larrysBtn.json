@@ -5,5 +5,7 @@
   "edit": "編輯",
   "export": "匯出",
   "save": "儲存",
-  "search": "搜尋"
+  "search": "搜尋",
+  "sentReview": "送審",
+  "sentReviewStop": "抽單"
 }
