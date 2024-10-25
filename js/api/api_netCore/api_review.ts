@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { notification } from 'antd';
 
@@ -22,7 +22,7 @@ const apiGetFlow = (username: string) => {
   };
 
   return axi2
-    .get<TreviewFlow>(api, { params })
+    .get<TreviewFlow[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       return Promise.reject(err);
@@ -91,13 +91,17 @@ const apiGetReviewHistory = (id: string) => {
 const useGetFlow = (
   username: string | undefined,
   {
+    filter,
     autoUpdate = true,
   }: {
+    filter?: {
+      name?: string | undefined;
+    };
     autoUpdate?: boolean;
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [raw, setRaw] = useState<TreviewFlow>();
+  const [raw, setRaw] = useState<TreviewFlow[]>();
 
   const update = async () => {
     if (!username) {
@@ -109,6 +113,10 @@ const useGetFlow = (
     setIsFetching(true);
     await apiGetFlow(username)
       .then((res) => {
+        if (filter?.name) {
+          res = res.filter((item) => item.name === filter.name);
+        }
+
         setRaw(res);
       })
       .catch((err) => {
@@ -123,6 +131,22 @@ const useGetFlow = (
       });
   };
 
+  const raw_filtered = useMemo(() => {
+    if (!filter) {
+      return raw;
+    }
+
+    const filtered = raw?.filter((item) => {
+      let pass = true;
+
+      filter?.name && !item.name.includes(filter.name) && (pass = false);
+
+      return pass;
+    });
+
+    return filtered;
+  }, [raw, ...Object.values(filter ?? {})]);
+
   useEffect(() => {
     autoUpdate && update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,6 +154,7 @@ const useGetFlow = (
 
   return {
     raw,
+    raw_filtered,
     setRaw,
     update,
     isFetching,
