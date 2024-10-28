@@ -812,6 +812,14 @@ function PreWorkContactDoc_component(
     return true;
   });
 
+  const filteredOthersKeyArr = othersKeyArr.filter((key) => {
+    if (key === 'unitPrice_locale' || key === 'totalPrice_locale') {
+      return false;
+    }
+
+    return true;
+  });
+
   // ----------------------------------------------------------------------------
 
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
@@ -858,7 +866,7 @@ function PreWorkContactDoc_component(
             disabled={disabled}
             list={othersList}
             cellConfig={othersCellConfig}
-            keyArr={othersKeyArr}
+            keyArr={filteredOthersKeyArr}
             changeKeyArr={() => {}}
             add={() => {}}
             isShowDndBtn={false}

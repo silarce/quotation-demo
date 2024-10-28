@@ -922,10 +922,11 @@ export type TquotationContentOtherDto = {
 // export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 export type TcreateQuotationContentOtherDto = Pick<
   TquotationContentOtherDto,
-  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec' | 'isDisplayedOnAccountReceivable'
+  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec'
 > & {
   quantity: `${number}`;
   totalPrice: `${number}`;
+  isDisplayedOnAccountReceivable?: boolean;
 };
 
 /**選配設定 */

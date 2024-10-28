@@ -29,6 +29,7 @@ import type {
   TcompletedProductDto,
   TretainageType,
   TaccountsReceivableInvoiceDto,
+  TquotationContentOtherDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -111,6 +112,7 @@ function PeriodPanel_pre(
   {
     data_period,
     finalProdArr,
+    data_otherArr,
     totalsTotal,
     onPanelStateChange,
     reqPatchInvoiceAllowance,
@@ -121,6 +123,7 @@ function PeriodPanel_pre(
   }: {
     data_period?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
+    data_otherArr: TquotationContentOtherDto[];
     // 用來取代原本的totals，內容為所有totals的總和
     totalsTotal?: {
       subTotal: number;
@@ -144,6 +147,7 @@ function PeriodPanel_pre(
   const { defaultState, isNew } = useDefaultState({
     data_period,
     finalProdArr,
+    data_otherArr,
   });
   // --------------------------------------------------------------------------
 
@@ -1246,9 +1250,11 @@ const useDefaultState = ({
   //
   data_period,
   finalProdArr,
+  data_otherArr,
 }: {
   data_period: Tperiod_reduce | undefined;
   finalProdArr: TquotationProductDto[];
+  data_otherArr: TquotationContentOtherDto[];
 }) => {
   const { customer } = useContext(AccountReceivableContext);
 
@@ -1294,7 +1300,6 @@ const useDefaultState = ({
 
       const cp = completedProductList[finalProdId] || {
         productId: finalProdId,
-
         basePrice: finalProd.unitPrice,
         completedQuantity: '',
         completedPayment: '',
@@ -1308,6 +1313,25 @@ const useDefaultState = ({
         completedPayment: String(cp.completedPayment),
       };
     });
+    const rowArr_other: Tstate_period['rowArr'] = data_otherArr.map((other) => {
+      const { id, item, unitPrice } = other;
+      const cp = completedProductList[id] || {
+        productId: id,
+        basePrice: unitPrice,
+        completedQuantity: '',
+        completedPayment: '',
+      };
+
+      return {
+        ...cp,
+        itemName: item,
+        basePrice: unitPrice,
+        completedQuantity: String(cp.completedQuantity),
+        completedPayment: String(cp.completedPayment),
+      };
+    });
+
+    rowArr.push(...rowArr_other);
 
     const totals_num = calcTotals(rowArr);
 
@@ -1819,5 +1843,5 @@ const create_emptyPeriod = (): Tperiod_reduce => {
 
 const PeriodPanel = forwardRef(PeriodPanel_pre);
 
-export { Thead, Tbody, Tfoot };
+export { Thead, Tbody, Tfoot, CurrencyBox };
 export default PeriodPanel;
