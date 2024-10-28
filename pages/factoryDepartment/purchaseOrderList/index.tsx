@@ -48,6 +48,7 @@ import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
+import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -249,7 +250,7 @@ export default function PurchaseOrderList() {
             //     GetReviewById(data[0].purchaseorderuuid);
             //     GetReviewHistory(data[0].purchaseorderid);
             // }
-            
+
             console.log(typeof (quoterequuidin));
             console.log(quoterequuidin);
             console.log(quoterequuidin === '');
@@ -347,7 +348,7 @@ export default function PurchaseOrderList() {
             GetReviewById(purchaseorderuuid);
             GetProdReceiptById(purchaseorderid as string);
             GetReviewHistory(purchaseorderid as string);
-            
+
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
     //#endregion
@@ -1253,7 +1254,7 @@ export default function PurchaseOrderList() {
         });
     }
 
-    const Excel = async (id: any, type2: any) => {
+    const Excel = async (id: any, type2: any, quoid: any) => {
         try {
 
             setIsLoading(true);
@@ -1261,7 +1262,7 @@ export default function PurchaseOrderList() {
                 id: id,
                 type: 'purchaseorder',
                 type2: type2,
-                quoterequuid: quoterequuidin
+                quoterequuid: quoid
             };
 
             const inputModel = {
@@ -1406,6 +1407,217 @@ export default function PurchaseOrderList() {
     }, [data1]);
 
 
+
+    //#region  詢價單modal
+    const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
+
+
+    const [test, setTest] = useState<string>("");
+
+    //帶入詢價單畫面的資料(欲詢價物料)
+    const [quotereqname, setQuotereqname] = useState<string>("");
+    const [quotereqspec, setQuotereqspec] = useState<string>("");
+    const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+    const [selectedOption, setSelectedOption] = useState('物料'); // 預設選項
+    //對應詢價單主檔的詢價單明細
+    const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
+    //確定廠商後更新請購單明細
+    const [refreshpurchaserequisitiondetail, setRefreshpurchaserequisitiondetail] = useState<any>();
+
+    //加入詢價廠商
+    const [prquotereqadddata, setPrquotereqadddata] = useState({
+        // id: "",id 自增長不用寫入
+        quoterequuid: "",
+        quotereqid: "",
+        unitprice: "",
+        totalprice: "",
+        suppliername: "",
+        deliverydate: moment(),
+        unit: "",
+        note: "",
+        awarded: false
+    });
+
+    //得標廠商id，update回quotereqdetail
+    const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
+    const [selectedsupplier, setSelectedsupplier] = useState<string>("");
+    const [purchaseorderdetailuuid2, setPurchaseorderdetailuuid2] = useState<string>("");
+
+    //打開詢價單modal
+    const prQuotereqModalOpen = async (item: any) => {
+        // alert(item.quotereqdetailuuid);
+        // alert(item.id);
+        // return;
+        setSelectedsupplier(item.quotereqdetailuuid);
+        setPurchaseorderdetailuuid2(item.id);
+
+        //清空
+        prquotereqadddata.quoterequuid = "";
+        prquotereqadddata.quotereqid = "";
+        prquotereqadddata.unitprice = "";
+        prquotereqadddata.totalprice = "";
+        prquotereqadddata.suppliername = "";
+        prquotereqadddata.deliverydate = moment();
+        prquotereqadddata.unit = "";
+        prquotereqadddata.note = "";
+        prquotereqadddata.awarded = false;
+        //預設詢價單主檔編號
+        prquotereqadddata.quoterequuid = item.quoterequuid;
+        prquotereqadddata.quotereqid = item.quotereqid;
+
+        setQuotereqname(item.name);
+        setQuotereqspec(item.spec);
+        setQuotereqquantity(item.quantity);
+        getQuotereqDetail(item.productid);
+        setPrquotereqmodalopen(true);
+    }
+
+    //關閉詢價單modal
+    const prQuotereqModalClose = async () => {
+        setPrquotereqmodalopen(false);
+        setPrquotereqdata([]);
+    }
+
+    //取得對應詢價單主檔的詢價單明細檔
+    const getQuotereqDetail = async (productid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                productid: productid as string | undefined,
+                type: 'po',
+                suppliername: suppliernamein
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setPrquotereqdata(data);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+
+
+
+    const UpdatePurchaseOrderDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaseorderdetailuuid: purchaseorderdetailuuid2,
+                unitprice: item.detail_unitprice,
+                totalprice: (parseFloat(item.detail_unitprice) * parseFloat(quotereqquantity)).toFixed(2),
+                quotereqdetailuuid: item.detail_id,
+                quoterequuid: item.detail_quoterequuid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaseOrderDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+
+            getPurchaseOrderDetail(purchaseorderuuidin);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+    const clearPurchaseOrderDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaseorderdetailuuid: purchaseorderdetailuuid2,
+                unitprice: '',
+                totalprice: '',
+                quotereqdetailuuid: '',
+                quoterequuid: ''
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaseOrderDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            getPurchaseOrderDetail(purchaseorderuuidin);
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
+
+
+
+    //#endregion
+
+
+    const handleCheckboxChange = (item: any) => {
+
+        console.log(item);
+        // return;
+        // 判斷當前選中的 supplier 是否與點擊的相同
+        if (selectedsupplier === item.detail_id) {
+            // 如果相同，清空選擇
+            setSelectedsupplier('');
+            clearPurchaseOrderDetail(item); // 呼叫清空資料的函數
+        } else {
+            // 如果不同，更新選中的供應商
+            setLastselectedsupplier(selectedsupplier);
+            setSelectedsupplier(item.detail_id);
+            UpdatePurchaseOrderDetail(item);
+        }
+
+    }
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1428,18 +1640,35 @@ export default function PurchaseOrderList() {
                                     列印
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po") }} title="單據Excel">
+                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po","") }} title="單據Excel">
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     單據
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn}
+                                {/* <button className={scss.squarebtn}
                                     onClick={() => { Excel(purchaseorderidin, "pc") }}
                                     title="比價Excel"
                                     style={{ display: `${(quoterequuidin === '' || quoterequuidin == null) ? 'none' : ''}` }}>
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
-                                </button>
+                                </button> */}
+                                <div className={scss.dropdownContainer} style={{ display: `${(quoterequuidin === '' || quoterequuidin == null) ? 'none' : ''}` }}>
+                                    <button className={scss.squarebtn} title="比價Excel">
+                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                        比價
+                                    </button>
+                                    <div className={scss.dropdownMenu}>
+                                        {data1.map((item) => (
+                                            <button
+                                                key={item.quoterequuid}
+                                                onClick={() => Excel(purchaseorderidin, "pc",item.quoterequuid)}
+                                                className={scss.dropdownOption}
+                                            >
+                                                {item.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
 
                             </div>
                             <div>
@@ -1859,7 +2088,21 @@ export default function PurchaseOrderList() {
                                                                     }}
                                                                 />
                                                             </span>
-                                                            <span>{_item.unit}</span>
+                                                            <span>
+                                                                {_item.unit}
+                                                            </span>
+                                                            <span>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (viewtype !== 'review') {
+                                                                            prQuotereqModalOpen(_item);
+                                                                        }
+                                                                    }}
+                                                                    disabled={_item.reviewtype === 'review'}
+                                                                >
+                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
+                                                                </button>
+                                                            </span>
                                                             {/* <span>{_item.unitprice.toLocaleString()}</span> */}
                                                             <span>
                                                                 <input
@@ -1868,7 +2111,8 @@ export default function PurchaseOrderList() {
                                                                     // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
                                                                     type="text"
                                                                     // maxLength={8}
-                                                                    value={_item.unitprice.toLocaleString()}
+                                                                    // value={_item.unitprice.toLocaleString()}
+                                                                    value={_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                                     onChange={(e) => {
                                                                         const newData = [...data1];
@@ -2371,7 +2615,53 @@ export default function PurchaseOrderList() {
 
                 </DragableModal>
 
+                <DragableModal
+                    handleText="詢價紀錄"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={prquotereqmodalopen}
+                    onCrossClick={prQuotereqModalClose}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
+                    </div>
+                    <hr />
+                    {/* {selectedsupplier} */}
+                    <div>
+                        <Thead01 type={'Quotereq2'} />
+                        <div style={{ height: '300px', overflowY: 'auto' }}>
+                            {prquotereqdata && (
+                                prquotereqdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader17}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.detail_suppliername}</span>
+                                            <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                            <span>{_item.detail_unit}</span>
+                                            <span style={{ textAlign: 'right', color: '#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                            <span style={{ color: '#14256a' }}>{_item.pricetype}</span>
+                                            <span>{_item.main_quotereqid}</span>
+                                            <span></span>
+                                            {/* <span></span> */}
+                                            <span>
+                                                <input
+                                                    style={{ backgroundColor: 'transparent', width: '100%', height: '20px' }}
+                                                    disabled={!(editmain && statusin !== '已核准' && statusin !== '已結案')}
+                                                    type='checkbox'
+                                                    checked={selectedsupplier === _item.detail_id}
+                                                    onChange={() => handleCheckboxChange(_item)}
+                                                />
 
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </DragableModal>
 
             </div>
         </SubLayer >

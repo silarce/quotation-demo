@@ -291,7 +291,7 @@ div.panelHeader11 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 30px 30px 150px 415px 415px 100px 100px 40px 100px 150px 250px;
+        grid-template-columns: 30px 30px 150px 415px 415px 100px 100px 40px 30px 100px 150px 250px;
         gap: 5px;
     }
 }
@@ -821,3 +821,126 @@ div.panelHeader19 {
 }
 
 //#endregion
+
+
+//#region 詢價單明細
+div.panelHeader17 {
+    padding-left: 20px;
+    border-bottom: solid 1px $colorBorder01;
+  
+    .row01,
+    .row02 {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+        // text-align: right;
+      }
+  
+      .clientName,
+      .country {
+        color: $colorMain;
+      }
+    }
+  
+    .row01 {
+      display: grid;
+      grid-template-columns: 30px 220px 100px 30px 30px 80px 100px 50px 180px 40px 40px;
+      gap: 5px;
+    }
+  }
+  
+  /* 自定義 checkbox 外觀 */
+  .quotereqdetail_checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    /* 隱藏原生 checkbox */
+    cursor: pointer;
+  
+    /* 模擬 checkbox 外框 */
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #14256a;
+      background-color: white;
+      border-radius: 3px;
+    }
+  
+    /* 模擬 checkbox 打勾樣式 */
+    &:after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 14px;
+      transform: translate(-50%, -50%) rotate(45deg);
+      border-bottom: 4px solid #14256a;
+      /* 打勾的顏色 */
+      border-right: 4px solid #14256a;
+      /* 打勾的顏色 */
+      opacity: 0;
+      /* 初始不顯示 */
+    }
+  
+    /* 控制 checkbox 打勾的顯示狀態 */
+    &:checked:after {
+      opacity: 1;
+      /* 顯示打勾 */
+    }
+  
+    /* 點擊後 checkbox 的背景色 */
+    // &:hover:before {
+    //   background-color: #f0f0f0;
+    // }
+  }
+  
+  
+  //#endregion
+
+
+
+
+
+
+  
+  .dropdownContainer {
+    position: relative;
+    display: inline-block;
+}
+
+
+.dropdownMenu {
+    display: none; // 初始隱藏下拉選單
+    position: absolute;
+    top: 100%; // 根據需求調整
+    left: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 1;
+    min-width: 100px;
+}
+
+.dropdownContainer:hover .dropdownMenu {
+    display: block; // 滑鼠懸停顯示選單
+}
+
+.dropdownOption {
+    font-size: 18px;
+    background: none;
+    border: none;
+    padding: px 12px;
+    width: 500px;
+    text-align: left;
+    cursor: pointer;
+    border-bottom: 1px solid #c1c1c1;
+
+    &:hover {
+        background-color: #f0f0f0;
+    }
+}

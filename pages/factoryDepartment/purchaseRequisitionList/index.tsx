@@ -728,6 +728,7 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             const conditionModel = {
                 productid: productid as string | undefined,
+                type:'pr'
             };
 
             var inputModel = {
@@ -1608,6 +1609,7 @@ export default function PurchaseRequisitionList() {
                         myAlert.success({ title: '更新成功' })
                         setEditmain(false);
                         getPurchaseRequisition();
+                        getPurchaseRequisitionDetail(purchaserequisitionuuidin);
 
                         // 更新狀態或執行其他操作
                         console.log(result);
@@ -2259,9 +2261,9 @@ export default function PurchaseRequisitionList() {
                                             <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
                                             <span>{_item.detail_unit}</span>
-                                            <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right',color:'#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                            <span>{_item.pricetype}</span>
+                                            <span style={{color:'#14256a'}}>{_item.pricetype}</span>
                                             <span>{_item.main_quotereqid}</span>
                                             <span></span>
                                             {/* <span></span> */}
