@@ -53,41 +53,43 @@ export default function ContractList({
 
   // ----------------------------------------------------------
 
-  const memoArr: TsubContract[] =
-    _.sortBy(subContracts, 'version')?.map((subContract) => {
-      const { id: subContractId, content } = subContract;
+  const subContracts_Ordered = _.sortBy(subContracts, 'version') ?? [];
+  const rootContractId = subContracts_Ordered[0]?.id;
 
-      const { managerReviewedAt } = content;
+  const memoArr: TsubContract[] = subContracts_Ordered.map((subContract) => {
+    const { id: subContractId, content } = subContract;
 
-      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
+    const { managerReviewedAt } = content;
 
-      const obj: TsubContract = {
-        contractNumber: subContract.contractNumber ?? '---',
-        createdAt: moment(subContract.content.createdAt).format('YYYY-MM-DD'),
-        projectName: subContract.content.projectName,
-        verifyForm: (
-          <span
-            className="cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              setActiveContractId(subContractId);
-            }}
-          >
-            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
-            <IconDetail className="inline-block" />
-          </span>
-        ),
-        href: {
-          pathname: '/domestic/contract/quotation',
-          query: {
-            id: subContracts![0].id,
-            version: subContract.version,
-          },
+    const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
+
+    const obj: TsubContract = {
+      contractNumber: subContract.contractNumber ?? '---',
+      createdAt: moment(subContract.content.createdAt).format('YYYY-MM-DD'),
+      projectName: subContract.content.projectName,
+      verifyForm: (
+        <span
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            setActiveContractId(subContractId);
+          }}
+        >
+          <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
+          <IconDetail className="inline-block" />
+        </span>
+      ),
+      href: {
+        pathname: '/domestic/contract/quotation',
+        query: {
+          id: rootContractId,
+          version: subContract.version,
         },
-      };
+      },
+    };
 
-      return obj;
-    }) ?? [];
+    return obj;
+  });
 
   // 第一個version 1 ，不需要顯示在這邊
   memoArr.shift();
