@@ -8,6 +8,8 @@ import { AxiosError } from 'axios';
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
 import { apiGetCustomers_id, TcustomerDto } from '../api_customer';
 
+import { XOR } from 'ts-essentials';
+
 import type {
   //
   TaccountantPresetDto,
@@ -34,7 +36,11 @@ import type {
   TcreatePaymentOrderDetail_Dto,
   TcreatePaymentOrder_Dto,
   //
+  Taccount_payable_statistics,
+  Taccount_payable_statistics_detail,
+  //
   Tprodreceipt_Dto,
+  //
 } from './_schemas';
 
 import { dtoSnakeToCamel } from '../apiUtils/dtoSnakeToCamel';
@@ -58,6 +64,24 @@ interface Tpayment_order_Dto_detailed extends Tpayment_order_Dto {
   agent_employee: TemployeeDto | undefined;
   beneficiary: TcustomerDto | undefined;
 }
+
+type TgetAccountPayableByProps = XOR<
+  {
+    supplier: {
+      supplier_uuid: string;
+    };
+  },
+  {
+    unpaid_date: {
+      date: string;
+    };
+  },
+  {
+    invoiceNumber: {
+      invoice_number: string;
+    };
+  }
+>;
 
 // =================================================================================
 
@@ -973,10 +997,105 @@ const useGetPaymentOrderById = (
 
 // =================================================================================
 
+// region GET
+//
+//
+//
+//
+// region accountPayable
+
+// 取得應付帳款
+const apiGetAccountPayableBy = async (props: TgetAccountPayableByProps) => {
+  const { supplier, unpaid_date, invoiceNumber } = props;
+
+  const apiLookup = {
+    // 以廠商id(等同於客戶id)取得應付帳款
+    supplier: {
+      api: `/${subRoot}/GetAccountPayableBySupplierId`,
+      params: {
+        supplier_uuid: supplier!.supplier_uuid,
+      },
+    },
+    // 以月份篩選當月以前應付帳款未付款的資料
+    unpaid_date: {
+      api: `/${subRoot}/GetMonthlyAccountPayable`,
+      params: {
+        date: unpaid_date!.date,
+      },
+    },
+    // 以發票號碼取得應付帳款
+    invoiceNumber: {
+      api: `/${subRoot}/SearchAccountPayableByInvoiceNumber`,
+      params: {
+        invoice_number: invoiceNumber!.invoice_number,
+      },
+    },
+  } as const;
+
+  const key = Object.keys(props)[0] as keyof TgetAccountPayableByProps;
+
+  const { api, params } = apiLookup[key];
+
+  return axi2
+    .get<Taccount_payable_Dto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+const useGetAccountPayableBy = (
+  // 為免無限循環，autoUpdate預設為false
+  // 要用autoUpdate的話，props要經過useMemo包裝，否則useEffect會一直無限循環
+  props: TgetAccountPayableByProps | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = false,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [res, setRes] = useState<Taccount_payable_Dto[]>();
+
+  const update = async () => {
+    if (isFetching || !props) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetAccountPayableBy(props)
+      .then((data) => {
+        setRes(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRes(undefined);
+        callAlertOnError && myAlert.err({ title: '取得應付帳款失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  return {
+    res,
+    setRes,
+    update,
+    isFetching,
+  };
+};
+
 // 以廠商id(等同於客戶id)取得應付帳款
 const apiGetAccountPayableBySupplierId = async (supplier_uuid: string) => {
-  // api名稱與需要的id不吻合，怪怪的
-  // const api = `/${subRoot}/GetPaymentOrderDetailByPaymentOrderId`;
   const api = `/${subRoot}/GetAccountPayableBySupplierId`;
   const params = {
     supplier_uuid,
@@ -1037,22 +1156,205 @@ const useGetAccountPayableBySupplierId = (
   };
 };
 
-// /Accountant/GetAccountPayable
-// const apiGetAccountPayable = async () => {
-//   const api = `/${subRoot}/GetAccountPayable`;
-//   const params = {
-//     date: '2024-10',
-//   };
+// 以id或當月日期取得應付帳款統計表
+const apiGetAccountPayableStatisticsByIdOrDate = async ({ id, date }: XOR<{ id: string }, { date: string }>) => {
+  const api = `/${subRoot}/GetAccountPayableStatisticsByIdOrDate`;
+  const params = {
+    id,
+    date,
+  };
 
-//   return axi2
-//     .get<Taccount_payable_Dto[]>(api, { params })
-//     .then(({ data }) => data)
-//     .catch((err: AxiosError) => {
-//       return Promise.reject(err);
-//     });
-// };
+  return axi2
+    .get<Taccount_payable_statistics>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
 
-// apiGetAccountPayable();
+// 以id或當月日期取得應付帳款統計表
+const useGetAccountPayableStatisticsByIdOrDate = (
+  params: XOR<{ id: string }, { date: string }>,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const { id, date } = params;
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [raw, setRaw] = useState<Taccount_payable_statistics>();
+
+  const update = async () => {
+    if (isFetching || (!params.id && !params.date)) {
+      setRaw(undefined);
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetAccountPayableStatisticsByIdOrDate(params)
+      .then((data) => {
+        setRaw(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRaw(undefined);
+        callAlertOnError && myAlert.err({ title: '取得應付帳款統計表失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [id, date]);
+
+  return {
+    raw,
+    setRaw,
+    update,
+    isFetching,
+  };
+};
+
+// 以統計表id取得應付帳款統計表所有detail
+const apiGetAccountPayableStatisticsDetailByStatisticsId = async (statistics_id: string) => {
+  const api = `/${subRoot}/GetAccountPayableStatisticsDetailByStatisticsId`;
+  const params = {
+    statistics_id,
+  };
+
+  return axi2
+    .get<Taccount_payable_statistics_detail[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+// 以統計表id取得應付帳款統計表所有detail
+const useGetAccountPayableStatisticsDetailByStatisticsId = (
+  statistics_id: string | undefined,
+  {
+    callAlertOnError = true,
+    autoUpdate = true,
+  }: {
+    callAlertOnError?: boolean;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [raw, setRaw] = useState<Taccount_payable_statistics_detail[]>();
+
+  const update = async () => {
+    if (isFetching || !statistics_id) {
+      setRaw(undefined);
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetAccountPayableStatisticsDetailByStatisticsId(statistics_id)
+      .then((data) => {
+        setRaw(data);
+
+        return data;
+      })
+      .catch((err: AxiosError) => {
+        setRaw(undefined);
+        callAlertOnError && myAlert.err({ title: '取得應付帳款統計表明細失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [statistics_id]);
+
+  return {
+    raw,
+    setRaw,
+    update,
+    isFetching,
+  };
+};
+
+// 產生當月應付帳款統計表(此api beta待更新，功能可用，account_payable_uuids現為account_payment_uuids)
+const apiPostAddAccountPayableStatistics = async ({
+  date,
+  note,
+  account_payable_uuids,
+}: {
+  date: string;
+  note: string;
+  account_payable_uuids: string[];
+}) => {
+  const api = `/${subRoot}/AddAccountPayableStatistics`;
+
+  const body = {
+    date,
+    note,
+    account_payable_uuids: account_payable_uuids.join(','),
+  };
+
+  return axi2
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '新增應付帳款統計表失敗', content: err.message });
+
+      return err;
+    });
+};
+
+// 以id更新應付帳款明細統計表
+const apiPatchUpdateAccountPayableStatisticsById = async (body: {
+  id: string;
+  data: {
+    detail_id: string;
+    payment: string;
+    note: `${number}`;
+    bank_account_uuid: string;
+    bank_account_name: string;
+  }[];
+}) => {
+  const api = `/${subRoot}/UpdateAccountPayableStatisticsById`;
+
+  return axi2
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '更新應付帳款統計表失敗', content: err.message });
+
+      return err;
+    });
+};
+
+// 以id刪除應付帳款明細統計表(已審核過的不能刪除api，beta待更新，功能可用但目前沒有限制)
+const apiDeleteAccountPayableStatisticsById = async (id: string) => {
+  const api = `/${subRoot}/DeleteAccountPayableStatisticsById`;
+  const body = {
+    id,
+  };
+
+  return axi2
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '刪除應付帳款統計表失敗', content: err.message });
+
+      return err;
+    });
+};
 
 // =================================================================================
 
@@ -1102,7 +1404,14 @@ export {
   apiGetAccountPayableBySupplierId,
   useGetPaymentOrder,
   useGetPaymentOrderById,
+  //
   useGetAccountPayableBySupplierId,
+  useGetAccountPayableBy,
+  useGetAccountPayableStatisticsByIdOrDate,
+  useGetAccountPayableStatisticsDetailByStatisticsId,
+  apiPostAddAccountPayableStatistics,
+  apiPatchUpdateAccountPayableStatisticsById,
+  apiDeleteAccountPayableStatisticsById,
 };
 
 export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed, Tpayment_order_Dto_detailed };

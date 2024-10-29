@@ -292,6 +292,7 @@ interface TcreatePaymentOrder_Dto {
   data: TcreatePaymentOrderDetail_Dto[];
 }
 
+// region account_payable
 interface Taccount_payable_Dto extends Tbase {
   serial_number: string | null; // varchar(50) - 序號
   review_status: string | null; // varchar(50) - 審核狀態
@@ -313,6 +314,19 @@ interface Taccount_payable_Dto extends Tbase {
   settled_amount: number | null; // int4 - 已付金額
   balance: number | null; // int4 - 餘額
   supplier: string | null; // varchar - 廠商名
+}
+
+interface Taccount_payable_statistics extends Tbase {
+  date: string;
+  note: string;
+}
+
+interface Taccount_payable_statistics_detail extends Tbase {
+  bank_account_uuid: string;
+  payment: number;
+  account_payable_statistics_id: string;
+  note: string;
+  bank_account_name: string;
 }
 
 // MARK: ============
@@ -379,10 +393,13 @@ export type {
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
   Tpayment_order_Dto,
-  Taccount_payable_Dto,
   TpaymentOrderDetail_Dto,
   TcreatePaymentOrderDetail_Dto,
   TcreatePaymentOrder_Dto,
+  //
+  Taccount_payable_Dto,
+  Taccount_payable_statistics,
+  Taccount_payable_statistics_detail,
   //
   Tprodreceipt_Dto,
 };
