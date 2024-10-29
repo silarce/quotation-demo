@@ -448,7 +448,7 @@ export default function AddPurchaseOrder() {
 
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
     }, []);
 
     //取所有物料，for查詢代入用
@@ -525,7 +525,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     quoterequuid: quoterequuid,
                     create_at: create_atin,
-                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    need_date: need_date,
                     create_by: create_byin,
                     note: note,
                     suppliername: suppliernamein,
@@ -601,7 +601,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     create_at: create_atin,
                     need_date: moment(need_date).format('YYYY-MM-DD'),
-                    create_by: create_byin,
+                    create_by: userInfo?.employee?.id.toString(),
                     note: note,
                     suppliername: suppliernamein,
                     supplierphone: supplierphonein,
@@ -1200,7 +1200,7 @@ export default function AddPurchaseOrder() {
         // setOriginalInvoicein(invoicein);
         // setOriginalSupplieraddressin(supplieraddressin);
         // setOriginalShippingaddressin(shippingaddressin);
-        setCreate_byin(userInfo?.username as string);
+        setCreate_byin(userInfo?.employee?.chName.toString() as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
@@ -2221,8 +2221,8 @@ export default function AddPurchaseOrder() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
-                                                    onChange: (e) => { setCreate_atin((e?.toString() || '') || '') }
+                                                    value: create_atin ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />

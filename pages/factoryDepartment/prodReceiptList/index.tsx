@@ -260,7 +260,7 @@ export default function ProdReceiptList() {
             setIsLoading(true);
             const conditionModel = {
                 type: '進貨中',
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
 
@@ -365,13 +365,25 @@ export default function ProdReceiptList() {
             console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
-                totalprice += element.totalprice;
+                // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+                const price = typeof element.totalprice === 'string'
+                    ? parseFloat(element.totalprice.replace(/,/g, ''))
+                    : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
+                totalprice += price;  // 將其加總
             });
-            setTotalPrice(totalprice.toLocaleString());
-            const taxPrice = Math.round(totalprice * 0.05);
-            setTaxPrice(taxPrice.toLocaleString());
-            const totalPayPrice = totalprice + taxPrice;
-            setTotalPayPrice(totalPayPrice.toLocaleString());
+            
+            // 四捨五入總價到小數點第二位
+            const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+            setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            
+            // 四捨五入稅金到小數點第二位
+            const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
+            setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            
+            // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+            const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+            setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            
 
             // 進貨進度
             let totalentry = data.length; // 總數量
@@ -494,7 +506,7 @@ export default function ProdReceiptList() {
             } = {
                 prodreceiptuuid: checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid as string | undefined,
                 data: data2,
-                username: userInfo?.username as string | undefined
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -1028,7 +1040,7 @@ export default function ProdReceiptList() {
             const conditionModel = {
                 prodreceiptuuid: prodreceiptuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -1071,7 +1083,7 @@ export default function ProdReceiptList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -1204,7 +1216,7 @@ export default function ProdReceiptList() {
                     document_type: "進貨單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username,
+                    user_id: userInfo?.employee?.id.toString(),
                     document_title: documenttitle
                 };
 
@@ -1239,7 +1251,7 @@ export default function ProdReceiptList() {
                 const conditionModel2 = {
                     type: type,
                     prodreceiptuuid: prodreceiptuuidin as string | undefined,
-                    username: userInfo?.username as string | undefined
+                    username: userInfo?.employee?.id.toString()
                 };
 
 
@@ -1279,7 +1291,7 @@ export default function ProdReceiptList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【進貨單】【${prodreceiptidin}】_${userInfo?.username}`)
+        setDocumenttitle(`【進貨單】【${prodreceiptidin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1827,8 +1839,8 @@ export default function ProdReceiptList() {
                                                     <CellWithBar key={index} className={scss.panelHeader19} >
                                                         <div className={scss.row01}>
                                                             <span>{index + 1}</span>
+                                                            <span>{_item.prodentryid}</span>
                                                             <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                            <span>{_item.prodreceiptid}</span>
                                                             <span>{_item.status}</span>
                                                             <span>{_item.note}</span>
                                                         </div>

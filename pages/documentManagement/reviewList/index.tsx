@@ -154,7 +154,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -204,7 +204,7 @@ export default function ReviewList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -244,7 +244,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -709,7 +709,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username,
+                user_id: userInfo?.employee?.id.toString(),
                 review_memo: review_memo,
                 review_id: currentreview_id
             };

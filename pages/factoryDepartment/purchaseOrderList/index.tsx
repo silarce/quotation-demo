@@ -100,6 +100,7 @@ export default function PurchaseOrderList() {
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [prdata, setPrdata] = useState<any[]>([]);
+    const [quodata, setQuodata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -208,7 +209,7 @@ export default function PurchaseOrderList() {
             setIsLoading(true);
             const conditionModel = {
                 type: '採購中',
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -285,13 +286,24 @@ export default function PurchaseOrderList() {
             const data = await response.json();
             setData1(data);
             let totalprice = 0;
+
+            // 計算總價
             data.forEach((element: { totalprice: any; }) => {
-                totalprice += element.totalprice;
+                // 檢查 totalprice 是不是數字，如果是字串就移除逗號並轉為數字
+                const price = typeof element.totalprice === 'string' ? parseFloat(element.totalprice.replace(/,/g, '')) : parseFloat(element.totalprice) || 0;
+                totalprice += price; // 將價格加總
             });
-            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const taxPrice = Math.round(totalprice * 0.05);
+
+            // 四捨五入總價到小數點第二位
+            const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+            setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            // 計算稅金並四捨五入到小數點第二位
+            const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
             setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const totalPayPrice = totalprice + taxPrice;
+
+            // 計算應付總價（總價 + 稅金），並四捨五入到小數點第二位
+            const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
             setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
             // 進貨進度
@@ -306,6 +318,7 @@ export default function PurchaseOrderList() {
             });
             setTotalreq(totalreq);
             setCompletereq(completereq);
+            setQuodata(data);
 
 
 
@@ -399,7 +412,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
                 data: data2,
-                username: userInfo?.username as string | undefined,
+                username: userInfo?.employee?.id.toString(),
                 note: notein
             };
 
@@ -446,7 +459,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 type: type,
                 purchaseorderuuid: purchaseorderuuidin,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -914,7 +927,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 purchaseorderuuid: purchaseorderuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -957,7 +970,7 @@ export default function PurchaseOrderList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -1079,7 +1092,7 @@ export default function PurchaseOrderList() {
                     document_type: "採購單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username,
+                    user_id: userInfo?.employee?.id.toString(),
                     document_title: documenttitle
                 };
 
@@ -1113,8 +1126,8 @@ export default function PurchaseOrderList() {
                 //改變單據狀態
                 const conditionModel2 = {
                     type: type,
-                    purchaseorderuuid: purchaseorderuuidin as string | undefined,
-                    username: userInfo?.username as string | undefined
+                    purchaseorderuuid: purchaseorderuuidin,
+                    username: userInfo?.employee?.id.toString()
                 };
 
 
@@ -1154,7 +1167,7 @@ export default function PurchaseOrderList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.username}`)
+        setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1381,7 +1394,7 @@ export default function PurchaseOrderList() {
 
     useEffect(() => {
         console.log(data1);
-        // 每次 data2 更新時，重新計算總價和稅金
+        // 每次 data1 更新時，重新計算總價和稅金
         let totalprice = 0;
         data1.forEach((element) => {
             // 檢查 totalprice 是不是數字，如果是字串就移除逗號
@@ -1394,17 +1407,18 @@ export default function PurchaseOrderList() {
         console.log(totalprice); // 應顯示正確的加總結果
 
         // 計算總價後，四捨五入到兩位小數，然後再格式化
-        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;  // 四捨五入總價到小數點第二位
         setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算稅金，四捨五入到最接近的整數
-        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        // 計算稅金，四捨五入到兩位小數
+        const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;  // 四捨五入稅金到小數點第二位
         setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
         // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
-        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;  // 四捨五入應付總價到小數點第二位
         setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     }, [data1]);
+
 
 
 
@@ -1630,21 +1644,49 @@ export default function PurchaseOrderList() {
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    查詢
-                                </button>
-                                &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    列印
-                                </button>
-                                &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po","") }} title="單據Excel">
-                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                    單據
-                                </button>
-                                &nbsp;
+                                <span>
+                                    <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                        <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        查詢
+                                    </button>
+                                    &nbsp;
+                                </span>
+                                {/* <span>
+                                    <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
+                                        <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        列印
+                                    </button>
+                                </span>
+                                <span>
+                                    &nbsp;
+                                    <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po", "") }} title="單據Excel">
+                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                        單據
+                                    </button>
+                                    &nbsp;
+
+                                </span> */}
+                                {purchaseorderidin && (
+                                    <>
+                                        <span>
+                                            <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
+                                                <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                列印
+                                            </button>
+                                        </span>
+                                        <span>
+                                            &nbsp;
+                                            <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po", "") }} title="單據Excel">
+                                                <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                                單據
+                                            </button>
+                                            &nbsp;
+                                        </span>
+                                    </>
+                                )}
+
+
+
                                 {/* <button className={scss.squarebtn}
                                     onClick={() => { Excel(purchaseorderidin, "pc") }}
                                     title="比價Excel"
@@ -1652,23 +1694,32 @@ export default function PurchaseOrderList() {
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
                                 </button> */}
-                                <div className={scss.dropdownContainer} style={{ display: `${(quoterequuidin === '' || quoterequuidin == null) ? 'none' : ''}` }}>
-                                    <button className={scss.squarebtn} title="比價Excel">
-                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                        比價
-                                    </button>
-                                    <div className={scss.dropdownMenu}>
-                                        {data1.map((item) => (
-                                            <button
-                                                key={item.quoterequuid}
-                                                onClick={() => Excel(purchaseorderidin, "pc",item.quoterequuid)}
-                                                className={scss.dropdownOption}
-                                            >
-                                                {item.name}
-                                            </button>
-                                        ))}
+                                {quodata.some((item) => item.quoterequuid) && (
+                                    <div className={scss.dropdownContainer}>
+                                        <button className={scss.squarebtn} title="比價Excel">
+                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                            比價
+                                        </button>
+                                        <div className={scss.dropdownMenu}>
+                                            {quodata.map((item, index) => (
+                                                <button
+                                                    key={item.quoterequuid}
+                                                    onClick={() => Excel(purchaseorderidin, "pc", item.quoterequuid)}
+                                                    className={scss.dropdownOption}
+                                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} // 添加 Flexbox 屬性
+                                                >
+                                                    <span style={{ flex: 2, textAlign: 'left' }}> {/* 讓這個 span 佔據一半空間 */}
+                                                        {index + 1}.{item.productid}
+                                                    </span>
+                                                    <span style={{ flex: 1, textAlign: 'right' }}> {/* 這個 span 將保持其內容的寬度 */}
+                                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
+
 
                             </div>
                             <div>
@@ -1826,7 +1877,7 @@ export default function PurchaseOrderList() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    value: create_atin ? moment(create_atin) : null,
                                                     onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -1850,7 +1901,7 @@ export default function PurchaseOrderList() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    value: need_datein ? moment(need_datein) : null,
                                                     onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}

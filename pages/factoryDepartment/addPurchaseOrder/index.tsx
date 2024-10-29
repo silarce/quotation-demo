@@ -236,7 +236,7 @@ export default function AddPurchaseOrder() {
             setIsLoading(true);
             const conditionModel = {
                 type: "未送出",
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -401,7 +401,7 @@ export default function AddPurchaseOrder() {
 
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
     }, []);
 
@@ -534,7 +534,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     create_at: create_atin,
                     need_date: moment(need_date).format('YYYY-MM-DD'),
-                    create_by: create_byin,
+                    create_by: userInfo?.employee?.id.toString(),
                     note: note,
                     suppliername: suppliernamein,
                     supplierphone: supplierphonein,
@@ -1051,7 +1051,7 @@ export default function AddPurchaseOrder() {
         // setOriginalInvoicein(invoicein);
         // setOriginalSupplieraddressin(supplieraddressin);
         // setOriginalShippingaddressin(shippingaddressin);
-        setCreate_byin(userInfo?.username as string);
+        setCreate_byin(userInfo?.employee?.chName.toString() as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");

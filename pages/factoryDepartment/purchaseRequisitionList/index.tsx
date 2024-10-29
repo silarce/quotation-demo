@@ -251,7 +251,7 @@ export default function PurchaseRequisitionList() {
             setIsLoading(true);
             const conditionModel = {
                 type: "詢價中",
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -271,6 +271,7 @@ export default function PurchaseRequisitionList() {
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             // if (data.length > 0 && checkfirstin === 0) {
             //     getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
@@ -375,14 +376,27 @@ export default function PurchaseRequisitionList() {
             setData1(data);
 
             let totalprice = 0;
+
+            // 計算總價
             data.forEach((element: { totalprice: any; }) => {
-                totalprice += element.totalprice;
+                // 檢查 totalprice 是不是數字，如果是字串就移除逗號並轉為數字
+                const price = typeof element.totalprice === 'string' ? parseFloat(element.totalprice.replace(/,/g, '')) : parseFloat(element.totalprice) || 0;
+                totalprice += price; // 將價格加總
             });
-            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const taxPrice = Math.round(totalprice * 0.05);
+
+            // 四捨五入總價到小數點第二位
+            const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+            setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            // 計算稅金並四捨五入
+            const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
             setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const totalPayPrice = totalprice + taxPrice;
+
+            // 計算應付總價（總價 + 稅金）並四捨五入
+            const totalPayPrice = roundedTotalPrice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+
 
             // 詢價進度
             let totalquotereq = data.length;
@@ -418,6 +432,9 @@ export default function PurchaseRequisitionList() {
         // alert(purchaserequisitionuuid);
         // alert(purchaserequisitionid);
         if (purchaserequisitionuuid) {
+
+            console.log(create_at)
+
             getPurchaseRequisitionDetail(purchaserequisitionuuid);
             setPurchaserequisitionidin(purchaserequisitionid as string);
             setPurchaserequisitionuuidin(purchaserequisitionuuid as string);
@@ -480,7 +497,7 @@ export default function PurchaseRequisitionList() {
                 totalprice1: totalprice1,
                 taxprice1: taxprice1,
                 totalpayprice1: totalpayprice1,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
                 needdate: need_datein,
                 data: data2,
                 note: notein
@@ -623,30 +640,34 @@ export default function PurchaseRequisitionList() {
 
     useEffect(() => {
         console.log(data1);
+
         // 每次 data2 更新時，重新計算總價和稅金
         let totalprice = 0;
         data2.forEach((element) => {
             // 檢查 totalprice 是不是數字，如果是字串就移除逗號
             const price = typeof element.totalprice === 'string'
                 ? parseFloat(element.totalprice.replace(/,/g, ''))
-                : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
-            console.log(price);  // 顯示正確的數字格式
-            totalprice += price;  // 將其加總
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
         });
+
         console.log(totalprice); // 應顯示正確的加總結果
 
-        // 計算總價後，四捨五入到兩位小數，然後再格式化
-        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
         setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算稅金，四捨五入到最接近的整數
-        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
         setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
-        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
         setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
     }, [data2]);
+
 
 
 
@@ -728,7 +749,7 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             const conditionModel = {
                 productid: productid as string | undefined,
-                type:'pr'
+                type: 'pr'
             };
 
             var inputModel = {
@@ -829,14 +850,14 @@ export default function PurchaseRequisitionList() {
                 suppliercontact: '',
                 supplierfax: '',
             };
-    
+
             const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-    
+
             const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaserequisitionDetail`, {
                 method: 'POST',
                 headers: {
@@ -844,11 +865,11 @@ export default function PurchaseRequisitionList() {
                 },
                 body: JSON.stringify(inputModel),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-    
+
             const responseData = await response.json();
             getPurchaseRequisitionDetail(purchaserequisitionuuidin);
         } catch (error: any) {
@@ -1069,7 +1090,7 @@ export default function PurchaseRequisitionList() {
             const conditionModel = {
                 purchaserequisitionuuid: purchaserequisitionuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -1113,7 +1134,7 @@ export default function PurchaseRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -1238,7 +1259,7 @@ export default function PurchaseRequisitionList() {
                     document_type: "請購單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username,
+                    user_id: userInfo?.employee?.id.toString(),
                     document_title: documenttitle
                 };
 
@@ -1272,8 +1293,8 @@ export default function PurchaseRequisitionList() {
                 //改變單據狀態
                 const conditionModel2 = {
                     type: type,
-                    purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
-                    username: userInfo?.username as string | undefined
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    username: userInfo?.employee?.id.toString()
                 };
 
 
@@ -1312,7 +1333,7 @@ export default function PurchaseRequisitionList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.username}`)
+        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1368,7 +1389,6 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             // alert(purchaserequisitionidin);
             const conditionModel = {
-                // username: userInfo?.username
                 id: id
             };
 
@@ -1577,7 +1597,7 @@ export default function PurchaseRequisitionList() {
                             note: notein,
                             data1: data1
                         };
-
+                        console.log(create_atin);
 
                         var inputModel = {
                             TypeName: 'ERP',
@@ -1775,13 +1795,19 @@ export default function PurchaseRequisitionList() {
                                                 },
                                             }}
                                         /> */}
+
                                         <InputSel
                                             caption="請購日期"
                                             disabled={!editmain}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    // value: create_atin  ? moment(create_atin) : null,
+                                                    value: (() => {
+
+                                                        console.log(create_atin)
+                                                        return create_atin ? moment(create_atin) : null
+                                                    })(),
                                                     onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -1804,7 +1830,7 @@ export default function PurchaseRequisitionList() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    value: need_datein ? moment(need_datein) : null,
                                                     onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -2261,9 +2287,9 @@ export default function PurchaseRequisitionList() {
                                             <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
                                             <span>{_item.detail_unit}</span>
-                                            <span style={{ textAlign: 'right',color:'#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right', color: '#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                            <span style={{color:'#14256a'}}>{_item.pricetype}</span>
+                                            <span style={{ color: '#14256a' }}>{_item.pricetype}</span>
                                             <span>{_item.main_quotereqid}</span>
                                             <span></span>
                                             {/* <span></span> */}

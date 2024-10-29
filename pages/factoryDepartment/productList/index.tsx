@@ -467,64 +467,6 @@ export default function ProductList() {
         }
     };
 
-    // 進貨單入庫
-    const TransferProdReceiptToProdEntry = async () => {
-        try {
-            // return;
-            setIsLoading(true);
-
-
-            const conditionModel: {
-                prodreceiptuuid: string | undefined,
-                data: any,
-                username: string | undefined
-            } = {
-                prodreceiptuuid: checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid as string | undefined,
-                data: data2,
-                username: userInfo?.username as string | undefined
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/TransferProdReceiptToProdEntry`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data11111');
-            }
-
-            const responseData = await response.json();
-            myAlert.info(
-                {
-                    title: '單據新增成功',
-                    content: `進貨單號為:${responseData}`
-                })
-
-            setData2([]);
-            getProduct();
-
-            getProdReceiptDetail(prodreceiptuuidin);
-            await new Promise(resolve => setTimeout(resolve, 500));
-            setEntrystatusin("入庫中");
-            // GetProdEntryDetailByProdReceiptId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
 
     const getProductidType = async () => {
         try {
@@ -652,25 +594,6 @@ export default function ProductList() {
         // 在這裡可以添加搜索的邏輯，使用keyword1來進行搜索
     };
 
-
-    function handleTransfer() {
-        if (editstatus === true) {
-            myAlert.warning({ title: "請先結束編輯狀態" });
-        }
-        else {
-            myAlert.confirm({
-                title: '確定要轉為入庫單嗎?',
-                content: <>
-                    <h1>請確認數量是否正確</h1>
-                </>,
-                props: {
-                    onOk: () => {
-                        TransferProdReceiptToProdEntry();
-                    }
-                }
-            });
-        }
-    }
 
     const handleAddProdEntry = (data: any) => {
         let shouldDisable = false; // 默认情况下，新增入庫按钮是启用的
@@ -817,7 +740,7 @@ export default function ProductList() {
 
                         const conditionModel = {
                             data: data,
-                            username: userInfo?.username
+                            username: userInfo?.employee?.chName.toString()
                         };
 
 
@@ -1085,7 +1008,7 @@ export default function ProductList() {
 
                         const conditionModel = {
                             data: data,
-                            username: userInfo?.username
+                            username: userInfo?.employee?.chName.toString()
                         };
 
 
@@ -1594,7 +1517,7 @@ export default function ProductList() {
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <div className={scss.content}  style={{ overflowY:'hidden'}}>
+                    <div className={scss.content} style={{ overflowY: 'hidden' }}>
                         <div
                             style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <div className={scss.head_head1}>
