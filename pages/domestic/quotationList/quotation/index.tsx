@@ -803,17 +803,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    if (status === 'Pending') {
-      if (
-        !reviewSalesEmployeeId ||
-        !reviewWorkDirectorEmployeeId ||
-        !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId
-        // ||        !reviewSalesManagerEmployeeId
-      ) {
-        return myAlert.warning({ title: '請先設定所有審核人員' });
-      }
-    }
+    // if (status === 'Pending') {
+    //   if (
+    //     !reviewSalesEmployeeId ||
+    //     !reviewWorkDirectorEmployeeId ||
+    //     !reviewCashierEmployeeId ||
+    //     !reviewSupervisorEmployeeId
+    //     // ||        !reviewSalesManagerEmployeeId
+    //   ) {
+    //     return myAlert.warning({ title: '請先設定所有審核人員' });
+    //   }
+    // }
 
     try {
       setIsLoading(true);
