@@ -13,7 +13,6 @@ import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/S
 import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/Table';
 
 // gear
-
 import { useYearMonth_options } from 'js/utils/helpers/hook/useYearMonth';
 
 import {
@@ -55,6 +54,8 @@ export default function AccountsPayableDetailList() {
     invoiceNumber,
     searchType = 'date',
   } = query;
+
+  const [disabled, setDisabled] = useState(true);
 
   // ----------------------------------------------------------------
   // MARK: DATA
@@ -134,27 +135,29 @@ export default function AccountsPayableDetailList() {
       id,
       serial_number,
       review_status,
-      note,
-      agent_employee_id,
-      invoice_title,
-      invoice_date,
+      // note,
+      // agent_employee_id,
+      // invoice_title,
+      // invoice_date,
       invoice_number,
       invoice_price,
-      payment_account,
-      payment_account_uuid,
+      // payment_account,
+      // payment_account_uuid,
       payment_status,
-      payment_order_uuid,
-      payment_order_serial_number,
-      purchase_invoice_uuid,
-      supplier_uuid,
-      transaction_date,
-      source_number,
-      settled_amount,
-      balance,
-      supplier,
+      // payment_order_uuid,
+      // payment_order_serial_number,
+      // purchase_invoice_uuid,
+      // supplier_uuid,
+      // transaction_date,
+      // source_number,
+      // settled_amount,
+      // balance,
+      // supplier,
     } = raw;
 
     const props: Parameters<typeof Row_tbody>[0] = {
+      disabled,
+      //
       serial_number,
       廠商編號: 'no property',
       發票廠商: 'no property',
@@ -191,6 +194,10 @@ export default function AccountsPayableDetailList() {
     }
   }, []);
 
+  useEffect(() => {
+    setCheckedRaw({});
+  }, [raw_accountPayable, disabled]);
+
   // ----------------------------------------------------------------
   // MARK: RENDER
   return (
@@ -198,14 +205,15 @@ export default function AccountsPayableDetailList() {
       <PageHeader02
         tag="應付帳款明細表"
         customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
-        panelList={createPanel()}
+        panelList={createPanel({ disabled, setDisabled })}
       />
 
       <div>
         <Spin spinning={false} delay={300}>
-          <Row_thead checked={isAllChecked} onCheckChange={handleCheckAllChange} />
+          <Row_thead disabled={disabled} checked={isAllChecked} onCheckChange={handleCheckAllChange} />
 
           {raw_accountPayable?.map((raw) => {
+            // disabled包含在createProps裏面了
             const props: Parameters<typeof Row_tbody>[0] = createProps(raw);
 
             return <Row_tbody key={raw.id} {...props} />;
@@ -225,19 +233,44 @@ export default function AccountsPayableDetailList() {
 
 // ==============================================================================
 
-const createPanel = () => {
-  const panelList: TpanelList = [
-    {
-      type: 'myButton',
-      label: '產生當月應付帳款統計表',
-      onClick: () => {},
+// MARK:createPanel
+
+const createPanel = ({
+  disabled,
+  setDisabled,
+}: {
+  disabled: boolean;
+  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const panel1: TpanelList[number] = {
+    type: 'myButton',
+    label: '勾選並產生當月應付帳款統計表',
+    onClick: () => {
+      setDisabled(false);
     },
-    {
-      type: 'myButton',
-      label: '查看當月應付帳款統計表',
-      onClick: () => {},
+  };
+
+  const panel2: TpanelList[number] = {
+    type: 'myButton',
+    label: '查看當月應付帳款統計表',
+    onClick: () => {},
+  };
+
+  const panel3: TpanelList[number] = {
+    type: 'myButton',
+    label: '取消',
+    onClick: () => {
+      setDisabled(true);
     },
-  ];
+  };
+
+  const panel4: TpanelList[number] = {
+    type: 'redButton',
+    label: '確認產生當月應付帳款統計表',
+    onClick: () => {},
+  };
+
+  const panelList: TpanelList = disabled ? [panel1, panel2] : [panel3, panel4];
 
   return panelList;
 };

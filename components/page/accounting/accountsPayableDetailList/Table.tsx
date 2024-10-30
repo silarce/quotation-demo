@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import classNames from 'classnames';
 
 import Row, { Cell } from 'components/global/gear/table/row';
 
@@ -7,6 +8,8 @@ import type { Treview_status } from 'js/api/api_netCore/_schemas';
 import { useTranslation } from 'react-i18next';
 
 import { Checkbox } from 'antd';
+
+import scss from './Table.module.scss';
 
 interface TconfigValue {
   serial_number: React.ReactNode; // 應付帳款單號
@@ -23,11 +26,6 @@ interface TconfigValue {
   review_status: Treview_status | null; // 審核狀態
 }
 
-interface Tprops extends TconfigValue {
-  checked: boolean;
-  onCheck: (checked: boolean) => void;
-}
-
 interface TconfigItem {
   label: React.ReactNode;
   style?: React.CSSProperties;
@@ -40,14 +38,26 @@ type Tconfig = {
 
 // ================================================================================
 
-const Row_thead = ({ checked, onCheckChange }: { checked: boolean; onCheckChange: (checked: boolean) => void }) => {
+const Row_thead = ({
+  disabled,
+  checked,
+  onCheckChange,
+}: {
+  disabled: boolean;
+  checked: boolean;
+  onCheckChange: (checked: boolean) => void;
+}) => {
   const config = useConfig();
 
   return (
     <Row thead={true}>
       <Cell style={config_other.checkBox.style}>
-        <label className="flex items-center gap-1 cursor-pointer">
-          <Checkbox checked={checked} onChange={(e) => onCheckChange(e.target.checked)} />
+        <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
+          <Checkbox
+            className={classNames(scss.antd_checkbox)}
+            checked={checked}
+            onChange={(e) => onCheckChange(e.target.checked)}
+          />
           <span>全選</span>
         </label>
       </Cell>
@@ -65,15 +75,22 @@ const Row_thead = ({ checked, onCheckChange }: { checked: boolean; onCheckChange
   );
 };
 
-const Row_tbody = (props: Tprops) => {
-  const { checked, onCheck } = props;
+const Row_tbody = (
+  props: TconfigValue & {
+    disabled: boolean;
+    checked: boolean;
+    onCheck: (checked: boolean) => void;
+  }
+) => {
+  const { disabled, checked, onCheck } = props;
 
   const config = useConfig();
 
   return (
     <Row>
-      <Cell style={config_other.checkBox.style}>
+      <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
         <Checkbox
+          className={classNames(scss.antd_checkbox)}
           checked={checked}
           onChange={(e) => {
             onCheck(e.target.checked);
@@ -169,7 +186,7 @@ const useConfig = () => {
 
 const config_other = {
   checkBox: {
-    style: { width: 80 },
+    style: { width: 60 },
   },
 };
 
