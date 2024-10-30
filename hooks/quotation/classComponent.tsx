@@ -193,6 +193,10 @@ class Class_component {
     return comLookUp[this.key](this).hiddenKeyArr;
   }
 
+  get disabledKeyArr() {
+    return comLookUp[this.key](this).disabledKeyArr;
+  }
+
   get componentInfo() {
     const info = {
       id: this._com.id ?? '',
@@ -533,6 +537,7 @@ class Class_component {
   }
   set material(v) {
     this._com.material = v;
+    this.surface_withCheckOptions = this.surface;
 
     // ________________________________________________________________
     const isSurfaceExist = this.options_surface?.some((item) => {
@@ -577,6 +582,15 @@ class Class_component {
 
     if (!isSurfaceExist) {
       return;
+    }
+
+    if (
+      //
+      v === '無烤漆' &&
+      this.key === 'guideRail' &&
+      checkIsSST(this.material)
+    ) {
+      v = '2B';
     }
 
     this._com.materialSurface = v;
@@ -1235,6 +1249,7 @@ type Tkit = {
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
+  disabledKeyArr?: string[];
 };
 
 const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = {
@@ -1279,7 +1294,11 @@ const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = 
       type: 'guideRail',
       creDesc: creDesc_guideRails,
       options: optionsCreator_componentMaterial_01(),
-      hiddenKeyArr: ['surface', 'density'],
+      hiddenKeyArr: [
+        // 'surface',
+        'density',
+      ],
+      disabledKeyArr: ['surface'],
       unit: 'M',
     };
   },
@@ -1290,6 +1309,7 @@ const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = 
       creDesc: creDesc_sidePlates,
       options: optionsCreator_componentMaterial_02(),
       hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '組',
     };
   },
 

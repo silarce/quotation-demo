@@ -530,6 +530,12 @@ function DndRow({
                 // }
 
                 const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
+                const disabledKeyArr = item.disabledKeyArr as string[] | undefined;
+
+                if (disabledKeyArr?.includes(key)) {
+                  theDisabled = true;
+                }
+
                 const isHidden = hiddenKeyArr?.includes(key);
 
                 let stateValue = item[key];
