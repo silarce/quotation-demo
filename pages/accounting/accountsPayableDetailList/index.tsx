@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 // antd
 import { Spin } from 'antd';
@@ -14,6 +15,7 @@ import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayable
 
 // gear
 import { useYearMonth_options } from 'js/utils/helpers/hook/useYearMonth';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
   Taccount_payable_Dto,
@@ -99,8 +101,31 @@ export default function AccountsPayableDetailList() {
 
   // ----------------------------------------------------------------
   // MARK: API
+
+  const reqPostAddAccountPayableStatistics = async () => {
+    const date = moment(`${year}-${month}`).format('YYYY-MM-DD');
+    const note = '';
+    const account_payable_uuids = Object.keys(checkedRaw);
+
+    if (account_payable_uuids.length === 0) {
+      myAlert.info({ title: '請選擇應付帳款' });
+    }
+
+    return await apiPostAddAccountPayableStatistics({
+      date,
+      note,
+      account_payable_uuids,
+    });
+  };
+
   // ----------------------------------------------------------------
   // MARK: HANDLE
+
+  const handleAddAccountPayableStatistics = async () => {
+    await reqPostAddAccountPayableStatistics().then(() => {
+      setDisabled(true);
+    });
+  };
 
   const handleCheckAllChange = (checked: boolean) => {
     if (checked) {
@@ -205,7 +230,7 @@ export default function AccountsPayableDetailList() {
       <PageHeader02
         tag="應付帳款明細表"
         customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
-        panelList={createPanel({ disabled, setDisabled })}
+        panelList={createPanel({ disabled, setDisabled, onAddClick: handleAddAccountPayableStatistics })}
       />
 
       <div>
@@ -238,9 +263,11 @@ export default function AccountsPayableDetailList() {
 const createPanel = ({
   disabled,
   setDisabled,
+  onAddClick,
 }: {
   disabled: boolean;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  onAddClick: () => void;
 }) => {
   const panel1: TpanelList[number] = {
     type: 'myButton',
@@ -267,7 +294,7 @@ const createPanel = ({
   const panel4: TpanelList[number] = {
     type: 'redButton',
     label: '確認產生當月應付帳款統計表',
-    onClick: () => {},
+    onClick: onAddClick,
   };
 
   const panelList: TpanelList = disabled ? [panel1, panel2] : [panel3, panel4];

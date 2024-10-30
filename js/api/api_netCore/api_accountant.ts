@@ -1319,7 +1319,11 @@ const apiPostAddAccountPayableStatistics = async ({
 
   return axi2
     .post<string>(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      myAlert.success({ title: '新增應付帳款統計表成功' });
+
+      return data;
+    })
     .catch((err: AxiosError) => {
       myAlert.err({ title: '新增應付帳款統計表失敗', content: err.message });
 
