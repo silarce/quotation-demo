@@ -193,6 +193,10 @@ class Class_component {
     return comLookUp[this.key](this).hiddenKeyArr;
   }
 
+  get disabledKeyArr() {
+    return comLookUp[this.key](this).disabledKeyArr;
+  }
+
   get componentInfo() {
     const info = {
       id: this._com.id ?? '',
@@ -1235,6 +1239,7 @@ type Tkit = {
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
+  disabledKeyArr?: string[];
 };
 
 const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = {
@@ -1279,7 +1284,11 @@ const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = 
       type: 'guideRail',
       creDesc: creDesc_guideRails,
       options: optionsCreator_componentMaterial_01(),
-      hiddenKeyArr: ['surface', 'density'],
+      hiddenKeyArr: [
+        // 'surface',
+        'density',
+      ],
+      disabledKeyArr: ['surface'],
       unit: 'M',
     };
   },
