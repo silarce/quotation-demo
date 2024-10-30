@@ -266,7 +266,7 @@ export default function AddTray() {
                     length: length as number | undefined,
                     width: width as number | undefined,
                     whname: whname as string | undefined,
-                    create_by: userInfo?.username
+                    create_by: userInfo?.employee?.chName.toString()
                 },
                 traylayout: allChildWidthData,
             };

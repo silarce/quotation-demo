@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -64,10 +64,12 @@ export default function ReviewList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
     const [data4, setData4] = useState<any[]>([]);
+    const [data5, setData5] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [searchdata3, setSearchdata3] = useState<any[]>([]);
     const [searchdata4, setSearchdata4] = useState<any[]>([]);
+    const [searchdata5, setSearchdata5] = useState<any[]>([]);
 
     // 變數宣告
     const [reviewtype, setReviewtype] = useState<string>("");
@@ -154,7 +156,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -204,7 +206,7 @@ export default function ReviewList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -244,7 +246,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -279,6 +281,56 @@ export default function ReviewList() {
         }
     };
 
+    const GetReviewRejected = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                user_id: userInfo?.employee?.id.toString(),
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(inputModel));
+
+
+
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewRejected?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+
+            setData5(responsedata);
+            setSearchdata5(responsedata);
+            console.log(responsedata);
+
+            // 檢查 data 是否有內容
+            if (data.length > 0) {
+
+                // setCurrentreview_id(data[0].id);
+                // setReviewtype(data[0].document_type)
+                // GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
+
+
+            } else {
+                console.log('沒有撈到資料');
+            }
+        } catch (error: any) {
+            // setError("GetReview:" + error.message);
+            console.log(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
     const hasFetchedData = useRef(false);
 
@@ -287,21 +339,24 @@ export default function ReviewList() {
             GetReview();
             GetReviewing();
             GetReviewed();
+            GetReviewRejected();
             hasFetchedData.current = true;
         }
     }, []);
 
     // 取流程狀態
-    const GetReviewStatus = async (item: any) => {
-        setReviewtype(item.document_type);
-        setItemQuery(item);
+    const GetReviewStatus = async (item: any, type: any) => {
+        setDocument_status(item.document_status);
+
         handleRowClick(item.id);
         setCurrentreview_id(item.id);
         try {
             // setIsLoading(true);
             const conditionModel = {
                 document_id: item.document_id,
-                document_uuid: item.document_uuid
+                document_uuid: item.document_uuid,
+                type: type,
+                id: item.id
             };
 
             var inputModel = {
@@ -321,9 +376,10 @@ export default function ReviewList() {
 
             setData2(data);
             // 設定 itemQuery
+            setReviewtype(item.document_type);
+            setItemQuery(item);
 
 
-            setDocument_status(item.document_status);
         } catch (error: any) {
             // setError("GetReviewStatus:" + error.message);
             console.log(error.message);
@@ -373,20 +429,29 @@ export default function ReviewList() {
         if (isPageLoaded && itemQuery) {
             if (reviewtype === "請購單") {
                 const parsedQuery = JSON.parse(itemQuery.query);
-                console.log(parsedQuery);
+
+                const query = {
+                    purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
+                    purchaserequisitionid: parsedQuery.purchaserequisitionid,
+                    create_at: parsedQuery.create_at,
+                    create_by: parsedQuery.create_by,
+                    // status: `${document_status === "核准" ? "已核准" : document_status}`,
+                    ...(document_status === "核准" ? { status: "已核准" } :
+                        document_status === "審核中" ? { status: "審核中" } :
+                            document_status === "駁回" ? { status: "已駁回" } :
+                                {}), // 根據不同情況設置 status
+                    need_date: parsedQuery.need_date,
+                    note: parsedQuery.note,
+                    firstin: 1,
+                    viewtype: 'review'
+                }
+
+                // console.log('parsedQuery', parsedQuery);
+                // console.log('query', query)
+
 
                 router.replace({
-                    query: {
-                        purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
-                        purchaserequisitionid: parsedQuery.purchaserequisitionid,
-                        create_at: getTaiwanDateStr(parsedQuery.create_at),
-                        create_by: parsedQuery.create_by,
-                        status: `${document_status === "核准" ? "已核准" : document_status}`,
-                        need_date: parsedQuery.need_date,
-                        note: parsedQuery.note,
-                        firstin: 1,
-                        viewtype: 'review'
-                    },
+                    query: query,
                 }, undefined, { shallow: true });
             }
             else if (reviewtype === "採購單") {
@@ -401,9 +466,12 @@ export default function ReviewList() {
                         supplieraddress: parsedQuery.supplieraddress,
                         supplierphone: parsedQuery.supplierphone,
                         invoice: parsedQuery.invoice,
-                        create_at: getTaiwanDateStr(parsedQuery.create_at),
+                        create_at: parsedQuery.create_at,
                         create_by: parsedQuery.create_by,
-                        status: `${document_status === "核准" ? "已核准" : document_status}`,
+                        ...(document_status === "核准" ? { status: "已核准" } :
+                            document_status === "審核中" ? { status: "審核中" } :
+                                document_status === "駁回" ? { status: "已駁回" } :
+                                    {}), // 根據不同情況設置 status
                         note: parsedQuery.note,
                         need_date: parsedQuery.need_date,
                         firstin: 1,
@@ -421,16 +489,19 @@ export default function ReviewList() {
                         prodreceiptid: parsedQuery.prodreceiptid,
                         purchaseorderuuid: parsedQuery.purchaseorderuuid,
                         purchaseorderid: parsedQuery.purchaseorderid,
-                        purchaseordercreate_at: getTaiwanDateStr(parsedQuery.purchaseordercreate_at),
+                        purchaseordercreate_at: parsedQuery.purchaseordercreate_at,
                         purchaseordercreate_by: parsedQuery.purchaseordercreate_by,
                         suppliername: parsedQuery.suppliername,
                         suppliertaxid: parsedQuery.suppliertaxid,
                         supplieraddress: parsedQuery.supplieraddress,
                         supplierphone: parsedQuery.supplierphone,
                         invoice: parsedQuery.invoice,
-                        create_at: getTaiwanDateStr(parsedQuery.create_at),
+                        create_at: parsedQuery.create_at,
                         create_by: parsedQuery.create_by,
-                        status: `${document_status === "核准" ? "已核准" : document_status}`,
+                        ...(document_status === "核准" ? { status: "已核准" } :
+                            document_status === "審核中" ? { status: "審核中" } :
+                                document_status === "駁回" ? { status: "已駁回" } :
+                                    {}), // 根據不同情況設置 status
                         note: parsedQuery.note,
                         firstin: 1,
                         viewtype: 'review'
@@ -438,6 +509,7 @@ export default function ReviewList() {
                 }, undefined, { shallow: true });
             }
         }
+        // }, [itemQuery, reviewtype]);
     }, [isPageLoaded, itemQuery, reviewtype]);
 
 
@@ -535,8 +607,10 @@ export default function ReviewList() {
             filteredData = searchdata;
         } else if (tabnow === "審核中") {
             filteredData = searchdata3;
-        } else {
+        } else if (tabnow === "審核完成") {
             filteredData = searchdata4;
+        } else {
+            filteredData = searchdata5;
         }
 
         // 如果正在進行選擇，則返回不繼續篩選
@@ -550,8 +624,10 @@ export default function ReviewList() {
                 setData(searchdata); // 恢復 data
             } else if (tabnow === "審核中") {
                 setData3(searchdata3); // 恢復 data3
-            } else {
+            } else if (tabnow === "審核完成") {
                 setData4(searchdata4); // 恢復 data4
+            } else {
+                setData5(searchdata5);
             }
             // setFilteredData(filteredData); // 更新已篩選資料
             return; // 直接結束函數，不需要進行後續篩選
@@ -583,8 +659,10 @@ export default function ReviewList() {
             setData(filteredData);
         } else if (tabnow === "審核中") {
             setData3(filteredData);
-        } else {
+        } else if (tabnow === "審核完成") {
             setData4(filteredData);
+        } else {
+            setData5(filteredData);
         }
 
         // console.log(filteredData);
@@ -655,43 +733,58 @@ export default function ReviewList() {
     };
 
     const tabChosed = (tabName: string) => {
+        let newReviewId = "";
+        let newDocumentStatus = "";
+
         if (tabName === "待審核") {
-            if (data.length != 0) {
-                setCurrentreview_id(data[0].id)
-            } else {
-                setCurrentreview_id("");
+            newDocumentStatus = "審核中";
+            if (data.length !== 0) {
+                newReviewId = data[0].id;
             }
         } else if (tabName === "審核中") {
-            if (data3.length != 0) {
-                setCurrentreview_id(data3[0].id)
-            } else {
-                setCurrentreview_id("");
+            newDocumentStatus = "審核中";
+            if (data3.length !== 0) {
+                newReviewId = data3[0].id;
             }
         } else if (tabName === "審核完成") {
-            if (data4.length != 0) {
-                setCurrentreview_id(data4[0].id)
-            } else {
-                setCurrentreview_id("");
+            newDocumentStatus = "核准";
+            if (data4.length !== 0) {
+                newReviewId = data4[0].id;
+            }
+        } else if (tabName === "駁回") {
+            newDocumentStatus = "駁回";
+            if (data5.length !== 0) {
+                newReviewId = data5[0].id;
             }
         }
+
+        setCurrentreview_id(newReviewId);
+        setDocument_status(newDocumentStatus);
         setTabnow(tabName);
         setTabshow(tabName);
         setReviewtype('');
         setSelectedItemId('');
         setData2([]);
-        if (tabName === "待審核") {
-            if (data.length > 0) {
-                GetReviewStatus(data[0]);
-            }
-        } else if (tabName === "審核中") {
-            if (data3.length > 0) {
-                GetReviewStatus(data3[0]);
-            }
-        } else if (tabName === "審核完成") {
-            if (data4.length > 0) {
-                GetReviewStatus(data4[0]);
-            }
-        }
+
+
+
+        // if (tabName === "待審核") {
+        //     if (data.length > 0) {
+        //         GetReviewStatus(data[0], "一般");
+        //     }
+        // } else if (tabName === "審核中") {
+        //     if (data3.length > 0) {
+        //         GetReviewStatus(data3[0], "一般");
+        //     }
+        // } else if (tabName === "審核完成") {
+        //     if (data4.length > 0) {
+        //         GetReviewStatus(data4[0], "一般");
+        //     }
+        // } else if (tabName === "駁回") {
+        //     if (data5.length > 0) {
+        //         GetReviewStatus(data5[0], "駁回");
+        //     }
+        // }
 
     };
     //#endregion
@@ -709,7 +802,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username,
+                user_id: userInfo?.employee?.id.toString(),
                 review_memo: review_memo,
                 review_id: currentreview_id
             };
@@ -739,7 +832,7 @@ export default function ReviewList() {
             GetReview();
             GetReviewing();
             GetReviewed();
-
+            GetReviewRejected();
 
         } catch (error: any) {
             // setError(error.message);
@@ -757,7 +850,7 @@ export default function ReviewList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username,
+                user_id: userInfo?.employee?.id.toString(),
                 review_memo: review_memo,
                 review_id: currentreview_id
             };
@@ -790,7 +883,52 @@ export default function ReviewList() {
             GetReview();
             GetReviewing();
             GetReviewed();
+            GetReviewRejected();
 
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+    const UpdateReviewReadedById = async (item: any) => {
+        console.log(item);
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                user_id: userInfo?.employee?.id.toString(),
+                id: item.id
+            };
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/Review/UpdateReviewReadedById`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            GetReview();
+            GetReviewing();
+            GetReviewed();
+            GetReviewRejected();
 
         } catch (error: any) {
             // setError(error.message);
@@ -802,6 +940,10 @@ export default function ReviewList() {
     }
 
 
+
+    const theKey = useMemo(() => {
+        return Math.random();
+    }, [router.query]);
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -878,10 +1020,10 @@ export default function ReviewList() {
                                         >
                                             審核完成
                                             &nbsp;
-                                            {/* {data4.length > 0 && (
+                                            {data4.filter(item => item.readed === false).length > 0 && (
                                                 <span style={{
                                                     display: 'inline-block',
-                                                    backgroundColor: '#5b5a5ad6',
+                                                    backgroundColor: '#007bff',
                                                     color: 'white',
                                                     borderRadius: '50%',
                                                     width: '24px',
@@ -890,11 +1032,37 @@ export default function ReviewList() {
                                                     lineHeight: '24px',
                                                     fontSize: '0.9rem',
                                                 }}>
-                                                    {data4.length}
+                                                    {data4.filter(item => item.readed === false).length}
                                                 </span>
-                                            )} */}
+                                            )}
 
                                         </button>
+                                    </span>
+                                    <span>
+                                        <button
+                                            className={scss.minitabbtn}
+                                            onClick={() => tabChosed('駁回')}
+                                            style={getButtonStyle('駁回')}
+                                        >
+                                            駁回
+                                            &nbsp;
+                                            {data5.filter(item => item.readed === false).length > 0 && (
+                                                <span style={{
+                                                    display: 'inline-block',
+                                                    backgroundColor: '#ea1833',
+                                                    color: 'white',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    textAlign: 'center',
+                                                    lineHeight: '24px',
+                                                    fontSize: '0.9rem',
+                                                }}>
+                                                    {data5.filter(item => item.readed === false).length}
+                                                </span>
+                                            )}
+                                        </button>
+
                                     </span>
                                 </div>
                                 <div></div>
@@ -905,7 +1073,7 @@ export default function ReviewList() {
                                     <div style={{ display: `${tabshow === "待審核" ? '' : 'none'}` }}>
                                         <div style={{ border: '1px solid #c1c1c1' }}>
 
-                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                            <div className={scss.body_content1} style={{ height: '500px' }}>
                                                 <div>
                                                     <Thead01 type={'ReviewList'} />
                                                     <span>
@@ -915,14 +1083,14 @@ export default function ReviewList() {
                                                                     <div
                                                                         key={index}
                                                                         className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                                        onClick={() => { GetReviewStatus(_item) }}
+                                                                        onClick={() => { GetReviewStatus(_item, "一般") }}
                                                                     >
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                                         <span>【{_item.document_type}】</span>
                                                                         <span>{_item.document_id}</span>
                                                                         <span>{_item.document_title}</span>
-                                                                        <span>{_item.create_by}</span> 
+                                                                        <span>{_item.create_by}</span>
 
                                                                     </div>
                                                                 </CellWithBar>
@@ -936,7 +1104,7 @@ export default function ReviewList() {
                                     <div style={{ display: `${tabshow === "審核中" ? '' : 'none'}` }}>
                                         <div style={{ border: '1px solid #c1c1c1' }}>
 
-                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                            <div className={scss.body_content1} style={{ height: '500px' }}>
                                                 <div>
                                                     <Thead01 type={'ReviewList'} />
                                                     <span>
@@ -946,7 +1114,7 @@ export default function ReviewList() {
                                                                     <div
                                                                         key={index}
                                                                         className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                                        onClick={() => { GetReviewStatus(_item) }}
+                                                                        onClick={() => { GetReviewStatus(_item, "一般") }}
                                                                     >
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
@@ -967,7 +1135,7 @@ export default function ReviewList() {
                                     <div style={{ display: `${tabshow === "審核完成" ? '' : 'none'}` }}>
                                         <div style={{ border: '1px solid #c1c1c1' }}>
 
-                                            <div className={scss.body_content1} style={{ height: '300px' }}>
+                                            <div className={scss.body_content1} style={{ height: '500px' }}>
                                                 <div>
                                                     <Thead01 type={'ReviewList'} />
                                                     <span>
@@ -977,7 +1145,46 @@ export default function ReviewList() {
                                                                     <div
                                                                         key={index}
                                                                         className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                                        onClick={() => { GetReviewStatus(_item) }}
+                                                                        onClick={() => {
+                                                                            UpdateReviewReadedById(_item);
+                                                                            GetReviewStatus(_item, "一般")
+                                                                        }}
+                                                                        style={{ backgroundColor: `${_item.readed === false ? 'rgba(210, 233, 255, 0.2)' : ''}` }}
+                                                                    >
+                                                                        <span>{index + 1}</span>
+                                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                        <span>【{_item.document_type}】</span>
+                                                                        <span>{_item.document_id}</span>
+                                                                        <span>{_item.document_title}</span>
+                                                                        <span>{_item.create_by}</span>
+
+                                                                    </div>
+                                                                </CellWithBar>
+                                                            ))
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: `${tabshow === "駁回" ? '' : 'none'}` }}>
+                                        <div style={{ border: '1px solid #c1c1c1' }}>
+
+                                            <div className={scss.body_content1} style={{ height: '500px' }}>
+                                                <div>
+                                                    <Thead01 type={'ReviewList'} />
+                                                    <span>
+                                                        {data5 && data5.length > 0 && (
+                                                            data5.slice(0, 100).map((_item: any, index: number) => (
+                                                                <CellWithBar key={index} className={scss.panelHeader21}>
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                        onClick={() => {
+                                                                            UpdateReviewReadedById(_item);
+                                                                            GetReviewStatus(_item, "駁回")
+                                                                        }}
+                                                                        style={{ backgroundColor: `${_item.readed === false ? 'rgba(210, 233, 255, 0.2)' : ''}` }}
                                                                     >
                                                                         <span>{index + 1}</span>
                                                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
@@ -996,7 +1203,7 @@ export default function ReviewList() {
                                         </div>
                                     </div>
                                 </div>
-                                <div style={{ border: '1px solid #c1c1c1' }}>
+                                <div style={{}}>
                                     <Thead01 type={'ReviewStatusList'} />
                                     <span>
                                         {data2 && (
@@ -1076,10 +1283,10 @@ export default function ReviewList() {
                                     {/* 當頁面加載完成後顯示內容 */}
                                     {isPageLoaded ? (
                                         <div>
-                                            {reviewtype === "請購單" && <PurchaseRequisitionList />}
-                                            {reviewtype === "採購單" && <PurchaseOrderList />}
-                                            {reviewtype === "進貨單" && <ProdReceiptList />}
-                                            {reviewtype === "報價單" && <Quotation />}
+                                            {reviewtype === "請購單" && <PurchaseRequisitionList key={theKey} />}
+                                            {reviewtype === "採購單" && <PurchaseOrderList key={theKey} />}
+                                            {reviewtype === "進貨單" && <ProdReceiptList key={theKey} />}
+                                            {reviewtype === "報價單" && <Quotation key={theKey} />}
                                         </div>
                                     ) : (
                                         <p>頁面加載中...</p> // 可以顯示一個載入中的提示

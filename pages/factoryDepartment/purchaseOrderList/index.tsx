@@ -48,6 +48,7 @@ import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
+import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -99,6 +100,7 @@ export default function PurchaseOrderList() {
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [prdata, setPrdata] = useState<any[]>([]);
+    const [quodata, setQuodata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -153,6 +155,8 @@ export default function PurchaseOrderList() {
     const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
     const [originaldata1, setOriginaldata1] = useState<any[]>([]);
     const [originalnote, setOriginalnote] = useState(notein);
+    const [originalcreate_at, setOriginalcreate_at] = useState(notein);
+    const [originalneed_date, setOriginalneed_date] = useState(notein);
 
     //進貨總數
     const [totalreq, setTotalreq] = useState<string>("");
@@ -205,7 +209,7 @@ export default function PurchaseOrderList() {
             setIsLoading(true);
             const conditionModel = {
                 type: '採購中',
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -247,6 +251,7 @@ export default function PurchaseOrderList() {
             //     GetReviewById(data[0].purchaseorderuuid);
             //     GetReviewHistory(data[0].purchaseorderid);
             // }
+
             console.log(typeof (quoterequuidin));
             console.log(quoterequuidin);
             console.log(quoterequuidin === '');
@@ -281,13 +286,24 @@ export default function PurchaseOrderList() {
             const data = await response.json();
             setData1(data);
             let totalprice = 0;
+
+            // 計算總價
             data.forEach((element: { totalprice: any; }) => {
-                totalprice += element.totalprice;
+                // 檢查 totalprice 是不是數字，如果是字串就移除逗號並轉為數字
+                const price = typeof element.totalprice === 'string' ? parseFloat(element.totalprice.replace(/,/g, '')) : parseFloat(element.totalprice) || 0;
+                totalprice += price; // 將價格加總
             });
-            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const taxPrice = Math.round(totalprice * 0.05);
+
+            // 四捨五入總價到小數點第二位
+            const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+            setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            // 計算稅金並四捨五入到小數點第二位
+            const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
             setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const totalPayPrice = totalprice + taxPrice;
+
+            // 計算應付總價（總價 + 稅金），並四捨五入到小數點第二位
+            const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
             setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
             // 進貨進度
@@ -302,6 +318,7 @@ export default function PurchaseOrderList() {
             });
             setTotalreq(totalreq);
             setCompletereq(completereq);
+            setQuodata(data);
 
 
 
@@ -343,7 +360,8 @@ export default function PurchaseOrderList() {
             setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
             GetProdReceiptById(purchaseorderid as string);
-            
+            GetReviewHistory(purchaseorderid as string);
+
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
     //#endregion
@@ -394,7 +412,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
                 data: data2,
-                username: userInfo?.username as string | undefined,
+                username: userInfo?.employee?.id.toString(),
                 note: notein
             };
 
@@ -441,7 +459,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 type: type,
                 purchaseorderuuid: purchaseorderuuidin,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -618,6 +636,8 @@ export default function PurchaseOrderList() {
         setOriginalShippingaddressin(shippingaddressin);
         setOriginaldata1(data1);
         setOriginalnote(notein);
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
         setEditmain(true);
     };
 
@@ -639,6 +659,8 @@ export default function PurchaseOrderList() {
                     setData1(originaldata1);
                     setEditmain(false);
                     setNotein(originalnote);
+                    setCreate_atin(originalcreate_at);
+                    setNeed_datein(originalneed_date);
                 }
             }
         });
@@ -905,7 +927,7 @@ export default function PurchaseOrderList() {
             const conditionModel = {
                 purchaseorderuuid: purchaseorderuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -948,7 +970,7 @@ export default function PurchaseOrderList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -1070,7 +1092,7 @@ export default function PurchaseOrderList() {
                     document_type: "採購單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username,
+                    user_id: userInfo?.employee?.id.toString(),
                     document_title: documenttitle
                 };
 
@@ -1104,8 +1126,8 @@ export default function PurchaseOrderList() {
                 //改變單據狀態
                 const conditionModel2 = {
                     type: type,
-                    purchaseorderuuid: purchaseorderuuidin as string | undefined,
-                    username: userInfo?.username as string | undefined
+                    purchaseorderuuid: purchaseorderuuidin,
+                    username: userInfo?.employee?.id.toString()
                 };
 
 
@@ -1145,7 +1167,7 @@ export default function PurchaseOrderList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.username}`)
+        setDocumenttitle(`【採購單】【${purchaseorderidin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1245,7 +1267,7 @@ export default function PurchaseOrderList() {
         });
     }
 
-    const Excel = async (id: any, type2: any) => {
+    const Excel = async (id: any, type2: any, quoid: any) => {
         try {
 
             setIsLoading(true);
@@ -1253,7 +1275,7 @@ export default function PurchaseOrderList() {
                 id: id,
                 type: 'purchaseorder',
                 type2: type2,
-                quoterequuid: quoterequuidin
+                quoterequuid: quoid
             };
 
             const inputModel = {
@@ -1284,7 +1306,7 @@ export default function PurchaseOrderList() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_採購單_${id}_比價單.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -1372,7 +1394,7 @@ export default function PurchaseOrderList() {
 
     useEffect(() => {
         console.log(data1);
-        // 每次 data2 更新時，重新計算總價和稅金
+        // 每次 data1 更新時，重新計算總價和稅金
         let totalprice = 0;
         data1.forEach((element) => {
             // 檢查 totalprice 是不是數字，如果是字串就移除逗號
@@ -1385,17 +1407,229 @@ export default function PurchaseOrderList() {
         console.log(totalprice); // 應顯示正確的加總結果
 
         // 計算總價後，四捨五入到兩位小數，然後再格式化
-        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;  // 四捨五入總價到小數點第二位
         setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算稅金，四捨五入到最接近的整數
-        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        // 計算稅金，四捨五入到兩位小數
+        const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;  // 四捨五入稅金到小數點第二位
         setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
         // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
-        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;  // 四捨五入應付總價到小數點第二位
         setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     }, [data1]);
+
+
+
+
+    //#region  詢價單modal
+    const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
+
+
+    const [test, setTest] = useState<string>("");
+
+    //帶入詢價單畫面的資料(欲詢價物料)
+    const [quotereqname, setQuotereqname] = useState<string>("");
+    const [quotereqspec, setQuotereqspec] = useState<string>("");
+    const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+    const [selectedOption, setSelectedOption] = useState('物料'); // 預設選項
+    //對應詢價單主檔的詢價單明細
+    const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
+    //確定廠商後更新請購單明細
+    const [refreshpurchaserequisitiondetail, setRefreshpurchaserequisitiondetail] = useState<any>();
+
+    //加入詢價廠商
+    const [prquotereqadddata, setPrquotereqadddata] = useState({
+        // id: "",id 自增長不用寫入
+        quoterequuid: "",
+        quotereqid: "",
+        unitprice: "",
+        totalprice: "",
+        suppliername: "",
+        deliverydate: moment(),
+        unit: "",
+        note: "",
+        awarded: false
+    });
+
+    //得標廠商id，update回quotereqdetail
+    const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
+    const [selectedsupplier, setSelectedsupplier] = useState<string>("");
+    const [purchaseorderdetailuuid2, setPurchaseorderdetailuuid2] = useState<string>("");
+
+    //打開詢價單modal
+    const prQuotereqModalOpen = async (item: any) => {
+        // alert(item.quotereqdetailuuid);
+        // alert(item.id);
+        // return;
+        setSelectedsupplier(item.quotereqdetailuuid);
+        setPurchaseorderdetailuuid2(item.id);
+
+        //清空
+        prquotereqadddata.quoterequuid = "";
+        prquotereqadddata.quotereqid = "";
+        prquotereqadddata.unitprice = "";
+        prquotereqadddata.totalprice = "";
+        prquotereqadddata.suppliername = "";
+        prquotereqadddata.deliverydate = moment();
+        prquotereqadddata.unit = "";
+        prquotereqadddata.note = "";
+        prquotereqadddata.awarded = false;
+        //預設詢價單主檔編號
+        prquotereqadddata.quoterequuid = item.quoterequuid;
+        prquotereqadddata.quotereqid = item.quotereqid;
+
+        setQuotereqname(item.name);
+        setQuotereqspec(item.spec);
+        setQuotereqquantity(item.quantity);
+        getQuotereqDetail(item.productid);
+        setPrquotereqmodalopen(true);
+    }
+
+    //關閉詢價單modal
+    const prQuotereqModalClose = async () => {
+        setPrquotereqmodalopen(false);
+        setPrquotereqdata([]);
+    }
+
+    //取得對應詢價單主檔的詢價單明細檔
+    const getQuotereqDetail = async (productid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                productid: productid as string | undefined,
+                type: 'po',
+                suppliername: suppliernamein
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetQuotereqDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setPrquotereqdata(data);
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+
+
+
+    const UpdatePurchaseOrderDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaseorderdetailuuid: purchaseorderdetailuuid2,
+                unitprice: item.detail_unitprice,
+                totalprice: (parseFloat(item.detail_unitprice) * parseFloat(quotereqquantity)).toFixed(2),
+                quotereqdetailuuid: item.detail_id,
+                quoterequuid: item.detail_quoterequuid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaseOrderDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+
+            getPurchaseOrderDetail(purchaseorderuuidin);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+    const clearPurchaseOrderDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaseorderdetailuuid: purchaseorderdetailuuid2,
+                unitprice: '',
+                totalprice: '',
+                quotereqdetailuuid: '',
+                quoterequuid: ''
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaseOrderDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            getPurchaseOrderDetail(purchaseorderuuidin);
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
+
+
+
+    //#endregion
+
+
+    const handleCheckboxChange = (item: any) => {
+
+        console.log(item);
+        // return;
+        // 判斷當前選中的 supplier 是否與點擊的相同
+        if (selectedsupplier === item.detail_id) {
+            // 如果相同，清空選擇
+            setSelectedsupplier('');
+            clearPurchaseOrderDetail(item); // 呼叫清空資料的函數
+        } else {
+            // 如果不同，更新選中的供應商
+            setLastselectedsupplier(selectedsupplier);
+            setSelectedsupplier(item.detail_id);
+            UpdatePurchaseOrderDetail(item);
+        }
+
+    }
 
 
     return (
@@ -1410,28 +1644,82 @@ export default function PurchaseOrderList() {
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    查詢
-                                </button>
-                                &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    列印
-                                </button>
-                                &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po") }} title="單據Excel">
-                                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                    單據
-                                </button>
-                                &nbsp;
-                                <button className={scss.squarebtn}
+                                <span>
+                                    <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                        <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        查詢
+                                    </button>
+                                    &nbsp;
+                                </span>
+                                {/* <span>
+                                    <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
+                                        <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        列印
+                                    </button>
+                                </span>
+                                <span>
+                                    &nbsp;
+                                    <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po", "") }} title="單據Excel">
+                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                        單據
+                                    </button>
+                                    &nbsp;
+
+                                </span> */}
+                                {purchaseorderidin && (
+                                    <>
+                                        <span>
+                                            <button className={scss.squarebtn} onClick={() => { Print() }} title="列印">
+                                                <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                列印
+                                            </button>
+                                        </span>
+                                        <span>
+                                            &nbsp;
+                                            <button className={scss.squarebtn} onClick={() => { Excel(purchaseorderidin, "po", "") }} title="單據Excel">
+                                                <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                                單據
+                                            </button>
+                                            &nbsp;
+                                        </span>
+                                    </>
+                                )}
+
+
+
+                                {/* <button className={scss.squarebtn}
                                     onClick={() => { Excel(purchaseorderidin, "pc") }}
                                     title="比價Excel"
                                     style={{ display: `${(quoterequuidin === '' || quoterequuidin == null) ? 'none' : ''}` }}>
                                     <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                                     比價
-                                </button>
+                                </button> */}
+                                {quodata.some((item) => item.quoterequuid) && (
+                                    <div className={scss.dropdownContainer}>
+                                        <button className={scss.squarebtn} title="比價Excel">
+                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                            比價
+                                        </button>
+                                        <div className={scss.dropdownMenu}>
+                                            {quodata.map((item, index) => (
+                                                <button
+                                                    key={item.quoterequuid}
+                                                    onClick={() => Excel(purchaseorderidin, "pc", item.quoterequuid)}
+                                                    className={scss.dropdownOption}
+                                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} // 添加 Flexbox 屬性
+                                                >
+                                                    <span style={{ flex: 2, textAlign: 'left' }}> {/* 讓這個 span 佔據一半空間 */}
+                                                        {index + 1}.{item.productid}
+                                                    </span>
+                                                    <span style={{ flex: 1, textAlign: 'right' }}> {/* 這個 span 將保持其內容的寬度 */}
+                                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                                    </span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
 
                             </div>
                             <div>
@@ -1527,20 +1815,27 @@ export default function PurchaseOrderList() {
                                     <img src={icon_sent_review_stop.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     抽單
                                 </button>
-                                <span style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${completereq === parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                    &nbsp;
+                                    <button className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
+                                        <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        結案
+                                    </button>
+                                </span> */}
+                                <span style={{ display: `${statusin === '已核准' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.redsquarebtn} onClick={() => { closeDoc("結案") }} title="單據結案">
                                         <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         結案
                                     </button>
                                 </span>
-                                <span style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${completereq != parseInt(totalreq) && statusin === '已核准' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.disablesquarebtn} title="單據未結">
                                         <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                         未結
                                     </button>
-                                </span>
+                                </span> */}
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     &nbsp;
                                     <button className={scss.disablesquarebtn} title="單據已結">
@@ -1582,7 +1877,7 @@ export default function PurchaseOrderList() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    value: create_atin ? moment(create_atin) : null,
                                                     onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -1606,7 +1901,7 @@ export default function PurchaseOrderList() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_datein || '') ? moment(need_datein) : null,
+                                                    value: need_datein ? moment(need_datein) : null,
                                                     onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -1844,7 +2139,21 @@ export default function PurchaseOrderList() {
                                                                     }}
                                                                 />
                                                             </span>
-                                                            <span>{_item.unit}</span>
+                                                            <span>
+                                                                {_item.unit}
+                                                            </span>
+                                                            <span>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (viewtype !== 'review') {
+                                                                            prQuotereqModalOpen(_item);
+                                                                        }
+                                                                    }}
+                                                                    disabled={_item.reviewtype === 'review'}
+                                                                >
+                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
+                                                                </button>
+                                                            </span>
                                                             {/* <span>{_item.unitprice.toLocaleString()}</span> */}
                                                             <span>
                                                                 <input
@@ -1853,7 +2162,8 @@ export default function PurchaseOrderList() {
                                                                     // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '60px' }}
                                                                     type="text"
                                                                     // maxLength={8}
-                                                                    value={_item.unitprice.toLocaleString()}
+                                                                    // value={_item.unitprice.toLocaleString()}
+                                                                    value={_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                                     onChange={(e) => {
                                                                         const newData = [...data1];
@@ -2321,7 +2631,7 @@ export default function PurchaseOrderList() {
                 {/* 審核 */}
                 <DragableModal
                     handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '820px' }}
+                    style={{ zIndex: '1001', width: '1000px' }}
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
@@ -2334,7 +2644,7 @@ export default function PurchaseOrderList() {
                         <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
                             <Space direction="vertical">
                                 {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
                                         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                                             {_item.name}：
                                             {_item.stages.map((_stage: any, index: number) => (
@@ -2356,7 +2666,53 @@ export default function PurchaseOrderList() {
 
                 </DragableModal>
 
+                <DragableModal
+                    handleText="詢價紀錄"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={prquotereqmodalopen}
+                    onCrossClick={prQuotereqModalClose}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '920px', padding: '10px 15px' }}>
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
+                    </div>
+                    <hr />
+                    {/* {selectedsupplier} */}
+                    <div>
+                        <Thead01 type={'Quotereq2'} />
+                        <div style={{ height: '300px', overflowY: 'auto' }}>
+                            {prquotereqdata && (
+                                prquotereqdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader17}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.detail_suppliername}</span>
+                                            <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                            <span>{_item.detail_unit}</span>
+                                            <span style={{ textAlign: 'right', color: '#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                            <span style={{ color: '#14256a' }}>{_item.pricetype}</span>
+                                            <span>{_item.main_quotereqid}</span>
+                                            <span></span>
+                                            {/* <span></span> */}
+                                            <span>
+                                                <input
+                                                    style={{ backgroundColor: 'transparent', width: '100%', height: '20px' }}
+                                                    disabled={!(editmain && statusin !== '已核准' && statusin !== '已結案')}
+                                                    type='checkbox'
+                                                    checked={selectedsupplier === _item.detail_id}
+                                                    onChange={() => handleCheckboxChange(_item)}
+                                                />
 
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </DragableModal>
 
             </div>
         </SubLayer >
