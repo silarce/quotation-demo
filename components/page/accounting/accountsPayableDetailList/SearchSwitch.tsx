@@ -1,42 +1,15 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
-import { nanoid } from 'nanoid';
-import moment, { Moment } from 'moment';
-import Decimal from 'decimal.js';
+
 import { useRouter } from 'next/router';
 
 // antd
-import { Spin, Switch } from 'antd';
-
-// layer
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { Switch } from 'antd';
 
 // gear
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import DragableModal from 'components/global/gear/dragableModal/dragableModal';
-import ThreePartBar from 'components/global/container/bar/threePartBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
-import Row, { Cell } from 'components/global/gear/table/row';
-import SearchBar from 'components/global/gear/HOC/searchBar/searchBar';
-
-import type { TuserDto } from 'js/api/dtoTypes';
-
-import { useTranslation } from 'react-i18next';
+import SearchBar, { TsearchGroup } from 'components/global/gear/HOC/searchBar/searchBar';
 
 import scss from './SearchSwitch.module.scss';
-
-import {
-  useGetAccountPayableBySupplierId,
-  useGetAccountPayableBy,
-  useGetAccountPayableStatisticsByIdOrDate,
-  useGetAccountPayableStatisticsDetailByStatisticsId,
-  apiPostAddAccountPayableStatistics,
-  apiPatchUpdateAccountPayableStatisticsById,
-  apiDeleteAccountPayableStatisticsById,
-} from 'js/api/api_netCore/api_accountant';
 
 import { Toption } from 'js/utils/options/options';
 

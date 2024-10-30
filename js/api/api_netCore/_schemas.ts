@@ -2,8 +2,9 @@ import { TemployeeDto } from '../dtoTypes';
 
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
+type Treview_status = '未審核' | '已審核' | '審核中';
 
-export type { Tinvoice_type, Ttax_type };
+export type { Tinvoice_type, Ttax_type, Treview_status };
 
 // ==============================================================================
 
@@ -295,7 +296,7 @@ interface TcreatePaymentOrder_Dto {
 // region account_payable
 interface Taccount_payable_Dto extends Tbase {
   serial_number: string | null; // varchar(50) - 序號
-  review_status: string | null; // varchar(50) - 審核狀態
+  review_status: Treview_status | null; // varchar(50) - 審核狀態
   note: string | null; // varchar(200) - 摘要說明
   agent_employee_id: string | null; // varchar - 經辦人員
   invoice_title: string | null; // varchar - 發票抬頭

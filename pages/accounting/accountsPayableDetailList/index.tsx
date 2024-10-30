@@ -1,37 +1,24 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import classNames from 'classnames';
-import { nanoid } from 'nanoid';
-import moment, { Moment } from 'moment';
-import Decimal from 'decimal.js';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // antd
-import { Spin, Switch } from 'antd';
+import { Spin } from 'antd';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/SearchSwitch';
+import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/Table';
 
 // gear
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import DragableModal from 'components/global/gear/dragableModal/dragableModal';
-import ThreePartBar from 'components/global/container/bar/threePartBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
-import Row, { Cell } from 'components/global/gear/table/row';
-import SearchBar from 'components/global/gear/HOC/searchBar/searchBar';
 
-import type { TuserDto } from 'js/api/dtoTypes';
-
-import { useTranslation } from 'react-i18next';
-
-import scss from './index.module.scss';
+import { useYearMonth_options } from 'js/utils/helpers/hook/useYearMonth';
 
 import {
+  Taccount_payable_Dto,
+  //
   useGetAccountPayableBySupplierId,
   useGetAccountPayableBy,
   useGetAccountPayableStatisticsByIdOrDate,
@@ -41,16 +28,16 @@ import {
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 
-import { Toption } from 'js/utils/options/options';
-
-// ================================================================================
-
 // ================================================================================
 type Tquery = {
   year?: string;
   month?: string;
   invoiceNumber?: string;
   searchType: 'date' | 'invoice';
+};
+
+type TcheckedRaw = {
+  [id: string]: Taccount_payable_Dto;
 };
 
 // ================================================================================
@@ -69,6 +56,7 @@ export default function AccountsPayableDetailList() {
     searchType = 'date',
   } = query;
 
+  // ----------------------------------------------------------------
   // MARK: DATA
 
   const params = useMemo(() => {
@@ -93,8 +81,102 @@ export default function AccountsPayableDetailList() {
 
   const { raw: raw_accountPayable } = useGetAccountPayableBy(params, { autoUpdate: true });
 
+  // ----------------------------------------------------------------
+  // MARK: STATE
+
+  const [checkedRaw, setCheckedRaw] = useState<TcheckedRaw>({});
+
+  const isAllChecked = useMemo(() => {
+    let checked = Object.keys(checkedRaw).length === raw_accountPayable?.length;
+
+    if (checked) {
+      checked = !!raw_accountPayable?.every((raw) => !!checkedRaw[raw.id]);
+    }
+
+    return checked;
+  }, [checkedRaw, raw_accountPayable]);
+
+  // ----------------------------------------------------------------
   // MARK: API
+  // ----------------------------------------------------------------
   // MARK: HANDLE
+
+  const handleCheckAllChange = (checked: boolean) => {
+    if (checked) {
+      const rawDict: TcheckedRaw = {};
+      raw_accountPayable?.forEach((raw) => {
+        rawDict[raw.id] = raw;
+      });
+
+      setCheckedRaw(rawDict);
+    } else {
+      setCheckedRaw({});
+    }
+  };
+
+  const handleCheck = (checked: boolean, id: string, raw: Taccount_payable_Dto) => {
+    setCheckedRaw((prev) => {
+      let copy = { ...prev };
+
+      if (checked) {
+        copy[id] = raw;
+      } else {
+        const { [id]: removed, ...restCopy } = copy;
+        copy = restCopy;
+      }
+
+      return copy;
+    });
+  };
+
+  const createProps = (raw: Taccount_payable_Dto) => {
+    const {
+      id,
+      serial_number,
+      review_status,
+      note,
+      agent_employee_id,
+      invoice_title,
+      invoice_date,
+      invoice_number,
+      invoice_price,
+      payment_account,
+      payment_account_uuid,
+      payment_status,
+      payment_order_uuid,
+      payment_order_serial_number,
+      purchase_invoice_uuid,
+      supplier_uuid,
+      transaction_date,
+      source_number,
+      settled_amount,
+      balance,
+      supplier,
+    } = raw;
+
+    const props: Parameters<typeof Row_tbody>[0] = {
+      serial_number,
+      廠商編號: 'no property',
+      發票廠商: 'no property',
+      invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
+      票期日: 'no property',
+      付款帳號: 'no property',
+      支付方式: 'no property',
+      支票號碼: 'no property',
+      invoice_number,
+      payment_status,
+      review_status,
+      checked: !!checkedRaw[id],
+      onCheck: (checked) => {
+        handleCheck(checked, id, raw);
+      },
+    };
+
+    return props;
+  };
+
+  // ----------------------------------------------------------------
+
   // ----------------------------------------------------------------
   // MARK: useEffect
   useEffect(() => {
@@ -121,7 +203,13 @@ export default function AccountsPayableDetailList() {
 
       <div>
         <Spin spinning={false} delay={300}>
-          <h1>fooo</h1>
+          <Row_thead checked={isAllChecked} onCheckChange={handleCheckAllChange} />
+
+          {raw_accountPayable?.map((raw) => {
+            const props: Parameters<typeof Row_tbody>[0] = createProps(raw);
+
+            return <Row_tbody key={raw.id} {...props} />;
+          })}
         </Spin>
       </div>
     </SubLayer>
@@ -135,7 +223,7 @@ export default function AccountsPayableDetailList() {
 // ==============================================================================
 // ==============================================================================
 
-// ==========================================================================
+// ==============================================================================
 
 const createPanel = () => {
   const panelList: TpanelList = [

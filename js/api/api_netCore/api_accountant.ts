@@ -1065,7 +1065,13 @@ const useGetAccountPayableBy = (
   const [raw, setRaw] = useState<Taccount_payable_Dto[]>();
 
   const update = async () => {
-    if (isFetching || !props) {
+    if (isFetching) {
+      return;
+    }
+
+    if (!props) {
+      setRaw(undefined);
+
       return;
     }
 
