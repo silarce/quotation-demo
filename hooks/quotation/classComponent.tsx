@@ -537,6 +537,7 @@ class Class_component {
   }
   set material(v) {
     this._com.material = v;
+    this.surface_withCheckOptions = this.surface;
 
     // ________________________________________________________________
     const isSurfaceExist = this.options_surface?.some((item) => {
@@ -581,6 +582,15 @@ class Class_component {
 
     if (!isSurfaceExist) {
       return;
+    }
+
+    if (
+      //
+      v === '無烤漆' &&
+      this.key === 'guideRail' &&
+      checkIsSST(this.material)
+    ) {
+      v = '2B';
     }
 
     this._com.materialSurface = v;
