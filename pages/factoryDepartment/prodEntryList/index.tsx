@@ -304,9 +304,7 @@ export default function ProdEntryList() {
         try {
             // alert(checkfirstin);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
+            const conditionModel= {
                 // keyword: "search" as string | undefined,
             };
 
@@ -826,65 +824,6 @@ export default function ProdEntryList() {
         }
     };
 
-    // 進貨單入庫
-    const TransferProdReceiptToProdEntry = async () => {
-        // alert("in");
-        try {
-            // return;
-            setIsLoading(true);
-
-
-            const conditionModel: {
-                prodentryuuid: string | undefined,
-                data: any,
-                username: string | undefined
-            } = {
-                prodentryuuid: checkfirstin === 0 ? prodentryuuidin : prodentryuuid as string | undefined,
-                data: data2,
-                username: userInfo?.username as string | undefined
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/TransferProdReceiptToProdEntry`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data11111');
-            }
-
-            const responseData = await response.json();
-            myAlert.info(
-                {
-                    title: '單據新增成功',
-                    content: `進貨單號為:${responseData}`
-                })
-
-            setData2([]);
-            getProdEntry();
-
-            getProdEntryDetail(checkfirstin === 0 ? prodentryuuidin : prodentryuuid);
-
-            // GetProdEntryDetailByProdReceiptId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
 
     const addWHPositionQuantity = async () => {
 
@@ -1059,24 +998,7 @@ export default function ProdEntryList() {
     };
 
 
-    function handleTransfer() {
-        if (editstatus === true) {
-            myAlert.warning({ title: "請先結束編輯狀態" });
-        }
-        else {
-            myAlert.confirm({
-                title: '確定要轉為入庫單嗎?',
-                content: <>
-                    <h1>請確認數量是否正確</h1>
-                </>,
-                props: {
-                    onOk: () => {
-                        TransferProdReceiptToProdEntry();
-                    }
-                }
-            });
-        }
-    }
+
 
     const handleAddProdEntry = (data: any) => {
         let shouldDisable = false; // 默认情况下，新增入庫按钮是启用的
@@ -1490,7 +1412,7 @@ export default function ProdEntryList() {
             const conditionModel = {
                 prodentryuuid: prodentryuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -1607,7 +1529,7 @@ export default function ProdEntryList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="進貨單號"
                                             disabled={true}
@@ -1616,7 +1538,7 @@ export default function ProdEntryList() {
                                                     value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                     <div>
                                         <InputSel
@@ -1629,7 +1551,7 @@ export default function ProdEntryList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="進貨日期"
                                             disabled={true}
@@ -1638,7 +1560,7 @@ export default function ProdEntryList() {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(prodreceiptcreate_atin)?.toString() : prodreceiptcreate_at) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
 
                                     </div>
                                     <div>
@@ -1652,7 +1574,7 @@ export default function ProdEntryList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="進貨人員"
                                             disabled={true}
@@ -1661,7 +1583,7 @@ export default function ProdEntryList() {
                                                     value: (checkfirstin === 0 ? prodreceiptcreate_byin : prodreceiptcreate_by) || ' ',
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                                 <div className={scss.head_content2}>

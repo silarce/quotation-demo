@@ -151,7 +151,7 @@ export default function AddProdReceipt() {
             //取得已核准的採購單
             GetPurchaseOrderForAddProdReceipt();
             setCreate_atin(moment().format('YYYY-MM-DD') || '');
-            setCreate_byin(userInfo?.username.toString() || '');
+            setCreate_byin(userInfo?.employee?.chName.toString() || '');
             // setNeed_date(moment().format('YYYY-MM-DD') || '');
             hasFetchedData.current = true;
         }
@@ -316,7 +316,7 @@ export default function AddProdReceipt() {
                     create_by: create_byin,
                     note: note,
                     data2: data2,
-                    username: userInfo?.username,
+                    username: userInfo?.employee?.id.toString(),
                     purchaseorderid: purchaseorderid
                 };
 
@@ -377,7 +377,7 @@ export default function AddProdReceipt() {
             // setIsLoading(true);
             const conditionModel = {
                 type: '未送出',
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -522,7 +522,7 @@ export default function AddProdReceipt() {
 
     //新增單據
     const handlePreAdd = () => {
-        setCreate_byin(userInfo?.username as string);
+        setCreate_byin(userInfo?.employee?.chName.toString() as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
@@ -886,6 +886,7 @@ export default function AddProdReceipt() {
             }
             const data = await response.text();
 
+
             getProdReceipt();
             setData2([]);
             setCheckedItems({});
@@ -902,6 +903,11 @@ export default function AddProdReceipt() {
             setPocreate_at('');//目前沒用
             setPocreate_by('');//目前沒用
             GetPurchaseOrderForAddProdReceipt();
+            await router.push({
+                pathname: `/factoryDepartment/prodReceiptList`,
+                query: {
+                },
+            });
 
         } catch (error: any) {
             // setError(error.message);
@@ -1124,7 +1130,7 @@ export default function AddProdReceipt() {
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                value: create_atin ? moment(create_atin) : null,
                                                 onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                             },
                                         }}
@@ -1216,11 +1222,11 @@ export default function AddProdReceipt() {
                                     />
                                 </div>
                                 <div>
-                                    {purchaseorderid}
+                                    {/* {purchaseorderid}
                                     <br />
                                     {suppliercontactin}
                                     <br />
-                                    {supplierfaxin}
+                                    {supplierfaxin} */}
                                     {/* <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
