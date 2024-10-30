@@ -306,7 +306,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       query: {
         purchaserequisitionuuid: item.purchaserequisitionuuid,
         purchaserequisitionid: item.purchaserequisitionid,
-        create_at: getTaiwanDateStr(item.create_at),
+        create_at: item.create_at,
         create_by: item.create_by,
         approved: item.approved,
         status: item.status,

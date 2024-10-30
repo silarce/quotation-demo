@@ -57,6 +57,7 @@ import icon_sent_review_stop from 'public/image/icon/fc_sent_review_stop.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 
 export default function PurchaseRequisitionList() {
 
@@ -75,6 +76,8 @@ export default function PurchaseRequisitionList() {
         viewtype, // 判斷審核的,
         reviewflow
     } = router.query;
+
+    console.log('進貨單', status)
 
     const getQueryParam = (param: any) => {
         if (Array.isArray(param)) {
@@ -153,6 +156,21 @@ export default function PurchaseRequisitionList() {
             setCheckFirstIn(parseInt(firstin as string) || 0);
         }
     }, [firstin]);
+
+
+    const [editmain, setEditmain] = useState<boolean>(false);
+
+    // 保存原始值
+    const [originalSuppliernamein, setOriginalSuppliernamein] = useState('');
+    const [originalSupplierphonein, setOriginalSupplierphonein] = useState('');
+    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState('');
+    const [originalInvoicein, setOriginalInvoicein] = useState('');
+    const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState('');
+    const [originalShippingaddressin, setOriginalShippingaddressin] = useState<string>("");
+    const [originaldata1, setOriginaldata1] = useState<any[]>([]);
+    const [originalnote, setOriginalnote] = useState('');
+    const [originalcreate_at, setOriginalcreate_at] = useState(notein);
+    const [originalneed_date, setOriginalneed_date] = useState(notein);
 
 
     //#region 上方功能列
@@ -235,7 +253,7 @@ export default function PurchaseRequisitionList() {
             setIsLoading(true);
             const conditionModel = {
                 type: "詢價中",
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -255,6 +273,7 @@ export default function PurchaseRequisitionList() {
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             // if (data.length > 0 && checkfirstin === 0) {
             //     getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
@@ -359,14 +378,27 @@ export default function PurchaseRequisitionList() {
             setData1(data);
 
             let totalprice = 0;
+
+            // 計算總價
             data.forEach((element: { totalprice: any; }) => {
-                totalprice += element.totalprice;
+                // 檢查 totalprice 是不是數字，如果是字串就移除逗號並轉為數字
+                const price = typeof element.totalprice === 'string' ? parseFloat(element.totalprice.replace(/,/g, '')) : parseFloat(element.totalprice) || 0;
+                totalprice += price; // 將價格加總
             });
-            setTotalPrice(totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const taxPrice = Math.round(totalprice * 0.05);
+
+            // 四捨五入總價到小數點第二位
+            const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+            setTotalPrice(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+            // 計算稅金並四捨五入
+            const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
             setTaxPrice(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-            const totalPayPrice = totalprice + taxPrice;
+
+            // 計算應付總價（總價 + 稅金）並四捨五入
+            const totalPayPrice = roundedTotalPrice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+
 
             // 詢價進度
             let totalquotereq = data.length;
@@ -402,6 +434,9 @@ export default function PurchaseRequisitionList() {
         // alert(purchaserequisitionuuid);
         // alert(purchaserequisitionid);
         if (purchaserequisitionuuid) {
+
+            console.log(create_at)
+
             getPurchaseRequisitionDetail(purchaserequisitionuuid);
             setPurchaserequisitionidin(purchaserequisitionid as string);
             setPurchaserequisitionuuidin(purchaserequisitionuuid as string);
@@ -413,7 +448,9 @@ export default function PurchaseRequisitionList() {
             setNeed_datein(need_date as string);
             setNotein(note as string);
             GetReviewById(purchaserequisitionuuid);
-            GetReviewHistory(purchaserequisitionid as string);
+            GetReviewHistory(purchaserequisitionuuid as string);
+            setPrquotereqmodalopen(false);
+            setEditmain(false);
         }
     }, [purchaserequisitionuuid]);
 
@@ -462,7 +499,7 @@ export default function PurchaseRequisitionList() {
                 totalprice1: totalprice1,
                 taxprice1: taxprice1,
                 totalpayprice1: totalpayprice1,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
                 needdate: need_datein,
                 data: data2,
                 note: notein
@@ -605,30 +642,34 @@ export default function PurchaseRequisitionList() {
 
     useEffect(() => {
         console.log(data1);
+
         // 每次 data2 更新時，重新計算總價和稅金
         let totalprice = 0;
         data2.forEach((element) => {
             // 檢查 totalprice 是不是數字，如果是字串就移除逗號
             const price = typeof element.totalprice === 'string'
                 ? parseFloat(element.totalprice.replace(/,/g, ''))
-                : parseFloat(element.totalprice) || 0;  // 如果是數字，直接轉換
-            console.log(price);  // 顯示正確的數字格式
-            totalprice += price;  // 將其加總
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
         });
+
         console.log(totalprice); // 應顯示正確的加總結果
 
-        // 計算總價後，四捨五入到兩位小數，然後再格式化
-        const roundedTotalPrice = parseFloat(totalprice.toFixed(2));  // 四捨五入總價
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
         setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算稅金，四捨五入到最接近的整數
-        const taxPrice = Math.round(roundedTotalPrice * 0.05);
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
         setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-        // 計算應付總價（總價 + 稅金），四捨五入到兩位小數並格式化
-        const totalPayPrice = parseFloat((roundedTotalPrice + taxPrice).toFixed(2));
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
         setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
     }, [data2]);
+
 
 
 
@@ -710,6 +751,7 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             const conditionModel = {
                 productid: productid as string | undefined,
+                type: 'pr'
             };
 
             var inputModel = {
@@ -759,8 +801,8 @@ export default function PurchaseRequisitionList() {
                 suppliertaxid: item.detail_suppliertaxid,
                 supplieraddress: item.detail_supplieraddress,
                 supplierphone: item.detail_supplierphone,
-                suppliercontact:item.detail_suppliercontact,
-                supplierfax:item.detail_supplierfax
+                suppliercontact: item.detail_suppliercontact,
+                supplierfax: item.detail_supplierfax
             };
 
             var inputModel = {
@@ -795,6 +837,49 @@ export default function PurchaseRequisitionList() {
         }
 
     };
+
+    const clearPurchaseRequisitionDetail = async (item: any) => {
+        try {
+            const conditionModel = {
+                purchaserequisitiondetailuuid: purchaserequisitiondetailuuid,
+                unitprice: '',
+                totalprice: '',
+                suppliername: '',
+                quotereqdetailuuid: '',
+                suppliertaxid: '',
+                supplieraddress: '',
+                supplierphone: '',
+                suppliercontact: '',
+                supplierfax: '',
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePurchaserequisitionDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
+
+
     // useEffect(() => {
     //     if (selectedsupplier) {
     //         // updateQuotereqDetail(selectedsupplier, lastselectedsupplier);
@@ -1007,7 +1092,7 @@ export default function PurchaseRequisitionList() {
             const conditionModel = {
                 purchaserequisitionuuid: purchaserequisitionuuidin,
                 type: type,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id.toString(),
             };
 
             var inputModel = {
@@ -1051,7 +1136,7 @@ export default function PurchaseRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                user_id: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -1176,7 +1261,7 @@ export default function PurchaseRequisitionList() {
                     document_type: "請購單",
                     review_id: review_flow,
                     query: review_query,
-                    username: userInfo?.username,
+                    user_id: userInfo?.employee?.id.toString(),
                     document_title: documenttitle
                 };
 
@@ -1210,8 +1295,8 @@ export default function PurchaseRequisitionList() {
                 //改變單據狀態
                 const conditionModel2 = {
                     type: type,
-                    purchaserequisitionuuid: purchaserequisitionuuidin as string | undefined,
-                    username: userInfo?.username as string | undefined
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    username: userInfo?.employee?.id.toString()
                 };
 
 
@@ -1250,7 +1335,7 @@ export default function PurchaseRequisitionList() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.username}`)
+        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1288,7 +1373,7 @@ export default function PurchaseRequisitionList() {
                         setStatusin("詢價中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(purchaserequisitionidin);
+                        GetReviewHistory(purchaserequisitionuuidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1306,8 +1391,7 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             // alert(purchaserequisitionidin);
             const conditionModel = {
-                // username: userInfo?.username
-                id: id
+                document_uuid: id
             };
 
             var inputModel = {
@@ -1355,10 +1439,17 @@ export default function PurchaseRequisitionList() {
     }
 
     const handleCheckboxChange = (item: any) => {
-        // 更新選中的供應商
-        setLastselectedsupplier(selectedsupplier);
-        setSelectedsupplier(item.detail_id);
-        UpdatePurchaserequisitionDetail(item);
+        // 判斷當前選中的 supplier 是否與點擊的相同
+        if (selectedsupplier === item.detail_id) {
+            // 如果相同，清空選擇
+            setSelectedsupplier('');
+            clearPurchaseRequisitionDetail(item); // 呼叫清空資料的函數
+        } else {
+            // 如果不同，更新選中的供應商
+            setLastselectedsupplier(selectedsupplier);
+            setSelectedsupplier(item.detail_id);
+            UpdatePurchaserequisitionDetail(item);
+        }
     };
 
     const GoToQuotereq = async () => {
@@ -1404,7 +1495,7 @@ export default function PurchaseRequisitionList() {
         setNeed_datein(item.need_date as string);
         setNotein(item.note as string);
         GetReviewById(item.purchaserequisitionuuid);
-        GetReviewHistory(item.purchaserequisitionid as string);
+        GetReviewHistory(item.purchaserequisitionuuid as string);
 
     }
 
@@ -1472,8 +1563,98 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        // setOriginalSuppliernamein(suppliernamein);
+        // setOriginalSupplierphonein(supplierphonein);
+        // setOriginalSuppliertaxidin(suppliertaxidin);
+        // setOriginalInvoicein(invoicein);
+        // setOriginalSupplieraddressin(supplieraddressin);
+        // setOriginalShippingaddressin(shippingaddressin);
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginaldata1(data1);
+        setOriginalnote(notein);
+        setEditmain(true);
+    };
+
+    const handleSave = async () => {
+        // 顯示確認對話框
+        myAlert.confirm({
+            title: '確定要儲存異動的資料嗎?',
+            content: null,
+            props: {
+                onOk: async () => {
+                    console.log(create_atin);
+                    console.log(need_datein);
+                    try {
+                        // 打印數據到控制台以供調試
+                        console.log(data);
+                        // return;
+
+                        const conditionModel = {
+                            purchaserequisitionuuid: purchaserequisitionuuidin,
+                            create_at: create_atin,
+                            need_date: need_datein,
+                            note: notein,
+                            data1: data1
+                        };
+                        console.log(create_atin);
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+
+
+                        // 發送數據到 API
+                        const response = await fetch(`${setting.apipath}/WareHouse/UpdatePR`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel),
+                        });
+
+                        if (!response.ok) {
+                            myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` })
+
+                        }
+                        // 解析 API 響應
+                        const result = await response.json();
+
+                        // 顯示成功提示
+                        myAlert.success({ title: '更新成功' })
+                        setEditmain(false);
+                        getPurchaseRequisition();
+                        getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+
+                        // 更新狀態或執行其他操作
+                        console.log(result);
+                    } catch (error: any) {
+                        // 顯示錯誤信息
+                        myAlert.err({ title: 'FunctionError', content: error.message },)
+                    }
+                }
+            }
+        });
+    }
+
+    const handleCancel = async () => {
+        setData1(originaldata1);
+        setNotein(originalnote);
+        setCreate_atin(originalcreate_at);
+        setNeed_datein(originalneed_date);
+        setOriginalneed_date(need_datein);
+        setEditmain(false);
+    }
+
     return (
-        <SubLayer isLoading_subLayer={isLoading}>
+        <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
@@ -1500,7 +1681,29 @@ export default function PurchaseRequisitionList() {
                                     單據
                                 </button> */}
                             </div>
-                            <div></div>
+                            <div>
+                                <span style={{ display: `${(statusin === "詢價中") ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.squarebtn} onClick={handleEdit}>
+                                        <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${(statusin === "已結案" || statusin === "已核准" || statusin === "審核中") ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.disablesquarebtn} >
+                                        <img src={icon_edit_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleSave}>
+                                    <img src={icon_save.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.squarebtn} onClick={handleCancel}>
+                                    <img src={icon_cancel.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    取消
+                                </button>
+                            </div>
                             <div></div>
                             <div>
                                 <button
@@ -1583,31 +1786,57 @@ export default function PurchaseRequisitionList() {
                                         />
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="請購日期"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                                     // value: checkfirstin
                                                 },
                                             }}
-                                        />
+                                        /> */}
 
+                                        <InputSel
+                                            caption="請購日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    // value: create_atin  ? moment(create_atin) : null,
+                                                    value: (() => {
+
+                                                        console.log(create_atin)
+                                                        return create_atin ? moment(create_atin) : null
+                                                    })(),
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
+                                        />
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="需用日期"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
                                                     value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
                                                 },
                                             }}
+                                        /> */}
+                                        <InputSel
+                                            caption="需用日期"
+                                            disabled={!editmain}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: need_datein ? moment(need_datein) : null,
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
                                         />
-
                                     </div>
                                     <div>
                                         <InputSel
@@ -1627,10 +1856,11 @@ export default function PurchaseRequisitionList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={true}
+                                            disabled={!editmain}
                                             inputProps={{
                                                 props: {
-                                                    value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                                    value: notein ? notein : ' ',
+                                                    onChange: (e) => { setNotein(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1725,7 +1955,27 @@ export default function PurchaseRequisitionList() {
                                                             <span>{_item.productid}</span>
                                                             <span>{_item.name}</span>
                                                             <span>{_item.spec}</span>
-                                                            <span>{_item.quantity.toLocaleString()}</span>
+                                                            <span>
+                                                                {/* {_item.quantity.toLocaleString()} */}
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    value={_item.quantity !== undefined ? _item.quantity.toLocaleString() : 0}
+                                                                    readOnly={!(editmain === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newQuantity = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            quantity: newQuantity.toString(),
+                                                                            totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                             <span>{_item.unit}</span>
                                                             <span>
                                                                 <button
@@ -1736,15 +1986,52 @@ export default function PurchaseRequisitionList() {
                                                                     }}
                                                                     disabled={_item.reviewtype === 'review'}
                                                                 >
-                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
+                                                                    <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
                                                                 </button>
 
                                                             </span>
-                                                            <span>{_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                                            <span>
+                                                                {/* {_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} */}
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                                    type="text"
+                                                                    value={_item.unitprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                                    readOnly={!(editmain === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newUnitPrice = e.target.value;
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            unitprice: newUnitPrice.toString(),
+                                                                            totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                             <span>{_item.totalprice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                                                             <span>{_item.suppliername}</span>
 
-                                                            <span title={_item.note}>{_item.note}</span>
+                                                            <span>
+                                                                <input
+                                                                    ref={noteRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                                    type="text"
+                                                                    value={_item.note}
+                                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                                    onChange={(e) => {
+                                                                        const newData = [...data1];
+                                                                        const newNote = e.target.value
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            note: newNote
+                                                                        };
+                                                                        setData1(newData);
+                                                                    }}
+                                                                />
+                                                            </span>
                                                         </div>
                                                     </CellWithBar>
                                                 ))
@@ -1777,9 +2064,9 @@ export default function PurchaseRequisitionList() {
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
-                                流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
+                                {/* 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
                                 (1).詢價請至詢價管理操作，詢價完畢後請送出審核<br />
-                                (2).待審核完畢後請依廠商分類，將項目加入下方清單轉為採購單。
+                                (2).待審核完畢後請依廠商分類，將項目加入下方清單轉為採購單。 */}
                             </div>
                             <div></div>
                             <div>
@@ -1977,7 +2264,6 @@ export default function PurchaseRequisitionList() {
 
 
 
-
                 <DragableModal
                     handleText="詢價紀錄"
                     style={{ zIndex: '1001', width: '1000px' }}
@@ -1992,35 +2278,37 @@ export default function PurchaseRequisitionList() {
                     {/* {selectedsupplier} */}
                     <div>
                         <Thead01 type={'Quotereq2'} />
-                        {prquotereqdata && (
-                            prquotereqdata.map((_item: any, index: number) => (
-                                <CellWithBar key={index} className={scss.panelHeader17}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.detail_suppliername}</span>
-                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
-                                        <span>{_item.detail_unit}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
-                                        <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                        <span>{_item.pricetype}</span>
-                                        <span>{_item.main_quotereqid}</span>
-                                        <span></span>
-                                        {/* <span></span> */}
-                                        <span>
-                                            <input
-                                                disabled={['已核准', '審核中', '已結案'].includes(statusin)}
-                                                className={scss.quotereqdetail_checkbox}
-                                                type='checkbox'
-                                                checked={selectedsupplier === _item.detail_id}
-                                                onChange={() => handleCheckboxChange(_item)}
-                                            />
+                        <div style={{ height: '300px', overflowY: 'auto' }}>
+                            {prquotereqdata && (
+                                prquotereqdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader17}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.detail_suppliername}</span>
+                                            <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
+                                            <span>{_item.detail_unit}</span>
+                                            <span style={{ textAlign: 'right', color: '#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
+                                            <span style={{ color: '#14256a' }}>{_item.pricetype}</span>
+                                            <span>{_item.main_quotereqid}</span>
+                                            <span></span>
+                                            {/* <span></span> */}
+                                            <span>
+                                                <input
+                                                    style={{ backgroundColor: 'transparent', width: '100%', height: '20px' }}
+                                                    disabled={!(editmain && statusin !== '已核准' && statusin !== '已結案')}
+                                                    type='checkbox'
+                                                    checked={selectedsupplier === _item.detail_id}
+                                                    onChange={() => handleCheckboxChange(_item)}
+                                                />
 
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))
-                        )}
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </DragableModal>
 
@@ -2220,7 +2508,7 @@ export default function PurchaseRequisitionList() {
                 {/* 審核 */}
                 <DragableModal
                     handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '820px' }}
+                    style={{ zIndex: '1001', width: '1000px' }}
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
@@ -2233,7 +2521,7 @@ export default function PurchaseRequisitionList() {
                         <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
                             <Space direction="vertical">
                                 {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
                                         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                                             {_item.name}：
                                             {_item.stages.map((_stage: any, index: number) => (
@@ -2250,11 +2538,51 @@ export default function PurchaseRequisitionList() {
                             </Space>
                         </Radio.Group>
                     </div>
-
-
-
                 </DragableModal>
-
+                {/* <Modal
+                    visible={reviewbar}
+                    footer={null}
+                    onCancel={() => setReviewbar(false)}  // 使用箭頭函數
+                    width="1100px"
+                    maskClosable={false}
+                    title={
+                        <div className={scss.modal_head_head1}>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>選擇審核流程</span>
+                            </div>
+                        </div>
+                    }
+                    // centered
+                    style={{ top: 200 }}
+                >
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1040px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+                </Modal> */}
 
 
             </div >

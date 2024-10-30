@@ -132,7 +132,7 @@ export default function FlowList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username
+                username: userInfo?.employee?.chName.toString()
             };
 
             var inputModel = {
@@ -456,7 +456,7 @@ export default function FlowList() {
                 stage_order: prevData2.length + 1, // 新增的資料順序號
                 review_type: '提出',
                 stage_user_uuid: userInfo?.employee?.id,
-                stage_user_name: userInfo?.username,
+                stage_user_name: userInfo?.employee?.chName.toString(),
                 stage_user_title: '經辦',
             }
         ]);
@@ -531,7 +531,7 @@ export default function FlowList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.username,
+                username: userInfo?.employee?.chName.toString(),
                 name: flowname,
                 stage_counter: data2.length,
                 data2: data2
