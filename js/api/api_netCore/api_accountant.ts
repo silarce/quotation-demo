@@ -72,7 +72,7 @@ type TgetAccountPayableByProps = XOR<
     };
   },
   {
-    unpaid_date: {
+    dateForUnpaid: {
       date: string;
     };
   },
@@ -1006,28 +1006,33 @@ const useGetPaymentOrderById = (
 
 // 取得應付帳款
 const apiGetAccountPayableBy = async (props: TgetAccountPayableByProps) => {
-  const { supplier, unpaid_date, invoiceNumber } = props;
+  const { supplier, dateForUnpaid, invoiceNumber } = props;
 
-  const apiLookup = {
+  const apiLookup: {
+    [key in keyof Required<TgetAccountPayableByProps>]: {
+      api: string;
+      params: object;
+    };
+  } = {
     // 以廠商id(等同於客戶id)取得應付帳款
     supplier: {
       api: `/${subRoot}/GetAccountPayableBySupplierId`,
       params: {
-        supplier_uuid: supplier!.supplier_uuid,
+        supplier_uuid: supplier?.supplier_uuid,
       },
     },
     // 以月份篩選當月以前應付帳款未付款的資料
-    unpaid_date: {
+    dateForUnpaid: {
       api: `/${subRoot}/GetMonthlyAccountPayable`,
       params: {
-        date: unpaid_date!.date,
+        date: dateForUnpaid?.date,
       },
     },
     // 以發票號碼取得應付帳款
     invoiceNumber: {
       api: `/${subRoot}/SearchAccountPayableByInvoiceNumber`,
       params: {
-        invoice_number: invoiceNumber!.invoice_number,
+        invoice_number: invoiceNumber?.invoice_number,
       },
     },
   } as const;
@@ -1057,7 +1062,7 @@ const useGetAccountPayableBy = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [res, setRes] = useState<Taccount_payable_Dto[]>();
+  const [raw, setRaw] = useState<Taccount_payable_Dto[]>();
 
   const update = async () => {
     if (isFetching || !props) {
@@ -1068,12 +1073,12 @@ const useGetAccountPayableBy = (
 
     return await apiGetAccountPayableBy(props)
       .then((data) => {
-        setRes(data);
+        setRaw(data);
 
         return data;
       })
       .catch((err: AxiosError) => {
-        setRes(undefined);
+        setRaw(undefined);
         callAlertOnError && myAlert.err({ title: '取得應付帳款失敗', content: err.message });
       })
       .finally(() => {
@@ -1087,8 +1092,8 @@ const useGetAccountPayableBy = (
   }, [props]);
 
   return {
-    res,
-    setRes,
+    raw,
+    setRaw,
     update,
     isFetching,
   };
@@ -1414,4 +1419,9 @@ export {
   apiDeleteAccountPayableStatisticsById,
 };
 
-export type { TapplyPayment_Dto_detailed, TpurchaseCollectTicket_Dto_detailed, Tpayment_order_Dto_detailed };
+export type {
+  TapplyPayment_Dto_detailed,
+  TpurchaseCollectTicket_Dto_detailed,
+  Tpayment_order_Dto_detailed,
+  TgetAccountPayableByProps,
+};
