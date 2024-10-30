@@ -972,7 +972,7 @@ const topPathList: TtopPathListConfig[] = [
   },
   {
     icon: icon_shareform,
-    label: '單據管理',
+    label: '審核管理',
     path01: sidePathList['/documentManagement'].path01,
     href: {
       pathname: sidePathList['/documentManagement'].path01 + '/reviewList',

@@ -1306,7 +1306,7 @@ export default function PurchaseOrderList() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_採購單_${id}_比價單.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -2631,7 +2631,7 @@ export default function PurchaseOrderList() {
                 {/* 審核 */}
                 <DragableModal
                     handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '820px' }}
+                    style={{ zIndex: '1001', width: '1000px' }}
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
@@ -2644,7 +2644,7 @@ export default function PurchaseOrderList() {
                         <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
                             <Space direction="vertical">
                                 {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
                                         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                                             {_item.name}：
                                             {_item.stages.map((_stage: any, index: number) => (

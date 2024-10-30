@@ -77,6 +77,8 @@ export default function PurchaseRequisitionList() {
         reviewflow
     } = router.query;
 
+    console.log('進貨單', status)
+
     const getQueryParam = (param: any) => {
         if (Array.isArray(param)) {
             return param[0];
@@ -446,7 +448,7 @@ export default function PurchaseRequisitionList() {
             setNeed_datein(need_date as string);
             setNotein(note as string);
             GetReviewById(purchaserequisitionuuid);
-            GetReviewHistory(purchaserequisitionid as string);
+            GetReviewHistory(purchaserequisitionuuid as string);
             setPrquotereqmodalopen(false);
             setEditmain(false);
         }
@@ -1371,7 +1373,7 @@ export default function PurchaseRequisitionList() {
                         setStatusin("詢價中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(purchaserequisitionidin);
+                        GetReviewHistory(purchaserequisitionuuidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1389,7 +1391,7 @@ export default function PurchaseRequisitionList() {
             // setIsLoading(true);
             // alert(purchaserequisitionidin);
             const conditionModel = {
-                id: id
+                document_uuid: id
             };
 
             var inputModel = {
@@ -1493,7 +1495,7 @@ export default function PurchaseRequisitionList() {
         setNeed_datein(item.need_date as string);
         setNotein(item.note as string);
         GetReviewById(item.purchaserequisitionuuid);
-        GetReviewHistory(item.purchaserequisitionid as string);
+        GetReviewHistory(item.purchaserequisitionuuid as string);
 
     }
 
@@ -1652,7 +1654,7 @@ export default function PurchaseRequisitionList() {
     }
 
     return (
-        <SubLayer isLoading_subLayer={isLoading}>
+        <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'請購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
@@ -2062,9 +2064,9 @@ export default function PurchaseRequisitionList() {
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
-                                流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
+                                {/* 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
                                 (1).詢價請至詢價管理操作，詢價完畢後請送出審核<br />
-                                (2).待審核完畢後請依廠商分類，將項目加入下方清單轉為採購單。
+                                (2).待審核完畢後請依廠商分類，將項目加入下方清單轉為採購單。 */}
                             </div>
                             <div></div>
                             <div>
@@ -2257,7 +2259,6 @@ export default function PurchaseRequisitionList() {
                         </div>
                     </div>
                 </div>
-
 
 
 
@@ -2507,7 +2508,7 @@ export default function PurchaseRequisitionList() {
                 {/* 審核 */}
                 <DragableModal
                     handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '820px' }}
+                    style={{ zIndex: '1001', width: '1000px' }}
                     show={reviewbar}
                     onCrossClick={() => { setReviewbar(false) }}>
                     <div style={{ padding: '0px 5px' }}>
@@ -2520,7 +2521,7 @@ export default function PurchaseRequisitionList() {
                         <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
                             <Space direction="vertical">
                                 {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
                                         <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                                             {_item.name}：
                                             {_item.stages.map((_stage: any, index: number) => (
@@ -2537,11 +2538,51 @@ export default function PurchaseRequisitionList() {
                             </Space>
                         </Radio.Group>
                     </div>
-
-
-
                 </DragableModal>
-
+                {/* <Modal
+                    visible={reviewbar}
+                    footer={null}
+                    onCancel={() => setReviewbar(false)}  // 使用箭頭函數
+                    width="1100px"
+                    maskClosable={false}
+                    title={
+                        <div className={scss.modal_head_head1}>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>選擇審核流程</span>
+                            </div>
+                        </div>
+                    }
+                    // centered
+                    style={{ top: 200 }}
+                >
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1040px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+                </Modal> */}
 
 
             </div >

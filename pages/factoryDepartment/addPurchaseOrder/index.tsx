@@ -481,7 +481,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     purchaseorderuuid: purchaseorderuuid,
                     create_at: create_atin,
-                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    need_date: need_date,
                     create_by: create_byin,
                     note: note,
                     suppliername: suppliernamein,
@@ -533,7 +533,7 @@ export default function AddPurchaseOrder() {
                 setIsLoading(true);
                 const conditionModel = {
                     create_at: create_atin,
-                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    need_date: need_date,
                     create_by: userInfo?.employee?.id.toString(),
                     note: note,
                     suppliername: suppliernamein,
@@ -1696,7 +1696,7 @@ export default function AddPurchaseOrder() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
+                                                    value: create_atin ? moment(create_atin) : null,
                                                     onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
@@ -1711,7 +1711,7 @@ export default function AddPurchaseOrder() {
                                             // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
+                                                    value: need_date ? moment(need_date) : null,
                                                     onChange: (e) => { setNeed_date(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
