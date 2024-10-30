@@ -79,7 +79,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
         const updateTime = () => {
             const now = new Date();
             setLocalTime(now.toLocaleString());
-            setCreateBy(userInfo?.username as string);
+            setCreateBy(userInfo?.employee?.chName.toString() as string);
         };
 
         // 初始化時間
@@ -229,7 +229,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                             disabled={!disabled}
                             inputProps={{
                                 props: {
-                                    value: userInfo?.username,
+                                    value: userInfo?.employee?.chName.toString(),
                                     // onChange: (e) => setCreateBy(e.target.value.trim())
                                 },
                             }}
