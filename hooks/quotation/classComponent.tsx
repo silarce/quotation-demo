@@ -1309,6 +1309,7 @@ const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = 
       creDesc: creDesc_sidePlates,
       options: optionsCreator_componentMaterial_02(),
       hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '組',
     };
   },
 
