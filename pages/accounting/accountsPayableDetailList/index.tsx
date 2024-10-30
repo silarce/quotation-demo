@@ -12,6 +12,9 @@ import { Spin, Switch } from 'antd';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// component
+import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/SearchSwitch';
+
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -112,17 +115,8 @@ export default function AccountsPayableDetailList() {
     <SubLayer>
       <PageHeader02
         tag="應付帳款明細表"
-        // customeLeft={[
-        //   <DateSelector
-        //     key="DateSelector"
-        //     yearOptionArr={yearOptionArr}
-        //     monthOptionArr={monthOptionArr}
-        //     year={year}
-        //     month={month}
-        //   />,
-        // ]}
-        // panelList={usePanelList()}
-        customeRight={[<MySwitch key="0" />]}
+        customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
+        panelList={createPanel()}
       />
 
       <div>
@@ -139,184 +133,25 @@ export default function AccountsPayableDetailList() {
 // ==============================================================================
 // ==============================================================================
 // ==============================================================================
+// ==============================================================================
 
-// MARK:usePanelList
+// ==========================================================================
 
-const usePanelList = () => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-
-  const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
-  const {
-    //
-    year = thisYear.toString(),
-    month = thisMonth.toString(),
-    invoiceNumber,
-  } = query;
-  const searchGroup_invoice: TsearchGroup = {
-    searchTargetList: [
-      {
-        width: '220px',
-        defaultValue: invoiceNumber,
-        placeholder: '以發票號碼搜尋所有應付帳款',
-      },
-    ],
-
-    doSearch: (searchValueArr) => {
-      const invoiceNumber = searchValueArr[0] as string;
-
-      const newQuery: Tquery = {
-        ...query,
-        invoiceNumber,
-      };
-
-      if (!newQuery.invoiceNumber) {
-        delete newQuery.invoiceNumber;
-      }
-
-      router.replace({
-        query: newQuery,
-      });
-    },
-  };
-  const search_date: TsearchGroup = {
-    searchTargetList: [
-      {
-        placeholder: '選擇年份',
-        options: yearOptionArr,
-        defaultValue: year,
-      },
-      {
-        placeholder: '選擇月份',
-        options: monthOptionArr,
-        defaultValue: month,
-      },
-    ],
-    doSearch: () => {},
-  };
-
+const createPanel = () => {
   const panelList: TpanelList = [
-    // { searchGroup: search_date },
-    { searchGroup: searchGroup_invoice },
-    // {
-    //   type: 'inputSearch',
-    //   placeholder: 'fooo',
-    //   onClick: () => {},
-    // },
     {
       type: 'myButton',
-      label: '產生當月應付帳款',
-      onClick: () => {
-        console.log('產生當月應付帳款');
-      },
+      label: '產生當月應付帳款統計表',
+      onClick: () => {},
+    },
+    {
+      type: 'myButton',
+      label: '查看當月應付帳款統計表',
+      onClick: () => {},
     },
   ];
 
   return panelList;
 };
 
-// MARK: DateSelector
-const DateSelector = ({
-  yearOptionArr,
-  monthOptionArr,
-  year,
-  month,
-  className,
-}: {
-  yearOptionArr: Toption[];
-  monthOptionArr: Toption[];
-  year: string;
-  month: string;
-  className?: string;
-}) => {
-  const selectPropsArr = useYearMonth_selectBar_query({
-    year: year,
-    month: month,
-    yearOptionArr,
-    monthOptionArr,
-  });
-
-  return <SelectBar key="selectBar" className={className} selectPropsArr={selectPropsArr} />;
-};
-
-const MySwitch = () => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-  const { yearOptionArr, monthOptionArr } = useYearMonth_options();
-  const {
-    //
-    year,
-    month,
-    invoiceNumber,
-    searchType,
-  } = query;
-
-  const checked = searchType === 'invoice';
-
-  const searchGroup_invoice: TsearchGroup = {
-    searchTargetList: [
-      {
-        width: '220px',
-        defaultValue: invoiceNumber,
-        placeholder: '以發票號碼搜尋所有應付帳款',
-      },
-    ],
-
-    doSearch: (searchValueArr) => {
-      const invoiceNumber = searchValueArr[0] as string;
-
-      const newQuery: Tquery = {
-        ...query,
-        invoiceNumber,
-      };
-
-      if (!newQuery.invoiceNumber) {
-        delete newQuery.invoiceNumber;
-      }
-
-      router.replace({
-        query: newQuery,
-      });
-    },
-  };
-
-  return (
-    <div className={scss.mySwitch}>
-      <Switch
-        className={classNames(scss.antdSwitch)}
-        checked={searchType === 'invoice'}
-        onChange={(checked) => {
-          const searchType = checked ? 'invoice' : 'date';
-          router.replace({
-            query: {
-              ...router.query,
-              searchType,
-            },
-          });
-        }}
-        checkedChildren={
-          <>
-            以<i className="text-white font-bold">發票</i> 搜尋 <i className="text-white font-bold">所有</i> 應付帳款
-          </>
-        }
-        unCheckedChildren={
-          <>
-            以<i className="text-white font-bold">日期</i> 搜尋 <i className="text-white font-bold">未付</i> 應付帳款
-          </>
-        }
-      />
-      {!checked && (
-        <DateSelector
-          key="DateSelector"
-          className="ml-2"
-          yearOptionArr={yearOptionArr}
-          monthOptionArr={monthOptionArr}
-          year={year || ''}
-          month={month || ''}
-        />
-      )}
-      {checked && <SearchBar className="ml-2 w-[282px]" {...searchGroup_invoice} />}
-    </div>
-  );
-};
 // ==========================================================================
