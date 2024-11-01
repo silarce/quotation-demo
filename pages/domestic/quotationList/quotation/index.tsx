@@ -819,6 +819,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(true);
       const res = await apiQuotationReview({ id: quotationId, body });
 
+      // res裡沒有status................竟然沒有
       if (res.status === 'Contract') {
         // router.push({
         //   pathname: '/domestic/contract',
