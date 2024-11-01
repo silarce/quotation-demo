@@ -864,13 +864,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(true);
       await apiQuotationReview({ id: quotationId, body });
 
-      if (shouldDirect) {
-        router.push({
-          pathname: '/domestic/contract',
-        });
-      } else {
-        await update_quotation();
-      }
+      myAlert.success({
+        title: '審核完成',
+        props: {
+          onOk: () => {
+            router.push('/domestic/quotationList?status=Pending');
+          },
+        },
+      });
+
+      // if (shouldDirect) {
+      //   router.push({
+      //     pathname: '/domestic/contract',
+      //   });
+      // } else {
+      //   await update_quotation();
+      // }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '審核發生錯誤', content: err.message });
