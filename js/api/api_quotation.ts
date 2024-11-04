@@ -62,6 +62,8 @@ type TgetQuotation = {
   meta: TpageMetaDto;
 };
 
+// type TquotationContractDto_withPage = TquotationContractDto & { page: number };
+
 export const apiGetQuotation = async (params?: Tparams) => {
   const api = '/quotation';
 
@@ -789,21 +791,17 @@ export const useContract_infinite_topBottom = ({
   const [viewRef_top, inView_top] = useInView();
   const [viewRef_bottom, inView_bottom] = useInView();
 
-  const [rawDataList, setRawDataList] = useState<{ [id: string]: TquotationContractDto }>({});
+  const [rawDataList, setRawDataList] = useState<{ [id: string]: TquotationContractDto }>();
   // const [dataPage, setDataPage] = useState<{ [page: `${number}`]: TquotationContractDto[] }>({});
-  const [rawData_page, setRawData_page] = useState<{ [page: `${number}`]: { [id: string]: TquotationContractDto } }>(
-    {}
-  );
+  const [rawData_page, setRawData_page] = useState<{
+    [page: `${number}`]: { [id: string]: TquotationContractDto };
+  }>();
 
   const [page, setPage] = useState<number>(startPage);
   // 用meta判斷是否已經有資料
   const [meta, setMeta] = useState<TpageMetaDto>();
 
   const [isFetchingPrev, setIsFetchingPrev] = useState(false);
-
-  // ------------------------------------------------------------
-
-  const rawDataArr = Object.values(rawData_page).flatMap((page) => Object.values(page));
 
   // ------------------------------------------------------------
 
@@ -836,11 +834,34 @@ export const useContract_infinite_topBottom = ({
 
     !meta && setIsLoadingPage1(true);
     setIsloading(true);
-    await apiGetContract(params)
-      .then((res) => {
-        const { data: raw_data, meta } = res;
 
-        const list = raw_data.reduce((acc, item) => {
+    await apiGetContract(params)
+      .then(async (firstRes) => {
+        if (!rawDataList) {
+          const secondRes = await apiGetContract({ ...params, page: params.page + 1 });
+
+          return {
+            firstRes,
+            secondRes,
+          };
+        }
+
+        return {
+          firstRes,
+          secondRes: undefined,
+        };
+      })
+      .then(({ firstRes, secondRes }) => {
+        const { data: raw_data_1st, meta: meta_1st } = firstRes;
+        const { data: raw_data_2nd, meta: meta_2nd } = secondRes ?? {};
+
+        const list_1st = raw_data_1st.reduce((acc, item) => {
+          acc[item.id] = item;
+
+          return acc;
+        }, {} as { [id: string]: TquotationContractDto });
+
+        const list_2nd = raw_data_2nd?.reduce((acc, item) => {
           acc[item.id] = item;
 
           return acc;
@@ -848,17 +869,23 @@ export const useContract_infinite_topBottom = ({
 
         setRawDataList((state) => ({
           ...state,
-          ...list,
+          ...list_1st,
+          ...list_2nd,
         }));
 
-        setRawData_page((state) => ({
-          ...state,
-          [`${meta.page}`]: list,
-        }));
+        setRawData_page((state) => {
+          const copy = { ...state };
+          copy[`${meta_1st.page}`] = list_1st;
 
-        setMeta(meta);
+          if (meta_2nd?.page && list_2nd) {
+            copy[`${meta_2nd.page}`] = list_2nd;
+          }
 
-        return res;
+          return copy;
+        });
+
+        setMeta(meta_2nd || meta_1st);
+        setPage(meta_2nd?.page ?? meta_1st.page);
       })
       .catch((err) => {
         setPage(meta?.page ?? startPage);
@@ -874,7 +901,7 @@ export const useContract_infinite_topBottom = ({
   }; // update
 
   const nextPage = () => {
-    if (!meta) {
+    if (!meta || !rawData_page) {
       return;
     }
 
@@ -889,7 +916,7 @@ export const useContract_infinite_topBottom = ({
   };
 
   const prevPage = () => {
-    if (!meta) {
+    if (!meta || !rawData_page) {
       return;
     }
 
@@ -912,6 +939,10 @@ export const useContract_infinite_topBottom = ({
     setRawData_page({});
     setMeta(undefined);
     setPage(1);
+  };
+
+  const getRawDataArr = () => {
+    return Object.values(rawData_page ?? {}).flatMap((page) => Object.values(page));
   };
 
   useEffect(() => {
@@ -963,7 +994,7 @@ export const useContract_infinite_topBottom = ({
     viewRef_bottom,
     rawDataList,
     rawData_page,
-    rawDataArr,
+    getRawDataArr,
     page,
     meta,
     reset,

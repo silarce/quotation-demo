@@ -33,10 +33,14 @@ function ContractList_pre(
     contractArr,
     viewRef,
     viewRef_top,
+    activeContractId,
+    onChangeActiveContract,
   }: {
     contractArr: Tcontract[];
     viewRef?: (node?: Element | null | undefined) => void;
     viewRef_top?: (node?: Element | null | undefined) => void;
+    activeContractId: string | undefined;
+    onChangeActiveContract: (contractId: string | undefined) => void;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -44,14 +48,13 @@ function ContractList_pre(
 
   // ------------------------------------------------------------------
 
-  const [contractId, setContractId] = useState<string>();
-
-  // panelHeader點擊變粉紅色用
-  const [activeIndex, setActiveIndex] = useState(-1);
-
   // ------------------------------------------------------------------
 
-  const { data: contract, update, clear } = useGetContract_id(contractId, { preBuiltPopulate: 'worksDepartment03' });
+  const {
+    data: contract,
+    update,
+    clear,
+  } = useGetContract_id(activeContractId, { preBuiltPopulate: 'worksDepartment03' });
 
   const subContracts = useMemo(() => {
     let subContracts = contract?.subContracts ?? [];
@@ -63,14 +66,14 @@ function ContractList_pre(
 
   // ------------------------------------------------------------------
 
-  const changeActive = (panelIndex: string | string[]) => {
-    panelIndex = panelIndex as string;
+  const changeActive = (
+    //
+    key: string | string[] | undefined
+  ) => {
+    if (key === undefined || typeof key === 'string') {
+      onChangeActiveContract(key);
+    }
 
-    const activeIndex = Number(panelIndex);
-    setActiveIndex(activeIndex);
-
-    const contractId = contractArr[Number(panelIndex)]?.contractId;
-    setContractId(contractId);
     clear();
   };
 
@@ -88,7 +91,7 @@ function ContractList_pre(
           onIconClick: () => {
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: item.version },
+              query: { contractId: activeContractId, version: item.version },
             });
           },
         };
@@ -103,7 +106,7 @@ function ContractList_pre(
 
   useEffect(() => {
     update();
-  }, [contractId]);
+  }, [activeContractId]);
 
   // ------------------------------------------------------------------
 
@@ -111,10 +114,16 @@ function ContractList_pre(
     <div ref={ref} className={style.container}>
       <Thead />
 
-      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
+      <Collapse
+        //
+        expandIcon={() => <></>}
+        accordion={true}
+        destroyInactivePanel={true}
+        onChange={changeActive}
+      >
         {contractArr.map((item, index) => {
           const { contractId } = item;
-          const isActive = activeIndex === index;
+          const isActive = activeContractId === contractId;
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation();
@@ -128,10 +137,17 @@ function ContractList_pre(
 
           return (
             <Panel
+              id={contractId}
               key={contractId}
               className={style.panel}
               header={
-                <PanelHeader viewRef={theViewRef} contract={item} isActive={isActive} openQuotation={openQuotation} />
+                <PanelHeader
+                  //
+                  viewRef={theViewRef}
+                  contract={item}
+                  isActive={isActive}
+                  openQuotation={openQuotation}
+                />
               }
             >
               <PanelBody contractDetailArr={contractDetailArr} />

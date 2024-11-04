@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -14,15 +14,11 @@ import style from './contractList.module.scss';
 // api
 import { useContract_infinite, Tparams, useContract_infinite_topBottom } from 'js/api/api_quotation';
 
-// type
-import { Toption } from 'js/utils/options/options';
-
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
 
 // ===========================================
-const optionDoorModel = optionsCreator_doorModelName({ haveEmpty: true });
+
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================
@@ -34,11 +30,17 @@ type Tquery = {
   address: string | undefined;
   customerName: string | undefined;
   keyWord: string | undefined;
+  //
+  activeContractId?: string | undefined;
+  activeContractPage?: string | undefined;
 };
 
 export default function WdContractList() {
   const router = useRouter();
-  const { doorType, county, district, address, customerName, keyWord } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { activeContractId, activeContractPage, doorType, county, district, address, customerName, keyWord } = query;
+
+  const [hadMoved, setHadMoved] = useState(false);
 
   // ---------------------------------------------------------------------
 
@@ -61,13 +63,14 @@ export default function WdContractList() {
     },
   };
 
-  // const ref_container = useRef<HTMLDivElement>(null);
-
   // const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
   //   customParams: params,
   // });
   const {
-    rawDataArr: dataArr,
+    // rawDataArr: dataArr,
+
+    getRawDataArr,
+    rawData_page,
     viewRef_top,
     viewRef_bottom,
     isLoadingPage1,
@@ -75,17 +78,13 @@ export default function WdContractList() {
     ref_container,
     isMounted,
   } = useContract_infinite_topBottom({
-    startPage: 5,
+    startPage: Number(activeContractPage || '1'),
     customParams: params,
-    // ref_container,
-    // ele_container: ref_container.current?.scrollTop,
   });
 
-  useEffect(() => {
-    isMounted && reset();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.query]);
+  const dataArr = useMemo(() => {
+    return getRawDataArr();
+  }, [rawData_page]);
 
   // ===================================================
 
@@ -95,24 +94,9 @@ export default function WdContractList() {
   const [customerNameState, setCustomerNameState] = useState<string | undefined>(undefined);
   const [keyWordState, setKeyWordState] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    setCountyState(county);
-    setDistrictState(district);
-    setAddressState(address);
-    setCustomerNameState(customerName);
-    setKeyWordState(keyWord);
-  }, [router.query]);
-
   // ===================================================
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
-    // 現在後端filter doorModelName無效，所以先拿掉
-    // {
-    //   defaultValue: doorType ?? '',
-    //   options: optionDoorModel,
-    //   placeholder: '選擇門型',
-    //   width: '90px',
-    // },
     {
       options: optionsCounty,
       placeholder: '選擇縣市',
@@ -219,7 +203,36 @@ export default function WdContractList() {
     return obj;
   });
 
-  // ===================================================
+  // --------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    setCountyState(county);
+    setDistrictState(district);
+    setAddressState(address);
+    setCustomerNameState(customerName);
+    setKeyWordState(keyWord);
+  }, [router.query]);
+
+  useEffect(() => {
+    rawData_page && reset();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [county, district, address, customerName, keyWord]);
+
+  useEffect(() => {
+    if (!hadMoved && rawData_page) {
+      const target = document.getElementById(activeContractId ?? '');
+      target?.scrollIntoView({
+        block: 'center',
+      });
+
+      setHadMoved(true);
+    }
+  }, [!!rawData_page]);
+
+  // --------------------------------------------------------------------------
 
   return (
     <SubLayer isLoading_subLayer={isLoadingPage1}>
@@ -231,6 +244,26 @@ export default function WdContractList() {
           viewRef_top={viewRef_top}
           contractArr={contractArr}
           ref={ref_container}
+          activeContractId={activeContractId}
+          onChangeActiveContract={(contractId) => {
+            let activeContractPage = undefined;
+
+            if (contractId && rawData_page) {
+              Object.entries(rawData_page).forEach(([page, data]) => {
+                if (!!data[contractId]) {
+                  activeContractPage = page;
+                }
+              });
+            }
+
+            router.replace({
+              query: {
+                ...query,
+                activeContractId: contractId,
+                activeContractPage,
+              },
+            });
+          }}
         />
       </div>
     </SubLayer>
