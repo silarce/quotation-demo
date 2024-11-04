@@ -785,7 +785,6 @@ export const useContract_infinite_topBottom = ({
 }) => {
   const ref_container = useRef<HTMLDivElement>(null);
 
-  const [isMounted, setIsMounted] = useState(false);
   const [isLoadingPage1, setIsLoadingPage1] = useState(false);
   const [isLoading, setIsloading] = useState(false);
   const [viewRef_top, inView_top] = useInView();
@@ -820,10 +819,6 @@ export const useContract_infinite_topBottom = ({
   };
 
   const update = async () => {
-    // if (isLoadingPage1 || isLoading) {
-    //   return;
-    // }
-
     const params = {
       page,
       ...defaultParams,
@@ -983,10 +978,6 @@ export const useContract_infinite_topBottom = ({
     })();
   }, [page, !!meta, isLoadingPage1, isLoading]);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return {
     isLoadingPage1,
     isLoading,
@@ -999,7 +990,6 @@ export const useContract_infinite_topBottom = ({
     meta,
     reset,
     ref_container,
-    isMounted,
   };
 }; //  useContract_infinite_topBottom
 

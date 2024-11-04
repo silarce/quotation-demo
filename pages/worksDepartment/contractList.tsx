@@ -76,7 +76,6 @@ export default function WdContractList() {
     isLoadingPage1,
     reset,
     ref_container,
-    isMounted,
   } = useContract_infinite_topBottom({
     startPage: Number(activeContractPage || '1'),
     customParams: params,
