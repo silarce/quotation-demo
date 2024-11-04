@@ -81,7 +81,8 @@ interface TaddReivew {
   document_id: string; // 單號
   document_uuid: string; // 唯一識別id
   document_type: string; // ex:請購單
-  username: string;
+  // username: string;
+  user_id: string;
   document_title: string; // ex:請購單20241024
   // 取得資料用的query
   query: {

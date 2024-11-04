@@ -1,4 +1,4 @@
-import { useState, useEffect, MouseEvent, useMemo } from 'react';
+import { useState, useEffect, MouseEvent, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 
@@ -22,31 +22,40 @@ const { Panel } = Collapse;
 
 type Tcontract = TtheadInfo & {
   contractId: string;
+  page: number | string;
 };
 
 export type { Tcontract };
 
 // ========================
 
-export default function ContractList({
-  contractArr,
-  viewRef,
-}: {
-  contractArr: Tcontract[];
-  viewRef?: (node?: Element | null | undefined) => void;
-}) {
+function ContractList_pre(
+  {
+    contractArr,
+    viewRef,
+    viewRef_top,
+    activeContractId,
+    onChangeActiveContract,
+  }: {
+    contractArr: Tcontract[];
+    viewRef?: (node?: Element | null | undefined) => void;
+    viewRef_top?: (node?: Element | null | undefined) => void;
+    activeContractId: string | undefined;
+    onChangeActiveContract: (contractId: string | undefined) => void;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   const router = useRouter();
 
   // ------------------------------------------------------------------
 
-  const [contractId, setContractId] = useState<string>();
-
-  // panelHeader點擊變粉紅色用
-  const [activeIndex, setActiveIndex] = useState(-1);
-
   // ------------------------------------------------------------------
 
-  const { data: contract, update, clear } = useGetContract_id(contractId, { preBuiltPopulate: 'worksDepartment03' });
+  const {
+    data: contract,
+    update,
+    clear,
+  } = useGetContract_id(activeContractId, { preBuiltPopulate: 'worksDepartment03' });
 
   const subContracts = useMemo(() => {
     let subContracts = contract?.subContracts ?? [];
@@ -58,14 +67,14 @@ export default function ContractList({
 
   // ------------------------------------------------------------------
 
-  const changeActive = (panelIndex: string | string[]) => {
-    panelIndex = panelIndex as string;
+  const changeActive = (
+    //
+    key: string | string[] | undefined
+  ) => {
+    if (key === undefined || typeof key === 'string') {
+      onChangeActiveContract(key);
+    }
 
-    const activeIndex = Number(panelIndex);
-    setActiveIndex(activeIndex);
-
-    const contractId = contractArr[Number(panelIndex)]?.contractId;
-    setContractId(contractId);
     clear();
   };
 
@@ -83,7 +92,7 @@ export default function ContractList({
           onIconClick: () => {
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: item.version },
+              query: { contractId: activeContractId, version: item.version },
             });
           },
         };
@@ -98,34 +107,56 @@ export default function ContractList({
 
   useEffect(() => {
     update();
-  }, [contractId]);
+  }, [activeContractId]);
 
   // ------------------------------------------------------------------
+
   return (
-    <div className={style.container}>
+    <div ref={ref} className={style.container}>
       <Thead />
 
-      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
+      <Collapse
+        //
+        expandIcon={() => <></>}
+        accordion={true}
+        destroyInactivePanel={true}
+        onChange={changeActive}
+        activeKey={activeContractId}
+      >
         {contractArr.map((item, index) => {
           const { contractId } = item;
-          const isActive = activeIndex === index;
+          const isActive = activeContractId === contractId;
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation();
+            router.replace({
+              query: {
+                ...router.query,
+                activeContractId: contractId,
+                activeContractPage: item.page,
+              },
+            });
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
               query: { contractId, version: 1 },
             });
           };
 
-          const theViewRef = index === contractArr.length - 3 ? viewRef : undefined;
+          const theViewRef = index <= 3 ? viewRef_top : index > contractArr.length - 3 ? viewRef : undefined;
 
           return (
             <Panel
-              key={index}
+              id={contractId}
+              key={contractId}
               className={style.panel}
               header={
-                <PanelHeader viewRef={theViewRef} contract={item} isActive={isActive} openQuotation={openQuotation} />
+                <PanelHeader
+                  //
+                  viewRef={theViewRef}
+                  contract={item}
+                  isActive={isActive}
+                  openQuotation={openQuotation}
+                />
               }
             >
               <PanelBody contractDetailArr={contractDetailArr} />
@@ -136,3 +167,5 @@ export default function ContractList({
     </div>
   );
 }
+
+export default forwardRef(ContractList_pre);
