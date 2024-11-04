@@ -79,10 +79,6 @@ export default function WdContractList() {
     customParams: params,
   });
 
-  const dataArr = useMemo(() => {
-    return getRawDataArr();
-  }, [rawData_page]);
-
   // ===================================================
 
   const [countyState, setCountyState] = useState<string | undefined>(undefined);

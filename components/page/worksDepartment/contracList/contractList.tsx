@@ -121,6 +121,7 @@ function ContractList_pre(
         accordion={true}
         destroyInactivePanel={true}
         onChange={changeActive}
+        activeKey={activeContractId}
       >
         {contractArr.map((item, index) => {
           const { contractId } = item;
