@@ -17,6 +17,8 @@ import { useContract_infinite, Tparams, useContract_infinite_topBottom } from 'j
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
 
+import type { Toption } from 'js/utils/options/countryAndDistrict';
+
 // ===========================================
 
 const optionsCounty = optionsCreator_county();
@@ -63,12 +65,8 @@ export default function WdContractList() {
     },
   };
 
-  // const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
-  //   customParams: params,
-  // });
   const {
-    // rawDataArr: dataArr,
-
+    //
     getRawDataArr,
     rawData_page,
     viewRef_top,
@@ -144,26 +142,20 @@ export default function WdContractList() {
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    // const doorType = (vArr[0] as Toption).value;
-    // const county = (vArr[1] as Toption).value;
-    // const customerName = vArr[2] as string;
-    // const keyWord = vArr[3] as string;
-    // router.push({
-    //   query: {
-    //     doorType,
-    //     county,
-    //     customerName,
-    //     keyWord,
-    //   },
-    // });
-    router.push({
+    console.log(vArr);
+    const [_, __, address, customerName, keyword] = vArr;
+
+    const county = (vArr[0] as Toption)?.value;
+    const district = (vArr[1] as Toption)?.value;
+
+    router.replace({
       query: {
         ...router.query,
-        county: countyState,
-        district: districtState,
-        address: addressState,
-        customerName: customerNameState,
-        keyWord: keyWordState,
+        county: county,
+        district: district,
+        address: (address || '') as string,
+        customerName: (customerName || '') as string,
+        keyWord: (keyword || '') as string,
       },
     });
   };
@@ -171,6 +163,7 @@ export default function WdContractList() {
   const searchGroup = {
     searchTargetList,
     doSearch,
+    controlled: true,
   };
   // -----------------------
 
