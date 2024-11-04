@@ -897,7 +897,7 @@ export default function ReviewList() {
     const UpdateReviewReadedById = async (item: any) => {
         console.log(item);
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 user_id: userInfo?.employee?.id.toString(),
                 id: item.id
@@ -935,7 +935,7 @@ export default function ReviewList() {
             console.log(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     }
 
