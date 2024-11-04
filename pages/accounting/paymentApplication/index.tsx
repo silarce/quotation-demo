@@ -104,6 +104,7 @@ export type { TstateDetail };
 // =========================================================================
 export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   const username = userInfo.username;
+  const userId = userInfo?.employee?.id;
 
   const router = useRouter();
   const query = router.query as Tquery;
@@ -258,12 +259,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
   // region reqAddReview
   const reqAddReview = async (review_id: string, title: string) => {
-    if (!state) {
-      return;
-    }
-
-    if (!state.id) {
-      myAlert.warning({ title: '狀態無id' });
+    if (!state.id || !userId) {
+      !state.id && myAlert.warning({ title: '狀態無id' });
+      !userId && myAlert.warning({ title: 'userInfo.employee.id為undefined' });
 
       return;
     }
@@ -273,7 +271,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
       document_id: state.serial_number,
       document_uuid: state.id,
       document_type: '付款申請',
-      username: username,
+      user_id: userId,
       document_title: title,
       query: {
         id: state.id,
@@ -339,7 +337,7 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   const handleSentReview = raw_paymentOrder
     ? () => {
         const { unmount } = ReviewFlowSelector.open({
-          username: username,
+          userId: userId,
           onConfirm: async ({ reviewFlowId, purpose }) => {
             reviewFlowId && (await reqAddReview(reviewFlowId, purpose).then(update_reviewFlow));
             unmount();
