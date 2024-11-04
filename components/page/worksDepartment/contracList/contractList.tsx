@@ -1,4 +1,4 @@
-import { useState, useEffect, MouseEvent, useMemo } from 'react';
+import { useState, useEffect, MouseEvent, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 
@@ -28,13 +28,18 @@ export type { Tcontract };
 
 // ========================
 
-export default function ContractList({
-  contractArr,
-  viewRef,
-}: {
-  contractArr: Tcontract[];
-  viewRef?: (node?: Element | null | undefined) => void;
-}) {
+function ContractList_pre(
+  {
+    contractArr,
+    viewRef,
+    viewRef_top,
+  }: {
+    contractArr: Tcontract[];
+    viewRef?: (node?: Element | null | undefined) => void;
+    viewRef_top?: (node?: Element | null | undefined) => void;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
   const router = useRouter();
 
   // ------------------------------------------------------------------
@@ -101,8 +106,9 @@ export default function ContractList({
   }, [contractId]);
 
   // ------------------------------------------------------------------
+
   return (
-    <div className={style.container}>
+    <div ref={ref} className={style.container}>
       <Thead />
 
       <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
@@ -118,11 +124,11 @@ export default function ContractList({
             });
           };
 
-          const theViewRef = index === contractArr.length - 3 ? viewRef : undefined;
+          const theViewRef = index <= 3 ? viewRef_top : index > contractArr.length - 3 ? viewRef : undefined;
 
           return (
             <Panel
-              key={index}
+              key={contractId}
               className={style.panel}
               header={
                 <PanelHeader viewRef={theViewRef} contract={item} isActive={isActive} openQuotation={openQuotation} />
@@ -136,3 +142,5 @@ export default function ContractList({
     </div>
   );
 }
+
+export default forwardRef(ContractList_pre);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -12,7 +12,7 @@ import ContractList, { Tcontract } from 'components/page/worksDepartment/contrac
 import style from './contractList.module.scss';
 
 // api
-import { useContract_infinite, Tparams } from 'js/api/api_quotation';
+import { useContract_infinite, Tparams, useContract_infinite_topBottom } from 'js/api/api_quotation';
 
 // type
 import { Toption } from 'js/utils/options/options';
@@ -40,6 +40,8 @@ export default function WdContractList() {
   const router = useRouter();
   const { doorType, county, district, address, customerName, keyWord } = router.query as Tquery;
 
+  // ---------------------------------------------------------------------
+
   const params: Tparams = {
     sort: 'contractNumber',
     order: 'ASC',
@@ -59,12 +61,29 @@ export default function WdContractList() {
     },
   };
 
-  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
+  // const ref_container = useRef<HTMLDivElement>(null);
+
+  // const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
+  //   customParams: params,
+  // });
+  const {
+    rawDataArr: dataArr,
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    reset,
+    ref_container,
+    isMounted,
+  } = useContract_infinite_topBottom({
+    startPage: 5,
     customParams: params,
+    // ref_container,
+    // ele_container: ref_container.current?.scrollTop,
   });
 
   useEffect(() => {
-    reset();
+    isMounted && reset();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query]);
 
@@ -206,7 +225,13 @@ export default function WdContractList() {
     <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag="合約" panelList={panelList} />
       <div className={style.mainContainer}>
-        <ContractList viewRef={viewRef_bottom} contractArr={contractArr} />
+        <ContractList
+          //
+          viewRef={viewRef_bottom}
+          viewRef_top={viewRef_top}
+          contractArr={contractArr}
+          ref={ref_container}
+        />
       </div>
     </SubLayer>
   );
