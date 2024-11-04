@@ -12,11 +12,13 @@ import { TreviewFlow, useGetFlow } from 'js/api/api_netCore/api_review';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
 const ReviewFlowSelector = ({
-  username,
+  // username,
+  userId,
   onConfirm,
   onItemClick,
 }: {
-  username: string | undefined;
+  // username: string | undefined;
+  userId: string | undefined;
   onConfirm?: (params: { reviewFlowId: string | undefined; purpose: string }) => void;
   onItemClick?: (reviewFlow: TreviewFlow) => void;
 }) => {
@@ -30,7 +32,7 @@ const ReviewFlowSelector = ({
     // setRaw,
     // update,
     // isFetching,
-  } = useGetFlow(username);
+  } = useGetFlow(userId);
 
   const handleConfirm = () => {
     onConfirm?.({

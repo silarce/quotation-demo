@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { notification } from 'antd';
 
@@ -15,10 +15,26 @@ const subRoot = 'Review';
 
 // Review/GetFlow
 
-const apiGetFlow = (username: string) => {
-  const api = `${subRoot}/GetFlow`;
+// 基本上不會使用這個
+// const apiGetFlow = (username: string) => {
+//   const api = `${subRoot}/GetFlow`;
+//   const params = {
+//     username,
+//   };
+
+//   return axi2
+//     .get<TreviewFlow[] | ''>(api, { params })
+//     .then(({ data }) => data)
+//     .catch((err: AxiosError) => {
+//       return Promise.reject(err);
+//     });
+// };
+
+// GetReviewFlow
+const apiGetReviewFlow = (user_id: string) => {
+  const api = `${subRoot}/GetReviewFlow`;
   const params = {
-    username,
+    user_id,
   };
 
   return axi2
@@ -89,7 +105,8 @@ const apiGetReviewHistory = (id: string) => {
 // ==============================================================================
 
 const useGetFlow = (
-  username: string | undefined,
+  // username: string | undefined,
+  user_id: string | undefined,
   {
     filter,
     autoUpdate = true,
@@ -104,15 +121,17 @@ const useGetFlow = (
   const [raw, setRaw] = useState<TreviewFlow[]>();
 
   const update = async () => {
-    if (!username) {
+    if (!user_id) {
       setRaw(undefined);
 
       return;
     }
 
     setIsFetching(true);
-    await apiGetFlow(username)
+    await apiGetReviewFlow(user_id)
       .then((res) => {
+        res = res || [];
+
         if (filter?.name) {
           res = res.filter((item) => item.name === filter.name);
         }
@@ -150,7 +169,7 @@ const useGetFlow = (
   useEffect(() => {
     autoUpdate && update();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [username]);
+  }, [user_id]);
 
   return {
     raw,
