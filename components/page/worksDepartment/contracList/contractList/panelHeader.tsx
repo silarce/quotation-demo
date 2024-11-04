@@ -12,6 +12,7 @@ import iconPlace from 'public/image/icon/place.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 type TtheadInfo = {
+  contractId: string;
   contractNumber: string;
   customerName: string;
   contactName: string;
@@ -31,6 +32,7 @@ type TtheadInfo = {
 
   unReviewPicture: number;
   unReviewWorkSheet: number;
+  //
 };
 
 // ===============================================================
