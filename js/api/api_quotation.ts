@@ -799,6 +799,8 @@ export const useContract_infinite_topBottom = ({
   // 用meta判斷是否已經有資料
   const [meta, setMeta] = useState<TpageMetaDto>();
 
+  const [isFetchingPrev, setIsFetchingPrev] = useState(false);
+
   // ------------------------------------------------------------
 
   const rawDataArr = Object.values(rawData_page).flatMap((page) => Object.values(page));
@@ -900,6 +902,7 @@ export const useContract_infinite_topBottom = ({
     }
 
     setPage(prevPage);
+    setIsFetchingPrev(true);
   };
 
   const reset = () => {
@@ -928,11 +931,12 @@ export const useContract_infinite_topBottom = ({
 
       // 取得前頁資料後保持與底部的距離
       // 也就是說不會取得前頁資料後就跳到最上面
-      if (inView_top && ref_container?.current) {
+      if (isFetchingPrev && ref_container?.current) {
         // 再畫面渲染前，取得與底部距離
         const scrollHeight = ref_container.current.scrollHeight;
         const scrollTop = ref_container.current.scrollTop;
         const distanceToBottom = scrollHeight - scrollTop; // 與底部距離
+        setIsFetchingPrev(false);
 
         // 這個setTimeout會在畫面渲染後再執行
         setTimeout(() => {
@@ -944,8 +948,9 @@ export const useContract_infinite_topBottom = ({
           }
         }, 0);
       }
+      //
     })();
-  }, [page, isLoadingPage1, isLoading]);
+  }, [page, !!meta, isLoadingPage1, isLoading]);
 
   useEffect(() => {
     setIsMounted(true);
