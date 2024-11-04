@@ -171,29 +171,38 @@ export default function WdContractList() {
 
   // ===================================================
 
-  const contractArr: Tcontract[] = dataArr.map((item) => {
-    const { content, contractNumber, unReviewPicture, unReviewWorkSheet } = item;
+  const contractArr: Tcontract[] = useMemo(() => {
+    const arr: Tcontract[] = [];
+    // rawData_page
+    Object.entries(rawData_page ?? {}).forEach(([page, rawDataDict]) => {
+      Object.values(rawDataDict).forEach((rawData) => {
+        const { id, content, contractNumber, unReviewPicture, unReviewWorkSheet } = rawData;
 
-    const obj: Tcontract = {
-      contractId: item.id,
-      // quotationNumber: content.quotationNumber,
-      contractNumber: contractNumber ?? '',
-      customerName: content.customer?.name ?? '',
-      contactName: content.contactPerson,
-      contactNumber: content.contactNumber,
-      agentName: content.agentEmployee?.chName ?? '',
-      date: content.quotationDate,
-      county: content.county,
-      projectName: content.projectName,
-      //
-      QtyOfProjectPatternForReview: 0,
-      QtyOfWorkwheetForReview: 0,
-      unReviewPicture,
-      unReviewWorkSheet,
-    };
+        const obj: Tcontract = {
+          contractId: id,
+          page,
+          // quotationNumber: content.quotationNumber,
+          contractNumber: contractNumber ?? '',
+          customerName: content.customer?.name ?? '',
+          contactName: content.contactPerson,
+          contactNumber: content.contactNumber,
+          agentName: content.agentEmployee?.chName ?? '',
+          date: content.quotationDate,
+          county: content.county,
+          projectName: content.projectName,
+          //
+          QtyOfProjectPatternForReview: 0,
+          QtyOfWorkwheetForReview: 0,
+          unReviewPicture,
+          unReviewWorkSheet,
+        };
 
-    return obj;
-  });
+        arr.push(obj);
+      });
+    });
+
+    return arr;
+  }, [rawData_page]);
 
   // --------------------------------------------------------------------------
 

@@ -22,6 +22,7 @@ const { Panel } = Collapse;
 
 type Tcontract = TtheadInfo & {
   contractId: string;
+  page: number | string;
 };
 
 export type { Tcontract };
@@ -127,6 +128,13 @@ function ContractList_pre(
 
           const openQuotation = (e: MouseEvent) => {
             e.stopPropagation();
+            router.replace({
+              query: {
+                ...router.query,
+                activeContractId: contractId,
+                activeContractPage: item.page,
+              },
+            });
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
               query: { contractId, version: 1 },
