@@ -360,7 +360,7 @@ export default function PurchaseOrderList() {
             setQuoterequuidin(quoterequuid as string);
             GetReviewById(purchaseorderuuid);
             GetProdReceiptById(purchaseorderid as string);
-            GetReviewHistory(purchaseorderid as string);
+            GetReviewHistory(purchaseorderuuid as string);
 
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
@@ -1205,7 +1205,7 @@ export default function PurchaseOrderList() {
                         setStatusin("採購中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(purchaseorderidin);
+                        GetReviewHistory(purchaseorderuuidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -1221,7 +1221,7 @@ export default function PurchaseOrderList() {
     const GetReviewHistory = async (id: any) => {
         try {
             const conditionModel = {
-                id: id
+                document_uuid: id
             };
 
             var inputModel = {
@@ -1344,7 +1344,7 @@ export default function PurchaseOrderList() {
         setShippingaddressin(item.shippingaddress as string);
         setQuoterequuidin(item.quoterequuid as string);
         GetReviewById(item.purchaseorderuuid);
-        GetReviewHistory(item.purchaseorderid as string);
+        GetReviewHistory(item.purchaseorderuuid as string);
     }
 
     const handleChangePurchaseOrder2 = (item: any, event: React.MouseEvent) => {
@@ -1635,7 +1635,7 @@ export default function PurchaseOrderList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag={'採購單'} panelList={panelList} />
+            <PageHeader02 tag={'採購單'} panelList={viewtype === "review" ? undefined : panelList}  />
             <div className={scss.container}>
                 <div className={scss.right}>
                     <div className={scss.content}>

@@ -132,7 +132,8 @@ export default function FlowList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.employee?.chName.toString()
+                // username: userInfo?.employee?.chName.toString()
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -531,7 +532,8 @@ export default function FlowList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                username: userInfo?.employee?.chName.toString(),
+                // username: userInfo?.employee?.chName.toString(),
+                username: userInfo?.employee?.id.toString(),
                 name: flowname,
                 stage_counter: data2.length,
                 data2: data2
