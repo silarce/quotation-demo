@@ -398,7 +398,7 @@ export default function OutboundOrder({
   const productWorksheetList = useMemo(() => {
     const productWorksheetList: TproductWorksheetList = {};
 
-    const finalProduct_sorted = _.sortBy(finalProduct, 'createdAt');
+    const finalProduct_sorted = _.sortBy(finalProduct, ['createdAt', 'order']);
 
     finalProduct_sorted.forEach((fp) => {
       const { id, items } = fp;

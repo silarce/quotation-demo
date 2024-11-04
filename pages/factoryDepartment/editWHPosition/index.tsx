@@ -368,7 +368,7 @@ export default function EditWHPosition() {
                     data: any,
                     username: string | undefined,
                 } = {
-                    username: userInfo?.username as string | undefined,
+                    username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };
 
@@ -420,7 +420,7 @@ export default function EditWHPosition() {
                     data: any,
                     username: string | undefined,
                 } = {
-                    username: userInfo?.username as string | undefined,
+                    username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };
 

@@ -118,7 +118,7 @@
   z-index: 1000;
   display: grid;
   // grid-template-columns: 45px 150px 415px 415px 65px 50px 300px 65px 70px ;
-  grid-template-columns:60px 30px 150px 415px 415px 65px 50px 100px 100px 200px 200px 45px;
+  grid-template-columns:60px 30px 150px 415px 415px 65px 50px 250px 100px 60px 250px 100px 60px 250px 100px 60px 200px 45px;
   // gap: 15px;
   width: auto;
   // margin: 5px 20px;
@@ -368,7 +368,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 415px 415px 65px 50px 100px 100px 200px 200px;
+    grid-template-columns: 60px 30px 150px 415px 415px 65px 50px 250px 100px 60px 250px 100px 60px 250px 100px 60px 200px;
     // gap: 5px;
   }
 }
@@ -678,9 +678,22 @@ div.panelHeader20 {
 
 }
 
+.modal_head_head2_title {
+  display: grid;
+  grid-template-columns: 390px 390px 390px 390px 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
+  width: auto;
+  // margin-top: 5px;
+  // margin-left: 10px;
+  // margin-right: 20px;  
+
+
+}
+
 .modal_head_content2 {
   display: grid;
-  grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  // grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
   // margin-top: 5px;
@@ -852,7 +865,7 @@ div.panelHeader16 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 20px 130px 250px 250px 80px 50px 50px 80px 80px 50px 200px 30px;
+    grid-template-columns: 20px 130px 390px 390px 80px 50px 50px 80px 80px 50px 200px 30px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;

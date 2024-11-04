@@ -293,12 +293,8 @@ export default function AddPurchaseRequisition() {
     //取物料清單
     const getProduct = async () => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel= {
             };
 
 
@@ -319,10 +315,6 @@ export default function AddPurchaseRequisition() {
             setData(data);
             setModalData(data);
             setSearchBarData(data);
-
-            console.log(userInfo);
-
-            console.log(erpFeature);
         } catch (error: any) {
             setError(error.message);
         }
@@ -333,12 +325,8 @@ export default function AddPurchaseRequisition() {
 
     const getPickingList = async () => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
+            const conditionModel= {
             };
 
 
@@ -367,8 +355,6 @@ export default function AddPurchaseRequisition() {
             setData1(data);
             // setDatarestore(data);
             setSearchdata(data);
-
-
             console.log(data);
             setPickinglistid(data[0].pickinglistid);
             setPickinglistuuid(data[0].id);
@@ -376,13 +362,8 @@ export default function AddPurchaseRequisition() {
             setNote(data[0].note);
             setStatus(data[0].status);
             setCreate_byin(data[0].create_by);
-
             getPickingListDetailById(data[0].id);
 
-
-            console.log(userInfo);
-
-            console.log(erpFeature);
         } catch (error: any) {
             setError(error.message);
         }
@@ -394,10 +375,8 @@ export default function AddPurchaseRequisition() {
 
     const getEmployeeList = async () => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
-                // keyword: "search" as string | undefined,
             };
 
 
@@ -441,7 +420,7 @@ export default function AddPurchaseRequisition() {
 
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
     }, []);
 
@@ -449,7 +428,6 @@ export default function AddPurchaseRequisition() {
 
     const getPickingListDetailById = async (pickinglistuuid: any) => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
                 pickinglistuuid: pickinglistuuid
@@ -490,12 +468,9 @@ export default function AddPurchaseRequisition() {
         // return;
         try {
             setIsLoading(true);
-            const conditionModel: {
-                note: any,
-                username: any
-            } = {
+            const conditionModel= {
                 note: note,
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
 
@@ -1540,7 +1515,7 @@ export default function AddPurchaseRequisition() {
             const conditionModel = {
                 type: type,
                 pickinglistuuid: pickinglistuuid,
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
 

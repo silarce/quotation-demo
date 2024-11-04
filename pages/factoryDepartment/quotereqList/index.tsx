@@ -102,6 +102,17 @@ export default function AddPurchaseOrder() {
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
+    const supplier1nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier1unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier1awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier2awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const supplier3awardedRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [searchproduct, setSearchProduct] = useState<string>("");
@@ -155,6 +166,7 @@ export default function AddPurchaseOrder() {
     const [keyword6, setKeyword6] = useState<string>("");
     const [keyword7, setKeyword7] = useState<string>("");
     const [keyword8, setKeyword8] = useState<string>("");
+    const [keyword9, setKeyword9] = useState<string>("");
 
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
@@ -183,6 +195,20 @@ export default function AddPurchaseOrder() {
     const [handinputunitprice, setHandinputunitprice] = useState<string>("");
     const [handinputtotalprice, setHandinputtotalprice] = useState<string>("");
     const [handinputsuppliername, setHandinputsuppliername] = useState<string>("");
+
+
+
+    const [handinputsupplier1_name, setHandinputsupplier1_name] = useState<string>("");//從標頭取
+
+    const [handinputsupplier1_unitprice, setHandinputsupplier1_price] = useState<string>("");
+    const [handinputsupplier1_awarded, setHandinputsupplier1_awarded] = useState<boolean>(false);
+    const [handinputsupplier2_name, setHandinputsupplier2_name] = useState<string>("");//從標頭取
+    const [handinputsupplier2_unitprice, setHandinputsupplier2_price] = useState<string>("");
+    const [handinputsupplier2_awarded, setHandinputsupplier2_awarded] = useState<boolean>(false);
+    const [handinputsupplier3_name, setHandinputsupplier3_name] = useState<string>("");//從標頭取
+    const [handinputsupplier3_unitprice, setHandinputsupplier3_price] = useState<string>("");
+    const [handinputsupplier3_awarded, setHandinputsupplier3_awarded] = useState<boolean>(false);
+
 
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
@@ -422,7 +448,7 @@ export default function AddPurchaseOrder() {
 
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
     }, []);
 
     //取所有物料，for查詢代入用
@@ -499,7 +525,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     quoterequuid: quoterequuid,
                     create_at: create_atin,
-                    need_date: moment(need_date).format('YYYY-MM-DD'),
+                    need_date: need_date,
                     create_by: create_byin,
                     note: note,
                     suppliername: suppliernamein,
@@ -575,7 +601,7 @@ export default function AddPurchaseOrder() {
                 const conditionModel = {
                     create_at: create_atin,
                     need_date: moment(need_date).format('YYYY-MM-DD'),
-                    create_by: create_byin,
+                    create_by: userInfo?.employee?.id.toString(),
                     note: note,
                     suppliername: suppliernamein,
                     supplierphone: supplierphonein,
@@ -652,11 +678,18 @@ export default function AddPurchaseOrder() {
         }
     };
 
-    const RemoveQuotereqDetail = async (id: any) => {
+    const RemoveQuotereqDetail = async (item: any) => {
         try {
             setIsLoading(true);
+            // 將 detailid 組成陣列並過濾掉空值或 undefined
+            const ids = [
+                item.supplier1_detailid,
+                item.supplier2_detailid,
+                item.supplier3_detailid
+            ].filter(id => id);  // 過濾掉空的 id
+
             const conditionModel = {
-                id: id
+                id: ids.join(',') // 將有效的 id 用逗號拼接
             };
 
 
@@ -779,7 +812,15 @@ export default function AddPurchaseOrder() {
                 note: handinputnote,
                 unitprice: handinputunitprice,
                 totalprice: handinputtotalprice,
-                suppliername: handinputsuppliername
+                suppliername1: suppliernamein,
+                supplierunitprice1: handinputsupplier1_unitprice,
+                supplierawarded1: handinputsupplier1_awarded,
+                suppliername2: suppliername2in,
+                supplierunitprice2: handinputsupplier2_unitprice,
+                supplierawarded2: handinputsupplier2_awarded,
+                suppliername3: suppliername3in,
+                supplierunitprice3: handinputsupplier3_unitprice,
+                supplierawarded3: handinputsupplier3_awarded,
             };
 
             setHandinputproductuuid('');
@@ -791,20 +832,39 @@ export default function AddPurchaseOrder() {
             setHandinputnote('');
             setHandinputunitprice('');
             setHandinputtotalprice('');
-
+            setHandinputsupplier1_price('');
+            setHandinputsupplier1_awarded(false);
+            setHandinputsupplier2_price('');
+            setHandinputsupplier2_awarded(false);
+            setHandinputsupplier3_price('');
+            setHandinputsupplier3_awarded(false);
             try {
                 setIsLoading(true);
 
                 const conditionModel = {
                     quotereqid: quotereqid,
                     quoterequuid: quoterequuid,
-                    supplierid: `${tabnow === '廠商1' ? supplieridin : tabnow === '廠商2' ? supplierid2in : tabnow === '廠商3' ? supplierid3in : ''}`,
-                    suppliername: `${tabnow === '廠商1' ? suppliernamein : tabnow === '廠商2' ? suppliername2in : tabnow === '廠商3' ? suppliername3in : ''}`,
-                    supplieraddress: `${tabnow === '廠商1' ? supplieraddressin : tabnow === '廠商2' ? supplieraddress2in : tabnow === '廠商3' ? supplieraddress3in : ''}`,
-                    suppliertaxid: `${tabnow === '廠商1' ? suppliertaxidin : tabnow === '廠商2' ? suppliertaxid2in : tabnow === '廠商3' ? suppliertaxid3in : ''}`,
-                    supplierphone: `${tabnow === '廠商1' ? supplierphonein : tabnow === '廠商2' ? supplierphone2in : tabnow === '廠商3' ? supplierphone3in : ''}`,
-                    suppliercontact: `${tabnow === '廠商1' ? suppliercontactin : tabnow === '廠商2' ? suppliercontact2in : tabnow === '廠商3' ? suppliercontact3in : ''}`,
-                    supplierfax: `${tabnow === '廠商1' ? supplierfaxin : tabnow === '廠商2' ? supplierfax2in : tabnow === '廠商3' ? supplierfax3in : ''}`,
+                    supplierid: supplieridin,
+                    suppliername: suppliernamein,
+                    supplieraddress: supplieraddressin,
+                    suppliertaxid: suppliertaxidin,
+                    supplierphone: supplierphonein,
+                    suppliercontact: suppliercontactin,
+                    supplierfax: supplierfaxin,
+                    supplierid2: supplierid2in,
+                    suppliername2: suppliername2in,
+                    supplieraddress2: supplieraddress2in,
+                    suppliertaxid2: suppliertaxid2in,
+                    supplierphone2: supplierphone2in,
+                    suppliercontact2: suppliercontact2in,
+                    supplierfax2: supplierfax2in,
+                    supplierid3: supplierid3in,
+                    suppliername3: suppliername3in,
+                    supplieraddress3: supplieraddress3in,
+                    suppliertaxid3: suppliertaxid3in,
+                    supplierphone3: supplierphone3in,
+                    suppliercontact3: suppliercontact3in,
+                    supplierfax3: supplierfax3in,
                     data: newEntry
                 };
 
@@ -874,7 +934,8 @@ export default function AddPurchaseOrder() {
                 onOk: async () => {
                     const updatedData = data2.filter((_, i) => i !== index);
                     setData2(updatedData);
-                    RemoveQuotereqDetail(item.detail_id);
+
+                    RemoveQuotereqDetail(item);
                 }
             }
         })
@@ -1139,7 +1200,7 @@ export default function AddPurchaseOrder() {
         // setOriginalInvoicein(invoicein);
         // setOriginalSupplieraddressin(supplieraddressin);
         // setOriginalShippingaddressin(shippingaddressin);
-        setCreate_byin(userInfo?.username as string);
+        setCreate_byin(userInfo?.employee?.chName.toString() as string);
         setSuppliernamein("");
         setSupplierphonein("");
         setSuppliertaxidin("");
@@ -1372,6 +1433,7 @@ export default function AddPurchaseOrder() {
         const name = keyword6.trim();
         const spec = keyword7.trim();
         const suppliername = keyword8.trim();
+        const pricetype = keyword9.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
@@ -1379,7 +1441,8 @@ export default function AddPurchaseOrder() {
             !requisitionproductId &&
             !name &&
             !spec &&
-            !suppliername) {
+            !suppliername &&
+            !pricetype) {
             setSearchProductdata(qodatadetaildata);
             return;
         }
@@ -1423,13 +1486,19 @@ export default function AddPurchaseOrder() {
             );
         }
 
+        if (pricetype) {
+            filteredData = filteredData.filter(item =>
+                item.pricetype.toString().includes(pricetype)
+            );
+        }
+
         setSearchProductdata(filteredData);
     };
 
     // 監聽條件變更
     useEffect(() => {
         filterData2();
-    }, [keywordstartdate2, keywordenddate2, keyword5, keyword6, keyword7, keyword8]);
+    }, [keywordstartdate2, keywordenddate2, keyword5, keyword6, keyword7, keyword8, keyword9]);
 
     const clearFilterData2 = (e: any) => {
         e.preventDefault();
@@ -2064,10 +2133,12 @@ export default function AddPurchaseOrder() {
                                     價格
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="Excel">
-                                    <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    詢價
-                                </button>
+                                <span style={{ display: `${quotereqid != '' ? '' : 'none'}` }}>
+                                    <button className={scss.squarebtn} onClick={() => { Excel(quotereqid) }} title="Excel">
+                                        <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        詢價
+                                    </button>
+                                </span>
                             </div>
                             <div>
                                 <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPO() }} title="新增單據">
@@ -2150,8 +2221,8 @@ export default function AddPurchaseOrder() {
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(create_atin || '') ? moment(create_atin) : null,
-                                                    onChange: (e) => { setCreate_atin((e?.toString() || '') || '') }
+                                                    value: create_atin ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />
@@ -2655,7 +2726,7 @@ export default function AddPurchaseOrder() {
                                                 type="text"
                                                 // maxLength={5}
                                                 value={_item.detail_quantity !== undefined ? _item.detail_quantity.toLocaleString() : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(editmain === true)}
                                                 // readOnly
                                                 // onChange={(e) => {
                                                 //     handleNumberChange(index, "quantity", e.target.value);
@@ -2688,57 +2759,146 @@ export default function AddPurchaseOrder() {
                                                 }}
                                             />
                                         </span>
-                                        {/* <span>
-                                            <button
-                                                onClick={() => {
-                                                    setQuotereqcanedit(false);
-                                                    prQuotereqModalOpen(false, _item)
-                                                }}
-                                            >
-                                                <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
-                                            </button>
-                                        </span> */}
                                         <span>
                                             <input
-                                                ref={unitpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                ref={supplier1nameRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+                                                type="text"
+                                                value={(_item.supplier1_name !== undefined && _item.supplier1_name !== '') ? _item.supplier1_name : suppliernamein}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier1unitpriceRefs.current[index]}
                                                 style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
                                                 type="text"
-                                                value={_item.detail_unitprice !== undefined ? _item.detail_unitprice.toLocaleString() : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                // readOnly
-                                                // onChange={(e) => {
-                                                //     handleStringChange(index, "unitprice", e.target.value);
-                                                // }}
+                                                value={_item.supplier1_unitprice !== undefined ? _item.supplier1_unitprice : ''}
+                                                readOnly={!(editmain === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     const newUnitPrice = e.target.value;
                                                     newData[index] = {
                                                         ...newData[index],
-                                                        detail_unitprice: newUnitPrice,
-                                                        detail_totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].detail_quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
+                                                        supplier1_unitprice: newUnitPrice,
                                                     };
                                                     setData2(newData);
                                                 }}
                                             />
                                         </span>
                                         <span>
-                                            {/* {_item.detail_totalprice.toLocaleString()} */}
-                                            <span>
-                                                {/* {typeof _item.detail_totalprice === 'number' ? _item.detail_totalprice.toLocaleString() : Number(_item.detail_totalprice).toLocaleString()} */}
-                                                <span>{_item.detail_totalprice?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                            </span>
+                                            <input
+                                                ref={supplier1awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier1_awarded === true}  // 根據 supplier1_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: newAwardedValue,  // 更新 supplier1_awarded
+                                                        supplier2_awarded: false,  // 取消其他兩個勾選
+                                                        supplier3_awarded: false,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+
                                         </span>
                                         <span>
                                             <input
-                                                ref={noteRefs.current[index]}
+                                                ref={supplier2nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+
                                                 type="text"
-                                                value={_item.detail_suppliername !== undefined ? _item.detail_suppliername : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                value={(_item.supplier2_name !== undefined && _item.supplier2_name !== '') ? _item.supplier2_name : suppliername2in}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier2unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                type="text"
+                                                value={_item.supplier2_unitprice !== undefined ? _item.supplier2_unitprice : ''}
+                                                readOnly={!(editmain === true)}
                                                 onChange={(e) => {
-                                                    handleStringChange(index, "suppliername", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier2_unitprice: newUnitPrice,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier2awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier2_awarded === true}  // 根據 supplier2_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: false,  // 取消其他兩個勾選
+                                                        supplier2_awarded: newAwardedValue,  // 更新 supplier2_awarded
+                                                        supplier3_awarded: false,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3nameRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '100%' }}
+
+                                                type="text"
+                                                value={(_item.supplier3_name !== undefined && _item.supplier3_name !== '') ? _item.supplier3_name : suppliername3in}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%' }}
+                                                type="text"
+                                                value={_item.supplier3_unitprice !== undefined ? _item.supplier3_unitprice : ''}
+                                                readOnly={!(editmain === true)}
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier3_unitprice: newUnitPrice,
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={supplier3awardedRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain === true ? "1px solid black" : ""), width: '100%', height: '20px' }}
+                                                type="checkbox"
+                                                checked={_item.supplier3_awarded === true}  // 根據 supplier3_awarded 的值來決定是否勾選
+                                                disabled={!(editmain === true)}  // 使用 disabled 屬性來禁止修改
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newAwardedValue = e.target.checked;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        supplier1_awarded: false,  // 取消其他兩個勾選
+                                                        supplier2_awarded: false,
+                                                        supplier3_awarded: newAwardedValue,  // 更新 supplier3_awarded
+                                                    };
+                                                    setData2(newData);
                                                 }}
                                             />
                                         </span>
@@ -2847,7 +3007,7 @@ export default function AddPurchaseOrder() {
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '20px', height: '20px' }} />
                                     </button>
                                 </div> */}
-                                <div>
+                                {/* <div>
                                     <input
                                         type="text"
                                         placeholder='單價'
@@ -2863,8 +3023,8 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
-                                </div>
-                                <div>
+                                </div> */}
+                                {/* <div>
                                     <input
                                         type="text"
                                         placeholder='金額'
@@ -2873,13 +3033,104 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(e.target.value.toString())
                                         }}
                                     />
+                                </div> */}
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商1'
+                                        value={suppliernamein}
+                                    // onChange={(e) => handleSuppliernow()}
+                                    />
                                 </div>
                                 <div>
                                     <input
                                         type="text"
-                                        placeholder='廠商'
-                                        value={handinputsuppliername}
+                                        placeholder='單價1'
+                                        value={handinputsupplier1_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier1_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier1_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(e.target.checked);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier2_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier3_awarded(false);      // 將其他狀態設為 false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商2'
+                                        value={suppliername2in}
                                     // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單價'
+                                        value={handinputsupplier2_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier2_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier2_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier2_awarded(e.target.checked);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier3_awarded(false);      // 將其他狀態設為 false
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='廠商3'
+                                        value={suppliername3in}
+                                    // onChange={(e) => handleSuppliernow()}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單價'
+                                        value={handinputsupplier3_unitprice}
+                                        onChange={(e) => {
+                                            const unitprice = e.target.value;
+                                            // 若為無效數字或空字串，將 unitprice 設為 0
+                                            const parsedUnitPrice = unitprice === '' ? 0 : parseFloat(unitprice) || 0;
+                                            setHandinputsupplier3_price(unitprice);
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        style={{ width: '100%', height: '20px' }}
+                                        type="checkbox"
+                                        checked={handinputsupplier3_awarded === true}  // 確保 checked 綁定到狀態變數
+                                        onChange={(e) => {
+                                            setHandinputsupplier1_awarded(false);      // 將其他狀態設為 false
+                                            setHandinputsupplier2_awarded(false);  // 更新當前 checkbox 的狀態
+                                            setHandinputsupplier3_awarded(e.target.checked);      // 將其他狀態設為 false
+                                        }}
                                     />
                                 </div>
                                 <div>
@@ -2959,7 +3210,10 @@ export default function AddPurchaseOrder() {
 
                 <DragableModal
                     handleText="品項查詢"
-                    style={{ zIndex: '1000', width: '1810px' }}
+                    style={{
+                        zIndex: '1000',
+                        width: '1810px'
+                    }}
                     show={productSearchmodalopen}
                     onCrossClick={productSearchModalClose}
                 >
@@ -2972,136 +3226,112 @@ export default function AddPurchaseOrder() {
                         </div>
                     </div>
                     <div className={scss.modal_head_content2}>
-                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
+                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '10px' }}>
                             <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
+                                <div className={scss.modal_head_head2_title}>
+                                    <div>
+                                        <InputSel
+                                            caption="起始日期"
+                                            disabled={false}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: keywordstartdate2 || null,
+                                                    onChange: (e: Moment | null) => { setKeywordstartdate2(e) }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            caption="截止日期"
+                                            disabled={false}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: keywordenddate2 || null,
+                                                    onChange: (e: Moment | null) => { setKeywordenddate2(e) }
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <select
+                                        value={keyword9 || ''}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                            setKeyword9(e.target.value);
+                                            e.target.blur(); // 讓 select 失去焦點
                                         }}
-                                    />
-                                </div>
-                                <div>
-                                    <InputSel
-                                        caption="起始日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: keywordstartdate2 || null,
-                                                onChange: (e: Moment | null) => { setKeywordstartdate2(e) }
-                                            }
+                                        disabled={false} // 根據需求設置是否禁用
+                                        style={{
+                                            // padding: '8px', // 調整樣式
+                                            fontSize: '18px',
+                                            borderBottom: '1px solid #14256a',
+                                            color: '#14256a'
                                         }}
-                                    />
+                                    >
+                                        <option value="">全部</option> {/* 預設選項 */}
+                                        <option value="詢價">詢價</option>
+                                        <option value="進價">進價</option>
+                                    </select>
                                 </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="截止日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: keywordenddate2 || null,
-                                                onChange: (e: Moment | null) => { setKeywordenddate2(e) }
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="物料編號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword5 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword5(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="品項名稱"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword6 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword6(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="品項規格"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword7 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword7(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="廠商名稱"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword8 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword8(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
-                                    <span>
-                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData2(e) }}>清除條件</button>
-                                    </span>
+                                <div className={scss.modal_head_head2_title}>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="料號"
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: keyword5 || ' ',
+                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword5(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="名稱"
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: keyword6 || ' ',
+                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword6(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="規格"
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: keyword7 || ' ',
+                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword7(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div >
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商"
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: keyword8 || ' ',
+                                                    onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword8(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ justifyContent: 'space-between' }}>
+                                        <span>
+                                            <button className={scss.minibtn} onClick={(e) => { clearFilterData2(e) }}>清除條件</button>
+                                        </span>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -3110,6 +3340,7 @@ export default function AddPurchaseOrder() {
                             overflowY: 'auto',
                             overflowX: 'auto',
                             border: '1px solid #c1c1c1',
+                            height: '500px'
                         }}>
                             <Thead01 type={'Quotereq4'} />
                             {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
@@ -3119,8 +3350,8 @@ export default function AddPurchaseOrder() {
                                         <div
                                             key={index}
                                             className={`${scss.row01} ${_item.detail_id === selectedItemId ? scss.selectedRow : ''}`}
-                                            // onClick={() => { handlechangepo(_item) }}
-                                            >
+                                        // onClick={() => { handlechangepo(_item) }}
+                                        >
                                             <span>{index + 1}</span>
                                             <span>{_item.detail_productid}</span>
                                             <span>{_item.detail_name}</span>
@@ -3128,9 +3359,9 @@ export default function AddPurchaseOrder() {
                                             <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_quantity}</span>
                                             <span>{_item.detail_unit}</span>
-                                            <span style={{ textAlign: 'right' }}>{_item.detail_unitprice.toLocaleString()}</span>
+                                            <span style={{ textAlign: 'right', color: '#ea1833' }}>{_item.detail_unitprice.toLocaleString()}</span>
                                             <span style={{ textAlign: 'right' }}>{_item.detail_totalprice.toLocaleString()}</span>
-                                            <span>{_item.pricetype}</span>
+                                            <span style={{ color: '#14256a' }}>{_item.pricetype}</span>
                                             <span>{_item.detail_suppliername}</span>                                        </div>
                                     </CellWithBar>
                                 ))
@@ -3277,7 +3508,7 @@ export default function AddPurchaseOrder() {
                                 </div>
                                 <br />
                                 <div >
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
                                         disabled={true}
@@ -3287,7 +3518,7 @@ export default function AddPurchaseOrder() {
                                                 value: ' ',
                                             },
                                         }}
-                                    />
+                                    /> */}
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                     <span>
@@ -3302,6 +3533,7 @@ export default function AddPurchaseOrder() {
                         <div style={{
                             maxHeight: '465.81px',
                             overflowY: 'auto',
+                            overflowX: 'auto',
                             border: '1px solid #c1c1c1',
                         }}>
                             <Thead01 type={'Quotereq3'} />

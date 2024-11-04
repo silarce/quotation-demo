@@ -230,7 +230,7 @@ export default function AddPurchaseRequisition() {
             setIsLoading(true);
             const conditionModel = {
                 type: "未送出",
-                username: userInfo?.username
+                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -315,9 +315,7 @@ export default function AddPurchaseRequisition() {
         try {
             //  console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
+            const conditionModel= {
                 // keyword: "search" as string | undefined,
             };
 
@@ -340,8 +338,6 @@ export default function AddPurchaseRequisition() {
             setModalData(data);
             setSearchBarData(data);
 
-            console.log(userInfo);
-
             console.log(erpFeature);
         } catch (error: any) {
             setError(error.message);
@@ -354,7 +350,7 @@ export default function AddPurchaseRequisition() {
 
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
     }, []);
 
@@ -437,8 +433,8 @@ export default function AddPurchaseRequisition() {
             const conditionModel = {
                 create_at: create_atin,
                 need_date: moment(need_date).format('YYYY-MM-DD'),
-                create_by: create_byin,
-                note: note,
+                create_by: userInfo?.employee?.id.toString(),
+                note: note
             };
 
 
@@ -451,6 +447,7 @@ export default function AddPurchaseRequisition() {
             };
 
             console.log(JSON.stringify(conditionModel));
+            console.log(JSON.stringify(inputModel));
 
             const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseRequisition`, {
                 method: 'POST',
@@ -489,7 +486,6 @@ export default function AddPurchaseRequisition() {
     };
     const RemovePurchaseRequisitionDetail = async (id: any) => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
             const conditionModel = {
                 id: id
@@ -935,7 +931,8 @@ export default function AddPurchaseRequisition() {
         setPurchaserequisitionid("儲存後產生");
         setStatus("未儲存");
         setNote("");
-        setCreate_byin(userInfo?.username as string);
+        // setCreate_byin(userInfo?.username as string);
+        setCreate_byin(userInfo?.employee?.chName.toString() || '');
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         setNeed_date(moment().format('YYYY-MM-DD') || '');
         setData2([]);
@@ -1254,8 +1251,8 @@ export default function AddPurchaseRequisition() {
                                             // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
-                                                    onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
+                                                    value: create_atin ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />
@@ -1263,7 +1260,7 @@ export default function AddPurchaseRequisition() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="請購人員"
+                                            caption="製單人員"
                                             disabled={true}
                                             inputProps={{
                                                 props: {
