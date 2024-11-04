@@ -1,0 +1,116 @@
+@use "styles/theme01" as *;
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    // border: 1px solid #c1c1c1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    // height: 712px;
+}
+
+.content {
+    width: 100%;
+    overflow-y: auto;
+    top: 0;
+}
+
+.body_content1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0px;
+    width: auto;
+    // margin-left: 20px;
+    margin-right: 20px;
+    // overflow-x: hidden;
+    max-height: 500px; // 最大高度設定為300px
+}
+
+//#region 結算薪資作業
+.thead1 {
+    position: -webkit-sticky; // 為兼容性增加前綴
+    position: sticky;
+    top: 0;
+    z-index: 1000; // 確保元素位於其他內容的上層
+    display: grid;
+    grid-template-columns: 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 10px;
+    gap: 5px;
+    height: 40px;
+    padding: 0 20px;
+    background-color: $bgc01;
+  
+    >* {
+      margin: auto;
+      margin-left: 0;
+  
+      &:nth-last-of-type(1) {
+        margin-left: auto;
+      }
+    }
+  
+    >span {
+      font-weight: 400;
+      font-size: 16px;
+      color: #979797;
+    }
+  }
+  
+  //#endregion
+
+  div.panelHeader11 {
+    // padding-left: 15px;
+    padding:10px 20px;
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        span {
+            font-weight: 400;
+            font-size: 16px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns: 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 100px 10px;
+        gap: 5px;
+    }
+}
+
+.longsquarebtn {
+    height: 39px;
+    width: 139px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    ;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    transform: translateY(2px);
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
+}
