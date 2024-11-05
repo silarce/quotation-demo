@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 import Row, { Cell } from 'components/global/gear/table/row';
 
@@ -10,6 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox } from 'antd';
 
 import scss from './Table.module.scss';
+
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 interface TconfigValue {
   serial_number: React.ReactNode; // 應付帳款單號
@@ -24,6 +27,13 @@ interface TconfigValue {
   payment_status: React.ReactNode; // 付款狀態
   //
   review_status: Treview_status | null; // 審核狀態
+}
+
+interface Ttbody extends TconfigValue {
+  disabled: boolean;
+  checked: boolean;
+  onCheck: (checked: boolean) => void;
+  onDetailClick: () => void;
 }
 
 interface TconfigItem {
@@ -50,7 +60,7 @@ const Row_thead = ({
   const config = useConfig();
 
   return (
-    <Row thead={true}>
+    <Row thead={true} fullWidth={true}>
       <Cell style={config_other.checkBox.style}>
         <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
           <Checkbox
@@ -71,23 +81,19 @@ const Row_thead = ({
           </Cell>
         );
       })}
+      <Cell style={config_other.detail.style}></Cell>
     </Row>
   );
 };
 
-const Row_tbody = (
-  props: TconfigValue & {
-    disabled: boolean;
-    checked: boolean;
-    onCheck: (checked: boolean) => void;
-  }
-) => {
-  const { disabled, checked, onCheck, review_status } = props;
+const Row_tbody = (props: Ttbody) => {
+  const { disabled, checked, onCheck, review_status, onDetailClick } = props;
 
   const config = useConfig();
 
   return (
     <Row
+      fullWidth={true}
       className={classNames(review_status === '審核中' && scss.reviewing, review_status === '已審核' && scss.reviewed)}
     >
       <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
@@ -108,6 +114,9 @@ const Row_tbody = (
           </Cell>
         );
       })}
+      <Cell style={config_other.detail.style}>
+        <IconDetail onClick={onDetailClick} />
+      </Cell>
     </Row>
   );
 };
@@ -190,6 +199,9 @@ const useConfig = () => {
 
 const config_other = {
   checkBox: {
+    style: { width: 60 },
+  },
+  detail: {
     style: { width: 60 },
   },
 };

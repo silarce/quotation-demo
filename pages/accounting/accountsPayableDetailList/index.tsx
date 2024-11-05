@@ -10,12 +10,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/SearchSwitch';
+// import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/SearchSwitch';
 import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/Table';
 
 // gear
-import { useYearMonth_options } from 'js/utils/helpers/hook/useYearMonth';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 
 import {
   Taccount_payable_Dto,
@@ -51,11 +52,17 @@ export default function AccountsPayableDetailList() {
   const router = useRouter();
   const query = router.query as Tquery;
 
-  const { thisYear, thisMonth } = useYearMonth_options();
+  const {
+    yearOptionArr,
+    monthOptionArr,
+
+    thisYear,
+    thisMonth,
+  } = useYearMonth_options();
   const {
     //
-    year,
-    month,
+    year = String(thisYear),
+    month = String(thisMonth),
     invoiceNumber,
     searchType = 'date',
   } = query;
@@ -192,6 +199,14 @@ export default function AccountsPayableDetailList() {
       onCheck: (checked) => {
         handleCheck(checked, id, raw);
       },
+      onDetailClick: () => {
+        router.push({
+          pathname: '/accounting/accountsPayableDetail',
+          query: {
+            invoiceNumber: invoice_number,
+          },
+        });
+      },
     };
 
     return props;
@@ -223,7 +238,19 @@ export default function AccountsPayableDetailList() {
     <SubLayer>
       <PageHeader02
         tag="應付帳款明細表"
-        customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
+        customeLeft={[
+          <SelectBar
+            key="DateSelector"
+            className="ml-2"
+            selectPropsArr={useYearMonth_selectBar_query({
+              year: year,
+              month: month,
+              yearOptionArr,
+              monthOptionArr,
+            })}
+          />,
+        ]}
+        // customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
         panelList={createPanel({ disabled, setDisabled, onAddClick: handleAddAccountPayableStatistics })}
       />
 
