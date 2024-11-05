@@ -37,8 +37,6 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 type Tquery = {
   year?: string;
   month?: string;
-  invoiceNumber?: string;
-  searchType: 'date' | 'invoice';
 };
 
 type TcheckedRaw = {
@@ -63,8 +61,6 @@ export default function AccountsPayableDetailList() {
     //
     year = String(thisYear),
     month = String(thisMonth),
-    invoiceNumber,
-    searchType = 'date',
   } = query;
 
   const [disabled, setDisabled] = useState(true);
@@ -75,22 +71,14 @@ export default function AccountsPayableDetailList() {
   const params = useMemo(() => {
     let params: Parameters<typeof useGetAccountPayableBy>[0] = undefined;
 
-    if (searchType === 'date' && year && month) {
-      params = {
-        dateForUnpaid: {
-          date: `${year}-${month}`,
-        },
-      };
-    } else if (searchType === 'invoice' && invoiceNumber) {
-      params = {
-        invoiceNumber: {
-          invoice_number: invoiceNumber,
-        },
-      };
-    }
+    params = {
+      dateForUnpaid: {
+        date: `${year}-${month}`,
+      },
+    };
 
     return params;
-  }, [year, month, invoiceNumber, searchType]);
+  }, [year, month]);
 
   const { raw: raw_accountPayable } = useGetAccountPayableBy(params, { autoUpdate: true });
 

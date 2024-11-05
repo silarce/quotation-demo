@@ -76,11 +76,6 @@ type TgetAccountPayableByProps = XOR<
     dateForUnpaid: {
       date: string;
     };
-  },
-  {
-    invoiceNumber: {
-      invoice_number: string;
-    };
   }
 >;
 
@@ -1007,7 +1002,7 @@ const useGetPaymentOrderById = (
 
 // 取得應付帳款
 const apiGetAccountPayableBy = async (props: TgetAccountPayableByProps) => {
-  const { supplier, dateForUnpaid, invoiceNumber } = props;
+  const { supplier, dateForUnpaid } = props;
 
   const apiLookup: {
     [key in keyof Required<TgetAccountPayableByProps>]: {
@@ -1027,13 +1022,6 @@ const apiGetAccountPayableBy = async (props: TgetAccountPayableByProps) => {
       api: `/${subRoot}/GetMonthlyAccountPayable`,
       params: {
         date: dateForUnpaid?.date,
-      },
-    },
-    // 以發票號碼取得應付帳款
-    invoiceNumber: {
-      api: `/${subRoot}/SearchAccountPayableByInvoiceNumber`,
-      params: {
-        invoice_number: invoiceNumber?.invoice_number,
       },
     },
   } as const;
