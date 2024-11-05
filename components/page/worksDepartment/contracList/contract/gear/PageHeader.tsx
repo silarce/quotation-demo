@@ -9,6 +9,9 @@ import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 import { AppContext } from 'pages/_app';
 import { erpFeaturesLookup, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList';
 
+// globalState
+import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
+
 // ========================================================
 
 import { TdocType } from 'js/api/dtoTypes';
@@ -36,14 +39,17 @@ const {
 // ========================================================
 export default function PageHeader({
   tagCallback,
-  panelList,
+  panelList = [],
   contractNumber = '未取得',
+  returnBtn = true,
 }: {
   tagCallback?: (contractId: string) => string;
   panelList?: TpanelList;
   contractNumber?: string;
+  returnBtn?: boolean;
 }) {
   const { erpFeature } = useContext(AppContext);
+  const history_contractList = useUrlHistory((state) => state.contractList);
 
   const router = useRouter();
   const query = router.query as {
@@ -260,6 +266,19 @@ export default function PageHeader({
   }, [] as typeof linkList_pass);
 
   const linkList = pass ? linkList_pass : domesticPass ? linkList_domestic : [];
+
+  if (returnBtn) {
+    panelList = [
+      ...panelList,
+      {
+        type: 'myButton',
+        label: '返回合約列表',
+        onClick: () => {
+          router.push(history_contractList);
+        },
+      },
+    ];
+  }
 
   return (
     <div>

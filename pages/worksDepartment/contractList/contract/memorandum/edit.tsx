@@ -332,7 +332,11 @@ export default function Edit() {
 
   return (
     <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
-      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        returnBtn={!(isNew || isReply)}
+        panelList={panelList}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+      />
       {/* pt-[1px]是為了處理 margin collapse */}
       <div className={'pt-[1px]'}>
         <div ref={ref_anchor} />
