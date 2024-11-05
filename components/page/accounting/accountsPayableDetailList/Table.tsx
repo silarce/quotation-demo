@@ -82,12 +82,14 @@ const Row_tbody = (
     onCheck: (checked: boolean) => void;
   }
 ) => {
-  const { disabled, checked, onCheck } = props;
+  const { disabled, checked, onCheck, review_status } = props;
 
   const config = useConfig();
 
   return (
-    <Row>
+    <Row
+      className={classNames(review_status === '審核中' && scss.reviewing, review_status === '已審核' && scss.reviewed)}
+    >
       <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
         <Checkbox
           className={classNames(scss.antd_checkbox)}
@@ -98,7 +100,7 @@ const Row_tbody = (
         />
       </Cell>
       {keyArr.map((key) => {
-        const { label, style } = config[key];
+        const { style } = config[key];
 
         return (
           <Cell key={key} style={style}>
