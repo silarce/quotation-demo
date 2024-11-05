@@ -28,6 +28,7 @@ import {
   apiPatchUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ================================================================================
 type Tquery = {
@@ -159,38 +160,29 @@ export default function AccountsPayableDetailList() {
     const {
       id,
       serial_number,
-      review_status,
-      // note,
-      // agent_employee_id,
-      // invoice_title,
-      // invoice_date,
-      invoice_number,
+      supplier_id,
+      invoice_title,
       invoice_price,
-      // payment_account,
-      // payment_account_uuid,
+      payment_tenor_date,
+      payment_account,
+      payment_method,
+      cheque_id,
+      invoice_number,
       payment_status,
-      // payment_order_uuid,
-      // payment_order_serial_number,
-      // purchase_invoice_uuid,
-      // supplier_uuid,
-      // transaction_date,
-      // source_number,
-      // settled_amount,
-      // balance,
-      // supplier,
+      review_status,
     } = raw;
 
     const props: Parameters<typeof Row_tbody>[0] = {
       disabled,
       //
       serial_number,
-      廠商編號: 'no property',
-      發票廠商: 'no property',
+      supplier_id,
+      invoice_title,
       invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
-      票期日: 'no property',
-      付款帳號: 'no property',
-      支付方式: 'no property',
-      支票號碼: 'no property',
+      payment_tenor_date: getTaiwanDateStr(payment_tenor_date),
+      payment_account,
+      payment_method,
+      cheque_id,
       invoice_number,
       payment_status,
       review_status,

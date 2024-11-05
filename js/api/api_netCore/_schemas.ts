@@ -316,6 +316,10 @@ interface Taccount_payable_Dto extends Tbase {
   settled_amount: number | null; // int4 - 已付金額
   balance: number | null; // int4 - 餘額
   supplier: string | null; // varchar - 廠商名
+  supplier_id: string | null;
+  payment_tenor_date: string | null;
+  payment_method: string | null;
+  cheque_id: string | null;
 }
 
 interface Taccount_payable_statistics extends Tbase {

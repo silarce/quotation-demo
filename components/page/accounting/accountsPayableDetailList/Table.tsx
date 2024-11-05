@@ -13,13 +13,13 @@ import scss from './Table.module.scss';
 
 interface TconfigValue {
   serial_number: React.ReactNode; // 應付帳款單號
-  廠商編號: React.ReactNode; // 無property
-  發票廠商: React.ReactNode; // 取supplier還是invoice_title?
+  supplier_id: React.ReactNode; // 廠商編號
+  invoice_title: React.ReactNode; // 發票廠商
   invoice_price: React.ReactNode; // 發票金額
-  票期日: React.ReactNode; // 發票日期還是支票到期日? 支票到期日無property
-  付款帳號: React.ReactNode; // payment_account嗎?還是付款帳號的號碼? 付款帳號的號碼無property
-  支付方式: React.ReactNode; // 無property
-  支票號碼: React.ReactNode; // 無property
+  payment_tenor_date: React.ReactNode; // 票期日
+  payment_account: React.ReactNode; // 付款帳號
+  payment_method: React.ReactNode; // 支付方式
+  cheque_id: React.ReactNode; // 支票號碼
   invoice_number: React.ReactNode; // 發票號碼
   payment_status: React.ReactNode; // 付款狀態
   //
@@ -114,13 +114,13 @@ const Row_tbody = (
 
 const keyArr: (keyof TconfigValue)[] = [
   'serial_number',
-  '廠商編號',
-  '發票廠商',
+  'supplier_id',
+  'invoice_title',
   'invoice_price',
-  '票期日',
-  '付款帳號',
-  '支付方式',
-  '支票號碼',
+  'payment_tenor_date',
+  'payment_account',
+  'payment_method',
+  'cheque_id',
   'invoice_number',
   'payment_status',
   'review_status',
@@ -133,16 +133,16 @@ const useConfig = () => {
   } = useTranslation();
 
   const config: Tconfig = useMemo(() => {
-    return {
+    const config: Tconfig = {
       serial_number: {
         label: '應付帳款單號',
         style: { width: 150 },
       },
-      廠商編號: {
+      supplier_id: {
         label: '廠商編號',
         style: { width: 100 },
       },
-      發票廠商: {
+      invoice_title: {
         label: '發票廠商',
         style: { width: 100 },
       },
@@ -150,19 +150,19 @@ const useConfig = () => {
         label: '發票金額',
         style: { width: 100 },
       },
-      票期日: {
+      payment_tenor_date: {
         label: '票期日',
         style: { width: 100 },
       },
-      付款帳號: {
+      payment_account: {
         label: '付款帳號',
         style: { width: 100 },
       },
-      支付方式: {
+      payment_method: {
         label: '支付方式',
         style: { width: 100 },
       },
-      支票號碼: {
+      cheque_id: {
         label: '支票號碼',
         style: { width: 100 },
       },
@@ -179,6 +179,8 @@ const useConfig = () => {
         style: { width: 100 },
       },
     };
+
+    return config;
   }, [language]);
 
   return config;
