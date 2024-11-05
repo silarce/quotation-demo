@@ -201,7 +201,7 @@ export default function AccountsPayableDetailList() {
       },
       onDetailClick: () => {
         router.push({
-          pathname: '/accounting/accountsPayableDetail',
+          pathname: '/accounting/accountsPayableDetailList/detail',
           query: {
             invoiceNumber: invoice_number,
           },

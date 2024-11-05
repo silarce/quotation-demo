@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { notification } from 'antd';
 
 import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
@@ -1167,6 +1168,66 @@ const useGetAccountPayableBySupplierId = (
   };
 };
 
+// 以發票號碼取得單筆應付帳款
+// SearchAccountPayableByInvoiceNumber
+const apiGetSearchAccountPayableByInvoiceNumber = (invoice_number: string) => {
+  const api = `/${subRoot}/SearchAccountPayableByInvoiceNumber`;
+  const params = {
+    invoice_number,
+  };
+
+  return axi2
+    .get<Taccount_payable_Dto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
+
+const useGetSearchAccountPayableByInvoiceNumber = (
+  invoiceNumber: string | undefined,
+  { autoUpdate = true }: { autoUpdate?: boolean } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [raw, setRaw] = useState<Taccount_payable_Dto>();
+
+  const update = async () => {
+    if (!invoiceNumber) {
+      setRaw(undefined);
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetSearchAccountPayableByInvoiceNumber(invoiceNumber)
+      .then((raw) => {
+        setRaw(raw);
+
+        return raw;
+      })
+      .catch((err) => {
+        setRaw(undefined);
+        notification.error({ message: '取得應付帳款失敗', description: err.message });
+
+        return err;
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  useEffect(() => {
+    update();
+  }, [invoiceNumber]);
+
+  return {
+    isFetching,
+    raw,
+    update,
+  };
+};
+
 // 以id或當月日期取得應付帳款統計表
 const apiGetAccountPayableStatisticsByIdOrDate = async ({ id, date }: XOR<{ id: string }, { date: string }>) => {
   const api = `/${subRoot}/GetAccountPayableStatisticsByIdOrDate`;
@@ -1424,6 +1485,7 @@ export {
   useGetAccountPayableBy,
   useGetAccountPayableStatisticsByIdOrDate,
   useGetAccountPayableStatisticsDetailByStatisticsId,
+  useGetSearchAccountPayableByInvoiceNumber,
   apiPostAddAccountPayableStatistics,
   apiPatchUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
