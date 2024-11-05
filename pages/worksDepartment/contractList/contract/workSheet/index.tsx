@@ -734,7 +734,11 @@ export default function Worksheet({
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        returnBtn={disabled}
+        panelList={panelList}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+      />
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />

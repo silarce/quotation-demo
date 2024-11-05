@@ -23,6 +23,9 @@ import scss from './index.module.scss';
 
 import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
+// globalState
+import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
+
 // ========================================================================
 
 interface Tproduct {
@@ -79,6 +82,8 @@ export default function ContracTable({
   isAdmin: boolean;
   userErpFeature: TerpFeatureDto[] | undefined;
 }) {
+  const history_contractList = useUrlHistory((state) => state.contractList);
+
   const havePermissionToSee = useMemo(() => {
     if (isAdmin) {
       return true;
@@ -215,10 +220,7 @@ export default function ContracTable({
   // -------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader
-        //  panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-      />
+      <PageHeader contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
         <h1 className="text-9xl">施工中</h1>
