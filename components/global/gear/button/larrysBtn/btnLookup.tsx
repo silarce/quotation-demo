@@ -1,7 +1,19 @@
 import * as Icons from '../../../../../public/image/icon/fcIconComponent/fcIcons';
 
 const btnLookup: {
-  [key: string]: {
+  [key in
+    | 'add'
+    | 'arrowDone'
+    | 'cancel'
+    | 'delete'
+    | 'edit'
+    | 'export'
+    | 'flow'
+    | 'exclam'
+    | 'save'
+    | 'search'
+    | 'sentReview'
+    | 'sentReviewStop']: {
     Icon: React.FC<React.SVGProps<SVGSVGElement>>;
     i18nKey?: string | null;
   };
