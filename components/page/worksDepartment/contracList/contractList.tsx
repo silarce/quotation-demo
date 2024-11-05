@@ -16,6 +16,9 @@ import { useGetContract_id } from 'js/api/api_quotation';
 // css
 import style from './contractList.module.scss';
 
+// globalState
+import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
+
 const { Panel } = Collapse;
 
 // ========================
@@ -45,6 +48,8 @@ function ContractList_pre(
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
+  const history_contractList = useUrlHistory((state) => state.contractList);
+
   const router = useRouter();
 
   // ------------------------------------------------------------------
@@ -136,6 +141,16 @@ function ContractList_pre(
                 activeContractPage: item.page,
               },
             });
+
+            history_contractList.set({
+              pathname: router.pathname,
+              query: {
+                ...router.query,
+                activeContractId: contractId,
+                activeContractPage: String(item.page),
+              },
+            });
+
             router.push({
               pathname: '/worksDepartment/contractList/contract/workContactDoc',
               query: { contractId, version: 1 },
