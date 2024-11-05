@@ -1,14 +1,46 @@
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
-const InvoiceInfo = () => {
+interface TinvoiceInfo {
+  發票類別: React.ReactNode;
+  invoice_date: React.ReactNode;
+  invoice_number: React.ReactNode;
+  申報期別: React.ReactNode;
+  進貨費用: string;
+  買受人統一編號: React.ReactNode;
+  買受人抬頭: React.ReactNode;
+  買受人發票地址: React.ReactNode;
+  營業人統一編號: React.ReactNode;
+  營業人抬頭: React.ReactNode;
+  稅別: string;
+  稅額: React.ReactNode;
+  進項金額: React.ReactNode;
+  合計金額: React.ReactNode;
+}
+
+const InvoiceInfo = ({
+  發票類別,
+  invoice_date,
+  invoice_number,
+  申報期別,
+  進貨費用,
+  買受人統一編號,
+  買受人抬頭,
+  買受人發票地址,
+  營業人統一編號,
+  營業人抬頭,
+  稅別,
+  稅額,
+  進項金額,
+  合計金額,
+}: TinvoiceInfo) => {
   return (
     <>
       <span className="text-base block mb-2">{'[發票資訊]'}</span>
       <div className="global_grid01">
-        <InputSel showBaseline="always" caption="發票類別" />
-        <InputSel showBaseline="always" caption="發票號碼" />
-        <InputSel showBaseline="always" caption="發票日期" />
-        <InputSel showBaseline="always" caption="申報期別" />
+        <InputSel showBaseline="always" caption="發票類別" node={發票類別} />
+        <InputSel showBaseline="always" caption="發票號碼" node={invoice_number} />
+        <InputSel showBaseline="always" caption="發票日期" node={invoice_date} />
+        <InputSel showBaseline="always" caption="申報期別" node={申報期別} />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
         <InputSel
@@ -16,6 +48,7 @@ const InvoiceInfo = () => {
           caption="進貨費用"
           radioProps={{
             props: {
+              value: 進貨費用,
               onChange: (e) => {
                 console.log(e.target.value);
               },
@@ -34,13 +67,13 @@ const InvoiceInfo = () => {
         />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel showBaseline="always" caption="買受人統一編號" />
-        <InputSel showBaseline="always" caption="買受人抬頭" />
-        <InputSel showBaseline="always" caption="買受人發票地址" />
+        <InputSel showBaseline="always" caption="買受人統一編號" node={買受人統一編號} />
+        <InputSel showBaseline="always" caption="買受人抬頭" node={買受人抬頭} />
+        <InputSel showBaseline="always" caption="買受人發票地址" node={買受人發票地址} />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel showBaseline="always" caption="營業人統一編號" />
-        <InputSel showBaseline="always" caption="營業人抬頭" />
+        <InputSel showBaseline="always" caption="營業人統一編號" node={營業人統一編號} />
+        <InputSel showBaseline="always" caption="營業人抬頭" node={營業人抬頭} />
         <div />
         <div />
         {/*  */}
@@ -50,6 +83,7 @@ const InvoiceInfo = () => {
           caption="稅別"
           radioProps={{
             props: {
+              value: 稅別,
               onChange: (e) => {
                 console.log(e.target.value);
               },
@@ -70,9 +104,9 @@ const InvoiceInfo = () => {
             ],
           }}
         />
-        <InputSel showBaseline="always" caption="稅額" />
-        <InputSel showBaseline="always" caption="進項金額" />
-        <InputSel showBaseline="always" caption="合計金額" />
+        <InputSel showBaseline="always" caption="稅額" node={稅額} />
+        <InputSel showBaseline="always" caption="進項金額" node={進項金額} />
+        <InputSel showBaseline="always" caption="合計金額" node={合計金額} />
       </div>
     </>
   );

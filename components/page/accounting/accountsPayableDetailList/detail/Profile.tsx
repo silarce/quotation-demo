@@ -1,11 +1,17 @@
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
-const Profile = () => {
+interface Tprofile {
+  serial_number: React.ReactNode;
+  支出單號進貨收票單號: React.ReactNode;
+  agentName: React.ReactNode;
+}
+
+const Profile = ({ serial_number, 支出單號進貨收票單號, agentName }: Tprofile) => {
   return (
     <div className="global_grid01">
-      <InputSel showBaseline="always" caption="應付帳款單號" />
-      <InputSel showBaseline="always" caption="支出單號/進會收票單號" />
-      <InputSel showBaseline="always" caption="經辦人員" />
+      <InputSel showBaseline="always" caption="應付帳款單號" node={serial_number} />
+      <InputSel showBaseline="always" caption="支出單號/進貨收票單號" node={支出單號進貨收票單號} />
+      <InputSel showBaseline="always" caption="經辦人員" node={agentName} />
     </div>
   );
 };

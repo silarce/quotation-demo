@@ -53,6 +53,33 @@ export default function AccountsPayableDetail() {
 
   const { raw, isFetching } = useGetSearchAccountPayableByInvoiceNumber(invoiceNumber);
 
+  console.log(raw);
+
+  const {
+    serial_number,
+    agentEmployee,
+
+    invoice_date,
+    invoice_number,
+  } = raw ?? {};
+
+  const invoiceInfo: Parameters<typeof InvoiceInfo>[0] = {
+    發票類別: 'no property',
+    invoice_date: getTaiwanDateStr(invoice_date),
+    invoice_number,
+    申報期別: 'no property',
+    進貨費用: 'no property',
+    買受人統一編號: 'no property',
+    買受人抬頭: 'no property',
+    買受人發票地址: 'no property',
+    營業人統一編號: 'no property',
+    營業人抬頭: 'no property',
+    稅別: 'no property',
+    稅額: 'no property',
+    進項金額: 'no property',
+    合計金額: 'no property',
+  };
+
   // -----------------------------------------------------------------------------
 
   return (
@@ -61,9 +88,13 @@ export default function AccountsPayableDetail() {
       <div>
         <BtnBar />
         <Spin spinning={false}>
-          <Profile />
+          <Profile
+            serial_number={serial_number}
+            支出單號進貨收票單號={'no property'}
+            agentName={agentEmployee?.chName}
+          />
           <br />
-          <InvoiceInfo />
+          <InvoiceInfo {...invoiceInfo} />
           <br />
           <Balancing />
         </Spin>

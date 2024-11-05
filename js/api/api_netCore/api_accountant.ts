@@ -8,6 +8,7 @@ import { AxiosError } from 'axios';
 
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
 import { apiGetCustomers_id, TcustomerDto } from '../api_customer';
+// import { apiGetInvoiceNumber, TaccountsReceivableInvoiceDto } from '../api_engineering';
 
 import { XOR } from 'ts-essentials';
 
@@ -64,6 +65,10 @@ interface Tpayment_order_Dto_detailed extends Tpayment_order_Dto {
   detailArr: TpaymentOrderDetail_Dto[];
   agent_employee: TemployeeDto | undefined;
   beneficiary: TcustomerDto | undefined;
+}
+
+interface TaccountPayable_Dto_detailed extends Taccount_payable_Dto {
+  agentEmployee: TemployeeDto | undefined;
 }
 
 type TgetAccountPayableByProps = XOR<
@@ -1177,7 +1182,7 @@ const useGetSearchAccountPayableByInvoiceNumber = (
   { autoUpdate = true }: { autoUpdate?: boolean } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [raw, setRaw] = useState<Taccount_payable_Dto>();
+  const [raw, setRaw] = useState<TaccountPayable_Dto_detailed>();
 
   const update = async () => {
     if (!invoiceNumber) {
@@ -1190,9 +1195,33 @@ const useGetSearchAccountPayableByInvoiceNumber = (
 
     return await apiGetSearchAccountPayableByInvoiceNumber(invoiceNumber)
       .then((raw) => {
-        setRaw(raw);
+        // setRaw(raw);
 
         return raw;
+      })
+      .then(async (raw) => {
+        const {
+          agent_employee_id,
+          // payment_account_uuid,
+          // payment_order_uuid,
+          // purchase_invoice_uuid,
+          // supplier_uuid,
+          // cheque_id,
+          invoice_number,
+        } = raw;
+
+        const [agentEmployee] = await Promise.all([
+          agent_employee_id ? apiGetEmployee_id(agent_employee_id) : undefined,
+        ]);
+
+        const raw_detailed: TaccountPayable_Dto_detailed = {
+          ...raw,
+          agentEmployee,
+        };
+
+        setRaw(raw_detailed);
+
+        return raw_detailed;
       })
       .catch((err) => {
         setRaw(undefined);
@@ -1206,7 +1235,7 @@ const useGetSearchAccountPayableByInvoiceNumber = (
   };
 
   useEffect(() => {
-    update();
+    autoUpdate && update();
   }, [invoiceNumber]);
 
   return {
@@ -1484,4 +1513,5 @@ export type {
   TpurchaseCollectTicket_Dto_detailed,
   Tpayment_order_Dto_detailed,
   TgetAccountPayableByProps,
+  TaccountPayable_Dto_detailed,
 };
