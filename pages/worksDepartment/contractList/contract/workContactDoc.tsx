@@ -21,9 +21,6 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { useGetContract_id } from 'js/api/api_quotation';
 
-// globalState
-import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
-
 // ============================================================================
 type Tquery = {
   contractId: string;
@@ -31,8 +28,6 @@ type Tquery = {
 
 // ============================================================================
 export default function WorkContactDoc() {
-  const history_contractList = useUrlHistory((state) => state.contractList);
-
   const router = useRouter();
   const { contractId } = router.query as Tquery;
 
@@ -94,13 +89,6 @@ export default function WorkContactDoc() {
     // contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
     { type: 'myButton', label: '匯出工程聯絡單', onClick: () => ref_workContact.current.openPdf() },
     { type: 'myButton', label: '編輯聯絡人', onClick: () => ref_workContact.current.setDisabled(false) },
-    {
-      type: 'myButton',
-      label: '返回合約列表',
-      onClick: () => {
-        router.push(history_contractList);
-      },
-    },
   ];
   const panelList_02: TpanelList = [
     {
@@ -137,7 +125,12 @@ export default function WorkContactDoc() {
   // ----------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} contractNumber={workContactContractNumber} />
+      <PageHeader
+        //
+        returnBtn={!(isShowPattern || !disabled)}
+        panelList={panelList}
+        contractNumber={workContactContractNumber}
+      />
 
       <div>
         <WorkContactDoc_component

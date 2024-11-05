@@ -414,7 +414,7 @@ export default function EditPickup() {
   // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
+      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
 
       <div className={scss.container}>
         {/* info */}
