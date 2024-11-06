@@ -10,8 +10,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-// import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/SearchSwitch';
-import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/Table';
+// import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/index/SearchSwitch';
+import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/index/Table';
 
 // gear
 
