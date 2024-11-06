@@ -85,7 +85,16 @@ export default function AccountsPayableDetail() {
 
   return (
     <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag="應付帳款明細" />
+      <PageHeader02
+        tag="應付帳款明細"
+        panelList={[
+          {
+            type: 'myButton',
+            label: '返回',
+            onClick: () => router.back(),
+          },
+        ]}
+      />
       <div>
         <BtnBar />
         <Spin spinning={false}>
