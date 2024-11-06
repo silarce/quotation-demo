@@ -12,7 +12,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // component
 import Profile from 'components/page/accounting/accountsPayableDetailList/detail/Profile';
 import InvoiceInfo from 'components/page/accounting/accountsPayableDetailList/detail/InvoiceInfo';
-import Balancing from 'components/page/accounting/accountsPayableDetailList/detail/Balance';
+import Balance from 'components/page/accounting/accountsPayableDetailList/detail/Balance';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -47,13 +47,14 @@ export default function AccountsPayableDetail() {
   const router = useRouter();
   const { invoiceNumber } = router.query as Tquery;
 
+  // 待api給的資料齊全了再繼續
   const [disabled, setDisabled] = useState(true);
 
   // -----------------------------------------------------------------------------
 
   const { raw, isFetching } = useGetSearchAccountPayableByInvoiceNumber(invoiceNumber);
 
-  console.log(raw);
+  // console.log(raw);
 
   const {
     serial_number,
@@ -94,9 +95,9 @@ export default function AccountsPayableDetail() {
             agentName={agentEmployee?.chName}
           />
           <br />
-          <InvoiceInfo {...invoiceInfo} />
+          <InvoiceInfo disabled={disabled} {...invoiceInfo} />
           <br />
-          <Balancing />
+          <Balance disabled={disabled} />
         </Spin>
       </div>
     </SubLayer>
@@ -112,12 +113,8 @@ const BtnBar = () => {
         <SquareBtn content="search" />
         <SquareBtn content="export" />
       </>
-      <>
-        <SquareBtn content="edit" />
-      </>
-      <>
-        <SquareBtn content="sentReview" />
-      </>
+      <>{/* <SquareBtn content="edit" /> */}</>
+      <>{/* <SquareBtn content="sentReview" /> */}</>
     </ThreePartBar>
   );
 };

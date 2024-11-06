@@ -9,9 +9,9 @@ interface Tprofile {
 const Profile = ({ serial_number, 支出單號進貨收票單號, agentName }: Tprofile) => {
   return (
     <div className="global_grid01">
-      <InputSel showBaseline="always" caption="應付帳款單號" node={serial_number} />
-      <InputSel showBaseline="always" caption="支出單號/進貨收票單號" node={支出單號進貨收票單號} />
-      <InputSel showBaseline="always" caption="經辦人員" node={agentName} />
+      <InputSel showBaseline="invisible" caption="應付帳款單號" node={serial_number} />
+      <InputSel showBaseline="invisible" caption="支出單號/進貨收票單號" node={支出單號進貨收票單號} />
+      <InputSel showBaseline="invisible" caption="經辦人員" node={agentName} />
     </div>
   );
 };

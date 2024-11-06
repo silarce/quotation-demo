@@ -18,6 +18,8 @@ interface TinvoiceInfo {
 }
 
 const InvoiceInfo = ({
+  disabled,
+  //
   發票類別,
   invoice_date,
   invoice_number,
@@ -32,19 +34,20 @@ const InvoiceInfo = ({
   稅額,
   進項金額,
   合計金額,
-}: TinvoiceInfo) => {
+}: TinvoiceInfo & { disabled?: boolean }) => {
   return (
     <>
       <span className="text-base block mb-2">{'[發票資訊]'}</span>
       <div className="global_grid01">
-        <InputSel showBaseline="always" caption="發票類別" node={發票類別} />
-        <InputSel showBaseline="always" caption="發票號碼" node={invoice_number} />
-        <InputSel showBaseline="always" caption="發票日期" node={invoice_date} />
-        <InputSel showBaseline="always" caption="申報期別" node={申報期別} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="發票類別" node={發票類別} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="發票號碼" node={invoice_number} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="發票日期" node={invoice_date} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="申報期別" node={申報期別} />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
         <InputSel
-          showBaseline="always"
+          disabled={disabled}
+          showBaseline="auto"
           caption="進貨費用"
           radioProps={{
             props: {
@@ -67,19 +70,20 @@ const InvoiceInfo = ({
         />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel showBaseline="always" caption="買受人統一編號" node={買受人統一編號} />
-        <InputSel showBaseline="always" caption="買受人抬頭" node={買受人抬頭} />
-        <InputSel showBaseline="always" caption="買受人發票地址" node={買受人發票地址} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="買受人統一編號" node={買受人統一編號} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="買受人抬頭" node={買受人抬頭} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="買受人發票地址" node={買受人發票地址} />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel showBaseline="always" caption="營業人統一編號" node={營業人統一編號} />
-        <InputSel showBaseline="always" caption="營業人抬頭" node={營業人抬頭} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="營業人統一編號" node={營業人統一編號} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="營業人抬頭" node={營業人抬頭} />
         <div />
         <div />
         {/*  */}
 
         <InputSel
-          showBaseline="always"
+          disabled={disabled}
+          showBaseline="auto"
           caption="稅別"
           radioProps={{
             props: {
@@ -104,9 +108,9 @@ const InvoiceInfo = ({
             ],
           }}
         />
-        <InputSel showBaseline="always" caption="稅額" node={稅額} />
-        <InputSel showBaseline="always" caption="進項金額" node={進項金額} />
-        <InputSel showBaseline="always" caption="合計金額" node={合計金額} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="稅額" node={稅額} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="進項金額" node={進項金額} />
+        <InputSel disabled={disabled} showBaseline="auto" caption="合計金額" node={合計金額} />
       </div>
     </>
   );

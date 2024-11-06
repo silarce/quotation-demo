@@ -29,13 +29,13 @@ type Tconfig = {
 };
 
 // ================================================================================
-const Balancing = () => {
+const Balance = ({ disabled }: { disabled: boolean }) => {
   return (
     <>
       <span className="text-base block mb-2">{'[沖帳明細]'}</span>
       <div>
         <Row_Thead />
-        <Row_body />
+        <Row_body disabled={disabled} />
       </div>
     </>
   );
@@ -59,7 +59,7 @@ const Row_Thead = () => {
   );
 };
 
-const Row_body = () => {
+const Row_body = ({ disabled }: { disabled: boolean }) => {
   return (
     <Row fullWidth={true}>
       {keyArr.map((key) => {
@@ -68,7 +68,7 @@ const Row_body = () => {
 
         return (
           <Cell key={key} style={style}>
-            <InputSel {...props} />
+            <InputSel disabled={disabled} showBaseline="auto" {...props} />
           </Cell>
         );
       })}
@@ -178,4 +178,4 @@ const config: Tconfig = {
 
 // ================================================================================
 
-export default Balancing;
+export default Balance;
