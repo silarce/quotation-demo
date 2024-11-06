@@ -1102,9 +1102,10 @@ const useClassProdList = ({
   };
 
   const copySelf_prod = (
+    //
     list: TproductList,
-    copyKey: string
-    // shouldKeepId?: boolean
+    copyKey: string,
+    shouldKeepId = true
   ) => {
     if (!doorModelList) {
       myAlert.info({ title: '尚未取得門型資料' });
@@ -1128,9 +1129,9 @@ const useClassProdList = ({
       calcQuotationAvgDiscount();
     };
 
-    // if (!shouldKeepId) {
-    //   copy.clearId();
-    // }
+    if (!shouldKeepId) {
+      copy.clearId();
+    }
 
     copy.attachId = newKey;
 
@@ -1371,11 +1372,7 @@ const useProd_attach = ({
   calcQuotationAvgDiscount: () => void;
 
   delSelf_prod: (list: TproductList, key: string) => void;
-  copySelf_prod: (
-    list: TproductList,
-    copyKey: string
-    // shouldKeepId?: boolean
-  ) => void;
+  copySelf_prod: (list: TproductList, copyKey: string, shouldKeepId?: boolean) => void;
   //
   callCalcSubTotal: () => void;
   onClassDoorTypeChange: ({
@@ -1401,7 +1398,7 @@ const useProd_attach = ({
         calcQuotationAvgDiscount();
       },
       copySelf: () => {
-        copySelf_prod(productList_attach, newKey);
+        copySelf_prod(productList_attach, newKey, false);
         calcQuotationAvgDiscount();
       },
       callCalcSubTotal,
