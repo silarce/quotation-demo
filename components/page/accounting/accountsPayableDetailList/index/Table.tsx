@@ -14,6 +14,12 @@ import scss from './Table.module.scss';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
+// type
+import { Taccount_payable_Dto } from 'js/api/api_netCore/api_accountant';
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+// ================================================================================
 interface TconfigValue {
   serial_number: React.ReactNode; // 應付帳款單號
   supplier_id: React.ReactNode; // 廠商編號
@@ -31,9 +37,9 @@ interface TconfigValue {
 
 interface Ttbody extends TconfigValue {
   disabled: boolean;
-  checked: boolean;
-  onCheck: (checked: boolean) => void;
-  onDetailClick: () => void;
+  checked?: boolean;
+  onCheck?: (checked: boolean) => void;
+  onDetailClick?: () => void;
 }
 
 interface TconfigItem {
@@ -52,25 +58,31 @@ const Row_thead = ({
   disabled,
   checked,
   onCheckChange,
+  noCheck = false,
+  className,
 }: {
   disabled: boolean;
-  checked: boolean;
-  onCheckChange: (checked: boolean) => void;
+  checked?: boolean;
+  onCheckChange?: (checked: boolean) => void;
+  noCheck?: boolean;
+  className?: string;
 }) => {
   const config = useConfig();
 
   return (
-    <Row thead={true} fullWidth={true}>
-      <Cell style={config_other.checkBox.style}>
-        <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
-          <Checkbox
-            className={classNames(scss.antd_checkbox)}
-            checked={checked}
-            onChange={(e) => onCheckChange(e.target.checked)}
-          />
-          <span>全選</span>
-        </label>
-      </Cell>
+    <Row thead={true} fullWidth={true} className={className}>
+      {!noCheck && (
+        <Cell style={config_other.checkBox.style}>
+          <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
+            <Checkbox
+              className={classNames(scss.antd_checkbox)}
+              checked={checked}
+              onChange={(e) => onCheckChange?.(e.target.checked)}
+            />
+            <span>全選</span>
+          </label>
+        </Cell>
+      )}
 
       {keyArr.map((key) => {
         const { label, style } = config[key];
@@ -86,8 +98,13 @@ const Row_thead = ({
   );
 };
 
-const Row_tbody = (props: Ttbody) => {
-  const { disabled, checked, onCheck, review_status, onDetailClick } = props;
+const Row_tbody = (
+  props: Ttbody & {
+    noCheck?: boolean;
+    noDetail?: boolean;
+  }
+) => {
+  const { disabled, checked, onCheck, review_status, onDetailClick, noCheck, noDetail } = props;
 
   const config = useConfig();
 
@@ -96,15 +113,17 @@ const Row_tbody = (props: Ttbody) => {
       fullWidth={true}
       className={classNames(review_status === '審核中' && scss.reviewing, review_status === '已審核' && scss.reviewed)}
     >
-      <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
-        <Checkbox
-          className={classNames(scss.antd_checkbox)}
-          checked={checked}
-          onChange={(e) => {
-            onCheck(e.target.checked);
-          }}
-        />
-      </Cell>
+      {!noCheck && (
+        <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
+          <Checkbox
+            className={classNames(scss.antd_checkbox)}
+            checked={checked}
+            onChange={(e) => {
+              onCheck?.(e.target.checked);
+            }}
+          />
+        </Cell>
+      )}
       {keyArr.map((key) => {
         const { style } = config[key];
 
@@ -114,9 +133,11 @@ const Row_tbody = (props: Ttbody) => {
           </Cell>
         );
       })}
-      <Cell style={config_other.detail.style}>
-        <IconDetail onClick={onDetailClick} />
-      </Cell>
+      {!noDetail && (
+        <Cell style={config_other.detail.style}>
+          <IconDetail onClick={onDetailClick} />
+        </Cell>
+      )}
     </Row>
   );
 };
@@ -206,4 +227,54 @@ const config_other = {
   },
 };
 
-export { Row_thead, Row_tbody };
+// ===========================================================================
+
+const createValueProps = (raw: Taccount_payable_Dto) => {
+  const {
+    serial_number,
+    supplier_id,
+    invoice_title,
+    invoice_price,
+    payment_tenor_date,
+    payment_account,
+    payment_method,
+    cheque_id,
+    invoice_number,
+    payment_status,
+    review_status,
+  } = raw;
+
+  const props: Pick<
+    Parameters<typeof Row_tbody>[0],
+    | 'serial_number'
+    | 'supplier_id'
+    | 'invoice_title'
+    | 'invoice_price'
+    | 'payment_tenor_date'
+    | 'payment_account'
+    | 'payment_method'
+    | 'cheque_id'
+    | 'invoice_number'
+    | 'payment_status'
+    | 'review_status'
+  > = {
+    //
+    serial_number,
+    supplier_id,
+    invoice_title,
+    invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
+    payment_tenor_date: getTaiwanDateStr(payment_tenor_date),
+    payment_account,
+    payment_method,
+    cheque_id,
+    invoice_number,
+    payment_status,
+    review_status,
+  };
+
+  return props;
+};
+
+// ===========================================================================
+
+export { Row_thead, Row_tbody, createValueProps };

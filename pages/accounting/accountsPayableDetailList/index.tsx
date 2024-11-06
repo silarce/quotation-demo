@@ -11,7 +11,11 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 // component
 // import SearchSwitch from 'components/page/accounting/accountsPayableDetailList/index/SearchSwitch';
-import { Row_thead, Row_tbody } from 'components/page/accounting/accountsPayableDetailList/index/Table';
+import {
+  Row_thead,
+  Row_tbody,
+  createValueProps,
+} from 'components/page/accounting/accountsPayableDetailList/index/Table';
 
 // gear
 
@@ -163,52 +167,52 @@ export default function AccountsPayableDetailList() {
     });
   };
 
-  const createProps = (raw: Taccount_payable_Dto) => {
-    const {
-      id,
-      serial_number,
-      supplier_id,
-      invoice_title,
-      invoice_price,
-      payment_tenor_date,
-      payment_account,
-      payment_method,
-      cheque_id,
-      invoice_number,
-      payment_status,
-      review_status,
-    } = raw;
+  // const createProps = (raw: Taccount_payable_Dto) => {
+  //   const {
+  //     id,
+  //     serial_number,
+  //     supplier_id,
+  //     invoice_title,
+  //     invoice_price,
+  //     payment_tenor_date,
+  //     payment_account,
+  //     payment_method,
+  //     cheque_id,
+  //     invoice_number,
+  //     payment_status,
+  //     review_status,
+  //   } = raw;
 
-    const props: Parameters<typeof Row_tbody>[0] = {
-      disabled,
-      //
-      serial_number,
-      supplier_id,
-      invoice_title,
-      invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
-      payment_tenor_date: getTaiwanDateStr(payment_tenor_date),
-      payment_account,
-      payment_method,
-      cheque_id,
-      invoice_number,
-      payment_status,
-      review_status,
-      checked: !!checkedRaw[id],
-      onCheck: (checked) => {
-        handleCheck(checked, id, raw);
-      },
-      onDetailClick: () => {
-        router.push({
-          pathname: '/accounting/accountsPayableDetailList/detail',
-          query: {
-            invoiceNumber: invoice_number,
-          },
-        });
-      },
-    };
+  //   const props: Parameters<typeof Row_tbody>[0] = {
+  //     disabled,
+  //     //
+  //     serial_number,
+  //     supplier_id,
+  //     invoice_title,
+  //     invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
+  //     payment_tenor_date: getTaiwanDateStr(payment_tenor_date),
+  //     payment_account,
+  //     payment_method,
+  //     cheque_id,
+  //     invoice_number,
+  //     payment_status,
+  //     review_status,
+  //     checked: !!checkedRaw[id],
+  //     onCheck: (checked) => {
+  //       handleCheck(checked, id, raw);
+  //     },
+  //     onDetailClick: () => {
+  //       router.push({
+  //         pathname: '/accounting/accountsPayableDetailList/detail',
+  //         query: {
+  //           invoiceNumber: invoice_number,
+  //         },
+  //       });
+  //     },
+  //   };
 
-    return props;
-  };
+  //   return props;
+  // };
 
   // ----------------------------------------------------------------
 
@@ -263,8 +267,22 @@ export default function AccountsPayableDetailList() {
           <Row_thead disabled={disabled} checked={isAllChecked} onCheckChange={handleCheckAllChange} />
 
           {raw_accountPayable?.map((raw) => {
-            // disabled包含在createProps裏面了
-            const props: Parameters<typeof Row_tbody>[0] = createProps(raw);
+            const props: Parameters<typeof Row_tbody>[0] = {
+              ...createValueProps(raw),
+              disabled,
+              checked: !!checkedRaw[raw.id],
+              onCheck: (checked) => {
+                handleCheck(checked, raw.id, raw);
+              },
+              onDetailClick: () => {
+                router.push({
+                  pathname: '/accounting/accountsPayableDetailList/detail',
+                  query: {
+                    invoiceNumber: raw.invoice_number,
+                  },
+                });
+              },
+            };
 
             return <Row_tbody key={raw.id} {...props} />;
           })}

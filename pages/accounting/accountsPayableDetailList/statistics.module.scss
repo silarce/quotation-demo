@@ -1,0 +1,56 @@
+.body {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 30px;
+  height: 100%;
+}
+
+.accountPayable {
+  border: solid 1px theme("colors.border");
+  overflow: auto;
+  position: relative;
+  height: 100%;
+
+  .thead {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.detailWrapper {
+  overflow: hidden;
+  display: grid;
+}
+.detailContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0px 20px;
+  height: 100%;
+  padding: 10px;
+  overflow: auto;
+
+  border: solid 1px theme("colors.border");
+
+  > * {
+    flex: none;
+  }
+}
+
+.detail {
+  display: grid;
+  grid-template-columns: 25px 1fr 120px;
+  align-items: center;
+  border: solid 1px theme("colors.border");
+  width: 380px;
+  font-size: 20px;
+  padding: 0px 0px 0px 5px;
+  .inputCell {
+    border-right: solid 1px theme("colors.border");
+    padding: 5px 10px;
+    width: 100%;
+  }
+  .moneyCell {
+    padding: 5px 10px;
+  }
+}

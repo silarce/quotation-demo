@@ -329,11 +329,11 @@ interface Taccount_payable_statistics extends Tbase {
 }
 
 interface Taccount_payable_statistics_detail extends Tbase {
-  bank_account_uuid: string;
-  payment: number;
-  account_payable_statistics_id: string;
-  note: string;
-  bank_account_name: string;
+  bank_account_uuid: string; // 付款帳號uui
+  payment: number; // 貨款金額
+  account_payable_statistics_id: string; // 應付帳款統計表uuid
+  note: string; //
+  bank_account_name: string; // 付款帳號名稱
 }
 
 // MARK: ============

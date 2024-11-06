@@ -1265,7 +1265,7 @@ const apiGetAccountPayableStatisticsByIdOrDate = async ({ id, date }: XOR<{ id: 
   };
 
   return axi2
-    .get<Taccount_payable_statistics>(api, { params })
+    .get<Taccount_payable_statistics[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       return Promise.reject(err);
@@ -1285,7 +1285,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
 ) => {
   const { id, date } = params;
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  const [raw, setRaw] = useState<Taccount_payable_statistics>();
+  const [raw, setRaw] = useState<Taccount_payable_statistics[]>();
 
   const update = async () => {
     if (isFetching || (!params.id && !params.date)) {
@@ -1426,7 +1426,7 @@ const apiPatchUpdateAccountPayableStatisticsById = async (body: {
   data: {
     detail_id: string;
     payment: string;
-    note: `${number}`;
+    note: string;
     bank_account_uuid: string;
     bank_account_name: string;
   }[];
@@ -1509,6 +1509,7 @@ export {
   useGetPaymentOrder,
   useGetPaymentOrderById,
   //
+  Taccount_payable_statistics_detail,
   useGetAccountPayableBySupplierId,
   useGetAccountPayableBy,
   useGetAccountPayableStatisticsByIdOrDate,
