@@ -280,17 +280,10 @@ export const useGetQuotation_id_2 = (
 
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-        const chunk = _.chunk(prodIdArr, 20);
-
-        for (const chunkIndex in chunk) {
-          const idArr = chunk[chunkIndex];
-          const times = Number(chunkIndex);
-
-          const wholeProdArr = await apiGetQuotationMultiProducts(idArr);
-          wholeProdArr.forEach((wholeProd, index) => {
-            res.latestContent.products[index + times * 20] = wholeProd;
-          });
-        }
+        await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
+          console.log(wholeProdArr);
+          res.latestContent.products = wholeProdArr;
+        });
       }
 
       setIsLoading(true);
@@ -338,72 +331,43 @@ export const useGetQuotation_id_2 = (
     return wholdProd;
   };
 
-  const updateAllWholdProd_noRender = async ({
-    stopToken,
-    onSingleSuceess,
-  }: {
-    stopToken: { stop: boolean };
-    onSingleSuceess?: (wholdProd: TquotationProductDto) => void;
-  }) => {
-    if (!res) {
-      return;
-    }
-
-    const products = res.latestContent.products;
-
-    for (const index in products) {
-      if (stopToken.stop) {
-        break;
+  const updateAllWholdProd_noRender = async () =>
+    //   {
+    //   stopToken,
+    //   onSingleSuceess,
+    // }: {
+    //   stopToken: { stop: boolean };
+    //   onSingleSuceess?: (wholdProd: TquotationProductDto) => void;
+    // }
+    {
+      if (!res) {
+        return;
       }
 
-      const prod = products[index];
-      const isWhole = !!prod.items;
-
-      if (isWhole) {
-        continue;
-      }
-
-      await new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          const wholeProd = await apiGetQuotationProducts(prod.id);
-          // renewProd(wholeProd);
-          products[index] = wholeProd;
-          onSingleSuceess?.(wholeProd);
-          resolve(wholeProd);
-        }, 100);
+      const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+      await getWholeProductArr(prodIdArr).then((wholdProdArr) => {
+        res.latestContent.products = wholdProdArr;
       });
-    }
-  };
+    };
 
-  const updateAllWholeProd_batch_noRender = async ({
-    stopToken,
-    onBatchSuceess,
-  }: {
-    stopToken: { stop: boolean };
-    onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
-  }) => {
-    if (!res) {
-      return;
-    }
-
-    const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-    const chunk = _.chunk(prodIdArr, 20);
-
-    for (const chunkIndex in chunk) {
-      if (stopToken.stop) {
-        break;
+  const updateAllWholeProd_batch_noRender = async () =>
+    //   {
+    //   stopToken,
+    //   onBatchSuceess,
+    // }: {
+    //   stopToken: { stop: boolean };
+    //   onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
+    // }
+    {
+      if (!res) {
+        return;
       }
 
-      const idArr = chunk[chunkIndex];
-      const times = Number(chunkIndex);
-
-      const wholeProdArr = await apiGetQuotationMultiProducts(idArr);
-      wholeProdArr.forEach((wholeProd, index) => {
-        res.latestContent.products[index + times * 20] = wholeProd;
+      const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+      await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
+        res.latestContent.products = wholeProdArr;
       });
-      onBatchSuceess?.(wholeProdArr);
-    }
-  };
+    };
 
   return {
     data: res,
@@ -411,9 +375,9 @@ export const useGetQuotation_id_2 = (
     update,
     setData: setRes,
     renewProd,
-    updateAllWholdProd_noRender,
+    // updateAllWholdProd_noRender,
     updateSingleProd_noRender,
-    updateAllWholeProd_batch_noRender,
+    // updateAllWholeProd_batch_noRender,
   };
 };
 
@@ -1234,34 +1198,38 @@ export const useGetContract_id_contentProductItems = (
       const res = await apiGetContract_Id(id, params);
 
       if (res) {
-        // const productArr = res.content.products;
-        const productArr = await Promise.all(
-          res.content.products.map(async (prod) => {
-            const productId = prod.id;
+        // // const productArr = res.content.products;
+        // // const productArr = await Promise.all(
+        // //   res.content.products.map(async (prod) => {
+        // //     const productId = prod.id;
 
-            return await apiGetQuotationProducts(productId);
-          })
-        );
-
+        // //     return await apiGetQuotationProducts(productId);
+        // //   })
+        // // );
+        const productArr = await getWholeProductArr(res.content.products.map(({ id }) => id));
         res.content.products = productArr;
 
         const version_num = Number(version);
 
         if (version_num && version_num > 1) {
-          const subContracts = res.subContracts;
+          // const subContracts = res.subContracts;
 
           const theSubContract = res.subContracts.find((item) => {
             return item.version === version_num;
           });
 
           if (theSubContract) {
-            const productArr = await Promise.all(
-              theSubContract!.content.products.map(async (prod) => {
-                const productId = prod.id;
+            // // const productArr = await Promise.all(
+            // //   theSubContract!.content.products.map(async (prod) => {
+            // //     const productId = prod.id;
 
-                return await apiGetQuotationProducts(productId);
-              })
-            );
+            // //     return await apiGetQuotationProducts(productId);
+            // //   })
+            // // );
+
+            const prodIdArr = theSubContract!.content.products.map(({ id }) => id) ?? [];
+            const productArr = await getWholeProductArr(prodIdArr);
+
             theSubContract!.content.products = productArr;
           }
         }
@@ -1832,6 +1800,25 @@ export const apiPatchQuotationContent_id_progress = (contentId: string, body: Tp
 // ========================================================================
 // ========================================================================
 // ========================================================================
+// ========================================================================
+
+// region FUNCTION
+
+const getWholeProductArr = async (prodIdArr: string[]) => {
+  const chunk = _.chunk(prodIdArr, 20); // api一次最多取20筆
+  const wholeProdArr: TquotationProductDto[] = [];
+
+  for (const chunkIndex in chunk) {
+    const idArr = chunk[chunkIndex];
+
+    await apiGetQuotationMultiProducts(idArr).then((prodArr) => {
+      wholeProdArr.push(...prodArr);
+    });
+  }
+
+  return wholeProdArr;
+};
+
 // ========================================================================
 
 const lookpu_contractPopulate = {
