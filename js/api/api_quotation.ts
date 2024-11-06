@@ -1157,13 +1157,15 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetContract_Id(id, params);
+    return await apiGetContract_Id(id, params).then(async (res) => {
+      const prodIdArr = res.content.products.map(({ id }) => id);
+      const wholeProdArr = await getWholeProductArr(prodIdArr);
+      res.content.products = wholeProdArr;
 
-    if (newRes) {
-      setRes(newRes);
-    }
+      setRes(res);
 
-    return newRes;
+      return res;
+    });
   };
 
   return {
@@ -1892,8 +1894,9 @@ const lookpu_contractPopulate = {
     'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
     'content.reviewSalesManagerEmployee',
-    'content.products.items.accessories',
-    'content.products.items.components',
+    'content.products',
+    // 'content.products.items.accessories',
+    // 'content.products.items.components',
     'content.others',
     'subContracts.content.products.rootProductId',
   ],
