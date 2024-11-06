@@ -320,6 +320,7 @@ interface Taccount_payable_Dto extends Tbase {
   payment_tenor_date: string | null; // 票期日
   payment_method: string | null; // 支付方式
   cheque_id: string | null; // 支票號碼
+  statistics_uuid: string | null; // 統計表uuid
 }
 
 interface Taccount_payable_statistics extends Tbase {

@@ -34,6 +34,7 @@ export default function AccountsPayableDetail() {
   const { invoiceNumber } = router.query as Tquery;
 
   // 待api給的資料齊全了再繼續
+  // !! 若raw.statistics_uuid不為null，則不可以編輯
   const [disabled, setDisabled] = useState(true);
 
   // -----------------------------------------------------------------------------
@@ -43,6 +44,7 @@ export default function AccountsPayableDetail() {
   // console.log(raw);
 
   const {
+    statistics_uuid,
     serial_number,
     agentEmployee,
 

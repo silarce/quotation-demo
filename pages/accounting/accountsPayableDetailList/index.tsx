@@ -125,6 +125,16 @@ export default function AccountsPayableDetailList() {
     });
   };
 
+  const handleStatisticsClick = () => {
+    router.push({
+      pathname: '/accounting/accountsPayableDetailList/statistics',
+      query: {
+        year,
+        month,
+      },
+    });
+  };
+
   const handleCheckAllChange = (checked: boolean) => {
     if (checked) {
       const rawDict: TcheckedRaw = {};
@@ -239,7 +249,13 @@ export default function AccountsPayableDetailList() {
           />,
         ]}
         // customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
-        panelList={createPanel({ disabled, setDisabled, onAddClick: handleAddAccountPayableStatistics })}
+        panelList={createPanel({
+          //
+          disabled,
+          setDisabled,
+          onAddClick: handleAddAccountPayableStatistics,
+          onStatisticsClick: handleStatisticsClick,
+        })}
       />
 
       <div>
@@ -273,10 +289,12 @@ const createPanel = ({
   disabled,
   setDisabled,
   onAddClick,
+  onStatisticsClick,
 }: {
   disabled: boolean;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   onAddClick: () => void;
+  onStatisticsClick: () => void;
 }) => {
   const panel1: TpanelList[number] = {
     type: 'myButton',
@@ -289,7 +307,7 @@ const createPanel = ({
   const panel2: TpanelList[number] = {
     type: 'myButton',
     label: '查看當月應付帳款統計表',
-    onClick: () => {},
+    onClick: onStatisticsClick,
   };
 
   const panel3: TpanelList[number] = {
