@@ -89,5 +89,21 @@
     "accountsPayable": "Accounts Payable",
     "invoicePriceTotal": "Invoice Price Total",
     "selectBeneficiary": "Select Beneficiary"
+  },
+  "accountsPayableDetailList": {
+    "accountsPayableDetailTable": "Accounts Payable Detail Table",
+    "checkAndGenerate": "Check And Generate Statistics",
+    "statistics": "Accounts Payable Statistics",
+    "serial_number": "Serial Number",
+    "supplier_id": "Supplier Number",
+    "invoice_title": "Invoice Title",
+    "invoice_price": "Invoice Price",
+    "payment_tenor_date": "Payment Tenor Date",
+    "payment_account": "Payment Account",
+    "payment_method": "Payment Method",
+    "cheque_id": "Cheque ID",
+    "invoice_number": "Invoice Number",
+    "payment_status": "Payment Status",
+    "review_status": "Review Status"
   }
 }

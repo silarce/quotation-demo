@@ -24,18 +24,11 @@ import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'j
 
 import {
   Taccount_payable_Dto,
-  //
-  useGetAccountPayableBySupplierId,
   useGetAccountPayableBy,
-  useGetAccountPayableStatisticsByIdOrDate,
-  useGetAccountPayableStatisticsDetailByStatisticsId,
   apiPostAddAccountPayableStatistics,
-  apiUpdateAccountPayableStatisticsById,
-  apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { useTranslation } from 'react-i18next';
 
 // ================================================================================
 type Tquery = {
@@ -51,6 +44,8 @@ type TcheckedRaw = {
 
 // MARK: START
 export default function AccountsPayableDetailList() {
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
+
   const router = useRouter();
   const query = router.query as Tquery;
 
@@ -167,55 +162,6 @@ export default function AccountsPayableDetailList() {
     });
   };
 
-  // const createProps = (raw: Taccount_payable_Dto) => {
-  //   const {
-  //     id,
-  //     serial_number,
-  //     supplier_id,
-  //     invoice_title,
-  //     invoice_price,
-  //     payment_tenor_date,
-  //     payment_account,
-  //     payment_method,
-  //     cheque_id,
-  //     invoice_number,
-  //     payment_status,
-  //     review_status,
-  //   } = raw;
-
-  //   const props: Parameters<typeof Row_tbody>[0] = {
-  //     disabled,
-  //     //
-  //     serial_number,
-  //     supplier_id,
-  //     invoice_title,
-  //     invoice_price: invoice_price ? invoice_price.toLocaleString() : invoice_price,
-  //     payment_tenor_date: getTaiwanDateStr(payment_tenor_date),
-  //     payment_account,
-  //     payment_method,
-  //     cheque_id,
-  //     invoice_number,
-  //     payment_status,
-  //     review_status,
-  //     checked: !!checkedRaw[id],
-  //     onCheck: (checked) => {
-  //       handleCheck(checked, id, raw);
-  //     },
-  //     onDetailClick: () => {
-  //       router.push({
-  //         pathname: '/accounting/accountsPayableDetailList/detail',
-  //         query: {
-  //           invoiceNumber: invoice_number,
-  //         },
-  //       });
-  //     },
-  //   };
-
-  //   return props;
-  // };
-
-  // ----------------------------------------------------------------
-
   // ----------------------------------------------------------------
   // MARK: useEffect
   useEffect(() => {
@@ -239,7 +185,7 @@ export default function AccountsPayableDetailList() {
   return (
     <SubLayer>
       <PageHeader02
-        tag="應付帳款明細表"
+        tag={t('accountsPayableDetailTable')}
         customeLeft={[
           <SelectBar
             key="DateSelector"
@@ -253,7 +199,7 @@ export default function AccountsPayableDetailList() {
           />,
         ]}
         // customeLeft={[<SearchSwitch className="ml-2" key="0" />]}
-        panelList={createPanel({
+        panelList={usePanel({
           //
           disabled,
           setDisabled,
@@ -303,7 +249,7 @@ export default function AccountsPayableDetailList() {
 
 // MARK:createPanel
 
-const createPanel = ({
+const usePanel = ({
   disabled,
   setDisabled,
   onAddClick,
@@ -314,9 +260,12 @@ const createPanel = ({
   onAddClick: () => void;
   onStatisticsClick: () => void;
 }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
+  const { t: t_common } = useTranslation('common');
+
   const panel1: TpanelList[number] = {
     type: 'myButton',
-    label: '勾選並產生當月應付帳款統計表',
+    label: t('checkAndGenerate'),
     onClick: () => {
       setDisabled(false);
     },
@@ -324,13 +273,13 @@ const createPanel = ({
 
   const panel2: TpanelList[number] = {
     type: 'myButton',
-    label: '查看當月應付帳款統計表',
+    label: t('statistics'),
     onClick: onStatisticsClick,
   };
 
   const panel3: TpanelList[number] = {
     type: 'myButton',
-    label: '取消',
+    label: t_common('cancel'),
     onClick: () => {
       setDisabled(true);
     },
@@ -338,7 +287,7 @@ const createPanel = ({
 
   const panel4: TpanelList[number] = {
     type: 'redButton',
-    label: '確認產生當月應付帳款統計表',
+    label: t_common('confirm'),
     onClick: onAddClick,
   };
 

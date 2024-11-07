@@ -70,7 +70,7 @@ const Row_thead = ({
   const config = useConfig();
 
   return (
-    <Row thead={true} fullWidth={true} className={className}>
+    <Row thead={true} className={className}>
       {!noCheck && (
         <Cell style={config_other.checkBox.style}>
           <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
@@ -110,7 +110,6 @@ const Row_tbody = (
 
   return (
     <Row
-      fullWidth={true}
       className={classNames(review_status === '審核中' && scss.reviewing, review_status === '已審核' && scss.reviewed)}
     >
       {!noCheck && (
@@ -162,53 +161,64 @@ const useConfig = () => {
   const {
     t,
     i18n: { language },
-  } = useTranslation();
+  } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
 
   const config: Tconfig = useMemo(() => {
     const config: Tconfig = {
       serial_number: {
-        label: '應付帳款單號',
-        style: { width: 150 },
+        // label: '應付帳款單號',
+        label: t('serial_number'),
+        style: { width: 110 },
       },
       supplier_id: {
-        label: '廠商編號',
-        style: { width: 100 },
+        // label: '廠商編號',
+        label: t('supplier_id'),
+        style: { width: 130 },
       },
       invoice_title: {
-        label: '發票廠商',
+        // label: '發票廠商',
+        label: t('invoice_title'),
         style: { width: 100 },
       },
       invoice_price: {
-        label: '發票金額',
+        // label: '發票金額',
+        label: t('invoice_price'),
         style: { width: 100 },
       },
       payment_tenor_date: {
-        label: '票期日',
-        style: { width: 100 },
+        // label: '票期日',
+        label: t('payment_tenor_date'),
+        style: { width: 160 },
       },
       payment_account: {
-        label: '付款帳號',
-        style: { width: 100 },
+        // label: '付款帳號',
+        label: t('payment_account'),
+        style: { width: 140 },
       },
       payment_method: {
-        label: '支付方式',
-        style: { width: 100 },
+        // label: '支付方式',
+        label: t('payment_method'),
+        style: { width: 140 },
       },
       cheque_id: {
-        label: '支票號碼',
-        style: { width: 100 },
+        // label: '支票號碼',
+        label: t('cheque_id'),
+        style: { width: 90 },
       },
       invoice_number: {
-        label: '發票號碼',
-        style: { width: 100 },
+        // label: '發票號碼',
+        label: t('invoice_number'),
+        style: { width: 130 },
       },
       payment_status: {
-        label: '付款狀態',
-        style: { width: 100 },
+        // label: '付款狀態',
+        label: t('payment_status'),
+        style: { width: 130 },
       },
       review_status: {
-        label: '審核狀態',
-        style: { width: 100 },
+        // label: '審核狀態',
+        label: t('review_status'),
+        style: { width: 110 },
       },
     };
 
