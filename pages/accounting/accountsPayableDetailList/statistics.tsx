@@ -24,7 +24,13 @@ import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'j
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
-import { IconDelete01, IconRemoveCircle, IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
+import {
+  IconDelete01,
+  IconRemoveCircle,
+  IconRemove02,
+  IconAdd,
+  IconAddCircle,
+} from 'public/image/icon/svgComponent/svgIcons';
 
 import {
   Taccount_payable_Dto,
@@ -38,6 +44,8 @@ import {
   apiPatchUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
+import { useGetBankAccount } from 'js/api/api_netCore/api_accountant';
+import type { Toption } from 'js/utils/options/options';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -94,6 +102,8 @@ export default function Statistics() {
 
   const { raw: raw_statisticsDetailArr } = useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
 
+  const { rawData_bankAccount, update_bankAccount } = useGetBankAccount();
+
   // -------------------------------------------------------------------------
 
   const { state, addDetail, deleteDetail, createSetDetail } = useDetail({
@@ -103,6 +113,22 @@ export default function Statistics() {
 
   // -------------------------------------------------------------------------
 
+  const options = useMemo(() => {
+    if (!rawData_bankAccount) {
+      return [];
+    }
+
+    return rawData_bankAccount.map((item) => {
+      const option: Toption = {
+        value: item.account_name,
+        label: item.account_name,
+        id: item.id,
+      };
+
+      return option;
+    });
+  }, [rawData_bankAccount]);
+
   const panelList = createPanelList({
     disabled,
     onDelete: () => {},
@@ -111,6 +137,12 @@ export default function Statistics() {
     onCancel: () => setDisabled(true),
     onConfirm: () => {},
   });
+
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    update_bankAccount();
+  }, []);
 
   // -------------------------------------------------------------------------
 
@@ -133,7 +165,16 @@ export default function Statistics() {
           })}
         </div>
         <div className={scss.detailWrapper}>
-          <div className="text-xl mb-2">合計</div>
+          <div className="text-xl mb-2">
+            <span>合計</span>
+            {!disabled && (
+              <IconAddCircle
+                //
+                className="inline-block align-middle ml-2 w-5 h-5 select-none"
+                onClick={addDetail}
+              />
+            )}
+          </div>
           <div className={scss.detailContainer}>
             {Object.entries(state).map(([key, stateDetail]) => {
               const setDetail = createSetDetail(key);
@@ -146,6 +187,7 @@ export default function Statistics() {
                   stateDetail={stateDetail}
                   setDetail={setDetail}
                   onDelete={onDelete}
+                  options={options}
                 />
               );
             })}
@@ -165,29 +207,42 @@ const Detail = ({
   stateDetail,
   setDetail,
   onDelete,
+  options,
 }: {
   disabled: boolean;
   stateDetail: Tstate_detail;
   setDetail: (props: (prev: Tstate_detail) => Tstate_detail | Tstate_detail) => void;
   onDelete: () => void;
+  options: Toption[];
 }) => {
   return (
     <div className={scss.detail}>
-      <IconRemove02 className={classNames('m-auto', disabled && 'invisible')} />
-      <div className={scss.inputCell}>
+      <IconRemove02 className={classNames('m-auto', disabled && 'invisible')} onClick={onDelete} />
+      <div className={scss.accountNameCell}>
         <InputSel
           //
           disabled={disabled}
           showBaseline="auto"
-          inputProps={{
+          selectProps={{
             props: {
-              placeholder: '付款帳號名稱',
-              disabled: false,
-              readOnly: disabled,
-              value: stateDetail.bank_account_name,
-              onChange: (e) => {
-                const value = e.target.value;
-                setDetail((prev) => ({ ...prev, bank_account_name: value }));
+              placeholder: '選擇或輸入銀行帳戶',
+              isSearchable: true,
+              options: options,
+              value: stateDetail.bank_account_name
+                ? {
+                    value: stateDetail.bank_account_name,
+                    label: stateDetail.bank_account_name,
+                    id: stateDetail.detail_id,
+                  }
+                : null,
+              onChange: (option) => {
+                const id = (option?.id || null) as string | null;
+
+                setDetail((prev) => ({
+                  ...prev,
+                  detail_id: id,
+                  bank_account_name: option?.value ?? '',
+                }));
               },
             },
           }}

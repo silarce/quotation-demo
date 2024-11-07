@@ -10,6 +10,8 @@ import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
 import { apiGetCustomers_id, TcustomerDto } from '../api_customer';
 // import { apiGetInvoiceNumber, TaccountsReceivableInvoiceDto } from '../api_engineering';
 
+import type { Toption } from 'js/utils/options/options';
+
 import { XOR } from 'ts-essentials';
 
 import type {
