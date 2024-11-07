@@ -56,7 +56,8 @@ const useReviewFlow = ({
 
   return {
     ReviewFlow,
-    reviewFlow: raw,
+    reviewFlow: raw?.[0],
+    reviewFlowArr: raw,
     update,
   };
 };
