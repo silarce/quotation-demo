@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import _ from 'lodash';
@@ -27,13 +26,7 @@ import ReviewFlowSelector, { apiAddReivew, reqSentReviewStop } from 'components/
 import { useReviewFlow } from 'components/composition/review/reviewFlow_2';
 
 // icon
-import {
-  IconDelete01,
-  IconRemoveCircle,
-  IconRemove02,
-  IconAdd,
-  IconAddCircle,
-} from 'public/image/icon/svgComponent/svgIcons';
+import { IconRemove02, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 import {
   Taccount_payable_Dto,
@@ -48,13 +41,9 @@ import {
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 import { useGetBankAccount } from 'js/api/api_netCore/api_accountant';
-import { useGetReivewById } from 'js/api/api_netCore/api_review';
 
 //
 import type { Toption } from 'js/utils/options/options';
-
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import scss from './statistics.module.scss';
 
@@ -80,6 +69,9 @@ interface Tstate {
 }
 
 // ================================================================================
+
+// MARK: START
+
 export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
   const userId = userInfo.employee?.id;
 
@@ -124,32 +116,14 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
     uuid: raw_statistics?.id,
   });
 
-  console.log(reviewFlow);
-
   // -------------------------------------------------------------------------
+
+  // region STATE
 
   const { state, addDetail, deleteDetail, createSetDetail } = useDetail({
     disabled,
     detailArr: raw_statisticsDetailArr,
   });
-
-  // -------------------------------------------------------------------------
-
-  const options = useMemo(() => {
-    if (!rawData_bankAccount) {
-      return [];
-    }
-
-    return rawData_bankAccount.map((item) => {
-      const option: Toption = {
-        value: item.account_name,
-        label: item.account_name,
-        id: item.id,
-      };
-
-      return option;
-    });
-  }, [rawData_bankAccount]);
 
   // -------------------------------------------------------------------------
   // region API
@@ -256,7 +230,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
       : null;
 
   const handleReviewStop =
-    raw_statistics && reviewFlow
+    raw_statistics && reviewFlow && !reviewFlow.document_status
       ? () => {
           reqSentReviewStop({
             uuid: raw_statistics.id,
@@ -267,6 +241,24 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
   // -------------------------------------------------------------------------
 
+  // MARK: PROPS
+
+  const options = useMemo(() => {
+    if (!rawData_bankAccount) {
+      return [];
+    }
+
+    return rawData_bankAccount.map((item) => {
+      const option: Toption = {
+        value: item.account_name,
+        label: item.account_name,
+        id: item.id,
+      };
+
+      return option;
+    });
+  }, [rawData_bankAccount]);
+
   const panelList = createPanelList({
     disabled,
     onDelete: handleDelete,
@@ -275,9 +267,12 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
     onCancel: () => setDisabled(true),
     onConfirm: reqUpdateAccountPayableStatisticsById,
     onSendReivewStop: handleReviewStop,
+    onReture: () => router.back(),
   });
 
   // -------------------------------------------------------------------------
+
+  // MARK: useEffect
 
   useEffect(() => {
     update_bankAccount();
@@ -341,6 +336,10 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
   );
 }
 
+// MARK: END
+
+// ============================================================================
+// ============================================================================
 // ============================================================================
 
 // MARK: Detail
@@ -496,6 +495,7 @@ const useDetail = ({
 
 // ============================================================================
 
+// MARK:createPanelList
 const createPanelList = ({
   disabled,
   onDelete,
@@ -504,6 +504,7 @@ const createPanelList = ({
   onConfirm,
   onSendReview,
   onSendReivewStop,
+  onReture,
 }: {
   disabled: boolean;
   onDelete: undefined | null | (() => void);
@@ -512,6 +513,7 @@ const createPanelList = ({
   onConfirm: () => void;
   onSendReview: undefined | null | (() => void);
   onSendReivewStop: undefined | null | (() => void);
+  onReture: () => void;
 }) => {
   const panelList_disabled: TpanelList = [
     onDelete && {
@@ -534,6 +536,11 @@ const createPanelList = ({
       label: '抽單',
       onClick: onSendReivewStop,
     },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: onReture,
+    },
   ];
   const panelList_abled: TpanelList = [
     {
@@ -551,6 +558,7 @@ const createPanelList = ({
   return disabled ? panelList_disabled : panelList_abled;
 };
 
+// MARK:createInputSelProps
 const createInputSelProps = ({
   options,
   stateDetail,
