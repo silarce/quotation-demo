@@ -41,7 +41,7 @@ import {
   useGetAccountPayableStatisticsByIdOrDate,
   useGetAccountPayableStatisticsDetailByStatisticsId,
   apiPostAddAccountPayableStatistics,
-  apiPatchUpdateAccountPayableStatisticsById,
+  apiUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 import { useGetBankAccount } from 'js/api/api_netCore/api_accountant';
@@ -100,7 +100,8 @@ export default function Statistics() {
     { autoUpdate: true }
   );
 
-  const { raw: raw_statisticsDetailArr } = useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
+  const { raw: raw_statisticsDetailArr, update: update_statisticsDetailArr } =
+    useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
 
   const { rawData_bankAccount, update_bankAccount } = useGetBankAccount();
 
@@ -129,13 +130,52 @@ export default function Statistics() {
     });
   }, [rawData_bankAccount]);
 
+  // -------------------------------------------------------------------------
+
+  const reqUpdateAccountPayableStatisticsById = async () => {
+    type Tbody = Parameters<typeof apiUpdateAccountPayableStatisticsById>[0];
+
+    const statisticsId = raw_statistics?.id;
+
+    if (!statisticsId) {
+      throw new Error('沒有statisticsId');
+    }
+
+    const arr: Tbody['data'] = Object.values(state).map((detail) => {
+      const { detail_id, payment, note, bank_account_uuid, bank_account_name } = detail;
+
+      const data: Tbody['data'][number] = {
+        detail_id: detail_id || undefined,
+        payment: payment || '0',
+        note,
+        bank_account_uuid: bank_account_uuid,
+        bank_account_name,
+      };
+
+      return data;
+    });
+    const body: Parameters<typeof apiUpdateAccountPayableStatisticsById>[0] = {
+      id: statisticsId,
+      data: arr,
+    };
+
+    await apiUpdateAccountPayableStatisticsById(body)
+      .then(async () => {
+        await update_statisticsDetailArr();
+        setDisabled(true);
+      })
+      .catch(() => {});
+  };
+
+  // -------------------------------------------------------------------------
+
   const panelList = createPanelList({
     disabled,
     onDelete: () => {},
     onEdit: () => setDisabled(false),
     onSendReview: () => {},
     onCancel: () => setDisabled(true),
-    onConfirm: () => {},
+    onConfirm: reqUpdateAccountPayableStatisticsById,
   });
 
   // -------------------------------------------------------------------------
@@ -236,11 +276,13 @@ const Detail = ({
                   }
                 : null,
               onChange: (option) => {
-                const id = (option?.id || null) as string | null;
+                const bank_account_uuid = (option?.id || null) as string | null;
+
+                console.log(option);
 
                 setDetail((prev) => ({
                   ...prev,
-                  detail_id: id,
+                  bank_account_uuid: bank_account_uuid,
                   bank_account_name: option?.value ?? '',
                 }));
               },

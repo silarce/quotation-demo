@@ -1423,13 +1423,13 @@ const apiPostAddAccountPayableStatistics = async ({
 };
 
 // 以id更新應付帳款明細統計表
-const apiPatchUpdateAccountPayableStatisticsById = async (body: {
+const apiUpdateAccountPayableStatisticsById = async (body: {
   id: string;
   data: {
-    detail_id: string;
+    detail_id?: string | undefined;
     payment: string;
     note: string;
-    bank_account_uuid: string;
+    bank_account_uuid: string | null;
     bank_account_name: string;
   }[];
 }) => {
@@ -1441,7 +1441,7 @@ const apiPatchUpdateAccountPayableStatisticsById = async (body: {
     .catch((err: AxiosError) => {
       myAlert.err({ title: '更新應付帳款統計表失敗', content: err.message });
 
-      return err;
+      return Promise.reject(err);
     });
 };
 
@@ -1518,7 +1518,7 @@ export {
   useGetAccountPayableStatisticsDetailByStatisticsId,
   useGetSearchAccountPayableByInvoiceNumber,
   apiPostAddAccountPayableStatistics,
-  apiPatchUpdateAccountPayableStatisticsById,
+  apiUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
 };
 

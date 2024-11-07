@@ -30,7 +30,7 @@ import {
   useGetAccountPayableStatisticsByIdOrDate,
   useGetAccountPayableStatisticsDetailByStatisticsId,
   apiPostAddAccountPayableStatistics,
-  apiPatchUpdateAccountPayableStatisticsById,
+  apiUpdateAccountPayableStatisticsById,
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 
