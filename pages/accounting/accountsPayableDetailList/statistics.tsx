@@ -23,6 +23,8 @@ import {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import ReviewFlowSelector, { apiAddReivew, reqSentReviewStop } from 'components/composition/review/reviewFlowSelecor';
+// import { useReviewFlow } from 'components/composition/review/reviewFlow';
+import { useReviewFlow } from 'components/composition/review/reviewFlow_2';
 
 // icon
 import {
@@ -114,7 +116,15 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
   const { rawData_bankAccount, update_bankAccount } = useGetBankAccount();
 
-  const { raw: reviewFlow, update: update_reviewFlow } = useGetReivewById(raw_statistics?.id);
+  const {
+    ReviewFlow,
+    reviewFlow,
+    update: update_reviewFlow,
+  } = useReviewFlow({
+    uuid: raw_statistics?.id,
+  });
+
+  console.log(reviewFlow);
 
   // -------------------------------------------------------------------------
 
@@ -207,7 +217,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
       }
     : null;
 
-  const handleAendReview =
+  const handleSendReview =
     raw_statistics && !reviewFlow
       ? () => {
           if (!raw_statistics || !userId) {
@@ -261,7 +271,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
     disabled,
     onDelete: handleDelete,
     onEdit: !reviewFlow ? () => setDisabled(false) : null,
-    onSendReview: handleAendReview,
+    onSendReview: handleSendReview,
     onCancel: () => setDisabled(true),
     onConfirm: reqUpdateAccountPayableStatisticsById,
     onSendReivewStop: handleReviewStop,
@@ -295,6 +305,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
             return <Row_tbody key={raw.id} {...props} />;
           })}
         </div>
+
         <div className={scss.detailWrapper}>
           <div className="text-xl mb-2">
             <span>合計</span>
@@ -324,6 +335,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
             })}
           </div>
         </div>
+        <ReviewFlow />
       </div>
     </SubLayer>
   );

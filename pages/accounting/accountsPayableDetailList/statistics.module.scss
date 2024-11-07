@@ -1,7 +1,7 @@
 .body {
   display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: 30px;
+  grid-template-rows: 1fr 1fr auto;
+  gap: 15px;
   height: 100%;
 }
 
