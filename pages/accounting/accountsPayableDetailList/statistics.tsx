@@ -21,8 +21,8 @@ import {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import ReviewFlowSelector, { apiAddReivew, reqSentReviewStop } from 'components/composition/review/reviewFlowSelecor';
 
 // icon
 import {
@@ -46,12 +46,17 @@ import {
   apiDeleteAccountPayableStatisticsById,
 } from 'js/api/api_netCore/api_accountant';
 import { useGetBankAccount } from 'js/api/api_netCore/api_accountant';
+import { useGetReivewById } from 'js/api/api_netCore/api_review';
+
+//
 import type { Toption } from 'js/utils/options/options';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import scss from './statistics.module.scss';
+
+import type { TuserDto } from 'js/api/dtoTypes';
 
 // ================================================================================
 
@@ -73,9 +78,12 @@ interface Tstate {
 }
 
 // ================================================================================
-export default function Statistics() {
+export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
+  const userId = userInfo.employee?.id;
+
   const router = useRouter();
-  const { year, month } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { year, month } = query as Tquery;
 
   // -------------------------------------------------------------------------
 
@@ -105,6 +113,8 @@ export default function Statistics() {
     useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
 
   const { rawData_bankAccount, update_bankAccount } = useGetBankAccount();
+
+  const { raw: reviewFlow, update: update_reviewFlow } = useGetReivewById(raw_statistics?.id);
 
   // -------------------------------------------------------------------------
 
@@ -186,24 +196,75 @@ export default function Statistics() {
   // -------------------------------------------------------------------------
 
   // region HANDLE
-  const handleDelete = () => {
-    myAlert.confirm({
-      title: '確定刪除?',
-      props: {
-        onOk: reqDelateAccountPayableStatisticsById,
-      },
-    });
-  };
+  const handleDelete = !reviewFlow
+    ? () => {
+        myAlert.confirm({
+          title: '確定刪除?',
+          props: {
+            onOk: reqDelateAccountPayableStatisticsById,
+          },
+        });
+      }
+    : null;
+
+  const handleAendReview =
+    raw_statistics && !reviewFlow
+      ? () => {
+          if (!raw_statistics || !userId) {
+            return;
+          }
+
+          const { destroy } = ReviewFlowSelector.open2({
+            userId,
+            onConfirm: async ({ reviewFlowId, purpose }) => {
+              if (!reviewFlowId) {
+                myAlert.info({ title: '請選擇審核流程' });
+
+                return;
+              }
+
+              const body: Parameters<typeof apiAddReivew>[0] = {
+                review_id: reviewFlowId,
+                document_id: raw_statistics.date,
+                document_uuid: raw_statistics.id,
+                document_type: '應付帳款統計表',
+                user_id: userId,
+                document_title: purpose,
+                query: {
+                  ...query,
+                },
+              };
+
+              await apiAddReivew(body)
+                .then(update_reviewFlow)
+                .catch(() => {});
+
+              destroy();
+            },
+          });
+        }
+      : null;
+
+  const handleReviewStop =
+    raw_statistics && reviewFlow
+      ? () => {
+          reqSentReviewStop({
+            uuid: raw_statistics.id,
+            onSuccess: update_reviewFlow,
+          });
+        }
+      : null;
 
   // -------------------------------------------------------------------------
 
   const panelList = createPanelList({
     disabled,
     onDelete: handleDelete,
-    onEdit: () => setDisabled(false),
-    onSendReview: () => {},
+    onEdit: !reviewFlow ? () => setDisabled(false) : null,
+    onSendReview: handleAendReview,
     onCancel: () => setDisabled(true),
     onConfirm: reqUpdateAccountPayableStatisticsById,
+    onSendReivewStop: handleReviewStop,
   });
 
   // -------------------------------------------------------------------------
@@ -222,7 +283,7 @@ export default function Statistics() {
 
       <div className={scss.body}>
         <div className={scss.accountPayable}>
-          <Row_thead className={scss.thead} disabled={true} />
+          <Row_thead className={scss.thead} disabled={true} noCheck={true} />
           {raw_accountPayable?.map((raw) => {
             const props: Parameters<typeof Row_tbody>[0] = {
               ...createValueProps(raw),
@@ -427,32 +488,39 @@ const createPanelList = ({
   disabled,
   onDelete,
   onEdit,
-  onSendReview,
   onCancel,
   onConfirm,
+  onSendReview,
+  onSendReivewStop,
 }: {
   disabled: boolean;
-  onDelete: () => void;
-  onEdit: () => void;
-  onSendReview: () => void;
+  onDelete: undefined | null | (() => void);
+  onEdit: undefined | null | (() => void);
   onCancel: () => void;
   onConfirm: () => void;
+  onSendReview: undefined | null | (() => void);
+  onSendReivewStop: undefined | null | (() => void);
 }) => {
   const panelList_disabled: TpanelList = [
-    {
+    onDelete && {
       type: 'redButton',
       label: '刪除統計表',
       onClick: onDelete,
     },
-    {
+    onEdit && {
       type: 'myButton',
       label: '編輯',
       onClick: onEdit,
     },
-    {
+    onSendReview && {
       type: 'myButton',
       label: '送審',
       onClick: onSendReview,
+    },
+    onSendReivewStop && {
+      type: 'myButton',
+      label: '抽單',
+      onClick: onSendReivewStop,
     },
   ];
   const panelList_abled: TpanelList = [

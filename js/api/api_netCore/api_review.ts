@@ -64,9 +64,13 @@ const apiAddReivew = (body: TaddReivew) => {
 
   return axi2
     .post(api, body)
-    .then(() => {})
+    .then(() => {
+      myAlert.success({ title: '送審成功' });
+    })
     .catch((err) => {
       myAlert.err({ title: '新增審核失敗', content: err.message });
+
+      return Promise.reject(err);
     });
 };
 
@@ -80,7 +84,9 @@ const apiGetReviewBack = (document_uuid: string) => {
 
   return axi2
     .post(api, body)
-    .then(() => {})
+    .then(() => {
+      myAlert.success({ title: '抽單成功' });
+    })
     .catch((err) => {
       myAlert.err({ title: '抽單失敗', content: err.message });
     });
