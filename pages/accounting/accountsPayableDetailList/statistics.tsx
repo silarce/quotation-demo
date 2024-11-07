@@ -131,6 +131,7 @@ export default function Statistics() {
   }, [rawData_bankAccount]);
 
   // -------------------------------------------------------------------------
+  // region API
 
   const reqUpdateAccountPayableStatisticsById = async () => {
     type Tbody = Parameters<typeof apiUpdateAccountPayableStatisticsById>[0];
@@ -167,11 +168,37 @@ export default function Statistics() {
       .catch(() => {});
   };
 
+  const reqDelateAccountPayableStatisticsById = async () => {
+    const statisticsId = raw_statistics?.id;
+
+    if (!statisticsId) {
+      throw new Error('沒有statisticsId');
+    }
+
+    await apiDeleteAccountPayableStatisticsById(statisticsId)
+      .then(() => {
+        router.push('/accounting/accountsPayableDetailList');
+      })
+      .catch(() => {});
+  };
+
+  // -------------------------------------------------------------------------
+
+  // region HANDLE
+  const handleDelete = () => {
+    myAlert.confirm({
+      title: '確定刪除?',
+      props: {
+        onOk: reqDelateAccountPayableStatisticsById,
+      },
+    });
+  };
+
   // -------------------------------------------------------------------------
 
   const panelList = createPanelList({
     disabled,
-    onDelete: () => {},
+    onDelete: handleDelete,
     onEdit: () => setDisabled(false),
     onSendReview: () => {},
     onCancel: () => setDisabled(true),
@@ -428,7 +455,7 @@ const createPanelList = ({
   const panelList_disabled: TpanelList = [
     {
       type: 'redButton',
-      label: '刪除',
+      label: '刪除統計表',
       onClick: onDelete,
     },
     {
@@ -449,7 +476,7 @@ const createPanelList = ({
       onClick: onCancel,
     },
     {
-      type: 'myButton',
+      type: 'redButton',
       label: '上傳',
       onClick: onConfirm,
     },

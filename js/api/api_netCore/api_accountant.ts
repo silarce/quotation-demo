@@ -1458,7 +1458,7 @@ const apiDeleteAccountPayableStatisticsById = async (id: string) => {
     .catch((err: AxiosError) => {
       myAlert.err({ title: '刪除應付帳款統計表失敗', content: err.message });
 
-      return err;
+      return Promise.reject(err);
     });
 };
 
