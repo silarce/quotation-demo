@@ -195,6 +195,7 @@ const useGetReivewById = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
+  const [isFirstLoaded, setIsFirstLoaded] = useState(false);
   const [raw, setRaw] = useState<TgetReivewById[]>();
 
   const update = async () => {
@@ -218,6 +219,7 @@ const useGetReivewById = (
       })
       .finally(() => {
         setIsFetching(false);
+        setIsFirstLoaded(true);
       });
   };
 
@@ -231,6 +233,7 @@ const useGetReivewById = (
     setRaw,
     update,
     isFetching,
+    isFirstLoaded,
   };
 };
 

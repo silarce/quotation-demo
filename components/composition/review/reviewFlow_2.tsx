@@ -43,14 +43,16 @@ const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
 
 const useReviewFlow = ({
   uuid,
+  autoUpdate = true,
 }: {
   uuid?: string;
+  autoUpdate?: boolean;
 } = {}) => {
   const router = useRouter();
   const query = router.query as { id?: string | undefined };
   const document_uuid = uuid || query.id;
 
-  const { raw, update } = useGetReivewById(document_uuid);
+  const { raw, update, isFetching, isFirstLoaded } = useGetReivewById(document_uuid, { autoUpdate });
 
   const ReviewFlow = useCallback((props: Omit<Tprops, 'raw'>) => <ReviewFlow_pre raw={raw} {...props} />, [raw]);
 
@@ -58,6 +60,8 @@ const useReviewFlow = ({
     ReviewFlow,
     reviewFlow: raw?.[0],
     reviewFlowArr: raw,
+    isFetching,
+    isFirstLoaded,
     update,
   };
 };

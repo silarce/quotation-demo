@@ -90,12 +90,20 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
   // -------------------------------------------------------------------------
 
-  const { raw } = useGetAccountPayableStatisticsByIdOrDate({
+  const {
+    raw,
+    isFetching: isFetching_statistics,
+    isFirstLoaded: isFirstLoaded_statistics,
+  } = useGetAccountPayableStatisticsByIdOrDate({
     date: `${year}-${month}`,
   });
   const raw_statistics = raw?.[0];
 
-  const { raw: raw_accountPayable } = useGetAccountPayableBy(
+  const {
+    raw: raw_accountPayable,
+    isFetching: isFetching_accountPayable,
+    isFirstLoaded: isFirstLoaded_accountPayable,
+  } = useGetAccountPayableBy(
     useMemo(() => {
       if (raw_statistics?.id) {
         return {
@@ -108,18 +116,39 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
     { autoUpdate: true }
   );
 
-  const { raw: raw_statisticsDetailArr, update: update_statisticsDetailArr } =
-    useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
+  const {
+    raw: raw_statisticsDetailArr,
+    isFetching: isFetching_statisticsDetailArr,
+    update: update_statisticsDetailArr,
+    isFirstLoaded: isFirstLoaded_statisticsDetailArr,
+  } = useGetAccountPayableStatisticsDetailByStatisticsId(raw_statistics?.id);
 
-  const { rawData_bankAccount, update_bankAccount } = useGetBankAccount();
+  const { rawData_bankAccount, update_bankAccount, isFetching_bankAccount, isFirstLoaded_bankAccount } =
+    useGetBankAccount();
 
   const {
     ReviewFlow,
     reviewFlow,
     update: update_reviewFlow,
+    isFetching: isFetching_reviewFlow,
+    isFirstLoaded: isFirstLoaded_reviewFlow,
   } = useReviewFlow({
     uuid: raw_statistics?.id,
   });
+
+  const isFetching =
+    isFetching_statistics ||
+    isFetching_accountPayable ||
+    isFetching_statisticsDetailArr ||
+    isFetching_bankAccount ||
+    isFetching_reviewFlow;
+
+  const isReady =
+    isFirstLoaded_statistics &&
+    isFirstLoaded_accountPayable &&
+    isFirstLoaded_statisticsDetailArr &&
+    isFirstLoaded_bankAccount &&
+    isFirstLoaded_reviewFlow;
 
   // -------------------------------------------------------------------------
 
@@ -288,8 +317,8 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
   // MARK: RENDER
 
   return (
-    <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag={t('accountsPayableStatistics')} panelList={panelList} />
+    <SubLayer bodyPreStyle="style01" isLoading_subLayer={isFetching}>
+      <PageHeader02 tag={t('accountsPayableStatistics')} panelList={isReady ? panelList : []} />
 
       <div className={scss.body}>
         <div className={scss.accountPayable}>
@@ -389,10 +418,11 @@ const Detail = ({
             props: {
               placeholder: '金額',
               className: 'text-right',
-              type: 'number',
+              type: disabled ? 'text' : 'number',
               disabled: false,
               readOnly: disabled,
-              value: stateDetail.payment,
+              value:
+                disabled && stateDetail.payment ? Number(stateDetail.payment).toLocaleString() : stateDetail.payment,
               onChange: (e) => {
                 const value = e.target.value as `${number}`;
                 setDetail((prev) => ({ ...prev, payment: value }));

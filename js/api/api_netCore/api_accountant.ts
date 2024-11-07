@@ -106,6 +106,7 @@ const apiGetBankAccount = async () => {
 
 const useGetBankAccount = () => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFirstLoaded, setIsFirstLoaded] = useState<boolean>(false);
   const [rawData, setRawData] = useState<TaccountantPresetDto[]>();
 
   const update = async () => {
@@ -123,6 +124,7 @@ const useGetBankAccount = () => {
       })
       .finally(() => {
         setIsFetching(false);
+        setIsFirstLoaded(true);
       });
   };
 
@@ -130,6 +132,7 @@ const useGetBankAccount = () => {
     rawData_bankAccount: rawData,
     update_bankAccount: update,
     isFetching_bankAccount: isFetching,
+    isFirstLoaded_bankAccount: isFirstLoaded,
   };
 };
 
@@ -1069,6 +1072,7 @@ const useGetAccountPayableBy = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFirstLoaded, setIsFirstLoaded] = useState<boolean>(false);
   const [raw, setRaw] = useState<Taccount_payable_Dto[]>();
 
   const update = async () => {
@@ -1096,6 +1100,7 @@ const useGetAccountPayableBy = (
       })
       .finally(() => {
         setIsFetching(false);
+        setIsFirstLoaded(true);
       });
   };
 
@@ -1109,6 +1114,7 @@ const useGetAccountPayableBy = (
     setRaw,
     update,
     isFetching,
+    isFirstLoaded,
   };
 };
 
@@ -1287,6 +1293,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
 ) => {
   const { id, date } = params;
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFirstLoaded, setIsFirstLoaded] = useState<boolean>(false);
   const [raw, setRaw] = useState<Taccount_payable_statistics[]>();
 
   const update = async () => {
@@ -1310,6 +1317,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
       })
       .finally(() => {
         setIsFetching(false);
+        setIsFirstLoaded(true);
       });
   };
 
@@ -1322,6 +1330,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
     setRaw,
     update,
     isFetching,
+    isFirstLoaded,
   };
 };
 
@@ -1352,6 +1361,7 @@ const useGetAccountPayableStatisticsDetailByStatisticsId = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFirstLoaded, setIsFirstLoaded] = useState<boolean>(false);
   const [raw, setRaw] = useState<Taccount_payable_statistics_detail[]>();
 
   const update = async () => {
@@ -1375,6 +1385,7 @@ const useGetAccountPayableStatisticsDetailByStatisticsId = (
       })
       .finally(() => {
         setIsFetching(false);
+        setIsFirstLoaded(true);
       });
   };
 
@@ -1387,6 +1398,7 @@ const useGetAccountPayableStatisticsDetailByStatisticsId = (
     setRaw,
     update,
     isFetching,
+    isFirstLoaded,
   };
 };
 
