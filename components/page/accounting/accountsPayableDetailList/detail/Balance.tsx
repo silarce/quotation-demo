@@ -1,6 +1,8 @@
 import Row, { Cell } from 'components/global/gear/table/row';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
+import { useTranslation } from 'react-i18next';
+
 // ================================================================================
 
 interface Tvalue {
@@ -44,6 +46,8 @@ const Balance = ({ disabled }: { disabled: boolean }) => {
 // ================================================================================
 
 const Row_Thead = () => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList.detail.balance' });
+
   return (
     <Row thead={true} fullWidth={true}>
       {keyArr.map((key) => {
@@ -51,7 +55,8 @@ const Row_Thead = () => {
 
         return (
           <Cell key={key} style={style}>
-            {label}
+            {/* {label} */}
+            {t(i18nKey)}
           </Cell>
         );
       })}
@@ -94,7 +99,7 @@ const keyArr: (keyof Tvalue)[] = [
 const config: Tconfig = {
   編號: {
     label: '編號',
-    i18nKey: '編號',
+    i18nKey: 'serialNumber',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return {
@@ -104,7 +109,7 @@ const config: Tconfig = {
   },
   商號: {
     label: '商號',
-    i18nKey: '商號',
+    i18nKey: 'tradeName',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '商號' };
@@ -112,7 +117,7 @@ const config: Tconfig = {
   },
   請款金額: {
     label: '請款金額',
-    i18nKey: '請款金額',
+    i18nKey: 'requestAmount',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '請款金額' };
@@ -120,7 +125,7 @@ const config: Tconfig = {
   },
   票期日: {
     label: '票期日',
-    i18nKey: '票期日',
+    i18nKey: 'payment_tenor_date',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '票期日' };
@@ -128,7 +133,7 @@ const config: Tconfig = {
   },
   付款帳號: {
     label: '付款帳號',
-    i18nKey: '付款帳號',
+    i18nKey: 'payment_account',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '付款帳號' };
@@ -136,7 +141,7 @@ const config: Tconfig = {
   },
   支付方式: {
     label: '支付方式',
-    i18nKey: '支付方式',
+    i18nKey: 'payment_method',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '支付方式' };
@@ -144,7 +149,7 @@ const config: Tconfig = {
   },
   廠商: {
     label: '廠商',
-    i18nKey: '廠商',
+    i18nKey: 'supplier',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '廠商' };
@@ -152,7 +157,7 @@ const config: Tconfig = {
   },
   支出日期: {
     label: '支出日期',
-    i18nKey: '支出日期',
+    i18nKey: 'paymentDate',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '支出日期' };
@@ -160,7 +165,7 @@ const config: Tconfig = {
   },
   付款狀態: {
     label: '付款狀態',
-    i18nKey: '付款狀態',
+    i18nKey: 'paymentStatus',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '付款狀態' };
@@ -168,7 +173,7 @@ const config: Tconfig = {
   },
   明細: {
     label: '明細',
-    i18nKey: '明細',
+    i18nKey: 'detail',
     style: { width: 100 },
     constructor_inputSelProps: () => {
       return { node: '明細' };

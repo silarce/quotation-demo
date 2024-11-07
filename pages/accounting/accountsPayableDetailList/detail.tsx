@@ -23,6 +23,8 @@ import { useGetSearchAccountPayableByInvoiceNumber } from 'js/api/api_netCore/ap
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
+import { useTranslation } from 'react-i18next';
+
 // ================================================================================
 type Tquery = {
   invoiceNumber?: string | undefined;

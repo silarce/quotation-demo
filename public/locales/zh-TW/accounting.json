@@ -108,6 +108,36 @@
     "statistics": {
       "accountsPayableStatistics": "應付帳款統計表",
       "deleteStatistics": "刪除應付帳款統計表"
+    },
+    "detail": {
+      "serial_number": "應付帳款單號",
+      "orderReceiptNumber": "支出單號/進貨收票單號",
+      "invoiceType": "發票類別",
+      "invoiceDate": "發票日期",
+      "invoiceNumber": "發票號碼",
+      "reportingPeriod": "申報期別",
+      "purchasePrice": "進貨費用",
+      "buyerBusinessIdNumber": "買受人統一編號",
+      "buyerTitle": "買受人抬頭",
+      "buyerInvoiceAddress": "買受人發票地址",
+      "businessEntityBusinessIdNumber": "營業人統一編號",
+      "businessEntityTitle": "營業人抬頭",
+      "taxType": "稅別",
+      "taxAmount": "稅額",
+      "inputPrice": "進項金額",
+      "totalPrice": "合計金額",
+      "balance": {
+        "serialNumber": "編號",
+        "tradeName": "商號",
+        "requestAmount": "請款金額",
+        "payment_tenor_date": "票期日",
+        "payment_account": "付款帳號",
+        "payment_method": "支付方式",
+        "supplier": "廠商",
+        "paymentDate": "支出日期",
+        "paymentStatus": "付款狀態",
+        "detail": "明細"
+      }
     }
   }
 }

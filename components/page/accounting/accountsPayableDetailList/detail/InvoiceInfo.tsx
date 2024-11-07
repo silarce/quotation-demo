@@ -1,5 +1,7 @@
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
+import { useTranslation } from 'react-i18next';
+
 interface TinvoiceInfo {
   發票類別: React.ReactNode;
   invoice_date: React.ReactNode;
@@ -35,20 +37,48 @@ const InvoiceInfo = ({
   進項金額,
   合計金額,
 }: TinvoiceInfo & { disabled?: boolean }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList.detail' });
+  // const { t: t_common } = useTranslation('common');
+
   return (
     <>
       <span className="text-base block mb-2">{'[發票資訊]'}</span>
       <div className="global_grid01">
-        <InputSel disabled={disabled} showBaseline="auto" caption="發票類別" node={發票類別} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="發票號碼" node={invoice_number} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="發票日期" node={invoice_date} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="申報期別" node={申報期別} />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="發票類別"
+          caption={t('invoiceType')}
+          node={發票類別}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="發票號碼"
+          caption={t('invoiceNumber')}
+          node={invoice_number}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="發票日期"
+          caption={t('invoiceDate')}
+          node={invoice_date}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="申報期別"
+          caption={t('reportingPeriod')}
+          node={申報期別}
+        />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
         <InputSel
           disabled={disabled}
           showBaseline="auto"
-          caption="進貨費用"
+          // caption="進貨費用"
+          caption={t('purchasePrice')}
           radioProps={{
             props: {
               value: 進貨費用,
@@ -70,13 +100,43 @@ const InvoiceInfo = ({
         />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel disabled={disabled} showBaseline="auto" caption="買受人統一編號" node={買受人統一編號} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="買受人抬頭" node={買受人抬頭} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="買受人發票地址" node={買受人發票地址} />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="買受人統一編號"
+          caption={t('buyerBusinessIdNumber')}
+          node={買受人統一編號}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="買受人抬頭"
+          caption={t('buyerTitle')}
+          node={買受人抬頭}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="買受人發票地址"
+          caption={t('buyerInvoiceAddress')}
+          node={買受人發票地址}
+        />
         <hr className="col-span-4 border-dashed border-border" />
         {/*  */}
-        <InputSel disabled={disabled} showBaseline="auto" caption="營業人統一編號" node={營業人統一編號} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="營業人抬頭" node={營業人抬頭} />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="營業人統一編號"
+          caption={t('businessEntityBusinessIdNumber')}
+          node={營業人統一編號}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="營業人抬頭"
+          caption={t('businessEntityTitle')}
+          node={營業人抬頭}
+        />
         <div />
         <div />
         {/*  */}
@@ -84,7 +144,8 @@ const InvoiceInfo = ({
         <InputSel
           disabled={disabled}
           showBaseline="auto"
-          caption="稅別"
+          // caption="稅別"
+          caption={t('taxType')}
           radioProps={{
             props: {
               value: 稅別,
@@ -108,9 +169,27 @@ const InvoiceInfo = ({
             ],
           }}
         />
-        <InputSel disabled={disabled} showBaseline="auto" caption="稅額" node={稅額} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="進項金額" node={進項金額} />
-        <InputSel disabled={disabled} showBaseline="auto" caption="合計金額" node={合計金額} />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="稅額"
+          caption={t('taxAmount')}
+          node={稅額}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="進項金額"
+          caption={t('inputPrice')}
+          node={進項金額}
+        />
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // caption="合計金額"
+          caption={t('totalPrice')}
+          node={合計金額}
+        />
       </div>
     </>
   );

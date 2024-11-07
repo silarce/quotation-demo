@@ -108,6 +108,36 @@
     "statistics": {
       "accountsPayableStatistics": "Accounts Payable Statistics",
       "deleteStatistics": "Delete Statistics"
+    },
+    "detail": {
+      "serial_number": "Serial Number",
+      "orderReceiptNumber": "Order/Receipt Number",
+      "invoiceType": "Invoice Type",
+      "invoiceDate": "Invoice Date",
+      "invoiceNumber": "Invoice Number",
+      "reportingPeriod": "Reporting Period",
+      "purchasePrice": "Purchase Price",
+      "buyerBusinessIdNumber": "Buyer Business ID Number",
+      "buyerTitle": "Buyer Title",
+      "buyerInvoiceAddress": "Buyer Invoice Address",
+      "businessEntityBusinessIdNumber": "Business Entity Business ID Number",
+      "businessEntityTitle": "Business Entity Title",
+      "taxType": "Tax Type",
+      "taxAmount": "Tax Amount",
+      "inputPrice": "Input Price",
+      "totalPrice": "Total Price",
+      "balance": {
+        "serialNumber": "Serial Number",
+        "tradeName": "Trade Name",
+        "requestAmount": "Request amount",
+        "payment_tenor_date": "Payment Tenor Date",
+        "payment_account": "Payment Account",
+        "payment_method": "Payment Method",
+        "supplier": "Supplier",
+        "paymentDate": "Payment Date",
+        "paymentStatus": "Payment Status",
+        "detail": "Detail"
+      }
     }
   }
 }
