@@ -93,7 +93,7 @@
   "accountsPayableDetailList": {
     "accountsPayableDetailTable": "應付帳款明細表",
     "checkAndGenerate": "勾選並產生當月應付帳款統計表",
-    "statistics": "應付帳款統計表",
+    "accountsPayableStatistics": "應付帳款統計表",
     "serial_number": "應付帳款單號",
     "supplier_id": "廠商編號",
     "invoice_title": "發票廠商",
@@ -104,6 +104,10 @@
     "cheque_id": "支票號碼",
     "invoice_number": "發票號碼",
     "payment_status": "付款狀態",
-    "review_status": "審核狀態"
+    "review_status": "審核狀態",
+    "statistics": {
+      "accountsPayableStatistics": "應付帳款統計表",
+      "deleteStatistics": "刪除應付帳款統計表"
+    }
   }
 }

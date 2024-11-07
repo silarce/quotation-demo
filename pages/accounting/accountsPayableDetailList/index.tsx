@@ -273,7 +273,7 @@ const usePanel = ({
 
   const panel2: TpanelList[number] = {
     type: 'myButton',
-    label: t('statistics'),
+    label: t('accountsPayableStatistics'),
     onClick: onStatisticsClick,
   };
 

@@ -59,12 +59,14 @@ const Row_thead = ({
   checked,
   onCheckChange,
   noCheck = false,
+  noDetail = false,
   className,
 }: {
   disabled: boolean;
   checked?: boolean;
   onCheckChange?: (checked: boolean) => void;
   noCheck?: boolean;
+  noDetail?: boolean;
   className?: string;
 }) => {
   const config = useConfig();
@@ -93,7 +95,7 @@ const Row_thead = ({
           </Cell>
         );
       })}
-      <Cell style={config_other.detail.style}></Cell>
+      {!noDetail && <Cell style={config_other.detail.style}></Cell>}
     </Row>
   );
 };
@@ -168,7 +170,7 @@ const useConfig = () => {
       serial_number: {
         // label: '應付帳款單號',
         label: t('serial_number'),
-        style: { width: 110 },
+        style: { width: 130 },
       },
       supplier_id: {
         // label: '廠商編號',

@@ -93,7 +93,7 @@
   "accountsPayableDetailList": {
     "accountsPayableDetailTable": "Accounts Payable Detail Table",
     "checkAndGenerate": "Check And Generate Statistics",
-    "statistics": "Accounts Payable Statistics",
+    "accountsPayableStatistics": "Accounts Payable Statistics",
     "serial_number": "Serial Number",
     "supplier_id": "Supplier Number",
     "invoice_title": "Invoice Title",
@@ -104,6 +104,10 @@
     "cheque_id": "Cheque ID",
     "invoice_number": "Invoice Number",
     "payment_status": "Payment Status",
-    "review_status": "Review Status"
+    "review_status": "Review Status",
+    "statistics": {
+      "accountsPayableStatistics": "Accounts Payable Statistics",
+      "deleteStatistics": "Delete Statistics"
+    }
   }
 }

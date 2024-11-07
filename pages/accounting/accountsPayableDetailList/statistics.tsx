@@ -49,6 +49,8 @@ import scss from './statistics.module.scss';
 
 import type { TuserDto } from 'js/api/dtoTypes';
 
+import { useTranslation } from 'react-i18next';
+
 // ================================================================================
 
 interface Tquery {
@@ -78,6 +80,9 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { year, month } = query as Tquery;
+
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList.statistics' });
+  const { t: t_common } = useTranslation('common');
 
   // -------------------------------------------------------------------------
 
@@ -259,7 +264,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
     });
   }, [rawData_bankAccount]);
 
-  const panelList = createPanelList({
+  const panelList = usePanelList({
     disabled,
     onDelete: handleDelete,
     onEdit: !reviewFlow ? () => setDisabled(false) : null,
@@ -284,7 +289,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
   return (
     <SubLayer bodyPreStyle="style01">
-      <PageHeader02 tag="應付帳款統計表" panelList={panelList} />
+      <PageHeader02 tag={t('accountsPayableStatistics')} panelList={panelList} />
 
       <div className={scss.body}>
         <div className={scss.accountPayable}>
@@ -303,7 +308,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
         <div className={scss.detailWrapper}>
           <div className="text-xl mb-2">
-            <span>合計</span>
+            <span>{t_common('total')}</span>
             {!disabled && (
               <IconAddCircle
                 //
@@ -496,7 +501,7 @@ const useDetail = ({
 // ============================================================================
 
 // MARK:createPanelList
-const createPanelList = ({
+const usePanelList = ({
   disabled,
   onDelete,
   onEdit,
@@ -515,42 +520,45 @@ const createPanelList = ({
   onSendReivewStop: undefined | null | (() => void);
   onReture: () => void;
 }) => {
+  const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList.statistics' });
+  const { t: t_common } = useTranslation('common');
+
   const panelList_disabled: TpanelList = [
     onDelete && {
       type: 'redButton',
-      label: '刪除統計表',
+      label: t('deleteStatistics'),
       onClick: onDelete,
     },
     onEdit && {
       type: 'myButton',
-      label: '編輯',
+      label: t_common('edit'),
       onClick: onEdit,
     },
     onSendReview && {
       type: 'myButton',
-      label: '送審',
+      label: t_common('sendReview'),
       onClick: onSendReview,
     },
     onSendReivewStop && {
       type: 'myButton',
-      label: '抽單',
+      label: t_common('sendReviewStop'),
       onClick: onSendReivewStop,
     },
     {
       type: 'myButton',
-      label: '返回',
+      label: t_common('return'),
       onClick: onReture,
     },
   ];
   const panelList_abled: TpanelList = [
     {
       type: 'myButton',
-      label: '取消',
+      label: t_common('cancel'),
       onClick: onCancel,
     },
     {
       type: 'redButton',
-      label: '上傳',
+      label: t_common('confirm'),
       onClick: onConfirm,
     },
   ];
