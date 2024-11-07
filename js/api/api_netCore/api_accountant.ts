@@ -1429,7 +1429,7 @@ const apiUpdateAccountPayableStatisticsById = async (body: {
     detail_id?: string | undefined;
     payment: string;
     note: string;
-    bank_account_uuid: string | null;
+    bank_account_uuid?: string;
     bank_account_name: string;
   }[];
 }) => {

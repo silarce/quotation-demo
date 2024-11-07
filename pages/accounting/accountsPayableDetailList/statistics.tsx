@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 // antd
 import { Spin } from 'antd';
@@ -21,7 +22,7 @@ import {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import {
@@ -149,7 +150,7 @@ export default function Statistics() {
         detail_id: detail_id || undefined,
         payment: payment || '0',
         note,
-        bank_account_uuid: bank_account_uuid,
+        bank_account_uuid: bank_account_uuid || undefined,
         bank_account_name,
       };
 
@@ -212,6 +213,8 @@ export default function Statistics() {
   }, []);
 
   // -------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer bodyPreStyle="style01">
@@ -282,39 +285,22 @@ const Detail = ({
   onDelete: () => void;
   options: Toption[];
 }) => {
+  const isNew = stateDetail.detail_id === null;
+  const accountProps = createInputSelProps({
+    options,
+    stateDetail,
+    setDetail,
+  });
+
   return (
-    <div className={scss.detail}>
+    <div className={classNames(scss.detail, isNew && 'bg-hoverBgc')}>
       <IconRemove02 className={classNames('m-auto', disabled && 'invisible')} onClick={onDelete} />
       <div className={scss.accountNameCell}>
         <InputSel
           //
           disabled={disabled}
           showBaseline="auto"
-          selectProps={{
-            props: {
-              placeholder: '選擇或輸入銀行帳戶',
-              isSearchable: true,
-              options: options,
-              value: stateDetail.bank_account_name
-                ? {
-                    value: stateDetail.bank_account_name,
-                    label: stateDetail.bank_account_name,
-                    id: stateDetail.detail_id,
-                  }
-                : null,
-              onChange: (option) => {
-                const bank_account_uuid = (option?.id || null) as string | null;
-
-                console.log(option);
-
-                setDetail((prev) => ({
-                  ...prev,
-                  bank_account_uuid: bank_account_uuid,
-                  bank_account_name: option?.value ?? '',
-                }));
-              },
-            },
-          }}
+          {...accountProps}
         />
       </div>
       <div className={scss.moneyCell}>
@@ -483,4 +469,62 @@ const createPanelList = ({
   ];
 
   return disabled ? panelList_disabled : panelList_abled;
+};
+
+const createInputSelProps = ({
+  options,
+  stateDetail,
+  setDetail,
+}: {
+  options: Toption[];
+  stateDetail: Tstate_detail;
+  setDetail: (props: (prev: Tstate_detail) => Tstate_detail | Tstate_detail) => void;
+}) => {
+  const selectProps_forNew: TinputSelProps['selectProps'] = {
+    props: {
+      placeholder: '選擇或輸入銀行帳戶',
+      isSearchable: true,
+      options: options,
+      value: stateDetail.bank_account_name
+        ? {
+            value: stateDetail.bank_account_name,
+            label: stateDetail.bank_account_name,
+            id: stateDetail.detail_id,
+          }
+        : null,
+      onChange: (option) => {
+        const bank_account_uuid = (option?.id || null) as string | null;
+
+        setDetail((prev) => ({
+          ...prev,
+          bank_account_uuid: bank_account_uuid,
+          bank_account_name: option?.value ?? '',
+        }));
+      },
+    },
+  };
+
+  const selectProps_forOld: TinputSelProps['selectProps'] = _.cloneDeep(selectProps_forNew);
+  selectProps_forOld.props!.placeholder = '選擇銀行帳戶';
+  selectProps_forOld.props!.isSearchable = false;
+
+  const inputProps_forOld: TinputSelProps['inputProps'] = {
+    props: {
+      value: stateDetail.bank_account_name,
+      onChange: (e) => {
+        const value = e.target.value;
+        setDetail((prev) => ({ ...prev, bank_account_uuid: null, bank_account_name: value }));
+      },
+    },
+  };
+
+  const isNew = stateDetail.detail_id === null;
+
+  const inputSelProps: TinputSelProps = isNew
+    ? { selectProps: selectProps_forNew }
+    : stateDetail.bank_account_uuid
+    ? { selectProps: selectProps_forOld }
+    : { inputProps: inputProps_forOld };
+
+  return inputSelProps;
 };
