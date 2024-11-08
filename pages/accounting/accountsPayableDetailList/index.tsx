@@ -25,6 +25,7 @@ import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'j
 import {
   Taccount_payable_Dto,
   useGetAccountPayableBy,
+  useGetAccountPayableStatisticsByIdOrDate,
   apiPostAddAccountPayableStatistics,
 } from 'js/api/api_netCore/api_accountant';
 
@@ -79,7 +80,13 @@ export default function AccountsPayableDetailList() {
     return params;
   }, [year, month]);
 
-  const { raw: raw_accountPayable } = useGetAccountPayableBy(params, { autoUpdate: true });
+  const { raw: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBy(params, {
+    autoUpdate: true,
+  });
+
+  const haveAccountPayableStatistics = !!useGetAccountPayableStatisticsByIdOrDate({
+    date: `${year}-${month}`,
+  }).raw;
 
   // ----------------------------------------------------------------
   // MARK: STATE
@@ -119,7 +126,8 @@ export default function AccountsPayableDetailList() {
   // MARK: HANDLE
 
   const handleAddAccountPayableStatistics = async () => {
-    await reqPostAddAccountPayableStatistics().then(() => {
+    await reqPostAddAccountPayableStatistics().then(async () => {
+      update_accountPayable();
       setDisabled(true);
     });
   };
@@ -133,6 +141,12 @@ export default function AccountsPayableDetailList() {
       },
     });
   };
+
+  const handleCheckAndGenerate = haveAccountPayableStatistics
+    ? null
+    : () => {
+        setDisabled(false);
+      };
 
   const handleCheckAllChange = (checked: boolean) => {
     if (checked) {
@@ -205,6 +219,7 @@ export default function AccountsPayableDetailList() {
           setDisabled,
           onAddClick: handleAddAccountPayableStatistics,
           onStatisticsClick: handleStatisticsClick,
+          onCheckAndGenerateClick: handleCheckAndGenerate,
         })}
       />
 
@@ -254,21 +269,21 @@ const usePanel = ({
   setDisabled,
   onAddClick,
   onStatisticsClick,
+  onCheckAndGenerateClick,
 }: {
   disabled: boolean;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   onAddClick: () => void;
   onStatisticsClick: () => void;
+  onCheckAndGenerateClick: null | undefined | (() => void);
 }) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
   const { t: t_common } = useTranslation('common');
 
-  const panel1: TpanelList[number] = {
+  const panel1: TpanelList[number] = onCheckAndGenerateClick && {
     type: 'myButton',
     label: t('checkAndGenerate'),
-    onClick: () => {
-      setDisabled(false);
-    },
+    onClick: onCheckAndGenerateClick,
   };
 
   const panel2: TpanelList[number] = {
