@@ -64,6 +64,13 @@ export default function AccountsPayableDetailList() {
 
   const [disabled, setDisabled] = useState(true);
 
+  const isFuture = (() => {
+    const date = moment(`${year}-${month}`);
+    const now = moment();
+
+    return date.isAfter(now);
+  })();
+
   // ----------------------------------------------------------------
   // MARK: DATA
 
@@ -84,11 +91,18 @@ export default function AccountsPayableDetailList() {
   });
 
   const { raw: raw_AccountPayableStatistics, update: update_AccountPayableStatistics } =
-    useGetAccountPayableStatisticsByIdOrDate({
-      date: `${year}-${month}`,
-    });
+    useGetAccountPayableStatisticsByIdOrDate(
+      {
+        date: `${year}-${month}`,
+      },
+      {
+        clearOnParamsChange: true,
+      }
+    );
 
-  const haveAccountPayableStatistics = !!raw_AccountPayableStatistics?.length;
+  // const haveAccountPayableStatistics = !!raw_AccountPayableStatistics?.length;
+  const haveAccountPayableStatistics =
+    raw_AccountPayableStatistics === undefined ? undefined : !!raw_AccountPayableStatistics?.length;
 
   // ----------------------------------------------------------------
   // MARK: STATE
@@ -135,23 +149,25 @@ export default function AccountsPayableDetailList() {
     });
   };
 
-  const handleStatisticsClick = !haveAccountPayableStatistics
-    ? null
-    : () => {
-        router.push({
-          pathname: '/accounting/accountsPayableDetailList/statistics',
-          query: {
-            year,
-            month,
-          },
-        });
-      };
+  const handleStatisticsClick =
+    haveAccountPayableStatistics === false
+      ? null
+      : () => {
+          router.push({
+            pathname: '/accounting/accountsPayableDetailList/statistics',
+            query: {
+              year,
+              month,
+            },
+          });
+        };
 
-  const handleCheckAndGenerate = haveAccountPayableStatistics
-    ? null
-    : () => {
-        setDisabled(false);
-      };
+  const handleCheckAndGenerate =
+    haveAccountPayableStatistics === undefined || haveAccountPayableStatistics || isFuture
+      ? null
+      : () => {
+          setDisabled(false);
+        };
 
   const handleCheckAllChange = (checked: boolean) => {
     if (checked) {
