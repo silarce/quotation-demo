@@ -319,6 +319,8 @@ const useGetApplyPaymentById = (
 
   const update = useCallback(async () => {
     if (isFetching || !id) {
+      setRes(undefined);
+
       return;
     }
 
@@ -396,7 +398,8 @@ const useGetApplyPaymentById = (
 
       const res = await apiDeleteApplyPaymentDetail(ApplyPaymentDetail)
         .then(() => {
-          return 'success';
+          setRes(undefined);
+          // return 'success';
         })
         .catch((err: AxiosError) => {
           callAlertOnError && myAlert.err({ title: '刪除支出單明細失敗', content: err.message });
@@ -405,9 +408,9 @@ const useGetApplyPaymentById = (
           setIsFetching(false);
         });
 
-      if (res === 'success') {
-        return await update();
-      }
+      // if (res === 'success') {
+      //   return await update();
+      // }
     },
     [isFetching, callAlertOnError, update]
   );

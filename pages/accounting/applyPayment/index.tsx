@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import { useRouter } from 'next/router';
 
 // antd
 import { Spin } from 'antd';
@@ -46,6 +47,10 @@ import scss from './index.module.scss';
 
 // ===================================================================================
 
+interface Tquery {
+  apply_paymnet_id?: string;
+}
+
 interface Tstate_applyPayment {
   readonly id?: string;
   readonly serial_number: string | undefined; // 單號
@@ -63,9 +68,13 @@ interface Tstate_applyPayment {
 export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
   const { t } = useTranslation('accounting', { keyPrefix: 'applyPayment' });
 
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { apply_paymnet_id } = query;
+
   // --------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
-  const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
+  // const [apply_paymnet_id, setApply_paymnet_id] = useState<string>();
 
   const [totalPrice, setTotalPrice] = useState(0);
 
@@ -147,16 +156,12 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
         invoice_number: state_detail.number || '',
         note: state_detail.note || '',
         subtotal: state_detail.subtotal || '0',
+        tax_type: state_detail.tax_type || null,
       };
 
       return dataItem;
     });
 
-    // const total_price = data
-    //   .reduce((de, item) => {
-    //     return de.add(item.amount_total);
-    //   }, new Decimal(0))
-    //   .toString() as `${number}`;
     const total_price = `${totalPrice}` as `${number}`;
 
     const body: Tbody = {
@@ -175,7 +180,12 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
     const body = createBody();
     body &&
       apiPostAddApplyPayment(body).then((id) => {
-        setApply_paymnet_id(id);
+        router.replace({
+          query: {
+            ...query,
+            apply_paymnet_id: id,
+          },
+        });
         setDisabled(true);
       });
   };
@@ -221,7 +231,13 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
           limit={1}
           onRowClick={(data) => {
             setDisabled(true);
-            setApply_paymnet_id(data.id);
+            router.replace({
+              query: {
+                ...query,
+                apply_paymnet_id: data.id,
+              },
+            });
+
             // unmount();
           }}
         />
@@ -230,6 +246,13 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
   };
 
   const handleAdd = () => {
+    router.replace({
+      query: {
+        ...query,
+        apply_paymnet_id: undefined,
+      },
+    });
+
     clear_data_applyPayment();
     setDisabled(false);
   };
