@@ -149,8 +149,8 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
     const idWillDeleteArr: string[] = [];
 
-    const data: Tbody['data'] = currentArr
-      .map((item) => {
+    const data: Tbody['data'] = (() => {
+      const date_pre = currentArr.map((item) => {
         const state_detail = item!.state_detail;
 
         if (state_detail.id && state_detail.willDelete) {
@@ -174,8 +174,10 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
         };
 
         return dataItem;
-      })
-      .filter((item) => !!item);
+      });
+
+      return date_pre.filter((item) => !!item) as Tbody['data'];
+    })();
 
     const total_price = `${totalPrice}` as `${number}`;
 
@@ -412,10 +414,14 @@ const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined, disabled: b
     setState((state) => {
       const copy = _.cloneDeep(state);
 
-      if (copy[id]?.id) {
-        copy[id].willDelete = true;
-      } else {
+      if (!copy || !copy[id]) {
+        return copy;
+      }
+
+      if (!copy[id]) {
         delete copy[id];
+      } else {
+        copy[id]!.willDelete = true;
       }
 
       return copy;
