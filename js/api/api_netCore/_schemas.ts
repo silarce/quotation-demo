@@ -2,8 +2,9 @@ import { TemployeeDto } from '../dtoTypes';
 
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
+type Treview_status = '未審核' | '已審核' | '審核中';
 
-export type { Tinvoice_type, Ttax_type };
+export type { Tinvoice_type, Ttax_type, Treview_status };
 
 // ==============================================================================
 
@@ -293,9 +294,10 @@ interface TcreatePaymentOrder_Dto {
   data: TcreatePaymentOrderDetail_Dto[];
 }
 
+// region account_payable
 interface Taccount_payable_Dto extends Tbase {
   serial_number: string | null; // varchar(50) - 序號
-  review_status: string | null; // varchar(50) - 審核狀態
+  review_status: Treview_status | null; // varchar(50) - 審核狀態
   note: string | null; // varchar(200) - 摘要說明
   agent_employee_id: string | null; // varchar - 經辦人員
   invoice_title: string | null; // varchar - 發票抬頭
@@ -314,6 +316,24 @@ interface Taccount_payable_Dto extends Tbase {
   settled_amount: number | null; // int4 - 已付金額
   balance: number | null; // int4 - 餘額
   supplier: string | null; // varchar - 廠商名
+  supplier_id: string | null; // 廠商編號
+  payment_tenor_date: string | null; // 票期日
+  payment_method: string | null; // 支付方式
+  cheque_id: string | null; // 支票號碼
+  statistics_uuid: string | null; // 統計表uuid
+}
+
+interface Taccount_payable_statistics extends Tbase {
+  date: string;
+  note: string;
+}
+
+interface Taccount_payable_statistics_detail extends Tbase {
+  bank_account_uuid: string; // 付款帳號uui
+  payment: number; // 貨款金額
+  account_payable_statistics_id: string; // 應付帳款統計表uuid
+  note: string; //
+  bank_account_name: string; // 付款帳號名稱
 }
 
 // MARK: ============
@@ -380,10 +400,13 @@ export type {
   TcreatePurchaseCollectTicketDetail_Dto,
   TupdatePurchaseCollectTicketDetail_Dto,
   Tpayment_order_Dto,
-  Taccount_payable_Dto,
   TpaymentOrderDetail_Dto,
   TcreatePaymentOrderDetail_Dto,
   TcreatePaymentOrder_Dto,
+  //
+  Taccount_payable_Dto,
+  Taccount_payable_statistics,
+  Taccount_payable_statistics_detail,
   //
   Tprodreceipt_Dto,
 };

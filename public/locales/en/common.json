@@ -31,5 +31,7 @@
   "agent": "Agent",
   "subtotal": "Subtotal",
   "total": "Total",
-  "clear": "Clear"
+  "clear": "Clear",
+  "cancel": "Cancel",
+  "return": "Return"
 }

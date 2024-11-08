@@ -40,6 +40,7 @@
 
 .cell {
   border-color: theme("colors.border");
+  flex: none;
 
   &:not(.unset) {
     padding: 10px 0;

@@ -31,5 +31,11 @@
   "agent": "經辦人員",
   "subtotal": "小計",
   "total": "合計",
-  "clear": "清除"
+  "clear": "清除",
+  "cancel": "取消",
+  "return": "返回",
+  "edit": "編輯",
+  "sentReview": "送審",
+  "sentReviewStop": "抽單"
+  
 }
