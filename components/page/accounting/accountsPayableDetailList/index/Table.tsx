@@ -74,7 +74,7 @@ const Row_thead = ({
   return (
     <Row thead={true} className={className}>
       {!noCheck && (
-        <Cell style={config_other.checkBox.style}>
+        <Cell className={config_other.checkBox.className} style={config_other.checkBox.style}>
           <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
             <Checkbox
               className={classNames(scss.antd_checkbox)}
@@ -95,7 +95,7 @@ const Row_thead = ({
           </Cell>
         );
       })}
-      {!noDetail && <Cell style={config_other.detail.style}></Cell>}
+      {!noDetail && <Cell className={config_other.detail.className} style={config_other.detail.style}></Cell>}
     </Row>
   );
 };
@@ -115,7 +115,11 @@ const Row_tbody = (
       className={classNames(review_status === '審核中' && scss.reviewing, review_status === '已審核' && scss.reviewed)}
     >
       {!noCheck && (
-        <Cell style={config_other.checkBox.style} className={classNames(disabled && 'invisible')}>
+        <Cell
+          // className={config_other.checkBox.className}
+          style={config_other.checkBox.style}
+          className={classNames(config_other.checkBox.className, disabled && 'invisible')}
+        >
           <Checkbox
             className={classNames(scss.antd_checkbox)}
             checked={checked}
@@ -135,7 +139,7 @@ const Row_tbody = (
         );
       })}
       {!noDetail && (
-        <Cell style={config_other.detail.style}>
+        <Cell className={config_other.detail.className} style={config_other.detail.style}>
           <IconDetail onClick={onDetailClick} />
         </Cell>
       )}
@@ -233,9 +237,11 @@ const useConfig = () => {
 const config_other = {
   checkBox: {
     style: { width: 60 },
+    className: scss.cell_check,
   },
   detail: {
-    style: { width: 60 },
+    style: { width: 50 },
+    className: scss.cell_detail,
   },
 };
 

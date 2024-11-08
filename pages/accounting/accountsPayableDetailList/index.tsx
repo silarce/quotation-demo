@@ -18,7 +18,6 @@ import {
 } from 'components/page/accounting/accountsPayableDetailList/index/Table';
 
 // gear
-
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 
