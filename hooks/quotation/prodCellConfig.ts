@@ -517,7 +517,7 @@ const prodCellConfig: TcellConfig = {
   bottomBarAngleIron: {
     label: '底座角鐵',
     inputSelProps: {
-      wrapperStyle: { width: '150px' },
+      wrapperStyle: { width: '210px' },
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
@@ -529,7 +529,7 @@ const prodCellConfig: TcellConfig = {
   bottomBarPlate: {
     label: '底座板',
     inputSelProps: {
-      wrapperStyle: { width: '150px' },
+      wrapperStyle: { width: '210px' },
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
