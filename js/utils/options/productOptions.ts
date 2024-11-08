@@ -372,6 +372,10 @@ export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
     // { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T', material: '高耐鍍鋅鋼板' },
     { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: 'SST#304' },
     { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: 'SST#316' },
+    // // { value: '鍍鋅 75*75*6T', label: '鍍鋅 75*75*6T', material: '鍍鋅鋼板' },
+    // // { value: '高耐鍍鋅鋼板 75*75*6T', label: '高耐鍍鋅鋼板 75*75*6T', material: '高耐鍍鋅鋼板' },
+    // // { value: '不鏽鋼#304 75*75*6T', label: '不鏽鋼#304 75*75*6T', material: 'SST#304' },
+    { value: '不鏽鋼#316 75*75*6T', label: '不鏽鋼#316 75*75*6T', material: 'SST#316' },
   ],
 });
 
