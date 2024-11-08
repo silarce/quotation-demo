@@ -2679,6 +2679,8 @@ class Class_product {
       // 'close',
       'onePieceRollUpBox',
       'isULGuideRail',
+      'bottomBarAngleIron',
+      'bottomBarPlate',
     ];
   }
 
@@ -3797,7 +3799,9 @@ class Class_product {
 
     // ________________________
     // 使底座板與底座角鐵的材質一樣
-    const angleIronMaterial = this.options_bottomBarAngleIron.find((item) => item.value === v)?.material as string;
+    const angleIronMaterial = this.options_bottomBarAngleIron.find((item) => item.value === v)?.material as
+      | string
+      | undefined;
     const plateInfo = this.options_bottomBarPlate.find((item) => item.value === this.bottomBarPlate);
     const plateMaterial = plateInfo?.material;
 
@@ -3812,7 +3816,8 @@ class Class_product {
     }
 
     // ________________________
-    this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial);
+
+    this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial ?? this.material);
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
@@ -3835,7 +3840,7 @@ class Class_product {
     // ________________________
     // 使底座板與底座角鐵的材質一樣
 
-    const plateMaterial = this.options_bottomBarPlate.find((item) => item.value === v)?.material as string;
+    const plateMaterial = this.options_bottomBarPlate.find((item) => item.value === v)?.material as string | undefined;
     const angleIronInfo = this.options_bottomBarAngleIron.find((item) => item.material === this.bottomBarAngleIron);
     const angleIronMaterial = angleIronInfo?.material;
 
@@ -3850,7 +3855,7 @@ class Class_product {
     }
     // ________________________
 
-    this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial);
+    this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial ?? this.material);
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
