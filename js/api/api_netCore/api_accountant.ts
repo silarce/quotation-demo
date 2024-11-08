@@ -319,6 +319,8 @@ const useGetApplyPaymentById = (
 
   const update = useCallback(async () => {
     if (isFetching || !id) {
+      setRes(undefined);
+
       return;
     }
 
@@ -394,20 +396,18 @@ const useGetApplyPaymentById = (
 
       setIsFetching(true);
 
-      const res = await apiDeleteApplyPaymentDetail(ApplyPaymentDetail)
+      return await apiDeleteApplyPaymentDetail(ApplyPaymentDetail)
         .then(() => {
           return 'success';
         })
         .catch((err: AxiosError) => {
           callAlertOnError && myAlert.err({ title: '刪除支出單明細失敗', content: err.message });
+
+          return Promise.reject(err);
         })
         .finally(() => {
           setIsFetching(false);
         });
-
-      if (res === 'success') {
-        return await update();
-      }
     },
     [isFetching, callAlertOnError, update]
   );
@@ -1286,18 +1286,24 @@ const useGetAccountPayableStatisticsByIdOrDate = (
   {
     callAlertOnError = true,
     autoUpdate = true,
+    clearOnParamsChange = false,
   }: {
     callAlertOnError?: boolean;
     autoUpdate?: boolean;
+    clearOnParamsChange?: boolean;
   } = {}
 ) => {
   const { id, date } = params;
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isFirstLoaded, setIsFirstLoaded] = useState<boolean>(false);
-  const [raw, setRaw] = useState<Taccount_payable_statistics[]>();
+  const [raw, setRaw] = useState<Taccount_payable_statistics[] | null>();
 
   const update = async () => {
-    if (isFetching || (!params.id && !params.date)) {
+    if (isFetching) {
+      return;
+    }
+
+    if (!params.id && !params.date) {
       setRaw(undefined);
 
       return;
@@ -1312,7 +1318,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
         return data;
       })
       .catch((err: AxiosError) => {
-        setRaw(undefined);
+        setRaw(null);
         callAlertOnError && myAlert.err({ title: '取得應付帳款統計表失敗', content: err.message });
       })
       .finally(() => {
@@ -1322,6 +1328,7 @@ const useGetAccountPayableStatisticsByIdOrDate = (
   };
 
   useEffect(() => {
+    clearOnParamsChange && setRaw(undefined);
     autoUpdate && update();
   }, [id, date]);
 

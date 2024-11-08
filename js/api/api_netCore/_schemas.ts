@@ -151,6 +151,20 @@ interface TcreateApplyPayment_data_Dto {
   accounting_subject: string;
   invoice_number: string;
   note: string;
+
+  // w ------------------------------------------------
+  // 20241108
+  // 實際上api不收，但應該要收，所以先送過去吧，以後應該會收吧
+  subtotal: `${number}`;
+  // 20241108
+  // POST Accountant/AddApplyPayment
+  // 新增支出單，不收tax_type
+  // POST /Accountant/UpdateApplyPayment
+  // 編輯支出單 收tax_type
+  // 但是只對新增的detail有效，對舊有的detail無效
+  // 另外新增的detail若沒有送tax_type，該detail的tax_type會變成"0"
+  tax_type: Ttax_type;
+  // w ------------------------------------------------
 }
 interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
   id?: string;

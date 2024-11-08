@@ -322,7 +322,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
 
       <div className={scss.body}>
         <div className={scss.accountPayable}>
-          <Row_thead className={scss.thead} disabled={true} noCheck={true} />
+          <Row_thead className={scss.thead} disabled={true} noCheck={true} noDetail={true} />
           {raw_accountPayable?.map((raw) => {
             const props: Parameters<typeof Row_tbody>[0] = {
               ...createValueProps(raw),
