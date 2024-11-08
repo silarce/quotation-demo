@@ -86,7 +86,8 @@ class Class_component {
 
   private reRender;
   renderCount = 0;
-  private _prod;
+  // private _prod;
+  _prod;
   private _com;
   readonly key;
   readonly identificationId;
@@ -564,6 +565,37 @@ class Class_component {
     }
 
     this.reRender();
+  }
+
+  setMaterial_noRelationToProd(v: string) {
+    this._com.material = v;
+    this.surface_withCheckOptions = this.surface;
+
+    // ________________________________________________________________
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === this.surface;
+    });
+
+    const prodSurface = this._prod.surface || '';
+    const isProdSurfaceExistHere = this.options_surface?.some((item) => {
+      return item.value === prodSurface;
+    });
+
+    if (!isSurfaceExist) {
+      const surface = isProdSurfaceExistHere ? prodSurface : this.options_surface?.[0].value ?? '';
+
+      this.surface = surface;
+    }
+    // ________________________________________________________________
+
+    this.callReqGetCodeNumber();
+
+    if (this.key === 'bottomBar') {
+      this.desc = creDesc_bottomBars(this);
+      // this._prod.changeBottomBarAngleIronAndBottomBarPlate(v);
+    }
+
+    // this.reRender();
   }
 
   get surface() {
@@ -1053,20 +1085,22 @@ const creDesc_slats = (classCom: Class_component) => {
 };
 
 const creDesc_bottomBars = (classCom: Class_component) => {
-  const {
-    // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
-    material,
-  } = classCom;
+  // const {
+  //   // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
+  //   material,
+  // } = classCom;
 
-  const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
+  // const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
 
-  let desc = '';
+  // let desc = '';
 
-  const list_bottomBarAngleIron = _.keyBy<Toption>(bottomBarAngleIron_options, 'material');
+  // const list_bottomBarAngleIron = _.keyBy<Toption>(bottomBarAngleIron_options, 'material');
 
-  desc = list_bottomBarAngleIron[material]?.value || '';
+  // desc = list_bottomBarAngleIron[material]?.value || '';
 
-  return `${desc}`;
+  // return `${desc}`;
+
+  return classCom._prod.bottomBarAngleIron;
 };
 
 const creDesc_guideRails = (classCom: Class_component) => {
