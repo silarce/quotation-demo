@@ -74,8 +74,11 @@ const Row_thead = ({
   return (
     <Row thead={true} className={className}>
       {!noCheck && (
-        <Cell className={config_other.checkBox.className} style={config_other.checkBox.style}>
-          <label className={classNames('flex items-center gap-1 cursor-pointer', disabled && 'invisible')}>
+        <Cell
+          className={classNames(config_other.checkBox.className, disabled && 'invisible')}
+          style={config_other.checkBox.style}
+        >
+          <label className={classNames('flex items-center gap-1 cursor-pointer')}>
             <Checkbox
               className={classNames(scss.antd_checkbox)}
               checked={checked}

@@ -83,9 +83,12 @@ export default function AccountsPayableDetailList() {
     autoUpdate: true,
   });
 
-  const haveAccountPayableStatistics = !!useGetAccountPayableStatisticsByIdOrDate({
-    date: `${year}-${month}`,
-  }).raw?.length;
+  const { raw: raw_AccountPayableStatistics, update: update_AccountPayableStatistics } =
+    useGetAccountPayableStatisticsByIdOrDate({
+      date: `${year}-${month}`,
+    });
+
+  const haveAccountPayableStatistics = !!raw_AccountPayableStatistics?.length;
 
   // ----------------------------------------------------------------
   // MARK: STATE
@@ -126,20 +129,23 @@ export default function AccountsPayableDetailList() {
 
   const handleAddAccountPayableStatistics = async () => {
     await reqPostAddAccountPayableStatistics().then(async () => {
-      update_accountPayable();
+      await Promise.all([update_accountPayable(), update_AccountPayableStatistics()]);
+
       setDisabled(true);
     });
   };
 
-  const handleStatisticsClick = () => {
-    router.push({
-      pathname: '/accounting/accountsPayableDetailList/statistics',
-      query: {
-        year,
-        month,
-      },
-    });
-  };
+  const handleStatisticsClick = !haveAccountPayableStatistics
+    ? null
+    : () => {
+        router.push({
+          pathname: '/accounting/accountsPayableDetailList/statistics',
+          query: {
+            year,
+            month,
+          },
+        });
+      };
 
   const handleCheckAndGenerate = haveAccountPayableStatistics
     ? null
@@ -273,7 +279,7 @@ const usePanel = ({
   disabled: boolean;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   onAddClick: () => void;
-  onStatisticsClick: () => void;
+  onStatisticsClick: null | undefined | (() => void);
   onCheckAndGenerateClick: null | undefined | (() => void);
 }) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
@@ -285,7 +291,7 @@ const usePanel = ({
     onClick: onCheckAndGenerateClick,
   };
 
-  const panel2: TpanelList[number] = {
+  const panel2: TpanelList[number] = onStatisticsClick && {
     type: 'myButton',
     label: t('accountsPayableStatistics'),
     onClick: onStatisticsClick,
