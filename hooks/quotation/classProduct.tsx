@@ -3796,6 +3796,23 @@ class Class_product {
     }
 
     // ________________________
+    // 使底座板與底座角鐵的材質一樣
+    const angleIronMaterial = this.options_bottomBarAngleIron.find((item) => item.value === v)?.material as string;
+    const plateInfo = this.options_bottomBarPlate.find((item) => item.value === this.bottomBarPlate);
+    const plateMaterial = plateInfo?.material;
+
+    if (angleIronMaterial !== plateMaterial) {
+      const newPlate = this.options_bottomBarPlate.find((item) => item.material === angleIronMaterial);
+
+      if (!newPlate) {
+        myAlert.err({ title: '找不到對應的底座版' });
+      }
+
+      this._prodData.bottomBarPlate = newPlate?.value ?? '';
+    }
+
+    // ________________________
+    this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial);
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
@@ -3816,6 +3833,24 @@ class Class_product {
     }
 
     // ________________________
+    // 使底座板與底座角鐵的材質一樣
+
+    const plateMaterial = this.options_bottomBarPlate.find((item) => item.value === v)?.material as string;
+    const angleIronInfo = this.options_bottomBarAngleIron.find((item) => item.material === this.bottomBarAngleIron);
+    const angleIronMaterial = angleIronInfo?.material;
+
+    if (plateMaterial !== angleIronMaterial) {
+      const newAngleIron = this.options_bottomBarAngleIron.find((item) => item.material === plateMaterial);
+
+      if (!newAngleIron) {
+        myAlert.err({ title: '找不到對應的底座角鐵' });
+      }
+
+      this._prodData.bottomBarAngleIron = newAngleIron?.value ?? '';
+    }
+    // ________________________
+
+    this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial);
 
     this.shouldCall_pgpb = true;
     this.callAllReq();
@@ -4521,14 +4556,16 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'close', // 開閉方式
     'onePieceRollUpBox', // 一體式捲箱
     'isULGuideRail',
-    // 'bottomBarAngleIron', // 底座角鐵
-    // 'bottomBarPlate', // 底座板
+
     'notes', // 備註
     'quantity',
     'price', // 牌價
     'dualPrice', // 牌價複價
     'unitPrice', //單價
     'totalPrice', // 複價
+
+    'bottomBarAngleIron', // 底座角鐵
+    'bottomBarPlate', // 底座板
   ];
 };
 

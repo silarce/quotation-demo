@@ -1,0 +1,12 @@
+.antd_checkbox {
+  * {
+    transition: none !important;
+  }
+}
+
+.reviewing {
+  background-color: theme("colors.chosenBgc");
+}
+.reviewed {
+  background-color: theme("colors.ok");
+}
