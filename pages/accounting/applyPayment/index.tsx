@@ -146,6 +146,7 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
         accounting_subject: state_detail.accounting_subject || '',
         invoice_number: state_detail.number || '',
         note: state_detail.note || '',
+        subtotal: state_detail.subtotal || '0',
       };
 
       return dataItem;

@@ -151,6 +151,9 @@ interface TcreateApplyPayment_data_Dto {
   accounting_subject: string;
   invoice_number: string;
   note: string;
+  // 20241108 實際上api不收，但應該要收，所以先送過去吧
+  // 以後應該會收吧
+  subtotal: `${number}`;
 }
 interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
   id?: string;
