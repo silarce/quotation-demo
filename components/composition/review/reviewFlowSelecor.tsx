@@ -6,8 +6,9 @@ import { Radio, Space } from 'antd';
 
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { TreviewFlow, useGetFlow } from 'js/api/api_netCore/api_review';
+import { TaddReivew, TreviewFlow, useGetFlow, apiAddReivew, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
@@ -91,11 +92,41 @@ const ReviewFlowSelector = ({
 };
 
 ReviewFlowSelector.open = (props: Parameters<typeof ReviewFlowSelector>[0]) => {
-  return DragableModal.create({
+  const instance = DragableModal.create({
     children: <ReviewFlowSelector {...props} />,
     handleText: '選擇審核流程',
     style: { zIndex: '1001', width: '820px' },
   });
+
+  return instance;
 };
 
+ReviewFlowSelector.open2 = (props: Parameters<typeof ReviewFlowSelector>[0]) => {
+  const instance = myAlert.clear({
+    width: '820px',
+    content: (
+      <div>
+        <ReviewFlowSelector {...props} />
+      </div>
+    ),
+  });
+
+  return instance;
+};
+
+// ================================================================================
+
+const reqSentReviewStop = ({ uuid, onSuccess }: { uuid: string; onSuccess?: () => void }) => {
+  myAlert.confirm({
+    title: '確認抽單?',
+    props: {
+      onOk: async () => {
+        apiGetReviewBack(uuid).then(onSuccess);
+      },
+    },
+  });
+};
+
+// ================================================================================
 export default ReviewFlowSelector;
+export { apiAddReivew, reqSentReviewStop };

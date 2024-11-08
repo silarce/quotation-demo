@@ -150,7 +150,7 @@ export const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams)
   const api = `/employees/${id}`;
 
   return axi
-    .get(api, { params })
+    .get<TemployeeDto>(api, { params })
     .then(({ data }) => {
       return data;
     })

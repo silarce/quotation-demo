@@ -1,0 +1,119 @@
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+
+// antd
+import { Spin } from 'antd';
+
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// component
+import Profile from 'components/page/accounting/accountsPayableDetailList/detail/Profile';
+import InvoiceInfo from 'components/page/accounting/accountsPayableDetailList/detail/InvoiceInfo';
+import Balance from 'components/page/accounting/accountsPayableDetailList/detail/Balance';
+
+// gear
+
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import ThreePartBar from 'components/global/container/bar/threePartBar';
+
+import { useGetSearchAccountPayableByInvoiceNumber } from 'js/api/api_netCore/api_accountant';
+
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { useTranslation } from 'react-i18next';
+
+// ================================================================================
+type Tquery = {
+  invoiceNumber?: string | undefined;
+};
+// ================================================================================
+
+export default function AccountsPayableDetail() {
+  const router = useRouter();
+  const { invoiceNumber } = router.query as Tquery;
+
+  // 待api給的資料齊全了再繼續
+  // !! 若raw.statistics_uuid不為null，則不可以編輯
+  const [disabled, setDisabled] = useState(true);
+
+  // -----------------------------------------------------------------------------
+
+  const { raw, isFetching } = useGetSearchAccountPayableByInvoiceNumber(invoiceNumber);
+
+  // console.log(raw);
+
+  const {
+    statistics_uuid,
+    serial_number,
+    agentEmployee,
+
+    invoice_date,
+    invoice_number,
+  } = raw ?? {};
+
+  const invoiceInfo: Parameters<typeof InvoiceInfo>[0] = {
+    發票類別: 'no property',
+    invoice_date: getTaiwanDateStr(invoice_date),
+    invoice_number,
+    申報期別: 'no property',
+    進貨費用: 'no property',
+    買受人統一編號: 'no property',
+    買受人抬頭: 'no property',
+    買受人發票地址: 'no property',
+    營業人統一編號: 'no property',
+    營業人抬頭: 'no property',
+    稅別: 'no property',
+    稅額: 'no property',
+    進項金額: 'no property',
+    合計金額: 'no property',
+  };
+
+  // -----------------------------------------------------------------------------
+
+  return (
+    <SubLayer bodyPreStyle="style01">
+      <PageHeader02
+        tag="應付帳款明細"
+        panelList={[
+          {
+            type: 'myButton',
+            label: '返回',
+            onClick: () => router.back(),
+          },
+        ]}
+      />
+      <div>
+        <BtnBar />
+        <Spin spinning={false}>
+          <Profile
+            serial_number={serial_number}
+            支出單號進貨收票單號={'no property'}
+            agentName={agentEmployee?.chName}
+          />
+          <br />
+          <InvoiceInfo disabled={disabled} {...invoiceInfo} />
+          <br />
+          <Balance disabled={disabled} />
+        </Spin>
+      </div>
+    </SubLayer>
+  );
+}
+
+// ================================================================================
+
+const BtnBar = () => {
+  return (
+    <ThreePartBar>
+      <>
+        <SquareBtn content="search" />
+        <SquareBtn content="export" />
+      </>
+      <>{/* <SquareBtn content="edit" /> */}</>
+      <>{/* <SquareBtn content="sentReview" /> */}</>
+    </ThreePartBar>
+  );
+};

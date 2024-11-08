@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import InputSel, { TinputSelProps } from '../../inputAndSel_v2/inputSel';
 
 // antd
-import { Modal, ModalFuncProps } from 'antd';
+import { Modal, ModalFuncProps, notification } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 // gear
@@ -385,6 +385,17 @@ const myAlert = {
   btnBar: ModalBtnBar,
   clear: ModalClear,
   input: ModalInut,
+  notify: {
+    open: notification.open,
+    close: notification.close,
+    destroy: notification.destroy,
+
+    success: notification.success,
+    error: notification.error,
+    info: notification.info,
+    warning: notification.warning,
+    warn: notification.warn,
+  },
 };
 
 export default myAlert;
