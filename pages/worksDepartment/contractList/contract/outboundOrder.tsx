@@ -818,8 +818,6 @@ const createRowProps_prodRow = ({
   // worksheetItemQty: number | undefined;
   // worksheetCreatedAt: string | null;
 }): TrowProps => {
-  const total_volume_prod = new Decimal(prod.quantity).mul(prod.volume || 0).toNumber();
-
   const { implementationQty, implementationVolume } = worksheetArr.reduce(
     ({ implementationQty, implementationVolume }, current) => {
       const { totalQty, totalVolume } = current;
@@ -837,6 +835,8 @@ const createRowProps_prodRow = ({
       implementationVolume: 0,
     }
   );
+  // const total_volume_prod = new Decimal(prod.quantity).mul(prod.volume || 0).toNumber();
+  const total_volume_prod = new Decimal(implementationQty).mul(prod.volume || 0).toNumber();
 
   // const total_volume_worksheet =
   //   worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';

@@ -18,13 +18,13 @@ import {
 } from 'components/page/accounting/accountsPayableDetailList/index/Table';
 
 // gear
-
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 
 import {
   Taccount_payable_Dto,
   useGetAccountPayableBy,
+  useGetAccountPayableStatisticsByIdOrDate,
   apiPostAddAccountPayableStatistics,
 } from 'js/api/api_netCore/api_accountant';
 
@@ -64,6 +64,13 @@ export default function AccountsPayableDetailList() {
 
   const [disabled, setDisabled] = useState(true);
 
+  const isFuture = (() => {
+    const date = moment(`${year}-${month}`);
+    const now = moment();
+
+    return date.isAfter(now);
+  })();
+
   // ----------------------------------------------------------------
   // MARK: DATA
 
@@ -79,7 +86,23 @@ export default function AccountsPayableDetailList() {
     return params;
   }, [year, month]);
 
-  const { raw: raw_accountPayable } = useGetAccountPayableBy(params, { autoUpdate: true });
+  const { raw: raw_accountPayable, update: update_accountPayable } = useGetAccountPayableBy(params, {
+    autoUpdate: true,
+  });
+
+  const { raw: raw_AccountPayableStatistics, update: update_AccountPayableStatistics } =
+    useGetAccountPayableStatisticsByIdOrDate(
+      {
+        date: `${year}-${month}`,
+      },
+      {
+        clearOnParamsChange: true,
+      }
+    );
+
+  // const haveAccountPayableStatistics = !!raw_AccountPayableStatistics?.length;
+  const haveAccountPayableStatistics =
+    raw_AccountPayableStatistics === undefined ? undefined : !!raw_AccountPayableStatistics?.length;
 
   // ----------------------------------------------------------------
   // MARK: STATE
@@ -119,20 +142,32 @@ export default function AccountsPayableDetailList() {
   // MARK: HANDLE
 
   const handleAddAccountPayableStatistics = async () => {
-    await reqPostAddAccountPayableStatistics().then(() => {
+    await reqPostAddAccountPayableStatistics().then(async () => {
+      await Promise.all([update_accountPayable(), update_AccountPayableStatistics()]);
+
       setDisabled(true);
     });
   };
 
-  const handleStatisticsClick = () => {
-    router.push({
-      pathname: '/accounting/accountsPayableDetailList/statistics',
-      query: {
-        year,
-        month,
-      },
-    });
-  };
+  const handleStatisticsClick =
+    haveAccountPayableStatistics === false
+      ? null
+      : () => {
+          router.push({
+            pathname: '/accounting/accountsPayableDetailList/statistics',
+            query: {
+              year,
+              month,
+            },
+          });
+        };
+
+  const handleCheckAndGenerate =
+    haveAccountPayableStatistics === undefined || haveAccountPayableStatistics || isFuture
+      ? null
+      : () => {
+          setDisabled(false);
+        };
 
   const handleCheckAllChange = (checked: boolean) => {
     if (checked) {
@@ -205,6 +240,7 @@ export default function AccountsPayableDetailList() {
           setDisabled,
           onAddClick: handleAddAccountPayableStatistics,
           onStatisticsClick: handleStatisticsClick,
+          onCheckAndGenerateClick: handleCheckAndGenerate,
         })}
       />
 
@@ -254,24 +290,24 @@ const usePanel = ({
   setDisabled,
   onAddClick,
   onStatisticsClick,
+  onCheckAndGenerateClick,
 }: {
   disabled: boolean;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   onAddClick: () => void;
-  onStatisticsClick: () => void;
+  onStatisticsClick: null | undefined | (() => void);
+  onCheckAndGenerateClick: null | undefined | (() => void);
 }) => {
   const { t } = useTranslation('accounting', { keyPrefix: 'accountsPayableDetailList' });
   const { t: t_common } = useTranslation('common');
 
-  const panel1: TpanelList[number] = {
+  const panel1: TpanelList[number] = onCheckAndGenerateClick && {
     type: 'myButton',
     label: t('checkAndGenerate'),
-    onClick: () => {
-      setDisabled(false);
-    },
+    onClick: onCheckAndGenerateClick,
   };
 
-  const panel2: TpanelList[number] = {
+  const panel2: TpanelList[number] = onStatisticsClick && {
     type: 'myButton',
     label: t('accountsPayableStatistics'),
     onClick: onStatisticsClick,
