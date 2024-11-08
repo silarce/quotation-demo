@@ -509,6 +509,7 @@ export const optionsCreator_boxB_SJ312 = createOptionsCreator({
     { value: '0.50', label: '0.50' },
     { value: '0.55', label: '0.55' },
     { value: '0.60', label: '0.60' },
+    { value: '0.70', label: '0.70' },
   ],
 });
 
