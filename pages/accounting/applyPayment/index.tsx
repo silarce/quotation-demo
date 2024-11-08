@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // antd
 import { Spin } from 'antd';
@@ -61,6 +62,10 @@ interface Tstate_applyPayment {
   description: string | undefined; // 備註說明
 
   agentName: string | undefined; //  經辦人名字
+}
+
+interface Tstate_detail extends TpurchaseInvoice_Dto {
+  willDelete?: boolean;
 }
 
 // ===================================================================================
@@ -142,25 +147,35 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
     const currentArr = ref_detailArr.current.filter((item) => item !== null) as TimperativeHandle[];
 
-    const data: Tbody['data'] = currentArr.map((item) => {
-      const state_detail = item!.state_detail;
+    const idWillDeleteArr: string[] = [];
 
-      const dataItem: TupdateApplyPayment_data_Dto = {
-        id: state_detail.id,
-        item: state_detail.item || '',
-        invoice_business_title: state_detail.business_title || '',
-        invoice_type: state_detail.type,
-        tax: state_detail.tax || '0',
-        amount_total: state_detail.amount_total || '0',
-        accounting_subject: state_detail.accounting_subject || '',
-        invoice_number: state_detail.number || '',
-        note: state_detail.note || '',
-        subtotal: state_detail.subtotal || '0',
-        tax_type: state_detail.tax_type || null,
-      };
+    const data: Tbody['data'] = currentArr
+      .map((item) => {
+        const state_detail = item!.state_detail;
 
-      return dataItem;
-    });
+        if (state_detail.id && state_detail.willDelete) {
+          idWillDeleteArr.push(state_detail.id);
+
+          return null;
+        }
+
+        const dataItem: TupdateApplyPayment_data_Dto = {
+          id: state_detail.id,
+          item: state_detail.item || '',
+          invoice_business_title: state_detail.business_title || '',
+          invoice_type: state_detail.type,
+          tax: state_detail.tax || '0',
+          amount_total: state_detail.amount_total || '0',
+          accounting_subject: state_detail.accounting_subject || '',
+          invoice_number: state_detail.number || '',
+          note: state_detail.note || '',
+          subtotal: state_detail.subtotal || '0',
+          tax_type: state_detail.tax_type || null,
+        };
+
+        return dataItem;
+      })
+      .filter((item) => !!item);
 
     const total_price = `${totalPrice}` as `${number}`;
 
@@ -173,29 +188,68 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
       data,
     };
 
-    return body;
+    return { body, idWillDeleteArr };
   };
 
   const reqPostApplyPayment = async () => {
-    const body = createBody();
-    body &&
-      apiPostAddApplyPayment(body).then((id) => {
-        router.replace({
-          query: {
-            ...query,
-            apply_paymnet_id: id,
-          },
-        });
-        setDisabled(true);
+    const instance = createBody();
+
+    if (!instance) {
+      return;
+    }
+
+    const { body } = instance;
+
+    apiPostAddApplyPayment(body).then((id) => {
+      router.replace({
+        query: {
+          ...query,
+          apply_paymnet_id: id,
+        },
       });
+      setDisabled(true);
+    });
   };
 
   const reqPatchApplyPayment = async () => {
-    const body = createBody();
-    body &&
-      (await reqPatch(body)
-        .then(update_data_applyPayment)
-        .then(() => setDisabled(true)));
+    const instance = createBody();
+
+    if (!instance) {
+      return;
+    }
+
+    const { body, idWillDeleteArr } = instance;
+    console.log(body);
+
+    new Promise(async (resolve, reject) => {
+      try {
+        for (const id of idWillDeleteArr) {
+          const res = await reqDeleteDetail(id);
+
+          if (!res) {
+            break;
+          }
+        }
+
+        return resolve(true);
+      } catch (error) {
+        return reject(error);
+      }
+    })
+      .then(() => {
+        return reqPatch(body);
+      })
+      .then(update_data_applyPayment)
+      .then(() => setDisabled(true))
+      .catch(() => {
+        myAlert.err({ title: '更新中斷', content: '若有執行刪除，則部分資料可能已刪除' });
+      });
+    // await reqPatch(body)
+    //   .then(update_data_applyPayment)
+    //   .then(() => setDisabled(true));
+    // await reqPatch(body)
+    //   .then(update_data_applyPayment)
+    //   .then(() => setDisabled(true));
   };
 
   // --------------------------------------------------------------------------
@@ -306,9 +360,11 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
                 return (
                   <Detail
                     key={id}
+                    className={classNames(state_detail?.willDelete && scss.none)}
                     disabled={disabled}
                     indexNumber={index + 1}
                     raw_detail={state_detail}
+                    willDelete={state_detail?.willDelete}
                     ref={(handle) => {
                       ref_detailArr.current[index] = handle;
                     }}
@@ -344,7 +400,7 @@ const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined, disabled: b
     return detailDict ?? {};
   }, [detailArr]);
 
-  const [state, setState] = useState<{ [id: string]: TpurchaseInvoice_Dto | undefined }>(defaultState);
+  const [state, setState] = useState<{ [id: string]: Tstate_detail | undefined }>(defaultState);
 
   const add = () => {
     setState((state) => {
@@ -354,9 +410,15 @@ const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined, disabled: b
 
   const remove = (id: string) => {
     setState((state) => {
-      const { [id]: removed, ...remain } = state;
+      const copy = _.cloneDeep(state);
 
-      return remain;
+      if (copy[id]?.id) {
+        copy[id].willDelete = true;
+      } else {
+        delete copy[id];
+      }
+
+      return copy;
     });
   };
 

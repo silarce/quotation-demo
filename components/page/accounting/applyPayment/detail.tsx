@@ -60,7 +60,9 @@ type Tconfig = {
 };
 
 type TimperativeHandle = {
-  state_detail: Tstate_detail;
+  state_detail: Tstate_detail & {
+    willDelete?: boolean;
+  };
 };
 // ==============================================================================
 
@@ -144,12 +146,16 @@ const Detail_pre = (
     indexNumber,
     onDeleteClick,
     onStateUpdate,
+    className,
+    willDelete,
   }: {
     raw_detail: TpurchaseInvoice_Dto | undefined;
     disabled: boolean;
     indexNumber: number;
     onDeleteClick: () => void;
     onStateUpdate: (state: Tstate_detail) => void;
+    className?: string;
+    willDelete?: boolean;
   },
   ref: React.Ref<TimperativeHandle>
 ) => {
@@ -163,7 +169,7 @@ const Detail_pre = (
   useImperativeHandle(
     ref,
     (): TimperativeHandle => ({
-      state_detail: state,
+      state_detail: { ...state, willDelete },
     })
   );
 
@@ -173,7 +179,7 @@ const Detail_pre = (
   }, [state]);
 
   return (
-    <Row>
+    <Row className={className}>
       <Cell style={config_other.btnCell.style}>
         {!disabled && <Icon_fc_delete className={'cursor-pointer translate-y-[-3px]'} onClick={onDeleteClick} />}
       </Cell>

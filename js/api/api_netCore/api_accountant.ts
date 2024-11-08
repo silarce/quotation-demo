@@ -396,21 +396,18 @@ const useGetApplyPaymentById = (
 
       setIsFetching(true);
 
-      const res = await apiDeleteApplyPaymentDetail(ApplyPaymentDetail)
+      return await apiDeleteApplyPaymentDetail(ApplyPaymentDetail)
         .then(() => {
-          setRes(undefined);
-          // return 'success';
+          return 'success';
         })
         .catch((err: AxiosError) => {
           callAlertOnError && myAlert.err({ title: '刪除支出單明細失敗', content: err.message });
+
+          return Promise.reject(err);
         })
         .finally(() => {
           setIsFetching(false);
         });
-
-      // if (res === 'success') {
-      //   return await update();
-      // }
     },
     [isFetching, callAlertOnError, update]
   );
