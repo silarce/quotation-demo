@@ -86,7 +86,7 @@ export default function AccountsPayableDetailList() {
 
   const haveAccountPayableStatistics = !!useGetAccountPayableStatisticsByIdOrDate({
     date: `${year}-${month}`,
-  }).raw;
+  }).raw?.length;
 
   // ----------------------------------------------------------------
   // MARK: STATE
