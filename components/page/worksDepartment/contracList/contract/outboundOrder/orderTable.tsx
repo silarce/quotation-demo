@@ -67,10 +67,10 @@ type TrowProps = {
     WG?: React.ReactNode;
     h?: React.ReactNode;
     B?: React.ReactNode;
-    qty?: React.ReactNode;
+    qty?: string | number;
     implementationQty?: number | string;
     volume?: React.ReactNode;
-    total_volume?: React.ReactNode;
+    total_volume?: string | number;
     implementationVolume?: number | string;
     doorModelName?: React.ReactNode;
     material?: React.ReactNode;
@@ -178,31 +178,36 @@ export default function OrderTable({
 
   // -------------------------------------------------------------------------------
 
-  const { totalImplementationQty, totalImplementationVolume, totalVolume } = useMemo(() => {
-    const totalImplementation = rowPropsArr.reduce(
-      (
-        { totalImplementationQty, totalImplementationVolume, totalVolume },
-        { left: { implementationQty, implementationVolume } = {}, center: { volume } = {} }
-      ) => {
-        const implementationQty_num = typeof implementationQty === 'number' ? implementationQty : 0;
-        const implementationVolume_num = typeof implementationVolume === 'number' ? implementationVolume : 0;
-        const volume_num = Number(volume) || 0;
+  const { totalQty, totalTotal_volume, totalImplementationQty, totalImplementationVolume, totalVolume } =
+    useMemo(() => {
+      const totalImplementation = rowPropsArr.reduce(
+        (
+          { totalQty, totalTotal_volume, totalImplementationQty, totalImplementationVolume, totalVolume },
+          { left: { qty, total_volume, implementationQty, implementationVolume } = {}, center: { volume } = {} }
+        ) => {
+          const implementationQty_num = typeof implementationQty === 'number' ? implementationQty : 0;
+          const implementationVolume_num = typeof implementationVolume === 'number' ? implementationVolume : 0;
+          const volume_num = Number(volume) || 0;
 
-        return {
-          totalImplementationQty: new Decimal(totalImplementationQty).add(implementationQty_num).toNumber(),
-          totalImplementationVolume: new Decimal(totalImplementationVolume).add(implementationVolume_num).toNumber(),
-          totalVolume: new Decimal(totalVolume).add(volume_num).toNumber(),
-        };
-      },
-      {
-        totalImplementationQty: 0,
-        totalImplementationVolume: 0,
-        totalVolume: 0,
-      }
-    );
+          return {
+            totalQty: new Decimal(totalQty).add(Number(qty) || 0).toNumber(),
+            totalTotal_volume: new Decimal(totalTotal_volume).add(Number(total_volume) || 0).toNumber(),
+            totalImplementationQty: new Decimal(totalImplementationQty).add(implementationQty_num).toNumber(),
+            totalImplementationVolume: new Decimal(totalImplementationVolume).add(implementationVolume_num).toNumber(),
+            totalVolume: new Decimal(totalVolume).add(volume_num).toNumber(),
+          };
+        },
+        {
+          totalQty: 0,
+          totalTotal_volume: 0,
+          totalImplementationQty: 0,
+          totalImplementationVolume: 0,
+          totalVolume: 0,
+        }
+      );
 
-    return totalImplementation;
-  }, [rowPropsArr]);
+      return totalImplementation;
+    }, [rowPropsArr]);
 
   // -------------------------------------------------------------------------------
   useEffect(() => {
@@ -264,6 +269,8 @@ export default function OrderTable({
         })}
 
         <TotalRow
+          totalQty={totalQty}
+          totalTotal_volume={totalTotal_volume}
           totalImplementationQty={totalImplementationQty}
           totalImplementationVolume={totalImplementationVolume}
           totalVolume={totalVolume}
@@ -483,10 +490,14 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 
 // region TotalRow
 const TotalRow = ({
+  totalQty,
+  totalTotal_volume,
   totalImplementationQty,
   totalImplementationVolume,
   totalVolume,
 }: {
+  totalQty: number | string;
+  totalTotal_volume: number | string;
   totalImplementationQty: number | string;
   totalImplementationVolume: number | string;
   totalVolume: number | string;
@@ -495,6 +506,8 @@ const TotalRow = ({
     <div className={scss.totalRow}>
       <Row
         left={{
+          qty: '總數量',
+          total_volume: '總才數合計',
           implementationQty: '總實作數量',
           implementationVolume: '總實作才數',
         }}
@@ -504,6 +517,8 @@ const TotalRow = ({
       />
       <Row
         left={{
+          qty: totalQty,
+          total_volume: totalTotal_volume,
           implementationQty: totalImplementationQty,
           implementationVolume: totalImplementationVolume,
         }}
@@ -915,7 +930,7 @@ const config: TconfigList = {
   },
   qty: {
     caption: '數量',
-    className: 'w-8 text-center',
+    className: 'w-12 text-center',
   },
   volume: {
     caption: '才數',
@@ -923,7 +938,7 @@ const config: TconfigList = {
   },
   total_volume: {
     caption: '總才數',
-    className: 'w-14 text-center',
+    className: 'w-[75px] text-center',
   },
   implementationQty: {
     caption: '實作數量',
