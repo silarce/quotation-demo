@@ -42,6 +42,7 @@ import Quotation from 'pages/domestic/quotationList/quotation';
 import PurchaseRequisitionList from 'pages/factoryDepartment/purchaseRequisitionList';
 import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
 import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
+import SalarySettlement from 'pages/accounting/salarySettlement';
 
 
 
@@ -504,6 +505,17 @@ export default function ReviewList() {
                                     {}), // 根據不同情況設置 status
                         note: parsedQuery.note,
                         firstin: 1,
+                        viewtype: 'review'
+                    },
+                }, undefined, { shallow: true });
+            }
+            else if (reviewtype==="薪資帳簿"){
+                const parsedQuery = JSON.parse(itemQuery.query);
+                console.log(parsedQuery);
+                router.replace({
+                    query: {
+                        year: parsedQuery.year,
+                        month: parsedQuery.month,
                         viewtype: 'review'
                     },
                 }, undefined, { shallow: true });
@@ -1287,6 +1299,7 @@ export default function ReviewList() {
                                             {reviewtype === "採購單" && <PurchaseOrderList key={theKey} />}
                                             {reviewtype === "進貨單" && <ProdReceiptList key={theKey} />}
                                             {reviewtype === "報價單" && <Quotation key={theKey} />}
+                                            {reviewtype === "薪資帳簿" && <SalarySettlement key={theKey} />}
                                         </div>
                                     ) : (
                                         <p>頁面加載中...</p> // 可以顯示一個載入中的提示
