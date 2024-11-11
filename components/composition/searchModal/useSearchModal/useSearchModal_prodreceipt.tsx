@@ -57,6 +57,7 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
 const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): TmodalData<Tprodreceipt_Dto> => {
   const invoice = filter?.invoice?.trim();
+  // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
   const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
 
   const dataArr = useMemo(() => {
@@ -69,9 +70,13 @@ const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): Tmod
         !String(data.prodreceiptid).includes(filter.prodreceiptid.trim()) && (pass = false);
       }
 
+      // 沒有發票資料的去除
+      !data.invoice && (pass = false);
+
       return pass;
     });
 
+    // 將重複的資料去除
     uniqInvoice && (dataArr = _.uniqBy(dataArr, 'invoice'));
 
     return dataArr;

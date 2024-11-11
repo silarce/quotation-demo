@@ -318,7 +318,9 @@ const useGetApplyPaymentById = (
   const [res, setRes] = useState<TapplyPayment_Dto_detailed>();
 
   const update = useCallback(async () => {
-    if (isFetching || !id) {
+    if (isFetching) {
+      return;
+    } else if (!id) {
       setRes(undefined);
 
       return;
@@ -758,6 +760,7 @@ const useGetPurchaseCollectTicketDetailByTicketId = (
   };
 };
 
+// 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
 const useGetUnpaidProdreceiptByInvoiceNumber = (
   invoice_number?: string,
   {
