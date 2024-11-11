@@ -28,11 +28,13 @@ import icon_eye from 'public/image/icon/eyeOpen.svg';
 import icon_eye_gray from 'public/image/icon/eyeProhibit.svg';
 import icon_cir_add from 'public/image/icon/addCircle.svg';
 import icon_cir_remove from 'public/image/icon/removeCircle.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
 //時間
 import moment from "moment";
-import { Modal } from "antd";
+import { Modal, Radio, Space } from "antd";
 import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
+import DragableModal from "components/global/gear/dragableModal/dragableModal";
 
 
 
@@ -44,6 +46,7 @@ export default function SalarySettlement() {
     const {
         year = thisYear.toString(),
         month = thisMonth.toString(),
+        viewtype
     } = router.query;
     //#endregion
 
@@ -61,7 +64,11 @@ export default function SalarySettlement() {
     const [originaldata, setOriginalData] = useState<any[]>([]);
 
     //普通變數
-    const [currentemp, setCurrentEmp] = useState<string>(""); // 物料data
+    const [currentemp, setCurrentEmp] = useState<string>("");
+    const [serial_id, setSerial_id] = useState<string>("");
+    const [serial_uuid, setSerial_uuid] = useState<string>("");
+    const [status, setStatus] = useState<string>("");
+
 
     //手key輸入
     const overtime_hoursRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
@@ -77,6 +84,12 @@ export default function SalarySettlement() {
     const supplementRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const allowanceRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const perfect_attendance_bonusRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const income_tax_peopleRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const health_insurance_peopleRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const annual_leave_daysRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const comp_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const late_minuteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
 
     // popout
     const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
@@ -92,8 +105,8 @@ export default function SalarySettlement() {
     const hasFetchedData = useRef(false);
     useEffect(() => {
         if (!hasFetchedData.current) {
-            GetPayrollByDate();
-
+            GetPayrollByDate("編輯中' or status = '審核中");
+            GetReviewFlow();
             hasFetchedData.current = true;
         }
     }, []);
@@ -155,13 +168,15 @@ export default function SalarySettlement() {
 
     //#region =============【  API  】===============================================================================
 
-    const GetPayrollByDate = async () => {
+    const GetPayrollByDate = async (type: any) => {
         try {
             setIsLoading(true);
 
             const conditionModel = {
                 date: year + '-' + month,
-                type: '編輯中'
+                // type: '編輯中'
+                // type:"編輯中' or status = '審核中"
+                type: type
             };
 
             const inputModel = {
@@ -184,12 +199,18 @@ export default function SalarySettlement() {
             // 重命名欄位並解析 `employee` JSON 字串
             const renamedData = responsedata.map((item: any) => {
                 const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料
+                setSerial_id(item.serial_id);
+                setSerial_uuid(item.serial_uuid);
+                setStatus(item.status);
+                console.log(item);
 
                 return {
                     id: item.id,
                     id_number: employeeData?.id_number || '',
                     department: item.department || '',
                     start_date: employeeData?.start_date || '',
+                    annual_leave_days: item.annual_leave_days || '0',
+                    comp_time: item.comp_time || '0',
                     ch_name: employeeData?.ch_name || '',
                     salary: item.salary || '0',
                     actual_salary: item.salary || '0',
@@ -205,15 +226,16 @@ export default function SalarySettlement() {
                     earning_total: item.earning_total || '0',
                     advance_payment: item.advance_payment || '0',
                     income_tax: item.income_tax || '0',
+                    income_tax_people: item.income_tax_people || '0',
                     labor_insurance_fee: item.labor_insurance_fee || '0',
                     health_insurance_fee: item.health_insurance_fee || '0',
+                    health_insurance_people: item.health_insurance_people || '0',
                     late_deduction: item.late_deduction || '0',
                     deduction_total: item.deduction_total || '0',
                     net_pay: item.net_pay || '0',
                     note: item.note || '',
                     late_time: item.late_time || '0',
                     late_minute: item.late_minute || '0',
-                    comp_time: item.comp_time || '0',
                     leave_day: item.leave_day || '0',
                     leave_detail: item.leave_detail || '{}',
                     leave_day_pay: item.leave_day_pay || '0',
@@ -222,6 +244,8 @@ export default function SalarySettlement() {
 
             console.log(renamedData); // 檢查重命名後的資料結構
             setData(renamedData);
+            console.log(serial_id);
+            console.log(serial_uuid);
 
         } catch (error: any) {
             console.log(error.message);
@@ -252,7 +276,7 @@ export default function SalarySettlement() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            GetPayrollByDate();
+            GetPayrollByDate("編輯中' or status = '審核中");
 
         } catch (error: any) {
             console.log(error.message);
@@ -290,7 +314,7 @@ export default function SalarySettlement() {
             }
             const responsedata = await response.json();
             myAlert.success({ title: '更新成功' })
-            GetPayrollByDate();
+            GetPayrollByDate("編輯中' or status = '審核中");
 
 
         } catch (error: any) {
@@ -304,6 +328,8 @@ export default function SalarySettlement() {
 
 
     }
+
+
 
     // const SettlePayroll = async () => {
     //     myAlert.confirm({
@@ -351,6 +377,318 @@ export default function SalarySettlement() {
     //         }
     //     });
     // };
+
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                user_id: userInfo?.employee?.id.toString()
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+            // setIsLoading(true);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                // console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            console.error(error.message);
+        } finally {
+            // setIsLoading(false);
+        }
+    };
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
+    const setReview = async (item: any) => {
+        setReview_flow(item.id);
+        setReviewflowdata2(item.stages);
+    }
+
+    const sentToReview = async (type: any) => {
+
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
+            }
+            else {
+                // return;
+                const review_query = {
+                    year: year,
+                    month: month,
+                };
+
+                const conditionModel = {
+                    document_id: serial_id,
+                    document_uuid: serial_uuid,
+                    document_type: "薪資帳簿",
+                    review_id: review_flow,
+                    query: review_query,
+                    user_id: userInfo?.employee?.id.toString(),
+                    document_title: documenttitle
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const responsedata = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(serial_uuid);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // //改變單據狀態
+                // const conditionModel2 = {
+                //     type: type,
+                //     purchaserequisitionuuid: serial_uuid,
+                //     username: userInfo?.employee?.id.toString()
+                // };
+
+
+                // var inputModel = {
+                //     TypeName: 'ERP',
+                //     ServiceName: 'WareHouseService',
+                //     FunctionName: 'no',
+                //     FilterConditions: JSON.stringify(conditionModel2),
+                // };
+
+                // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                // const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+                // if (!response2.ok) {
+                //     throw new Error('Failed to fetch data');
+                // }
+                // const data2 = await response2.json();
+                // // getPurchaseRequisition();
+                // // getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+
+                // // setStatusin("審核中");
+
+
+
+
+
+            }
+
+        } catch (error: any) {
+            console.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【薪資單】【${year}年${month}月份_薪資單】_${userInfo?.employee?.chName.toString()}`)
+    }
+
+    const handleGetReviewBack = () => {
+        myAlert.confirm({
+            title: '確定要抽單嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            document_uuid: serial_uuid,
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                        setReviewflowdata([]);
+                        // setStatusin("編輯中");
+                        setReview_flow("");
+                        setValue(null);
+                        GetReviewHistory(serial_uuid);
+
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
+    }
+
+    const GetReviewHistory = async (id: any) => {
+        try {
+            // setIsLoading(true);
+            // alert(purchaserequisitionidin);
+            const conditionModel = {
+                document_uuid: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+    //#endregion
+
+
+
+
+
+
+
+
+
 
 
     //#endregion
@@ -474,10 +812,17 @@ export default function SalarySettlement() {
         setOriginalData(data);
     }
 
+    //儲存
     const handleeditallsave = () => {
         seteditall(false);
         console.log(data);
         UpdatePayroll();
+    }
+
+    //確認結算
+    const handleeditconfirm = () => {
+        setDocumenttitle(`【薪資單】【${parseFloat(year.toString()) - 1911}年${month}月份_薪資單】_${userInfo?.employee?.chName.toString()}`)
+        sentToReview("送審");
     }
 
     //#endregion
@@ -488,7 +833,7 @@ export default function SalarySettlement() {
             <PageHeader02 tag={'結算薪資作業'} panelList={undefined}
                 customeRight={
                     [
-                        <div>
+                        <div style={{ display: `${viewtype === 'review' ? 'none' : ''}` }}>
                             <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
                                 <button className={scss.longsquarebtn}
                                     onClick={() => {
@@ -528,6 +873,8 @@ export default function SalarySettlement() {
                                 <button className={scss.longredsquarebtn}
                                     onClick={() => {
                                         // SettlePayroll();
+
+                                        handleeditconfirm()
                                     }}
                                     title="確認結算">
                                     確認結算
@@ -548,6 +895,8 @@ export default function SalarySettlement() {
                             <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
                         </span>
                         <span style={{ padding: '0px 10px' }}>
+                            {serial_id}<br />
+                            {serial_uuid}
                         </span>
                     </div>
                 ]}
@@ -561,9 +910,10 @@ export default function SalarySettlement() {
                             <span>部門</span>
                             <span>姓名</span>
                             <span>到職日</span>
+                            <span>年資日</span>
+                            <span>補修日數</span>
                             <span>假別</span>
-                            <span>請假日數
-                            </span>
+                            <span>請假日數</span>
                             <span>本薪(30天)</span>
                             <span>加班時數</span>
                             <span>出勤日數</span>
@@ -578,8 +928,12 @@ export default function SalarySettlement() {
                             <span>請假扣款</span>
                             <span>借支</span>
                             <span>所得稅</span>
+                            <span>扶養人數</span>
                             <span>勞保費</span>
                             <span>健保費</span>
+                            <span>眷屬人屬</span>
+                            <span>遲到次數</span>
+                            <span>遲到分數</span>
                             <span>遲到扣款</span>
                             <span>本月應扣</span>
                             <span>本月實領</span>
@@ -605,44 +959,52 @@ export default function SalarySettlement() {
                                                 <span>{_item.ch_name}</span>
                                                 <span>{getTaiwanDateStr(_item.start_date)}</span>
                                                 <span>
-                                                    {/* <button onClick={() => {
-                                                        setCurrentEmp(_item.employee_id);
-                                                        setLeavedaybar(true);
-
-                                                        // 確認 leave_detail 已是物件格式
-                                                        const leaveDetail = data[index].leave_detail || {};
-
-                                                        // 將 leaveDetail 轉換成陣列格式
-                                                        const newLeaveData = Object.entries(leaveDetail).map(([leaveType, leaveDays]) => ({
-                                                            leaveType,
-                                                            leaveDays,
-                                                        }));
-
-                                                        // 更新 leavedata state
-                                                        setLeavedata(newLeaveData);
-                                                    }}>
-                                                        <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                                    </button> */}
-
-
-                                                    {/* <button onClick={() => {
-                                                        setCurrentEmp(_item.employee_id);
-                                                        setLeavedaybar(true);
-                                                        console.log(_item.leave_detail)
-                                                        // 確認 leave_detail 存在並解析成物件
-                                                        const leaveDetail = data[index].leave_detail ? JSON.parse(data[index].leave_detail) : {};
-
-                                                        // 將 leaveDetail 轉換成陣列格式
-                                                        const newLeaveData = Object.entries(leaveDetail).map(([leaveType, leaveDays]) => ({
-                                                            leaveType,
-                                                            leaveDays,
-                                                        }));
-
-                                                        // 更新 leavedata state
-                                                        setLeavedata(newLeaveData);
-                                                    }}>
-                                                        <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                                    </button> */}
+                                                    <input
+                                                        ref={annual_leave_daysRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type="number"
+                                                        value={_item.annual_leave_days}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newAnnual_leave_days = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                annual_leave_days: newAnnual_leave_days.toString(),
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    日
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={comp_timeRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type="number"
+                                                        value={_item.comp_time}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newComp_time = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                comp_time: newComp_time.toString(),
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    日
+                                                </span>
+                                                <span>
                                                     <button onClick={() => {
                                                         setCurrentEmp(_item.id);
                                                         setLeavedaybar(true);
@@ -911,6 +1273,29 @@ export default function SalarySettlement() {
                                                 </span>
                                                 <span>
                                                     <input
+                                                        ref={income_tax_peopleRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type={editall ? "number" : "text"}
+                                                        value={editall ? _item.income_tax_people : Number(_item.income_tax_people).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newIncome_tax_people = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                income_tax_people: editall ? newIncome_tax_people : parseFloat(newIncome_tax_people.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    人
+                                                </span>
+                                                <span>
+                                                    <input
                                                         ref={labor_insurance_feeRefs.current[index]}
                                                         style={{
                                                             backgroundColor: 'transparent',
@@ -952,6 +1337,75 @@ export default function SalarySettlement() {
                                                             setData(newData);
                                                         }}
                                                     />
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={health_insurance_peopleRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type={editall ? "number" : "text"}
+                                                        value={editall ? _item.health_insurance_people : Number(_item.health_insurance_people).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newHealth_insurance_people = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                health_insurance_people: editall ? newHealth_insurance_people : parseFloat(newHealth_insurance_people.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    人
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={late_timeRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type={editall ? "number" : "text"}
+                                                        value={editall ? _item.late_time : Number(_item.late_time).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newLate_time = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                late_time: editall ? newLate_time : parseFloat(newLate_time.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    次
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={late_minuteRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type={editall ? "number" : "text"}
+                                                        value={editall ? _item.late_minute : Number(_item.late_minute).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newLate_minute = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                late_minute: editall ? newLate_minute : parseFloat(newLate_minute.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                    分
                                                 </span>
                                                 <span>
                                                     <input
@@ -1005,19 +1459,21 @@ export default function SalarySettlement() {
                     title={null}
                     footer={
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
-                            <button
-                                className={scss.minitabbtn}
-                                onClick={() => {
-                                    seteditbtn(!editbtn);
-                                    setOriginalLeavedata(leavedata);
-                                }}
-                                style={{
-                                    display: `${editbtn === false ? '' : 'none'}`,
-                                    margin: '0px 20px'
-                                }}
-                            >
-                                編輯
-                            </button>
+                            <span style={{display:`${viewtype==="review"?'none':''}`}}>
+                                <button
+                                    className={scss.minitabbtn}
+                                    onClick={() => {
+                                        seteditbtn(!editbtn);
+                                        setOriginalLeavedata(leavedata);
+                                    }}
+                                    style={{
+                                        display: `${editbtn === false ? '' : 'none'}`,
+                                        margin: '0px 20px'
+                                    }}
+                                >
+                                    編輯
+                                </button>
+                            </span>
                             <button
                                 className={scss.minitabbtn}
                                 onClick={() => {
@@ -1066,7 +1522,7 @@ export default function SalarySettlement() {
                         <span>日數</span>
                         <span></span>
                     </div>
-                    <div className={scss.body_content1} style={{ overflowY: 'auto'}}>
+                    <div className={scss.body_content1} style={{ overflowY: 'auto' }}>
                         {leavedata && leavedata.map((item, index) => (
                             <CellWithBar key={index} className={scss.panelHeader2}>
                                 <div className={scss.row01}>
@@ -1133,6 +1589,40 @@ export default function SalarySettlement() {
 
 
                 </Modal>
+
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+                </DragableModal>
 
 
 
