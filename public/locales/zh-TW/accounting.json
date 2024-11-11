@@ -45,8 +45,10 @@
     "goods_spec": "規格",
     "detail": "明細資料",
     "addDetail": "新增明細資料",
+    "selectDetail": "選擇明細資料",
     "selectInvoice": "選擇發票",
-    "clearInvoiceWarning": "清除發票將一併清除明細資料"
+    "clearInvoiceWarning": "清除發票將一併清除明細資料",
+    "unclosedInvoices": "未結案發票"
   },
   "prodreceipt": {
     "prodreceiptid": "進貨單號",

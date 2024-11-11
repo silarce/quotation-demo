@@ -45,8 +45,10 @@
     "goods_spec": "Spec",
     "detail": "Detail",
     "addDetail": "Add Detail",
+    "selectDetail": "Select Detail",
     "selectInvoice": "Select Invoice",
-    "clearInvoiceWarning": "Clear Invoice will also clear the detail"
+    "clearInvoiceWarning": "Clear Invoice will also clear the detail",
+    "unclosedInvoices": "Unclosed Invoices"
   },
   "prodreceipt": {
     "prodreceiptid": "Prodreceipt ID",
