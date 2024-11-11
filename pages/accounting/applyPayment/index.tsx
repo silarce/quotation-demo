@@ -313,6 +313,12 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
     setDisabled(false);
   };
 
+  const handleEdit = data_applyPayment
+    ? () => {
+        setDisabled(false);
+      }
+    : null;
+
   // --------------------------------------------------------------------------
 
   useEffect(() => {
@@ -343,7 +349,7 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
           disabled={disabled}
           onSearchClick={handleSearch}
           onCancelClick={() => setDisabled(true)}
-          onEditClick={() => setDisabled(false)}
+          onEditClick={handleEdit}
           onAddClick={handleAdd}
           onConfirmClick={handleConfirm}
         />
@@ -493,7 +499,7 @@ const BtnBar = ({
   disabled: boolean;
   onSearchClick: () => void;
   onCancelClick: () => void;
-  onEditClick: () => void;
+  onEditClick: null | undefined | (() => void);
   onAddClick: () => void;
   onConfirmClick: () => void;
 }) => {
@@ -514,7 +520,7 @@ const BtnBar = ({
         {disabled && (
           <>
             <SquareBtn content="add" onClick={onAddClick} />
-            <SquareBtn content="edit" onClick={onEditClick} />
+            {onEditClick && <SquareBtn content="edit" onClick={onEditClick} />}
           </>
         )}
       </>
