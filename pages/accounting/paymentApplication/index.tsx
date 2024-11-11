@@ -13,7 +13,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
-import { useReviewFlow } from 'components/composition/review/reviewFlow_2';
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelecor';
 
 // gear
