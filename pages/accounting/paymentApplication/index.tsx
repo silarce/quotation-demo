@@ -133,6 +133,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   // --------------------------------------------------------------------------
 
   // region API
+  //
+  //
+  //
 
   // region reqAdd
   const reqAdd = async () => {
@@ -549,9 +552,16 @@ const Profile = ({
 
       <InputSel
         {...inputSelConfig_profile}
-        caption={t('applicant_department')}
+        caption={t('applicant_date')}
         showBaseline="invisible"
         node={getTaiwanDateStr(state.applicant_date?.toISOString() || null)}
+      />
+
+      <InputSel
+        {...inputSelConfig_profile}
+        caption={t('applicant_department')}
+        showBaseline="invisible"
+        node={state.applicant_department}
       />
 
       <InputSel
@@ -561,7 +571,6 @@ const Profile = ({
         node={state.agent?.chName}
       />
 
-      <div></div>
       {/*  */}
       <InputSel
         {...inputSelConfig_profile}
@@ -590,20 +599,6 @@ const Profile = ({
       <div></div>
       <div></div>
       {/*  */}
-      <InputSel
-        {...inputSelConfig_profile}
-        caption={t('applicant_date')}
-        inputProps={{
-          props: {
-            value: state.offset_method,
-            onChange: (e) => {
-              setState((prev) => {
-                return { ...prev, offset_method: e.target.value };
-              });
-            },
-          },
-        }}
-      />
 
       {/* <InputSel
         {...inputSelConfig_profile}
