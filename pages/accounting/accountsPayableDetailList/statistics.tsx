@@ -23,7 +23,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import ReviewFlowSelector, { apiAddReivew, reqSentReviewStop } from 'components/composition/review/reviewFlowSelecor';
 // import { useReviewFlow } from 'components/composition/review/reviewFlow';
-import { useReviewFlow } from 'components/composition/review/reviewFlow_2';
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
 
 // icon
 import { IconRemove02, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';

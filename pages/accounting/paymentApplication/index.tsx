@@ -102,8 +102,7 @@ interface TstateDetail {
 export type { TstateDetail };
 
 // =========================================================================
-export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
-  const username = userInfo.username;
+export default function PaymentApplication({ userInfo }: { userInfo: TuserDto }) {
   const userId = userInfo?.employee?.id;
 
   const router = useRouter();
@@ -133,6 +132,9 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
   // --------------------------------------------------------------------------
 
   // region API
+  //
+  //
+  //
 
   // region reqAdd
   const reqAdd = async () => {
@@ -297,6 +299,8 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
   const handleSearch = () => {
     DragableModal.create({
+      // handleText: '選擇付款申請單',
+      handleText: t('selectPaymentApplication'),
       children: (
         <SearchModal_paymentOrder
           limit={1}
@@ -518,6 +522,7 @@ const Profile = ({
 
   const selectCustomer = () => {
     const { unmount } = DragableModal.create({
+      handleText: t_common('selectSupplier'),
       children: (
         <SearchModal_customer
           onRowClick={async (customer) => {
@@ -549,9 +554,16 @@ const Profile = ({
 
       <InputSel
         {...inputSelConfig_profile}
-        caption={t('applicant_department')}
+        caption={t('applicant_date')}
         showBaseline="invisible"
         node={getTaiwanDateStr(state.applicant_date?.toISOString() || null)}
+      />
+
+      <InputSel
+        {...inputSelConfig_profile}
+        caption={t('applicant_department')}
+        showBaseline="invisible"
+        node={state.applicant_department}
       />
 
       <InputSel
@@ -561,7 +573,6 @@ const Profile = ({
         node={state.agent?.chName}
       />
 
-      <div></div>
       {/*  */}
       <InputSel
         {...inputSelConfig_profile}
@@ -590,20 +601,6 @@ const Profile = ({
       <div></div>
       <div></div>
       {/*  */}
-      <InputSel
-        {...inputSelConfig_profile}
-        caption={t('applicant_date')}
-        inputProps={{
-          props: {
-            value: state.offset_method,
-            onChange: (e) => {
-              setState((prev) => {
-                return { ...prev, offset_method: e.target.value };
-              });
-            },
-          },
-        }}
-      />
 
       {/* <InputSel
         {...inputSelConfig_profile}

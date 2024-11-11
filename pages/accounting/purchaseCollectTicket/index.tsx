@@ -170,6 +170,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // MARK:handleSelectTicket
   const handleSelectTicket = () => {
     DragableModal.create({
+      // 進貨收票單
+      handleText: t('purchaseCollectTicket'),
       children: (
         <SearchModal_purchaseCollectTicket
           limit={1}
@@ -189,6 +191,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // MARK:handleSelectInvoice
   const handleSelectInvoice = () => {
     const { unmount } = DragableModal.create({
+      // handleText: '未結案發票',
+      handleText: t('unclosedInvoices'),
       children: (
         <SearchModal_prodreceipt
           limit={1}
@@ -233,6 +237,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   // MARK: handleSelectDetail
   const handleSelectDetail = () => {
     const { unmount } = DragableModal.create({
+      // 選擇明細資料
+      handleText: t('selectDetail'),
       children: (
         <SearchModal_prodreceipt
           options={{
@@ -349,7 +355,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           <div className="mt-2 ">
             <div>
               <span className="text-xl text-main mr-5">{t('detail')}</span>
-              {!disabled && <SquareBtn label={t('addDetail')} sharp="mini" onClick={handleSelectDetail} />}
+              {!disabled && (
+                <SquareBtn className={classNames()} label={t('addDetail')} sharp="mini" onClick={handleSelectDetail} />
+              )}
             </div>
             <div className={classNames('mt-2', scss.table)}>
               <Detail_thead className={scss.thead} />
