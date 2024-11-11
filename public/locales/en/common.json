@@ -33,5 +33,13 @@
   "total": "Total",
   "clear": "Clear",
   "cancel": "Cancel",
-  "return": "Return"
+  "return": "Return",
+  "edit": "Edit",
+  "sentReview": "Sent Review",
+  "sentReviewStop": "Sent Review Stop",
+  "select": "Select ",
+  "customer": "Customer",
+  "form": "Form",
+  "selectCustomer": "選擇客戶",
+  "selectSupplier": "Select Supplier"
 }

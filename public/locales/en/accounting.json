@@ -7,7 +7,7 @@
     "accountName": "Account Name"
   },
   "applyPayment": {
-    "applyPayment": "Apply Payment",
+    "applyPayment": "Apply Payment ",
     "serial_number": "Serial Number",
     "payment_date": "Payment Date",
     "applicant_department": "Applicant Department",
@@ -45,8 +45,10 @@
     "goods_spec": "Spec",
     "detail": "Detail",
     "addDetail": "Add Detail",
+    "selectDetail": "Select Detail",
     "selectInvoice": "Select Invoice",
-    "clearInvoiceWarning": "Clear Invoice will also clear the detail"
+    "clearInvoiceWarning": "Clear Invoice will also clear the detail",
+    "unclosedInvoices": "Unclosed Invoices"
   },
   "prodreceipt": {
     "prodreceiptid": "Prodreceipt ID",
@@ -68,6 +70,7 @@
   },
   "paymentOrder": {
     "paymentApplication": "Payment Application",
+    "selectPaymentApplication": "Select Payment Application",
     "serial_number": "Serial Number",
     "applicant_department": "Applicant Department",
     "offset_method": "Offset Method",

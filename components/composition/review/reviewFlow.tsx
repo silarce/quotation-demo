@@ -1,51 +1,28 @@
-import { useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Image from 'next/image';
 
-import { useGetReivewById } from 'js/api/api_netCore/api_review';
+import { TgetReivewById, useGetReivewById } from 'js/api/api_netCore/api_review';
 
 import icon_review from 'public/image/icon/review.svg';
 
 // ======================================================================
 
-interface TimperativeHandle {
-  update: () => void;
-}
-
 interface Tprops {
-  document_uuid?: string | undefined;
   className?: string;
   className_stage?: string;
+  raw: TgetReivewById[] | undefined;
 }
 
 // ======================================================================
-const ReviewFlow_pre = (props: Tprops = {}, ref: React.ForwardedRef<TimperativeHandle>) => {
-  // const ref = useRef<TimperativeHandle>(null);
-
-  const { className, className_stage } = props;
-
-  const router = useRouter();
-  const query = router.query as { id?: string | undefined };
-  const document_uuid = props.document_uuid || query.id;
-
-  const { raw, update } = useGetReivewById(document_uuid);
-
+const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
   const reviewFlow = raw?.[0];
   const haveReviewFlow = !!reviewFlow && reviewFlow.stages.length > 0;
 
   // ----------------------------------------------------------------------
-
-  useImperativeHandle(
-    ref,
-    (): TimperativeHandle => ({
-      update,
-    })
-  );
-
-  // ----------------------------------------------------------------------
   return (
-    <div className={classNames('border-b border-border flex flex-wrap gap-5', className)}>
+    <div className={classNames('border-b border-border flex flex-wrap gap-5 min-h-14', className)}>
       {!haveReviewFlow && <span className="text-lg text-border">無審核流程</span>}
       {reviewFlow?.stages.map((stage, index) => {
         const { review_person, review_time, review_title } = stage;
@@ -64,20 +41,29 @@ const ReviewFlow_pre = (props: Tprops = {}, ref: React.ForwardedRef<TimperativeH
   );
 };
 
-const ReviewFlow = forwardRef(ReviewFlow_pre);
+const useReviewFlow = ({
+  uuid,
+  autoUpdate = true,
+}: {
+  uuid?: string;
+  autoUpdate?: boolean;
+} = {}) => {
+  const router = useRouter();
+  const query = router.query as { id?: string | undefined };
+  const document_uuid = uuid || query.id;
 
-const useReviewFlow = () => {
-  const ref = useRef<TimperativeHandle>(null);
+  const { raw, update, isFetching, isFirstLoaded } = useGetReivewById(document_uuid, { autoUpdate });
 
-  const ReviewFlow_ref = useCallback((props: Tprops = {}) => {
-    return <ReviewFlow {...props} ref={ref} />;
-  }, []);
+  const ReviewFlow = useCallback((props: Omit<Tprops, 'raw'>) => <ReviewFlow_pre raw={raw} {...props} />, [raw]);
 
   return {
-    ReviewFlow: ReviewFlow_ref,
-    update: ref.current?.update,
+    ReviewFlow,
+    reviewFlow: raw?.[0],
+    reviewFlowArr: raw,
+    isFetching,
+    isFirstLoaded,
+    update,
   };
 };
 
-export default ReviewFlow;
 export { useReviewFlow };

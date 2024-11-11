@@ -395,6 +395,8 @@ export default function ApplyPayment({ userInfo, isAdmin }: { userInfo: TuserDto
 
 const useDetailArr = (detailArr: TpurchaseInvoice_Dto[] | undefined, disabled: boolean) => {
   const defaultState = useMemo(() => {
+    detailArr = _.sortBy(detailArr, ['create_at']);
+
     const detailDict = detailArr?.reduce((acc, item) => {
       return { ...acc, [item.id]: item };
     }, {});
