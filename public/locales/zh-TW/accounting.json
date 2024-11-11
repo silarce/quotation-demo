@@ -70,6 +70,7 @@
   },
   "paymentOrder": {
     "paymentApplication": "付款申請",
+    "selectPaymentApplication": "選擇付款申請單",
     "serial_number": "付款申請單號",
     "applicant_department": "申請單位",
     "offset_method": "沖銷方式",

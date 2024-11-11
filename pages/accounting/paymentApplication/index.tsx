@@ -102,8 +102,7 @@ interface TstateDetail {
 export type { TstateDetail };
 
 // =========================================================================
-export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: TuserDto; isAdmin: boolean }) {
-  const username = userInfo.username;
+export default function PaymentApplication({ userInfo }: { userInfo: TuserDto }) {
   const userId = userInfo?.employee?.id;
 
   const router = useRouter();
@@ -300,6 +299,8 @@ export default function PaymentApplication({ userInfo, isAdmin }: { userInfo: Tu
 
   const handleSearch = () => {
     DragableModal.create({
+      // handleText: '選擇付款申請單',
+      handleText: t('selectPaymentApplication'),
       children: (
         <SearchModal_paymentOrder
           limit={1}
@@ -521,6 +522,7 @@ const Profile = ({
 
   const selectCustomer = () => {
     const { unmount } = DragableModal.create({
+      handleText: t_common('selectSupplier'),
       children: (
         <SearchModal_customer
           onRowClick={async (customer) => {

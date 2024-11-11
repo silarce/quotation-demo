@@ -7,7 +7,7 @@
     "accountName": "Account Name"
   },
   "applyPayment": {
-    "applyPayment": "Apply Payment",
+    "applyPayment": "Apply Payment ",
     "serial_number": "Serial Number",
     "payment_date": "Payment Date",
     "applicant_department": "Applicant Department",
@@ -70,6 +70,7 @@
   },
   "paymentOrder": {
     "paymentApplication": "Payment Application",
+    "selectPaymentApplication": "Select Payment Application",
     "serial_number": "Serial Number",
     "applicant_department": "Applicant Department",
     "offset_method": "Offset Method",
