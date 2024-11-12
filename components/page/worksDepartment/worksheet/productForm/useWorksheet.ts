@@ -133,7 +133,12 @@ type Tworksheet = {
 
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
+  //
 
+  calcTarget: 'fullWidth' | 'WG';
+  setCalcTarget: (value: 'fullWidth' | 'WG') => void;
+  // calcFullWidth: () => `${number}`;
+  // calcWG: () => `${number}`;
   //
   basicSpec: {
     quoteType: string;
@@ -309,7 +314,7 @@ type Tworksheet = {
   getOptions_accessories: () => Toption[];
 
   // -----------------------------------------------------------------------------
-  reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto | undefined>;
+  reqGeneralSpec: (calcTarget?: 'fullWidth' | 'WG') => Promise<TdoorGeneralSpecsDto | undefined>;
   update_generalSpec: () => Promise<void>;
   update_availableComponents: () => Promise<void>;
 
@@ -377,6 +382,19 @@ const useWorksheet = create<Tworksheet>(
 
       return isSpecial;
     },
+
+    //
+    calcTarget: 'fullWidth',
+    setCalcTarget: (value) => {
+      set(
+        produce((state) => {
+          state.calcTarget = value;
+          // state.basicSpec.fullWidth = '';
+          // state.basicSpec.WG = '';
+        })
+      );
+    },
+
     // ---------------------------------------------------------------------
 
     basicSpec: {
@@ -391,6 +409,7 @@ const useWorksheet = create<Tworksheet>(
       isAntiTyphoon: false,
       area: '',
       volume: '',
+
       setBasicSpec_quoteType: (value) => {
         get().setDoorModelInfo(undefined);
         set(
@@ -506,6 +525,22 @@ const useWorksheet = create<Tworksheet>(
           produce<Tworksheet>((state) => {
             state.generalSpec && (state.generalSpec.gapA = Number(value));
             state.shouldCalcData2 = true;
+
+            const calcTarget = state.calcTarget;
+
+            if (calcTarget === 'fullWidth') {
+              state.basicSpec.WG = calcWG_M({
+                fullWidth_M: Number(state.basicSpec.fullWidth),
+                gapA: state.generalSpec?.gapA ?? 0,
+                gapC: state.generalSpec?.gapC ?? 0,
+              }).toString();
+            } else if (calcTarget === 'WG') {
+              state.basicSpec.fullWidth = calcFullWidth_M({
+                WG: Number(state.basicSpec.WG),
+                gapA: state.generalSpec?.gapA ?? 0,
+                gapC: state.generalSpec?.gapC ?? 0,
+              }).toString();
+            }
           })
         );
       },
@@ -514,6 +549,22 @@ const useWorksheet = create<Tworksheet>(
           produce<Tworksheet>((state) => {
             state.generalSpec && (state.generalSpec.gapC = Number(value));
             state.shouldCalcData2 = true;
+
+            const calcTarget = state.calcTarget;
+
+            if (calcTarget === 'fullWidth') {
+              state.basicSpec.WG = calcWG_M({
+                fullWidth_M: Number(state.basicSpec.fullWidth),
+                gapA: state.generalSpec?.gapA ?? 0,
+                gapC: state.generalSpec?.gapC ?? 0,
+              }).toString();
+            } else if (calcTarget === 'WG') {
+              state.basicSpec.fullWidth = calcFullWidth_M({
+                WG: Number(state.basicSpec.WG),
+                gapA: state.generalSpec?.gapA ?? 0,
+                gapC: state.generalSpec?.gapC ?? 0,
+              }).toString();
+            }
           })
         );
       },
@@ -1045,7 +1096,7 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
     // MARK: reqGeneralSpec
-    reqGeneralSpec: async () => {
+    reqGeneralSpec: async (calcTarget = get().calcTarget) => {
       type Tbody = {
         modelName: string;
         fullWidth: number | undefined;
@@ -1062,12 +1113,23 @@ const useWorksheet = create<Tworksheet>(
         isAntiTyphoon: get().basicSpec.isAntiTyphoon,
       };
 
-      if (body.fullWidth) {
+      // if (body.fullWidth) {
+      //   body.WG = undefined;
+      // } else if (body.WG) {
+      //   body.fullWidth = undefined;
+      // } else if (!body.fullWidth && !body.WG) {
+      //   body.fullWidth = 0;
+      // }
+      if (calcTarget === 'fullWidth') {
         body.WG = undefined;
-      } else if (body.WG) {
+      } else if (calcTarget === 'WG') {
         body.fullWidth = undefined;
-      } else if (!body.fullWidth && !body.WG) {
-        body.fullWidth = 0;
+      }
+
+      if (!body.fullWidth && !body.WG) {
+        myAlert.warning({ title: '請輸入全寬或WG' });
+
+        return;
       }
 
       try {
@@ -1082,6 +1144,8 @@ const useWorksheet = create<Tworksheet>(
     },
     // MARK:update_generalSpec
     update_generalSpec: async () => {
+      // const { calcTarget } = get();
+
       const generalSpec = await get().reqGeneralSpec();
       set(
         produce<Tworksheet>((state) => {
@@ -1143,6 +1207,7 @@ const useWorksheet = create<Tworksheet>(
     //  MARK:calcData
     calcData: async () => {
       const {
+        calcTarget,
         basicSpec,
         getIsSpecialProd,
         update_generalSpec,
@@ -1165,6 +1230,19 @@ const useWorksheet = create<Tworksheet>(
 
         return;
       }
+
+      if (calcTarget === 'fullWidth' && !basicSpec.fullWidth) {
+        myAlert.warning({ title: '請輸入全寬' });
+
+        return;
+      } else if (calcTarget === 'WG' && !basicSpec.WG) {
+        myAlert.warning({ title: '請輸入WG' });
+
+        return;
+      }
+
+      // ___________________________________________________________________
+      // ___________________________________________________________________
 
       const material = (() => {
         if (basicSpec.doorModelName === 'SJ-305D') {
@@ -1216,15 +1294,15 @@ const useWorksheet = create<Tworksheet>(
       // _____________________________________________________________________
       // _____________________________________________________________________
 
-      set(
-        produce((state) => {
-          const basicSpec = state.basicSpec;
+      // set(
+      //   produce((state) => {
+      //     const basicSpec = state.basicSpec;
 
-          if (basicSpec.fullWidth) {
-            basicSpec.WG = '';
-          }
-        })
-      );
+      //     if (basicSpec.fullWidth) {
+      //       basicSpec.WG = '';
+      //     }
+      //   })
+      // );
 
       await update_generalSpec();
 
@@ -1238,6 +1316,30 @@ const useWorksheet = create<Tworksheet>(
           state.motor.vendor = defaultVendor;
           state.ABCD.boxB = String(defaultBoxB ?? '');
           state.ABCD.boxD = String(defaultBoxD ?? '');
+
+          // 為了更新fullWidth或WG
+          state.ABCD.setGapA(state.generalSpec.gapA);
+          state.ABCD.setGapC(state.generalSpec.gapC);
+        })
+      );
+
+      set(
+        produce<Tworksheet>((state) => {
+          const calcTarget = state.calcTarget;
+
+          if (calcTarget === 'fullWidth') {
+            state.basicSpec.WG = calcWG_M({
+              fullWidth_M: Number(state.basicSpec.fullWidth),
+              gapA: state.generalSpec?.gapA ?? 0,
+              gapC: state.generalSpec?.gapC ?? 0,
+            }).toString();
+          } else if (calcTarget === 'WG') {
+            state.basicSpec.fullWidth = calcFullWidth_M({
+              WG: Number(state.basicSpec.WG),
+              gapA: state.generalSpec?.gapA ?? 0,
+              gapC: state.generalSpec?.gapC ?? 0,
+            }).toString();
+          }
         })
       );
 
@@ -1319,26 +1421,26 @@ const useWorksheet = create<Tworksheet>(
       // ______________________________________________________________________
 
       // 計算fullWidth或WG
-      set(
-        produce<Tworksheet>((state) => {
-          const { basicSpec, ABCD, getFullWidth_mm, getWG_mm } = state;
+      // 沒有必要，在calcData與編輯gapA或gapC時就計算了
+      // set(
+      //   produce<Tworksheet>((state) => {
+      //     const calcTarget = state.calcTarget;
 
-          if (basicSpec.fullWidth) {
-            const WG_mm = new Decimal(getFullWidth_mm()) //
-              .minus(ABCD.getGapA())
-              .minus(ABCD.getGapC())
-              .toNumber();
-            basicSpec.WG = new Decimal(WG_mm).div(1000).toString();
-          } else if (basicSpec.WG) {
-            const fullWidth_mm = new Decimal(getWG_mm()) //
-              .add(ABCD.getGapA())
-              .add(ABCD.getGapC())
-              .toNumber();
-            basicSpec.fullWidth = new Decimal(fullWidth_mm).div(1000).toString();
-          }
-          //
-        })
-      );
+      //     if (calcTarget === 'fullWidth') {
+      //       state.basicSpec.WG = calcWG_M({
+      //         fullWidth_M: Number(state.basicSpec.fullWidth),
+      //         gapA: state.generalSpec?.gapA ?? 0,
+      //         gapC: state.generalSpec?.gapC ?? 0,
+      //       }).toString();
+      //     } else if (calcTarget === 'WG') {
+      //       state.basicSpec.fullWidth = calcFullWidth_M({
+      //         WG: Number(state.basicSpec.WG),
+      //         gapA: state.generalSpec?.gapA ?? 0,
+      //         gapC: state.generalSpec?.gapC ?? 0,
+      //       }).toString();
+      //     }
+      //   })
+      // );
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1427,14 +1529,29 @@ const useWorksheet = create<Tworksheet>(
       // ______________________________________________________________________
       // ______________________________________________________________________
 
+      const { slatLength } = (await get().reqGeneralSpec('WG')) ?? {};
+
+      if (!slatLength) {
+        myAlert.warning({ title: '取得門片長度失敗' });
+
+        return;
+      }
+
+      set(
+        produce((state) => {
+          state.generalSpec.slatLength = slatLength;
+        })
+      );
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+
       const generateDoorProductBom = takeGenerateDoorProductBom({
         worksheet: worksheet,
         avalibleComponentIdList,
       });
 
       let doorProductBom: TdoorProductBomDto | undefined = undefined;
-
-      // if()
 
       if (generateDoorProductBom) {
         try {
@@ -2320,6 +2437,36 @@ const reduceMaterialSurface = (materialSurface: string) => {
   }
 
   return materialSurface;
+};
+
+const calcFullWidth_M = ({ gapA: gapA_mm, gapC: gapC_mm, WG: WG_M }: { gapA: number; gapC: number; WG: number }) => {
+  const fullWidth_M = new Decimal(WG_M) //
+    .mul(1000)
+    .add(gapA_mm)
+    .add(gapC_mm)
+    .div(1000)
+    .toNumber();
+
+  return fullWidth_M;
+};
+
+const calcWG_M = ({
+  gapA: gapA_mm,
+  gapC: gapC_mm,
+  fullWidth_M: fullWidth,
+}: {
+  gapA: number;
+  gapC: number;
+  fullWidth_M: number;
+}) => {
+  const WG_M = new Decimal(fullWidth) //
+    .mul(1000)
+    .minus(gapA_mm)
+    .minus(gapC_mm)
+    .div(1000)
+    .toNumber();
+
+  return WG_M;
 };
 
 const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', '雙排'];

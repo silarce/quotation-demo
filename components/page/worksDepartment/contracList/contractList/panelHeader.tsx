@@ -12,6 +12,7 @@ import iconPlace from 'public/image/icon/place.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 type TtheadInfo = {
+  contractId: string;
   contractNumber: string;
   customerName: string;
   contactName: string;
@@ -25,6 +26,13 @@ type TtheadInfo = {
   projectName: string;
   alertLight?: boolean;
   remindLight?: boolean;
+  //
+  QtyOfProjectPatternForReview: number;
+  QtyOfWorkwheetForReview: number;
+
+  unReviewPicture: number;
+  unReviewWorkSheet: number;
+  //
 };
 
 // ===============================================================
@@ -56,11 +64,15 @@ export default function PanelHeader({
     // totalPrice: budgetAmount,
     alertLight,
     remindLight,
+
+    unReviewPicture,
+    unReviewWorkSheet,
   } = contract;
   const { date, county: country, projectName } = contract;
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive} onClick={onClick}>
+      {/* row01 */}
       <div ref={viewRef} className={scss.row01}>
         <span>{contractNumber}</span>
         <span className={scss.clientName}>{clientName}</span>
@@ -74,6 +86,7 @@ export default function PanelHeader({
           <IconDetail onClick={openQuotation} />
         </div>
       </div>
+      {/* row02 */}
       <div className={scss.row02}>
         <span>{date}</span>
         <div className={scss.place}>
@@ -91,6 +104,17 @@ export default function PanelHeader({
           <span>已出具說明，尚未收足款項</span>
         </div>
         <div></div>
+      </div>
+      {/* row03 */}
+      <div className={scss.row03}>
+        <p>
+          應審核工程圖表 :　
+          <span className={classNames(scss.num, unReviewPicture && scss.active)}>{unReviewPicture}</span>
+        </p>
+        <p>
+          應審核工作表 :　
+          <span className={classNames(scss.num, unReviewWorkSheet && scss.active)}>{unReviewWorkSheet}</span>
+        </p>
       </div>
     </CellWithBar>
   );

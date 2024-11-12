@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
-
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -19,7 +19,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 
 // type
 import type { Toption } from 'js/utils/options/options';
-import type { TaccountantDto } from 'js/api/dtoTypes';
+import type { TaccountantDto, TcustomerDto } from 'js/api/dtoTypes';
 import type { AxiosError } from 'axios';
 
 // icon
@@ -52,6 +52,8 @@ import {
 
 import { Tcurrency } from 'js/api/dtoTypes';
 
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
+
 // ______________________________________________________________
 // ______________________________________________________________
 
@@ -76,7 +78,6 @@ type Tstate_accountant = {
   importAccountingNumber: string;
   noteNumber: string;
   accountingNumber: string;
-  vendorName: string;
   billSerialNumber: string[];
   notes: string;
 
@@ -96,6 +97,10 @@ type Tstate_accountant = {
 
   // 已分出金額
   readonly splitPayment: number[];
+  //
+  vendorName: string;
+  vendorCustomerId: string | null;
+  vendorCustomer: TcustomerDto | undefined;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -159,7 +164,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   // region get Data
 
   const {
-    data: data_accountant,
+    data: data_accountant_raw,
     update: update_accountant,
     isFetching,
   } = useGetAccountant({
@@ -170,7 +175,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
-        populate: ['incomeBill.accountsReceivableDeduction'],
+        populate: ['incomeBill.accountsReceivableDeduction', 'vendorCustomer'],
         sort: 'insertDate',
         pageSize: 999999,
         filter: {
@@ -190,6 +195,22 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   const { data: data_accountantPreset } = useGetAccountantPreset();
 
+  const data_accountant = useMemo(() => {
+    const sortedData_accountant = _.orderBy(
+      data_accountant_raw,
+      (data) => {
+        // 之前更新insertDate的時候時分秒沒有歸零，使的排序出問題，因此在這裡歸零
+        const { insertDate, createdAt } = data;
+        const insertDate_format = moment(insertDate).format('YYYY-MM-DD');
+
+        return [insertDate_format, createdAt];
+      },
+      ['asc', 'asc']
+    );
+
+    return sortedData_accountant;
+  }, [data_accountant_raw]);
+
   // ----------------------------------------------------------------------------
   // region REQUEST
 
@@ -200,26 +221,28 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return;
     }
 
-    if (!state_accountant.insertDate) {
+    const { vendorCustomer, ...preBody } = state_accountant;
+
+    if (!preBody.insertDate) {
       myAlert.info({ title: '請選擇日期' });
 
       return;
     }
 
     const body: TcreateAccountantDto = {
-      ...state_accountant,
-      insertDate: state_accountant.insertDate.toISOString(true),
+      ...preBody,
+      insertDate: preBody.insertDate.toISOString(true),
       paymentType,
-      price: Number(state_accountant.price),
+      price: Number(preBody.price),
       fee: 0,
-      noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
-      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      noteMaturityDate: preBody.noteMaturityDate?.toISOString(true),
+      receiptCollectionDate: preBody.receiptCollectionDate?.toISOString(true) ?? null,
       // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
-      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
-      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
-      currency: state_accountant.currency,
-      exchangeRate: state_accountant.exchangeRate ? (state_accountant.exchangeRate as `${number}`) : '0',
-      currencyValue: state_accountant.currencyValue ? (state_accountant.currencyValue as `${number}`) : '0',
+      receiptEstimatedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: preBody.currency,
+      exchangeRate: preBody.exchangeRate ? (preBody.exchangeRate as `${number}`) : '0',
+      currencyValue: preBody.currencyValue ? (preBody.currencyValue as `${number}`) : '0',
     };
 
     await apiPostAccountant({ body });
@@ -244,6 +267,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       // ...state_accountant,
       accountingNumber: state_accountant.accountingNumber,
       vendorName: state_accountant.vendorName,
+      vendorCustomerId: state_accountant.vendorCustomerId,
       notes: state_accountant.notes,
       importAccountingNumber: state_accountant.importAccountingNumber,
       noteNumber: state_accountant.noteNumber,
@@ -329,9 +353,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const handle_import = ({
     accountReceivableId,
     accountantWillImport,
+    currency,
   }: {
     accountReceivableId: string;
     accountantWillImport: TaccountantDto;
+    currency: string;
   }) => {
     const quota = calcQuota(accountantWillImport);
 
@@ -344,8 +370,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)
           }
           onCancel={modal.destroy}
-          // defaultPayment={accountantWillImport.price}
           quota={quota}
+          currency={currency}
         />
       ),
     });
@@ -451,8 +477,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         <ContractSelector
           showModal={!!accountantWillImport}
           onConfirm={(arr) => {
-            const contractArr = arr[0];
-            const accountReceivableId: string | undefined | null = contractArr[0]?.accountReceivableId;
+            const contract = arr[0][0];
+            const accountReceivableId: string | undefined | null = contract?.accountReceivableId;
+
+            const accountantCurrency = accountantWillImport?.currency || ('TWD' as Tcurrency);
+            const contractCurrency = contract.currency;
 
             if (accountReceivableId === null) {
               myAlert.info({ title: '該合約尚未建立應收帳款' });
@@ -462,7 +491,18 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               handle_import({
                 accountReceivableId,
                 accountantWillImport: accountantWillImport!,
+                currency: cutCurrency(accountantCurrency),
               });
+
+              if (contractCurrency !== accountantCurrency) {
+                myAlert.warning({
+                  props: {
+                    title: (
+                      <span className="whitespace-pre-wrap">{`注意\n收款幣別(${accountantCurrency})\n合約幣別(${contractCurrency})\n幣別不一致`}</span>
+                    ),
+                  },
+                });
+              }
             }
           }}
           onCancel={() => {

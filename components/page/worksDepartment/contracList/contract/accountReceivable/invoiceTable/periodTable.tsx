@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import { Moment } from 'moment';
 
 // component
-import PeriodPanel, { Thead, Tbody, Tfoot } from './periodPanel';
+import PeriodPanel, { Thead, Tbody, Tfoot, CurrencyBox } from './periodPanel';
 import type { TimperativeHandle_panel, Tcenter } from './periodPanel';
 
 // gear
@@ -20,6 +20,8 @@ import type {
   TquotationProductDto,
   TcompletedProductDto,
   TretainageType,
+  TquotationContractDto,
+  TquotationContentOtherDto,
 } from 'js/api/dtoTypes';
 
 // api
@@ -107,6 +109,7 @@ type Tstate_period = {
   isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
   isOlderInvoice: boolean;
   //
+  contractArr: TquotationContractDto[];
 };
 
 type Tleft = {
@@ -134,18 +137,26 @@ export default function PeriodTable({
   className,
   data_finalProdcut = [],
   data_period = [],
+  data_otherArr = [],
   onAddConfirm,
   reqPatchInvoiceAllowance,
   reqDeleteInvoice,
   reqDeletePeriod,
+  readonly,
+  currency,
+  contractId,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
   data_period: TaccountsReceivablePeriodDto[] | undefined | null;
+  data_otherArr: TquotationContentOtherDto[] | undefined;
   onAddConfirm: (state_invoice: Tstate_period) => Promise<void>;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
   reqDeleteInvoice: (invoiceId: string) => void;
   reqDeletePeriod: (periodId: string) => void;
+  readonly?: boolean;
+  currency: string;
+  contractId: string | undefined;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
@@ -164,16 +175,19 @@ export default function PeriodTable({
 
   // --------------------------------------------------------------------------
 
-  const { finalProdList, finalProdArr } = useMemo(() => {
+  const {
+    //  finalProdList,
+    finalProdArr,
+  } = useMemo(() => {
     const data_finalProdcut_sorted = _.sortBy(data_finalProdcut, 'order');
 
-    const list: { [id: string]: TquotationProductDto } = {};
-    data_finalProdcut_sorted.forEach((prod) => {
-      list[prod.id] = prod;
-    });
+    // const list: { [id: string]: TquotationProductDto } = {};
+    // data_finalProdcut_sorted.forEach((prod) => {
+    //   list[prod.id] = prod;
+    // });
 
     return {
-      finalProdList: list,
+      // finalProdList: list,
       finalProdArr: data_finalProdcut_sorted,
     };
   }, [data_finalProdcut]);
@@ -265,7 +279,38 @@ export default function PeriodTable({
         itemName,
         size,
         qty: quantity,
-        contractPrice: unitPrice.toLocaleString(),
+        // contractPrice: unitPrice.toLocaleString(),
+        contractPrice: (
+          <CurrencyBox currency={'TWD'} width="120px">
+            {unitPrice.toLocaleString()}
+          </CurrencyBox>
+        ),
+      };
+    });
+
+    const rowArr_other: Tleft['rowArr'] = (data_otherArr ?? []).map((other) => {
+      const {
+        //
+        item,
+        quantity,
+        unitPrice,
+        spec,
+        // isDisplayedOnAccountReceivable,
+      } = other;
+
+      const otherTotalPrice = new Decimal(unitPrice || 0).mul(quantity || 0);
+      subTotal_d = subTotal_d.add(otherTotalPrice);
+
+      return {
+        itemName: item,
+        size: spec,
+        qty: quantity,
+        // contractPrice: unitPrice.toLocaleString(),
+        contractPrice: (
+          <CurrencyBox currency={currency} width="120px">
+            {unitPrice.toLocaleString()}
+          </CurrencyBox>
+        ),
       };
     });
 
@@ -278,12 +323,12 @@ export default function PeriodTable({
     };
 
     return {
-      rowArr,
+      rowArr: [...rowArr, ...rowArr_other],
       totals,
     };
 
     //
-  }, [finalProdArr]);
+  }, [finalProdArr, data_otherArr]);
 
   // --------------------------------------------------------------------------
 
@@ -382,16 +427,19 @@ export default function PeriodTable({
       {/*  */}
 
       <TopBar caption="請款明細">
-        <MyButton_v2
-          px="px22"
-          py="py4"
-          onClick={() => {
-            setIsAddingNew((prev) => !prev);
-          }}
-        >
-          {!isAddingNew ? '新增' : '取消'}
-        </MyButton_v2>
-        {isAddingNew && (
+        {!readonly && (
+          <MyButton_v2
+            px="px22"
+            py="py4"
+            onClick={() => {
+              setIsAddingNew((prev) => !prev);
+            }}
+          >
+            {!isAddingNew ? '新增' : '取消'}
+          </MyButton_v2>
+        )}
+
+        {isAddingNew && !readonly && (
           <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handel_onConfirm}>
             確認
           </MyButton_v2>
@@ -400,9 +448,17 @@ export default function PeriodTable({
 
       {/*  */}
       <div className={scss.table}>
-        <Left node_left={node_left} />
+        <Left node_left={node_left} currency={currency} />
 
-        {isAddingNew && <PeriodPanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
+        {isAddingNew && (
+          <PeriodPanel
+            ref={ref_newInvoicePanel}
+            finalProdArr={finalProdArr}
+            data_otherArr={data_otherArr}
+            currency={currency}
+            contractId={contractId}
+          />
+        )}
 
         {periodArr_sorted.map((data_invoice, index) => {
           return (
@@ -413,10 +469,12 @@ export default function PeriodTable({
               key={data_invoice.id}
               data_period={data_invoice}
               finalProdArr={finalProdArr}
+              data_otherArr={data_otherArr}
               onPanelStateChange={onPanelStateChange}
               reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
               reqDeleteInvoice={reqDeleteInvoice}
               reqDeletePeriod={reqDeletePeriod}
+              currency={currency}
             />
           );
         })}
@@ -424,8 +482,10 @@ export default function PeriodTable({
         <PeriodPanel
           //
           data_period={periodTotal}
+          data_otherArr={data_otherArr}
           finalProdArr={finalProdArr}
           totalsTotal={totalsTotal}
+          currency={currency}
         />
       </div>
     </div>
@@ -443,8 +503,10 @@ export default function PeriodTable({
 const Left = ({
   //
   node_left: { rowArr, totals },
+  currency,
 }: {
   node_left: Tleft;
+  currency: string;
 }) => {
   return (
     <div className={classNames(scss.invoice, scss.left)}>
@@ -457,7 +519,7 @@ const Left = ({
           <span>合約單價</span>
         </div>
       </Thead>
-      <Tbody totals={totals} isConrtract={true}>
+      <Tbody totals={totals} isConrtract={true} currency={currency}>
         {rowArr.map((row, index) => {
           const { itemName, size, qty, contractPrice } = row;
 

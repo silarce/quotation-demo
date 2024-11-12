@@ -1202,8 +1202,8 @@ export const useGetAccountReceivable = createUseInfinite<TgetAccountReceivableDt
   errTitle: '取得應收帳款明細列表失敗',
 });
 
-/**取得應收帳款明細 by id */
-const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
+// 取得應收帳款明細 by id
+export const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi
@@ -2095,6 +2095,7 @@ export const apiPostAccountReceivableAccounts = async (body: TcreateAccountRecei
     });
 };
 
+// 取得所有已開立發票 //w 注意，是已開立發票 invoiceStatus為"已開立" 的發票
 const apiGetAccountReceivableInvoices_all = async (params?: Tparams) => {
   const api = '/engineering/account-receivable/invoices';
 
@@ -2145,11 +2146,12 @@ export const useGetAccountReceivableInvoices_all = ({
   };
 };
 
+// 取得所有已開立發票 //w 注意，是已開立發票 invoiceStatus為"已開立" 的發票
 export const useGetAccountReceivableInvoices_all_infinite = createUseInfinite<
   TpageResponse<TaccountsReceivableInvoiceDto>
 >({
   apiClient: apiGetAccountReceivableInvoices_all,
-  errTitle: '取得發票列表失敗',
+  errTitle: '取得以開立發票列表失敗',
 });
 
 // ---------------------------------------------------------------------------

@@ -21,10 +21,26 @@
   input {
     background-color: transparent;
   }
+
+  &.style01 {
+    padding: 0 10px;
+  }
+
+  &.stickyTop {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  &.stickyBottom {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+  }
 }
 
 .cell {
   border-color: theme("colors.border");
+  flex: none;
 
   &:not(.unset) {
     padding: 10px 0;
@@ -45,8 +61,26 @@
 
   &.flex {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    // align-items: center;
+    // justify-content: center;
+    &.justifyContent-flex-start {
+      justify-content: flex-start;
+    }
+    &.justifyContent-center {
+      justify-content: center;
+    }
+    &.justifyContent-flex-end {
+      justify-content: flex-end;
+    }
+    &.alignItems-center {
+      align-items: center;
+    }
+    &.alignItems-flex-start {
+      align-items: flex-start;
+    }
+    &.alignItems-flex-end {
+      align-items: flex-end;
+    }
   }
 
   &.block {

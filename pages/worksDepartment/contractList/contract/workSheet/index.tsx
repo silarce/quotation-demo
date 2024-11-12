@@ -734,7 +734,11 @@ export default function Worksheet({
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        returnBtn={disabled}
+        panelList={panelList}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+      />
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
@@ -1066,7 +1070,7 @@ const useControl_pdf = ({
           weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
         },
         roller: {
-          diameter: `${item.diameter}"` ?? '', // 要有 " 符號，代表吋
+          diameter: item.diameter ? `${item.diameter}"` : '', // 要有 " 符號，代表吋
           bearingInnerDiameter: item.bearingInnerDiameter ?? '',
           bearingName: item.bearingName ?? '',
           bearingHousingTotalLength: item.bearingHousingTotalLength ?? '',

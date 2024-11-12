@@ -16,13 +16,14 @@ import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/ap
 
 type Tquery = {
   contractId: string | undefined;
+  editCertifiedDocument?: 'true' | undefined;
 };
 
 // ======================================================================
 
 export default function CertifiedDocument_page() {
   const router = useRouter();
-  const { contractId } = router.query as Tquery;
+  const { contractId, editCertifiedDocument } = router.query as Tquery;
 
   // -------------------------------------------------------------------
 
@@ -50,6 +51,7 @@ export default function CertifiedDocument_page() {
   return (
     <SubLayer>
       <PageHeader
+        returnBtn={!editCertifiedDocument}
         panelList={compositionPanelList}
         contractNumber={contract?.engineeringContact?.contractNumber ?? ''}
       />

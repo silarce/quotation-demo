@@ -18,7 +18,10 @@
     flex: none;
   }
   &:nth-last-of-type(1) {
-    border: none;
+    border-bottom: none;
+  }
+  &:nth-last-of-type(2) {
+    border-bottom: none;
   }
 }
 
@@ -41,18 +44,20 @@
 .tfoot {
   position: sticky;
   bottom: 0;
+  background-color: #fff;
+  border-top: solid 1px theme("colors.border");
 }
 
-.fee {
-  width: 100%;
-  text-align: right;
-  border-bottom: solid 1px black;
-  background-color: transparent;
+// .fee {
+//   width: 100%;
+//   text-align: right;
+//   border-bottom: solid 1px black;
+//   background-color: transparent;
 
-  &.disabled {
-    border-color: transparent;
-  }
-}
+//   &.disabled {
+//     border-color: transparent;
+//   }
+// }
 
 .price {
   text-align: right;

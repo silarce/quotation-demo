@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { axi } from './_axiosCreator';
+import { AxiosError } from './_axiosCreator';
 
 import { createUseInfinite } from './createUseInfinite';
 
@@ -145,15 +146,15 @@ export type TapiGetEmployee_idParams = {
   populate: Tpopulate;
 };
 
-const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
+export const apiGetEmployee_id = (id: string, params?: TapiGetEmployee_idParams) => {
   const api = `/employees/${id}`;
 
   return axi
-    .get(api, { params })
+    .get<TemployeeDto>(api, { params })
     .then(({ data }) => {
       return data;
     })
-    .catch((err) => false);
+    .catch((err: AxiosError) => Promise.reject(err));
 };
 
 export const useEmployeeById = (id: string, params?: TapiGetEmployee_idParams) => {

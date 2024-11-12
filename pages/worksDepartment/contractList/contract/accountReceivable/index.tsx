@@ -8,6 +8,7 @@ import _ from 'lodash';
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Profile, {
@@ -25,6 +26,8 @@ import DeductionDetail from 'components/page/worksDepartment/contracList/contrac
 import IncomeBillSorting, {
   Tstate_incomeBillSorting,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillSorting';
+// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -48,12 +51,22 @@ import {
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
 import type { TcustomerDto, TincomeBillSerialDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
 
 // css
 import scss from './index.module.scss';
 import { AxiosError } from 'axios';
 
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
+
+// hook
+// import { useProductList } from 'hooks/quotation/useProduct';
+
 // ========================================================================
+
+type Tquery = {
+  contractId: string | undefined;
+};
 
 type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
@@ -71,13 +84,20 @@ export const AccountReceivableContext = createContext<TaccountReceivableContext>
 
 // region START
 
-export default function AccountReceivable() {
+export default function AccountReceivable({
+  //
+  contractId: contractId_outside,
+  readonly = false,
+  showSubPageHeader = true,
+}: {
+  contractId?: string | undefined;
+  readonly?: boolean;
+  showSubPageHeader?: boolean;
+}) {
   const router = useRouter();
-  const { contractId } = router.query as { contractId: string | undefined };
+  const { contractId = contractId_outside } = router.query as Tquery;
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
-
-  let isFetching = false;
 
   // --------------------------------------------------------------------------
 
@@ -90,6 +110,7 @@ export default function AccountReceivable() {
   } = useGetContract_id(contractId, {
     customPopulate: [
       'content.customer',
+      'content.others',
       'engineeringContact',
 
       // 'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
@@ -97,16 +118,23 @@ export default function AccountReceivable() {
       // 'accountReceivable.periods.invoices.incomeBillList',
       // 'accountReceivable.periods.invoices.incomeBillSerialList',
       'accountReceivable.periods.invoices.incomeBillSerialList.invoices',
+      'accountReceivable.periods.invoices.incomeBillSerialList.accountsReceivableDeduction',
 
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
-      'accountReceivable.accountantList.accountsReceivableDeduction',
+      // 'accountReceivable.accountantList', // 棄用
       'accountReceivable.incomeBillList.accountant',
       'accountReceivable.incomeBillList.invoices',
+      'accountReceivable.incomeBillList.accountsReceivableDeduction',
+      //
+      'subContracts.content.products',
     ],
   });
 
-  const { engineeringContact, accountReceivable } = contract ?? {};
+  const { engineeringContact, accountReceivable, content } = contract ?? {};
+
+  // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
+  const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
 
   const {
     data: data_finalProdcut = [],
@@ -132,6 +160,38 @@ export default function AccountReceivable() {
       incomeBillList_noInvoice,
     };
   }, [accountReceivable?.incomeBillList]);
+
+  // const { productArr, latestQuotationDiscount } = useProdArr(contract);
+
+  // --------------------------------------------------------------------------
+
+  // const {
+  //   //
+  //   productList,
+  //   prodCellConfig,
+  //   prodKeyArr,
+  //   changeProdKeyArr,
+  //   //
+  //   othersKeyArr,
+  //   othersList,
+  //   othersCellConfig,
+  // } = useProductList({
+  //   productArr: productArr,
+  //   others: contract?.content.others ?? [],
+  //   averageDiscount: null,
+  //   resetTrigger: productArr,
+  //   quotationDiscount: Number(latestQuotationDiscount) || 100,
+  //   discount_fromData: Number(latestQuotationDiscount) || 100,
+  // });
+
+  // // 把金額隱藏
+  // const filteredProdKeyArr = prodKeyArr.filter((key) => {
+  //   if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
+  //     return false;
+  //   }
+
+  //   return true;
+  // });
 
   // --------------------------------------------------------------------------
 
@@ -227,6 +287,8 @@ export default function AccountReceivable() {
       businessIdNumber,
       isOriginalCustomer,
       isOlderInvoice,
+
+      contractArr,
     } = state_invoice;
 
     if (!isOlderInvoice && (accountantInvoiceBook || actualPrice)) {
@@ -276,6 +338,10 @@ export default function AccountReceivable() {
       isOriginalCustomer,
       retainagePercent: retainagePercent || null,
       isOlderInvoice,
+
+      // 在選擇器已經剔除accountReceivableId為null的合約
+
+      otherAccountReceivableIds: contractArr.map((item) => item.accountReceivableId!),
     };
 
     try {
@@ -468,8 +534,6 @@ export default function AccountReceivable() {
     valueList: createValueList_profile_engineeringContact({ engineeringContact }),
   };
 
-  isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
-
   const panelList_01: TpanelList = [
     { type: 'myButton', label: '建立應收帳款明細', onClick: () => reqPostAccountReceivable() },
   ];
@@ -502,7 +566,7 @@ export default function AccountReceivable() {
 
   if (!accountReceivable) {
     return (
-      <SubLayer isLoading_all={isFetching}>
+      <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
         <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
         <EmptyMain />
       </SubLayer>
@@ -510,8 +574,9 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isFetching}>
-      <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
+    <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
+      {showSubPageHeader && <PageHeader contractNumber={engineeringContact?.contractNumber ?? '---'} />}
+      {!showSubPageHeader && <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? '---'}`} />}
 
       <div className={scss.main}>
         <Profile {...props_profile} />
@@ -521,6 +586,8 @@ export default function AccountReceivable() {
           className="mt-10"
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
+          readonly={readonly}
+          currency={currency}
         />
 
         {/* 應收帳款管理 */}
@@ -529,6 +596,8 @@ export default function AccountReceivable() {
           periodArr={periodArr}
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
+          readonly={readonly}
+          currency={currency}
         />
 
         {/* 已收款紀錄 */}
@@ -536,10 +605,11 @@ export default function AccountReceivable() {
           className="mt-10 "
           incomeBillList={incomeBillList}
           reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
+          readonly={readonly}
         />
 
         {/* 扣款明細 */}
-        <DeductionDetail className="mt-10 " periodArr={periodArr} />
+        <DeductionDetail className="mt-10 " periodArr={periodArr} currency={currency} />
 
         {/* 請款明細 */}
         <AccountReceivableContext.Provider value={contextValue}>
@@ -547,12 +617,47 @@ export default function AccountReceivable() {
             className="mt-10 "
             data_finalProdcut={data_finalProdcut}
             data_period={accountReceivable.periods}
+            data_otherArr={content?.others}
             onAddConfirm={reqAddInvoice}
             reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
+            readonly={readonly}
+            // currency={currency}
+            currency={'TWD'}
+            contractId={contractId}
           />
         </AccountReceivableContext.Provider>
+        <br />
+        <br />
+        <br />
+        {/* 主產品與其他設定 */}
+        {/* <Table_prod
+          disabled={true}
+          prodList={productList}
+          prodCellConfig={prodCellConfig}
+          prodKeyArr={filteredProdKeyArr}
+          changeProdKeyArr={changeProdKeyArr}
+          addProd={() => {}}
+          setTargetProd={() => {}}
+          // panelBox="easyBox"
+          panelBox="emptyBox"
+          emptyBlockWidth="40px"
+          rowHeight="h60"
+          isShowDndBtn={false}
+          discountRate={''} // 報價單總折數
+          changeDiscountRate={(v) => {}}
+        />
+        <Table_others
+          disabled={true}
+          list={othersList}
+          cellConfig={othersCellConfig}
+          keyArr={othersKeyArr}
+          changeKeyArr={() => {}}
+          add={() => {}}
+          isShowDndBtn={false}
+          isDisplayInPage="worksDepartment"
+        /> */}
       </div>
     </SubLayer>
   );
@@ -576,3 +681,27 @@ const EmptyMain = () => {
 };
 
 // ========================================================================
+
+// const useProdArr = (contract: TquotationContractDto | undefined) => {
+//   return useMemo(() => {
+//     const list: { [key: string]: TquotationProductDto } = {};
+
+//     const subContractArr = contract?.subContracts ?? [];
+//     const orderedSubContracts = _.sortBy(subContractArr, 'version');
+
+//     orderedSubContracts.forEach((contract) => {
+//       const prodArr = contract.content.products;
+
+//       prodArr.forEach((prod) => {
+//         list[prod.rootProductId] = prod;
+//       });
+//     });
+
+//     const productArr = Object.values(list);
+//     const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
+
+//     const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
+
+//     return { productArr, latestQuotationDiscount };
+//   }, [contract]);
+// };

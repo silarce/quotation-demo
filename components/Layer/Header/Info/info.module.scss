@@ -125,3 +125,24 @@
     }
   }
 }
+
+.language {
+  // display: grid;
+  // min-width: 80px;
+  // > * {
+  //   margin: auto;
+  // }
+}
+
+.dropdown {
+  display: grid;
+  width: 80px;
+  padding: 0;
+  span {
+    margin: auto;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    color: $colorMain;
+  }
+}

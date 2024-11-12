@@ -10,6 +10,7 @@ import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -93,6 +94,8 @@ import { useProductList } from 'hooks/quotation/useProduct';
 // type
 import type { TquotationContractDto, TquotationContentDto } from 'js/api/api_quotation';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+
+import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
 // =============================================================
 
@@ -192,6 +195,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   // const { data: contract, update } = useGetContract_id_noItems_2(id);
   // 這個技術債以後重構時再還...
+  // 貓的，重構之日遙遙無期
   const { data: contract, update } = useGetContract_id_contentProductItems(
     id,
 
@@ -221,6 +225,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {};
     }
 
+    const currency = cutCurrency(contract?.currency) || '';
+    const exchangeRate = contract?.exchangeRate || '';
+
     let subContracts = contract.subContracts.filter((item) => {
       if (version === '1') {
         return true;
@@ -247,17 +254,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
     let subTotal = new Decimal(0);
     let salesTax = new Decimal(0);
     let total = new Decimal(0);
+    let foreignTotal = new Decimal(0);
 
     subContracts.forEach((item) => {
       subTotal = subTotal.plus(item.subTotal);
       salesTax = salesTax.plus(item.salesTax);
       total = total.plus(item.total);
+      foreignTotal = foreignTotal.plus(item.foreignTotal || 0);
     });
 
     const totalInfo = {
       subTotal: subTotal.toNumber(),
       salesTax: salesTax.toNumber(),
       total: total.toNumber(),
+      foreignTotal: foreignTotal.toNumber().toLocaleString(),
+      currency,
+      exchangeRate,
     };
 
     return {
@@ -409,61 +421,61 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
       customer: {
         value: content?.customer,
-        // onChange: (customer) => {
-        //   const customerPhoneNumber = customer.phone || '';
-        //   const contact = customer.contacts?.[0];
-        //   const name = contact?.name ?? '';
-        //   const phone = contact?.phone || customerPhoneNumber || '';
-        //   const fax = customer.fax || '';
-
-        //   setCustomer(customer);
-        //   changeProfile('contactPerson', `${name}`);
-        //   changeProfile('contactNumber', phone);
-        //   changeProfile('faxNumber', fax);
-        // },
-        // onClear: () => {
-        //   setCustomer(null);
-        //   changeProfile('contactPerson', '');
-        //   changeProfile('contactNumber', '');
-        //   changeProfile('faxNumber', '');
-        // },
+      },
+      designUnit: {
+        value: content?.designUnit,
       },
       itemList: {
         validityPeriod: {
           value: content?.validityPeriod ?? '',
-          // onChange: (v) => changeProfile('validityPeriod', v),
         },
         projectName: {
           value: content?.projectName ?? '',
-          // onChange: (v) => changeProfile('projectName', v),
         },
         county: {
           value: content?.county ?? '',
-          // onChange: (v) => {
-          //   changeProfile('county', v);
-          //   changeProfile('district', '');
-          // },
         },
         district: {
           value: content?.district ?? '',
-          // onChange: (v) => changeProfile('district', v),
         },
         address: {
           value: content?.address ?? '',
-          // onChange: (v) => changeProfile('address', v),
         },
         contactPerson: {
           value: content?.contactPerson ?? '',
-          // onChange: (v) => changeProfile('contactPerson', v),
         },
         contactNumber: {
           value: content?.contactNumber ?? '',
-          // onChange: (v) => changeProfile('contactNumber', v),
         },
         faxNumber: {
           value: content?.faxNumber ?? '',
-          // onChange: (v) => changeProfile('faxNumber', v),
         },
+
+        designatedBrand: {
+          value: content?.designatedBrand ?? '',
+        },
+        siteManager: {
+          value: content?.siteManager ?? '',
+        },
+        siteManagerNumber: {
+          value: content?.siteManagerNumber ?? '',
+        },
+        requiredDoorType: {
+          value: content?.requiredDoorType ?? '',
+        },
+        requiredDoorQuantity: {
+          value: String(content?.requiredDoorQuantity ?? ''),
+        },
+        estimatedDiscount: {
+          value: content?.estimatedDiscount ?? '',
+        },
+        type: {
+          value: content?.type ?? '',
+        },
+        scheduledProcurementOrBidDate: {
+          value: content?.estimatedDiscount ? moment(content.estimatedDiscount) : null,
+        },
+
         trackProgress: {
           value: content?.trackProgress ?? '',
 
@@ -612,6 +624,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }) ?? [],
       addMethod: () => {},
     },
+    exchangeRate: {
+      value: totalInfo?.exchangeRate ?? '',
+    },
+    foreignTotal: {
+      value: totalInfo?.foreignTotal ?? '',
+    },
+    currency: {
+      value: (totalInfo?.currency ?? '') as Tcurrency,
+    },
   };
 
   const { control_signature } = useMemo(() => {
@@ -631,11 +652,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
         style: { width: '170px' },
       },
-      {
-        label: '業務經理',
-        value: contract?.content?.reviewSalesManagerEmployee?.chName ?? '',
-        style: { width: '170px' },
-      },
+      // {
+      //   label: '業務經理',
+      //   value: contract?.content?.reviewSalesManagerEmployee?.chName ?? '',
+      //   style: { width: '170px' },
+      // },
       {
         label: '業務主管',
         value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',

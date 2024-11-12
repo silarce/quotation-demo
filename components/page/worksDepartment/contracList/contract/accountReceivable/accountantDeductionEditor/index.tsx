@@ -21,6 +21,7 @@ import scss from './index.module.scss';
 
 import {
   TupdateAccountantDeductionDto,
+  TaccountantDto,
   //
   useGetAccountant_id,
   //
@@ -29,7 +30,12 @@ import {
 
 import { TupdateIncomeBillSerialDto, apiPatchIncomeBill } from 'js/api/api_engineering';
 
-import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
+// type
+import type { Tcurrency } from 'js/utils/currency/cutCurrency';
+
+// utils
+import { calcIncomeBillUnpaidPayment } from 'js/utils/calc/calcIncomeBill';
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 // ===============================================================]
 
@@ -37,11 +43,12 @@ type Tstate_deduction = {
   id?: string;
   itemName: string; // 扣款項目
   detailedAmount: string; // 扣款金額
+  currency: string;
 };
 
 type Tprops = {
-  accountantId?: string;
-  incomeBillId?: string;
+  accountantId?: string | null;
+  incomeBillId?: string | null;
   defaultStateArr?: Tstate_deduction[];
 
   // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
@@ -117,6 +124,10 @@ function EditDeductionPanel({
 
   // --------------------------------------------------------------------
 
+  const { defaultState, receivableCurrency } = useDefault({ data_accountant, defaultStateArr, incomeBillId });
+
+  // --------------------------------------------------------------------
+
   // region FUNCTION
 
   const handle_edit = (index: number, key: 'itemName' | 'detailedAmount', value: string) => {
@@ -127,7 +138,7 @@ function EditDeductionPanel({
   };
 
   const handle_Add = () => {
-    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '' }]);
+    setState_deductionArr((pre) => [...pre, { itemName: '', detailedAmount: '', currency: receivableCurrency }]);
   };
 
   const handle_Remove = (index: number) => {
@@ -162,6 +173,7 @@ function EditDeductionPanel({
         priorPeriodPayment: Number(data_incomeBill.priorPeriodPayment || 0),
         deductionPayment: deductionPayment,
         fee: Number(data_incomeBill.fee || 0),
+        receivablePayment: Number(data_incomeBill.receivablePayment || 0),
       });
 
       const body: TupdateIncomeBillSerialDto = {
@@ -202,34 +214,6 @@ function EditDeductionPanel({
 
   // MARK: useEffect
 
-  const defaultState = useMemo(() => {
-    const deductionArr = (() => {
-      let deductionArr;
-
-      if (!data_accountant) {
-        deductionArr = defaultStateArr;
-      } else {
-        const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
-
-        if (incomeBill) {
-          deductionArr = incomeBill?.accountsReceivableDeduction;
-        }
-      }
-
-      return deductionArr || [];
-    })();
-
-    const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
-      return {
-        id: deduction.id,
-        itemName: deduction.itemName,
-        detailedAmount: String(deduction.detailedAmount),
-      };
-    });
-
-    return state_deductionArr;
-  }, [data_accountant, defaultStateArr]);
-
   useEffect(() => {
     setState_deductionArr(_.cloneDeep(defaultState));
   }, [defaultState, readonly]);
@@ -251,7 +235,7 @@ function EditDeductionPanel({
         </div>
         {/*  */}
         {state_deductionArr.map((deduction, index) => {
-          const { itemName, detailedAmount } = deduction;
+          const { itemName, detailedAmount, currency } = deduction;
 
           const value_itemName = itemName ? { value: itemName, label: itemName } : null;
 
@@ -284,9 +268,12 @@ function EditDeductionPanel({
               <InputSel
                 disabled={readonly}
                 showBaseline="auto"
+                prefix={currency}
                 inputProps={{
                   props: {
-                    value: detailedAmount,
+                    className: 'text-right',
+                    type: readonly ? 'text' : 'number',
+                    value: readonly ? Number(detailedAmount || 0).toLocaleString() : detailedAmount,
                     onChange: (e) => {
                       handle_edit(index, 'detailedAmount', e.target.value);
                     },
@@ -377,6 +364,61 @@ const EditDefunctionBtn = ({
       }}
     />
   );
+};
+
+// ====================================================================
+
+const useDefault = ({
+  data_accountant,
+  defaultStateArr,
+  incomeBillId,
+}: {
+  data_accountant: TaccountantDto | undefined;
+  defaultStateArr: Tstate_deduction[] | undefined;
+  incomeBillId: string | null | undefined;
+}) => {
+  return useMemo(() => {
+    let receivableCurrency = '--- ---';
+
+    const deductionArr = (() => {
+      let deductionArr;
+
+      if (!data_accountant) {
+        deductionArr = defaultStateArr;
+      } else {
+        const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
+
+        if (incomeBill) {
+          incomeBill.receivableCurrency && (receivableCurrency = incomeBill.receivableCurrency);
+          deductionArr = incomeBill?.accountsReceivableDeduction;
+        }
+      }
+
+      return deductionArr || [];
+    })();
+
+    const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
+      let currency: string;
+
+      if ('currency' in deduction) {
+        currency = deduction.currency || '--- ---';
+        receivableCurrency = currency;
+      } else {
+        currency = receivableCurrency;
+      }
+
+      currency = cutCurrency(currency as Tcurrency);
+
+      return {
+        id: deduction.id,
+        itemName: deduction.itemName,
+        detailedAmount: String(deduction.detailedAmount),
+        currency,
+      };
+    });
+
+    return { defaultState: state_deductionArr, receivableCurrency };
+  }, [data_accountant, defaultStateArr]);
 };
 
 // ====================================================================

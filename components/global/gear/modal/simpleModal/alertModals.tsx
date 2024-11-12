@@ -1,7 +1,8 @@
 import classNames from 'classnames';
+import InputSel, { TinputSelProps } from '../../inputAndSel_v2/inputSel';
 
 // antd
-import { Modal, ModalFuncProps } from 'antd';
+import { Modal, ModalFuncProps, notification } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
 // gear
@@ -249,6 +250,51 @@ const ModalClear = (props?: ModalFuncProps) => {
 
 // ====================================================
 
+const ModalInut = (props: {
+  title?: string | number;
+  props?: ModalFuncProps;
+  className?: string;
+  width?: React.CSSProperties['width'];
+  onConfirm?: (value: string) => void;
+  isTextArea?: boolean;
+  defaultValue?: string;
+  placeholder?: string;
+}) => {
+  const { onConfirm, isTextArea, defaultValue, placeholder, width = 'auto', ...rest } = props;
+
+  const modal = Modal.confirm({
+    icon: <></>,
+    ...modalProps,
+
+    cancelButtonProps: {
+      style: { display: 'none' },
+    },
+    okButtonProps: {
+      style: { display: 'none' },
+    },
+    width,
+    ...rest,
+    className: classNames(style.confirm, modalProps.className, props?.className),
+  });
+
+  modal.update({
+    content: (
+      <Input
+        className={'mt-10'}
+        isTextArea={isTextArea}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        onConfirm={onConfirm}
+        onCancel={modal.destroy}
+      />
+    ),
+  });
+
+  return modal;
+};
+
+// ====================================================
+
 const BtnBar = ({ btnPropsArr }: { btnPropsArr: TbtnPropsArr }) => {
   return (
     <div className={style.btnBar}>
@@ -256,6 +302,73 @@ const BtnBar = ({ btnPropsArr }: { btnPropsArr: TbtnPropsArr }) => {
         return <MyButton_v2 key={index} {...props} />;
       })}
     </div>
+  );
+};
+
+// ====================================================
+
+const Input = ({
+  isTextArea,
+  placeholder,
+  defaultValue,
+  onConfirm,
+  onCancel,
+  className,
+}: {
+  isTextArea?: boolean;
+  placeholder?: string;
+  defaultValue?: string;
+  onConfirm?: (value: string) => void;
+  onCancel?: () => void;
+  className?: string;
+}) => {
+  const inputSelProps: TinputSelProps = (() => {
+    if (isTextArea) {
+      return {
+        textareaProps: {
+          allowNewLineByUser: true,
+          props: {
+            defaultValue,
+            placeholder,
+            name: 'input',
+          },
+        },
+      };
+    } else {
+      return {
+        inputProps: {
+          props: {
+            defaultValue,
+            placeholder,
+            name: 'input',
+          },
+        },
+      };
+    }
+  })();
+
+  return (
+    <form
+      className={className}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const value = e.currentTarget['input'].value;
+        onConfirm?.(value);
+      }}
+    >
+      <InputSel {...inputSelProps} />
+      <div className="flex gap-8 mt-10 justify-center">
+        <MyButton_v2
+          theme="danger"
+          buttonProps={{
+            htmlType: 'submit',
+          }}
+        >
+          確認
+        </MyButton_v2>
+        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
+      </div>
+    </form>
   );
 };
 
@@ -271,6 +384,18 @@ const myAlert = {
   destroyAll: Modal.destroyAll,
   btnBar: ModalBtnBar,
   clear: ModalClear,
+  input: ModalInut,
+  notify: {
+    open: notification.open,
+    close: notification.close,
+    destroy: notification.destroy,
+
+    success: notification.success,
+    error: notification.error,
+    info: notification.info,
+    warning: notification.warning,
+    warn: notification.warn,
+  },
 };
 
 export default myAlert;

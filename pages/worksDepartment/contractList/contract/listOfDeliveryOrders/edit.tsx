@@ -428,7 +428,12 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} tagCallback={tagCallback} contractNumber={contract?.content.quotationNumber} />
+      <PageHeader
+        returnBtn={disabled}
+        panelList={panelList}
+        tagCallback={tagCallback}
+        contractNumber={contract?.content.quotationNumber}
+      />
 
       <div>
         <div>

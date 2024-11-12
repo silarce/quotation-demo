@@ -38,17 +38,18 @@ import { optionsCreator_quotationStatus } from 'js/utils/options/options';
 import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
 import { findGuideRailUnicode } from 'config/product/lookup';
 import { companyInfo } from 'config/companyInfo';
+import { lookup_quoteType_doorModelName } from 'js/utils/options/productOptions';
 
 // utils
 import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
-
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
 import { dlExcel } from './dlExcel';
 import { dlPdf } from './dlPdf';
 
 // api
 import { apiGetAssets } from 'js/api/api_product';
+
+import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
 
 // ============================================================================
 
@@ -1005,9 +1006,11 @@ const config: Tconfig = {
 const quotationProdAndOther_ToProdArr = ({
   quotationProductArr,
   quotationOtherArr,
+  checkIsSpecialDoor,
 }: {
   quotationProductArr: TquotationProductDto[];
   quotationOtherArr: TquotationContentOtherDto[];
+  checkIsSpecialDoor: (doorModelName: string) => boolean;
 }): Tprod[] => {
   const productArr: Tprod[] = (() => {
     return quotationProductArr.map((pro) => {
@@ -1035,6 +1038,16 @@ const quotationProdAndOther_ToProdArr = ({
         //
         reduceQty,
       } = pro;
+
+      const name = (() => {
+        if (quoteType === '捲門') {
+          return doorModelName;
+        } else {
+          return (lookup_quoteType_doorModelName[quoteType]?.[doorModelName]?.name || doorModelName) as string;
+        }
+      })();
+
+      const isSpecialDoor = checkIsSpecialDoor(doorModelName);
 
       let { quantity, totalPrice } = pro;
 
@@ -1067,13 +1080,31 @@ const quotationProdAndOther_ToProdArr = ({
 
       let material = materialName;
 
-      const doorRailForExcel =
-        doorModelName !== 'SJ-302'
-          ? ''
-          : findGuideRailUnicode({
-              isAntiTyphoon: !!isAntiTyphoon,
-              isSilencing: !!hasSilencingStrip,
-            });
+      // const doorRailForExcel = isSpecialDoor
+      //   ? guideRail
+      //   : doorModelName === 'SJ-302'
+      //   ? findGuideRailUnicode({
+      //       isAntiTyphoon: !!isAntiTyphoon,
+      //       isSilencing: !!hasSilencingStrip,
+      //     })
+      //   : '';
+      // const doorRailForExcel = isSpecialDoor
+      //   ? guideRail
+      //   : doorModelName === 'SJ-302'
+      //   ? findGuideRailUnicode({
+      //       guideRail,
+      //     })
+      //   : '';
+
+      const doorRailForExcel = (() => {
+        if (isSpecialDoor) {
+          return guideRail;
+        }
+
+        const guideRailName = guideRail?.replace('.svg', '');
+
+        return guideRailName ? findGuideRailUnicode({ guideRail: guideRailName }) : '';
+      })();
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
@@ -1086,7 +1117,7 @@ const quotationProdAndOther_ToProdArr = ({
       return {
         itemName,
         size,
-        doorModelName,
+        doorModelName: name,
         materialName: material,
         thickness: thickness_str,
         materialSurface: materialSurface ?? '',
@@ -1156,6 +1187,7 @@ const useModalQuotationPdf = ({
 }) => {
   const [visible, setVisible] = useState(false);
   const [pdfData, setPdfData] = useState<TpdfData>();
+  const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
   useEffect(() => {
     if (!quotationContent) {
@@ -1256,6 +1288,7 @@ const useModalQuotationPdf = ({
     const prodArr = quotationProdAndOther_ToProdArr({
       quotationProductArr: quotationProductArr,
       quotationOtherArr: others ?? [],
+      checkIsSpecialDoor,
     });
 
     setPdfData({ top, prodArr, bottom });

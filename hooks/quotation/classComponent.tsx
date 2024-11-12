@@ -51,7 +51,7 @@ class Class_component {
 
     if (!this._com.material) {
       if (key === 'sidePlate' || key === 'roller' || key === 'motor' || key === 'motorAccessories') {
-        this._com.material = comLookUp[key].options[0].value;
+        this._com.material = comLookUp[key](this).options[0].value;
       }
     }
 
@@ -86,7 +86,8 @@ class Class_component {
 
   private reRender;
   renderCount = 0;
-  private _prod;
+  // private _prod;
+  _prod;
   private _com;
   readonly key;
   readonly identificationId;
@@ -119,7 +120,7 @@ class Class_component {
     }
 
     if (this._prod.doorType === 'SJ-302' && this.key === 'bottomBar') {
-      const options = comLookUp[this.key].options;
+      const options = comLookUp[this.key](this).options;
 
       //如果v === 高耐鍍鋅鋼板
       if (v === options[3].value) {
@@ -177,14 +178,24 @@ class Class_component {
   }
 
   renewDescDensity() {
-    this.desc = comLookUp[this.key].creDesc(this);
+    this.desc = comLookUp[this.key](this).creDesc(this);
     this.density = String(this._prod._doorGeneralSpecs?.density || 0);
   }
 
   // ---------------------------------------------------------
 
+  get prod() {
+    return {
+      doorType: this._prod.doorType,
+    };
+  }
+
   get hiddenKeyArr() {
-    return comLookUp[this.key].hiddenKeyArr;
+    return comLookUp[this.key](this).hiddenKeyArr;
+  }
+
+  get disabledKeyArr() {
+    return comLookUp[this.key](this).disabledKeyArr;
   }
 
   get componentInfo() {
@@ -203,6 +214,10 @@ class Class_component {
   // ---------------------------------------------------------
 
   get options_material() {
+    if (this._prod.doorType === 'W2') {
+      return _.cloneDeep(this._prod.options_material ?? []);
+    }
+
     if (this.key === 'slat') {
       const copy = _.cloneDeep(this._prod.options_material ?? []);
 
@@ -221,7 +236,7 @@ class Class_component {
 
     // SJ-302的底座沒有高耐鍍鋅鋼板，因此將高耐鍍鋅鋼板的選項拿掉
     if (this.key === 'bottomBar' && this._prod.doorType === 'SJ-302') {
-      let copy = _.cloneDeep(comLookUp[this.key].options ?? []);
+      let copy = _.cloneDeep(comLookUp[this.key](this).options ?? []);
       copy = copy.filter((item) => {
         return item.value !== '高耐鍍鋅鋼板';
       });
@@ -229,7 +244,7 @@ class Class_component {
       return copy;
     }
 
-    return comLookUp[this.key].options;
+    return comLookUp[this.key](this).options;
   }
 
   get options_surface() {
@@ -254,7 +269,7 @@ class Class_component {
 
   // ---------------------------------------------------------
   get comName() {
-    return comLookUp[this.key].typeName;
+    return comLookUp[this.key](this).typeName;
   }
 
   get desc() {
@@ -292,7 +307,7 @@ class Class_component {
           id: comId,
         };
 
-        this.desc = comLookUp[this.key].creDesc(this);
+        this.desc = comLookUp[this.key](this).creDesc(this);
         this.material = this.material; // 只是為了觸發prod的reqProdGenerateDoorProductBom
       }
     }
@@ -523,6 +538,7 @@ class Class_component {
   }
   set material(v) {
     this._com.material = v;
+    this.surface_withCheckOptions = this.surface;
 
     // ________________________________________________________________
     const isSurfaceExist = this.options_surface?.some((item) => {
@@ -551,6 +567,37 @@ class Class_component {
     this.reRender();
   }
 
+  setMaterial_noRelationToProd(v: string) {
+    this._com.material = v;
+    this.surface_withCheckOptions = this.surface;
+
+    // ________________________________________________________________
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === this.surface;
+    });
+
+    const prodSurface = this._prod.surface || '';
+    const isProdSurfaceExistHere = this.options_surface?.some((item) => {
+      return item.value === prodSurface;
+    });
+
+    if (!isSurfaceExist) {
+      const surface = isProdSurfaceExistHere ? prodSurface : this.options_surface?.[0].value ?? '';
+
+      this.surface = surface;
+    }
+    // ________________________________________________________________
+
+    this.callReqGetCodeNumber();
+
+    if (this.key === 'bottomBar') {
+      this.desc = creDesc_bottomBars(this);
+      // this._prod.changeBottomBarAngleIronAndBottomBarPlate(v);
+    }
+
+    // this.reRender();
+  }
+
   get surface() {
     return this._com.materialSurface;
   }
@@ -567,6 +614,15 @@ class Class_component {
 
     if (!isSurfaceExist) {
       return;
+    }
+
+    if (
+      //
+      v === '無烤漆' &&
+      this.key === 'guideRail' &&
+      checkIsSST(this.material)
+    ) {
+      v = '2B';
     }
 
     this._com.materialSurface = v;
@@ -632,7 +688,7 @@ class Class_component {
   }
 
   get unit() {
-    return comLookUp[this.key].unit;
+    return comLookUp[this.key](this).unit;
   }
 
   get bottomBarAngleIron_options() {
@@ -645,7 +701,7 @@ class Class_component {
 
   get body() {
     return {
-      type: comLookUp[this.key].type,
+      type: comLookUp[this.key](this).type,
       material: this._com.material ?? '',
       materialSurface: this._com.materialSurface || undefined,
       isPainted: this._com.isPainted ?? false,
@@ -1029,20 +1085,22 @@ const creDesc_slats = (classCom: Class_component) => {
 };
 
 const creDesc_bottomBars = (classCom: Class_component) => {
-  const {
-    // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
-    material,
-  } = classCom;
+  // const {
+  //   // isAntiTyphoon,    isWaterProof,      hasAluminumBarrier ,
+  //   material,
+  // } = classCom;
 
-  const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
+  // const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
 
-  let desc = '';
+  // let desc = '';
 
-  const list_bottomBarAngleIron = _.keyBy<Toption>(bottomBarAngleIron_options, 'material');
+  // const list_bottomBarAngleIron = _.keyBy<Toption>(bottomBarAngleIron_options, 'material');
 
-  desc = list_bottomBarAngleIron[material]?.value || '';
+  // desc = list_bottomBarAngleIron[material]?.value || '';
 
-  return `${desc}`;
+  // return `${desc}`;
+
+  return classCom._prod.bottomBarAngleIron;
 };
 
 const creDesc_guideRails = (classCom: Class_component) => {
@@ -1149,6 +1207,14 @@ const creDesc_headBoxes = (classCom: Class_component) => {
   return `${name ?? ''} ${material ?? ''}`;
 };
 
+const creDesc_middlePillar = (classCom: Class_component) => {
+  return '中柱';
+};
+
+const creDesc_backBone = (classCom: Class_component) => {
+  return '背撐';
+};
+
 const confomtTree = {
   //
   isAntiTyphoon: {
@@ -1200,81 +1266,151 @@ const confomtTree = {
 type Tkit = {
   typeName: string;
   // type是api要收的東西
-  type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
+  type:
+    | 'slat'
+    | 'bottomBar'
+    | 'guideRail'
+    | 'sidePlate'
+    | 'roller'
+    | 'motor'
+    | 'motorAccessories'
+    | 'headBox'
+    | 'middlePillar'
+    | 'backBone'
+    | 'middlePillar'
+    | 'backBone';
   creDesc: (classCom: Class_component, options?: Toption[]) => string;
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
+  disabledKeyArr?: string[];
 };
 
-const comLookUp: { [key in TcomponentKey]: Tkit } = {
-  slat: {
-    typeName: '捲門片',
-    type: 'slat',
-    creDesc: creDesc_slats,
-    options: [],
-    hiddenKeyArr: [],
-    // unit: (
-    //   <span>
-    //     m<sup>2</sup>
-    //   </span>
-    // ),
-    unit: 'm\u00B2',
+const comLookUp: { [key in TcomponentKey]: (props: Class_component) => Tkit } = {
+  slat: (classCom) => {
+    let typeName = '捲門片';
+    let unit = 'm\u00B2';
+
+    classCom.prod.doorType === 'W2' && (typeName = '門片');
+
+    if (classCom.prod.doorType === 'W2') {
+      typeName = '門片';
+      unit = 'M';
+    }
+
+    return {
+      typeName,
+      type: 'slat',
+      creDesc: creDesc_slats,
+      options: [],
+      hiddenKeyArr: [],
+      // unit: (
+      //   <span>
+      //     m<sup>2</sup>
+      //   </span>
+      // ),
+      unit,
+    };
   },
-  bottomBar: {
-    typeName: '底座',
-    type: 'bottomBar',
-    creDesc: creDesc_bottomBars,
-    options: optionsCreator_componentMaterial_01(),
-    hiddenKeyArr: ['surface', 'density'],
-    unit: 'M',
+  bottomBar: () => {
+    return {
+      typeName: '底座',
+      type: 'bottomBar',
+      creDesc: creDesc_bottomBars,
+      options: optionsCreator_componentMaterial_01(),
+      hiddenKeyArr: ['surface', 'density'],
+      unit: 'M',
+    };
   },
-  guideRail: {
-    typeName: '門軌',
-    type: 'guideRail',
-    creDesc: creDesc_guideRails,
-    options: optionsCreator_componentMaterial_01(),
-    hiddenKeyArr: ['surface', 'density'],
-    unit: 'M',
+  guideRail: () => {
+    return {
+      typeName: '門軌',
+      type: 'guideRail',
+      creDesc: creDesc_guideRails,
+      options: optionsCreator_componentMaterial_01(),
+      hiddenKeyArr: [
+        // 'surface',
+        'density',
+      ],
+      disabledKeyArr: ['surface'],
+      unit: 'M',
+    };
   },
-  sidePlate: {
-    typeName: '支板',
-    type: 'sidePlate',
-    creDesc: creDesc_sidePlates,
-    options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density', 'material'],
+  sidePlate: () => {
+    return {
+      typeName: '支板',
+      type: 'sidePlate',
+      creDesc: creDesc_sidePlates,
+      options: optionsCreator_componentMaterial_02(),
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '組',
+    };
   },
-  roller: {
-    typeName: '捲軸',
-    type: 'roller',
-    creDesc: creDesc_rollers,
-    options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density', 'material'],
-    unit: 'M',
+
+  roller: () => {
+    return {
+      typeName: '捲軸',
+      type: 'roller',
+      creDesc: creDesc_rollers,
+      options: optionsCreator_componentMaterial_02(),
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: 'M',
+    };
   },
-  motor: {
-    typeName: '馬達機',
-    type: 'motor',
-    creDesc: creDesc_motors,
-    options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density', 'material'],
-    unit: '組',
+
+  motor: () => {
+    return {
+      typeName: '馬達機',
+      type: 'motor',
+      creDesc: creDesc_motors,
+      options: optionsCreator_componentMaterial_02(),
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '組',
+    };
   },
-  motorAccessories: {
-    typeName: '馬達配件',
-    type: 'motorAccessories',
-    creDesc: creDesc_motorComponent,
-    options: optionsCreator_componentMaterial_03(),
-    hiddenKeyArr: ['surface', 'density', 'material'],
-    unit: '組',
+
+  motorAccessories: () => {
+    return {
+      typeName: '馬達配件',
+      type: 'motorAccessories',
+      creDesc: creDesc_motorComponent,
+      options: optionsCreator_componentMaterial_03(),
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '組',
+    };
   },
-  headBox: {
-    typeName: '門箱',
-    type: 'headBox',
-    creDesc: creDesc_headBoxes,
-    options: optionsCreator_componentMaterial_01(),
-    hiddenKeyArr: ['surface', 'density'],
-    unit: 'M',
+
+  headBox: () => {
+    return {
+      typeName: '門箱',
+      type: 'headBox',
+      creDesc: creDesc_headBoxes,
+      options: optionsCreator_componentMaterial_01(),
+      hiddenKeyArr: ['surface', 'density'],
+      unit: 'M',
+    };
+  },
+
+  middlePillar: () => {
+    return {
+      typeName: '中柱',
+      type: 'middlePillar',
+      creDesc: creDesc_middlePillar,
+      options: [],
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '支',
+    };
+  },
+
+  backBone: () => {
+    return {
+      typeName: '背撐',
+      type: 'backBone',
+      creDesc: creDesc_backBone,
+      options: [],
+      hiddenKeyArr: ['surface', 'density', 'material'],
+      unit: '支',
+    };
   },
 };
 
@@ -1287,6 +1423,8 @@ const comTypeLookUp = {
   motor: 'motor',
   motorAccessories: 'motorAccessories',
   headBox: 'headBox',
+  middlePillar: 'middlePillar',
+  backBone: 'backBone',
 } as const;
 
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {

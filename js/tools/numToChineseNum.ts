@@ -1,4 +1,8 @@
-export default function changeNumberMoneyToChinese(money: string | number) {
+// 大寫中文數字
+const cnNums_uppercase = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖'];
+const cnNums = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+
+function changeNumberMoneyToChinese(money: string | number) {
   // 接收數字或者字串數字
   if (typeof money === 'string') {
     if (money === '') {
@@ -18,8 +22,6 @@ export default function changeNumberMoneyToChinese(money: string | number) {
     throw Error(`引數有誤：${money}，請輸入數字或字串數字`);
   }
 
-  // 漢字的數字
-  const cnNums = ['零', '壹', '貳', '參', '肆', '伍', '陸', '柒', '捌', '玖'];
   // 基本單位
   const cnIntRadice = ['', '拾', '佰', '仟'];
   // 對應整數部分擴充套件單位
@@ -89,7 +91,7 @@ export default function changeNumberMoneyToChinese(money: string | number) {
       } else {
         // 連續存在多個0的時候需要補'零'
         if (zeroCount > 0) {
-          ChineseStr += cnNums[0];
+          ChineseStr += cnNums_uppercase[0];
         }
 
         // 歸零
@@ -101,7 +103,7 @@ export default function changeNumberMoneyToChinese(money: string | number) {
         最後加上單位就轉換成功了！
         這裡只加十百千的單位
         */
-        ChineseStr += cnNums[parseInt(term)] + cnIntRadice[baseUnit];
+        ChineseStr += cnNums_uppercase[parseInt(term)] + cnIntRadice[baseUnit];
       }
 
       /*
@@ -125,7 +127,7 @@ export default function changeNumberMoneyToChinese(money: string | number) {
       const term = DecimalNum.substr(i, 1);
 
       if (term !== '0') {
-        ChineseStr += cnNums[Number(term)] + cnDecUnits[i];
+        ChineseStr += cnNums_uppercase[Number(term)] + cnDecUnits[i];
       }
     }
   }
@@ -134,3 +136,6 @@ export default function changeNumberMoneyToChinese(money: string | number) {
 
   return ChineseStr;
 }
+
+export default changeNumberMoneyToChinese;
+export { cnNums_uppercase, cnNums };

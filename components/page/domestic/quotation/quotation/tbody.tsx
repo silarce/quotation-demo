@@ -76,6 +76,7 @@ export default function Tbody({
   onVKeyChange,
   rowHeight,
   showAttatchModal,
+  isDisplayInPage,
 }: // onVerticalKeyChange,
 {
   disabled: boolean;
@@ -91,6 +92,7 @@ export default function Tbody({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h60';
   showAttatchModal?: () => void;
+  isDisplayInPage?: string;
 }) {
   // ---------------------------------------------------------------
 
@@ -181,6 +183,7 @@ export default function Tbody({
                 clearAttach={() => item.clearAttach?.()}
                 reRenderTrigger={item.renderCount}
                 alwaysShow={pIndex < 7}
+                isDisplayInPage={isDisplayInPage}
               />
             );
           })}
@@ -404,6 +407,7 @@ function DndRow({
   showAttatchModal,
   clearAttach,
   alwaysShow,
+  isDisplayInPage,
 }: {
   vKey: string;
   id: string;
@@ -430,6 +434,7 @@ function DndRow({
   clearAttach?: () => void;
   reRenderTrigger?: any;
   alwaysShow?: boolean;
+  isDisplayInPage?: string;
 }) {
   const [viewRef, isView] = useInView();
 
@@ -525,12 +530,33 @@ function DndRow({
                 // }
 
                 const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
+                const disabledKeyArr = item.disabledKeyArr as string[] | undefined;
+
+                if (disabledKeyArr?.includes(key)) {
+                  theDisabled = true;
+                }
+
                 const isHidden = hiddenKeyArr?.includes(key);
 
                 let stateValue = item[key];
 
                 const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
                 const { inputProps, selectProps, checkBoxProps } = inputSelProps;
+
+                // if (
+                //   // 其他設定用的
+                //   isDisplayInPage === 'worksDepartment' &&
+                //   item.isDisplayedOnAccountReceivable === false &&
+                //   (key === 'unitPrice_locale' || key === 'totalPrice_locale')
+                // ) {
+                //   return (
+                //     <div
+                //       key={key}
+                //       className={classNames(scss.column, isHidden && scss.hidden)}
+                //       style={{ width: inputSelProps.wrapperStyle?.width }}
+                //     ></div>
+                //   );
+                // }
 
                 if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
                   return (

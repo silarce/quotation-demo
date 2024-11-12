@@ -16,7 +16,7 @@ import iconDoorRail_sj302_90_30t from 'public/image/fakeDB/doorRail/antiTyphoon/
 import iconDoorRail_sj302_95_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg';
 import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg';
 
-import { TinvoiceType, TquotationStatus } from 'js/api/dtoTypes';
+import { TinvoiceType, TquotationStatus, Tcurrency } from 'js/api/dtoTypes';
 
 // ============================================================================
 
@@ -101,6 +101,21 @@ export const optionsCreator_taxDeductionCategory = (): Toption[] => [
 //     { value: "事務所", label: "事務所" },
 //     { value: "業主", label: "業主" },
 //   ]
+
+// 報價單類型
+export const optionsCreator_quotationType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+  const { haveEmpty } = props;
+  const arr = [
+    { value: '公共工程', label: '公共工程' },
+    { value: '私人案件', label: '私人案件' },
+  ];
+
+  if (haveEmpty) {
+    addEmpty(arr);
+  }
+
+  return arr;
+};
 
 // 類別
 export const optionsCreator_prodClass = (props: { haveEmpty?: boolean } = {}): Toption[] => {
@@ -479,6 +494,8 @@ export const optionsCreator_deduction = ({ emptyOption }: { emptyOption?: boolea
     { value: '堆高機租用費', label: '堆高機租用費' },
     { value: '流動廁所分攤費', label: '流動廁所分攤費' },
     { value: '點工修繕費', label: '點工修繕費' },
+    { value: '欄杆拆裝', label: '欄杆拆裝' },
+    { value: '打石費用', label: '打石費用' },
   ];
 
   if (emptyOption) {
@@ -500,6 +517,18 @@ export const optionsCreator_invoiceType = ({ emptyOption }: { emptyOption?: bool
   if (emptyOption) {
     optionArr.unshift({ value: '', label: '不拘' });
   }
+
+  return optionArr;
+};
+
+export const optionsCreator_currency = (): Toption[] => {
+  const v1: Tcurrency = 'TWD 新臺幣';
+  const v2: Tcurrency = 'USD 美元';
+
+  const optionArr = [
+    { value: v1, label: v1 },
+    { value: v2, label: v2 },
+  ];
 
   return optionArr;
 };

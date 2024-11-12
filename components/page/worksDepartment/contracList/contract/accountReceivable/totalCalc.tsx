@@ -6,7 +6,7 @@ import Decimal from 'decimal.js';
 import { Radio } from 'antd';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './totalCalc.module.scss';
 
@@ -31,6 +31,8 @@ type Tprops = {
   accountReceivable: TaccountsReceivableDto;
   valueList?: TvalueList;
   reqPatchAccountReceivable: TreqPatchAccountReceivable;
+  readonly?: boolean;
+  currency: string;
 };
 
 type Tstate_payment = {
@@ -54,6 +56,8 @@ type Tstate_payment = {
 
 // ============================================================================
 
+// ============================================================================
+
 // MARK: START
 
 export default function TotalCalc({
@@ -61,6 +65,8 @@ export default function TotalCalc({
   className,
   accountReceivable,
   reqPatchAccountReceivable,
+  readonly: readonly_static,
+  currency,
 }: Tprops) {
   // ---------------------------------------------------------------------------
 
@@ -74,6 +80,18 @@ export default function TotalCalc({
 
   const defaultState = useDefaultStatePayment(accountReceivable);
   const [state_payment, setState_payment] = useState<Tstate_payment>(defaultState);
+
+  // --------------------------------------------------------------------------
+
+  const defaultInputSelProps: TinputSelProps = {
+    prefix: currency,
+    wrapperStyle: {
+      width: 150,
+      gap: 10,
+    },
+    fontSize: '16',
+    showBaseline: 'invisible',
+  };
 
   // --------------------------------------------------------------------------
 
@@ -225,25 +243,35 @@ export default function TotalCalc({
             }}
           />
         </div>
-        <div className={scss.btnBar}>
-          <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
-          <IconEdit className={classNames(!readOnly && scss.active)} onClick={switchReadOnly} />
-        </div>
+        {!readonly_static && (
+          <div className={scss.btnBar}>
+            <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
+            <IconEdit className={classNames(!readOnly && scss.active)} onClick={switchReadOnly} />
+          </div>
+        )}
       </div>
       {/*  */}
       <div className={scss.caption}>總計算</div>
       {/*  */}
       {/*  */}
       <div>
-        <Row symbol="undefined" caption="合約金額" value={state_payment['contractTotalPrice']} />
+        <Row
+          symbol="undefined"
+          caption="合約金額"
+          value={
+            <InputSel
+              {...defaultInputSelProps}
+              node={<div className="text-right">{state_payment['contractTotalPrice'].toLocaleString()}</div>}
+            />
+          }
+        />
 
         <div className={scss.row}>
           <Minus />
           <span>未施作項目</span>
           <div className="">
             <InputSel
-              fontSize="16"
-              wrapperStyle={{ width: '110px' }}
+              {...defaultInputSelProps}
               showBaseline={readOnly ? 'invisible' : 'always'}
               inputProps={{
                 props: {
@@ -261,15 +289,78 @@ export default function TotalCalc({
         </div>
 
         <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
-        <Row symbol="=" caption="已完成項目(含稅)" value={state_payment['completedPart']} />
-        <Row symbol="-" caption="已收款金額" value={state_payment['receivedPayment']} />
-        <Row symbol="-" caption="額外收入(含稅)" value={state_payment['extraIncome']} />
-        <Row symbol="-" caption="扣款金額(含稅)" value={state_payment['totalDeduction']} />
+
+        <Row
+          symbol="="
+          caption="已完成項目(含稅)"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['completedPart'].toLocaleString()}
+            />
+          }
+        />
+        <Row
+          symbol="-"
+          caption="已收款金額"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['receivedPayment'].toLocaleString()}
+            />
+          }
+        />
+        <Row
+          symbol="-"
+          caption="額外收入(含稅)"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['extraIncome'].toLocaleString()}
+            />
+          }
+        />
+        <Row
+          symbol="-"
+          caption="扣款金額(含稅)"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['totalDeduction'].toLocaleString()}
+            />
+          }
+        />
         <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
-        <Row symbol="=" caption="未收款金額(含稅)" value={state_payment['unpaidPayment']} />
-        {/* <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={state_payment['finalPayment']} /> */}
-        <Row symbol="-" caption={decideFinalPaymentCaption(state_payment)} value={state_payment['finalPayment']} />
-        <Row symbol="=" caption="請款中" value={state_payment['paymentPending']} />
+        <Row
+          symbol="="
+          caption="未收款金額(含稅)"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['unpaidPayment'].toLocaleString()}
+            />
+          }
+        />
+        <Row
+          symbol="-"
+          caption={decideFinalPaymentCaption(state_payment)}
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['finalPayment']?.toLocaleString()}
+            />
+          }
+        />
+        <Row
+          symbol="="
+          caption="請款中"
+          value={
+            <SimpleNode
+              defaultInputSelProps={defaultInputSelProps}
+              value={state_payment['paymentPending'].toLocaleString()}
+            />
+          }
+        />
       </div>
       {/*  */}
     </div>
@@ -367,6 +458,16 @@ const Row = ({
       <span>{value}</span>
     </div>
   );
+};
+
+const SimpleNode = ({
+  defaultInputSelProps,
+  value,
+}: {
+  defaultInputSelProps: TinputSelProps;
+  value: React.ReactNode;
+}) => {
+  return <InputSel {...defaultInputSelProps} node={<div className="text-right">{value}</div>} />;
 };
 
 // =============================================================================

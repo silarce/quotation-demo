@@ -23,7 +23,7 @@
 // 報價單
 import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -61,6 +61,7 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
+import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -69,11 +70,12 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
+
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import Dropdown from 'components/global/gear/dropdown/Dropdown';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -88,7 +90,11 @@ import { AppContext } from 'pages/_app';
 
 // utils
 import { urlToFile } from 'js/utils/helpers/urlToFile';
-import { init_variable } from 'components/page/domestic/quotation/function/utils_quotation';
+import {
+  init_variable,
+  calcNTDToForeignCurrency,
+  checkIsReviewer,
+} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -119,6 +125,7 @@ import {
 
 // hook
 import { useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
@@ -158,6 +165,16 @@ type Tprofile = {
   trackProgress: string;
   projectProgress: string;
   isLost: boolean;
+
+  //
+  designatedBrand: string;
+  siteManager: string;
+  siteManagerNumber: string;
+  requiredDoorType: string;
+  requiredDoorQuantity: string;
+  estimatedDiscount: string; // number
+  scheduledProcurementOrBidDate: Moment | null;
+  type: string;
 };
 
 type Tquery = {
@@ -167,15 +184,17 @@ type Tquery = {
   isContract: string | undefined;
 };
 
-type Tstate_summary = {
-  discountRate: string;
-  tuneTotal: string;
-  subTotal: string;
-  salesTax: string;
-  total: string;
-  deliveryLocation: string;
-  deliveryDate: string;
-};
+// type Tstate_summary = {
+//   discountRate: string;
+//   tuneTotal: string;
+//   subTotal: string;
+//   salesTax: string;
+//   total: string;
+//   deliveryLocation: string;
+//   deliveryDate: string;
+//   exchangeRate: string;
+//   usd: string;
+// };
 
 type TcustomerSelectorShow = {
   show: boolean;
@@ -230,6 +249,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isWorkDirector,
     isCashier,
     isSupervisor,
+    // eslint-disable-next-line prefer-const
     isSalesManagerEmployee,
     isManager,
     salesReviewedAt,
@@ -270,8 +290,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [showMemoModal, setShowMemoModal] = useState(false);
 
-  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
-
   // __________________________________________________________
 
   const [taxRate, setTaxRate] = useState(0.05);
@@ -306,6 +324,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
   const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
+  const [designUnit, setDesignUnit] = useState<TcustomerDto | undefined | null>();
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -314,15 +333,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [state_anno, setState_annotation] = useState<string[]>([]);
   const [state_qr, setState_qr] = useState<string[]>([]);
 
-  const [state_summary, setState_summary] = useState<Tstate_summary>({
-    discountRate: '',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
 
   const [state_paymentMethod, setState_PaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
     []
@@ -333,8 +344,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // region get Data
 
-  const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
+  const {
+    data: quotationData,
+    update,
+    // updateSingleProd_noRender,
+    // updateAllWholeProd_batch_noRender,
+  } = useGetQuotation_id_2(quotationId as string, {
     preBuiltPopulate: ['simple', 'attached'],
+    // getProductItems: false,
   });
   // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
   const {
@@ -384,12 +401,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSendToReview = !!(
     toSalesAt ||
     toSupervisorAt ||
-    toSalesManagerAt ||
+    // toSalesManagerAt ||
     toWorkDirectorAt ||
     toCashierAt ||
     toManagerAt
   );
-  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
   version = latestContent?.version;
   editNotes = latestContent?.editNotes;
@@ -409,65 +432,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
-  if (userId) {
-    if (userId === reviewSalesEmployeeId && toSalesAt) {
-      isSales = true;
-      isReviewer = true;
-    } else if (userId === reviewSupervisorEmployeeId && toSupervisorAt) {
-      if (salesReviewedAt) {
-        isSupervisor = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
-      if (salesReviewedAt && supervisorReviewedAt) {
-        isSalesManagerEmployee = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (
-        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
-        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
-        // 代表這個content是在SalesManager這個property被加進來之前的content
-        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
-      ) {
-        isWorkDirector = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
-        isCashier = true;
-        isReviewer = true;
-      }
-    } else if (
-      userId === reviewManagerEmployeeId ||
-      // 總經理ID
-      userId === '01f55698-49bb-4501-b432-1157a5109554'
-    ) {
-      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
-        isManager = true;
-        isReviewer = true;
-      } else if (
-        salesReviewedAt &&
-        supervisorReviewedAt &&
-        salesManagerReviewedAt &&
-        workDirectorReviewedAt &&
-        cashierReviewedAt
-      ) {
-        isManager = true;
-        isReviewer = true;
-      }
-    }
-  }
+  const checkReviewerResult = checkIsReviewer({
+    userId,
 
-  // 如果是準合約，如果業務與業務主管為同一人，視為業務主管
-  // 因為在準合約時業務預設為已審核過(salesReviewedAt不為null)所以可以這樣處理
-  if (status === 'Pending') {
-    if (userId === reviewSupervisorEmployeeId) {
-      isSupervisor = true;
-      isSales = false;
-      isReviewer = true;
-    }
-  }
+    status,
+
+    reviewSalesEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewManagerEmployeeId,
+
+    salesReviewedAt,
+    supervisorReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+
+    toSalesAt,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+  });
+
+  isReviewer = checkReviewerResult.isReviewer;
+
+  isSales = checkReviewerResult.isSales;
+  isSupervisor = checkReviewerResult.isSupervisor;
+  isWorkDirector = checkReviewerResult.isWorkDirector;
+  isCashier = checkReviewerResult.isCashier;
+  isManager = checkReviewerResult.isManager;
 
   // --------------------------------------------------------------------------
 
@@ -557,25 +552,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     setIsLoading(true);
 
-    let isGetDetailSpecSuccess = true;
+    // let isGetDetailSpecSuccess = true;
 
-    for (const prod of Object.values(productList)) {
-      try {
-        await prod.reqGetDetailSpec();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得細部規格失敗', content: err.message });
-        isGetDetailSpecSuccess = false;
-        setIsLoading(false);
-        break;
-      }
-    }
+    // for (const prod of Object.values(productList)) {
+    //   try {
+    //     await prod.reqGetDetailSpec();
+    //   } catch (error) {
+    //     const err = error as Error;
+    //     myAlert.err({ title: '取得細部規格失敗', content: err.message });
+    //     isGetDetailSpecSuccess = false;
+    //     setIsLoading(false);
+    //     break;
+    //   }
+    // }
 
-    if (!isGetDetailSpecSuccess) {
-      setIsLoading(false);
+    // if (!isGetDetailSpecSuccess) {
+    //   setIsLoading(false);
 
-      return;
-    }
+    //   return;
+    // }
 
     // 總樘數
     let prodQty = 0;
@@ -678,6 +673,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',
       faxNumber: state_profile.faxNumber ?? '',
+
+      designatedBrand: state_profile.designatedBrand ?? '',
+      siteManager: state_profile.siteManager ?? '',
+      siteManagerNumber: state_profile.siteManagerNumber ?? '',
+      requiredDoorType: doorModelSummary || null,
+
+      // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      // estimatedDiscount: state_profile.estimatedDiscount || null,
+      // scheduledProcurementOrBidDate:
+      //   state_profile.scheduledProcurementOrBidDate &&
+      //   moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+
+      type: state_profile.type ?? '',
+
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
@@ -694,7 +703,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: state_profile.trackProgress ?? '',
       projectProgress: state_profile.projectProgress ?? '',
 
-      discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      discount: `${Number(state_summary.discountRate ?? 100)}`,
       averageDiscount: avgDiscount_withQty || null,
       tuneTotal: state_summary.tuneTotal || '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
@@ -703,12 +712,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
+      exchangeRate: state_summary.exchangeRate || null,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', '') || null,
+      currency: state_summary.currency,
+
       //
       products: prodArr,
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
       isLost: state_profile.isLost,
+      //
+      designUnitId: designUnit?.id ?? null,
     };
 
     if (!body.customerId) {
@@ -775,7 +790,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -788,36 +803,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    if (status === 'Pending') {
-      if (
-        !reviewSalesEmployeeId ||
-        !reviewWorkDirectorEmployeeId ||
-        !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId ||
-        !reviewSalesManagerEmployeeId
-      ) {
-        return myAlert.warning({ title: '請先設定所有審核人員' });
-      }
-    }
-
-    if (isSales && salesReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
+    // if (status === 'Pending') {
+    //   if (
+    //     !reviewSalesEmployeeId ||
+    //     !reviewWorkDirectorEmployeeId ||
+    //     !reviewCashierEmployeeId ||
+    //     !reviewSupervisorEmployeeId
+    //     // ||        !reviewSalesManagerEmployeeId
+    //   ) {
+    //     return myAlert.warning({ title: '請先設定所有審核人員' });
+    //   }
+    // }
 
     try {
       setIsLoading(true);
       const res = await apiQuotationReview({ id: quotationId, body });
 
+      // res裡沒有status................竟然沒有
       if (res.status === 'Contract') {
         // router.push({
         //   pathname: '/domestic/contract',
@@ -910,6 +912,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
+  const reqPatchReviewer_pending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(quotationId, {});
+      await update();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '送審失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // 轉為準合約
   const reqToPending = async () => {
     if (!latestContent) {
@@ -965,7 +984,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const res = await apiPostCopyQuotation({
         quotationId,
         customerId,
-        isRelationQuotation: customerSelectorShow.isRelationQuotation,
+        isRelationQuotation: customerSelectorShow.isRelationQuotation || false,
       });
 
       if (res) {
@@ -1058,6 +1077,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // avgDiscount,
     avgDiscount_withQty,
     //
+    doorModelSummary,
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
     // others: quotationData?.latestContent.others,
@@ -1206,6 +1226,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           changeProfile('faxNumber', '');
         },
       },
+      designUnit: {
+        value: designUnit,
+        onChange: (customer) => setDesignUnit(customer),
+        onClear: () => setDesignUnit(null),
+      },
 
       isLost: {
         value: state_profile.isLost,
@@ -1250,69 +1275,127 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: state_profile.faxNumber,
           onChange: (v) => changeProfile('faxNumber', v),
         },
+
+        designatedBrand: {
+          value: state_profile.designatedBrand,
+          onChange: (v) => {
+            changeProfile('designatedBrand', v);
+          },
+        },
+        siteManager: {
+          value: state_profile.siteManager,
+          onChange: (v) => {
+            changeProfile('siteManager', v);
+          },
+        },
+        siteManagerNumber: {
+          value: state_profile.siteManagerNumber,
+          onChange: (v) => {
+            changeProfile('siteManagerNumber', v);
+          },
+        },
+        requiredDoorType: {
+          value: state_profile.requiredDoorType,
+          onChange: (v) => {
+            changeProfile('requiredDoorType', v);
+          },
+        },
+        requiredDoorQuantity: {
+          value: state_profile.requiredDoorQuantity,
+          onChange: (v) => {
+            changeProfile('requiredDoorQuantity', v);
+          },
+        },
+        estimatedDiscount: {
+          value: state_profile.estimatedDiscount,
+          onChange: (v) => {
+            changeProfile('estimatedDiscount', v);
+          },
+        },
+        type: {
+          value: state_profile.type,
+          onChange: (v) => {
+            changeProfile('type', v);
+          },
+        },
+        scheduledProcurementOrBidDate: {
+          value: state_profile.scheduledProcurementOrBidDate,
+          onChange: (v) => {
+            setState_profile((state) => ({ ...state, scheduledProcurementOrBidDate: v }));
+          },
+        },
+
+        //
         trackProgress: {
           value: state_profile.trackProgress,
+          onChange: (v) => {
+            !disabled && changeProfile('trackProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('trackProgress', v);
+          //     },
 
-          onChange: isSendToReview
-            ? undefined
-            : (v) => {
-                !isSendToReview && changeProfile('trackProgress', v);
-              },
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  const modal = myAlert.input({
+                    title: '追蹤進度',
+                    placeholder: '追蹤進度',
+                    defaultValue: state_profile.trackProgress,
+                    isTextArea: true,
+                    width: 656,
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        trackProgress: v,
+                      });
 
-          onClick: !isSendToReview
-            ? undefined
-            : () => {
-                setInputModalConfig({
-                  visible: true,
-                  title: '追蹤進度',
-                  placeholder: '請輸入追蹤進度',
-                  onConfirm: async (v) => {
-                    const res = await reqPatchQuotationContent_id_progress({
-                      trackProgress: v,
-                    });
-
-                    if (res) {
-                      const trackProgress = res.trackProgress;
-                      changeProfile('trackProgress', trackProgress);
-                    }
-
-                    setInputModalConfig(undefined);
-                  },
-                  onCancel: () => setInputModalConfig(undefined),
-                });
-              },
+                      if (res) {
+                        const trackProgress = res.trackProgress;
+                        changeProfile('trackProgress', trackProgress);
+                        modal.destroy();
+                      }
+                    },
+                  });
+                },
           disabled: isSendToReview ? false : undefined,
         },
         projectProgress: {
           value: state_profile.projectProgress,
-          // onChange: (v) => changeProfile('projectProgress', v),
-          onChange: isSendToReview
-            ? undefined
-            : (v) => {
-                !isSendToReview && changeProfile('projectProgress', v);
-              },
-          onClick: !isSendToReview
-            ? undefined
-            : () => {
-                setInputModalConfig({
-                  visible: true,
-                  title: '工程進度',
-                  placeholder: '請輸入工程進度',
-                  onConfirm: async (v) => {
-                    const res = await reqPatchQuotationContent_id_progress({
-                      projectProgress: v,
-                    });
 
-                    if (res) {
-                      const projectProgress = res.projectProgress;
-                      changeProfile('projectProgress', projectProgress);
-                    }
+          onChange: (v) => {
+            !disabled && changeProfile('projectProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('projectProgress', v);
+          //     },
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  const modal = myAlert.input({
+                    title: '工程進度',
+                    placeholder: '工程進度',
+                    defaultValue: state_profile.projectProgress,
+                    isTextArea: true,
+                    width: 656,
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        projectProgress: v,
+                      });
 
-                    setInputModalConfig(undefined);
-                  },
-                  onCancel: () => setInputModalConfig(undefined),
-                });
-              },
+                      if (res) {
+                        const projectProgress = res.projectProgress;
+                        changeProfile('projectProgress', projectProgress);
+                        modal.destroy();
+                      }
+                    },
+                  });
+                },
           disabled: isSendToReview ? false : undefined,
         },
       },
@@ -1320,7 +1403,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return control_profile;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state_profile]);
+  }, [state_profile, designUnit]);
 
   // ____________________________________________________________________
   // ____________________________________________________________________
@@ -1507,6 +1590,39 @@ function TheQuotation({ router }: { router: NextRouter }) {
           });
         },
       },
+
+      exchangeRate: {
+        value: state_summary.exchangeRate,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.exchangeRate = v;
+
+            const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+            copy.foreignTotal = calcNTDToForeignCurrency({
+              NTD: total_num,
+              foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+            }).toLocaleString();
+
+            return copy;
+          });
+        },
+      },
+      foreignTotal: {
+        value: state_summary.foreignTotal,
+      },
+      currency: {
+        value: state_summary.currency,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.currency = v;
+
+            return copy;
+          });
+        },
+      },
     };
 
     return payInfoControl;
@@ -1547,12 +1663,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         style: { width: '180px' },
         isReviewed: !!quotationData?.latestContent.workDirectorReviewedAt,
       },
-      {
-        label: '業務經理',
-        value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
-      },
+      // {
+      //   label: '業務經理',
+      //   value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
+      //   style: { width: '180px' },
+      //   isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
+      // },
       {
         label: '業務主管',
         value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
@@ -1672,7 +1788,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         unit_str = acce.unit as string;
       }
 
-      const partName = acce.name.replaceAll('60A', '');
+      let partName = acce.name.replaceAll('60A', '');
+
+      if (partName === '氟碳烤漆' || partName === '粉體烤漆') {
+        partName = '烤漆';
+      }
 
       return {
         partName,
@@ -1821,24 +1941,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
           type: 'myButton',
           label: '送審',
           onClick: () => {
-            if (status === 'Pending' && !verifyForm) {
-              return myAlert.warning({ title: '請先送出合約審核表' });
+            if (status === 'Pending') {
+              if (!verifyForm) {
+                return myAlert.warning({ title: '請先送出合約審核表' });
+              }
+
+              if (toCashierAt) {
+                myAlert.info({ title: '此報價單已經送審' });
+
+                return;
+              }
+
+              myAlert.confirm({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+              });
+
+              return;
             }
 
-            if (status === 'Pending' && toSupervisorAt) {
-              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
-            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+            if (toSalesAt || toSupervisorAt) {
               myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
               setShowEmployeSelector(true);
-            }
-
-            if (status === 'Pending') {
-              myAlert.info({
-                title: '送審後合約審核表將被鎖定',
-                content: '建議先確認合約審核表是否正確',
-                props: { width: 450 },
-              });
             }
           }, // onClick close
         }
@@ -1936,7 +2062,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const customeRight = [
     !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
       <Dropdown
-        key="1"
+        key="0"
         // placement="bottomRight"
         itemArr={[
           //
@@ -2005,6 +2131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // setEditNotes(latestContent?.editNotes ?? '');
 
     setCustomer(latestContent?.customer ?? null);
+    setDesignUnit(latestContent?.designUnit ?? null);
 
     setState_profile({
       validityPeriod: latestContent?.validityPeriod ?? '',
@@ -2018,14 +2145,61 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
       isLost: latestContent?.isLost ?? false,
+
+      designatedBrand: latestContent?.designatedBrand ?? '',
+      siteManager: latestContent?.siteManager ?? '',
+      siteManagerNumber: latestContent?.siteManagerNumber ?? '',
+      requiredDoorType: latestContent?.requiredDoorType ?? '',
+      requiredDoorQuantity: String(latestContent?.requiredDoorQuantity ?? ''),
+      estimatedDiscount: latestContent?.estimatedDiscount ?? '',
+      scheduledProcurementOrBidDate: latestContent?.scheduledProcurementOrBidDate
+        ? moment(latestContent.scheduledProcurementOrBidDate)
+        : null,
+      type: latestContent?.type ?? '',
     });
   }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
-    if (targetProd) {
-      targetProd.callApiAndGetOptions();
-    }
+    (async () => {
+      if (targetProd) {
+        // if (!targetProd.isComplete && targetProd.id) {
+        //   const wholeProd = await updateSingleProd_noRender(targetProd.id);
+
+        //   if (wholeProd) {
+        //     targetProd.renewWholeProd(targetProd.quotationProductToProd({ quotationProduct: wholeProd }));
+        //   }
+        // }
+
+        targetProd.callApiAndGetOptions();
+      }
+    })();
   }, [targetProd]);
+
+  // 批次更新主產品資料，這個useEffect先不要刪，留著備用
+  // useEffect(() => {
+  //   const stopToken = { stop: false };
+
+  //   updateAllWholeProd_batch_noRender({
+  //     stopToken,
+  //     onBatchSuceess: (wholeProdArr) => {
+  //       wholeProdArr.forEach((wholeProd) => {
+  //         if (wholeProd.id in productList) {
+  //           const prod = productList[wholeProd.id];
+
+  //           if (prod.isComplete) {
+  //             return;
+  //           }
+
+  //           prod.renewWholeProd(prod.quotationProductToProd({ quotationProduct: wholeProd }));
+  //         }
+  //       });
+  //     },
+  //   });
+
+  //   return () => {
+  //     stopToken.stop = true;
+  //   };
+  // }, [quotationData, productList]);
 
   useEffect(() => {
     if (latestContent) {
@@ -2041,6 +2215,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         paymentMethods,
         annotations,
         quotationRanges,
+        //
+        exchangeRate,
+        foreignTotal,
+        currency,
       } = latestContent;
 
       const haveTax = !!salesTax;
@@ -2057,6 +2235,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total: total.toLocaleString(),
         deliveryLocation,
         deliveryDate,
+        exchangeRate: exchangeRate || '',
+        foreignTotal: foreignTotal || '',
+        currency: currency,
       });
 
       setTaxRate(haveTax ? 0.05 : 0);
@@ -2082,15 +2263,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       ]);
 
-      setState_summary({
-        discountRate: '100',
-        tuneTotal: '',
-        subTotal: '',
-        salesTax: '',
-        total: '',
-        deliveryLocation: '',
-        deliveryDate: '',
-      });
+      // setState_summary({
+      //   discountRate: '100',
+      //   tuneTotal: '',
+      //   subTotal: '',
+      //   salesTax: '',
+      //   total: '',
+      //   deliveryLocation: '',
+      //   deliveryDate: '',
+      //   exchangeRate: '',
+      //   usd: '',
+      // });
+      clearSummary();
+
       setTaxRate(0.05);
     }
   }, [quotationData, quotationContentData, disabled]);
@@ -2106,12 +2291,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       taxRate,
     });
 
+    const foreignTotal = calcNTDToForeignCurrency({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
     setState_summary((state) => {
       return {
         ...state,
         subTotal,
         salesTax,
         total,
+        foreignTotal,
       };
     });
 
@@ -2191,6 +2382,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile_memo disabled={disabled} control={control_profile} editNotes={editNotes} />
+          <InputSel
+            className={'ml-[50px]'}
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary doorModelSummary={DoorSummary.format(doorModelSummary)} />}
+          />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>
@@ -2450,13 +2649,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       />
       {/*  */}
 
-      <InputModal
-        visible={!!inputModalConfig?.visible}
-        onConfirm={inputModalConfig?.onConfirm}
-        onCancel={inputModalConfig?.onCancel}
-        title={inputModalConfig?.title ?? ''}
-        placeholder={inputModalConfig?.placeholder}
-      />
       {/* 審核人員選擇器 */}
       <EmployeeSelectorGroup
         showModal={showEmployeSelector}
@@ -2545,6 +2737,15 @@ const creEmptyProfile = (): Tprofile => ({
   trackProgress: '',
   projectProgress: '',
   isLost: false,
+
+  designatedBrand: '',
+  siteManager: '',
+  siteManagerNumber: '',
+  requiredDoorType: '',
+  requiredDoorQuantity: '',
+  estimatedDiscount: '',
+  scheduledProcurementOrBidDate: null,
+  type: '',
 });
 
 // =============================================================================

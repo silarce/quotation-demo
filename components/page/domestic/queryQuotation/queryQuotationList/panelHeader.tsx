@@ -51,7 +51,7 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
   const {
     quotationNumber,
     status,
-    quoteDate: updatedAt,
+    quoteDate,
     county,
     projectName,
     customerName,
@@ -105,7 +105,7 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
       <div className={scss.info}>
         <span ref={viewRef_bottom}>{quotationNumber}</span>
         <span className={scss.step}>{status}</span>
-        <span>{updatedAt}</span>
+        <span>{quoteDate}</span>
         <span>{county}</span>
         <span className={scss.clientName}>{projectName}</span>
         <span className={scss.clientName}>{customerName}</span>

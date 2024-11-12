@@ -6,10 +6,13 @@ import Decimal from 'decimal.js';
 // gear
 import TopBar from './ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './incomeBillSorting.module.scss';
 
+// utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { cutCurrency } from 'js/utils/currency/cutCurrency';
 
 import type {
   TaccountsReceivablePeriodDto,
@@ -17,6 +20,7 @@ import type {
   TaccountsReceivableInvoiceDto,
   TincomeBillSerialDto,
 } from 'js/api/dtoTypes';
+import type { Tcurrency } from 'js/api/dtoTypes';
 
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -78,8 +82,8 @@ type TincomeBill = {
   noteMaturityDate: React.ReactNode; // 票據到期日
 
   receiveDate: React.ReactNode;
-  receivablePayment: React.ReactNode;
-  receivablePayment_num: number;
+  receivablePaymentForAccountReceivable: React.ReactNode;
+  receivablePaymentForAccountReceivable_num: number;
 
   //
   isRelationedInvoiceChanged: boolean;
@@ -106,18 +110,31 @@ type TdndData_group = {
 export type { TstateList as Tstate_incomeBillSorting };
 
 // ================================================================================
+
+const theCurrency: Tcurrency = 'TWD 新臺幣';
+const currency_tw = cutCurrency(theCurrency);
+
+// ================================================================================
 // region START
 export default function IncomeBillSorting({
   className,
   periodArr,
   incomeBillList_noInvoice,
   onConfirm,
+  readonly,
+  currency,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
   incomeBillList_noInvoice: TincomeBillSerialDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
+  readonly?: boolean;
+  currency: string;
 }) {
+  // 幣別一樣時才需要計算amountNotCollected
+  // 因為算一算其實不會怎麼樣，所以簡單處理，隱藏就好
+  const showAmountNotCollected = currency === currency_tw;
+
   const [disabled, setDisabled] = useState(true);
 
   const [stateList, setStateList] = useState<TstateList>({});
@@ -169,11 +186,11 @@ export default function IncomeBillSorting({
     //
     total_invoice,
     total_invoice_num,
-    total_incomeBill,
+    total_incomeBill_receivablePaymentForAccountReceivable: total_incomeBill,
     amountNotCollected,
   } = useMemo(() => {
     let total_invoice_d = new Decimal(0);
-    let total_incomeBill_d = new Decimal(0);
+    let total_incomeBill_receivablePaymentForAccountReceivable_d = new Decimal(0);
 
     periodArr.forEach((period) => {
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
@@ -186,26 +203,36 @@ export default function IncomeBillSorting({
 
       const incomeBillList = invoice.incomeBillSerialList;
 
-      // const price = period.price || 0;
-      const price = invoice.actualPrice || 0;
+      const { actualPrice, allowance } = invoice;
 
-      total_invoice_d = total_invoice_d.add(price || 0);
+      total_invoice_d = total_invoice_d.add(actualPrice || 0).minus(allowance || 0);
 
       incomeBillList?.forEach((incomeBill) => {
-        total_incomeBill_d = total_incomeBill_d.add(incomeBill.receivablePayment || 0);
+        total_incomeBill_receivablePaymentForAccountReceivable_d =
+          total_incomeBill_receivablePaymentForAccountReceivable_d.add(
+            incomeBill.receivablePaymentForAccountReceivable || 0
+          );
       });
     }); // periodArr.forEach
 
     incomeBillList_noInvoice?.forEach((incomeBill) => {
-      total_incomeBill_d = total_incomeBill_d.add(incomeBill.receivablePayment || 0);
+      total_incomeBill_receivablePaymentForAccountReceivable_d =
+        total_incomeBill_receivablePaymentForAccountReceivable_d.add(
+          incomeBill.receivablePaymentForAccountReceivable || 0
+        );
     });
 
-    const amountNotCollected = new Decimal(total_invoice_d).minus(total_incomeBill_d).toNumber().toLocaleString();
+    const amountNotCollected = new Decimal(total_invoice_d)
+      .minus(total_incomeBill_receivablePaymentForAccountReceivable_d)
+      .toNumber()
+      .toLocaleString();
 
     return {
       total_invoice_num: total_invoice_d.toNumber(),
       total_invoice: total_invoice_d.toNumber().toLocaleString(),
-      total_incomeBill: total_incomeBill_d.toNumber().toLocaleString(),
+      total_incomeBill_receivablePaymentForAccountReceivable: total_incomeBill_receivablePaymentForAccountReceivable_d
+        .toNumber()
+        .toLocaleString(),
       amountNotCollected,
     };
   }, [periodArr, incomeBillList_noInvoice]);
@@ -256,6 +283,7 @@ export default function IncomeBillSorting({
           noteMaturityDate,
           receivablePayment,
           accountsReceivableDeduction,
+          receivablePaymentForAccountReceivable,
         } = incomeBill;
 
         return {
@@ -265,8 +293,8 @@ export default function IncomeBillSorting({
           importAccountingNumber: importAccountingNumber || '---',
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate) || '---',
           // price: price.toLocaleString(),
-          receivablePayment: receivablePayment?.toLocaleString(),
-          receivablePayment_num: receivablePayment || 0,
+          receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
+          receivablePaymentForAccountReceivable_num: receivablePaymentForAccountReceivable || 0,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
           raw: incomeBill,
@@ -302,13 +330,13 @@ export default function IncomeBillSorting({
           新增折讓
         </MyButton_v2> */}
 
-        {disabled && (
+        {disabled && !readonly && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
             排序/編輯
           </MyButton_v2>
         )}
 
-        {!disabled && (
+        {!disabled && !readonly && (
           <>
             <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
               取消
@@ -340,7 +368,7 @@ export default function IncomeBillSorting({
               <span>收款日期</span>
               <span>帳號/號碼</span>
               <span>到期日</span>
-              <span>收款金額</span>
+              <span>{'收款金額(含匯費)'}</span>
             </Row>
           </Right>
         </Group>
@@ -379,6 +407,8 @@ export default function IncomeBillSorting({
                   //
                   activeIncomeBillId={activeIncomeBill?.id}
                   handle_editAllowance={handle_editAllowance}
+                  //
+                  currency={currency}
                 />
               );
             })}
@@ -403,7 +433,15 @@ export default function IncomeBillSorting({
             <Row>
               <span></span>
               <span>合計</span>
-              <span>{total_invoice}</span>
+              {/* <span>{total_invoice}</span> */}
+              <InputSel
+                {...defaultInputSelProps_02}
+                // prefix={currency}
+                showBaseline="invisible"
+                className={'mr-3'}
+                prefix={currency_tw}
+                node={<div className="text-right">{total_invoice}</div>}
+              />
             </Row>
           </Left>
           <Right>
@@ -411,24 +449,41 @@ export default function IncomeBillSorting({
               <span></span>
               <span></span>
               <span>合計</span>
-              <span>{total_incomeBill}</span>
+              {/* <span>{total_incomeBill}</span> */}
+              <InputSel
+                {...defaultInputSelProps_02}
+                prefix={currency}
+                showBaseline="invisible"
+                className={'mr-3'}
+                node={<div className="text-right">{total_incomeBill}</div>}
+              />
             </Row>
           </Right>
         </Group>
 
-        <div className={scss.footCaption}>已開立發票未收款項</div>
-
-        <Group className={scss['total']}>
-          <Left></Left>
-          <Right>
-            <Row>
-              <span></span>
-              <span></span>
-              <span>合計</span>
-              <span>{amountNotCollected}</span>
-            </Row>
-          </Right>
-        </Group>
+        {showAmountNotCollected && (
+          <>
+            <div className={scss.footCaption}>已開立發票未收款項</div>
+            <Group className={scss['total']}>
+              <Left></Left>
+              <Right>
+                <Row>
+                  <span></span>
+                  <span></span>
+                  <span>合計</span>
+                  {/* <span>{amountNotCollected}</span> */}
+                  <InputSel
+                    {...defaultInputSelProps_02}
+                    // prefix={currency}
+                    showBaseline="invisible"
+                    className={'mr-3'}
+                    node={<div className="text-right">{amountNotCollected}</div>}
+                  />
+                </Row>
+              </Right>
+            </Group>
+          </>
+        )}
       </div>
     </div>
   );
@@ -476,11 +531,13 @@ const Group_Dnd = ({
   disabled,
   activeIncomeBillId,
   handle_editAllowance,
+  currency,
 }: {
   state: Tstate;
   disabled: boolean;
   activeIncomeBillId?: UniqueIdentifier | undefined;
   handle_editAllowance: (invoiceId: string, value: string) => void;
+  currency: string;
 }) => {
   const { invoice, incomeBillArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
@@ -508,20 +565,36 @@ const Group_Dnd = ({
         <Row>
           <span>{invoiceNumber}</span>
           <span>{invoiceDate}</span>
-          <span className="justify-self-end mr-5">{price}</span>
+          <InputSel
+            {...defaultInputSelProps}
+            className="justify-self-end"
+            prefix={currency_tw}
+            showBaseline="invisible"
+            node={<div className="text-right">{price}</div>}
+          />
         </Row>
 
         <Row className={classNames(scss.allowance, scss.plus, (disabled || isNoInvoice) && scss.disabled)}>
           <div></div>
           <p>折讓</p>
-          <input
-            className="justify-self-end mr-5"
-            placeholder="無折讓"
-            readOnly={disabled || isNoInvoice}
-            type={disabled ? 'text' : 'number'}
-            value={allowance}
-            onChange={(e) => {
-              handle_editAllowance(String(invoice.id), e.target.value);
+
+          <InputSel
+            {...defaultInputSelProps}
+            className="justify-self-end "
+            showBaseline="auto"
+            disabled={disabled || isNoInvoice}
+            prefix={currency_tw}
+            inputProps={{
+              props: {
+                placeholder: '無折讓',
+                value: allowance,
+                readOnly: disabled || isNoInvoice,
+                disabled: false,
+                type: disabled ? 'text' : 'number',
+                onChange: (e) => {
+                  handle_editAllowance(String(invoice.id), e.target.value);
+                },
+              },
             }}
           />
         </Row>
@@ -547,7 +620,7 @@ const Group_Dnd = ({
               receiveDate: insertDate,
               importAccountingNumber,
               noteMaturityDate,
-              receivablePayment: price,
+              receivablePaymentForAccountReceivable: price,
             } = incomeBill;
 
             return (
@@ -561,7 +634,13 @@ const Group_Dnd = ({
                 <span>{insertDate}</span>
                 <span>{importAccountingNumber}</span>
                 <span>{noteMaturityDate}</span>
-                <span>{price}</span>
+                {/* <span>{price}</span> */}
+                <InputSel
+                  {...defaultInputSelProps}
+                  showBaseline="invisible"
+                  prefix={currency}
+                  node={<div className="text-right mr-3">{price}</div>}
+                />
               </Row_Dnd>
             );
           })}
@@ -825,6 +904,7 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
       noteMaturityDate,
       receivablePayment,
       accountsReceivableDeduction,
+      receivablePaymentForAccountReceivable,
     } = incomeBill;
 
     return {
@@ -833,8 +913,8 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
       receiveDate: getTaiwanDateStr(receiveDate),
       importAccountingNumber,
       noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
-      receivablePayment: receivablePayment?.toLocaleString(),
-      receivablePayment_num: receivablePayment,
+      receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
+      receivablePaymentForAccountReceivable_num: receivablePaymentForAccountReceivable || 0,
       accountsReceivableDeduction,
       isRelationedInvoiceChanged: false,
       raw: incomeBill,
@@ -848,4 +928,19 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
     invoice: virtualInvoice,
     incomeBillArr,
   };
+};
+
+// ================================================================================
+const defaultInputSelProps: TinputSelProps = {
+  wrapperStyle: {
+    // gap: '10px',
+    width: '140px',
+  },
+};
+
+const defaultInputSelProps_02: TinputSelProps = {
+  wrapperStyle: {
+    // gap: '10px',
+    width: '150px',
+  },
 };

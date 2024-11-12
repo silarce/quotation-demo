@@ -915,6 +915,8 @@ export type TquotationContentOtherDto = {
   notes: string;
   // 尺寸規格
   spec: string | null;
+  // 是否可以在工務部揭露金額
+  isDisplayedOnAccountReceivable: boolean;
 };
 
 // export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
@@ -924,6 +926,7 @@ export type TcreateQuotationContentOtherDto = Pick<
 > & {
   quantity: `${number}`;
   totalPrice: `${number}`;
+  isDisplayedOnAccountReceivable?: boolean;
 };
 
 /**選配設定 */
@@ -1798,6 +1801,26 @@ export type TquotationContentDto = {
   address: string; // 剩餘地址
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
+
+  // 指定廠牌
+  designatedBrand: string | null;
+  // 工地主任
+  siteManager: string | null;
+  // 工地主任電話
+  siteManagerNumber: string | null;
+  // 門型彙總
+  requiredDoorType: string | null;
+
+  // 需求門型數量 // 棄用
+  requiredDoorQuantity: number | null;
+  // 預估折數 // 棄用
+  estimatedDiscount: string | null;
+  // 預定採購日/投標日 // 棄用
+  scheduledProcurementOrBidDate: string | null; // 日期
+
+  // 類型
+  type: string | null;
+
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
@@ -1888,6 +1911,12 @@ export type TquotationContentDto = {
   //
   settleProducts: TsettleProductDto[];
   //
+  designUnitId: string | null;
+  designUnit?: TcustomerDto;
+  //
+  exchangeRate: `${number}` | null;
+  foreignTotal: `${number}` | null;
+  currency: Tcurrency;
 };
 
 export type TquotationDto = {
@@ -2049,6 +2078,7 @@ export type TcreateQuotationProductDto = {
   accessories: TcreateQuotationProductAccessoryDto[];
   // 來源產品
   attachedToProductId?: string | null;
+  //
 };
 
 export type TupdateQuotationProductDto = TcreateQuotationProductDto & {
@@ -2211,6 +2241,40 @@ export type TcreateQuotationContentDto = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
 
+  // // 指定廠牌
+  // designatedBrand?: string | null;
+  // // 工地主任
+  // siteManager?: string | null;
+  // // 工地主任電話
+  // siteManagerNumber?: string | null;
+  // // 需求門型
+  // requiredDoorType?: string | null;
+  // // 需求門型數量
+  // requiredDoorQuantity?: number | null;
+  // // 預估折數
+  // estimatedDiscount?: string | null;
+  // // 預定採購日/投標日
+  // scheduledProcurementOrBidDate?: string | null; // 日期
+  // // 類型
+  // type?: string | null;
+
+  // 指定廠牌
+  designatedBrand?: string | null;
+  // 工地主任
+  siteManager?: string | null;
+  // 工地主任電話
+  siteManagerNumber?: string | null;
+  // 門型彙總
+  requiredDoorType?: string | null;
+  // 需求門型數量 // 可以用，但是棄用
+  // requiredDoorQuantity?: number | null;
+  // 預估折數 // 可以用，但是棄用
+  // estimatedDiscount?: string | null;
+  // 預定採購日/投標日 // 可以用，但是棄用
+  // scheduledProcurementOrBidDate?: string | null; // 日期
+  // 類型
+  type?: string | null;
+
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
   status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
@@ -2243,6 +2307,12 @@ export type TcreateQuotationContentDto = {
 
   // 失件
   isLost: boolean;
+  //
+  designUnitId: string | null;
+  //
+  exchangeRate: string | null;
+  foreignTotal: string | null;
+  currency: Tcurrency;
 };
 
 /**合約 */
@@ -2293,6 +2363,16 @@ export type TquotationContractDto = {
   //
   // 是否已簽回
   isSignedBack: boolean;
+  //
+  unReviewPicture: number;
+  unReviewWorkSheet: number;
+  //
+  // '幣別'
+  currency: Tcurrency;
+  // '美金價格'
+  foreignTotal: string | null;
+  // '匯率'
+  exchangeRate: string | null;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -2300,7 +2380,7 @@ export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 export type TcopyQuotationDto = {
   quotationId: string;
   customerId: string;
-  isRelationQuotation?: boolean;
+  isRelationQuotation: boolean;
 };
 
 // export type TcreateModifyQuotationDto = {
@@ -2386,8 +2466,8 @@ export type TquotationAccouting_area = {
   year: number;
   month: number;
   county: string;
-  totalsum: string; // 牌價複價
-  pricesum: string; // 單價複價
+  totalsum: string; // 牌價
+  pricesum: string; // 承包價
   percentage: number | null; // 百分比
 };
 
@@ -2417,7 +2497,7 @@ export type TcontractAccountingReportFormDto = {
 // 追加減工程統計表
 export type TquotationAccounting_modifyContract = {
   projectname: string;
-  quotationnumber: string;
+  quotationnumber: string | null;
   quotetype: string;
   year: number;
   month: number;
@@ -2425,6 +2505,7 @@ export type TquotationAccounting_modifyContract = {
   pricesum: `${number}`;
   county: string;
   percentage: number | null;
+  area: string | null; // property的key為推測，待後端更新後要與後端同步
 };
 
 // ========================================================================
@@ -2629,6 +2710,28 @@ export type TdoorHeadBoxDto = {
   isIntegrated: boolean; // 一體式捲箱
 };
 
+export type TdoorMiddlePillarDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+};
+
+export type TdoorBackBoneDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  doorModelName: string; // 門型名稱
+  code: string; // 編號
+  specialSpec: string | null; // 特殊規格
+  price: number | null;
+  name: string;
+};
+
 export type TdoorComponentListDto = {
   slats: TdoorSlatDto[]; // 門片
   bottomBars: TdoorBottomBarDto[]; // 底座
@@ -2638,6 +2741,9 @@ export type TdoorComponentListDto = {
   motors: TdoorMotorDto[]; // 馬達
   motorAccessories: TdoorMotorAccessoriesDto[]; // 馬達配件
   headBoxes: TdoorHeadBoxDto[]; // 捲箱
+  //
+  middlePillar?: TdoorMiddlePillarDto[]; // 中柱
+  backBone?: TdoorBackBoneDto[]; //
 };
 
 export type TgenerateDoorProductBomDto_ComponentInfo = {
@@ -2679,6 +2785,9 @@ export type TgenerateDoorProductBomDto = {
   motor: TgenerateDoorProductBomDto_ComponentInfo;
   motorAccessories: TgenerateDoorProductBomDto_ComponentInfo;
   headBox: TgenerateDoorProductBomDto_ComponentInfo;
+  //
+  middlePillar?: TgenerateDoorProductBomDto_ComponentInfo;
+  backBone?: TgenerateDoorProductBomDto_ComponentInfo;
 };
 
 export type TdoorBomDto_Component = {
@@ -3680,65 +3789,95 @@ export type TincomeBillSerialDto = {
   createdAt: string;
   updatedAt: string;
 
-  // 收入傳票號碼
+  // '收入傳票號碼'
   billSerialNumber: string;
-  // 匯款時間點/收到票據時間點
+  // '收入傳票歸屬的年月份'
+  incomeBillDate: string | null;
+  // '匯款時間點/收到票據時間點
   receiveDate: string | null;
-  // 合約編號
+  // '合約編號'
   contractNumber: string | null;
-  // 工程名稱
+  // '工程名稱'
   projectName: string | null;
-  // 承攬款
+  // '承攬款'
   contractPayment: number | null;
-  // 本期計價
+  // '本期計價'
   periodPayment: number | null;
-  // 前期已收
+  // '前期已收'
   priorPeriodPayment: number | null;
-  // 票據/匯款 匯入帳號
+  // '票據/匯款 匯入帳號'
   importAccountingNumber: string | null;
-  // 票據編號
+  // '票據編號'
   noteNumber: string | null;
-  // 票據到期日
+  // '票據到期日'
   noteMaturityDate: string | null;
-  // 收款金額
+  // '收款金額'
   receivablePayment: number | null;
-  // 扣款金額
+  // '扣款金額'
   deductionPayment: number | null;
-  // 未收款金額 // 餘額
+  // '未收款金額'
   unpaidPayment: number | null;
-  // 是否為國外收入傳票
+  // '是否為國外收入傳票'
   isForeign: boolean;
+
+  // '備註差額(帶入應收帳款的扣款明細和匯費)'
   // 差額 // 更新accountant的扣款明細、手續費會更新差額
   difference: string | null;
+  // '發票號碼'
+  invoiceNumber: string | null;
+  // '收款id'
+  accountantId: string | null;
+  // '收款'
+  accountant: TaccountantDto;
+  // '應收帳款id'
+  accountReceivableId: string | null;
+  // '應收帳款'
+  accountReceivable: TaccountsReceivableDto;
+  // '關聯的應收帳款發票'
+  invoices: TaccountsReceivableInvoiceDto[];
+  // '是否為紙本匯入之收入傳票'
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
-  // 收入傳票歸屬日期
-  incomeBillDate: string | null;
-  //
-  accountantId: string;
-  accountant: TaccountantDto;
-  //
+  // '手key的備註'
   note: string | null;
-
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // temporary_separatePayment: number | null;
-  //
-  accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
-  order: number | null;
+  // '廠商名稱'
+  vendorName: string | null;
+  vendorCustomerId: string | null;
+  vendorCustomer?: TcustomerDto;
+  // '扣款明細'
+  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // '手續費'
   fee: number | null;
-
-  // 沒意外的話invoices裡應該最多只會有一筆資料
-  invoiceNumber: string | null;
-  invoices?: TaccountsReceivableInvoiceDto[];
-
-  //
-  //
+  // '排序'
+  order: number | null;
   // '應收是否已閱'
   isCashierSeen: boolean | null;
   // '應收是否已閱'
   isWorkSupervisorSeen: boolean | null;
   // '總經理是否已閱'
   isManagerSeen: boolean | null;
+  // '出口報單幣別'
+  declarationCurrency: Tcurrency | null;
+  // '出口報單匯率'
+  declarationExchangeRate: string | null;
+  // '出口報單外幣金額'
+  declarationCurrencyPayment: string | null;
+  // '出口報單台幣金額'
+  declarationPayment: string | null;
+  // '收款幣別'
+  receivableCurrency: Tcurrency | null;
+  // '收款匯率'
+  receivableExchangeRate: string | null;
+  // '收款外幣金額'
+  receivableCurrencyPayment: string | null;
+  // '國外匯費(外幣)'
+  foreignCurrencyFee: string | null;
+  // '國外匯費(台幣)'
+  foreignFee: string | null;
+  // '兌換利益'
+  exchangeBenefits: string | null;
+
+  receivablePaymentForAccountReceivable: number | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3767,6 +3906,20 @@ export type TupdateIncomeBillSerialDto = Pick<
   isCashierSeen?: boolean | null;
   isWorkSupervisorSeen?: boolean | null;
   isManagerSeen?: boolean | null;
+} & {
+  declarationCurrency: string | null;
+  declarationExchangeRate: string | null;
+  declarationPayment: string | null;
+  declarationCurrencyPayment: string | null;
+  receivableCurrency: string | null;
+  receivableExchangeRate: string | null;
+  receivableCurrencyPayment: string | null;
+  foreignFee: string | null;
+  foreignCurrencyFee: string | null;
+  exchangeBenefits: string | null;
+} & {
+  vendorName?: string | null;
+  vendorCustomerId?: string | null;
 };
 
 type TupdateIncomeBillDeductionDto = {
@@ -3818,6 +3971,11 @@ export type TincomeBillSerialSettlementFormDto = {
   foreignAccumulatePayment: number;
   // 應收帳款總額(外銷)
   foreignReceivablePayment: number;
+
+  // 不足預估之收款
+  internalUnderestimationPayment: number | null;
+  // 不足預估之收款(外銷)
+  foreignUnderestimationPayment: string | null;
 
   // 應收帳款狀態
   reviewStatus: TincomeBillSerialSettlementFormStatus;
@@ -3967,6 +4125,9 @@ export type TaccountsReceivableDto = {
   // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
   // accountantList?: TaccountantDto[];
   incomeBillList?: TincomeBillSerialDto[];
+
+  currency: Tcurrency;
+  exchangeRate: string | null;
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -4085,6 +4246,8 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   businessIdNumber: string | null; // 統一編號
   isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
   isOlderInvoice: boolean; // 是否為舊的手key發票
+
+  otherAccountReceivableIds: string[]; // 同屬合約
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -4156,6 +4319,8 @@ export type TaccountantDto = {
   insertDate: string | null;
   // 廠商名稱
   vendorName: string | null;
+  vendorCustomerId: string | null;
+  vendorCustomer?: TcustomerDto;
   // 金額 // 新臺幣
   price: number;
   // 備註
@@ -4205,6 +4370,9 @@ export type TaccountantDto = {
   // 已分出金額
   splitPayment: number[] | null;
   isAlreadyImportIncomeBill: boolean;
+
+  accountReceivableId: string | null;
+  accountReceivable: TaccountsReceivableDto | null;
 };
 
 export type TcreateAccountantDto = Pick<
@@ -4229,6 +4397,7 @@ export type TcreateAccountantDto = Pick<
   noteMaturityDate?: string | null; // 票據到期日
   // receiptCollectionDate?: string | null; // 託收日
   // receiptEstimatedDate?: string | null; // 預兌日
+  vendorCustomerId?: string | null;
 };
 
 export type TupdateAccountantDto = Partial<

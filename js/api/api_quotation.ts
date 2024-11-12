@@ -1,8 +1,8 @@
 // apiGetQuotationProducts
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _, { sortBy } from 'lodash';
+import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
@@ -61,6 +61,8 @@ type TgetQuotation = {
   data: TquotationDto[];
   meta: TpageMetaDto;
 };
+
+// type TquotationContractDto_withPage = TquotationContractDto & { page: number };
 
 export const apiGetQuotation = async (params?: Tparams) => {
   const api = '/quotation';
@@ -277,16 +279,11 @@ export const useGetQuotation_id_2 = (
       const res = await apiGetQuotation_id_2(id, theParams);
 
       if (getProductItems) {
-        // 伺服器撐得住，不用批次呼叫
-        const productArr = await Promise.all(
-          res.latestContent.products.map(async (prod) => {
-            const productId = prod.id;
-
-            return await apiGetQuotationProducts(productId);
-          })
-        );
-
-        res.latestContent.products = productArr;
+        const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+        await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
+          console.log(wholeProdArr);
+          res.latestContent.products = wholeProdArr;
+        });
       }
 
       setIsLoading(true);
@@ -304,11 +301,83 @@ export const useGetQuotation_id_2 = (
     }
   };
 
+  const renewProd = (wholeProd: TquotationProductDto) => {
+    setRes((res) => {
+      if (!res) {
+        return res;
+      }
+
+      const copy = { ...res };
+
+      const index = copy.latestContent.products.findIndex((prod) => wholeProd.id === prod.id);
+      copy.latestContent.products[index] = wholeProd;
+
+      return copy;
+    });
+  };
+
+  const updateSingleProd_noRender = async (prodId: string) => {
+    const wholdProd = await apiGetQuotationProducts(prodId);
+
+    // renewProd(wholdProd);
+    if (!res) {
+      return;
+    }
+
+    const products = res.latestContent.products;
+    const index = products.findIndex((prod) => prod.id === prodId);
+    products[index] = wholdProd;
+
+    return wholdProd;
+  };
+
+  const updateAllWholdProd_noRender = async () =>
+    //   {
+    //   stopToken,
+    //   onSingleSuceess,
+    // }: {
+    //   stopToken: { stop: boolean };
+    //   onSingleSuceess?: (wholdProd: TquotationProductDto) => void;
+    // }
+    {
+      if (!res) {
+        return;
+      }
+
+      const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+      await getWholeProductArr(prodIdArr).then((wholdProdArr) => {
+        res.latestContent.products = wholdProdArr;
+      });
+    };
+
+  const updateAllWholeProd_batch_noRender = async () =>
+    //   {
+    //   stopToken,
+    //   onBatchSuceess,
+    // }: {
+    //   stopToken: { stop: boolean };
+    //   onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
+    // }
+    {
+      if (!res) {
+        return;
+      }
+
+      const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+      await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
+        res.latestContent.products = wholeProdArr;
+      });
+    };
+
   return {
     data: res,
     isLoading,
     update,
     setData: setRes,
+    renewProd,
+    // updateAllWholdProd_noRender,
+    updateSingleProd_noRender,
+    // updateAllWholeProd_batch_noRender,
   };
 };
 
@@ -322,6 +391,7 @@ const apiGetQuotationContent_Id = async (id: string) => {
   const params = {
     populate: [
       'customer',
+      'designUnit',
       'agentEmployee',
       'supervisorEmployee',
       'managerEmployee',
@@ -636,6 +706,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView_bottom, isLoading]);
+
   // -----------------------------------------------
 
   // 簽回
@@ -668,6 +739,223 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     reqSignedBack,
   };
 };
+
+export const useContract_infinite_topBottom = ({
+  startPage = 1,
+  customParams,
+}: {
+  startPage?: number;
+  customParams?: Omit<Tparams, 'page'>;
+}) => {
+  const ref_container = useRef<HTMLDivElement>(null);
+
+  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [viewRef_top, inView_top] = useInView();
+  const [viewRef_bottom, inView_bottom] = useInView();
+
+  const [rawDataList, setRawDataList] = useState<{ [id: string]: TquotationContractDto }>();
+  // const [dataPage, setDataPage] = useState<{ [page: `${number}`]: TquotationContractDto[] }>({});
+  const [rawData_page, setRawData_page] = useState<{
+    [page: `${number}`]: { [id: string]: TquotationContractDto };
+  }>();
+
+  const [page, setPage] = useState<number>(startPage);
+  // 用meta判斷是否已經有資料
+  const [meta, setMeta] = useState<TpageMetaDto>();
+
+  const [isFetchingPrev, setIsFetchingPrev] = useState(false);
+
+  // ------------------------------------------------------------
+
+  const defaultParams = {
+    populate: [
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewCashierEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.reviewSalesManagerEmployee',
+      'content.products.quantity',
+      'content.products.options',
+    ],
+  };
+
+  const update = async () => {
+    const params = {
+      page,
+      ...defaultParams,
+      ...customParams,
+      populate: [...defaultParams.populate, ...(customParams?.populate ?? [])],
+    };
+    //
+
+    !meta && setIsLoadingPage1(true);
+    setIsloading(true);
+
+    await apiGetContract(params)
+      .then(async (firstRes) => {
+        if (!rawDataList) {
+          const secondRes = await apiGetContract({ ...params, page: params.page + 1 });
+
+          return {
+            firstRes,
+            secondRes,
+          };
+        }
+
+        return {
+          firstRes,
+          secondRes: undefined,
+        };
+      })
+      .then(({ firstRes, secondRes }) => {
+        const { data: raw_data_1st, meta: meta_1st } = firstRes;
+        const { data: raw_data_2nd, meta: meta_2nd } = secondRes ?? {};
+
+        const list_1st = raw_data_1st.reduce((acc, item) => {
+          acc[item.id] = item;
+
+          return acc;
+        }, {} as { [id: string]: TquotationContractDto });
+
+        const list_2nd = raw_data_2nd?.reduce((acc, item) => {
+          acc[item.id] = item;
+
+          return acc;
+        }, {} as { [id: string]: TquotationContractDto });
+
+        setRawDataList((state) => ({
+          ...state,
+          ...list_1st,
+          ...list_2nd,
+        }));
+
+        setRawData_page((state) => {
+          const copy = { ...state };
+          copy[`${meta_1st.page}`] = list_1st;
+
+          if (meta_2nd?.page && list_2nd) {
+            copy[`${meta_2nd.page}`] = list_2nd;
+          }
+
+          return copy;
+        });
+
+        setMeta(meta_2nd || meta_1st);
+        setPage(meta_2nd?.page ?? meta_1st.page);
+      })
+      .catch((err) => {
+        setPage(meta?.page ?? startPage);
+
+        myAlert.err({ title: `取得第${page}頁合約資料失敗` });
+
+        return err;
+      })
+      .finally(() => {
+        setIsloading(false);
+        setIsLoadingPage1(false);
+      });
+  }; // update
+
+  const nextPage = () => {
+    if (!meta || !rawData_page) {
+      return;
+    }
+
+    const pageArr = _.sortBy(Object.keys(rawData_page));
+    const nextPage = Number(pageArr[pageArr.length - 1]) + 1;
+
+    if (nextPage > meta?.pageCount) {
+      return;
+    }
+
+    setPage(nextPage);
+  };
+
+  const prevPage = () => {
+    if (!meta || !rawData_page) {
+      return;
+    }
+
+    const pageArr = _.sortBy(Object.keys(rawData_page));
+    const prevPage = Number(pageArr[0]) - 1;
+
+    // 決定不考慮第零頁甚至負數頁的情形
+    if (prevPage < 1) {
+      return;
+    }
+
+    setPage(prevPage);
+    setIsFetchingPrev(true);
+  };
+
+  const reset = () => {
+    setIsLoadingPage1(false);
+    setIsloading(false);
+    setRawDataList({});
+    setRawData_page({});
+    setMeta(undefined);
+    setPage(1);
+  };
+
+  const getRawDataArr = () => {
+    return Object.values(rawData_page ?? {}).flatMap((page) => Object.values(page));
+  };
+
+  useEffect(() => {
+    inView_top && prevPage();
+  }, [inView_top]);
+  useEffect(() => {
+    inView_bottom && nextPage();
+  }, [inView_bottom]);
+
+  useEffect(() => {
+    if (meta?.page === page || isLoadingPage1 || isLoading) {
+      return;
+    }
+
+    (async () => {
+      await update();
+
+      // 取得前頁資料後保持與底部的距離
+      // 也就是說不會取得前頁資料後就跳到最上面
+      if (isFetchingPrev && ref_container?.current) {
+        // 再畫面渲染前，取得與底部距離
+        const scrollHeight = ref_container.current.scrollHeight;
+        const scrollTop = ref_container.current.scrollTop;
+        const distanceToBottom = scrollHeight - scrollTop; // 與底部距離
+        setIsFetchingPrev(false);
+
+        // 這個setTimeout會在畫面渲染後再執行
+        setTimeout(() => {
+          if (ref_container?.current) {
+            // 畫面渲染後取得新的高
+            const scrollHeight = ref_container.current.scrollHeight;
+
+            ref_container.current.scrollTop = scrollHeight - distanceToBottom;
+          }
+        }, 0);
+      }
+      //
+    })();
+  }, [page, !!meta, isLoadingPage1, isLoading]);
+
+  return {
+    isLoadingPage1,
+    isLoading,
+    viewRef_top,
+    viewRef_bottom,
+    rawDataList,
+    rawData_page,
+    getRawDataArr,
+    page,
+    meta,
+    reset,
+    ref_container,
+  };
+}; //  useContract_infinite_topBottom
 
 export const apiGetContract_employee = async (employeeId: string, params?: Tparams) => {
   const api = `/quotation/contracts/employee/${employeeId}`;
@@ -869,13 +1157,15 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetContract_Id(id, params);
+    return await apiGetContract_Id(id, params).then(async (res) => {
+      const prodIdArr = res.content.products.map(({ id }) => id);
+      const wholeProdArr = await getWholeProductArr(prodIdArr);
+      res.content.products = wholeProdArr;
 
-    if (newRes) {
-      setRes(newRes);
-    }
+      setRes(res);
 
-    return newRes;
+      return res;
+    });
   };
 
   return {
@@ -910,34 +1200,38 @@ export const useGetContract_id_contentProductItems = (
       const res = await apiGetContract_Id(id, params);
 
       if (res) {
-        // const productArr = res.content.products;
-        const productArr = await Promise.all(
-          res.content.products.map(async (prod) => {
-            const productId = prod.id;
+        // // const productArr = res.content.products;
+        // // const productArr = await Promise.all(
+        // //   res.content.products.map(async (prod) => {
+        // //     const productId = prod.id;
 
-            return await apiGetQuotationProducts(productId);
-          })
-        );
-
+        // //     return await apiGetQuotationProducts(productId);
+        // //   })
+        // // );
+        const productArr = await getWholeProductArr(res.content.products.map(({ id }) => id));
         res.content.products = productArr;
 
         const version_num = Number(version);
 
         if (version_num && version_num > 1) {
-          const subContracts = res.subContracts;
+          // const subContracts = res.subContracts;
 
           const theSubContract = res.subContracts.find((item) => {
             return item.version === version_num;
           });
 
           if (theSubContract) {
-            const productArr = await Promise.all(
-              theSubContract!.content.products.map(async (prod) => {
-                const productId = prod.id;
+            // // const productArr = await Promise.all(
+            // //   theSubContract!.content.products.map(async (prod) => {
+            // //     const productId = prod.id;
 
-                return await apiGetQuotationProducts(productId);
-              })
-            );
+            // //     return await apiGetQuotationProducts(productId);
+            // //   })
+            // // );
+
+            const prodIdArr = theSubContract!.content.products.map(({ id }) => id) ?? [];
+            const productArr = await getWholeProductArr(prodIdArr);
+
             theSubContract!.content.products = productArr;
           }
         }
@@ -1016,6 +1310,17 @@ export const apiGetQuotationProducts = async (productId: string) => {
 
   return axi
     .get<TquotationProductDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 取得多筆主產品
+// GET  quotation/multiProducts/:productIds
+export const apiGetQuotationMultiProducts = async (productIds: string[]) => {
+  const api = `/quotation/multiProducts/${productIds.join(',')}`;
+
+  return axi
+    .get<TquotationProductDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1324,9 +1629,14 @@ const apiQuotationAccounting_modifyContract = async (params: Tparam_accounting_m
 export const useQuotationAccounting_modifyContract = (params: {
   year: number | undefined;
   month: number | undefined;
-  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
+  area:
+    | ('northern' | 'central' | 'southern' | 'eastern' | 'all')
+    | ('northern' | 'central' | 'southern' | 'eastern' | 'all')[];
 }) => {
   const [res, setRes] = useState<TquotationAccounting_modifyContract[]>();
+
+  const { area } = params;
+  const areaStr = Array.isArray(area) ? area.join(',') : area;
 
   const update = async () => {
     if (!params.year || !params.area) {
@@ -1336,7 +1646,8 @@ export const useQuotationAccounting_modifyContract = (params: {
     const okParams = {
       year: params.year,
       month: params.month,
-      area: params.area,
+      // area: params.area,
+      area: areaStr,
     };
 
     const newRes = await apiQuotationAccounting_modifyContract(okParams);
@@ -1383,6 +1694,8 @@ export const useQuotationAccounting_personalContract = (
 
   const update = async () => {
     if (!params.employeeId || !params.year) {
+      setRes(undefined);
+
       return;
     }
 
@@ -1491,6 +1804,25 @@ export const apiPatchQuotationContent_id_progress = (contentId: string, body: Tp
 // ========================================================================
 // ========================================================================
 
+// region FUNCTION
+
+const getWholeProductArr = async (prodIdArr: string[]) => {
+  const chunk = _.chunk(prodIdArr, 20); // api一次最多取20筆
+  const wholeProdArr: TquotationProductDto[] = [];
+
+  for (const chunkIndex in chunk) {
+    const idArr = chunk[chunkIndex];
+
+    await apiGetQuotationMultiProducts(idArr).then((prodArr) => {
+      wholeProdArr.push(...prodArr);
+    });
+  }
+
+  return wholeProdArr;
+};
+
+// ========================================================================
+
 const lookpu_contractPopulate = {
   basic: ['content'],
   // contract_noItem: [
@@ -1533,6 +1865,7 @@ const lookpu_contractPopulate = {
   // ],
   contract_noItem02: [
     'content.customer',
+    'content.designUnit',
     'content.agentEmployee',
     'content.supervisorEmployee',
     'content.managerEmployee',
@@ -1552,6 +1885,7 @@ const lookpu_contractPopulate = {
   ],
   forAttach: [
     'content.customer',
+    'content.designUnit',
     'content.agentEmployee',
     'content.supervisorEmployee',
     'content.managerEmployee',
@@ -1560,14 +1894,15 @@ const lookpu_contractPopulate = {
     'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
     'content.reviewSalesManagerEmployee',
-    'content.products.items.accessories',
-    'content.products.items.components',
+    'content.products',
+    // 'content.products.items.accessories',
+    // 'content.products.items.components',
     'content.others',
     'subContracts.content.products.rootProductId',
   ],
 
   worksDepartment: ['content', 'accountReceivable', 'content.verifyForm'],
-  worksDepartment02: ['content', 'subContracts.content.products.rootProductId'],
+  worksDepartment02: ['content.others', 'subContracts.content.products.rootProductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
 
@@ -1583,7 +1918,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 
   simple = [
     'contents.customer',
+    'contents.designUnit',
     'latestContent.customer',
+    'latestContent.designUnit',
     'latestContent.agentEmployee',
     'latestContent.supervisorEmployee',
     'latestContent.managerEmployee',

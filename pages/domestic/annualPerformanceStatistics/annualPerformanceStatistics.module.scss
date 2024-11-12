@@ -20,6 +20,7 @@
     display: grid;
     > span {
       margin: auto;
+      margin-right: 10px;
     }
     border: solid 1px theme("colors.border");
     border-width: 0 1px 1px 0;
@@ -39,6 +40,7 @@
   @extend .grid;
   position: sticky;
   left: 0;
+  z-index: 1;
   border-left: 3px solid white;
   grid-auto-columns: 67px;
   background-color: theme("colors.bgc01");
@@ -60,6 +62,9 @@
   .companyName,
   .year {
     background-color: theme("colors.bgc01");
+    > span {
+      margin-right: auto;
+    }
   }
   .companyName {
     color: theme("colors.main");

@@ -22,7 +22,6 @@ import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile, useProfile } from 'components/page/domestic/quotation/quotationProfile';
-
 import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
@@ -31,14 +30,13 @@ import QuotationSinature_3, {
 import QuotationPdf, {
   useModalQuotationPdf,
 } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
-
 import QuotationPdf_part, {
   TmainProduct,
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-
 import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -49,6 +47,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -90,7 +89,9 @@ import {
   useQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
+// hook
 import { Class_product, useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 import Summary, {
   TsummaryControl,
@@ -104,7 +105,11 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
-import { init_variable } from 'components/page/domestic/quotation/function/utils_quotation';
+import {
+  init_variable,
+  calcNTDToForeignCurrency,
+  checkIsReviewer,
+} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // ------------------------------------------------------------------
 
@@ -183,6 +188,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isCashier,
     isSupervisor,
     //
+    // eslint-disable-next-line prefer-const
     isSalesManagerEmployee,
     //
     isManager,
@@ -234,23 +240,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
-  const [state_summary, setState_Summary] = useState<{
-    discountRate: string;
-    tuneTotal: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
+  const { state_summary, setState_summary, clearSummary } = useSummary();
+
+  // const [state_summary, setState_Summary] = useState<{
+  //   discountRate: string;
+  //   tuneTotal: string;
+  //   subTotal: string;
+  //   salesTax: string;
+  //   total: string;
+  //   deliveryLocation: string;
+  //   deliveryDate: string;
+  //   exchangeRate: string;
+  //   usd: string;
+  // }>({
+  //   discountRate: '100',
+  //   tuneTotal: '',
+  //   subTotal: '',
+  //   salesTax: '',
+  //   total: '',
+  //   deliveryLocation: '',
+  //   deliveryDate: '',
+  //   exchangeRate: '',
+  //   usd: '',
+  // });
 
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
@@ -308,12 +320,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSendToReview = !!(
     toSalesAt ||
     toSupervisorAt ||
-    toSalesManagerAt ||
+    // toSalesManagerAt ||
     toWorkDirectorAt ||
     toCashierAt ||
     toManagerAt
   );
-  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
@@ -326,56 +344,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
-  if (userId) {
-    if (userId === reviewSalesEmployeeId && toSalesAt) {
-      isSales = true;
-      isReviewer = true;
-    } else if (userId === reviewSupervisorEmployeeId && toSupervisorAt) {
-      if (salesReviewedAt) {
-        isSupervisor = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
-      if (salesReviewedAt && supervisorReviewedAt) {
-        isSalesManagerEmployee = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (
-        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
-        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
-        // 代表這個content是在SalesManager這個property被加進來之前的content
-        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
-      ) {
-        isWorkDirector = true;
-        isReviewer = true;
-      }
-    } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
-        isCashier = true;
-        isReviewer = true;
-      }
-    } else if (
-      userId === reviewManagerEmployeeId ||
-      // 總經理ID
-      userId === '01f55698-49bb-4501-b432-1157a5109554'
-    ) {
-      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
-        isManager = true;
-        isReviewer = true;
-      } else if (
-        //
-        salesReviewedAt &&
-        supervisorReviewedAt &&
-        salesManagerReviewedAt &&
-        workDirectorReviewedAt &&
-        cashierReviewedAt
-      ) {
-        isManager = true;
-        isReviewer = true;
-      }
-    }
-  }
+  const checkReviewerResult = checkIsReviewer({
+    userId,
+
+    status,
+
+    reviewSalesEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewManagerEmployeeId,
+
+    salesReviewedAt,
+    supervisorReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+
+    toSalesAt,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+  });
+
+  isReviewer = checkReviewerResult.isReviewer;
+
+  isSales = checkReviewerResult.isSales;
+  isSupervisor = checkReviewerResult.isSupervisor;
+  isWorkDirector = checkReviewerResult.isWorkDirector;
+  isCashier = checkReviewerResult.isCashier;
+  isManager = checkReviewerResult.isManager;
 
   // 如果是準合約，如果業務與業務主管為同一人，視為業務主管
   // 因為在準合約時業務預設為已審核過(salesReviewedAt不為null)所以可以這樣處理
@@ -521,7 +520,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
 
-  const { control_profile, state_profile, state_customer } = useProfile({
+  const { control_profile, state_profile, state_customer, state_designUnit } = useProfile({
     quotationContent: theContent,
     disabled,
   });
@@ -569,6 +568,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     attachDivTotal,
     attachTotal,
     avgDiscount_withQty,
+    doorModelSummary,
   } = useProductList({
     productArr: contractProdArr,
     others: theContent?.others,
@@ -708,11 +708,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
       validityPeriod: state_profile.validityPeriod ?? '',
       //
       customerId: state_customer?.id ?? '',
+      designUnitId: state_designUnit?.id || null,
       //
       projectName: state_profile.projectName ?? '',
       county: state_profile.county ?? '',
       district: state_profile.district ?? '',
       address: state_profile.address ?? '',
+
+      designatedBrand: state_profile.designatedBrand ?? '',
+      siteManager: state_profile.siteManager ?? '',
+      siteManagerNumber: state_profile.siteManagerNumber ?? '',
+      requiredDoorType: doorModelSummary || null,
+
+      // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      // estimatedDiscount: state_profile.estimatedDiscount || null,
+      // scheduledProcurementOrBidDate:
+      //   state_profile.scheduledProcurementOrBidDate &&
+      //   moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+      type: state_profile.type ?? '',
+
       contactPerson: state_profile.contactPerson ?? '',
       contactNumber: state_profile.contactNumber ?? '',
       quantity: prodQty ?? 0,
@@ -733,7 +747,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: state_profile.trackProgress ?? '',
       projectProgress: state_profile.projectProgress ?? '',
 
-      discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      discount: `${Number(state_summary.discountRate ?? 100)}`,
       tuneTotal: state_summary.tuneTotal ?? '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
       salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
@@ -741,6 +755,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: paymentMethod,
+      exchangeRate: state_summary.exchangeRate || null,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', '') || null,
+      currency: state_summary.currency,
       //
       //
       // products: [...prodArr, ...attachProdArr],
@@ -815,7 +832,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -828,45 +845,41 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    if (status === 'Pending') {
-      if (
-        !reviewSalesEmployeeId ||
-        !reviewWorkDirectorEmployeeId ||
-        !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId ||
-        !reviewSalesManagerEmployeeId
-      ) {
-        return myAlert.warning({ title: '請先設定所有審核人員' });
-      }
-    }
+    // if (status === 'Pending') {
+    //   if (
+    //     !reviewSalesEmployeeId ||
+    //     !reviewWorkDirectorEmployeeId ||
+    //     !reviewCashierEmployeeId ||
+    //     !reviewSupervisorEmployeeId
+    //     // ||
+    //     // !reviewSalesManagerEmployeeId
+    //   ) {
+    //     return myAlert.warning({ title: '請先設定所有審核人員' });
+    //   }
+    // }
 
     const shouldDirect = isManager && status === 'Pending';
-
-    if (isSales && salesReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt && body.reviewResult) {
-      return myAlert.warning({ title: '您已經審核過此報價單' });
-    }
 
     try {
       setIsLoading(true);
       await apiQuotationReview({ id: quotationId, body });
 
-      if (shouldDirect) {
-        router.push({
-          pathname: '/domestic/contract',
-        });
-      } else {
-        await update_quotation();
-      }
+      myAlert.success({
+        title: '審核完成',
+        props: {
+          onOk: () => {
+            router.push('/domestic/quotationList?status=Pending');
+          },
+        },
+      });
+
+      // if (shouldDirect) {
+      //   router.push({
+      //     pathname: '/domestic/contract',
+      //   });
+      // } else {
+      //   await update_quotation();
+      // }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '審核發生錯誤', content: err.message });
@@ -911,6 +924,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新審核人員失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reqPatchReviewer_pending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(quotationId, {});
+      await update_quotation();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '送審失敗', content: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -1035,7 +1065,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: state_summary.discountRate,
           onChange: (e) => {
             let v = e.target.value;
-            setState_Summary((state) => {
+            setState_summary((state) => {
               const copy = { ...state };
 
               if ((v as string) === '') {
@@ -1061,14 +1091,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         inputAttr: {
           disabled: disabled,
           value: state_summary.tuneTotal,
+          placeholder: '範圍正負1000',
           onChange: (e) => {
             const value_num = Number(e.target.value);
 
-            if (Math.abs(value_num) > 10) {
+            if (Math.abs(value_num) > 1000) {
               return;
             }
 
-            setState_Summary((state) => ({
+            setState_summary((state) => ({
               ...state,
               tuneTotal: e.target.value,
             }));
@@ -1099,7 +1130,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation: {
         value: state_summary.deliveryLocation,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryLocation = v;
 
@@ -1110,7 +1141,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: {
         value: state_summary.deliveryDate,
         onChange: (v) => {
-          setState_Summary((state) => {
+          setState_summary((state) => {
             const copy = { ...state };
             copy.deliveryDate = v;
 
@@ -1161,6 +1192,40 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return copy;
         });
       },
+    },
+    exchangeRate: {
+      value: state_summary.exchangeRate,
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.exchangeRate = v;
+
+      //     const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+      //     copy.foreignTotal = calcNTDToForeignCurrency({
+      //       NTD: total_num,
+      //       foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+      //     }).toLocaleString();
+
+      //     return copy;
+      //   });
+      // },
+    },
+    foreignTotal: {
+      value: state_summary.foreignTotal,
+    },
+    currency: {
+      value: state_summary.currency,
+      disabled: true,
+      // onChange: (v) => {
+      //   setState_summary((state) => {
+      //     const copy = { ...state };
+      //     copy.currency = v;
+
+      //     return copy;
+      //   });
+      // },
     },
   };
 
@@ -1282,12 +1347,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
   const panel_noEditable: TpanelList = [
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出報價單',
       img: iconUpload.src,
       onClick: () => setPdfModalVisible(true),
     },
     {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '匯出材料/配件',
       img: iconUpload.src,
@@ -1295,6 +1362,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     isAllReviewedBeforePending && quotationId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'redButton',
           label: '轉為準合約',
           onClick: () => {
@@ -1311,6 +1379,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     (!!isReviewer || null) && {
+      className: classNames(style.panelListBtn, style.plus),
       type: 'myButton',
       label: '審核',
       onClick: () => setReviewModalShow(true),
@@ -1318,27 +1387,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     quotationId && !contentId
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '送審',
           onClick: () => {
-            if (status === 'Pending' && !verifyForm) {
-              return myAlert.warning({ title: '請先送出合約審核表' });
+            if (status === 'Pending') {
+              if (!verifyForm) {
+                return myAlert.warning({ title: '請先送出合約審核表' });
+              }
+
+              if (toCashierAt) {
+                myAlert.info({ title: '此報價單已經送審' });
+
+                return;
+              }
+
+              myAlert.confirm({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+              });
+
+              return;
             }
 
-            if (status === 'Pending' && toSupervisorAt) {
-              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
-            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+            if (toSalesAt || toSupervisorAt) {
               myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
               setShowEmployeSelector(true);
-            }
-
-            if (status === 'Pending') {
-              myAlert.info({
-                title: '送審後合約審核表將被鎖定',
-                content: '建議先確認合約審核表是否正確',
-                props: { width: 450 },
-              });
             }
           }, // onClick close
         }
@@ -1346,7 +1422,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     (() => {
       if (status === 'Pending') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+        return {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '合約審核表',
+          onClick: () => setReviewFormShow(true),
+        };
       } else {
         return null;
       }
@@ -1354,6 +1435,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     status === 'Pending'
       ? {
+          className: classNames(style.panelListBtn, style.plus),
           type: 'myButton',
           label: '解除鎖定',
           img: iconRedLock.src,
@@ -1372,9 +1454,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // 有contentId就會取用content，就不應該編輯
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !contentId
+      ? {
+          className: classNames(style.panelListBtn, style.plus),
+          type: 'myButton',
+          label: '編輯',
+          onClick: () => setDisabled(false),
+        }
+      : null,
 
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    {
+      className: classNames(style.panelListBtn, style.plus),
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
   ];
 
   const panelList = (() => {
@@ -1428,7 +1522,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [productList]);
 
   useEffect(() => {
-    if (!theContent) {
+    if (!theContent || !disabled) {
       return;
     }
 
@@ -1444,13 +1538,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods,
       annotations,
       quotationRanges,
+      exchangeRate,
+      foreignTotal,
+      currency,
     } = theContent;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
     setPaymentMethod(paymentMethods);
 
-    setState_Summary({
+    setState_summary({
       discountRate: discount,
       tuneTotal,
       subTotal: String(subTotal),
@@ -1458,8 +1555,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       total: String(total),
       deliveryLocation,
       deliveryDate,
+      exchangeRate: exchangeRate || '',
+      foreignTotal: foreignTotal || '',
+      currency,
     });
-  }, [theContent]);
+  }, [theContent, disabled]);
 
   useEffect(() => {
     // 進入page後會自動計算attachTotal
@@ -1471,12 +1571,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       prodSubTotal: attachTotal,
     });
 
-    setState_Summary((state) => {
+    const foreignTotal = calcNTDToForeignCurrency({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
+    setState_summary((state) => {
       return {
         ...state,
         subTotal,
         salesTax,
         total,
+        foreignTotal,
       };
     });
   }, [
@@ -1519,7 +1625,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
-
+          <InputSel
+            className={'ml-[50px]'}
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary doorModelSummary={DoorSummary.format(doorModelSummary)} />}
+          />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>
@@ -1660,7 +1773,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
                   return;
                 }
 
-                setState_Summary((state) => {
+                setState_summary((state) => {
                   return {
                     ...state,
                     discountRate: v,
@@ -2004,7 +2117,11 @@ const extractPdfPartFromClassProduct = ({
         unit_str = list_acce.unit as string;
       }
 
-      const partName = acce.name.replaceAll('60A', '');
+      let partName = acce.name.replaceAll('60A', '');
+
+      if (partName === '氟碳烤漆' || partName === '粉體烤漆') {
+        partName = '烤漆';
+      }
 
       return {
         partName,

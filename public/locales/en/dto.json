@@ -1,0 +1,14 @@
+{
+  "accountsReceivableInvoice": {
+    "invoiceNumber": "Invoice Number",
+    "invoiceDate": "Invoice Date",
+    "actualPrice": "Actual Price",
+    "note": "Note",
+    "allowance": "Allowance",
+    "nameOfBusinessEntity": "Business Entity",
+    "businessIdNumber": "Business ID Number",
+    "contractNumber": "Contract Number",
+    "contractProjectName": "Project Name",
+    "contractContractor": "Contractor"
+  }
+}

@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // antd
-import { Checkbox } from 'antd';
+import { Checkbox, Radio } from 'antd';
 
 // gear
 import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -53,6 +53,29 @@ const options_doorType = optionsCreator_quoteType();
 function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
   // --------------------------------------------------
 
+  // const {
+  //   //
+  //   basicSpec,
+  //   setDoorModelInfo,
+  //   getOptions_material,
+  //   calcData,
+  //   isAntiTyphoonLock,
+  //   getOptions_doorModelInfo,
+  //   isSpecialProd,
+  // } = useWorksheet(
+  //   useShallow((state) => ({
+  //     doorModelInfo: state.doorModelInfo,
+  //     basicSpec: state.basicSpec,
+  //     setDoorModelInfo: state.setDoorModelInfo,
+  //     getOptions_material: state.getOptions_material,
+  //     calcData: state.calcData,
+  //     isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
+  //     getOptions_doorModelInfo: state.getOptions_doorModelInfo,
+  //     isSpecialProd: state.getIsSpecialProd(),
+  //     generalSpec: state.generalSpec, // 用於更新getOptions
+  //     // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+  //   }))
+  // );
   const {
     //
     basicSpec,
@@ -62,6 +85,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     isAntiTyphoonLock,
     getOptions_doorModelInfo,
     isSpecialProd,
+    calcTarget,
+    setCalcTarget,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -74,6 +99,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+      calcTarget: state.calcTarget,
+      setCalcTarget: state.setCalcTarget,
     }))
   );
 
@@ -150,6 +177,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.fullWidth,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_fullWidth(e.target.value);
+                setCalcTarget('fullWidth');
               },
             },
           }}
@@ -176,6 +204,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               value: basicSpec.WG,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                 basicSpec.setBasicSpec_WG(e.target.value);
+                setCalcTarget('WG');
               },
             },
           }}
@@ -233,15 +262,28 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           }}
         />
       </div>
-      <MyButton_v2
-        //
-        className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
-        preImg="upload"
-        px="px32"
-        onClick={calcData}
-      >
-        計算
-      </MyButton_v2>
+
+      <div className={classNames('mt-5', disabled && 'invisible')}>
+        <Radio.Group
+          value={calcTarget}
+          onChange={(value) => {
+            setCalcTarget(value.target.value);
+          }}
+        >
+          <Radio value="fullWidth">以全寬計算</Radio>
+          <Radio value="WG">以WG計算</Radio>
+        </Radio.Group>
+
+        <MyButton_v2
+          //
+          className={classNames('')}
+          preImg="upload"
+          px="px32"
+          onClick={calcData}
+        >
+          計算
+        </MyButton_v2>
+      </div>
     </div>
   );
 }

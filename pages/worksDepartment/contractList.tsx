@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -12,17 +12,15 @@ import ContractList, { Tcontract } from 'components/page/worksDepartment/contrac
 import style from './contractList.module.scss';
 
 // api
-import { useContract_infinite, Tparams } from 'js/api/api_quotation';
-
-// type
-import { Toption } from 'js/utils/options/options';
+import { useContract_infinite, Tparams, useContract_infinite_topBottom } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
+
+import type { Toption } from 'js/utils/options/countryAndDistrict';
 
 // ===========================================
-const optionDoorModel = optionsCreator_doorModelName({ haveEmpty: true });
+
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================
@@ -34,11 +32,19 @@ type Tquery = {
   address: string | undefined;
   customerName: string | undefined;
   keyWord: string | undefined;
+  //
+  activeContractId?: string | undefined;
+  activeContractPage?: string | undefined;
 };
 
 export default function WdContractList() {
   const router = useRouter();
-  const { doorType, county, district, address, customerName, keyWord } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { activeContractId, activeContractPage, doorType, county, district, address, customerName, keyWord } = query;
+
+  const [hadMoved, setHadMoved] = useState(false);
+
+  // ---------------------------------------------------------------------
 
   const params: Tparams = {
     sort: 'contractNumber',
@@ -59,14 +65,19 @@ export default function WdContractList() {
     },
   };
 
-  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
+  const {
+    //
+    getRawDataArr,
+    rawData_page,
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    reset,
+    ref_container,
+  } = useContract_infinite_topBottom({
+    startPage: Number(activeContractPage || '1'),
     customParams: params,
   });
-
-  useEffect(() => {
-    reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.query]);
 
   // ===================================================
 
@@ -76,24 +87,9 @@ export default function WdContractList() {
   const [customerNameState, setCustomerNameState] = useState<string | undefined>(undefined);
   const [keyWordState, setKeyWordState] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    setCountyState(county);
-    setDistrictState(district);
-    setAddressState(address);
-    setCustomerNameState(customerName);
-    setKeyWordState(keyWord);
-  }, [router.query]);
-
   // ===================================================
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
-    // 現在後端filter doorModelName無效，所以先拿掉
-    // {
-    //   defaultValue: doorType ?? '',
-    //   options: optionDoorModel,
-    //   placeholder: '選擇門型',
-    //   width: '90px',
-    // },
     {
       options: optionsCounty,
       placeholder: '選擇縣市',
@@ -142,26 +138,20 @@ export default function WdContractList() {
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    // const doorType = (vArr[0] as Toption).value;
-    // const county = (vArr[1] as Toption).value;
-    // const customerName = vArr[2] as string;
-    // const keyWord = vArr[3] as string;
-    // router.push({
-    //   query: {
-    //     doorType,
-    //     county,
-    //     customerName,
-    //     keyWord,
-    //   },
-    // });
-    router.push({
+    console.log(vArr);
+    const [_, __, address, customerName, keyword] = vArr;
+
+    const county = (vArr[0] as Toption)?.value;
+    const district = (vArr[1] as Toption)?.value;
+
+    router.replace({
       query: {
         ...router.query,
-        county: countyState,
-        district: districtState,
-        address: addressState,
-        customerName: customerNameState,
-        keyWord: keyWordState,
+        county: county,
+        district: district,
+        address: (address || '') as string,
+        customerName: (customerName || '') as string,
+        keyWord: (keyword || '') as string,
       },
     });
   };
@@ -169,6 +159,7 @@ export default function WdContractList() {
   const searchGroup = {
     searchTargetList,
     doSearch,
+    controlled: true,
   };
   // -----------------------
 
@@ -176,32 +167,101 @@ export default function WdContractList() {
 
   // ===================================================
 
-  const contractArr: Tcontract[] = dataArr.map((item) => {
-    const { content, contractNumber } = item;
+  const contractArr: Tcontract[] = useMemo(() => {
+    const arr: Tcontract[] = [];
+    // rawData_page
+    Object.entries(rawData_page ?? {}).forEach(([page, rawDataDict]) => {
+      Object.values(rawDataDict).forEach((rawData) => {
+        const { id, content, contractNumber, unReviewPicture, unReviewWorkSheet } = rawData;
 
-    const obj: Tcontract = {
-      contractId: item.id,
-      // quotationNumber: content.quotationNumber,
-      contractNumber: contractNumber ?? '',
-      customerName: content.customer?.name ?? '',
-      contactName: content.contactPerson,
-      contactNumber: content.contactNumber,
-      agentName: content.agentEmployee?.chName ?? '',
-      date: content.quotationDate,
-      county: content.county,
-      projectName: content.projectName,
-    };
+        const obj: Tcontract = {
+          contractId: id,
+          page,
+          // quotationNumber: content.quotationNumber,
+          contractNumber: contractNumber ?? '',
+          customerName: content.customer?.name ?? '',
+          contactName: content.contactPerson,
+          contactNumber: content.contactNumber,
+          agentName: content.agentEmployee?.chName ?? '',
+          date: content.quotationDate,
+          county: content.county,
+          projectName: content.projectName,
+          //
+          QtyOfProjectPatternForReview: 0,
+          QtyOfWorkwheetForReview: 0,
+          unReviewPicture,
+          unReviewWorkSheet,
+        };
 
-    return obj;
-  });
+        arr.push(obj);
+      });
+    });
 
-  // ===================================================
+    return arr;
+  }, [rawData_page]);
+
+  // --------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    setCountyState(county);
+    setDistrictState(district);
+    setAddressState(address);
+    setCustomerNameState(customerName);
+    setKeyWordState(keyWord);
+  }, [router.query]);
+
+  useEffect(() => {
+    rawData_page && reset();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [county, district, address, customerName, keyWord]);
+
+  useEffect(() => {
+    if (!hadMoved && rawData_page) {
+      const target = document.getElementById(activeContractId ?? '');
+      target?.scrollIntoView({
+        block: 'center',
+      });
+
+      setHadMoved(true);
+    }
+  }, [!!rawData_page]);
+
+  // --------------------------------------------------------------------------
 
   return (
     <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag="合約" panelList={panelList} />
       <div className={style.mainContainer}>
-        <ContractList viewRef={viewRef_bottom} contractArr={contractArr} />
+        <ContractList
+          //
+          viewRef={viewRef_bottom}
+          viewRef_top={viewRef_top}
+          contractArr={contractArr}
+          ref={ref_container}
+          activeContractId={activeContractId}
+          onChangeActiveContract={(contractId) => {
+            let activeContractPage = undefined;
+
+            if (contractId && rawData_page) {
+              Object.entries(rawData_page).forEach(([page, data]) => {
+                if (!!data[contractId]) {
+                  activeContractPage = page;
+                }
+              });
+            }
+
+            router.replace({
+              query: {
+                ...query,
+                activeContractId: contractId,
+                activeContractPage,
+              },
+            });
+          }}
+        />
       </div>
     </SubLayer>
   );

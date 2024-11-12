@@ -1,0 +1,11 @@
+{
+  "add": "ADD",
+  "cancel": "CANCEL",
+  "delete": "DELETE",
+  "edit": "EDIT",
+  "export": "EXPORT",
+  "save": "SAVE",
+  "search": "SEARCH",
+  "sentReview": "SENT REVIEW",
+  "sentReviewStop": "SENT REVIEW STOP"
+}

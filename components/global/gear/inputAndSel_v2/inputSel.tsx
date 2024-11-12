@@ -40,6 +40,7 @@ type TinputSelProps = {
   key?: React.Key;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent) => void;
+  htmlFor?: string;
   //
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -52,13 +53,14 @@ type TinputSelProps = {
   inputPropsAndSelectProps?: TinputPropsAndSelectProps;
   checkBoxProps_v2?: TcheckBoxProps_v2;
   radioProps?: TradioProps;
+  node?: React.ReactNode;
 
   //
   className?: string;
   wrapperPreStyle?: 'ps01';
   wrapperStyle?: CSSProperties;
   //
-  caption?: string;
+  caption?: React.ReactNode;
   captionClassName?: string;
   captionStyle?: React.CSSProperties;
   captionSize?: '14' | '16' | '18' | '20';
@@ -78,7 +80,9 @@ type TinputSelProps = {
   isMustPreStyle?: 'minimal';
   mustTipClassName?: string;
   //
-  // suffix?: string;
+
+  prefix?: React.ReactNode;
+  prefixClassName?: string;
   suffix?: React.ReactNode;
   suffixClassName?: string;
   //
@@ -109,6 +113,7 @@ export type {
 
 export default function InputSel({
   disabled,
+  htmlFor,
   //
   onClick,
   //
@@ -123,6 +128,7 @@ export default function InputSel({
   inputPropsAndSelectProps,
   checkBoxProps_v2,
   radioProps,
+  node,
   //
   className,
   wrapperPreStyle,
@@ -147,6 +153,8 @@ export default function InputSel({
   isMustPreStyle,
   mustTipClassName,
   //
+  prefix,
+  prefixClassName,
   suffix,
   suffixClassName,
   //
@@ -201,6 +209,7 @@ export default function InputSel({
 
         onClick?.(e);
       }}
+      htmlFor={htmlFor}
     >
       {caption && (
         <div
@@ -214,6 +223,11 @@ export default function InputSel({
         >
           <span>{caption}</span>
           {isMust && <MustTip_simple className={mustTipClassName} preStyle={isMustPreStyle} />}
+        </div>
+      )}
+      {prefix && (
+        <div className={classNames(fontClassName, scss.prefix, prefixClassName)}>
+          <span>{prefix}</span>
         </div>
       )}
 
@@ -522,6 +536,8 @@ export default function InputSel({
             </div>
           );
         })()}
+
+      {node && <div className={classNames(scss.nodeBox, fontClassName)}>{node}</div>}
 
       {suffix && (
         <div className={classNames(fontClassName, scss.suffix, suffixClassName)}>

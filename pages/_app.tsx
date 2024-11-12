@@ -23,17 +23,25 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
 import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 
-// css
-import 'antd/dist/antd.css';
+// i18n
+import { useTranslation } from 'react-i18next';
+
+// -----------------------------------------------------------------------------------
+// 全域 css
 import '../styles/globals.scss';
+import 'antd/dist/antd.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 import 'slick-carousel/slick/slick.css'; // react-slick
 import 'slick-carousel/slick/slick-theme.css'; // react-slick
+// -----------------------------------------------------------------------------------
+// i18n
+import 'hooks/i18n';
 
 // 全域moment語系轉換
 import 'moment/locale/zh-tw';
 // moment擴充套件
 import moment_tz from 'moment-timezone';
+// -----------------------------------------------------------------------------------
 
 // 時區設為台北時間
 moment_tz.tz.setDefault('Asia/Taipei');
@@ -78,6 +86,8 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   useGlobalErrorCatcher();
 
+  const { i18n } = useTranslation();
+  // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
@@ -286,5 +296,6 @@ const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
 
 // =======================================================================
 export type { NextPageWithLayout, TappContext, TmyPageProps };
+// export default MyApp;
 export default MyApp;
 export { AppContext };

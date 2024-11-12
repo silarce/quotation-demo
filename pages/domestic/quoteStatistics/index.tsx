@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+// import ExcelJs, { TableProperties } from 'exceljs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -27,10 +28,6 @@ import {
 import { TquotationStatus } from 'js/api/dtoTypes';
 
 // ==================================================================
-const yearOptionArr = optionsCreator_year();
-const monthOptionArr = optionsCreator_month({ emptyOption: true });
-const regionOptionArr = optionsCreator_region({ emptyOption: true });
-const quotationStatusArr = optionsCreator_quotationStatus({ emptyOption: true, need: 'basic' });
 
 type Tquery = {
   year: string | undefined;
@@ -40,10 +37,38 @@ type Tquery = {
   quotationStatus: TquotationStatus | undefined;
 };
 
+type Tdata = {
+  idNumber: string;
+  designDepartment: string;
+  constructionName: string;
+  customer: {
+    customerName: string;
+    contactPerson: string;
+    contactPhone: string;
+    listPrice: string;
+    bearPrice: string;
+    percent: string;
+  }[];
+};
+
+export type { Tdata };
+
 // ==================================================================
+
+const yearOptionArr = optionsCreator_year();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
+const regionOptionArr = optionsCreator_region({ emptyOption: true });
+const quotationStatusArr = optionsCreator_quotationStatus({ emptyOption: true, need: 'basic' });
+
+// ==================================================================
+
+// MARK: START
+
 export default function QuoteStatistics() {
   const router = useRouter();
   const { year, month, region, quotationStatus } = router.query as Tquery;
+
+  // ------------------------------------------------------------------
 
   const { data, update } = useQuotationAccounting({
     year: year ? Number(year) + 1911 : undefined,
@@ -52,24 +77,7 @@ export default function QuoteStatistics() {
     quotationStatus: quotationStatus || 'all',
   });
 
-  useEffect(() => {
-    update();
-  }, [year, month, region, quotationStatus]);
-
-  useEffect(() => {
-    const now = new Date();
-    const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month;
-
-    router.push({
-      query: {
-        year: theYear,
-        month: theMonth,
-        region: region,
-      },
-    });
-  }, []);
-
+  // ------------------------------------------------------------------
   const { control_rowArr, groupListKeyArr, control_totalList } = useMemo(() => {
     if (!data) {
       return {
@@ -189,6 +197,9 @@ export default function QuoteStatistics() {
   }, [data]);
 
   // ------------------------------------------------------------------
+
+  // region PROPS
+
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
@@ -244,47 +255,42 @@ export default function QuoteStatistics() {
       placeholder: '選擇區域',
       boxStyle: { width: '140px' },
     },
-    // {
-    //   selectProps: {
-    //     value: quotationStatus,
-    //     options: quotationStatusArr,
-    //     onChange: (option) => {
-    //       if (typeof option?.value === 'string') {
-    //         router.push({
-    //           query: {
-    //             ...router.query,
-    //             quotationStatus: option.value,
-    //           },
-    //         });
-    //       }
-    //     },
-    //   },
-    //   placeholder: '報價單狀態',
-    //   boxStyle: { width: '140px' },
-    // },
   ];
 
-  // ------------------------------------------------------------------
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   const panelList: TpanelList = [
     // {
-    //   type: 'inputSearch',
-    //   placeholder: '輸入搜尋內容',
-    //   /**
-    //   要搜尋的欄位有 編號 工程名稱 客戶 聯絡人 連絡電話
-    //    */
-    //   onClick: (str) => {
-    //     router.push({
-    //       query: {
-    //         ...router.query,
-    //         keyWord: str,
-    //       },
-    //     });
-    //   },
+    //   type: 'myButton',
+    //   label: '匯出Excel',
+    //   onClick: dlExcel,
     // },
   ];
   // ------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [year, month, region, quotationStatus]);
+
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+        region: region,
+      },
+    });
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer>
@@ -299,23 +305,12 @@ export default function QuoteStatistics() {
     </SubLayer>
   );
 }
-// ===================================================================
-// ===================================================================
-// ===================================================================
-// ===================================================================
-// ===================================================================
-// ===================================================================
 
-export type Tdata = {
-  idNumber: string;
-  designDepartment: string;
-  constructionName: string;
-  customer: {
-    customerName: string;
-    contactPerson: string;
-    contactPhone: string;
-    listPrice: string;
-    bearPrice: string;
-    percent: string;
-  }[];
-};
+// MARK: END
+
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================

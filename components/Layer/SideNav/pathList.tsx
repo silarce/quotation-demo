@@ -93,7 +93,7 @@ const erpFeaturesLookup = {
   worksDepartment_worksheet: '工務部-工作表編輯',
   worksDepartment_deliveryList: '工務部-出庫單編輯',
   incomeBill: '收入傳票',
-  fac: '廠務部'
+  fac: '廠務部',
 } as const;
 
 // key:value逆轉版本的erpFeaturesLookup
@@ -118,7 +118,7 @@ const {
   worksDepartment_worksheet,
   worksDepartment_deliveryList,
   incomeBill,
-  fac
+  fac,
 } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
@@ -463,7 +463,13 @@ const sidePathList: TsidePathList = {
 
         {
           label: '收入作業',
-          erpFeature: [incomeBill],
+          erpFeature: [
+            incomeBill,
+            worksDepartment,
+            accountsReceivable,
+            worksDepartment_worksheet,
+            worksDepartment_deliveryList,
+          ],
           list: [
             {
               label: '會計收款管理',
@@ -579,6 +585,8 @@ const sidePathList: TsidePathList = {
     };
   })(),
 
+  // MARK: 會計部
+
   '/accounting': ((): TsidePathConfig => {
     const path01 = '/accounting';
 
@@ -633,6 +641,37 @@ const sidePathList: TsidePathList = {
               label: '開立發票管理',
               path: path01 + '/invoiceManagement',
               erpFeature: [accountingDepartment],
+            },
+          ],
+        },
+        {
+          label: '銀行管理',
+          path: path01 + '/bankManagement',
+          erpFeature: [accountingDepartment],
+        },
+        {
+          label: '應付帳款',
+          erpFeature: [accountsReceivable],
+          list: [
+            {
+              label: '支出單',
+              path: path01 + '/applyPayment',
+              erpFeature: [accountsReceivable],
+            },
+            {
+              label: '進貨收票單',
+              path: path01 + '/purchaseCollectTicket',
+              erpFeature: [accountsReceivable],
+            },
+            {
+              label: '付款申請',
+              path: path01 + '/paymentApplication',
+              erpFeature: [accountsReceivable],
+            },
+            {
+              label: '應付帳款明細表',
+              path: path01 + '/accountsPayableDetailList',
+              erpFeature: [accountsReceivable],
             },
           ],
         },
@@ -746,7 +785,6 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: [fac],
             },
-
           ],
         },
         {
