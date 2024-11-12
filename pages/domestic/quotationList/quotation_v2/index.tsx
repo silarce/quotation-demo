@@ -79,7 +79,8 @@ import {
   TquotationContentDto,
   TcreateQuotationContentDto,
   // useGetQuotation_id,
-  useGetQuotation_id_2,
+  // useGetQuotation_id_2,
+  useGetQuotation_id_3,
   apiPostQuotation,
   apiPatchQuotation,
   apiQuotationSubmitReview,
@@ -150,6 +151,9 @@ interface Tstate {
     scheduledProcurementOrBidDate: Moment | null;
     type: string;
 
+    customer: TcustomerDto;
+    designUnit: TcustomerDto;
+
     isLost: boolean; // 失單
   };
 }
@@ -171,6 +175,24 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const [disabled, setDisabled] = useState(true);
 
   const [isFeching, setIsFeching] = useState(false);
+
+  // ----------------------------------------------------------------------
+
+  const {
+    raw: quotationData,
+    update,
+    // updateSingleProd_noRender,
+    // updateAllWholeProd_batch_noRender,
+  } = useGetQuotation_id_3(quotationId as string, {
+    preBuiltPopulate: ['simple', 'attached'],
+    // getProductItems: false,
+  });
+
+  // const {
+  //   data: quotationContentData,
+  //   update: updateContent,
+  //   clearData: clearData_content,
+  // } = useGetQuotationContent_id(contentId as string);
 
   // ----------------------------------------------------------------------
   // region PROPS

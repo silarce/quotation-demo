@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
@@ -167,7 +167,7 @@ export const useGetQuotation_detail_infinite = createUseInfinite<TgetQuotation>(
   errTitle: '取得報價單失敗',
 });
 
-export const apiGetQuotation_Id = async (id: string, params?: Tparams) => {
+export const apiGetQuotation_old = async (id: string, params?: Tparams) => {
   const api = `/quotation/${id}`;
 
   params = {
@@ -214,7 +214,7 @@ export const useGetQuotation_id = (id: string | undefined, { params }: { params?
     }
 
     try {
-      const newRes = await apiGetQuotation_Id(id, params);
+      const newRes = await apiGetQuotation_old(id, params);
 
       if (newRes) {
         setRes(newRes);
@@ -233,7 +233,7 @@ export const useGetQuotation_id = (id: string | undefined, { params }: { params?
   };
 };
 
-export const apiGetQuotation_id_2 = async (id: string, params?: Tparams) => {
+export const apiGetQuotation_id = async (id: string, params?: Tparams) => {
   const api = `/quotation/${id}`;
 
   return axi
@@ -275,18 +275,18 @@ export const useGetQuotation_id_2 = (
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const res = await apiGetQuotation_id_2(id, theParams);
+      const res = await apiGetQuotation_id(id, theParams);
 
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
         await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
-          console.log(wholeProdArr);
           res.latestContent.products = wholeProdArr;
         });
       }
 
-      setIsLoading(true);
       setRes(res);
 
       return res;
@@ -380,6 +380,8 @@ export const useGetQuotation_id_2 = (
     // updateAllWholeProd_batch_noRender,
   };
 };
+
+//
 
 //
 //
@@ -1359,6 +1361,7 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
 };
 
 // 設定報價單審核人員
+// body送{}似乎是不變更審核人員，僅重置審核狀態
 export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuationContentDto) => {
   const api = `/quotation/${id}/submit`;
 
@@ -1428,7 +1431,7 @@ export const apiGetQuotation_id_attachments = (id: string) => {
   const api = `/quotation/${id}/attachments`;
 
   return axi
-    .get(api)
+    .get<TfileDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1458,6 +1461,8 @@ export const useQuotation_id_attachments = (id: string | undefined) => {
 };
 
 /**上傳報價單附件 */
+// 似乎一次只能上傳一個檔案，也就是formData裡只能有一個file
+// 這個api收的是content的id
 export const apiPostQuotation_id_attachments = (id: string, body: FormData) => {
   const api = `/quotation/${id}/attachments`;
 
@@ -1468,6 +1473,8 @@ export const apiPostQuotation_id_attachments = (id: string, body: FormData) => {
 };
 
 /**移除報價單附件 */
+// 如果移除了，該版本報價單的附件是不是就沒了?
+// 這個api實際上似乎不該使用?
 export const apiDelQuotation_id_attachments = (id: string, fileId: string) => {
   const api = `/quotation/${id}/attachments/${fileId}`;
 
@@ -1922,8 +1929,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
     'latestContent.customer',
     'latestContent.designUnit',
     'latestContent.agentEmployee',
-    'latestContent.supervisorEmployee',
-    'latestContent.managerEmployee',
+
+    // 'latestContent.supervisorEmployee',
+    // 'latestContent.managerEmployee',
 
     'latestContent.reviewSalesEmployee',
     'latestContent.reviewSupervisorEmployee',
@@ -1953,3 +1961,351 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 }
 
 const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+
+// MARK:useGetQuotation_id_3
+
+export const useGetQuotation_id_3 = (
+  id: string | undefined | null,
+  {
+    params,
+    preBuiltPopulate = ['simple'],
+  }: {
+    params?: Tparams;
+    preBuiltPopulate?: TquotationPopulateList[];
+  }
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [raw, setRaw] = useState<TquotationDto | null>();
+  const [attachmentArr, setAttachmentArr] = useState<TfileDto[] | null>();
+
+  // ------------------------------------------------------------------------
+
+  const theParams = {
+    populate: quotationPopulateGeter(preBuiltPopulate),
+    ...params,
+  };
+
+  // ------------------------------------------------------------------------
+
+  const update = async () => {
+    if (isFetching) {
+      return;
+    } else if (!id) {
+      setRaw(null);
+
+      return;
+    }
+
+    const req1 = async () => {
+      return await apiGetQuotation_id(id, theParams)
+        .then(async (res) => {
+          const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+          await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
+            res.latestContent.products = wholeProdArr;
+          });
+
+          return res;
+        })
+        .then((res) => {
+          setRaw(res);
+
+          return res;
+        })
+        .catch(() => {
+          myAlert.notify.error({
+            message: '取得報價單資料失敗',
+          });
+          setRaw(null);
+        });
+    };
+
+    const req2 = async () => {
+      return await apiGetQuotation_id_attachments(id)
+        .then((res) => {
+          setAttachmentArr(res);
+
+          return res;
+        })
+        .catch(() => {
+          myAlert.notify.error({
+            message: '取得附件資料失敗',
+          });
+          setAttachmentArr(null);
+        });
+    };
+
+    setIsFetching(true);
+
+    const [quotation, attachmentArr] = await Promise.all([req1(), req2()]).finally(() => {
+      setIsFetching(false);
+    });
+
+    return {
+      quotation,
+      attachmentArr,
+    };
+  }; // update
+
+  // ------------------------------------------------------------------------
+
+  // post成功後不會自動更新
+  const reqPost = async ({
+    body,
+    attachmentArr,
+    onPostSuccess,
+  }: {
+    body: TcreateQuotationContentDto;
+    attachmentArr: FormData[];
+    onPostSuccess?: (newQuotation: TquotationDto) => void;
+  }) => {
+    setIsFetching(true);
+
+    return await apiPostQuotation(body)
+      .then(async (newQuotation) => {
+        const contentId = newQuotation.latestContent.id;
+        let isSomethingWrong = false;
+
+        for (const attachment of attachmentArr) {
+          await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+            isSomethingWrong = true;
+          });
+        }
+
+        isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+        return newQuotation;
+      })
+      .then((newQuotation) => {
+        onPostSuccess && onPostSuccess(newQuotation);
+
+        return newQuotation;
+      })
+      .catch((err) => {
+        myAlert.err({ title: '新增報價單失敗' });
+        console.log(err);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  const reqPatch = async ({ body, attachmentArr }: { body: TcreateQuotationContentDto; attachmentArr: FormData[] }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiPatchQuotation(body, raw.id)
+      .then(async (newQuotation) => {
+        const contentId = newQuotation.latestContent.id;
+        let isSomethingWrong = false;
+
+        for (const attachment of attachmentArr) {
+          await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+            isSomethingWrong = true;
+          });
+        }
+
+        isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+        return newQuotation;
+      })
+      .then(async (newQuotation) => {
+        await update();
+
+        return newQuotation;
+      })
+      .catch((err) => {
+        myAlert.err({ title: '更新報價單失敗' });
+        console.log(err);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 送審
+  // body送{}似乎是不變更審核人員，僅重置審核狀態
+  const reqPatchReviewer = async ({
+    quotationId,
+    body,
+  }: {
+    quotationId: string;
+    body: TsubmitReviewQotuationContentDto;
+  }) => {
+    setIsFetching(true);
+
+    return await apiQuotationSubmitReview(quotationId, body)
+      .then(async (res) => {
+        myAlert.success({ title: '送審成功' });
+        await update();
+
+        return res;
+      })
+      .catch((error) => {
+        const err = error as Error;
+        myAlert.err({ title: '更新審核人員失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  const reqReview = async (body: TreviewQuotationContentDto) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiQuotationReview({ id: raw.id, body })
+      .then(async (res) => {
+        myAlert.success({ title: '審核成功' });
+        await update();
+
+        return res;
+      })
+      .catch((err) => {
+        myAlert.err({ title: '審核失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  const reqUnlock = async () => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiQuotationUnlock(raw.id)
+      .then(async () => {
+        myAlert.success({ title: '解除鎖定成功', content: '該報價單改為發包' });
+
+        await update();
+      })
+      .catch((error) => {
+        const err = error as AxiosError<{ message: string }>;
+        myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 轉為準合約
+  const reqToPending = async (contentId: string) => {
+    setIsFetching(true);
+
+    return await apiPatchQuotationToPending({ contentId })
+      .then(async () => {
+        await update();
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 複製報價單
+
+  const reqCopyQuotation = async ({
+    customerId,
+    isRelationQuotation = false,
+  }: {
+    customerId: string;
+    isRelationQuotation?: boolean; // 是否關聯報價單
+  }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    await apiPostCopyQuotation({
+      quotationId: raw.id,
+      customerId,
+      isRelationQuotation,
+    });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 編輯報價單追蹤狀態;
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    const contentId = raw.latestContent.id;
+
+    setIsFetching(true);
+
+    return await apiPatchQuotationContent_id_progress(contentId, {
+      trackProgress,
+      projectProgress,
+    })
+      .catch((err) => {
+        return err;
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  return {
+    isFetching,
+    //
+    raw,
+    update,
+    // attachment
+    attachmentArr,
+    domain,
+    //
+    reqPost,
+    reqPatch,
+    reqReview,
+    reqUnlock,
+    reqPatchReviewer,
+    reqCopyQuotation,
+    reqPatchQuotationContent_id_progress,
+    reqToPending,
+  };
+}; // useGetQuotation_id_3
