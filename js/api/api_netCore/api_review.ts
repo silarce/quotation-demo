@@ -7,7 +7,12 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { axi2 } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
-import type { TreviewFlow, TgetReivewById, TaddReivew } from './_schemas';
+import type {
+  //
+  TreviewFlow,
+  TgetReviewById,
+  TaddReview,
+} from './_schemas';
 
 const subRoot = 'Review';
 
@@ -52,26 +57,29 @@ const apiGetReviewById = (document_uuid: string) => {
   };
 
   return axi2
-    .get<TgetReivewById[]>(api, { params })
+    .get<TgetReviewById[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       return Promise.reject(err);
     });
 };
 
-const apiAddReivew = (body: TaddReivew) => {
+const apiAddReview = (body: TaddReview) => {
   const api = `${subRoot}/AddReview`;
 
-  return axi2
-    .post(api, body)
-    .then(() => {
-      myAlert.success({ title: '送審成功' });
-    })
-    .catch((err) => {
-      myAlert.err({ title: '新增審核失敗', content: err.message });
+  return (
+    axi2
+      // 回應id
+      .post<string>(api, body)
+      .then(() => {
+        myAlert.success({ title: '送審完成' });
+      })
+      .catch((err) => {
+        myAlert.err({ title: '新增審核失敗', content: err.message });
 
-      return Promise.reject(err);
-    });
+        return Promise.reject(err);
+      })
+  );
 };
 
 // 抽單
@@ -85,7 +93,7 @@ const apiGetReviewBack = (document_uuid: string) => {
   return axi2
     .post(api, body)
     .then(() => {
-      myAlert.success({ title: '抽單成功' });
+      myAlert.success({ title: '抽單完成' });
     })
     .catch((err) => {
       myAlert.err({ title: '抽單失敗', content: err.message });
@@ -186,7 +194,7 @@ const useGetFlow = (
   };
 };
 
-const useGetReivewById = (
+const useGetReviewById = (
   document_uuid: string | undefined,
   {
     autoUpdate = true,
@@ -196,7 +204,7 @@ const useGetReivewById = (
 ) => {
   const [isFetching, setIsFetching] = useState(false);
   const [isFirstLoaded, setIsFirstLoaded] = useState(false);
-  const [raw, setRaw] = useState<TgetReivewById[]>();
+  const [raw, setRaw] = useState<TgetReviewById[]>();
 
   const update = async () => {
     if (!document_uuid) {
@@ -288,9 +296,9 @@ const useGetReviewHistory = (
 export {
   //
   useGetFlow,
-  useGetReivewById,
-  apiAddReivew,
+  useGetReviewById,
+  apiAddReview,
   apiGetReviewBack,
   useGetReviewHistory,
 };
-export type { TreviewFlow, TgetReivewById, TaddReivew };
+export type { TreviewFlow, TgetReviewById, TaddReview };

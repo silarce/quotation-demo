@@ -8,7 +8,7 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { TaddReivew, TreviewFlow, useGetFlow, apiAddReivew, apiGetReviewBack } from 'js/api/api_netCore/api_review';
+import { TreviewFlow, useGetFlow } from 'js/api/api_netCore/api_review';
 
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
@@ -115,18 +115,4 @@ ReviewFlowSelector.open2 = (props: Parameters<typeof ReviewFlowSelector>[0]) => 
 };
 
 // ================================================================================
-
-const reqSentReviewStop = ({ uuid, onSuccess }: { uuid: string; onSuccess?: () => void }) => {
-  myAlert.confirm({
-    title: '確認抽單?',
-    props: {
-      onOk: async () => {
-        apiGetReviewBack(uuid).then(onSuccess);
-      },
-    },
-  });
-};
-
-// ================================================================================
 export default ReviewFlowSelector;
-export { apiAddReivew, reqSentReviewStop };
