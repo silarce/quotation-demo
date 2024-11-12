@@ -21,8 +21,7 @@ import {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import ReviewFlowSelector, { apiAddReivew, reqSentReviewStop } from 'components/composition/review/reviewFlowSelecor';
-// import { useReviewFlow } from 'components/composition/review/reviewFlow';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelecor';
 import { useReviewFlow } from 'components/composition/review/reviewFlow';
 
 // icon
@@ -129,9 +128,11 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
   const {
     ReviewFlow,
     reviewFlow,
-    update: update_reviewFlow,
+    // update: update_reviewFlow,
     isFetching: isFetching_reviewFlow,
     isFirstLoaded: isFirstLoaded_reviewFlow,
+    reqAddReview,
+    sentReviewStop,
   } = useReviewFlow({
     uuid: raw_statistics?.id,
   });
@@ -241,10 +242,10 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
                 return;
               }
 
-              const body: Parameters<typeof apiAddReivew>[0] = {
+              const body: Parameters<typeof reqAddReview>[0] = {
                 review_id: reviewFlowId,
                 document_id: raw_statistics.date,
-                document_uuid: raw_statistics.id,
+                // document_uuid: raw_statistics.id,
                 document_type: '應付帳款統計表',
                 user_id: userId,
                 document_title: purpose,
@@ -253,9 +254,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
                 },
               };
 
-              await apiAddReivew(body)
-                .then(update_reviewFlow)
-                .catch(() => {});
+              await reqAddReview(body);
 
               destroy();
             },
@@ -263,15 +262,7 @@ export default function Statistics({ userInfo }: { userInfo: TuserDto }) {
         }
       : null;
 
-  const handleReviewStop =
-    raw_statistics && reviewFlow && !reviewFlow.document_status
-      ? () => {
-          reqSentReviewStop({
-            uuid: raw_statistics.id,
-            onSuccess: update_reviewFlow,
-          });
-        }
-      : null;
+  const handleReviewStop = raw_statistics && reviewFlow && !reviewFlow.document_status ? sentReviewStop : null;
 
   // -------------------------------------------------------------------------
 

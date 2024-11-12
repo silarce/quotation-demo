@@ -40,8 +40,6 @@ import {
   Tpayment_order_Dto_detailed,
 } from 'js/api/api_netCore/api_accountant';
 
-import { TaddReivew, apiAddReivew, apiGetReviewBack } from 'js/api/api_netCore/api_review';
-
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -115,7 +113,12 @@ export default function PaymentApplication({ userInfo }: { userInfo: TuserDto })
 
   // --------------------------------------------------------------------------
 
-  const { ReviewFlow, update: update_reviewFlow } = useReviewFlow();
+  const {
+    ReviewFlow,
+    // update: update_reviewFlow,
+    reqAddReview,
+    sentReviewStop,
+  } = useReviewFlow();
 
   // --------------------------------------------------------------------------
   const { res: raw_paymentOrder, clear: clear_paymentOrder } = useGetPaymentOrderById(id);
@@ -260,7 +263,7 @@ export default function PaymentApplication({ userInfo }: { userInfo: TuserDto })
   };
 
   // region reqAddReview
-  const reqAddReview = async (review_id: string, title: string) => {
+  const handleReqAddReview = async (review_id: string, title: string) => {
     if (!state.id || !userId) {
       !state.id && myAlert.warning({ title: '狀態無id' });
       !userId && myAlert.warning({ title: 'userInfo.employee.id為undefined' });
@@ -268,10 +271,10 @@ export default function PaymentApplication({ userInfo }: { userInfo: TuserDto })
       return;
     }
 
-    const body: TaddReivew = {
+    const body: Parameters<typeof reqAddReview>[0] = {
       review_id,
       document_id: state.serial_number,
-      document_uuid: state.id,
+      // document_uuid: state.id,
       document_type: '付款申請',
       user_id: userId,
       document_title: title,
@@ -280,17 +283,7 @@ export default function PaymentApplication({ userInfo }: { userInfo: TuserDto })
       },
     };
 
-    await apiAddReivew(body);
-  };
-
-  const reqReviewBack = async () => {
-    if (!state.id) {
-      myAlert.warning({ title: '狀態無id' });
-
-      return;
-    }
-
-    await apiGetReviewBack(state.id);
+    await reqAddReview(body);
   };
 
   // --------------------------------------------------------------------------
@@ -343,25 +336,14 @@ export default function PaymentApplication({ userInfo }: { userInfo: TuserDto })
         const { unmount } = ReviewFlowSelector.open({
           userId: userId,
           onConfirm: async ({ reviewFlowId, purpose }) => {
-            reviewFlowId && (await reqAddReview(reviewFlowId, purpose).then(update_reviewFlow));
+            reviewFlowId && (await handleReqAddReview(reviewFlowId, purpose));
             unmount();
           },
         });
       }
     : null;
 
-  const handleSentReviewStop = raw_paymentOrder
-    ? () => {
-        myAlert.confirm({
-          title: '確認抽單?',
-          props: {
-            onOk: async () => {
-              reqReviewBack().then(update_reviewFlow);
-            },
-          },
-        });
-      }
-    : null;
+  const handleSentReviewStop = raw_paymentOrder ? sentReviewStop : null;
 
   const onAdd = () => {
     const { id, ...rest } = query;
