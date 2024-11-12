@@ -622,10 +622,11 @@ export default function SalarySettlement() {
                         }
 
                         setReviewflowdata([]);
-                        // setStatusin("編輯中");
+                        setStatus("編輯中");
                         setReview_flow("");
                         setValue(null);
                         GetReviewHistory(serial_uuid);
+                        GetPayrollByDate("編輯中' or status = '審核中");
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -843,42 +844,58 @@ export default function SalarySettlement() {
                                     產生薪資
                                 </button>
                             </span>
-                            <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
-                                <button className={scss.longsquarebtn}
-                                    onClick={() => {
-                                        handleeditalledit();
+                            <span style={{ display: `${status === "審核中" ? 'none' : ''}` }}>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
+                                    <button className={scss.longsquarebtn}
+                                        onClick={() => {
+                                            handleeditalledit();
+                                        }}
+                                        title="編輯">
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, padding: '0px 10px' }}>
+                                    <button className={scss.longsquarebtn} onClick={() => {
+                                        handleeditallcancel();
                                     }}
-                                    title="編輯">
-                                    編輯
-                                </button>
-                            </span>
-                            <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, padding: '0px 10px' }}>
-                                <button className={scss.longsquarebtn} onClick={() => {
-                                    handleeditallcancel();
-                                }}
-                                    title="取消">
-                                    取消
-                                </button>
-                            </span>
-                            <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                <button className={scss.longredsquarebtn}
-                                    onClick={() => {
-                                        handleeditallsave();
-                                    }}
-                                    title="儲存">
-                                    儲存
-                                </button>
-                            </span>
-                            <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                <button className={scss.longredsquarebtn}
-                                    onClick={() => {
-                                        // SettlePayroll();
+                                        title="取消">
+                                        取消
+                                    </button>
+                                </span>
+                                <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            handleeditallsave();
+                                        }}
+                                        title="儲存">
+                                        儲存
+                                    </button>
+                                </span>
 
-                                        handleeditconfirm()
-                                    }}
-                                    title="確認結算">
-                                    確認結算
-                                </button>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            handleeditconfirm()
+                                        }}
+                                        title="確認結算">
+                                        確認結算
+                                    </button>
+                                </span>
+                            </span>
+                            <span style={{ display: `${status === "審核中" ? '' : 'none'}` }}>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            handleGetReviewBack();
+                                        }}
+                                        title="">
+                                        抽單
+                                    </button>
+                                </span>
                             </span>
                         </div>
                     ]}
@@ -894,9 +911,10 @@ export default function SalarySettlement() {
                         <span style={{ padding: '0px 10px' }}>
                             <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
                         </span>
-                        <span style={{ padding: '0px 10px' }}>
-                            {serial_id}<br />
-                            {serial_uuid}
+                        <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
+                            {/* {serial_id}<br />
+                            {serial_uuid} */}
+                            {status}
                         </span>
                     </div>
                 ]}
@@ -1459,7 +1477,7 @@ export default function SalarySettlement() {
                     title={null}
                     footer={
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
-                            <span style={{display:`${viewtype==="review"?'none':''}`}}>
+                            <span style={{ display: `${viewtype === "review" ? 'none' : ''}` }}>
                                 <button
                                     className={scss.minitabbtn}
                                     onClick={() => {
