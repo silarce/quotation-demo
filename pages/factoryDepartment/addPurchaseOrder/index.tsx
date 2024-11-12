@@ -1827,9 +1827,9 @@ export default function AddPurchaseOrder() {
                                         />
                                     </div>
                                     <div>
-                                        {quotereqcanedit.toString()}
+                                        {/* {quotereqcanedit.toString()}
                                         <br />
-                                        {editmain.toString()}
+                                        {editmain.toString()} */}
                                         {/* <button onClick={() => handleClearMainArea()} style={{ display: suppliernamein || supplieraddressin || supplierphonein || suppliertaxidin || note || shippingaddressin ? '' : 'none' }}>
                                             <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
@@ -2304,7 +2304,7 @@ export default function AddPurchaseOrder() {
                             <div></div>
                             <div></div>
                             <div>
-                                {/* <table className={scss.count_table}>
+                                <table className={scss.count_table}>
                                     <tr>
                                         <td></td>
                                         <td></td>
@@ -2326,7 +2326,7 @@ export default function AddPurchaseOrder() {
                                         <td>應付金額</td>
                                         <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
                                     </tr>
-                                </table> */}
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -153,10 +153,15 @@ export default function PayrollLedger() {
 
     //#region =============【  API  】===============================================================================
 
-    const GenerateSalary = async () => {
+    const GetPayrollByDate = async () => {
+
+        //router year傳進來是 ~2024 month 是 1~12
+        console.log(moment().format('YYYY-MM-DD HH:mm:ss'))
         try {
             setIsLoading(true);
             const conditionModel = {
+                date: year + '-' + month,
+                type:'已核准'
             };
 
             var inputModel = {
@@ -167,38 +172,45 @@ export default function PayrollLedger() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Salary/GenerateSalary?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/Salary/GetPayrollByDate?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const responsedata = await response.json();
             console.log(responsedata);
             // 重新命名欄位生成新的資料結構
-            const renamedData = responsedata.map((item: any) => ({
-                id_number: item.employee?.[0]?.id_number || '',
-                name: item.employee?.[0]?.name || '',
-                start_date: item.employee?.[0]?.start_date || '',
-                ch_name: item.employee?.[0]?.ch_name || '',
-                salary: item.salary,
-                supplement: item.supplement,
-                allowance: item.allowance,
-                employee_id: item.employee?.[0]?.employee_id || '',
-                overtime_hours: '',
-                attendance_days: '',
-                public_holidays: '',
-                perfect_attendance_bonus: item.bonus[0].bonus,
-                subtotal: '',
-                overtime_pay: '',
-                earning_total: '',
-                advance_payment: '',
-                income_tax: '',
-                labor_insurance_fee: '',
-                health_insurance_fee: '',
-                late_deduction: '',
-                deduction_total: '',
-                net_pay: '',
-                note: ''
-            }));
+            const renamedData = responsedata.map((item: any) => {
+                // 解析 `employee` 欄位為物件陣列
+                const employeeData = JSON.parse(item.employee);
+                // 確認 `employeeData` 是否有資料
+                const firstEmployee = employeeData.length > 0 ? employeeData[0] : {};
+
+                return {
+                    id_number: firstEmployee.id_number || '',
+                    department: item.department || '',
+                    start_date: firstEmployee.start_date || '',
+                    ch_name: firstEmployee.ch_name || '',
+                    salary: item.salary || '',
+                    supplement: item.supplement || '',
+                    allowance: item.allowance || '',
+                    employee_id: firstEmployee.employee_id || '',
+                    overtime_hours: item.overtime_hours || '',
+                    attendance_days: item.attendance_days || '',
+                    public_holidays: item.public_holidays || '',
+                    perfect_attendance_bonus: item.perfect_attendance_bonus || '',
+                    subtotal: item.subtotal || '',
+                    overtime_pay: item.overtime_pay || '',
+                    earning_total: item.earning_total || '',
+                    advance_payment: item.advance_payment || '',
+                    income_tax: item.income_tax || '',
+                    labor_insurance_fee: item.labor_insurance_fee || '',
+                    health_insurance_fee: item.health_insurance_fee || '',
+                    late_deduction: item.late_deduction || '',
+                    deduction_total: item.deduction_total || '',
+                    net_pay: item.net_pay || '',
+                    note: item.note || ''
+                };
+            });
 
             console.log(renamedData); // 檢查重命名後的資料結構
 
@@ -212,24 +224,24 @@ export default function PayrollLedger() {
         }
     };
 
-
-    const SettlePayroll = async () => {
+    const Excel = async () => {
         try {
 
+            setIsLoading(true);
             const conditionModel = {
-                date: moment().format('YYYY-MM-DD HH:mm:ss'),
-                data: data
+                type2: 'payrollLedger',
+                date: year + '-' + month,
+                type:'已核准'
             };
 
-
-            var inputModel = {
+            const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'SalaryService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/Salary/SettlePayroll`, {
+            const response = await fetch(`${setting.apipath}/Salary/download-excel`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,21 +249,35 @@ export default function PayrollLedger() {
                 body: JSON.stringify(inputModel)
             });
 
-
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
 
-            const responsedata = await response.json();
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
 
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
 
-        } catch (error: any) {
-            console.log(error.message);
-        }
-        finally {
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_${year}年${month}月份_薪資表.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
-
 
     //#endregion
 
@@ -263,25 +289,11 @@ export default function PayrollLedger() {
     //#endregion
 
     //#region =============【方法邏輯】===============================================================================
-    const currentYear = moment().year();
-    const currentMonth = moment().month() + 1; // moment 的月份從 0 開始，所以需要加 1
 
-    // 生成年份選項
-    const generateYearOptions = (yearsCount: number) => {
-        const options = [];
-        for (let i = 0; i < yearsCount; i++) {
-            options.push(currentYear - i);
-        }
-        return options;
-    };
-
-    // 生成月份選項
-    const generateMonthOptions = () => {
-        return Array.from({ length: 12 }, (_, i) => i + 1);
-    };
-
-    const [selectedYear, setSelectedYear] = useState(currentYear);
-    const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+    useEffect(() => {
+        // alert(year + "-" + month);
+        GetPayrollByDate();
+    }, [year, month]);
 
 
     //#endregion
@@ -317,8 +329,16 @@ export default function PayrollLedger() {
                         </div>
                     ]}
                 customeLeft={[
-
-                    [<SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />]
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ padding: '0px 10px' }}>
+                            <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
+                        </span>
+                        <span style={{ padding: '0px 10px' }}>
+                            <button className={scss.longsquarebtn} style={{ marginTop: '-5px' }} onClick={() => { Excel() }} title="核准">
+                                匯出Excel
+                            </button>
+                        </span>
+                    </div>
                 ]}
             />
             <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
@@ -365,7 +385,7 @@ export default function PayrollLedger() {
                                         <CellWithBar key={index} className={scss.panelHeader11}>
                                             <div className={scss.row01}>
                                                 <span>{_item.id_number}</span>
-                                                <span>{_item.name}</span>
+                                                <span>{_item.department}</span>
                                                 <span>{getTaiwanDateStr(_item.start_date)}</span>
                                                 <span>{_item.ch_name}</span>
                                                 <span>{_item.salary}</span>

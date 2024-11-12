@@ -318,7 +318,9 @@ const useGetApplyPaymentById = (
   const [res, setRes] = useState<TapplyPayment_Dto_detailed>();
 
   const update = useCallback(async () => {
-    if (isFetching || !id) {
+    if (isFetching) {
+      return;
+    } else if (!id) {
       setRes(undefined);
 
       return;
