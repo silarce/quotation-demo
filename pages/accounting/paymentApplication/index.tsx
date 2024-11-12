@@ -14,7 +14,7 @@ import { SearchModal_customer } from 'components/composition/searchModal/useSear
 import { SearchModal_paymentOrder } from 'components/composition/searchModal/useSearchModal/useSearchModal_paymentOrder';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/paymentApplication/detail';
 import { useReviewFlow } from 'components/composition/review/reviewFlow';
-import ReviewFlowSelector from 'components/composition/review/reviewFlowSelecor';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
 // gear
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
