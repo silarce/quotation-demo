@@ -186,8 +186,6 @@ export default function QuotationProfile({
 
   const customerTypes = customer.value?.types.map((type) => customerTypesLookup[type.name]).join('/');
 
-  console.log(customer);
-
   // ---------------------------------------------------------------------------------
 
   // region

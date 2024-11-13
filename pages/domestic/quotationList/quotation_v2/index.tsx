@@ -61,9 +61,6 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import iconUpload from 'public/image/icon/upload.svg';
 import iconRedLock from 'public/image/icon/redLock.svg';
 
-// css
-import style from './quotation.module.scss';
-
 // utils
 import { urlToFile } from 'js/utils/helpers/urlToFile';
 import {
@@ -115,8 +112,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // ======================================================================
 
-import { Tstate_profile } from '../../../../components/page/domestic/quotation_v2/type_quotation';
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
+import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
+
+import { useAnnotations } from 'components/page/domestic/quotation_v2/hook/useRemark';
+
+// css
+import scss from './index.module.scss';
 
 // ======================================================================
 // ======================================================================
@@ -246,17 +248,46 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   }, [quotationId, contentId]);
 
   // ----------------------------------------------------------------------
+
+  const { remarkArr, openSelector } = useAnnotations({
+    disabled: true,
+    raw_remarkArr: useMemo(() => {
+      return ['aaaaa', 'bbbbbb'];
+    }, []),
+  });
+
+  console.log(remarkArr);
+
   // MARK: RENDER
   return (
     <SubLayer>
       <PageHeader02 tag="報價單" panelList={panelList} />
       <div>
+        <button onClick={openSelector}>test</button>
+
         <QuotationProfile
           disabled={disabled}
           form={props_profileForm}
           quotationNumber={content?.quotationNumber ?? '---'}
           editNotes={content?.editNotes}
         />
+
+        <div className={scss.summary}>
+          <div className={scss.left}>
+            {/* 備註 */}
+            <div>
+              <QuotationRemark disabled={true} />
+            </div>
+            {/* 報價範圍 */}
+            <div>報價範圍</div>
+            {/* 附件 */}
+            <div>附件</div>
+          </div>
+          {/* 付款資訊 */}
+          <div className={scss.right}>
+            <div className="w-[400px] border border-border">付款資訊</div>
+          </div>
+        </div>
       </div>
     </SubLayer>
   );
