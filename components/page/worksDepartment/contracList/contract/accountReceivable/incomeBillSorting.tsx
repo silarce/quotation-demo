@@ -13,6 +13,7 @@ import scss from './incomeBillSorting.module.scss';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { cutCurrency } from 'js/utils/currency/cutCurrency';
+import { isInteger } from 'js/utils/checkValue';
 
 import type {
   TaccountsReceivablePeriodDto,
@@ -164,6 +165,11 @@ export default function IncomeBillSorting({
   };
 
   const handle_editAllowance = (invoiceId: string, value: string) => {
+    // 判斷字串是否為整數
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     setStateList((list) => {
       list = { ...list };
       const state = list[invoiceId];
