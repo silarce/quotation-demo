@@ -1987,65 +1987,69 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
-  const theParams = {
-    populate: quotationPopulateGeter(preBuiltPopulate),
-    ...params,
-  };
+  const { attachedToContractId } = raw || {};
+  const {} = raw?.latestContent || {};
+
+  // 是否為追加追減報價單
+  const isAttached = attachedToContractId === undefined ? undefined : !!attachedToContractId;
 
   // ------------------------------------------------------------------------
 
+  // 取得
   const update = async () => {
     if (isFetching) {
       return;
     } else if (!id) {
       setRaw(null);
+      setAttachmentArr(null);
 
       return;
     }
 
-    const req1 = async () => {
-      return await apiGetQuotation_id(id, theParams)
-        .then(async (res) => {
-          const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-          await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
-            res.latestContent.products = wholeProdArr;
-          });
-
-          return res;
-        })
-        .then((res) => {
-          setRaw(res);
-
-          return res;
-        })
-        .catch(() => {
-          myAlert.notify.error({
-            message: '取得報價單資料失敗',
-          });
-          setRaw(null);
-        });
+    const theParams = {
+      populate: quotationPopulateGeter(preBuiltPopulate),
+      ...params,
     };
 
-    const req2 = async () => {
-      return await apiGetQuotation_id_attachments(id)
-        .then((res) => {
-          setAttachmentArr(res);
+    const quotation = await apiGetQuotation_id(id, theParams)
+      .then(async (quotation) => {
+        const prodIdArr = quotation.latestContent.products.map((prod) => prod.id);
+        const wholeProdArr = await getWholeProductArr(prodIdArr);
+        quotation.latestContent.products = wholeProdArr;
 
-          return res;
-        })
-        .catch(() => {
-          myAlert.notify.error({
-            message: '取得附件資料失敗',
-          });
-          setAttachmentArr(null);
+        return quotation;
+      })
+      .catch(() => {
+        myAlert.notify.error({
+          message: '取得報價單資料失敗',
         });
-    };
 
-    setIsFetching(true);
+        return null;
+      });
 
-    const [quotation, attachmentArr] = await Promise.all([req1(), req2()]).finally(() => {
-      setIsFetching(false);
-    });
+    if (!quotation) {
+      setRaw(null);
+      setAttachmentArr(null);
+
+      return null;
+    }
+
+    const contentId = quotation.latestContent.id;
+
+    const attachmentArr = await apiGetQuotation_id_attachments(contentId)
+      .then((attachmentArr) => {
+        return attachmentArr;
+      })
+      .catch(() => {
+        myAlert.notify.error({
+          message: '取得附件資料失敗',
+        });
+
+        return null;
+      });
+
+    setRaw(quotation);
+    setAttachmentArr(attachmentArr);
 
     return {
       quotation,
@@ -2055,6 +2059,7 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
+  // 新增
   // post成功後不會自動更新
   const reqPost = async ({
     body,
@@ -2098,6 +2103,7 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
+  // 更新
   const reqPatch = async ({ body, attachmentArr }: { body: TcreateQuotationContentDto; attachmentArr: FormData[] }) => {
     if (!raw) {
       myAlert.info({ title: '還未取得報價單' });
@@ -2167,6 +2173,7 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
+  // 審核
   const reqReview = async (body: TreviewQuotationContentDto) => {
     if (!raw) {
       myAlert.info({ title: '還未取得報價單' });
@@ -2193,6 +2200,7 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
+  // 解鎖
   const reqUnlock = async () => {
     if (!raw) {
       myAlert.info({ title: '還未取得報價單' });
@@ -2281,7 +2289,7 @@ export const useGetQuotation_id_3 = (
       projectProgress,
     })
       .catch((err) => {
-        return err;
+        return null;
       })
       .finally(() => {
         setIsFetching(false);

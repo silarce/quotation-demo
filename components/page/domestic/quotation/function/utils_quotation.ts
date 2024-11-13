@@ -342,4 +342,82 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
 
 // ============================================================================
 
-export { init_variable, calcNTDToForeignCurrency, checkIsReviewer };
+const parseQuotationContentSituation = ({
+  userId,
+  quotationContent,
+}: {
+  userId: string | undefined | null;
+  quotationContent: TquotationContentDto;
+}) => {
+  const {
+    reviewSalesEmployee,
+    reviewWorkDirectorEmployee,
+    reviewCashierEmployee,
+    reviewSupervisorEmployee,
+    // reviewSalesManagerEmployee,
+    reviewManagerEmployee,
+
+    salesReviewedAt,
+    supervisorReviewedAt,
+    // salesManagerReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+
+    toSalesAt,
+    toSupervisorAt,
+    // toSalesManagerAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+    //
+    //
+    status,
+  } = quotationContent;
+
+  const salesEmployeeId = reviewSalesEmployee?.id || null;
+  const workDirectorEmployeeId = reviewWorkDirectorEmployee?.id || null;
+  const cashierEmployeeId = reviewCashierEmployee?.id || null;
+  const supervisorEmployeeId = reviewSupervisorEmployee?.id || null;
+  // const salesManagerEmployeeId = reviewSalesManagerEmployee || null;
+  const managerEmployeeId = reviewManagerEmployee?.id || null;
+
+  const isSendToReview =
+    status === 'Pending'
+      ? !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt)
+      : !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+
+  const {
+    isReviewer = null,
+    isSales = null,
+    isWorkDirector = null,
+    isCashier = null,
+    isSupervisor = null,
+    isManager = null,
+  } = !!userId
+    ? checkIsReviewer({
+        userId,
+        reviewSalesEmployeeId: salesEmployeeId || undefined,
+        reviewSupervisorEmployeeId: workDirectorEmployeeId || undefined,
+        reviewWorkDirectorEmployeeId: cashierEmployeeId || undefined,
+        reviewCashierEmployeeId: supervisorEmployeeId || undefined,
+        reviewManagerEmployeeId: managerEmployeeId || undefined,
+        ...quotationContent,
+      })
+    : {};
+
+  return {
+    isSendToReview,
+    //
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+    isManager,
+  };
+}; // parseQuotationContentSituation
+
+// ============================================================================
+
+export { init_variable, calcNTDToForeignCurrency, checkIsReviewer, parseQuotationContentSituation };

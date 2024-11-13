@@ -7,17 +7,24 @@ import { Tstate_profile } from 'components/page/domestic/quotation_v2/type_quota
 import { Tprops_profile } from '../QuotationProfile';
 
 import { TcustomerDto } from 'js/api/dtoTypes';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ==========================================================================
 
-const useProfile = (content: TquotationContentDto | undefined) => {
-  const defaultState = useDefaultState(content);
+const useProfile = ({
+  disabled,
+  quotationContent,
+}: {
+  disabled: boolean;
+  quotationContent: TquotationContentDto | undefined;
+}) => {
+  const defaultState = useDefaultState(quotationContent);
 
   const [state, setState] = useState<Tstate_profile>(defaultState);
 
   useEffect(() => {
     setState(defaultState);
-  }, [defaultState]);
+  }, [defaultState, disabled]);
 
   return {
     state_profile: state,
@@ -78,9 +85,25 @@ const useDefaultState = (raw_content: TquotationContentDto | undefined) => {
 const createProps_profileForm = ({
   state_profile,
   setState_profile,
+  reqPatchTrackProgressOrProjectProgress,
+  isSendToReview,
 }: {
   state_profile: Tstate_profile;
   setState_profile: React.Dispatch<React.SetStateAction<Tstate_profile>>;
+  isSendToReview: boolean | undefined;
+  //
+  reqPatchTrackProgressOrProjectProgress: (props: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => Promise<
+    | {
+        trackProgress: string | null;
+        projectProgress: string | null;
+      }
+    | undefined
+    | null
+  >;
+  //
 }) => {
   const props_form: Tprops_profile['form'] = {
     projectName: {
@@ -132,11 +155,43 @@ const createProps_profileForm = ({
     trackProgress: {
       value: state_profile.trackProgress,
       onChange: (v: string) => setState_profile((prev) => ({ ...prev, trackProgress: v })),
+      onEditClick: !isSendToReview
+        ? null
+        : async () => {
+            myAlert.input({
+              title: '更新追蹤狀態',
+              isTextArea: true,
+              width: 1000,
+              onConfirm: async (v) => {
+                const res = await reqPatchTrackProgressOrProjectProgress({ trackProgress: v });
+
+                if (res) {
+                  setState_profile((prev) => ({ ...prev, trackProgress: res.trackProgress || '' }));
+                }
+              },
+            });
+          },
     },
     // 工地進度
     projectProgress: {
       value: state_profile.projectProgress,
       onChange: (v: string) => setState_profile((prev) => ({ ...prev, projectProgress: v })),
+      onEditClick: !isSendToReview
+        ? null
+        : async () => {
+            myAlert.input({
+              title: '更新工地進度',
+              isTextArea: true,
+              width: 1000,
+              onConfirm: async (v) => {
+                const res = await reqPatchTrackProgressOrProjectProgress({ projectProgress: v });
+
+                if (res) {
+                  setState_profile((prev) => ({ ...prev, projectProgress: res.projectProgress || '' }));
+                }
+              },
+            });
+          },
     },
     // 指定廠牌
     designatedBrand: {

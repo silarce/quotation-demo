@@ -8,7 +8,9 @@ import _ from 'lodash';
 import { AxiosError } from 'axios';
 
 // components
-import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
+
+// import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
@@ -68,6 +70,7 @@ import {
   init_variable,
   calcNTDToForeignCurrency,
   checkIsReviewer,
+  parseQuotationContentSituation,
 } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
@@ -111,6 +114,10 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // ======================================================================
+
+import { Tstate_profile } from '../../../../components/page/domestic/quotation_v2/type_quotation';
+import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
+
 // ======================================================================
 // ======================================================================
 
@@ -123,39 +130,12 @@ interface Tquery {
   isContract?: string;
 }
 
-interface Tstate {
-  quotationId: string | null;
-  contentId: string | null;
-  isNew: boolean | null;
-
-  quotationNumber: string | null;
-
-  profile: {
-    projectName: string;
-    validityPeriod: string;
-    county: string;
-    district: string;
-    address: string;
-    contactPerson: string;
-    contactNumber: string;
-    faxNumber: string;
-    trackProgress: string;
-    projectProgress: string;
-
-    designatedBrand: string;
-    siteManager: string;
-    siteManagerNumber: string;
-    requiredDoorType: string;
-    requiredDoorQuantity: string;
-    estimatedDiscount: string;
-    scheduledProcurementOrBidDate: Moment | null;
-    type: string;
-
-    customer: TcustomerDto;
-    designUnit: TcustomerDto;
-
-    isLost: boolean; // 失單
-  };
+interface Tprops_useQuotation {
+  quotationId: undefined | string;
+  contentId: undefined | string;
+  isNew: undefined | boolean;
+  quotationNumber: undefined | string;
+  content: TquotationContentDto;
 }
 
 // ======================================================================
@@ -179,25 +159,69 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
 
   const {
+    isFetching,
+    //
     raw: quotationData,
-    update,
-    // updateSingleProd_noRender,
-    // updateAllWholeProd_batch_noRender,
+    update: update_quotation,
+    // attachment
+    attachmentArr,
+    domain,
+    //
+    reqPost,
+    reqPatch,
+    reqReview,
+    reqUnlock,
+    reqPatchReviewer,
+    reqCopyQuotation,
+    reqPatchQuotationContent_id_progress,
+    reqToPending,
   } = useGetQuotation_id_3(quotationId as string, {
     preBuiltPopulate: ['simple', 'attached'],
-    // getProductItems: false,
   });
 
-  // const {
-  //   data: quotationContentData,
-  //   update: updateContent,
-  //   clearData: clearData_content,
-  // } = useGetQuotationContent_id(contentId as string);
+  const {
+    data: quotationContentData,
+    update: updateContent,
+    clearData: clearData_content,
+  } = useGetQuotationContent_id(contentId as string);
+
+  const content = quotationData?.latestContent || quotationContentData;
+
+  const {
+    isSendToReview,
+    //
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+    isManager,
+  } =
+    (content &&
+      parseQuotationContentSituation({
+        quotationContent: content,
+        userId,
+      })) ??
+    {};
+
+  // ----------------------------------------------------------------------
+
+  const { state_profile, setState_profile } = useProfile({
+    disabled,
+    quotationContent: content,
+  });
 
   // ----------------------------------------------------------------------
   // region PROPS
 
-  const panelList = useQuotation({
+  const props_profileForm = createProps_profileForm({
+    state_profile,
+    setState_profile,
+    reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
+    isSendToReview,
+  });
+
+  const panelList = usePanel({
     disabled,
     props_panelList_01: {
       onEdit: () => {
@@ -212,21 +236,40 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   // ----------------------------------------------------------------------
+  // region useEffect
+  useEffect(() => {
+    if (quotationId) {
+      update_quotation();
+    } else if (contentId) {
+      updateContent();
+    }
+  }, [quotationId, contentId]);
+
+  // ----------------------------------------------------------------------
   // MARK: RENDER
   return (
     <SubLayer>
       <PageHeader02 tag="報價單" panelList={panelList} />
-      <div></div>
+      <div>
+        <QuotationProfile
+          disabled={disabled}
+          form={props_profileForm}
+          quotationNumber={content?.quotationNumber ?? '---'}
+          editNotes={content?.editNotes}
+        />
+      </div>
     </SubLayer>
   );
 }
 // MARK: END
+//
+//
 
 // ======================================================================
 
-// region HOOK
-
-const useQuotation = ({
+//
+// MARK: usePanel
+const usePanel = ({
   disabled,
   props_panelList_01,
   props_panelList_02,

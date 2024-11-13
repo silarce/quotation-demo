@@ -1,0 +1,74 @@
+.container {
+  display: grid;
+  grid-template-columns: 800px 295px;
+  gap: 33px;
+  justify-content: space-between;
+  padding: 0 22px 0 50px;
+  margin-top: 36px;
+}
+
+.topBox {
+  .clientState {
+    flex: none;
+    padding: 4px 10px;
+    margin-right: 10px;
+    color: #fff;
+    font-weight: 400;
+    font-size: 16px;
+    background-color: theme("colors.border");
+    &.haveState {
+      background-color: theme("colors.main");
+    }
+  }
+}
+
+.formLeft {
+  display: grid;
+  grid-template-columns: auto 394px;
+  // grid-template-columns: 550px 394px;
+  justify-content: space-between;
+}
+
+.clientName {
+  grid-column: span 2;
+  margin-top: 17px;
+  margin-bottom: 4px;
+  min-height: 36px;
+  > div {
+    position: relative;
+    textarea {
+      padding-left: 25px;
+    }
+
+    display: flex;
+    gap: 20px;
+
+    > svg {
+      position: absolute;
+      top: 50%;
+      left: 104px;
+      transform: translateY(-50%);
+    }
+  }
+
+  &.disabled {
+    > div {
+      textarea {
+        padding-left: 0px;
+      }
+    }
+  }
+}
+
+.right {
+  display: grid;
+  gap: 16px 24px;
+  height: fit-content;
+  padding: 18px 24px;
+  background-color: theme("colors.bgc01");
+  .caption {
+    font-size: 18px;
+    font-weight: 400;
+    color: theme("colors.main");
+  }
+}
