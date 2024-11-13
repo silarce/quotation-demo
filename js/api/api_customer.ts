@@ -15,6 +15,7 @@ import type {
   TcustomerDto_Populate,
   TpageMetaDto,
   Tcontact,
+  TcustomerType,
 } from './dtoTypes';
 
 /**
@@ -79,7 +80,7 @@ export type TpostCustomer = {
   customerNumber: string; // 不可以為空字串
   name: string; //客戶全稱
   nickname: string; //客戶簡稱
-  types: ('construction' | 'firm' | 'propertyOwner' | 'contractor')[];
+  types: TcustomerType[];
   principal: string; //客戶負責人
   taxDeductionCategory: string; //扣稅類別
   taxId: string; //統一編號

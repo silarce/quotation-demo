@@ -393,8 +393,8 @@ export type {
   Tbase,
   //
   TreviewFlow,
-  TaddReivew,
-  TgetReivewById,
+  TaddReivew as TaddReview,
+  TgetReivewById as TgetReviewById,
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,

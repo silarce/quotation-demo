@@ -171,10 +171,10 @@ export default function TotalCalc({
       isFinalPaymentWithTax, // 含稅未稅
       finalPaymentPercent: finalPaymentPercent || '0', // 百分比
 
-      pendingTasks, // 未施作項目
-      unpaidPayment, // 未收款金額
-      finalPayment, // 尾款 保留款
-      paymentPending, // 請款中未收到款項
+      pendingTasks: `${pendingTasks || 0}`, // 未施作項目
+      unpaidPayment: `${unpaidPayment || 0}`, // 未收款金額
+      finalPayment: `${finalPayment || 0}`, // 尾款 保留款
+      paymentPending: `${paymentPending || 0}`, // 請款中未收到款項
     };
 
     await reqPatchAccountReceivable(body)
@@ -549,18 +549,18 @@ const useDefaultStatePayment = (accountReceivable: TaccountsReceivableDto) => {
       isFinalPaymentWithTax,
       finalPaymentPercent,
 
-      contractTotalPrice,
-      pendingTasks,
+      contractTotalPrice: Number(contractTotalPrice || 0),
+      pendingTasks: Number(pendingTasks || 0),
 
       completedPart: 0,
 
-      receivedPayment,
-      extraIncome,
-      totalDeduction,
+      receivedPayment: Number(receivedPayment || 0),
+      extraIncome: Number(extraIncome || 0),
+      totalDeduction: Number(totalDeduction || 0),
 
-      unpaidPayment,
-      finalPayment,
-      paymentPending,
+      unpaidPayment: Number(unpaidPayment || 0),
+      finalPayment: Number(finalPayment || 0),
+      paymentPending: Number(paymentPending || 0),
     };
 
     return state;
