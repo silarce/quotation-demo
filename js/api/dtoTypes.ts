@@ -3,6 +3,9 @@
 // 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
 
 // ---------------------------------------------------------------------------
+
+export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
+
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
 
 // 表面處理
@@ -207,7 +210,7 @@ export type TcustomerDto = {
     id: string;
     createdAt: string;
     updateAt: string;
-    name: 'construction' | 'firm' | 'propertyOwner' | 'contractor';
+    name: TcustomerType;
   }[];
   legacyContracts?: TlegacyContractDto[];
 };

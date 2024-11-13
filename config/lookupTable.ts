@@ -1,6 +1,8 @@
-import { annotationAndQuotationRangeType, TquotationStatus } from 'js/api/dtoTypes';
+import { annotationAndQuotationRangeType, TquotationStatus, TcustomerType } from 'js/api/dtoTypes';
 
-export const customerTypesLookup = Object.freeze({
+export const customerTypesLookup: {
+  [key in TcustomerType]: string;
+} = Object.freeze({
   // construction: '營造',
   // firm: '事務所',
   // propertyOwner: '業主',
@@ -9,6 +11,7 @@ export const customerTypesLookup = Object.freeze({
   firm: '協力廠商',
   propertyOwner: '業主',
   contractor: '事務所',
+  supplier: '供應商',
 } as const);
 
 // Pending與TempPending是不一樣的東西，但是因為業務部的需求，顯示出來的文字都是準合約
