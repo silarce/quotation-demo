@@ -1,18 +1,25 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Image from 'next/image';
 
-import { TgetReivewById, useGetReivewById } from 'js/api/api_netCore/api_review';
+import {
+  TaddReview,
+  TgetReviewById as TgetReviewById,
+  useGetReviewById,
+  apiAddReview,
+  apiGetReviewBack,
+} from 'js/api/api_netCore/api_review';
 
 import icon_review from 'public/image/icon/review.svg';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ======================================================================
 
 interface Tprops {
   className?: string;
   className_stage?: string;
-  raw: TgetReivewById[] | undefined;
+  raw: TgetReviewById[] | undefined;
 }
 
 // ======================================================================
@@ -52,17 +59,82 @@ const useReviewFlow = ({
   const query = router.query as { id?: string | undefined };
   const document_uuid = uuid || query.id;
 
-  const { raw, update, isFetching, isFirstLoaded } = useGetReivewById(document_uuid, { autoUpdate });
+  const [isFetching, setIsFetching] = useState(false);
+
+  const { raw, update, isFetching: isFetching_get, isFirstLoaded } = useGetReviewById(document_uuid, { autoUpdate });
 
   const ReviewFlow = useCallback((props: Omit<Tprops, 'raw'>) => <ReviewFlow_pre raw={raw} {...props} />, [raw]);
+
+  // 送審
+  const reqAddReview = async (theBody: Omit<TaddReview, 'document_uuid'> & { document_uuid?: string }) => {
+    const documentUuid = theBody.document_uuid || document_uuid;
+
+    if (!documentUuid) {
+      myAlert.err({ title: '沒有document_uuid' });
+
+      return;
+    }
+
+    const body: TaddReview = {
+      ...theBody,
+      document_uuid: documentUuid,
+    };
+
+    setIsFetching(true);
+
+    return await apiAddReview(body)
+      .then(async () => {
+        await update();
+      })
+      .finally(() => setIsFetching(false));
+  };
+
+  // 抽單
+  const reqSentReviewStop = async () => {
+    if (!document_uuid) {
+      myAlert.err({ title: '沒有document_uuid' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetReviewBack(document_uuid)
+      .then(async () => {
+        await update();
+      })
+
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // 抽單modal
+  const sentReviewStop = () => {
+    if (!document_uuid) {
+      myAlert.err({ title: '沒有document_uuid' });
+
+      return;
+    }
+
+    myAlert.confirm({
+      title: '確認抽單?',
+      props: {
+        onOk: reqSentReviewStop,
+      },
+    });
+  };
 
   return {
     ReviewFlow,
     reviewFlow: raw?.[0],
     reviewFlowArr: raw,
-    isFetching,
+    isFetching: isFetching || isFetching_get,
     isFirstLoaded,
     update,
+    reqAddReview,
+    reqSentReviewStop,
+    sentReviewStop,
   };
 };
 

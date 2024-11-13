@@ -3,6 +3,9 @@
 // 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
 
 // ---------------------------------------------------------------------------
+
+export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
+
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
 
 // 表面處理
@@ -207,7 +210,7 @@ export type TcustomerDto = {
     id: string;
     createdAt: string;
     updateAt: string;
-    name: 'construction' | 'firm' | 'propertyOwner' | 'contractor';
+    name: TcustomerType;
   }[];
   legacyContracts?: TlegacyContractDto[];
 };
@@ -4091,30 +4094,30 @@ export type TaccountsReceivableDto = {
   // 收款期
   periods: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
-  contractTotalPrice: number;
+  contractTotalPrice: `${number}`;
   // 已收帳款金額(目前總計請款)
-  receivedPayment: number;
+  receivedPayment: `${number}`;
   // 手續費總合計
-  totalFee: number;
+  totalFee: `${number}`;
   // 總扣款金額
-  totalDeduction: number;
+  totalDeduction: `${number}`;
   // 未收款金額
-  unpaidPayment: number;
+  unpaidPayment: `${number}`;
   // 尾款
-  finalPayment: number | null;
+  finalPayment: `${number}` | null;
   // 累計完成項目細節
   totalCompletedProduct: TcompletedProductDto | null;
   // 目前請款合計(未稅)
-  totalPayment: number;
+  totalPayment: `${number}`;
   // 目前合計請款營業稅額
-  totalTax: number;
+  totalTax: `${number}`;
   // 額外收入
-  extraIncome: number;
+  extraIncome: `${number}`;
   // 未施作項目
-  pendingTasks: number;
+  pendingTasks: `${number}`;
   //
   // 請款中未收到款項
-  paymentPending: number;
+  paymentPending: `${number}`;
   // 保留款/尾款%數
   finalPaymentPercent: string;
   // 保留款/尾款類型

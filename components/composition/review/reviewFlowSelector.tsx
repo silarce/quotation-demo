@@ -8,9 +8,11 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { TaddReivew, TreviewFlow, useGetFlow, apiAddReivew, apiGetReviewBack } from 'js/api/api_netCore/api_review';
+import { TreviewFlow, useGetFlow } from 'js/api/api_netCore/api_review';
 
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+
+import scss from './reviewFlowSelector.module.scss';
 
 const ReviewFlowSelector = ({
   // username,
@@ -53,36 +55,36 @@ const ReviewFlowSelector = ({
           setState_purpose(e.target.value);
         }}
       />
-      <Radio.Group
-        onChange={(e) => {
-          setState_flowId(e.target.value);
-        }}
-        value={state_flowId}
-        style={{ paddingTop: '5px' }}
-      >
-        <Space direction="vertical">
+      <div className={scss.body}>
+        <Radio.Group
+          className={scss.antdRadioGroup}
+          onChange={(e) => {
+            setState_flowId(e.target.value);
+          }}
+          value={state_flowId}
+          style={{ paddingTop: '5px' }}
+        >
           {rawFlow_filtered?.map((_item) => (
-            <Radio
-              key={_item.id}
-              value={_item.id}
-              style={{ fontSize: '18px', width: '800px', borderBottom: '1px solid #ccc', padding: '5px' }}
-              onClick={() => onItemClick?.(_item)}
-            >
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+            <Radio key={_item.id} className={scss.antdRadio} value={_item.id} onClick={() => onItemClick?.(_item)}>
+              <div className={scss.row}>
                 {_item.name}：
-                {_item.stages.map((_stage, index: number) => (
-                  <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
-                    {_stage.review_type}：{_stage.stage_user_name}
-                    {index < _item.stages.length - 1 && (
-                      <Image src={icon_arrow_right} alt="arrow" style={{ height: '20px', width: '20px' }} />
-                    )}
-                  </div>
-                ))}
+                <div className={scss.subRow}>
+                  {_item.stages.map((_stage, index: number) => (
+                    <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                      {_stage.review_type}：
+                      <br />
+                      {_stage.stage_user_name}
+                      {index < _item.stages.length - 1 && (
+                        <Image src={icon_arrow_right} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </Radio>
           ))}
-        </Space>
-      </Radio.Group>
+        </Radio.Group>
+      </div>
 
       <SquareBtn className="my-5 ml-5" sharp="long" onClick={handleConfirm}>
         確認
@@ -115,18 +117,4 @@ ReviewFlowSelector.open2 = (props: Parameters<typeof ReviewFlowSelector>[0]) => 
 };
 
 // ================================================================================
-
-const reqSentReviewStop = ({ uuid, onSuccess }: { uuid: string; onSuccess?: () => void }) => {
-  myAlert.confirm({
-    title: '確認抽單?',
-    props: {
-      onOk: async () => {
-        apiGetReviewBack(uuid).then(onSuccess);
-      },
-    },
-  });
-};
-
-// ================================================================================
 export default ReviewFlowSelector;
-export { apiAddReivew, reqSentReviewStop };
