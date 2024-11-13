@@ -186,29 +186,40 @@ export default function PayrollLedger() {
                 const firstEmployee = employeeData.length > 0 ? employeeData[0] : {};
 
                 return {
-                    id_number: firstEmployee.id_number || '',
+                    id: item.id,
+                    id_number: employeeData?.id_number || '',
                     department: item.department || '',
-                    start_date: firstEmployee.start_date || '',
-                    ch_name: firstEmployee.ch_name || '',
-                    salary: item.salary || '',
-                    supplement: item.supplement || '',
-                    allowance: item.allowance || '',
-                    employee_id: firstEmployee.employee_id || '',
-                    overtime_hours: item.overtime_hours || '',
-                    attendance_days: item.attendance_days || '',
-                    public_holidays: item.public_holidays || '',
-                    perfect_attendance_bonus: item.perfect_attendance_bonus || '',
-                    subtotal: item.subtotal || '',
-                    overtime_pay: item.overtime_pay || '',
-                    earning_total: item.earning_total || '',
-                    advance_payment: item.advance_payment || '',
-                    income_tax: item.income_tax || '',
-                    labor_insurance_fee: item.labor_insurance_fee || '',
-                    health_insurance_fee: item.health_insurance_fee || '',
-                    late_deduction: item.late_deduction || '',
-                    deduction_total: item.deduction_total || '',
-                    net_pay: item.net_pay || '',
-                    note: item.note || ''
+                    start_date: employeeData?.start_date || '',
+                    annual_leave_days: item.annual_leave_days || '0',
+                    comp_time: item.comp_time || '0',
+                    ch_name: employeeData?.ch_name || '',
+                    salary: item.salary || '0',
+                    actual_salary: item.salary || '0',
+                    supplement: item.supplement || '0',
+                    allowance: item.allowance || '0',
+                    employee_id: item.employee_id || '',
+                    overtime_hours: item.overtime_hours || '0',
+                    attendance_days: item.attendance_days || '0',
+                    public_holidays: item.public_holidays || '0',
+                    perfect_attendance_bonus: item.perfect_attendance_bonus || '0',
+                    subtotal: item.subtotal || '0',
+                    overtime_pay: item.overtime_pay || '0',
+                    earning_total: item.earning_total || '0',
+                    advance_payment: item.advance_payment || '0',
+                    income_tax: item.income_tax || '0',
+                    income_tax_people: item.income_tax_people || '0',
+                    labor_insurance_fee: item.labor_insurance_fee || '0',
+                    health_insurance_fee: item.health_insurance_fee || '0',
+                    health_insurance_people: item.health_insurance_people || '0',
+                    late_deduction: item.late_deduction || '0',
+                    deduction_total: item.deduction_total || '0',
+                    net_pay: item.net_pay || '0',
+                    note: item.note || '',
+                    late_time: item.late_time || '0',
+                    late_minute: item.late_minute || '0',
+                    leave_day: item.leave_day || '0',
+                    leave_detail: item.leave_detail || '{}',
+                    leave_day_pay: item.leave_day_pay || '0',
                 };
             });
 
@@ -373,9 +384,10 @@ export default function PayrollLedger() {
                             {data && (
                                 data.map((_item: any, index: number) => {
                                     // 計算總薪資
-                                    const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0);
+                                    const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0) - parseFloat(_item.leave_day_pay || 0);
                                     const earning_total = taxTotal + parseFloat(_item.overtime_pay || 0)
-                                    const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0);
+                                    const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0) + parseFloat(_item.leave_day_pay || 0);
+                                    _item.actual_salary = parseFloat(_item.salary || 0) - parseFloat(_item.leave_day_pay || 0)
                                     _item.earning_total = earning_total;
                                     _item.deduction_total = deduction_total;
                                     _item.subtotal = taxTotal;
