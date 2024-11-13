@@ -14,6 +14,8 @@ import { useInputSelProps } from '../useInputSelProps';
 
 import SearchModal, { Tprops_refine } from '..';
 
+import { customerTypesLookup } from 'js/api/api_customer';
+
 // =====================================================================================
 
 // 由五個部分組成
@@ -58,6 +60,9 @@ const useData = (state_filter: Tstate_filter | undefined): TmodalData<TcustomerD
       customerNumber: {
         $contains: state_filter.customerNumber,
       },
+      'types.name': {
+        $eq: state_filter.type,
+      },
     };
 
     return {
@@ -65,6 +70,7 @@ const useData = (state_filter: Tstate_filter | undefined): TmodalData<TcustomerD
       sort: 'customerNumber',
       order: 'ASC',
       filter,
+      populate: ['types'],
     };
   }, [state_filter]);
 
@@ -150,6 +156,10 @@ const useConfig_filter = () => {
   const { t, i18n } = useTranslation('common');
 
   return useMemo(() => {
+    const options_type = Object.keys(customerTypesLookup).map((key) => {
+      return { value: key, label: t(key) };
+    });
+
     const config_filter: Tconfig_filter = [
       {
         caption: t('customerNumber'),
@@ -161,17 +171,13 @@ const useConfig_filter = () => {
         key: 'name',
         type: 'input',
       },
-      // {
-      //   caption: t('type02'),
-      //   key: 'type',
-      //   type: 'select',
-      //   selectOptions: [
-      //     { value: 'construction', label: t('construction') },
-      //     { value: 'firm', label: t('firm') },
-      //     { value: 'propertyOwner', label: t('propertyOwner') },
-      //     { value: 'contractor', label: t('contractor') },
-      //   ],
-      // },
+      {
+        caption: t('type02'),
+        key: 'type',
+        type: 'select',
+
+        selectOptions: options_type,
+      },
     ];
 
     return config_filter;
