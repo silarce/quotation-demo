@@ -6,13 +6,6 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 
 import scss from './QuotationRemark.module.scss';
 
-const fakeData = [
-  'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum dolorum sed delectus quod optio placeat consequatur qui fugiat animi, illum earum libero minima possimus, id reiciendis, officiis reprehenderit cum perferendis.',
-  'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum dolorum sed delectus quod optio placeat consequatur qui fugiat animi, illum earum libero minima possimus, id reiciendis, officiis reprehenderit cum perferendis.',
-  'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum dolorum sed delectus quod optio placeat consequatur qui fugiat animi, illum earum libero minima possimus, id reiciendis, officiis reprehenderit cum perferendis.',
-  'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum dolorum sed delectus quod optio placeat consequatur qui fugiat animi, illum earum libero minima possimus, id reiciendis, officiis reprehenderit cum perferendis.',
-];
-
 // =======================================================================
 
 interface Tremark {
@@ -37,7 +30,7 @@ export default function QuotationRemark({ disabled, label, onAddClick, onUpponAd
       <div className={scss.labelBox}>
         <p>{label}</p>
         <IconAddCircle
-          className={classNames(disabled && 'hidden')}
+          className={classNames(disabled && 'invisible')}
           onClick={() => {
             onUpponAddClick();
           }}
@@ -48,14 +41,12 @@ export default function QuotationRemark({ disabled, label, onAddClick, onUpponAd
 
         return (
           <div key={index}>
-            {disabled ? <span></span> : <IconRemoveCircle onClick={onDelete} />}
-            {/* <span className={scss.serialNumber}>{index + 1}.</span> */}
+            <IconRemoveCircle className={classNames(disabled && 'invisible')} onClick={onDelete} />
             <span className={scss.serialNumber}></span>
             <InputSel
               className={classNames(scss.inputSel)}
               textareaProps={{
                 props: {
-                  // placeholder: '請輸入' + label,
                   value,
                   onChange: (e) => onChange(e.target.value),
                 },
@@ -66,7 +57,9 @@ export default function QuotationRemark({ disabled, label, onAddClick, onUpponAd
           </div>
         );
       })}
-      <div>{disabled ? <span></span> : <IconAddCircle onClick={() => onAddClick()} />}</div>
+      <div>
+        <IconAddCircle className={classNames(disabled && 'invisible')} onClick={() => onAddClick()} />
+      </div>
     </div>
   );
 }
