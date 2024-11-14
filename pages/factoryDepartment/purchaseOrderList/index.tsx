@@ -1635,7 +1635,7 @@ export default function PurchaseOrderList() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag={'採購單'} panelList={viewtype === "review" ? undefined : panelList}  />
+            <PageHeader02 tag={'採購單'} panelList={viewtype === "review" ? undefined : panelList} />
             <div className={scss.container}>
                 <div className={scss.right}>
                     <div className={scss.content}>
@@ -1724,7 +1724,7 @@ export default function PurchaseOrderList() {
                             </div>
                             <div>
                                 {/* <span>
-                                    <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handleGoToAddPO() }} title="新增單據">
+                                    <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPO() }} title="新增單據">
                                         <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                         新增
                                     </button>

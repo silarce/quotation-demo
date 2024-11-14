@@ -675,22 +675,27 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        // {
-        //   label: '薪資管理',
-        //   erpFeature: [accountingDepartment],
-        //   list: [
-        //     {
-        //       label: '結算薪資作業',
-        //       path: path01 + '/salarySettlement',
-        //       erpFeature: [accountingDepartment],
-        //     },
-        //     {
-        //       label: '薪資帳簿',
-        //       path: path01 + '/payrollLedger',
-        //       erpFeature: [accountingDepartment],
-        //     },
-        //   ],
-        // },
+        {
+          label: '薪資管理',
+          erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '結算薪資作業',
+              path: path01 + '/salarySettlement',
+              erpFeature: [accountingDepartment],
+            },
+            {
+              label: '薪資帳簿',
+              path: path01 + '/payrollLedger',
+              erpFeature: [accountingDepartment],
+            },
+            // {
+            //   label: '固定薪資維護',
+            //   path: path01 + '/salaryMaintenance',
+            //   erpFeature: [accountingDepartment],
+            // },
+          ],
+        },
         // {
         //   label: 'foo',
         //   erpFeature: devPass,
