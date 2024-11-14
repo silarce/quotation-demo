@@ -24,9 +24,14 @@ import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import icon_eye from 'public/image/icon/eyeOpen.svg';
+import icon_export from 'public/image/icon/fc_export.svg';
+
+
 import moment from "moment";
 import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
 import { Tparams } from "js/api/dtoTypes";
+import { Modal } from "antd";
 
 // type Tquery = {
 //     year?: string;
@@ -45,7 +50,7 @@ export default function PayrollLedger() {
     const {
         year = thisYear.toString(),
         month = thisMonth.toString(),
-        keyword
+        viewtype
     } = router.query;
     //#endregion
 
@@ -61,7 +66,7 @@ export default function PayrollLedger() {
     const [bomdata, setBomdata] = useState<any[]>([]); // 物料data
     const [searchdata, setSearchdata] = useState<any[]>([]); // 物料查詢
     const [searchbardata, setSearchBarData] = useState<any[]>([]); // 手key物料查詢
-
+    const [leavedata, setLeavedata] = useState<any[]>([]);
 
     // 查詢變數-物料
 
@@ -69,7 +74,10 @@ export default function PayrollLedger() {
     const [selectedOption, setSelectedOption] = useState(moment().format('YYYY-MM')); // 預設為當前年月份
     // const [year, setYear] = useState(moment().format('YYYY-MM')); // 預設為當前年月份
     // const [month, setMonth] = useState(moment().format('MM')); // 預設為當前年月份
-
+    const [currentemp, setCurrentEmp] = useState<string>("");
+    const [serial_id, setSerial_id] = useState<string>("");
+    const [serial_uuid, setSerial_uuid] = useState<string>("");
+    const [status, setStatus] = useState<string>("");
 
     //手key輸入
     const overtime_hoursRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
@@ -81,6 +89,22 @@ export default function PayrollLedger() {
     const labor_insurance_feeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const health_insurance_feeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_deductionRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const leave_day_payRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const supplementRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const allowanceRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const perfect_attendance_bonusRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const income_tax_peopleRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const health_insurance_peopleRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const annual_leave_daysRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const comp_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const late_minuteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+
+    // popout
+    const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
+    const [editbtn, seteditbtn] = useState<boolean>(false);
+    const [addbar, setaddbar] = useState<boolean>(false);
+    // const [editall, seteditall] = useState<boolean>(false);
 
     //#endregion
 
@@ -161,7 +185,7 @@ export default function PayrollLedger() {
             setIsLoading(true);
             const conditionModel = {
                 date: year + '-' + month,
-                type:'已核准'
+                type: '已核准'
             };
 
             var inputModel = {
@@ -180,10 +204,9 @@ export default function PayrollLedger() {
             console.log(responsedata);
             // 重新命名欄位生成新的資料結構
             const renamedData = responsedata.map((item: any) => {
-                // 解析 `employee` 欄位為物件陣列
-                const employeeData = JSON.parse(item.employee);
-                // 確認 `employeeData` 是否有資料
-                const firstEmployee = employeeData.length > 0 ? employeeData[0] : {};
+                const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料
+
+                console.log(item);
 
                 return {
                     id: item.id,
@@ -242,7 +265,7 @@ export default function PayrollLedger() {
             const conditionModel = {
                 type2: 'payrollLedger',
                 date: year + '-' + month,
-                type:'已核准'
+                type: '已核准'
             };
 
             const inputModel = {
@@ -346,6 +369,7 @@ export default function PayrollLedger() {
                         </span>
                         <span style={{ padding: '0px 10px' }}>
                             <button className={scss.longsquarebtn} style={{ marginTop: '-5px' }} onClick={() => { Excel() }} title="核准">
+                                <img src={icon_export.src} alt="search" style={{ height: '15px', width: '15px' }} />
                                 匯出Excel
                             </button>
                         </span>
@@ -359,26 +383,35 @@ export default function PayrollLedger() {
                         <div className={scss.thead1}>
                             <span>員工編號</span>
                             <span>部門</span>
-                            <span>到職日</span>
                             <span>姓名</span>
+                            <span>到職日</span>
+                            <span>年資日</span>
+                            <span>補修日數</span>
+                            <span>假別</span>
+                            <span>請假日數</span>
                             <span>本薪(30天)</span>
-                            <span>職務加給</span>
-                            <span>工作津貼</span>
                             <span>加班時數</span>
                             <span>出勤日數</span>
                             <span>公休日數</span>
+                            <span>本薪</span>
+                            <span>職務加給</span>
+                            <span>工作津貼</span>
                             <span>全勤獎金</span>
                             <span>應稅合計</span>
                             <span>加班費</span>
-                            <span>本月應領</span>
+                            <span style={{ borderRight: '1px solid #ddd' }}>本月應領</span>
+                            <span>請假扣款</span>
                             <span>借支</span>
                             <span>所得稅</span>
+                            <span>扶養人數</span>
                             <span>勞保費</span>
                             <span>健保費</span>
-                            <span style={{ borderRight: '1px solid #clclcl' }}>遲到扣款</span>
+                            <span>眷屬人屬</span>
+                            <span>遲到次數</span>
+                            <span>遲到分數</span>
+                            <span>遲到扣款</span>
                             <span>本月應扣</span>
                             <span>本月實領</span>
-                            <span></span>
                         </div>
                         <span>
                             {data && (
@@ -394,183 +427,252 @@ export default function PayrollLedger() {
                                     const net_pay = parseFloat(_item.earning_total || 0) - parseFloat(_item.deduction_total || 0)
                                     _item.net_pay = net_pay;
                                     return (
-                                        <CellWithBar key={index} className={scss.panelHeader11}>
+                                        <CellWithBar key={index} className={scss.panelHeader1}>
                                             <div className={scss.row01}>
                                                 <span>{_item.id_number}</span>
                                                 <span>{_item.department}</span>
-                                                <span>{getTaiwanDateStr(_item.start_date)}</span>
                                                 <span>{_item.ch_name}</span>
-                                                <span>{_item.salary}</span>
-                                                <span>{_item.supplement}</span>
-                                                <span>{_item.allowance}</span>
+                                                <span>{getTaiwanDateStr(_item.start_date)}</span>
+                                                <span>
+                                                    <input
+                                                        ref={annual_leave_daysRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type="number"
+                                                        value={_item.annual_leave_days}
+                                                    />
+                                                    日
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={comp_timeRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type="number"
+                                                        value={_item.comp_time}
+                                                    />
+                                                    日
+                                                </span>
+                                                <span>
+                                                    <button onClick={() => {
+                                                        setCurrentEmp(_item.id);
+                                                        setLeavedaybar(true);
+
+                                                        // 判斷 leave_detail 是字串還是物件
+                                                        let leaveDetail = data[index].leave_detail;
+
+                                                        // 若是 JSON 字串格式，解析為物件
+                                                        if (typeof leaveDetail === "string") {
+                                                            try {
+                                                                leaveDetail = JSON.parse(leaveDetail);
+                                                            } catch (error) {
+                                                                console.error("JSON 解析錯誤:", error);
+                                                                leaveDetail = {}; // 若解析失敗，則使用空物件作為預設
+                                                            }
+                                                        }
+
+                                                        // 將 leaveDetail 轉換成陣列格式
+                                                        const newLeaveData = Object.entries(leaveDetail).map(([leaveType, leaveDays]) => ({
+                                                            leaveType,
+                                                            leaveDays,
+                                                        }));
+
+                                                        // 更新 leavedata state
+                                                        setLeavedata(newLeaveData);
+                                                    }}>
+                                                        <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                    </button>
+
+                                                </span>
+                                                <span>
+                                                    {_item.leave_day || 0}
+                                                </span>
+                                                <span>
+                                                    {Number(_item.salary).toLocaleString()}
+                                                </span>
                                                 <span>
                                                     <input
                                                         ref={overtime_hoursRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '50px' }}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
                                                         type="number"
                                                         value={_item.overtime_hours}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newOvertime_hours = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                overtime_hours: newOvertime_hours.toString(),
-                                                            };
-                                                            setData(newData);
-                                                        }}
                                                     />
                                                     時
                                                 </span>
                                                 <span>
                                                     <input
                                                         ref={attendance_daysRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '50px' }}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
                                                         type="number"
                                                         value={_item.attendance_days}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newAttendance_days = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                attendance_days: newAttendance_days.toString(),
-                                                            };
-                                                            setData(newData);
-                                                        }}
                                                     />
                                                     日
                                                 </span>
                                                 <span>
                                                     <input
                                                         ref={public_holidaysRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '50px' }}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
                                                         type="number"
                                                         value={_item.public_holidays}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newPublic_holidays = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                public_holidays: newPublic_holidays.toString(),
-                                                            };
-                                                            setData(newData);
-                                                        }}
                                                     />
                                                     日
                                                 </span>
-                                                <span>{_item.perfect_attendance_bonus}</span>
-                                                <span>{taxTotal}</span>
+                                                <span>{Number(_item.actual_salary).toLocaleString()}</span>
                                                 <span>
-                                                    <input
-                                                        ref={overtime_payRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.overtime_pay}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newOvertime_pay = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                overtime_pay: newOvertime_pay.toString()
-                                                            };
-                                                            setData(newData);
-                                                        }}
-                                                    />
+                                                    {Number(_item.supplement).toLocaleString()}
                                                 </span>
                                                 <span>
-                                                    {_item.earning_total || 0}
+                                                    {Number(_item.allowance).toLocaleString()}
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={perfect_attendance_bonusRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.perfect_attendance_bonus).toLocaleString()}
+                                                    />
+                                                </span>
+                                                <span>{taxTotal.toLocaleString()}</span>
+                                                <span>
+                                                    {Number(_item.overtime_pay).toLocaleString()}
+                                                </span>
+                                                <span style={{ borderRight: '1px solid #ddd' }}>
+                                                    {_item.earning_total.toLocaleString() || 0}
                                                     {/* {_item.earning_total || 0} */}
                                                 </span>
                                                 <span>
-                                                    {/* advance_payment */}
                                                     <input
-                                                        ref={advance_paymentRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.advance_payment}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newAdvance_payment = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                advance_payment: newAdvance_payment.toString(),
-                                                            };
-                                                            setData(newData);
+                                                        ref={leave_day_payRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
                                                         }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.leave_day_pay).toLocaleString()}
                                                     />
                                                 </span>
                                                 <span>
+                                                    {Number(_item.advance_payment).toLocaleString()}
+                                                </span>
+                                                <span>
+                                                    {Number(_item.income_tax).toLocaleString()}
+                                                </span>
+                                                <span>
                                                     <input
-                                                        ref={income_taxRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.income_tax}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newIncome_tax = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                income_tax: newIncome_tax.toString(),
-                                                            };
-                                                            setData(newData);
+                                                        ref={income_tax_peopleRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
                                                         }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.income_tax_people).toLocaleString()}
                                                     />
+                                                    人
                                                 </span>
                                                 <span>
                                                     <input
                                                         ref={labor_insurance_feeRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.labor_insurance_fee}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newLabor_insurance_fee = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                labor_insurance_fee: newLabor_insurance_fee.toString(),
-                                                            };
-                                                            setData(newData);
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
                                                         }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.labor_insurance_fee).toLocaleString()}
                                                     />
                                                 </span>
                                                 <span>
                                                     <input
                                                         ref={health_insurance_feeRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.health_insurance_fee}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newHealth_insurance_fee = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                health_insurance_fee: newHealth_insurance_fee.toString(),
-                                                            };
-                                                            setData(newData);
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
                                                         }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.health_insurance_fee).toLocaleString()}
                                                     />
                                                 </span>
                                                 <span>
                                                     <input
-                                                        ref={late_deductionRefs.current[index]}
-                                                        style={{ backgroundColor: 'transparent', borderBottom: '1px solid gray', width: '100px' }}
-                                                        type="number"
-                                                        value={_item.late_deduction}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newLate_deduction = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                late_deduction: newLate_deduction.toString(),
-                                                            };
-                                                            setData(newData);
+                                                        ref={health_insurance_peopleRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
                                                         }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.health_insurance_people).toLocaleString()}
+                                                    />
+                                                    人
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={late_timeRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.late_time).toLocaleString()}
+                                                    />
+                                                    次
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={late_minuteRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '50px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.late_minute).toLocaleString()}
+                                                    />
+                                                    分
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={late_deductionRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type={"number"}
+                                                        value={Number(_item.late_deduction).toLocaleString()}
                                                     />
                                                 </span>
                                                 <span>
-                                                    {_item.deduction_total}
+                                                    {_item.deduction_total.toLocaleString()}
                                                 </span>
                                                 <span>
-                                                    {_item.net_pay}
+                                                    {_item.net_pay.toLocaleString()}
                                                 </span>
                                             </div>
                                         </CellWithBar>
@@ -581,6 +683,150 @@ export default function PayrollLedger() {
                     </div>
                     <div></div>
                 </div>
+                <Modal
+                    visible={leavedaybar}
+                    onCancel={() => {
+                        setLeavedaybar(false);  // 關閉 Modal
+                        seteditbtn(false);      // 將 editbtn 設為 false
+                        setLeavedata([]);
+                    }}
+                    width="502px"
+                    closable={false}  // 移除右上角的叉叉
+                    style={{ top: 150, }}
+                    bodyStyle={{ padding: 0, height: '520px' }}  // 移除內部間距
+                    title={null}
+                    footer={
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
+                            <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
+                                {/* <button
+                                    className={scss.minitabbtn}
+                                    onClick={() => {
+                                        seteditbtn(!editbtn);
+                                        setOriginalLeavedata(leavedata);
+                                    }}
+                                    style={{
+                                        display: `${editbtn === false ? '' : 'none'}`,
+                                        margin: '0px 20px'
+                                    }}
+                                >
+                                    編輯
+                                </button> */}
+                            </span>
+                            {/* <button
+                                className={scss.minitabbtn}
+                                onClick={() => {
+                                    seteditbtn(false);
+                                    setLeavedata(originalleavedata);
+                                }}
+                                style={{
+                                    display: `${editbtn === true ? '' : 'none'}`,
+                                    margin: '0px 20px'
+                                }}
+                            >
+                                取消
+                            </button> */}
+                            <button
+                                className={scss.minitabbtn}
+                                onClick={() => {
+                                    setLeavedaybar(false)
+                                    seteditbtn(false)
+                                }}
+                                style={{ display: `${editbtn === false ? '' : 'none'}` }}
+                            >
+                                關閉
+                            </button>
+                            {/* <button
+                                className={scss.minitabredbtn}
+                                onClick={() => {
+                                    console.log(leavedata);
+                                    updateLeaveDetail(currentemp);
+                                    // setLeavedaybar(false);
+                                    seteditbtn(false);
+                                }}
+                                style={{ display: `${editbtn === true ? '' : 'none'}` }}
+                            >
+                                確定
+                            </button> */}
+                        </div>
+                    }
+                >
+                    <div className={scss.thead2}>
+                        <span>
+                            {/* <button onClick={() => { handleAddData() }} style={{ display: `${editbtn ? '' : 'none'}` }}>
+                                <img src={icon_cir_add.src} alt="add" style={{ height: '30px', width: '30px' }} />
+                            </button> */}
+                        </span>
+                        <span>假別</span>
+                        <span>日數</span>
+                        <span></span>
+                    </div>
+                    <div className={scss.body_content1} style={{ overflowY: 'auto' }}>
+                        {leavedata && leavedata.map((item, index) => (
+                            <CellWithBar key={index} className={scss.panelHeader2}>
+                                <div className={scss.row01}>
+                                    <span>
+                                        {/* {editbtn && (
+                                            <button onClick={() => { }}
+                                                style={{
+                                                    height: '70px'
+                                                }}>
+                                                <img src={icon_cir_remove.src} alt="remove"
+                                                    style={{ width: '30px', height: '30px' }} />
+                                            </button>
+                                        )} */}
+                                    </span>
+                                    <span>
+                                        <select
+                                            value={item.leaveType}
+                                            // onChange={(e) => handleLeaveTypeChange(index, e.target.value)}
+                                            disabled={!editbtn}
+                                            style={{
+                                                width: '100%',
+                                                fontSize: '18px',
+                                                borderBottom: editbtn ? '1px solid #14256a' : 'none',
+                                                backgroundColor: 'transparent',
+                                                height: '50px',
+                                                appearance: editbtn ? 'auto' as any : 'none' as any,  // 型別轉換
+                                                MozAppearance: editbtn ? 'auto' as any : 'none' as any,  // 型別轉換
+                                                WebkitAppearance: editbtn ? 'auto' as any : 'none' as any  // 型別轉換
+                                            }}
+                                        >
+                                            <option value="">請選擇假別</option>
+                                            <option value="事假">事假</option>
+                                            <option value="病假">病假</option>
+                                            <option value="喪假">喪假</option>
+                                            <option value="公假">公假</option>
+                                            <option value="產假">產假</option>
+                                            <option value="生理假">生理假</option>
+                                            <option value="家庭照顧假">家庭照顧假</option>
+                                        </select>
+                                    </span>
+
+                                    <span>
+                                        <input
+                                            type="text"
+                                            placeholder="請輸入日數"
+                                            value={item.leaveDays}
+                                            // onChange={(e) => handleLeaveDaysChange(index, e.target.value)}
+                                            readOnly={true}  // 當 editbtn 為 false 時禁用輸入
+                                            style={{
+                                                fontSize: '18px',
+                                                width: '100%',
+                                                borderBottom: editbtn ? '1px solid #14256a' : 'none',  // 底線在 editbtn 為 true 時顯示
+                                                backgroundColor: 'transparent',
+                                                height: '50px'
+                                            }}
+                                        />
+                                    </span>
+
+                                    <span></span>
+                                </div>
+                            </CellWithBar>
+                        ))}
+                    </div>
+
+
+                </Modal>
             </div>
         </SubLayer>
 
