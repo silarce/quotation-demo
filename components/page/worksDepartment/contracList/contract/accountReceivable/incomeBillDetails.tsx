@@ -19,6 +19,7 @@ import type { Tcurrency, TincomeBillSerialDto } from 'js/api/dtoTypes';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { cutCurrency } from 'js/utils/currency/cutCurrency';
+import { isInteger } from 'js/utils/checkValue';
 
 // ============================================================================
 
@@ -79,6 +80,10 @@ export default function IncomeBillDetails({
   // region function
 
   const editFee = (index: number, value: string) => {
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     setState_incomeBillArr((arr) => {
       const copy = [...arr];
       copy[index].fee = value;

@@ -1,6 +1,6 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
-import scss from './salarySettlement.module.scss';
+import scss from './salaryMaintenance.module.scss';
 import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { setting } from '../../factoryDepartment/wareHouseList/index';
 import { useRouter } from "next/router";
@@ -38,7 +38,7 @@ import DragableModal from "components/global/gear/dragableModal/dragableModal";
 
 
 
-export default function SalarySettlement() {
+export default function salaryMaintenance() {
     const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
 
     //#region =============【路由參數】===============================================================================
@@ -105,7 +105,8 @@ export default function SalarySettlement() {
     const hasFetchedData = useRef(false);
     useEffect(() => {
         if (!hasFetchedData.current) {
-            GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+            GetSalary();
             GetReviewFlow();
             hasFetchedData.current = true;
         }
@@ -132,7 +133,7 @@ export default function SalarySettlement() {
 
     useEffect(() => {
         setData([]);
-        GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+        // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
     }, [year, month]);
 
 
@@ -175,16 +176,16 @@ export default function SalarySettlement() {
 
     //#region =============【  API  】===============================================================================
 
-    const GetPayrollByDate = async (type: any) => {
+    const GetSalary = async () => {
         try {
             // alert(year + '-' + month);
             setIsLoading(true);
 
             const conditionModel = {
-                date: year + '-' + month,
+                // date: year + '-' + month,
                 // type: '編輯中'
                 // type:"編輯中' or status = '審核中"
-                type: type
+                // type: type
             };
 
             const inputModel = {
@@ -195,7 +196,7 @@ export default function SalarySettlement() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Salary/GetPayrollByDate?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/Salary/GetSalary?${queryParams}`);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
@@ -203,65 +204,63 @@ export default function SalarySettlement() {
 
             const responsedata = await response.json();
             console.log(responsedata);
-            if (responsedata.length === 0) {
-                // 若無資料，將 `serial_id` 和 `serial_uuid` 設為空值，`status` 設為 "尚未建立"
-                setSerial_id('');
-                setSerial_uuid('');
-                setStatus(`尚未建立`);
-            } else {
+            // if (responsedata.length === 0) {
+            //     // 若無資料，將 `serial_id` 和 `serial_uuid` 設為空值，`status` 設為 "尚未建立"
+            //     setSerial_id('');
+            //     setSerial_uuid('');
+            //     setStatus(`尚未建立`);
+            // } else {
 
-                // alert("OK");
-                // 重命名欄位並解析 `employee` JSON 字串
-                const renamedData = responsedata.map((item: any) => {
-                    const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料
-                    setSerial_id(item.serial_id);
-                    setSerial_uuid(item.serial_uuid);
-                    setStatus(`${item.status}`);
-                    console.log(item);
+            // alert("OK");
+            // 重命名欄位並解析 `employee` JSON 字串
+            // const renamedData = responsedata.map((item: any) => {
+            //     const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料
+            //     setSerial_id(item.serial_id);
+            //     setSerial_uuid(item.serial_uuid);
+            //     setStatus(`${item.status}`);
+            //     console.log(item);
 
-                    return {
-                        id: item.id,
-                        id_number: employeeData?.id_number || '',
-                        department: item.department || '',
-                        start_date: employeeData?.start_date || '',
-                        annual_leave_days: item.annual_leave_days || '0',
-                        comp_time: item.comp_time || '0',
-                        ch_name: employeeData?.ch_name || '',
-                        salary: item.salary || '0',
-                        actual_salary: item.salary || '0',
-                        supplement: item.supplement || '0',
-                        allowance: item.allowance || '0',
-                        employee_id: item.employee_id || '',
-                        overtime_hours: item.overtime_hours || '0',
-                        attendance_days: item.attendance_days || '0',
-                        public_holidays: item.public_holidays || '0',
-                        perfect_attendance_bonus: item.perfect_attendance_bonus || '0',
-                        subtotal: item.subtotal || '0',
-                        overtime_pay: item.overtime_pay || '0',
-                        earning_total: item.earning_total || '0',
-                        advance_payment: item.advance_payment || '0',
-                        income_tax: item.income_tax || '0',
-                        income_tax_people: item.income_tax_people || '0',
-                        labor_insurance_fee: item.labor_insurance_fee || '0',
-                        health_insurance_fee: item.health_insurance_fee || '0',
-                        health_insurance_people: item.health_insurance_people || '0',
-                        late_deduction: item.late_deduction || '0',
-                        deduction_total: item.deduction_total || '0',
-                        net_pay: item.net_pay || '0',
-                        note: item.note || '',
-                        late_time: item.late_time || '0',
-                        late_minute: item.late_minute || '0',
-                        leave_day: item.leave_day || '0',
-                        leave_detail: item.leave_detail || '{}',
-                        leave_day_pay: item.leave_day_pay || '0',
-                    };
-                });
+            //     return {
+            //         id: item.id,
+            //         id_number: employeeData?.id_number || '',
+            //         department: item.department || '',
+            //         start_date: employeeData?.start_date || '',
+            //         annual_leave_days: item.annual_leave_days || '0',
+            //         comp_time: item.comp_time || '0',
+            //         ch_name: employeeData?.ch_name || '',
+            //         salary: item.salary || '0',
+            //         actual_salary: item.salary || '0',
+            //         supplement: item.supplement || '0',
+            //         allowance: item.allowance || '0',
+            //         employee_id: item.employee_id || '',
+            //         overtime_hours: item.overtime_hours || '0',
+            //         attendance_days: item.attendance_days || '0',
+            //         public_holidays: item.public_holidays || '0',
+            //         perfect_attendance_bonus: item.perfect_attendance_bonus || '0',
+            //         subtotal: item.subtotal || '0',
+            //         overtime_pay: item.overtime_pay || '0',
+            //         earning_total: item.earning_total || '0',
+            //         advance_payment: item.advance_payment || '0',
+            //         income_tax: item.income_tax || '0',
+            //         income_tax_people: item.income_tax_people || '0',
+            //         labor_insurance_fee: item.labor_insurance_fee || '0',
+            //         health_insurance_fee: item.health_insurance_fee || '0',
+            //         health_insurance_people: item.health_insurance_people || '0',
+            //         late_deduction: item.late_deduction || '0',
+            //         deduction_total: item.deduction_total || '0',
+            //         net_pay: item.net_pay || '0',
+            //         note: item.note || '',
+            //         late_time: item.late_time || '0',
+            //         late_minute: item.late_minute || '0',
+            //         leave_day: item.leave_day || '0',
+            //         leave_detail: item.leave_detail || '{}',
+            //         leave_day_pay: item.leave_day_pay || '0',
+            //     };
+            // });
 
-                console.log(renamedData); // 檢查重命名後的資料結構
-                setData(renamedData);
-                console.log(serial_id);
-                console.log(serial_uuid);
-            }
+            console.log(responsedata); // 檢查重命名後的資料結構
+            setData(responsedata);
+            // }
 
         } catch (error: any) {
             console.log(error.message);
@@ -292,7 +291,7 @@ export default function SalarySettlement() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
 
         } catch (error: any) {
             console.log(error.message);
@@ -330,7 +329,7 @@ export default function SalarySettlement() {
             }
             const responsedata = await response.json();
             myAlert.success({ title: '更新成功' })
-            GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
 
 
         } catch (error: any) {
@@ -557,7 +556,7 @@ export default function SalarySettlement() {
                 setReviewflowdata([]);
                 GetReviewById(serial_uuid);
                 setStatus("審核中");
-                GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+                // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
                 setReviewbar(false);
                 await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -643,7 +642,7 @@ export default function SalarySettlement() {
                         setReview_flow("");
                         setValue(null);
                         GetReviewHistory(serial_uuid);
-                        GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+                        // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -848,75 +847,73 @@ export default function SalarySettlement() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'結算薪資作業'} panelList={undefined}
+            <PageHeader02 tag={'固定薪資維護'} panelList={undefined}
                 customeRight={
                     [
-                        <div style={{ display: `${viewtype === 'review' ? 'none' : ''}` }}>
-                            <span style={{ display: `${status === '已核准' ? 'none' : ''}` }}>
-                                <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
+                        <span>
+                            <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
+                                <button className={scss.longsquarebtn}
+                                    onClick={() => {
+                                        GenerateSalary();
+                                    }}
+                                    title="產生薪資">
+                                    產生薪資
+                                </button>
+                            </span>
+                            <span style={{ display: `${status === "審核中" ? 'none' : ''}` }}>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
                                     <button className={scss.longsquarebtn}
                                         onClick={() => {
-                                            GenerateSalary();
+                                            handleeditalledit();
                                         }}
-                                        title="產生薪資">
-                                        產生薪資
+                                        title="編輯">
+                                        編輯
                                     </button>
                                 </span>
-                                <span style={{ display: `${status === "審核中" ? 'none' : ''}` }}>
-                                    <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
-                                        <button className={scss.longsquarebtn}
-                                            onClick={() => {
-                                                handleeditalledit();
-                                            }}
-                                            title="編輯">
-                                            編輯
-                                        </button>
-                                    </span>
-                                    <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, padding: '0px 10px' }}>
-                                        <button className={scss.longsquarebtn} onClick={() => {
-                                            handleeditallcancel();
-                                        }}
-                                            title="取消">
-                                            取消
-                                        </button>
-                                    </span>
-                                    <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                        <button className={scss.longredsquarebtn}
-                                            onClick={() => {
-                                                handleeditallsave();
-                                            }}
-                                            title="儲存">
-                                            儲存
-                                        </button>
-                                    </span>
-
-                                    <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                        <button className={scss.longredsquarebtn}
-                                            onClick={() => {
-                                                // SettlePayroll();
-
-                                                handleeditconfirm()
-                                            }}
-                                            title="確認結算">
-                                            確認結算
-                                        </button>
-                                    </span>
+                                <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, padding: '0px 10px' }}>
+                                    <button className={scss.longsquarebtn} onClick={() => {
+                                        handleeditallcancel();
+                                    }}
+                                        title="取消">
+                                        取消
+                                    </button>
                                 </span>
-                                <span style={{ display: `${status === "審核中" ? '' : 'none'}` }}>
-                                    <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                        <button className={scss.longredsquarebtn}
-                                            onClick={() => {
-                                                // SettlePayroll();
+                                <span style={{ display: `${(data.length > 0 && editall === true) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            handleeditallsave();
+                                        }}
+                                        title="儲存">
+                                        儲存
+                                    </button>
+                                </span>
 
-                                                handleGetReviewBack();
-                                            }}
-                                            title="">
-                                            抽單
-                                        </button>
-                                    </span>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            handleeditconfirm()
+                                        }}
+                                        title="確認結算">
+                                        確認結算
+                                    </button>
                                 </span>
                             </span>
-                        </div>
+                            <span style={{ display: `${status === "審核中" ? '' : 'none'}` }}>
+                                <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
+                                    <button className={scss.longredsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            handleGetReviewBack();
+                                        }}
+                                        title="">
+                                        抽單
+                                    </button>
+                                </span>
+                            </span>
+                        </span>
                     ]}
                 customeLeft={[
                     // <span
