@@ -1,0 +1,81 @@
+.listContainer {
+  > p {
+    font-weight: 400;
+    font-size: 18px;
+    color: theme("colors.main");
+    margin: 0;
+    margin-bottom: 15px;
+    margin-top: 28px;
+  }
+
+  // 裡面裝了兩個span 一個svg
+  > div {
+    display: grid;
+    grid-template-columns: 16px fit-content(100%) auto;
+    height: 25px;
+    // height: 24px;
+    margin-bottom: 8px;
+    &:nth-last-of-type(1) {
+      margin-bottom: 0;
+    }
+    > * {
+      margin: auto;
+    }
+    > svg {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+    }
+    > span {
+      display: inline-block;
+      font-weight: 400;
+      font-size: 16px;
+      margin-left: 0;
+      &.serialNumber {
+        // 這是裝了數字的元素
+        width: 20px;
+        margin-left: 7px;
+        margin-right: 6px;
+        text-align: center;
+      }
+    }
+
+    > label {
+      padding: 0;
+      > input {
+        font-weight: 400;
+        font-size: 16px;
+      }
+      > svg {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  .inputSel {
+    input {
+      font-size: 16px;
+    }
+    hr {
+      border-color: transparent;
+    }
+  }
+}
+
+.appendix {
+  .fileName {
+    cursor: pointer;
+    border-bottom: solid 1px black;
+    line-height: 24px;
+  }
+  .serialNumber {
+    > img {
+      display: inline;
+    }
+  }
+}
+
+.row.rowPlus {
+  grid-template-columns: 16px fit-content(100%) fit-content(100%);
+}

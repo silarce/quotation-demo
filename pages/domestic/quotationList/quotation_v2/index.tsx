@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { AxiosError } from 'axios';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
 
 // import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationSinature_3, {
@@ -113,9 +112,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // ======================================================================
 
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
-import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
+import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
 
 import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
+import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
+
+import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
+import QuotationAttachment from 'components/page/domestic/quotation_v2/QuotationAttachment';
 
 // css
 import scss from './index.module.scss';
@@ -231,6 +234,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     raw_remarkArr: content?.quotationRanges,
   });
 
+  const {
+    //
+    fileInfoKitArr,
+    addFile,
+    createFileArr, // 要呼叫patch時使用
+  } = useAttachment({
+    resetTrigger: disabled,
+    rawArr: attachmentArr,
+    kit: {
+      removeWithConfirm: false,
+    },
+  });
+
   // ----------------------------------------------------------------------
   // region PROPS
 
@@ -272,7 +288,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     <SubLayer>
       <PageHeader02 tag="報價單" panelList={panelList} />
       <div>
-        <button onClick={openSelector_anno}>test</button>
+        <button
+          onClick={async () => {
+            const arr = await createFileArr();
+            console.log(arr);
+          }}
+        >
+          test
+        </button>
 
         <QuotationProfile
           disabled={disabled}
@@ -299,7 +322,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
               onAddClick={addQuotationRange}
             />
             {/* 附件 */}
-            <div>附件</div>
+            <QuotationAttachment disabled={disabled} fileArr={fileInfoKitArr} addFile={addFile} />
           </div>
           {/* 付款資訊 */}
           <div className={scss.right}>
