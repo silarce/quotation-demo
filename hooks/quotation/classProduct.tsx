@@ -2605,6 +2605,7 @@ class Class_product {
   clearId() {
     this._prodData.id = undefined;
     this._prodData.rootProductId = undefined;
+    this._prodData.attachedToProductId = undefined;
   }
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------

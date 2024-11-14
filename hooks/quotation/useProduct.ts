@@ -1125,7 +1125,7 @@ const useClassProdList = ({
     };
 
     copy.copySelf = () => {
-      copySelf_prod(list, newKey);
+      copySelf_prod(list, newKey, false);
       calcQuotationAvgDiscount();
     };
 
@@ -1144,6 +1144,8 @@ const useClassProdList = ({
     callCalcSubTotal();
 
     reRender();
+
+    return list[newKey];
   };
 
   // --------------------------------------------------------
