@@ -115,7 +115,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
 
-import { useAnnotations } from 'components/page/domestic/quotation_v2/hook/useRemark';
+import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
 
 // css
 import scss from './index.module.scss';
@@ -213,6 +213,24 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     quotationContent: content,
   });
 
+  const {
+    annoArr,
+    addAnno,
+    openSelector: openSelector_anno,
+  } = useAnnotations({
+    disabled: true,
+    raw_remarkArr: content?.annotations,
+  });
+
+  const {
+    quotationRangeArr,
+    addQuotationRange,
+    openSelector: openSelector_qr,
+  } = useQuotationRange({
+    disabled: true,
+    raw_remarkArr: content?.quotationRanges,
+  });
+
   // ----------------------------------------------------------------------
   // region PROPS
 
@@ -249,21 +267,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
-  const { remarkArr, openSelector } = useAnnotations({
-    disabled: true,
-    raw_remarkArr: useMemo(() => {
-      return ['aaaaa', 'bbbbbb'];
-    }, []),
-  });
-
-  console.log(remarkArr);
-
   // MARK: RENDER
   return (
     <SubLayer>
       <PageHeader02 tag="報價單" panelList={panelList} />
       <div>
-        <button onClick={openSelector}>test</button>
+        <button onClick={openSelector_anno}>test</button>
 
         <QuotationProfile
           disabled={disabled}
@@ -275,11 +284,20 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         <div className={scss.summary}>
           <div className={scss.left}>
             {/* 備註 */}
-            <div>
-              <QuotationRemark disabled={true} />
-            </div>
-            {/* 報價範圍 */}
-            <div>報價範圍</div>
+            <QuotationRemark
+              label="備註"
+              disabled={disabled}
+              remarkArr={annoArr}
+              onUpponAddClick={openSelector_anno}
+              onAddClick={addAnno}
+            />
+            <QuotationRemark
+              label="報價範圍"
+              disabled={disabled}
+              remarkArr={quotationRangeArr}
+              onUpponAddClick={openSelector_qr}
+              onAddClick={addQuotationRange}
+            />
             {/* 附件 */}
             <div>附件</div>
           </div>

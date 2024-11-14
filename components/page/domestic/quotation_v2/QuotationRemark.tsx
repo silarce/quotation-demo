@@ -15,7 +15,7 @@ const fakeData = [
 
 // =======================================================================
 
-interface Titem {
+interface Tremark {
   value: string;
   onChange: (v: string) => void;
   onDelete: () => void;
@@ -26,32 +26,29 @@ interface Tprops {
   label: string;
   onAddClick: () => void;
   onUpponAddClick: () => void;
-  itemArr: Titem[];
+  remarkArr: Tremark[];
 }
 
 // =======================================================================
 
-export default function QuotationRemark({ disabled }: { disabled: boolean }) {
+export default function QuotationRemark({ disabled, label, onAddClick, onUpponAddClick, remarkArr }: Tprops) {
   return (
     <div className={scss.listContainer}>
       <div className={scss.labelBox}>
-        <p>{'label'}</p>
+        <p>{label}</p>
         <IconAddCircle
           className={classNames(disabled && 'hidden')}
-
-          // onClick={toShowAdd}
+          onClick={() => {
+            onUpponAddClick();
+          }}
         />
       </div>
-      {fakeData.map((memo, index) => {
+      {remarkArr.map((remark, index) => {
+        const { value, onChange, onDelete } = remark;
+
         return (
           <div key={index}>
-            {disabled ? (
-              <span></span>
-            ) : (
-              <IconRemoveCircle
-              // onClick={() => delString(index)}
-              />
-            )}
+            {disabled ? <span></span> : <IconRemoveCircle onClick={onDelete} />}
             {/* <span className={scss.serialNumber}>{index + 1}.</span> */}
             <span className={scss.serialNumber}></span>
             <InputSel
@@ -59,8 +56,8 @@ export default function QuotationRemark({ disabled }: { disabled: boolean }) {
               textareaProps={{
                 props: {
                   // placeholder: '請輸入' + label,
-                  value: memo,
-                  // onChange: (e) => editString(index, e.target.value),
+                  value,
+                  onChange: (e) => onChange(e.target.value),
                 },
               }}
               showBaseline="auto"
@@ -69,16 +66,7 @@ export default function QuotationRemark({ disabled }: { disabled: boolean }) {
           </div>
         );
       })}
-      <div>
-        {disabled ? (
-          <span></span>
-        ) : (
-          <IconAddCircle
-
-          // onClick={() => addString('')}
-          />
-        )}
-      </div>
+      <div>{disabled ? <span></span> : <IconAddCircle onClick={() => onAddClick()} />}</div>
     </div>
   );
 }

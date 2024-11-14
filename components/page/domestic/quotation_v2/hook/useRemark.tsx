@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client';
 
 // gear
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 const AnnoSelectorGroup = selectModalCreator_multi<['annotation']>({
   selectorArr: [
@@ -29,7 +28,7 @@ const RangeSelectorGroup = selectModalCreator_multi<['quotationRange']>({
 
 interface Tprops {
   disabled: boolean;
-  raw_remarkArr: string[] | undefined;
+  raw_remarkArr: string[] | undefined | null;
 }
 
 // ===============================================================================
@@ -49,8 +48,12 @@ const useRemark = ({ disabled, raw_remarkArr }: Tprops) => {
     setRemarkArr(newRemarkList);
   };
 
-  const addRemark = (newRemarkArr: string[] = []) => {
-    setRemarkArr([...remarkArr, ...newRemarkArr]);
+  const addRemark = (newRemarkArr: string[] | string = '') => {
+    if (typeof newRemarkArr === 'string') {
+      setRemarkArr([...remarkArr, newRemarkArr]);
+    } else {
+      setRemarkArr([...remarkArr, ...newRemarkArr]);
+    }
   };
 
   useEffect(() => {
@@ -61,7 +64,19 @@ const useRemark = ({ disabled, raw_remarkArr }: Tprops) => {
 };
 
 const useAnnotations = (props: Tprops) => {
-  const instance = useRemark(props);
+  const { remarkArr, editRemark, delRemark, addRemark } = useRemark(props);
+
+  const annoArr = remarkArr.map((value, index) => {
+    return {
+      value,
+      onChange: (v: string) => {
+        editRemark(index, v);
+      },
+      onDelete: () => {
+        delRemark(index);
+      },
+    };
+  });
 
   const openSelector = () => {
     const container = document.createElement('div');
@@ -72,66 +87,83 @@ const useAnnotations = (props: Tprops) => {
 
     const unmountComponent = () => {
       root.unmount();
+      document.body.removeChild(container);
     };
 
-    // root.render(
-    //   <AnnoSelectorGroup
-    //     showModal={true}
-    //     onConfirm={() => {}}
-    //     onCancel={() => {
-    //       unmountComponent();
-    //     }}
-    //   />
-    // );
     root.render(
       <>
-        <Foo
-          onCancel={unmountComponent}
-          onConfirm_anno={(arr) => {
-            instance.addRemark(arr);
+        <AnnoSelector
+          onConfirm={(arr) => {
+            addRemark(arr);
           }}
+          onCancel={unmountComponent}
         />
       </>
     );
-
-    document.body.removeChild(container);
-
-    // document.body.removeChild(container);
-
-    // const { destroy } = myAlert.clear({
-    //   content: (
-    //     <AnnoSelectorGroup
-    //       showModal={true}
-    //       onConfirm={() => {}}
-    //       onCancel={() => {
-    //         destroy();
-    //       }}
-    //     />
-    //   ),
-    // });
   };
 
   return {
-    ...instance,
+    annoArr,
+    addAnno: addRemark,
     openSelector,
   };
 };
 
-const Foo = ({
-  onConfirm_anno,
-  onCancel,
-}: {
-  onConfirm_anno: (arr: string[]) => void;
+const useQuotationRange = (props: Tprops) => {
+  const { remarkArr, editRemark, delRemark, addRemark } = useRemark(props);
 
-  onCancel: () => void;
-}) => {
+  const quotationRangeArr = remarkArr.map((value, index) => {
+    return {
+      value,
+      onChange: (v: string) => {
+        editRemark(index, v);
+      },
+      onDelete: () => {
+        delRemark(index);
+      },
+    };
+  });
+
+  const openSelector = () => {
+    const container = document.createElement('div');
+    container.className = 'tempDOMContainer';
+    document.body.appendChild(container);
+
+    const root = createRoot(container);
+
+    const unmountComponent = () => {
+      root.unmount();
+      document.body.removeChild(container);
+    };
+
+    root.render(
+      <>
+        <QuotationRangeSelector
+          onConfirm={(arr) => {
+            addRemark(arr);
+          }}
+          onCancel={unmountComponent}
+        />
+      </>
+    );
+  };
+
+  return {
+    quotationRangeArr,
+    addQuotationRange: addRemark,
+    openSelector,
+  };
+};
+
+const AnnoSelector = ({ onConfirm, onCancel }: { onConfirm: (arr: string[]) => void; onCancel: () => void }) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
-    return () => {
-      onCancel();
-    };
-  }, []);
+    !show &&
+      setTimeout(() => {
+        onCancel();
+      }, 300);
+  }, [show]);
 
   return (
     <AnnoSelectorGroup
@@ -140,16 +172,45 @@ const Foo = ({
         const value = (arr[0] ?? []).map((anno) => {
           return anno.description;
         });
-        onConfirm_anno(value);
+        onConfirm(value);
       }}
       onCancel={() => {
         setShow(false);
-        // onCancel();
-        // unmountComponent();
       }}
-      // afterClose={onCancel}
     />
   );
 };
 
-export { useAnnotations };
+const QuotationRangeSelector = ({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm: (arr: string[]) => void;
+  onCancel: () => void;
+}) => {
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    !show &&
+      setTimeout(() => {
+        onCancel();
+      }, 300);
+  }, [show]);
+
+  return (
+    <RangeSelectorGroup
+      showModal={show}
+      onConfirm={(arr) => {
+        const value = (arr[0] ?? []).map((anno) => {
+          return anno.description;
+        });
+        onConfirm(value);
+      }}
+      onCancel={() => {
+        setShow(false);
+      }}
+    />
+  );
+};
+
+export { useAnnotations, useQuotationRange };
