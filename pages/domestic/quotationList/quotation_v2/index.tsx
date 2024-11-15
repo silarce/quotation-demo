@@ -288,15 +288,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     <SubLayer>
       <PageHeader02 tag="報價單" panelList={panelList} />
       <div>
-        <button
-          onClick={async () => {
-            const arr = await createFileArr();
-            console.log(arr);
-          }}
-        >
-          test
-        </button>
-
         <QuotationProfile
           disabled={disabled}
           form={props_profileForm}

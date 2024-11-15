@@ -37,7 +37,6 @@ const useAttachment = ({
   const defaultState = useDefaultState(rawArr);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>(defaultState);
-  console.log(fileInfoArr);
 
   const addFile = (files: File | File[]) => {
     let arr: File[] = [];
@@ -66,7 +65,7 @@ const useAttachment = ({
     setFileInfoArr([...fileInfoArr, ...infoArr]);
   };
 
-  // w 注意，不要呼叫刪除的api，否則不同版本的content的附件應該會有缺失
+  // w 不呼叫刪除的api，是因為應該會導致不同版本的content的附件缺失
   const removeFile = (indexOrId: number | string) => {
     let copy = [...fileInfoArr];
 

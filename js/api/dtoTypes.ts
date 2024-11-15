@@ -295,6 +295,7 @@ export type TerpFeatureDto = {
   createdAt: string;
   updatedAt: string;
   name: string;
+  // 以下是有設populate才會給
   departments: TdepartmentDto_jobs[];
   employees: TemployeeDto[];
 };
@@ -5286,3 +5287,56 @@ export type TsettleBonusDto = {
 // };
 
 // type Tfoooooooooo = Tfooo<{ engineeringContact: true }>;
+
+// interface TrouterPermissionDict {
+//   home: {
+//     dailyReport: TerpFeatureDto[];
+//     reviewDailyReport: TerpFeatureDto[];
+//   };
+//   setting: {
+//     companyInfo: TerpFeatureDto[];
+//     employees: TerpFeatureDto[];
+//   };
+//   domestic: {
+//     quotation: TerpFeatureDto[];
+//     contract: TerpFeatureDto[];
+//     customer: TerpFeatureDto[];
+//     annotationList: TerpFeatureDto[];
+//   };
+//   worksDepartment: {
+//     foo: TerpFeatureDto[];
+//   };
+//   accounting: { foo: TerpFeatureDto[] };
+//   factoryDepartment: { foo: TerpFeatureDto[] };
+//   //
+//   documentManagement: {
+//     // 如果要提高辨識性使方便維護的話，或許可以多一層加進一個name
+//     // 前端也可以直接用name作為路由的label
+//     // 但若是要用i18n的話，那個這個name就會是單純給開發者辨識的字串而已
+//     reviewList: {
+//       name: '審核清單';
+//       erpFeatureArr: TerpFeatureDto[];
+//     };
+//   };
+// }
+
+// interface TrouterPermissionItem {
+//   name: string;
+//   // 若使用者沒有相應權限，則不開放
+//   // 若erpFeatures為空陣列，則代表沒有限制
+//   erpFeatures: TerpFeatureDto[];
+// }
+
+// interface TrouterPermissionDict {
+//   // 若為undefined，則不開放
+//   home_dailyReport?: TrouterPermissionItem;
+//   home_reviewDailyReport?: TrouterPermissionItem;
+
+//   setting_companyInfo?: TrouterPermissionItem;
+//   setting_employees?: TrouterPermissionItem;
+
+//   domestic_quotation?: TrouterPermissionItem;
+//   domestic_contract?: TrouterPermissionItem;
+//   domestic_customer?: TrouterPermissionItem;
+//   domestic_annotationList?: TrouterPermissionItem;
+// }
