@@ -689,9 +689,14 @@ const sidePathList: TsidePathList = {
               path: path01 + '/payrollLedger',
               erpFeature: [accountingDepartment],
             },
+            {
+              label: '薪資維護',
+              path: path01 + '/salaryMaintenance',
+              erpFeature: [accountingDepartment],
+            },
             // {
-            //   label: '固定薪資維護',
-            //   path: path01 + '/salaryMaintenance',
+            //   label: '獎金/津貼維護',
+            //   path: path01 + '/bonusMaintenance',
             //   erpFeature: [accountingDepartment],
             // },
           ],

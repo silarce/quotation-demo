@@ -1,6 +1,6 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
-import scss from './salaryMaintenance.module.scss';
+import scss from './bonusMaintenance.module.scss';
 import { createRef, useContext, useEffect, useRef, useState } from "react";
 import { setting } from '../../factoryDepartment/wareHouseList/index';
 import { useRouter } from "next/router";
@@ -38,7 +38,7 @@ import DragableModal from "components/global/gear/dragableModal/dragableModal";
 
 
 
-export default function salaryMaintenance() {
+export default function bonusMaintenance() {
     const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
 
     //#region =============【路由參數】===============================================================================
@@ -828,7 +828,7 @@ export default function salaryMaintenance() {
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
-            <PageHeader02 tag={'固定薪資維護'} panelList={undefined}
+            <PageHeader02 tag={'獎金/津貼維護'} panelList={undefined}
                 customeRight={
                     [
                         <span>
