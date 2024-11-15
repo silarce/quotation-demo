@@ -85,20 +85,22 @@ interface Tform_info {
     onChange?: (value: Moment | null) => void;
   };
   //付款辦法
-  paymentMethod: TpaymentMethod[];
+  paymentMethodArr: TpaymentMethod[];
   addPaymentMethod?: () => void;
 
   //
 }
 
-interface Tprops {
+interface Tprops_quotationPayInfo {
   disabled: boolean;
   form: Tform_pay & Tform_info;
 }
 
+export type { Tprops_quotationPayInfo };
+
 // ========================================================================
 
-export default function QuotationPayInfo(props: Tprops) {
+export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
   const {
     disabled,
     form,
@@ -121,7 +123,7 @@ export default function QuotationPayInfo(props: Tprops) {
     //
     deliveryLocation,
     deliveryDate,
-    paymentMethod,
+    paymentMethodArr: paymentMethod,
     addPaymentMethod,
     //
   } = form;

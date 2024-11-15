@@ -111,6 +111,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // ======================================================================
 
+// region REFACTOR IMPORT
+
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
 
@@ -119,6 +121,9 @@ import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRema
 
 import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
 import QuotationAttachment from 'components/page/domestic/quotation_v2/QuotationAttachment';
+
+import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
+import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
 // css
 import scss from './index.module.scss';
@@ -247,6 +252,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
+  const { kit: kit_payInfo } = usePayInfo({
+    disabled,
+    raw: content,
+  });
+
   // ----------------------------------------------------------------------
   // region PROPS
 
@@ -256,6 +266,26 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
     isSendToReview,
   });
+
+  const props_payInfo: Tprops_quotationPayInfo['form'] = {
+    haveTax: { value: true },
+    discountRate: { value: '999' },
+    tuneTotal: { value: '999' },
+    currency: { value: 'foo' },
+    exchangeRate: { value: '999' },
+    avgDiscount_withQty: 'foo',
+    subTotal: 'foo',
+    salesTax: 'foo',
+    total: 'foo',
+    foreignTotal: 'foo',
+
+    // deliveryLocation: kit_payInfo.deliveryLocation,
+    // deliveryDate: kit_payInfo.deliveryDate,
+    // paymentMethodArr: kit_payInfo.paymentMethodArr,
+    // addPaymentMethod: kit_payInfo.addPaymentMethod,
+
+    ...kit_payInfo,
+  };
 
   const panelList = usePanel({
     disabled,
@@ -317,7 +347,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           </div>
           {/* 付款資訊 */}
           <div className={scss.right}>
-            <div className="w-[400px] border border-border">付款資訊</div>
+            {/* <div className="w-[400px] border border-border">付款資訊</div> */}
+            <QuotationPayInfo disabled={disabled} form={props_payInfo} />
           </div>
         </div>
       </div>

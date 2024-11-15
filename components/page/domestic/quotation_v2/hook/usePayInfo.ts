@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import moment, { Moment } from 'moment';
 
 interface Traw {
   deliveryLocation: string;
   deliveryDate: string;
-  paymentMethod: {
+  paymentMethods: {
     milestone: string;
     // totalPaymentRatio: `${number}`;
     totalPaymentRatio: string;
@@ -15,7 +15,7 @@ interface Traw {
 interface Tstate {
   deliveryLocation: string;
   deliveryDate: Moment | null;
-  paymentMethod: {
+  paymentMethodArr: {
     milestone: string;
     // totalPaymentRatio: `${number}`;
     totalPaymentRatio: string;
@@ -24,7 +24,7 @@ interface Tstate {
 
 // ===========================================================================
 
-const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw }) => {
+const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefined | null }) => {
   const defaultState = useDefaultState(raw);
   const [state, setState] = useState<Tstate>(defaultState);
 
@@ -43,14 +43,14 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw }) => {
 
 // ===========================================================================
 
-const useDefaultState = (raw: Traw) => {
+const useDefaultState = (raw: Traw | undefined | null) => {
   const defaultState: Tstate = useMemo(() => {
-    const { deliveryLocation, deliveryDate, paymentMethod } = raw;
+    const { deliveryLocation, deliveryDate, paymentMethods: paymentMethod } = raw ?? {};
 
     return {
-      deliveryLocation,
+      deliveryLocation: deliveryLocation ?? '',
       deliveryDate: deliveryDate ? moment(deliveryDate) : null,
-      paymentMethod: _.cloneDeep(paymentMethod),
+      paymentMethodArr: _.cloneDeep(paymentMethod ?? []),
     };
   }, [raw]);
 
@@ -60,7 +60,7 @@ const useDefaultState = (raw: Traw) => {
 const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatch<React.SetStateAction<Tstate>> }) => {
   const deleteMethod = (index: number) => {
     const newState = _.cloneDeep(state);
-    newState.paymentMethod.splice(index, 1);
+    newState.paymentMethodArr.splice(index, 1);
     setState(newState);
   };
 
@@ -77,24 +77,22 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
         setState((prev) => ({ ...prev, deliveryDate: v }));
       },
     },
-    paymentMethodArr: state.paymentMethod.map((method, index) => {
+    paymentMethodArr: state.paymentMethodArr.map((method, index) => {
       return {
         milestone: {
           value: method.milestone,
           onChange: (v: string) => {
             const copy = { ...state };
-            copy.paymentMethod[index].milestone = v;
-
-            return copy;
+            copy.paymentMethodArr[index].milestone = v;
+            setState(copy);
           },
         },
         totalPaymentRatio: {
           value: method.totalPaymentRatio,
           onChange: (v: string) => {
             const copy = { ...state };
-            copy.paymentMethod[index].totalPaymentRatio = v;
-
-            return copy;
+            copy.paymentMethodArr[index].totalPaymentRatio = v;
+            setState(copy);
           },
         },
         onDelete: () => {
@@ -104,7 +102,7 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
     }),
     addPaymentMethod: () => {
       const copy = _.cloneDeep(state);
-      copy.paymentMethod.push({ milestone: '', totalPaymentRatio: '' });
+      copy.paymentMethodArr.push({ milestone: '', totalPaymentRatio: '' });
       setState(copy);
     },
   };
