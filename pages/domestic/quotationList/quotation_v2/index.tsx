@@ -125,6 +125,8 @@ import QuotationAttachment from 'components/page/domestic/quotation_v2/Quotation
 import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
+import { QuotationRow } from 'components/page/domestic/quotation_v2/quotationRow/QuotationRow';
+
 // css
 import scss from './index.module.scss';
 
@@ -325,6 +327,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           editNotes={content?.editNotes}
         />
 
+        {/* prod */}
+        {/* prod */}
+        {/* prod */}
+        <div className={scss.prodTable}>
+          <QuotationRow />
+        </div>
+        {/* prod */}
+        {/* prod */}
+        {/* prod */}
         <div className={scss.summary}>
           <div className={scss.left}>
             {/* 備註 */}
