@@ -126,6 +126,7 @@ import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInf
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
 import { QuotationRow } from 'components/page/domestic/quotation_v2/quotationRow/QuotationRow';
+import { useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 
 // css
 import scss from './index.module.scss';
@@ -217,6 +218,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     {};
 
   // ----------------------------------------------------------------------
+
+  // console.log(content);
+
+  useQuotationProduct({
+    raw_productArr: content?.products,
+    disabled,
+  });
 
   const { state_profile, setState_profile } = useProfile({
     disabled,
@@ -330,9 +338,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         {/* prod */}
         {/* prod */}
-        <div className={scss.prodTable}>
-          <QuotationRow />
-        </div>
+        <div className={scss.prodTable}>{/* <QuotationRow /> */}</div>
         {/* prod */}
         {/* prod */}
         {/* prod */}
