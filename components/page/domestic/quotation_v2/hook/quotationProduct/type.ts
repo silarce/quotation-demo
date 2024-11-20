@@ -1,4 +1,4 @@
-interface Tstate_prod {
+interface TstateProd {
   //
   readonly id: string | null | undefined;
   readonly key: string;
@@ -86,26 +86,28 @@ interface Tstate_prod {
   // 底座板 目前選項寫死在前端
   bottomBarPlate: string | null;
 
+  // W 這些要做成component
   // 配電箱牌價
-  distributionBoxPrice: `${number}` | '';
+  // distributionBoxPrice: `${number}` | '';
   // 配電箱單價
-  distributionBoxUnitPrice: `${number}` | '';
+  // distributionBoxUnitPrice: `${number}` | '';
   // 配電箱數量
-  distributionBoxQuantity: `${number}` | '';
+  // distributionBoxQuantity: `${number}` | '';
   // 配電箱牌價複價
-  distributionBoxDualPrice: `${number}` | '';
+  // distributionBoxDualPrice: `${number}` | '';
   // 配電箱複價
-  distributionBoxTotalPrice: `${number}` | '';
+  // distributionBoxTotalPrice: `${number}` | '';
   // 安裝費牌價
-  installationFeePrice: `${number}` | '';
+  // installationFeePrice: `${number}` | '';
   // 安裝費牌價複價
-  installationFeeDualPrice: `${number}` | '';
+  // installationFeeDualPrice: `${number}` | '';
   // 安裝費數量
-  installationFeeQuantity: `${number}` | '';
+  // installationFeeQuantity: `${number}` | '';
   // 安裝費單價
-  installationFeeUnitPrice: `${number}` | '';
+  // installationFeeUnitPrice: `${number}` | '';
   // 安裝費複價
-  installationFeeTotalPrice: `${number}` | '';
+  // installationFeeTotalPrice: `${number}` | '';
+  // W 這些要做成component
 
   //
   // 以下這些東西會從 get /products/door/calc-general-spec 取得
@@ -164,4 +166,8 @@ interface Tstate_prod {
   rootProductId: string;
 }
 
-export type { Tstate_prod };
+interface TstateProdDict {
+  [key: string]: TstateProd;
+}
+
+export type { TstateProd, TstateProdDict };

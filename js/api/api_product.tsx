@@ -59,6 +59,12 @@ export const apiGetAssets = async (path: string) => {
     .catch((err) => Promise.reject(err));
 };
 
+export const createAssetUrl = (assetName: string) => {
+  const domain = axios.defaults.baseURL;
+
+  return `${domain}/products/assets/door-track/${assetName}`;
+};
+
 export const apiGetProdDoorModels = async () => {
   const api = '/products/door/models';
 
@@ -276,6 +282,7 @@ export const apiGetboxD = (params: TgetBoxDParams) => {
 // ========================================================================
 
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import axios from 'axios';
 
 const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
   return (

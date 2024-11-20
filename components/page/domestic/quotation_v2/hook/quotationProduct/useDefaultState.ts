@@ -7,16 +7,29 @@ import type {
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-import type { Tstate_prod } from './type';
+import type { TstateProd, TstateProdDict } from './type';
+
+interface TdefaultState {
+  stateProdDict: TstateProdDict;
+  prodKeyArr: string[];
+}
 
 const useDefaultState = (raw_productArr: undefined | TquotationProductDto[]) => {
-  const defaultState = useMemo(() => {
+  const defaultState: TdefaultState = useMemo(() => {
     if (!raw_productArr) {
-      return [];
+      return {
+        stateProdDict: {} as TstateProdDict,
+        prodKeyArr: [] as string[],
+      };
     }
 
-    const arr = raw_productArr.map((raw) => {
-      const stateProd: Tstate_prod = {
+    const dict: TstateProdDict = {};
+    const keyArr: string[] = [];
+
+    raw_productArr.forEach((raw) => {
+      keyArr.push(raw.id);
+
+      const stateProd: TstateProd = {
         id: raw.id,
         key: raw.id,
         itemName: raw.itemName,
@@ -64,16 +77,18 @@ const useDefaultState = (raw_productArr: undefined | TquotationProductDto[]) => 
         bottomBarAngleIron: raw.bottomBarAngleIron,
         bottomBarPlate: raw.bottomBarPlate,
 
-        distributionBoxPrice: `${raw.distributionBoxPrice || 0}`,
-        distributionBoxUnitPrice: `${raw.distributionBoxUnitPrice || 0}`,
-        distributionBoxQuantity: `${raw.distributionBoxQuantity || 0}`,
-        distributionBoxDualPrice: `${raw.distributionBoxDualPrice || 0}`,
-        distributionBoxTotalPrice: `${raw.distributionBoxTotalPrice || 0}`,
-        installationFeePrice: `${raw.installationFeePrice || 0}`,
-        installationFeeDualPrice: `${raw.installationFeeDualPrice || 0}` as `${number}`,
-        installationFeeQuantity: `${raw.installationFeeQuantity || 0}` as `${number}`,
-        installationFeeUnitPrice: `${raw.installationFeeUnitPrice || 0}`,
-        installationFeeTotalPrice: `${raw.installationFeeTotalPrice || 0}` as `${number}`,
+        // W 這些要做成component
+        // distributionBoxPrice: `${raw.distributionBoxPrice || 0}`,
+        // distributionBoxUnitPrice: `${raw.distributionBoxUnitPrice || 0}`,
+        // distributionBoxQuantity: `${raw.distributionBoxQuantity || 0}`,
+        // distributionBoxDualPrice: `${raw.distributionBoxDualPrice || 0}`,
+        // distributionBoxTotalPrice: `${raw.distributionBoxTotalPrice || 0}`,
+        // installationFeePrice: `${raw.installationFeePrice || 0}`,
+        // installationFeeDualPrice: `${raw.installationFeeDualPrice || 0}` as `${number}`,
+        // installationFeeQuantity: `${raw.installationFeeQuantity || 0}` as `${number}`,
+        // installationFeeUnitPrice: `${raw.installationFeeUnitPrice || 0}`,
+        // installationFeeTotalPrice: `${raw.installationFeeTotalPrice || 0}` as `${number}`,
+        // W 這些要做成component
 
         gapA: raw.gapA,
         gapC: raw.gapC,
@@ -104,10 +119,13 @@ const useDefaultState = (raw_productArr: undefined | TquotationProductDto[]) => 
         rootProductId: raw.rootProductId,
       };
 
-      return stateProd;
+      dict[stateProd.key] = stateProd;
     });
 
-    return arr;
+    return {
+      stateProdDict: dict,
+      prodKeyArr: keyArr,
+    };
   }, [raw_productArr]);
 
   return defaultState;
