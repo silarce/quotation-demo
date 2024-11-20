@@ -161,14 +161,17 @@ export default function IncomeBillDetails({
     const stateArr: Tstate_incomeBill[] = incomeBillList.map((incomeBill) => {
       const {
         id,
+        isForeign,
         receivableCurrency,
         receiveDate: insertDate = '',
         accountant: { paymentType = '' },
         importAccountingNumber,
         receivablePayment = 0,
+        receivableCurrencyPayment = 0,
         noteNumber = '',
         noteMaturityDate = '',
         fee,
+        foreignCurrencyFee,
         billSerialNumber,
         accountsReceivableDeduction = [],
       } = incomeBill;
@@ -188,6 +191,9 @@ export default function IncomeBillDetails({
         return state;
       });
 
+      const theReceivablePayment: number = isForeign ? Number(receivableCurrencyPayment || 0) : receivablePayment || 0;
+      const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
+
       const state: Tstate_incomeBill = {
         id,
         receivableCurrency: cutCurrency((receivableCurrency || 'TWD 新台幣') as Tcurrency),
@@ -195,10 +201,11 @@ export default function IncomeBillDetails({
         receiveDate: insertDate,
         paymentType,
         importAccountingNumber: importAccountingNumber ?? '',
-        receivablePayment: receivablePayment || 0,
+        // receivablePayment: receivablePayment || 0,
+        receivablePayment: theReceivablePayment,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        fee: String(fee || 0),
+        fee: theFee,
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
