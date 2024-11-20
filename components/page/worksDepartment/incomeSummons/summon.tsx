@@ -1346,7 +1346,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
     label: (
       <span className={classNames(scss.tipLabel, scss.plus)}>
         {/* 兌換損益 <Tip content={calcIncomeBillExchangeBenefits.description} /> */}
-        兌換損益{' '}
+        兌換損益
         <Tip content={<span className="whitespace-pre-wrap">{calcIncomeBillExchangeBenefits.description}</span>} />
       </span>
     ),
@@ -1356,27 +1356,34 @@ const cellPropsList_summon: TcellPropsList_summon = {
       let exchangeBenefits = Number(state_incomeBillSerial.exchangeBenefits ?? '0');
       exchangeBenefits = new Decimal(exchangeBenefits).toDecimalPlaces(0).toNumber();
 
-      const { type, value } = reducer_input({
-        disabled: true,
-        value: exchangeBenefits,
-      });
+      // w -----------------------------------------------------
+      // exchangeBenefit若為負數，代表收益，正數代表損失
+      // 與慣例不符對UX不好，因此在這裡將數值正負反轉
+      exchangeBenefits = -exchangeBenefits;
+      // w -----------------------------------------------------
+
+      // const { type, value } = reducer_input({
+      //   disabled: true,
+      //   value: exchangeBenefits,
+      // });
 
       const inputSelProps: TinputSelProps = {
         disabled: true,
-        showBaseline: 'auto',
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              // setState_incomeBillSerial((state) => ({
-              //   ...state,
-              //   exchangeBenefits: e.target.value,
-              // }));
-            },
-          },
-        },
+        showBaseline: 'invisible',
+        node: exchangeBenefits,
+        // inputProps: {
+        //   props: {
+        //     className: 'text-right',
+        //     type,
+        //     value,
+        //     onChange: (e) => {
+        //       // setState_incomeBillSerial((state) => ({
+        //       //   ...state,
+        //       //   exchangeBenefits: e.target.value,
+        //       // }));
+        //     },
+        //   },
+        // },
       };
 
       return inputSelProps;
