@@ -60,7 +60,7 @@ const calcIncomeBillExchangeBenefits = ({
 };
 
 calcIncomeBillExchangeBenefits.description = `兌損損益 = 出口報單台幣金額-前期已收-收款金額-匯費-國外匯費(新臺幣)
-負數為兌換利益，正數為兌換損失`;
+正數為兌換利益，負數為兌換損失`;
 
 // export default calcIncomeBillUnpaidPayment;
 export { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits };

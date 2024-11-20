@@ -171,7 +171,11 @@ export function Selector_component<Tdata extends TapiData>(
     };
 
     return filter;
-  }, [searchStrArr, filter_callback, filter_extends_callback]);
+  }, [
+    searchStrArr,
+    //  filter_callback,
+    // filter_extends_callback,
+  ]);
 
   const params: Tparams = {
     filter,
