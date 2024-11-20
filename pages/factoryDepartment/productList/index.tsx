@@ -168,7 +168,8 @@ export default function ProductList() {
     const [originaloldproductid, setOriginaloldproductid] = useState(surfacein);
 
     //新增物料
-    const [addproductid, setAddProductid] = useState<string>("SJ");
+    // const [addproductid, setAddProductid] = useState<string>("SJ");
+    const [addproductid, setAddProductid] = useState<string>("");
     const [addproductname, setAddProductname] = useState<string>("");
     const [addproductspec, setAddProductspec] = useState<string>("");
     const [addproductunit, setAddProductunit] = useState<string>("");
@@ -1082,7 +1083,8 @@ export default function ProductList() {
             content: null,
             props: {
                 onOk: async () => {
-                    setAddProductid('SJ');
+                    // setAddProductid('SJ');
+                    setAddProductid('');
                     setAddProductname('');
                     setAddProductspec('');
                     setAddProductunit('');
@@ -1168,7 +1170,9 @@ export default function ProductList() {
     }
     useEffect(() => {
         // 更新 addproductid，基於最新的 state
-        setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+        // setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+        setAddProductid(type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+
     }, [type1selectedvalue, type2selectedvalue, type3inputedvalue, type4selectedvalue, type5selectedvalue]);
 
 
@@ -1179,24 +1183,22 @@ export default function ProductList() {
 
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // 取得使用者輸入，去掉前面的 "SJ" 部分，只保留後面的部分
-        const inputValue = e.target.value;
+        setAddProductid(e.target.value);    
+        // const inputValue = e.target.value;
+        // const newValue = inputValue.slice(2);
+        // setAddProductid("SJ" + newValue);    
+        // if (addproductid === "SJ") {
 
-        // 確保 "SJ" 之前的部分不會被刪除，並且只更新 "SJ" 之後的部分
-        const newValue = inputValue.slice(2);  // 只取使用者修改的部分，去掉 "SJ"
-        setAddProductid("SJ" + newValue);      // 始終將 "SJ" 作為開頭
-        if (addproductid === "SJ") {
-
-            setType1SelectedOption('');
-            setType1SelectedValue('');
-            setType2SelectedOption('');
-            setType2SelectedValue('');
-            setType3InputedValue('');
-            setType4SelectedOption('');
-            setType4SelectedValue('');
-            setType5SelectedOption('');
-            setType5SelectedValue('');
-        }
+        //     setType1SelectedOption('');
+        //     setType1SelectedValue('');
+        //     setType2SelectedOption('');
+        //     setType2SelectedValue('');
+        //     setType3InputedValue('');
+        //     setType4SelectedOption('');
+        //     setType4SelectedValue('');
+        //     setType5SelectedOption('');
+        //     setType5SelectedValue('');
+        // }
     };
 
 
@@ -1827,18 +1829,18 @@ export default function ProductList() {
                                     </button>
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div>
+                                    <div style={{display:'none'}}>
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type1", e) }}>
                                             <option value=''>選擇類別</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'classification') // 過濾 type === 'classification'
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .filter(item => item.type === 'classification') 
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
-                                                        {`(${item.code_name}) ${item.name}`}  {/* 動態生成選項，顯示格式如 (P)成品 */}
+                                                        {`(${item.code_name}) ${item.name}`}  
                                                     </option>
                                                 ))}
                                         </select>
@@ -1848,8 +1850,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type2", e) }}>
                                             <option value=''>選擇細分</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'component') // 過濾出 type 為 'component' 的資料
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .filter(item => item.type === 'component') 
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}) {item.name}
@@ -1865,8 +1867,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type4", e) }}>
                                             <option value=''>選擇材質</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'material') // 過濾出類型為 'material' 的資料
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .filter(item => item.type === 'material') 
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}) {item.name}
@@ -1880,8 +1882,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type5", e) }}>
                                             <option value=''>選擇表面</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'surface') // 過濾 type 為 'surface' 的資料
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) // 依照 code_name 排序
+                                                .filter(item => item.type === 'surface') 
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}){item.name}
@@ -1907,8 +1909,8 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                        {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>料號已存在！</p>}
-                                        {addproductid.length < 14 && <p style={{ fontSize: '16px', color: 'red' }}>料號不符編碼原則！</p>}
+                                        {/* {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>料號已存在！</p>}
+                                        {addproductid.length < 14 && <p style={{ fontSize: '16px', color: 'red' }}>料號不符編碼原則！</p>} */}
                                     </div>
                                 </div>
                                 <div className={scss.foot_head2}>

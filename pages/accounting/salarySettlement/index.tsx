@@ -942,7 +942,7 @@ export default function SalarySettlement() {
             <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.content}>
 
-                    <div className={scss.body_content1}>
+                    <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
                         <div className={scss.thead1}>
                             <span>員工編號</span>
                             <span>部門</span>
@@ -1500,19 +1500,21 @@ export default function SalarySettlement() {
                     footer={
                         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
                             <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
-                                <button
-                                    className={scss.minitabbtn}
-                                    onClick={() => {
-                                        seteditbtn(!editbtn);
-                                        setOriginalLeavedata(leavedata);
-                                    }}
-                                    style={{
-                                        display: `${editbtn === false ? '' : 'none'}`,
-                                        margin: '0px 20px'
-                                    }}
-                                >
-                                    編輯
-                                </button>
+                                <span style={{ display: `${editall === true ? '' : 'none'}` }}>
+                                    <button
+                                        className={scss.minitabbtn}
+                                        onClick={() => {
+                                            seteditbtn(!editbtn);
+                                            setOriginalLeavedata(leavedata);
+                                        }}
+                                        style={{
+                                            display: `${editbtn === false ? '' : 'none'}`,
+                                            margin: '0px 20px'
+                                        }}
+                                    >
+                                        編輯
+                                    </button>
+                                </span>
                             </span>
                             <button
                                 className={scss.minitabbtn}
