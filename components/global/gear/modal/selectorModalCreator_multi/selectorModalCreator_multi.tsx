@@ -342,7 +342,14 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             props.filter_extends = dynaProps?.filter_extends;
 
             if (dynaProps?.filter) {
-              props.filter = dynaProps.filter;
+              const propsFilter = props.filter;
+
+              props.filter = (strArr) => {
+                return {
+                  ...propsFilter?.(strArr),
+                  ...dynaProps.filter?.(strArr),
+                };
+              };
             }
 
             if (key === 'employee' && props.searchInputSelPropsArr?.[0]) {
