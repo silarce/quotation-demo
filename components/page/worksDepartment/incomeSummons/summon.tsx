@@ -97,7 +97,7 @@ type Tstate_incomeBillSerial = {
   foreignFee: string | null;
   // '國外匯費_外幣'
   foreignCurrencyFee: string | null;
-  // '兌換利益'
+  // '兌換損益'
   exchangeBenefits: string | null;
 };
 
@@ -388,7 +388,7 @@ const keyArr_foreign: TconfigKey[] = [
   'foreignCurrencyFee', // 外銷 國外匯費_外幣
   'foreignFee', // 外銷 國外匯費_新台幣
 
-  'exchangeBenefits', // 外銷 兌換利益
+  'exchangeBenefits', // 外銷 兌換損益
 
   'note', // 備註
 ];
@@ -1345,7 +1345,9 @@ const cellPropsList_summon: TcellPropsList_summon = {
   exchangeBenefits: {
     label: (
       <span className={classNames(scss.tipLabel, scss.plus)}>
-        兌換利益 <Tip content={calcIncomeBillExchangeBenefits.description} />
+        {/* 兌換損益 <Tip content={calcIncomeBillExchangeBenefits.description} /> */}
+        兌換損益{' '}
+        <Tip content={<span className="whitespace-pre-wrap">{calcIncomeBillExchangeBenefits.description}</span>} />
       </span>
     ),
     style: { width: 150 },
