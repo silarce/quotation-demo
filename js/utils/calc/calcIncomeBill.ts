@@ -33,7 +33,7 @@ const calcIncomeBillUnpaidPayment = (params: {
 
 calcIncomeBillUnpaidPayment.description = '餘額=承攬價(或本期計價)-上期已計價-扣款-匯費 - 收款金額';
 
-// 計算兌換利益
+// 計算兌換損益
 const calcIncomeBillExchangeBenefits = ({
   declarationPayment, // '出口報單台幣金額'
   priorPeriodPayment, // 前期已收
@@ -47,7 +47,7 @@ const calcIncomeBillExchangeBenefits = ({
   fee: number;
   foreignFee: number;
 }) => {
-  // 兌換利益 = 出口報單台幣金額-前期已收-收款金額-匯費-國外匯費(新臺幣)
+  // 兌換損益 = 出口報單台幣金額-前期已收-收款金額-匯費-國外匯費(新臺幣)
 
   const exchangeBenefits = new Decimal(declarationPayment)
     .minus(priorPeriodPayment)
@@ -59,7 +59,8 @@ const calcIncomeBillExchangeBenefits = ({
   return exchangeBenefits;
 };
 
-calcIncomeBillExchangeBenefits.description = '兌換利益 = 出口報單台幣金額-前期已收-收款金額-匯費-國外匯費(新臺幣)';
+calcIncomeBillExchangeBenefits.description = `兌損損益 = 出口報單台幣金額-前期已收-收款金額-匯費-國外匯費(新臺幣)
+負數為兌換利益，正數為兌換損失`;
 
 // export default calcIncomeBillUnpaidPayment;
 export { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits };
