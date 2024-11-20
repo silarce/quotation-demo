@@ -106,6 +106,8 @@ export default function IncomeBillDetails({
 
   // ---------------------------------------------------------------------------
 
+  const isForeign = incomeBillList.some((incomeBill) => incomeBill.isForeign);
+
   const { totals, showTotals } = useMemo(() => {
     let showTotals = true;
 
@@ -161,14 +163,17 @@ export default function IncomeBillDetails({
     const stateArr: Tstate_incomeBill[] = incomeBillList.map((incomeBill) => {
       const {
         id,
+        isForeign,
         receivableCurrency,
         receiveDate: insertDate = '',
         accountant: { paymentType = '' },
         importAccountingNumber,
         receivablePayment = 0,
+        receivableCurrencyPayment = 0,
         noteNumber = '',
         noteMaturityDate = '',
         fee,
+        foreignCurrencyFee,
         billSerialNumber,
         accountsReceivableDeduction = [],
       } = incomeBill;
@@ -188,6 +193,9 @@ export default function IncomeBillDetails({
         return state;
       });
 
+      const theReceivablePayment: number = isForeign ? Number(receivableCurrencyPayment || 0) : receivablePayment || 0;
+      const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
+
       const state: Tstate_incomeBill = {
         id,
         receivableCurrency: cutCurrency((receivableCurrency || 'TWD 新台幣') as Tcurrency),
@@ -195,10 +203,11 @@ export default function IncomeBillDetails({
         receiveDate: insertDate,
         paymentType,
         importAccountingNumber: importAccountingNumber ?? '',
-        receivablePayment: receivablePayment || 0,
+        // receivablePayment: receivablePayment || 0,
+        receivablePayment: theReceivablePayment,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        fee: String(fee || 0),
+        fee: theFee,
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
@@ -250,7 +259,7 @@ export default function IncomeBillDetails({
           }
         }}
       >
-        <Thead />
+        <Thead isForeign={isForeign} />
         {state_incomeBillArr.map((incomeBill, index_state) => {
           const {
             id,
@@ -365,14 +374,19 @@ const Row = ({ className, children }: { className?: string; children: React.Reac
   return <div className={classNames(scss.row, className)}>{children}</div>;
 };
 
-const Thead = () => {
+const Thead = ({ isForeign }: { isForeign: boolean }) => {
   return (
     <Row className={scss.thead}>
-      {keyArr_thead.map((key) => (
-        <div key={key} className={scss.cell} style={configList[key].style}>
-          {configList[key].label}
-        </div>
-      ))}
+      {keyArr_thead.map((key) => {
+        const { label, style } = configList[key];
+        const theLabel = typeof label === 'function' ? label(isForeign) : label;
+
+        return (
+          <div key={key} className={scss.cell} style={style}>
+            {theLabel}
+          </div>
+        );
+      })}
     </Row>
   );
 };
@@ -449,7 +463,8 @@ type Tkey =
   | 'btn';
 
 type Tconfig = {
-  label: string;
+  // label: string;
+  label: string | ((isForeign: boolean) => string);
   className?: string;
   style?: React.CSSProperties;
 };
@@ -491,7 +506,9 @@ const configList: TconfigList = {
     style: { width: '165px' },
   },
   receivablePayment: {
-    label: '金額',
+    label: (isForeign) => {
+      return isForeign ? '收款外幣金額' : '金額';
+    },
     style: { width: '150px' },
   },
   noteNumber: {
@@ -503,7 +520,10 @@ const configList: TconfigList = {
     style: { width: '120px' },
   },
   fee: {
-    label: '匯費',
+    // label: '匯費',
+    label: (isForeign) => {
+      return isForeign ? '外幣匯費' : '匯費';
+    },
     style: {
       width: '130px',
     },
