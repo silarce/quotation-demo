@@ -72,8 +72,8 @@ type Tprops_quotationRow_dndThead = Omit<Tprops_quotationRow, 'onDragEnd'> & {
     [key: string]:
       | undefined
       | {
-          label: string;
-          style: React.CSSProperties;
+          label: React.ReactNode;
+          style?: React.CSSProperties;
         };
   };
   onDragEnd: (props: {
@@ -124,7 +124,7 @@ const QuotationRow_pre = (
 ) => {
   return (
     <div ref={ref} {...props_row} className={classNames(scss.row, className)}>
-      {left && (
+      {(left || dragHandle || dragHandleInvisible) && (
         <div {...props_left} className={classNames(scss.left, props_left?.className)}>
           {(dragHandle || dragHandleInvisible) && (
             <Cell

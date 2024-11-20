@@ -469,3 +469,8 @@ class ClassProd_base implements Interface_ClassProd_base {
     this.setProd('dualPrice', value);
   }
 } // ClassProd_base
+
+// ================================================================================
+
+export { ClassProd_base };
+export type { Interface_ClassProd_base };
