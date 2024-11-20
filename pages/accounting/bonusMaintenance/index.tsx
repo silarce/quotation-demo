@@ -1,7 +1,7 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import scss from './bonusMaintenance.module.scss';
-import { createRef, useContext, useEffect, useRef, useState } from "react";
+import { createRef, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { setting } from '../../factoryDepartment/wareHouseList/index';
 import { useRouter } from "next/router";
 import { content } from "html2canvas/dist/types/css/property-descriptors/content";
@@ -29,6 +29,7 @@ import icon_eye_gray from 'public/image/icon/eyeProhibit.svg';
 import icon_cir_add from 'public/image/icon/addCircle.svg';
 import icon_cir_remove from 'public/image/icon/removeCircle.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_search2 from 'public/image/icon/search.svg';
 
 //時間
 import moment from "moment";
@@ -59,16 +60,17 @@ export default function bonusMaintenance() {
 
     // 資料列
     const [data, setData] = useState<any[]>([]);
-    const [leavedata, setLeavedata] = useState<any[]>([]);
+    const [bonuspeople, setbonuspeopledata] = useState<any[]>([]);
     const [originalleavedata, setOriginalLeavedata] = useState<any[]>([]);
     const [originaldata, setOriginalData] = useState<any[]>([]);
+    const [employeedata, setEmployeedata] = useState<any[]>([]);
 
     //普通變數
     const [currentemp, setCurrentEmp] = useState<string>("");
     const [serial_id, setSerial_id] = useState<string>("");
     const [serial_uuid, setSerial_uuid] = useState<string>("");
     const [status, setStatus] = useState<string>("");
-
+    const [currenindex, setCurrentIndex] = useState<number>(0);
 
     //手key輸入
     const overtime_hoursRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
@@ -92,8 +94,14 @@ export default function bonusMaintenance() {
     const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const salaryRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
 
+    const categoryRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const item_nameRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const seniorityRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const bonusRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const monthRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const noteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     // popout
-    const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
+    const [peoplebar, setpeoplebar] = useState<boolean>(false);
     const [editbtn, seteditbtn] = useState<boolean>(false);
     const [addbar, setaddbar] = useState<boolean>(false);
     const [editall, seteditall] = useState<boolean>(false);
@@ -107,8 +115,9 @@ export default function bonusMaintenance() {
     useEffect(() => {
         if (!hasFetchedData.current) {
             // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
-            GetSalary();
+            GetSalaryBonus();
             GetReviewFlow();
+            GetEmployee();
             hasFetchedData.current = true;
         }
     }, []);
@@ -177,72 +186,42 @@ export default function bonusMaintenance() {
 
     //#region =============【  API  】===============================================================================
 
-    const GetSalary = async () => {
+    const GetSalaryBonus = async () => {
         try {
             setIsLoading(true);
-    
+
             const conditionModel = {
                 // 在這裡可以填入查詢條件
             };
-    
+
             const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'SalaryService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-    
+
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Salary/GetSalary?${queryParams}`);
-    
+            const response = await fetch(`${setting.apipath}/Salary/GetSalaryBonus?${queryParams}`);
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-    
+
             let responsedata = await response.json();
-    
-            // 根據 `employee[0].id_number` 進行排序
+
+            // 根據 item_name 和 seniority 進行排序
             responsedata = responsedata.sort((a: any, b: any) => {
-                const aIdNumber = a.employee ? a.employee[0]?.id_number || '' : '';
-                const bIdNumber = b.employee ? b.employee[0]?.id_number || '' : '';
-                return aIdNumber.localeCompare(bIdNumber);
+                const itemNameComparison = a.item_name.localeCompare(b.item_name); // 先依據 item_name 排序
+                if (itemNameComparison !== 0) {
+                    return itemNameComparison; // 如果 item_name 不同，直接返回比較結果
+                }
+                // 如果 item_name 相同，再比較 seniority
+                return a.seniority - b.seniority;
             });
-    
+
             console.log(responsedata); // 檢查排序後的資料
             setData(responsedata);
-    
-        } catch (error: any) {
-            console.log(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    
-
-    const GenerateSalary = async () => {
-        try {
-            setIsLoading(true);
-
-            const conditionModel = {
-                date: year + '-' + month,
-                type: '編輯中'
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'SalaryService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Salary/GenerateSalary?${queryParams}`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
-
         } catch (error: any) {
             console.log(error.message);
         } finally {
@@ -250,16 +229,23 @@ export default function bonusMaintenance() {
         }
     };
 
-    const UpdateSalary = async (item:any) => {
+    const UpdateSalaryBonusById = async (item: any) => {
         try {
             setIsLoading(true);
+
+            // 將 item.employee 處理為僅包含 id 的陣列
+            const employeeIds = JSON.parse(item.employee).map((emp: any) => emp.id);
+
+
             const conditionModel = {
                 id: item.id,
-                salary:item.salary,
-                allowance:item.allowance,
-                supplement:item.supplement,
-                employee_id:item.employee_id,
-                note:item.note
+                category: item.category,
+                item_name: item.item_name,
+                seniority: item.seniority,
+                bonus: item.bonus,
+                month: item.month,
+                note: item.note,
+                employee_id: employeeIds
             };
 
             var inputModel = {
@@ -271,7 +257,7 @@ export default function bonusMaintenance() {
 
             console.log(JSON.stringify(conditionModel));
 
-            const response = await fetch(`${setting.apipath}/Salary/UpdateSalaryById`, {
+            const response = await fetch(`${setting.apipath}/Salary/UpdateSalaryBonusById`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -284,8 +270,7 @@ export default function bonusMaintenance() {
             }
             const responsedata = await response.json();
             myAlert.success({ title: '更新成功' })
-            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
-            // GetSalary();
+            GetSalaryBonus();
             setEditlist(false);
 
 
@@ -300,9 +285,47 @@ export default function bonusMaintenance() {
 
 
     }
+    //借用審核的取員工資料
+    const GetEmployee = async () => {
+        try {
+            setIsLoading(true);
 
+            const conditionModel = {
+                // 在這裡可以填入查詢條件
+            };
 
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/Review/GetEmployeeTitle?${queryParams}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            let responsedata = await response.json();
+
+            // 根據 `employee[0].id_number` 進行排序
+            responsedata = responsedata.sort((a: any, b: any) => {
+                const aId = a.id_number ? a.id_number || '' : '';
+                return aId.localeCompare(aId);
+            });
+
+            console.log(responsedata); // 檢查排序後的資料
+            setEmployeedata(responsedata);
+            setFilteredData(responsedata);
+
+        } catch (error: any) {
+            console.log(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     // const SettlePayroll = async () => {
     //     myAlert.confirm({
     //         title: '確定要結算薪資嗎?',
@@ -349,6 +372,57 @@ export default function bonusMaintenance() {
     //         }
     //     });
     // };
+
+
+
+    const AddSalaryBonus = async () => {
+
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                category: '',
+                item_name: '',
+                seniority: 0,
+                bonus: 0,
+                month: '',
+                note: '',
+                employee_id: '[]'
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'SalaryService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+            const response = await fetch(`${setting.apipath}/Salary/AddSalaryBonus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            GetSalaryBonus();
+            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+
+
+
 
 
     //#region 審核
@@ -684,7 +758,7 @@ export default function bonusMaintenance() {
     // 組件編輯
     const handleEdit = async (index: any) => {
         if (editlist === true) {
-            myAlert.warning({ title: '薪資維護中，請先結束編輯狀態' })
+            myAlert.warning({ title: '獎金維護中，請先結束編輯狀態' })
             return;
         }
         setOriginaleditlistdata(data);
@@ -698,28 +772,63 @@ export default function bonusMaintenance() {
     };
 
     // 從組件清單移除
-    const handleRemove = (index: number, item: any) => {
-        myAlert.confirm({
-            title: '確定要將組件移除嗎?',
-            props: {
-                onOk: () => {
-                    const updatedData = data.filter((_, i) => i !== index);
-                    setData(updatedData);
-                    // RemoveBomDetail(item.id);
-                }
-            }
-        });
-    };
+    // const handleRemove = (index: number, item: any) => {
+    //     myAlert.confirm({
+    //         title: '確定要將人員移除嗎?',
+    //         props: {
+    //             onOk: () => {
+    //                 const updatedData = data.filter((_, i) => i !== index);
+    //                 setbonuspeopledata(updatedData);
+    //                 // RemoveBomDetail(item.id);
+    //             }
+    //         }
+    //     });
+    // };
+
     // 更新組件清單
     const handleUpdate = (index: number, item: any) => {
         myAlert.confirm({
             title: '確定更新嗎?',
             props: {
                 onOk: () => {
-                    UpdateSalary(item);
+                    UpdateSalaryBonusById(item);
                 }
             }
         });
+    };
+
+    const handleAddData = (item: any) => {
+        if (!selectedItems.some((selected) => selected.id === item.id)) {
+            setSelectedItems([...selectedItems, item]);
+        }
+        // 判斷資料是否已存在
+        const isExist = bonuspeople.some((person) => person.id === item.id);
+        if (isExist) {
+            console.log("資料已存在:", item);
+            return; // 如果已存在，停止後續操作
+        }
+
+        // 如果資料不存在，新增資料
+        setbonuspeopledata([
+            ...bonuspeople,
+            {
+                id: item.id,
+                id_number: item.id_number,
+                start_date: '',
+                ch_name: item.ch_name
+            },
+        ]);
+
+        console.log("新增後的資料:", bonuspeople);
+    };
+
+
+    const handleRemove = (targetItem: any) => {
+        // 使用 id 來篩選出需要保留的項目
+        const updatedData = bonuspeople.filter((item) => item.id !== targetItem.id);
+        console.log("Updated Data:", updatedData); // 確認篩選後的資料
+        setSelectedItems(selectedItems.filter((selected) => selected.id_number !== targetItem.id_number));
+        setbonuspeopledata(updatedData);
     };
 
 
@@ -761,35 +870,27 @@ export default function bonusMaintenance() {
     //#endregion
 
     const updateLeaveDetail = (id: any) => {
-        // 計算 leaveDays 的總和
-        const totalLeaveDays = leavedata.reduce((sum, item) => {
-            const days = parseFloat(item.leaveDays); // 確保 leaveDays 是數字格式
-            return sum + (isNaN(days) ? 0 : days); // 若 days 不是數字，則累加 0
-        }, 0);
+        // 將 bonuspeople 轉換為字串格式，與 data 的結構一致
+        const updatedEmployee = JSON.stringify(bonuspeople);
 
-        // 根據 employee_id 更新對應的 leave_detail 和 leave_day
-        const updatedData = data.map(employee => {
-            if (employee.id === id) {
-                const updatedLeaveDetail = leavedata.reduce((acc, item) => {
-                    if (item.leaveType && item.leaveDays) {
-                        acc[item.leaveType] = item.leaveDays;
-                    }
-                    return acc;
-                }, {} as Record<string, string>);
-
+        // 在 data 中找到對應 id 並更新 employee
+        const updatedData = data.map(item => {
+            if (item.id === id) {
                 return {
-                    ...employee,
-                    leave_detail: updatedLeaveDetail,
-                    leave_day: totalLeaveDays  // 更新 leave_day 為統計後的總和
+                    ...item,
+                    employee: updatedEmployee, // 更新 employee
+                    update_at: new Date().toISOString() // 更新時間戳
                 };
             }
-            return employee;
+            return item;
         });
 
-        // 設定更新後的 data
+        // 設定更新後的資料
         setData(updatedData);
         console.log('Updated data:', updatedData);
+        // UpdateSalaryBonusById();
     };
+
 
     const handleeditallcancel = () => {
         myAlert.confirm({
@@ -804,26 +905,79 @@ export default function bonusMaintenance() {
         })
     };
 
-    const handleeditalledit = () => {
-        seteditall(true);
-        setOriginalData(data);
-    }
-
-    //儲存
-    const handleeditallsave = (item:any) => {
-        seteditall(false);
-        console.log(data);
-        // UpdatePayroll();
-        
-    }
-
-    //確認結算
-    const handleeditconfirm = () => {
-        setDocumenttitle(`【薪資單】【${parseFloat(year.toString()) - 1911}年${month}月份_薪資單】_${userInfo?.employee?.chName.toString()}`)
-        sentToReview("送審");
-    }
-
     //#endregion
+
+
+
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    const [selectedItems, setSelectedItems] = useState<any[]>([]); // 存儲已選中的項目
+
+    const uniqueDepartments = useMemo(() => {
+        // 取得 department 欄位的唯一值
+        const departments = employeedata.map(item => item.department);
+        return [...new Set(departments)];
+    }, [employeedata]);
+
+    const [selectedDepartment, setSelectedDepartment] = useState("");
+    const [searchText, setSearchText] = useState("");
+
+    // const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [filteredData, setFilteredData] = useState<any[]>([]);
+    const isSelectingRef = useRef(false);
+    // 監聽條件變更
+    useEffect(() => {
+        // filterData();
+        if (isSelectingRef.current) return;
+        let filteredData = employeedata
+            .filter((item) => !selectedItems.some((selected) => selected.id_number === item.id_number));
+
+        if (searchText) {
+            filteredData = filteredData.filter(item =>
+                item.ch_name.toString().includes(searchText.trim())
+            );
+        }
+
+
+        setFilteredData(filteredData);
+        console.log(filteredData.length)
+    }, [searchText, selectedItems]);
+
+
+    const handleAdd = () => {
+        // setData([
+        //     ...data,
+        //     {
+        //         id: '', // 預設為空字串
+        //         category: '', // 預設為空字串
+        //         item_name: '', // 預設為空字串
+        //         seniority: 0, // 預設為 0
+        //         bonus: 0, // 預設為 0
+        //         month: '1,2,3,4,5,6,7,8,9,10,11,12', // 預設為空字串
+        //         note: '', // 預設為空字串
+        //         create_at: '', // 預設為空字串
+        //         update_at: '', // 預設為空字串
+        //         create_by: null, // 預設為 null
+        //         update_by: null, // 預設為 null
+        //         employee: '[]', // 預設為空陣列
+        //         actual_salary: 0, // 預設為 0
+        //         earning_total: 0, // 預設為 0
+        //         deduction_total: 0, // 預設為 0
+        //         subtotal: 0, // 預設為 0
+        //         net_pay: 0, // 預設為 0
+        //     },
+        // ]);
+
+        AddSalaryBonus();
+
+
+
+        console.log("新增後的資料:", data);
+    };
+
+
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -920,17 +1074,22 @@ export default function bonusMaintenance() {
             <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.content}>
 
-                    <div className={scss.body_content1}>
+                    <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
                         <div className={scss.thead1}>
+                            <span>
+                                <button onClick={() => { handleAdd() }}>
+                                    <img src={icon_cir_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
+                                </button>
+                            </span>
+                            <span>類別</span>
+                            <span>項目</span>
+                            <span>年資</span>
+                            <span>獎金</span>
+                            <span>發放月份</span>
+                            <span>發放人數</span>
+                            <span>發放對象</span>
+                            <span>備註</span>
                             <span></span>
-                            <span>員工編號</span>
-                            <span>部門</span>
-                            <span>姓名</span>
-                            <span>到職日</span>
-                            <span>本薪(30天)</span>
-                            <span>職務加給</span>
-                            <span>工作津貼</span>
-
                         </div>
                         <span>
                             {data && (
@@ -962,27 +1121,23 @@ export default function bonusMaintenance() {
                                                         <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                     </button>
                                                 </span>
-                                                <span>{_item.employee[0].id_number}</span>
-                                                <span>{_item.employee[0].name}</span>
-                                                <span>{_item.employee[0].ch_name}</span>
-                                                <span>{getTaiwanDateStr(_item.employee[0].start_date)}</span>
                                                 <span>
                                                     <input
-                                                        ref={salaryRefs.current[index]}
+                                                        ref={categoryRefs.current[index]}
                                                         style={{
                                                             backgroundColor: 'transparent',
-                                                            borderBottom: editlist ? '1px solid gray' : 'none',
-                                                            width: '100px'
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100%'
                                                         }}
-                                                        readOnly={!editlist}
-                                                        type={editlist ? "number" : "text"}
-                                                        value={editlist ? _item.salary : Number(_item.salary).toLocaleString()}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "text" : "text"}
+                                                        value={editlist && editlistindex === index ? _item.category : _item.category}
                                                         onChange={(e) => {
                                                             const newData = [...data];
-                                                            const newSalary = e.target.value;
+                                                            const newCategory = e.target.value;
                                                             newData[index] = {
                                                                 ...newData[index],
-                                                                salary: editlist ? newSalary : parseFloat(newSalary.replace(/,/g, ''))
+                                                                category: editlist ? newCategory : newCategory
                                                             };
                                                             setData(newData);
                                                         }}
@@ -990,21 +1145,21 @@ export default function bonusMaintenance() {
                                                 </span>
                                                 <span>
                                                     <input
-                                                        ref={supplementRefs.current[index]}
+                                                        ref={item_nameRefs.current[index]}
                                                         style={{
                                                             backgroundColor: 'transparent',
-                                                            borderBottom: editlist ? '1px solid gray' : 'none',
-                                                            width: '100px'
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100%'
                                                         }}
-                                                        readOnly={!editlist}
-                                                        type={editlist ? "number" : "text"}
-                                                        value={editlist ? _item.supplement : Number(_item.supplement).toLocaleString()}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "text" : "text"}
+                                                        value={editlist && editlistindex === index ? _item.item_name : _item.item_name}
                                                         onChange={(e) => {
                                                             const newData = [...data];
-                                                            const newSupplement = e.target.value;
+                                                            const newItem_name = e.target.value;
                                                             newData[index] = {
                                                                 ...newData[index],
-                                                                supplement: editlist ? newSupplement : parseFloat(newSupplement.replace(/,/g, ''))
+                                                                item_name: editlist ? newItem_name : newItem_name
                                                             };
                                                             setData(newData);
                                                         }}
@@ -1012,26 +1167,213 @@ export default function bonusMaintenance() {
                                                 </span>
                                                 <span>
                                                     <input
-                                                        ref={allowanceRefs.current[index]}
+                                                        ref={seniorityRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100%'
+                                                        }}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "number" : "text"}
+                                                        value={
+                                                            editlist && editlistindex === index
+                                                                ? _item.seniority
+                                                                : Number(_item.seniority).toLocaleString()
+                                                        }
+                                                        onChange={(e) => {
+                                                            if (editlist && editlistindex === index) {
+                                                                const newData = [...data];
+                                                                const newSeniority = e.target.value;
+                                                                newData[index] = {
+                                                                    ...newData[index],
+                                                                    seniority: newSeniority,
+                                                                };
+                                                                setData(newData);
+                                                            }
+                                                        }}
+                                                    />
+
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={bonusRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100%'
+                                                        }}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "number" : "text"}
+                                                        value={editlist && editlistindex === index ? _item.bonus : Number(_item.bonus).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newBonus = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                bonus: editlist ? newBonus : parseFloat(newBonus.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span>
+                                                    {/* <input
+                                                        ref={monthRefs.current[index]}
                                                         style={{
                                                             backgroundColor: 'transparent',
                                                             borderBottom: editlist ? '1px solid gray' : 'none',
                                                             width: '100px'
                                                         }}
                                                         readOnly={!editlist}
-                                                        type={editlist ? "number" : "text"}
-                                                        value={editlist ? _item.allowance : Number(_item.allowance).toLocaleString()}
+                                                        type={editlist ? "text" : "text"}
+                                                        value={editlist ? _item.month : _item.month}
                                                         onChange={(e) => {
                                                             const newData = [...data];
-                                                            const newAllowance = e.target.value;
+                                                            const newMonth = e.target.value;
                                                             newData[index] = {
                                                                 ...newData[index],
-                                                                allowance: editlist ? newAllowance : parseFloat(newAllowance.replace(/,/g, ''))
+                                                                month: editlist ? newMonth : newMonth
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    /> */}
+                                                    {editlist && editlistindex === index ? (
+                                                        <div
+                                                            style={{
+                                                                position: 'relative',
+                                                                width: '250px',
+                                                                borderBottom: '1px solid gray',
+                                                                // backgroundColor: 'white',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                        >
+                                                            {/* 點擊顯示下拉清單 */}
+                                                            <div
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation(); // 防止事件冒泡
+                                                                    const dropdown = e.currentTarget.nextElementSibling as HTMLElement; // 類型斷言
+                                                                    if (dropdown) {
+                                                                        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {_item.month || '未選擇月份'} {/* 如果月份為空顯示提示文字 */}
+                                                            </div>
+
+                                                            {/* 下拉清單 */}
+                                                            <div
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '100%',
+                                                                    left: 0,
+                                                                    width: '100%',
+                                                                    // borderBottom: '1px solid gray',
+                                                                    // backgroundColor: 'white',
+                                                                    display: 'none',
+                                                                    zIndex: 9999, // 提升 z-index
+                                                                    maxHeight: '200px',
+                                                                    overflowY: 'auto',
+                                                                    border: '1px solid gray'
+                                                                }}
+                                                            >
+                                                                {Array.from({ length: 12 }, (_, i) => {
+                                                                    const monthValue = (i + 1).toString();
+                                                                    const isSelected = (_item.month || '').split(',').includes(monthValue);
+                                                                    return (
+                                                                        <div
+                                                                            key={monthValue}
+                                                                            style={{
+                                                                                backgroundColor: isSelected ? '#3363ff' : 'white',
+                                                                                color: isSelected ? 'white' : 'inherit',
+                                                                                cursor: 'pointer',
+
+                                                                            }}
+                                                                            onClick={() => {
+                                                                                const currentMonths = (_item.month || '').split(',').filter((m: any) => m); // 避免空值
+                                                                                const newMonths = isSelected
+                                                                                    ? currentMonths.filter((m: any) => m !== monthValue) // 移除選項
+                                                                                    : [...currentMonths, monthValue]; // 新增選項
+                                                                                const sortedMonths = newMonths.sort((a: any, b: any) => Number(a) - Number(b)); // 重新排列
+                                                                                const newData = [...data];
+                                                                                newData[index] = {
+                                                                                    ...newData[index],
+                                                                                    month: sortedMonths.join(','), // 更新為排序後的字串
+                                                                                };
+                                                                                setData(newData); // 更新 state
+                                                                            }}
+                                                                        >
+                                                                            {monthValue} 月
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span>{_item.month || '未選擇月份'}</span> // 顯示非編輯模式的月份字串或提示文字
+                                                    )}
+
+                                                </span>
+                                                <span>{JSON.parse(data[index].employee).length}</span>
+                                                <span>
+                                                    <button onClick={() => {
+                                                        setCurrentEmp(_item.id);
+                                                        setCurrentIndex(index);
+                                                        setpeoplebar(true);
+
+                                                        // 判斷 leave_detail 是字串還是物件
+                                                        let bonuspeopleDetail = data[index].employee;
+
+                                                        // 若是 JSON 字串格式，解析為物件
+                                                        if (typeof bonuspeopleDetail === "string") {
+                                                            try {
+                                                                bonuspeopleDetail = JSON.parse(bonuspeopleDetail);
+                                                            } catch (error) {
+                                                                console.error("JSON 解析錯誤:", error);
+                                                                bonuspeopleDetail = {}; // 若解析失敗，則使用空物件作為預設
+                                                            }
+                                                        }
+
+                                                        // // 將 leaveDetail 轉換成陣列格式
+                                                        // const newbonuspeopleData = Object.entries(bonuspeopleDetail).map(([id, ch_name]) => ({
+                                                        //     id,
+                                                        //     ch_name
+                                                        // }));
+
+                                                        // 更新 leavedata state
+                                                        setbonuspeopledata(bonuspeopleDetail);
+                                                        console.log(bonuspeopleDetail);
+                                                        setOriginalLeavedata(bonuspeople);
+                                                    }}>
+                                                        <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                                    </button>
+
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={noteRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100%'
+                                                        }}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "text" : "text"}
+                                                        value={editlist && editlistindex === index ? _item.note : _item.note}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newNote = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                note: editlist ? newNote : newNote
                                                             };
                                                             setData(newData);
                                                         }}
                                                     />
                                                 </span>
+                                                <span></span>
                                             </div>
                                         </CellWithBar>
                                     );
@@ -1045,39 +1387,85 @@ export default function bonusMaintenance() {
 
                 </div>
                 <Modal
-                    visible={leavedaybar}
+                    visible={peoplebar}
                     onCancel={() => {
-                        setLeavedaybar(false);  // 關閉 Modal
-                        seteditbtn(false);      // 將 editbtn 設為 false
-                        setLeavedata([]);
+                        setpeoplebar(false); // 關閉 Modal
+                        // seteditbtn(false);   // 將 editbtn 設為 false
+                        setbonuspeopledata([]);
                     }}
-                    width="502px"
-                    closable={false}  // 移除右上角的叉叉
-                    style={{ top: 150, }}
-                    bodyStyle={{ padding: 0, height: '520px' }}  // 移除內部間距
-                    title={null}
-                    footer={
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
-                            <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
-                                <button
-                                    className={scss.minitabbtn}
-                                    onClick={() => {
-                                        seteditbtn(!editbtn);
-                                        setOriginalLeavedata(leavedata);
-                                    }}
-                                    style={{
-                                        display: `${editbtn === false ? '' : 'none'}`,
-                                        margin: '0px 20px'
-                                    }}
+                    width="1002px"
+                    closable={false} // 移除右上角的叉叉
+                    style={{ top: 150 }}
+                    bodyStyle={{ padding: 0, height: '520px', overflow: 'hidden' }} // 限制 Modal 高度並防止溢出
+                    title={
+                        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                {/* 部門選擇下拉選單 */}
+                                {/* <select
+                                    value={selectedDepartment}
+                                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                                    style={{ padding: "5px", fontSize: "16px" }}
                                 >
-                                    編輯
-                                </button>
+                                    <option value="">全部部門</option>
+                                    {uniqueDepartments.map((dept, index) => (
+                                        <option key={index} value={dept}>
+                                            {dept}
+                                        </option>
+                                    ))}
+                                </select> */}
+
+                                {/* 搜索輸入框 */}
+                                <div style={{ display: "inline-flex", alignItems: "center", borderBottom: "1px solid #c1c1c1" }}>
+                                    <input
+                                        type="text"
+                                        placeholder="搜尋關鍵字"
+                                        value={searchText}
+                                        style={{ padding: "4px 5px", width: "350px", fontSize: "16px", border: "none", outline: "none" }}
+                                        onChange={(e) => setSearchText(e.target.value)}
+                                    />
+                                    <span style={{ padding: "4px 12px" }}>
+                                        <img src={icon_search2.src} alt="search" style={{ height: "20px", width: "20px" }} />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                    footer={
+                        <div style={{ justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
+                            <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
+                                <span style={{ display: `${editlist && editlistindex === currenindex ? '' : 'none'}` }}>
+                                    <button
+                                        className={scss.minitabbtn}
+                                        onClick={() => {
+                                            seteditbtn(!editbtn);
+                                            setOriginalLeavedata(bonuspeople);
+                                        }}
+                                        style={{
+                                            display: `${editbtn === false ? '' : 'none'}`,
+                                            margin: '0px 20px'
+                                        }}
+                                    >
+                                        編輯
+                                    </button>
+                                </span>
                             </span>
                             <button
                                 className={scss.minitabbtn}
                                 onClick={() => {
-                                    seteditbtn(false);
-                                    setLeavedata(originalleavedata);
+                                    myAlert.confirm({
+                                        title: '確定要取消編輯嗎?',
+                                        content: null,
+                                        props: {
+                                            onOk: async () => {
+                                                seteditbtn(false);
+                                                setbonuspeopledata(originalleavedata);
+                                                // setpeoplebar(false);
+                                            }
+                                        }
+                                    })
+
+
                                 }}
                                 style={{
                                     display: `${editbtn === true ? '' : 'none'}`,
@@ -1089,7 +1477,7 @@ export default function bonusMaintenance() {
                             <button
                                 className={scss.minitabbtn}
                                 onClick={() => {
-                                    setLeavedaybar(false)
+                                    setpeoplebar(false)
                                     seteditbtn(false)
                                 }}
                                 style={{ display: `${editbtn === false ? '' : 'none'}` }}
@@ -1099,7 +1487,7 @@ export default function bonusMaintenance() {
                             <button
                                 className={scss.minitabredbtn}
                                 onClick={() => {
-                                    console.log(leavedata);
+                                    console.log(bonuspeople);
                                     updateLeaveDetail(currentemp);
                                     // setLeavedaybar(false);
                                     seteditbtn(false);
@@ -1111,83 +1499,86 @@ export default function bonusMaintenance() {
                         </div>
                     }
                 >
+                    {/* Header */}
                     <div className={scss.thead2}>
                         <span>
-                            <button onClick={() => { }} style={{ display: `${editbtn ? '' : 'none'}` }}>
-                                <img src={icon_cir_add.src} alt="add" style={{ height: '30px', width: '30px' }} />
-                            </button>
+
                         </span>
-                        <span>假別</span>
-                        <span>日數</span>
+                        <span>員工編號</span>
+                        <span>姓名</span>
                         <span></span>
                     </div>
-                    <div className={scss.body_content1} style={{ overflowY: 'auto' }}>
-                        {leavedata && leavedata.map((item, index) => (
-                            <CellWithBar key={index} className={scss.panelHeader2}>
-                                <div className={scss.row01}>
-                                    <span>
-                                        {editbtn && (
-                                            <button onClick={() => { }}
-                                                style={{
-                                                    height: '70px'
-                                                }}>
-                                                <img src={icon_cir_remove.src} alt="remove"
-                                                    style={{ width: '30px', height: '30px' }} />
-                                            </button>
-                                        )}
-                                    </span>
-                                    <span>
-                                        <select
-                                            value={item.leaveType}
-                                            onChange={(e) => { }}
-                                            disabled={!editbtn}
-                                            style={{
-                                                width: '100%',
-                                                fontSize: '18px',
-                                                borderBottom: editbtn ? '1px solid #14256a' : 'none',
-                                                backgroundColor: 'transparent',
-                                                height: '50px',
-                                                appearance: editbtn ? 'auto' as any : 'none' as any,  // 型別轉換
-                                                MozAppearance: editbtn ? 'auto' as any : 'none' as any,  // 型別轉換
-                                                WebkitAppearance: editbtn ? 'auto' as any : 'none' as any  // 型別轉換
-                                            }}
+
+                    {/* Body Content */}
+                    <div style={{}}>
+                        <div
+                            className={scss.body_content1}
+                            style={{ overflowY: 'auto', borderBottom: '5px solid #e0e0e0' }} // 第一部分
+                        >
+                            <span style={{ overflowY: 'auto', height: '200px' }}>
+                                {bonuspeople && bonuspeople.map((item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader2}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01}`}
                                         >
-                                            <option value="">請選擇假別</option>
-                                            <option value="事假">事假</option>
-                                            <option value="病假">病假</option>
-                                            <option value="喪假">喪假</option>
-                                            <option value="公假">公假</option>
-                                            <option value="產假">產假</option>
-                                            <option value="生理假">生理假</option>
-                                            <option value="家庭照顧假">家庭照顧假</option>
-                                        </select>
-                                    </span>
+                                            <span>
+                                                {/* {editbtn && (
+                                                    <button onClick={() => { handleRemove(item) }}
+                                                        style={{
+                                                            height: '20px'
+                                                        }}>
+                                                        <img src={icon_cir_remove.src} alt="remove"
+                                                            style={{ width: '30px', height: '30px' }} />
+                                                    </button>
+                                                )} */}
+                                            </span>
+                                            <span>{item.id_number}</span>
+                                            <span>{item.ch_name}</span>
+                                            <span>
+                                                {editbtn && (
+                                                    <button onClick={() => { handleRemove(item) }}
+                                                        style={{
+                                                            height: '20px'
+                                                        }}>
+                                                        <img src={icon_cir_remove.src} alt="remove"
+                                                            style={{ width: '30px', height: '30px' }} />
+                                                    </button>
+                                                )}</span>
+                                        </div>
+                                    </CellWithBar>
+                                ))}
+                            </span>
+                            <span style={{ borderTop: '5px solid #ccc', overflowY: 'auto', height: '500px' }}>
+                                {filteredData.map((item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader3}>
+                                        <div
+                                            className={`${scss.row01}`}
+                                        >
+                                            <span>
+                                                <button onClick={() => { handleAddData(item) }} style={{ display: `${editbtn ? '' : 'none'}` }}>
+                                                    <img src={icon_cir_add.src} alt="add" style={{ height: '30px', width: '30px' }} />
+                                                </button>
+                                            </span>
+                                            <span>{item.id_number}</span>
+                                            <span>{item.ch_name}</span>
+                                            <span></span>
+                                        </div>
+                                    </CellWithBar>
+                                ))}
+                            </span>
+                        </div>
+                        {/* <hr style={{ border: 'solid 2px gray' }} /> */}
+                        {/* <div
+                            className={scss.body_content1}
+                            style={{ overflowY: 'auto', height: '500px', borderTop: '5px solid #ccc' }} // 第二部分
+                        >
+                           
+                        </div> */}
 
-                                    <span>
-                                        <input
-                                            type="text"
-                                            placeholder="請輸入日數"
-                                            value={item.leaveDays}
-                                            onChange={(e) => { }}
-                                            readOnly={!editbtn}  // 當 editbtn 為 false 時禁用輸入
-                                            style={{
-                                                fontSize: '18px',
-                                                width: '100%',
-                                                borderBottom: editbtn ? '1px solid #14256a' : 'none',  // 底線在 editbtn 為 true 時顯示
-                                                backgroundColor: 'transparent',
-                                                height: '50px'
-                                            }}
-                                        />
-                                    </span>
-
-                                    <span></span>
-                                </div>
-                            </CellWithBar>
-                        ))}
                     </div>
-
-
                 </Modal>
+
 
                 <DragableModal
                     handleText="選擇審核流程"
