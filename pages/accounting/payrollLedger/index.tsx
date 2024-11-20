@@ -368,8 +368,18 @@ export default function PayrollLedger() {
                             <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
                         </span>
                         <span style={{ padding: '0px 10px' }}>
-                            <button className={scss.longsquarebtn} style={{ marginTop: '-5px' }} onClick={() => { Excel() }} title="核准">
-                                <img src={icon_export.src} alt="search" style={{ height: '15px', width: '15px' }} />
+                            <button
+                                className={scss.longsquarebtn}
+                                style={{
+                                    marginTop: '-5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                onClick={() => { Excel() }}
+                                title="核准"
+                            >
+                                <img src={icon_export.src} alt="search" style={{ height: '20px', width: '20px', marginRight: '8px' }} />
                                 匯出Excel
                             </button>
                         </span>
