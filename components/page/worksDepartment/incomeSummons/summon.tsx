@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { useRouter } from 'next/router';
 
 // antd
 import { Badge } from 'antd';
@@ -40,6 +41,8 @@ import { useVipInfo } from 'hooks/globalState/useVipInfo';
 import { AppContext } from 'pages/_app';
 
 import { optionsCreator_currency } from 'js/utils/options/options';
+
+import { apiGetContract } from 'js/api/api_quotation';
 
 // ============================================================================
 
@@ -120,6 +123,7 @@ type TconfigItem = {
     //
     accountantId?: string;
     update_incomeBill?: () => void;
+    router: ReturnType<typeof useRouter>;
   }) => TinputSelProps;
 };
 
@@ -209,6 +213,8 @@ const Summons_pre = (
 ) => {
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+
+  const router = useRouter();
 
   const {
     manager,
@@ -301,17 +307,18 @@ const Summons_pre = (
       </div>
 
       {keyArr.map((key) => {
-        const { style, className, createInputSelProps: createInputAttr } = cellPropsList_summon[key];
+        const { style, className, createInputSelProps: createInputSelProps } = cellPropsList_summon[key];
 
         // 要使!isPaperImported為true的狀態仍可以編輯
         // 將送進createInputAttr中的disabled回傳即可
-        const inputSelProps = createInputAttr({
+        const inputSelProps = createInputSelProps({
           disabled: disabled,
           isPaperImported,
           state_incomeBillSerial,
           setState_incomeBillSerial,
           accountantId,
           update_incomeBill,
+          router,
         });
 
         return (
@@ -393,6 +400,8 @@ const keyArr_foreign: TconfigKey[] = [
   'note', // 備註
 ];
 
+// MARK: cellPropsList_summon
+
 const cellPropsList_summon: TcellPropsList_summon = {
   btnPanel: {
     label: '',
@@ -459,9 +468,14 @@ const cellPropsList_summon: TcellPropsList_summon = {
   },
   contractNumber: {
     label: '合約編號',
-    style: { width: 100 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
+    style: { width: 120 },
+    createInputSelProps: ({
+      disabled,
+      state_incomeBillSerial,
+      setState_incomeBillSerial: setState_incomeBillSerial,
+      router,
+    }) => {
+      const inputProps: TinputSelProps['inputProps'] = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.contractNumber,
@@ -474,8 +488,44 @@ const cellPropsList_summon: TcellPropsList_summon = {
             });
           },
         },
-      },
-    }),
+      };
+
+      const pushToAccountReceivable = async () => {
+        await apiGetContract({
+          filter: {
+            contractNumber: {
+              $eq: state_incomeBillSerial.contractNumber,
+            },
+          },
+        })
+          .then((res) => {
+            const contract = res.data[0];
+
+            if (contract) {
+              router.push({
+                pathname: '/worksDepartment/contractList/contract/accountReceivable',
+                query: {
+                  contractId: contract.id,
+                  version: '1',
+                },
+              });
+            }
+          })
+          .catch(() => {
+            myAlert.info({ title: '查無此合約' });
+          });
+      };
+
+      const node = (
+        <span className={'cursor-pointer'} onClick={() => pushToAccountReceivable()}>
+          {state_incomeBillSerial.contractNumber}
+        </span>
+      );
+
+      const props = disabled ? { node } : { inputProps };
+
+      return props;
+    },
   },
   projectName: {
     label: '工程名稱',
