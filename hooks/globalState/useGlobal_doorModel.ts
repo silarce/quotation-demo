@@ -17,9 +17,10 @@ type TdoorModelDict = {
 };
 
 type TdoorModelList = {
-  raw?: TdoorModelInfoDto[];
-  doorModelArr: TdoorModelInfoDto[];
-  doorModelDict: TdoorModelDict;
+  isReady: boolean;
+  raw: undefined | null | TdoorModelInfoDto[];
+  doorModelArr: undefined | null | TdoorModelInfoDto[];
+  doorModelDict: undefined | null | TdoorModelDict;
   checkIsSpecialDoor: (doorModelName: string) => boolean;
   update: () => void;
 };
@@ -45,23 +46,32 @@ const useDoorModel_prime = create<TdoorModelList>()(
               raw: data,
               doorModelArr: _.cloneDeep(data),
               doorModelDict: dict,
+              isReady: true,
             }));
           })
           .catch(() => {
+            set((state) => ({
+              raw: null,
+              doorModelArr: null,
+              doorModelDict: null,
+              isReady: true,
+            }));
             myAlert.notify.error({ message: '取得門型列表失敗' });
           });
       };
 
       //
       const doorModelList: TdoorModelList = {
-        doorModelDict: {},
-        doorModelArr: [],
+        raw: undefined,
+        doorModelDict: undefined,
+        doorModelArr: undefined,
+        isReady: false,
         update,
         checkIsSpecialDoor: (doorModelName: string) => {
           let isSpecial = true;
           const doorModelDir = get().doorModelDict;
 
-          if (doorModelName in doorModelDir) {
+          if (doorModelDir && doorModelName in doorModelDir) {
             isSpecial = false;
           }
 
