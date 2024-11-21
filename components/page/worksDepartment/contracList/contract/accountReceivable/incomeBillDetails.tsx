@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import moment from 'moment';
+
+import Link from 'next/link';
 
 // component
 import EditDefunctionBtn from './accountantDeductionEditor';
@@ -70,6 +73,8 @@ export default function IncomeBillDetails({
   reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
   readonly?: boolean;
 }) {
+  // ---------------------------------------------------------------------------
+
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(true);
@@ -268,6 +273,9 @@ export default function IncomeBillDetails({
             deductionTotal,
           } = incomeBill;
 
+          // const month = moment(receiveDate).getMonth()
+          const month = moment(receiveDate).month() + 1;
+
           return (
             <Row key={id}>
               <div className={scss.cell} style={configList['receiveDate'].style}>
@@ -320,7 +328,7 @@ export default function IncomeBillDetails({
                 className={classNames(scss.cell, configList['billSerialNumber'].className)}
                 style={configList['billSerialNumber'].style}
               >
-                {billSerialNumber}
+                <Link href={`/worksDepartment/incomeSummons?month=${month}`}>{billSerialNumber}</Link>
               </div>
               <div className={scss.cell} style={configList['deductionTotal'].style}>
                 <InputSel
