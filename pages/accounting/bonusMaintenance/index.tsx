@@ -797,30 +797,7 @@ export default function bonusMaintenance() {
         });
     };
 
-    const handleAddData = (item: any) => {
-        if (!selectedItems.some((selected) => selected.id === item.id)) {
-            setSelectedItems([...selectedItems, item]);
-        }
-        // 判斷資料是否已存在
-        const isExist = bonuspeople.some((person) => person.id === item.id);
-        if (isExist) {
-            console.log("資料已存在:", item);
-            return; // 如果已存在，停止後續操作
-        }
 
-        // 如果資料不存在，新增資料
-        setbonuspeopledata([
-            ...bonuspeople,
-            {
-                id: item.id,
-                id_number: item.id_number,
-                start_date: '',
-                ch_name: item.ch_name
-            },
-        ]);
-
-        console.log("新增後的資料:", bonuspeople);
-    };
 
 
     const handleRemove = (targetItem: any) => {
@@ -976,6 +953,50 @@ export default function bonusMaintenance() {
         console.log("新增後的資料:", data);
     };
 
+
+
+    // 用來儲存選中的資料
+    // const [selectedItems, setSelectedItems] = useState<any[]>([]);
+    const [allChecked, setAllChecked] = useState(false);
+
+    // 全選功能
+    const handleSelectAll = () => {
+        setAllChecked(!allChecked);
+
+        if (!allChecked) {
+            // 過濾掉重複的資料，將所有資料加到 bonuspeopledata
+            const newItems = filteredData.filter(
+                (item) => !bonuspeople.some((person) => person.id === item.id)
+            );
+            setbonuspeopledata([...bonuspeople, ...newItems]);
+        } else {
+            // 取消全選，清除 filteredData 的資料
+            const filteredIds = new Set(filteredData.map((item) => item.id));
+            const remainingItems = bonuspeople.filter((item) => !filteredIds.has(item.id));
+            setbonuspeopledata(remainingItems);
+        }
+    };
+
+    // 單選功能
+    const handleCheckboxChange = (item: any, isChecked: boolean) => {
+        if (isChecked) {
+            // 加入選中的資料，排除重複
+            if (!bonuspeople.some((person) => person.id === item.id)) {
+                setbonuspeopledata([
+                    ...bonuspeople,
+                    {
+                        id: item.id,
+                        id_number: item.id_number,
+                        start_date: '',
+                        ch_name: item.ch_name,
+                    },
+                ]);
+            }
+        } else {
+            // 移除取消選中的資料
+            setbonuspeopledata(bonuspeople.filter((person) => person.id !== item.id));
+        }
+    };
 
 
 
@@ -1392,6 +1413,7 @@ export default function bonusMaintenance() {
                         setpeoplebar(false); // 關閉 Modal
                         // seteditbtn(false);   // 將 editbtn 設為 false
                         setbonuspeopledata([]);
+                        setAllChecked(false);
                     }}
                     width="1002px"
                     closable={false} // 移除右上角的叉叉
@@ -1400,20 +1422,6 @@ export default function bonusMaintenance() {
                     title={
                         <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                {/* 部門選擇下拉選單 */}
-                                {/* <select
-                                    value={selectedDepartment}
-                                    onChange={(e) => setSelectedDepartment(e.target.value)}
-                                    style={{ padding: "5px", fontSize: "16px" }}
-                                >
-                                    <option value="">全部部門</option>
-                                    {uniqueDepartments.map((dept, index) => (
-                                        <option key={index} value={dept}>
-                                            {dept}
-                                        </option>
-                                    ))}
-                                </select> */}
-
                                 {/* 搜索輸入框 */}
                                 <div style={{ display: "inline-flex", alignItems: "center", borderBottom: "1px solid #c1c1c1" }}>
                                     <input
@@ -1429,8 +1437,8 @@ export default function bonusMaintenance() {
                                 </div>
                             </div>
                         </div>
-
                     }
+
                     footer={
                         <div style={{ justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
                             <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
@@ -1549,16 +1557,40 @@ export default function bonusMaintenance() {
                                     </CellWithBar>
                                 ))}
                             </span>
-                            <span style={{ borderTop: '5px solid #ccc', overflowY: 'auto', height: '500px' }}>
+                            <label style={{ display: "flex", alignItems: "center", padding: ' 10px 30px', fontSize: '16px', borderTop: '5px solid #ccc' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={allChecked}
+                                    onChange={handleSelectAll}
+                                    disabled={!editbtn} // 當 editbtn 為 false 時禁用
+                                    style={{
+                                        transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
+                                        margin: "0 10px", // 調整外邊距，讓顯示更美觀
+
+                                    }}
+                                />
+                                <span style={{ paddingLeft: '20px' }}>
+                                    全選
+                                </span>
+
+                            </label>
+                            <div style={{ overflowY: 'auto', height: '500px', borderTop: '1px solid #ccc' }}>
+                                {/* 全選功能的 Checkbox */}
+
                                 {filteredData.map((item, index) => (
                                     <CellWithBar key={index} className={scss.panelHeader3}>
-                                        <div
-                                            className={`${scss.row01}`}
-                                        >
+                                        <div className={`${scss.row01}`}>
                                             <span>
-                                                <button onClick={() => { handleAddData(item) }} style={{ display: `${editbtn ? '' : 'none'}` }}>
-                                                    <img src={icon_cir_add.src} alt="add" style={{ height: '30px', width: '30px' }} />
-                                                </button>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={bonuspeople.some((person) => person.id === item.id)}
+                                                    onChange={(e) => handleCheckboxChange(item, e.target.checked)}
+                                                    disabled={!editbtn} // 當 editbtn 為 false 時禁用
+                                                    style={{
+                                                        transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
+                                                        margin: "0 10px", // 調整外邊距，讓顯示更美觀
+                                                    }}
+                                                />
                                             </span>
                                             <span>{item.id_number}</span>
                                             <span>{item.ch_name}</span>
@@ -1566,7 +1598,8 @@ export default function bonusMaintenance() {
                                         </div>
                                     </CellWithBar>
                                 ))}
-                            </span>
+                            </div>
+
                         </div>
                         {/* <hr style={{ border: 'solid 2px gray' }} /> */}
                         {/* <div
