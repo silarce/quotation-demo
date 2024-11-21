@@ -2248,7 +2248,7 @@ export default function AddPurchaseOrder() {
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
                                     </button>
                                 </div> */}
-                                {/* <div>
+                                <div>
                                     <input
                                         type="text"
                                         placeholder='單價'
@@ -2264,8 +2264,8 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
-                                </div> */}
-                                {/* <div>
+                                </div>
+                                <div>
                                     <input
                                         type="text"
                                         placeholder='金額'
@@ -2275,7 +2275,7 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(e.target.value.toString())
                                         }}
                                     />
-                                </div> */}
+                                </div>
                                 <div>
                                     <input
                                         type="text"
