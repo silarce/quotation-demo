@@ -72,6 +72,7 @@ export default function BonusPayout() {
     const [serial_uuid, setSerial_uuid] = useState<string>("");
     const [status, setStatus] = useState<string>("");
     const [currenindex, setCurrentIndex] = useState<number>(0);
+    const [bonustype, setBonusType] = useState<string>("");
 
     //手key輸入
 
@@ -162,6 +163,14 @@ export default function BonusPayout() {
         yearOptionArr,
         monthOptionArr,
     });
+
+    const selectPropsArr2 =({
+        year: year as string,
+        month: month as string,
+        yearOptionArr,
+        monthOptionArr,
+    });
+    
 
     //#endregion
 
@@ -1063,13 +1072,15 @@ export default function BonusPayout() {
                     [
                         <span>
                             <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
-                                {/* <button className={scss.longsquarebtn}
+                                <button className={scss.longsquarebtn}
                                     onClick={() => {
-                                        GenerateSalary();
+                                        // GenerateSalary();
+                                        alert(`${parseInt((year as string))-1911}-${bonustype}`)
+
                                     }}
-                                    title="產生薪資">
-                                    產生薪資
-                                </button> */}
+                                    title="獎金結算">
+                                    獎金結算
+                                </button>
                             </span>
                             <span style={{ display: `${status === "審核中" ? 'none' : ''}` }}>
                                 <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
@@ -1135,43 +1146,68 @@ export default function BonusPayout() {
                     //         color:'#ea1833'
                     //     }}>尚未產生本月薪資帳簿!!</span>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ padding: '0px 10px' }}>
-                            {/* <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} /> */}
+                        <span style={{ paddingLeft:'50px' }}>
 
-                            <select
-                                onChange={(e) => {
-                                    const selectedBonusType = e.target.value;
-                                    console.log("選擇的獎金種類:", selectedBonusType);
-                                    // 在這裡可以執行選擇後的操作
-                                }}
-                                style={{
-                                    width: '250px',
-                                    // border: '1px solid gray',
-                                    backgroundColor: '#F5F5F5',
-                                    padding: '5px 0px',
-                                    margin: '0px 0p 0px 40px',
-                                    color:'#14256a',
-                                    fontSize:'16px'
-                                }}
-                            >
-                                {/* <option value="" disabled selected> */}
-                                <option value="">
-                                    全部
-                                </option>
-                                {bonustypedata.map((bonusType: string, index: number) => (
-                                    <option key={index} value={bonusType}>
-                                        {bonusType}
+                            <div style={{ position: 'relative', width: '250px' }}>
+                                <select
+                                    onChange={(e) => {
+                                        const selectedBonusType = e.target.value;
+                                        console.log("選擇的獎金種類:", selectedBonusType);
+                                        setBonusType(selectedBonusType);
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        border: '1px solid #c1c1c1',
+                                        backgroundColor: '#F5F5F5',
+                                        padding: '6px 20px',
+                                        color: '#14256a',
+                                        fontSize: '16px',
+                                        appearance: 'none', // 隱藏原生箭頭
+                                        cursor: 'pointer',
+                                        outline: 'none', // 移除選中時的外框
+                                    }}
+                                >
+                                    <option value="" disabled selected>
+                                        選擇獎金種類
                                     </option>
-                                ))}
-                            </select>
+                                    {bonustypedata.map((bonusType: string, index: number) => (
+                                        <option key={index} value={bonusType}>
+                                            {bonusType}
+                                        </option>
+                                    ))}
+                                </select>
+                                {/* 自訂 "V" 形箭頭 */}
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        right: '15px', // 調整箭頭與右側的距離
+                                        transform: 'translateY(-50%)',
+                                        fontSize: '15px', // 調整箭頭大小
+                                        color: '#14256a', // 調整箭頭顏色
+                                        pointerEvents: 'none', // 防止影響選單點擊
+                                        // fontWeight:'bolder'
+                                        // fontWeight:'bold'
+                                    }}
+                                >
+                                    ⌵ {/* 使用 Unicode 模仿原生 "V" */}
+                                </div>
+                            </div>
+
+
+
 
 
                         </span>
                         <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
+                            <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
                             {/* {serial_id}<br />
                             {serial_uuid} */}
-                            {status}
+                            {/* {status} */}
+                            
                         </span>
+                        {parseInt(year as string)-1911}
+                        {bonustype}
                     </div>
 
                 ]}
@@ -1182,17 +1218,15 @@ export default function BonusPayout() {
                     <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
                         <div className={scss.thead1}>
                             <span>
-                                <button onClick={() => { handleAdd() }}>
+                                {/* <button onClick={() => { handleAdd() }}>
                                     <img src={icon_cir_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
-                                </button>
+                                </button> */}
                             </span>
-                            <span>類別</span>
-                            <span>項目</span>
+                            <span>員工編號</span>
+                            <span>部門</span>
+                            <span>到職日</span>
                             <span>年資</span>
-                            <span>獎金</span>
-                            <span>發放月份</span>
-                            <span>發放人數</span>
-                            <span>發放對象</span>
+                            <span>獎金</span>                            
                             <span>備註</span>
                             <span></span>
                         </div>
