@@ -1,5 +1,10 @@
-interface TstateProd {
+import { TdoorModelInfoDto } from 'js/api/api_product';
+
+// interface TprodData {}
+
+interface TstateProdData {
   //
+
   readonly id: string | null | undefined;
   readonly key: string;
   // 項目名
@@ -166,8 +171,13 @@ interface TstateProd {
   rootProductId: string;
 }
 
+interface TstateProd {
+  data: TstateProdData;
+  doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
+}
+
 interface TstateProdDict {
   [key: string]: TstateProd;
 }
 
-export type { TstateProd, TstateProdDict };
+export type { TstateProd, TstateProdData, TstateProdDict };

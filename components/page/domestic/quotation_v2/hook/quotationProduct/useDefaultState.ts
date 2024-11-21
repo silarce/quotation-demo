@@ -1,35 +1,45 @@
 import { useMemo } from 'react';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 import type {
+  TdoorModelInfoDto,
   TquotationProductDto,
   TquotationProductComponentDto,
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-import type { TstateProd, TstateProdDict } from './type';
+import type { TstateProd, TstateProdData, TstateProdDict } from './type';
 
 interface TdefaultState {
   stateProdDict: TstateProdDict;
   prodKeyArr: string[];
 }
 
-const useDefaultState = (raw_productArr: undefined | TquotationProductDto[]) => {
+const useDefaultState = ({
+  raw_productArr,
+  doorModelDict,
+}: {
+  raw_productArr: undefined | TquotationProductDto[];
+  doorModelDict: Record<string, TdoorModelInfoDto> | null | undefined;
+}) => {
   const defaultState: TdefaultState = useMemo(() => {
-    if (!raw_productArr) {
+    if (!raw_productArr || doorModelDict === undefined) {
       return {
         stateProdDict: {} as TstateProdDict,
         prodKeyArr: [] as string[],
       };
     }
 
+    const raw_productArr_copy = _.cloneDeep(raw_productArr);
+
     const dict: TstateProdDict = {};
     const keyArr: string[] = [];
 
-    raw_productArr.forEach((raw) => {
+    raw_productArr_copy.forEach((raw) => {
       keyArr.push(raw.id);
 
-      const stateProd: TstateProd = {
+      const stateProd: TstateProdData = {
         id: raw.id,
         key: raw.id,
         itemName: raw.itemName,
@@ -119,14 +129,17 @@ const useDefaultState = (raw_productArr: undefined | TquotationProductDto[]) => 
         rootProductId: raw.rootProductId,
       };
 
-      dict[stateProd.key] = stateProd;
+      dict[stateProd.key] = {
+        data: stateProd,
+        doorModel: doorModelDict?.[stateProd.doorModelName] || null,
+      };
     });
 
     return {
       stateProdDict: dict,
       prodKeyArr: keyArr,
     };
-  }, [raw_productArr]);
+  }, [raw_productArr, doorModelDict]);
 
   return defaultState;
 };

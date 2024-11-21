@@ -1,10 +1,18 @@
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 import { createAssetUrl } from 'js/api/api_product';
 
 import { TstateProd } from '../../type';
+import { TnodeConfig } from './config';
 
+// DTO
+import { TdoorModelInfoDto } from 'js/api/api_product';
+// =======================================================================
 interface Interface_ClassProd_base {
+  readonly nodeConfig: TnodeConfig;
+  //
+  //
   readonly id: string | null | undefined;
   readonly key: string;
   // 項目名
@@ -173,30 +181,64 @@ interface Interface_ClassProd_base {
   // // 源頭產品
   // // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
   // rootProductId: string;
+  // -----------------------------------------------------------------------
+
+  changeDoorModel: (doorModel: TdoorModelInfoDto | null) => Interface_ClassProd_base;
+
+  // -----------------------------------------------------------------------
 }
+
+// ================================================================================
+
+// 在子類別中，可以透過customizeNodeConfig方法來覆寫nodeConfig
+// 務必要先進行深拷貝，避免影響到原本的nodeConfig
+const customizeNodeConfig = (nodeConfig: TnodeConfig) => {
+  const config = _.cloneDeep(nodeConfig);
+
+  // 修改style與className時要注意避免修改影響寬度的樣式，避免與其他的row不對齊
+
+  // 範例
+  // config.itemName.style = { ...config.itemName.style, background: 'red' };
+  // config.itemName.className = classNames(config.itemName.className, scss.foo);
+  // config.itemName.createNode = (state) => {
+  //   return null;
+  // };
+
+  return config;
+};
+
+// ================================================================================
 
 class ClassProd_base implements Interface_ClassProd_base {
   // MARK: constructor
   constructor({
     stateProd,
     setStateProd,
+    nodeConfig,
   }: {
     stateProd: TstateProd;
     setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
+    nodeConfig: TnodeConfig;
   }) {
-    this.stateProd = stateProd;
-    this.setStateProd = setStateProd;
+    this.state = stateProd;
+    this.data = this.state.data;
+    this.setState = setStateProd;
+    this.nodeConfig = customizeNodeConfig(nodeConfig);
   } // constructor
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
-  stateProd: TstateProd;
-  setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
-  setProd<K extends keyof TstateProd>(key: K, value: TstateProd[K]) {
-    this.setStateProd((prev) => {
-      return {
-        ...prev,
-        [key]: value,
-      };
+  readonly nodeConfig: TnodeConfig;
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  state: TstateProd;
+  data: TstateProd['data'];
+  setState: React.Dispatch<React.SetStateAction<TstateProd>>;
+  setData<K extends keyof TstateProd['data']>(key: K, value: TstateProd['data'][K]) {
+    this.setState((prev) => {
+      const copy = { ...prev };
+      copy.data[key] = value;
+
+      return copy;
     });
   }
   // -----------------------------------------------------------------------
@@ -205,269 +247,287 @@ class ClassProd_base implements Interface_ClassProd_base {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  changeDoorModel(doorModel: TdoorModelInfoDto | null) {
+    this.state.doorModel = doorModel;
+
+    return this;
+  }
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+
+  // region 輸出
+
   get id() {
-    return this.stateProd.id;
+    return this.data.id;
   }
 
   get key() {
-    return this.stateProd.key;
+    return this.data.key;
   }
 
   get itemName() {
-    return this.stateProd.itemName;
+    return this.data.itemName;
   }
   set itemName(value) {
-    this.setProd('itemName', value);
+    this.setData('itemName', value);
   }
 
   get discount() {
-    return this.stateProd.discount;
+    return this.data.discount;
   }
   set discount(value) {
-    this.setProd('discount', value);
+    this.setData('discount', value);
   }
 
   get quoteType() {
-    return this.stateProd.quoteType;
+    return this.data.quoteType;
   }
   set quoteType(value) {
-    this.setProd('quoteType', value);
+    this.setData('quoteType', value);
   }
 
   get doorModelName() {
-    return this.stateProd.doorModelName;
+    return this.data.doorModelName;
   }
   set doorModelName(value) {
-    this.setProd('doorModelName', value);
+    this.setData('doorModelName', value);
   }
 
   get fullWidth() {
-    return this.stateProd.fullWidth;
+    return this.data.fullWidth;
   }
   set fullWidth(value) {
-    this.setProd('fullWidth', value);
+    this.setData('fullWidth', value);
   }
   get fullWidth_mm() {
-    return new Decimal(this.stateProd.fullWidth).mul(1000).toNumber();
+    return new Decimal(this.data.fullWidth).mul(1000).toNumber();
   }
 
   get WG() {
-    return this.stateProd.WG;
+    return this.data.WG;
   }
   set WG(value) {
-    this.setProd('WG', value);
+    this.setData('WG', value);
   }
   get WG_mm() {
-    return new Decimal(this.stateProd.WG).mul(1000).toNumber();
+    return new Decimal(this.data.WG).mul(1000).toNumber();
   }
 
   get height() {
-    return this.stateProd.height;
+    return this.data.height;
   }
   set height(value) {
-    this.setProd('height', value);
+    this.setData('height', value);
   }
   get height_mm() {
-    return new Decimal(this.stateProd.height).mul(1000).toNumber();
+    return new Decimal(this.data.height).mul(1000).toNumber();
   }
 
   get boxB() {
-    return this.stateProd.boxB;
+    return this.data.boxB;
   }
   set boxB(value) {
-    this.setProd('boxB', value);
+    this.setData('boxB', value);
   }
   get boxB_mm() {
-    return new Decimal(this.stateProd.boxB).mul(1000).toNumber();
+    return new Decimal(this.data.boxB).mul(1000).toNumber();
   }
 
   get boxD() {
-    return this.stateProd.boxD;
+    return this.data.boxD;
   }
   set boxD(value) {
-    this.setProd('boxD', value);
+    this.setData('boxD', value);
   }
   get boxD_mm() {
-    return new Decimal(this.stateProd.boxD).mul(1000).toNumber();
+    return new Decimal(this.data.boxD).mul(1000).toNumber();
   }
 
   get area() {
-    return this.stateProd.area ?? '';
+    return this.data.area ?? '';
   }
 
   get volume() {
-    return this.stateProd.volume ?? '';
+    return this.data.volume ?? '';
   }
 
   get materialName() {
-    return this.stateProd.materialName;
+    return this.data.materialName;
   }
   set materialName(value) {
-    this.setProd('materialName', value);
+    this.setData('materialName', value);
   }
 
   get materialSurface() {
-    return this.stateProd.materialSurface;
+    return this.data.materialSurface;
   }
   set materialSurface(value) {
-    this.setProd('materialSurface', value);
+    this.setData('materialSurface', value);
   }
 
   get horsepower() {
-    return this.stateProd.horsepower;
+    return this.data.horsepower;
   }
   set horsepower(value) {
-    this.setProd('horsepower', value);
+    this.setData('horsepower', value);
   }
 
   get motorVendor() {
-    return this.stateProd.motorVendor;
+    return this.data.motorVendor;
   }
   set motorVendor(value) {
-    this.setProd('motorVendor', value);
+    this.setData('motorVendor', value);
   }
 
   get motorVoltage() {
-    return this.stateProd.motorVoltage;
+    return this.data.motorVoltage;
   }
   set motorVoltage(value) {
-    this.setProd('motorVoltage', value);
+    this.setData('motorVoltage', value);
   }
 
   get motorPhase() {
-    return this.stateProd.motorPhase;
+    return this.data.motorPhase;
   }
   set motorPhase(value) {
-    this.setProd('motorPhase', value);
+    this.setData('motorPhase', value);
   }
 
   get guideRail() {
-    return this.stateProd.guideRail;
+    return this.data.guideRail;
   }
   set guideRail(value) {
-    this.setProd('guideRail', value);
+    this.setData('guideRail', value);
   }
 
   get guideRailImg() {
-    if (!this.stateProd.guideRail) {
+    if (!this.data.guideRail) {
       return undefined;
     }
 
-    return createAssetUrl(this.stateProd.guideRail);
+    return createAssetUrl(this.data.guideRail);
   }
 
   get guideRailThickness() {
-    return this.stateProd.guideRailThickness;
+    return this.data.guideRailThickness;
   }
   set guideRailThickness(value) {
-    this.setProd('guideRailThickness', value);
+    this.setData('guideRailThickness', value);
   }
 
   get hasSilencingStrip() {
-    return this.stateProd.hasSilencingStrip;
+    return this.data.hasSilencingStrip;
   }
   set hasSilencingStrip(value) {
-    this.setProd('hasSilencingStrip', value);
+    this.setData('hasSilencingStrip', value);
   }
 
   get isULGuideRail() {
-    return this.stateProd.isULGuideRail;
+    return this.data.isULGuideRail;
   }
   set isULGuideRail(value) {
-    this.setProd('isULGuideRail', value);
+    this.setData('isULGuideRail', value);
   }
 
   get isIntegratedHeadBox() {
-    return this.stateProd.isIntegratedHeadBox;
+    return this.data.isIntegratedHeadBox;
   }
   set isIntegratedHeadBox(value) {
-    this.setProd('isIntegratedHeadBox', value);
+    this.setData('isIntegratedHeadBox', value);
   }
 
   get headBoxThickness() {
-    return this.stateProd.headBoxThickness;
+    return this.data.headBoxThickness;
   }
   set headBoxThickness(value) {
-    this.setProd('headBoxThickness', value);
+    this.setData('headBoxThickness', value);
   }
 
   get isAntiTyphoon() {
-    return this.stateProd.isAntiTyphoon;
+    return this.data.isAntiTyphoon;
   }
   set isAntiTyphoon(value) {
-    this.setProd('isAntiTyphoon', value);
+    this.setData('isAntiTyphoon', value);
   }
 
   get bounceDoorWidth() {
-    return this.stateProd.bounceDoorWidth;
+    return this.data.bounceDoorWidth;
   }
   set bounceDoorWidth(value) {
-    this.setProd('bounceDoorWidth', value);
-    this.setProd('bounceDoor', !!value);
+    this.setData('bounceDoorWidth', value);
+    this.setData('bounceDoor', !!value);
   }
 
   get closingType() {
-    return this.stateProd.closingType;
+    return this.data.closingType;
   }
   set closingType(value) {
-    this.setProd('closingType', value);
+    this.setData('closingType', value);
   }
 
   get notes() {
-    return this.stateProd.notes;
+    return this.data.notes;
   }
   set notes(value) {
-    this.setProd('notes', value);
+    this.setData('notes', value);
   }
 
   get bottomBarAngleIron() {
-    return this.stateProd.bottomBarAngleIron;
+    return this.data.bottomBarAngleIron;
   }
   set bottomBarAngleIron(value) {
-    this.setProd('bottomBarAngleIron', value);
+    this.setData('bottomBarAngleIron', value);
   }
 
   get bottomBarPlate() {
-    return this.stateProd.bottomBarPlate;
+    return this.data.bottomBarPlate;
   }
   set bottomBarPlate(value) {
-    this.setProd('bottomBarPlate', value);
+    this.setData('bottomBarPlate', value);
   }
 
   get quantity() {
-    return this.stateProd.quantity;
+    return this.data.quantity;
   }
   set quantity(value) {
-    this.setProd('quantity', value);
+    this.setData('quantity', value);
   }
 
   get unitPrice() {
-    return this.stateProd.unitPrice;
+    return this.data.unitPrice;
   }
   set unitPrice(value) {
-    this.setProd('unitPrice', value);
+    this.setData('unitPrice', value);
   }
 
   get totalPrice() {
-    return this.stateProd.totalPrice;
+    return this.data.totalPrice;
   }
   set totalPrice(value) {
-    this.setProd('totalPrice', value);
+    this.setData('totalPrice', value);
   }
 
   get price() {
-    return this.stateProd.price;
+    return this.data.price;
   }
   set price(value) {
-    this.setProd('price', value);
+    this.setData('price', value);
   }
 
   get dualPrice() {
-    return this.stateProd.dualPrice;
+    return this.data.dualPrice;
   }
   set dualPrice(value) {
-    this.setProd('dualPrice', value);
+    this.setData('dualPrice', value);
   }
+
+  //  endregion  輸出
+  // -----------------------------------------------------------------------------------
 } // ClassProd_base
 
 // ================================================================================
