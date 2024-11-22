@@ -56,7 +56,7 @@ const useQuotationProduct = ({
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState.prodKeyArr); // 主產品的key
 
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState.stateProdDict);
-  const [activeStateProd, setActiveStateProd] = useState<TstateProd>();
+  const [activeProdKey, setActiveProdKey] = useState<string>();
 
   // -----------------------------------------------------------------------
 
@@ -89,7 +89,7 @@ const useQuotationProduct = ({
   };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
-    setActiveStateProd(stateProd);
+    setActiveProdKey(stateProd?.key);
   };
 
   // -----------------------------------------------------------------------
@@ -130,12 +130,12 @@ const useQuotationProduct = ({
 
   // MARK:activeClassProd
   const activeClassProd = useMemo(() => {
-    if (!activeStateProd) {
+    if (!activeProdKey) {
       return undefined;
     }
 
-    return classProdDict[activeStateProd.key];
-  }, [activeStateProd, classProdDict]);
+    return classProdDict[activeProdKey];
+  }, [activeProdKey, classProdDict]);
 
   // -----------------------------------------------------------------------
   // region useEffect
