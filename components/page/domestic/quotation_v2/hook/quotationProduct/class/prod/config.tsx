@@ -75,7 +75,7 @@ const options_quoteType = optionsCreator_quoteType();
 // =======================================================================
 
 const defaultKeyArr: TcellKey[] = [
-  'itemName',
+  // 'itemName',
   'discount',
   'quoteType',
   'doorModelName',
@@ -110,7 +110,7 @@ const defaultKeyArr: TcellKey[] = [
 const nodeConfig_origin: TnodeConfig = {
   itemName: {
     label: '項目',
-    style: { width: 350 },
+    style: { width: 150 },
     createNode(classProd) {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
@@ -147,6 +147,7 @@ const nodeConfig_origin: TnodeConfig = {
     createNode(classProd) {
       const selectProps: TinputSelProps['selectProps'] = {
         props: {
+          menuPortalTarget: undefined,
           isSearchable: true,
           options: options_quoteType,
           value: classProd.quoteType ? { value: classProd.quoteType, label: classProd.quoteType } : null,

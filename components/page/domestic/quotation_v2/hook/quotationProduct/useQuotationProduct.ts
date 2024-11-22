@@ -32,6 +32,8 @@ import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 type TsetProd = React.Dispatch<React.SetStateAction<TstateProd>>;
 
+type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
+
 // ================================================================================
 
 const useQuotationProduct = ({
@@ -54,6 +56,7 @@ const useQuotationProduct = ({
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState.prodKeyArr); // 主產品的key
 
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState.stateProdDict);
+  const [activeStateProd, setActiveStateProd] = useState<TstateProd>();
 
   // -----------------------------------------------------------------------
 
@@ -85,10 +88,14 @@ const useQuotationProduct = ({
     return setProd;
   };
 
+  const choseActiveProd = (stateProd: TstateProd | undefined) => {
+    setActiveStateProd(stateProd);
+  };
+
   // -----------------------------------------------------------------------
 
-  // 將state與class分離的作法不可行
-  // 效能被消耗得太嚴重
+  // region COOKED
+
   const classProdDict = useMemo(() => {
     if (!doorModelDict) {
       return {};
@@ -97,6 +104,10 @@ const useQuotationProduct = ({
     const dict: { [key: string]: Interface_ClassProd_base } = {};
 
     Object.entries(state_prodDict).forEach(([key, state]) => {
+      if (state.key !== key) {
+        throw new Error('classProdDict發生錯誤，key與state.key不一致');
+      }
+
       const { doorModelName } = state.data;
 
       if (!(doorModelName in lookup_classProd)) {
@@ -117,6 +128,15 @@ const useQuotationProduct = ({
     return dict;
   }, [state_prodDict, nodeConfig_prime]);
 
+  // MARK:activeClassProd
+  const activeClassProd = useMemo(() => {
+    if (!activeStateProd) {
+      return undefined;
+    }
+
+    return classProdDict[activeStateProd.key];
+  }, [activeStateProd, classProdDict]);
+
   // -----------------------------------------------------------------------
   // region useEffect
 
@@ -129,11 +149,14 @@ const useQuotationProduct = ({
 
   return {
     classProdDict,
+    activeClassProd,
+    //
     cellKeyArr,
     setCellKeyArr,
     prodKeyArr,
-    // prodKeyArr: [prodKeyArr[0]],
     setProdKeyArr,
+    //
+    choseActiveProd,
   };
 };
 
@@ -141,4 +164,5 @@ const useQuotationProduct = ({
 
 // ================================================================================
 
-export { useQuotationProduct, nodeConfig_origin as configFotThead };
+export type { TuseQuotationProductInstance };
+export { useQuotationProduct, nodeConfig_origin };

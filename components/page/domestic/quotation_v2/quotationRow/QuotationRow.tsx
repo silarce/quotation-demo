@@ -60,6 +60,7 @@ type Tprops_quotationRow = TdivAttr & {
   props_left?: TdivAttr;
   props_center?: TdivAttr;
   props_right?: TdivAttr;
+  isActive?: boolean;
 
   dragHandle?: React.HTMLAttributes<HTMLDivElement>;
   dragHandleInvisible?: boolean;
@@ -118,12 +119,18 @@ const QuotationRow_pre = (
     props_right,
     dragHandle,
     dragHandleInvisible,
+    isActive,
     ...props_row
   }: Tprops_quotationRow | undefined = {},
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
   return (
-    <div ref={ref} {...props_row} className={classNames(scss.row, className)}>
+    <div
+      //
+      ref={ref}
+      {...props_row}
+      className={classNames(scss.row, isActive, isActive && scss.active, className)}
+    >
       {(left || dragHandle || dragHandleInvisible) && (
         <div {...props_left} className={classNames(scss.left, props_left?.className)}>
           {(dragHandle || dragHandleInvisible) && (

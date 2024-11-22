@@ -39,9 +39,8 @@ const useDefaultState = ({
     raw_productArr_copy.forEach((raw) => {
       keyArr.push(raw.id);
 
-      const stateProd: TstateProdData = {
+      const stateProd: TstateProdData & { id: string } = {
         id: raw.id,
-        key: raw.id,
         itemName: raw.itemName,
         discount: raw.discount,
         quoteType: raw.quoteType,
@@ -129,7 +128,8 @@ const useDefaultState = ({
         rootProductId: raw.rootProductId,
       };
 
-      dict[stateProd.key] = {
+      dict[stateProd.id] = {
+        key: stateProd.id,
         data: stateProd,
         doorModel: doorModelDict?.[stateProd.doorModelName] || null,
       };

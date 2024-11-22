@@ -10,6 +10,7 @@ import { TnodeConfig } from './config';
 import { TdoorModelInfoDto } from 'js/api/api_product';
 // =======================================================================
 interface Interface_ClassProd_base {
+  readonly state: TstateProd;
   readonly nodeConfig: TnodeConfig;
   //
   //
@@ -230,10 +231,10 @@ class ClassProd_base implements Interface_ClassProd_base {
   readonly nodeConfig: TnodeConfig;
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
-  state: TstateProd;
-  data: TstateProd['data'];
-  setState: React.Dispatch<React.SetStateAction<TstateProd>>;
-  setData<K extends keyof TstateProd['data']>(key: K, value: TstateProd['data'][K]) {
+  readonly state: TstateProd;
+  readonly data: TstateProd['data'];
+  private setState: React.Dispatch<React.SetStateAction<TstateProd>>;
+  private setData<K extends keyof TstateProd['data']>(key: K, value: TstateProd['data'][K]) {
     this.setState((prev) => {
       const copy = { ...prev };
       copy.data[key] = value;
@@ -261,13 +262,12 @@ class ClassProd_base implements Interface_ClassProd_base {
   // -----------------------------------------------------------------------
 
   // region 輸出
+  get key() {
+    return this.state.key;
+  }
 
   get id() {
     return this.data.id;
-  }
-
-  get key() {
-    return this.data.key;
   }
 
   get itemName() {

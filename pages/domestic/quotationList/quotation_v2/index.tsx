@@ -125,22 +125,11 @@ import QuotationAttachment from 'components/page/domestic/quotation_v2/Quotation
 import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
-// import { QuotationRow } from 'components/page/domestic/quotation_v2/quotationRow/QuotationRow';
-import {
-  QuotationRow,
-  Cell,
-  QuotationRow_dndThead,
-  QuotationRow_dnd,
-  Table_dnd,
-} from 'components/page/domestic/quotation_v2/quotationRow';
-import {
-  useQuotationProduct,
-  configFotThead,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
+import { useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
+import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
 
 // css
 import scss from './index.module.scss';
-import Input from 'components/global/gear/inputAndSel_v2/cog/input';
 
 // ======================================================================
 // ======================================================================
@@ -234,14 +223,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // console.log(content);
 
-  const {
-    //
-    classProdDict,
-    cellKeyArr,
-    setCellKeyArr,
-    prodKeyArr,
-    setProdKeyArr,
-  } = useQuotationProduct({
+  const instance_quotationProduct = useQuotationProduct({
     raw_productArr: content?.products,
     disabled,
   });
@@ -360,43 +342,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <br />
         <br />
-        <div>
-          <QuotationRow_dndThead
-            disabled={disabled}
-            keyArr={cellKeyArr}
-            onDragEnd={({ move }) => {
-              setCellKeyArr(move(cellKeyArr));
-            }}
-            configDict={configFotThead}
-            dragHandleInvisible={true}
-          />
-          <Table_dnd
-            items={prodKeyArr}
-            onDragEnd={({ move }) => {
-              setProdKeyArr(move(prodKeyArr));
-            }}
-          >
-            {prodKeyArr.map((prodKey, index) => {
-              const classProd = classProdDict[prodKey];
 
-              return (
-                <QuotationRow_dnd key={prodKey} id={prodKey} index={index}>
-                  {cellKeyArr.map((cellKey, cIndex) => {
-                    const { style, className, createNode } = classProd.nodeConfig[cellKey];
+        <QuotationProdTable disabled={disabled} {...instance_quotationProduct} />
 
-                    const node = createNode(classProd);
-
-                    return (
-                      <Cell key={cellKey} className={classNames(className)} style={style}>
-                        {node}
-                      </Cell>
-                    );
-                  })}
-                </QuotationRow_dnd>
-              );
-            })}
-          </Table_dnd>
-        </div>
         {/* prod */}
         {/* prod */}
         {/* prod */}

@@ -4,9 +4,7 @@ import { TdoorModelInfoDto } from 'js/api/api_product';
 
 interface TstateProdData {
   //
-
   readonly id: string | null | undefined;
-  readonly key: string;
   // 項目名
   itemName: string;
   // 折數
@@ -172,6 +170,7 @@ interface TstateProdData {
 }
 
 interface TstateProd {
+  readonly key: string;
   data: TstateProdData;
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 }
