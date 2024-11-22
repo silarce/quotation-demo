@@ -112,3 +112,8 @@
   justify-content: flex-end;
   gap: 5px;
 }
+
+.inputLink {
+  cursor: pointer;
+  color: theme("colors.antdBlue.primary");
+}
