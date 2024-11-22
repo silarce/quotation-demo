@@ -1980,7 +1980,7 @@ export default function AddPurchaseRequisition() {
                                             </button> */}
                                             <button
                                                 onClick={() => { handleinbox(_item) }}
-                                                disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
+                                                // disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
                                             >
                                                 <img
                                                     src={parseFloat(_item.quantity) === parseFloat(_item.picking_qty) ? icon_tray_out_gray.src : icon_tray_out.src}
