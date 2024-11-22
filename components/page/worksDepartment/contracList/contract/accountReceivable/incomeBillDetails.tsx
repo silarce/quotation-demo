@@ -271,10 +271,14 @@ export default function IncomeBillDetails({
             billSerialNumber,
             state_deduction,
             deductionTotal,
+
+            raw: { isForeign },
           } = incomeBill;
 
-          // const month = moment(receiveDate).getMonth()
           const month = moment(receiveDate).month() + 1;
+          let hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}`;
+
+          isForeign && (hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}&isForeign=true`);
 
           return (
             <Row key={id}>
@@ -328,7 +332,7 @@ export default function IncomeBillDetails({
                 className={classNames(scss.cell, configList['billSerialNumber'].className)}
                 style={configList['billSerialNumber'].style}
               >
-                <Link href={`/worksDepartment/incomeSummons?month=${month}`}>{billSerialNumber}</Link>
+                <Link href={hrefToIncomeSummons}>{billSerialNumber}</Link>
               </div>
               <div className={scss.cell} style={configList['deductionTotal'].style}>
                 <InputSel
