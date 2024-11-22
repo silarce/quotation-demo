@@ -43,6 +43,7 @@ import { IconEdit, IconCheck02, Icon_info } from 'public/image/icon/svgComponent
 
 import { AccountReceivableContext } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
+import { isInteger } from 'js/utils/checkValue';
 // ==========================================================================
 
 type Tcenter = {
@@ -323,6 +324,10 @@ function PeriodPanel_pre(
           });
         },
         oncompletedPaymentChange: (value) => {
+          if (!isInteger(value) && value !== '') {
+            return;
+          }
+
           handle_editInvoiceRow({
             rowIndex,
             key: 'completedPayment',
@@ -1465,6 +1470,10 @@ class Class_OtherNode {
   }
 
   set retainage(value) {
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     this.setState_period((period) => {
       period = { ...period };
       period.retainage = value;
@@ -1486,6 +1495,10 @@ class Class_OtherNode {
     return this.state_period.deduction;
   }
   set deduction(value) {
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     this.setState_period((period) => {
       period = { ...period };
       period.deduction = value;
@@ -1505,6 +1518,10 @@ class Class_OtherNode {
     return this.state_period.writeOffDeposit;
   }
   set writeOffDeposit(value) {
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     this.setState_period((period) => {
       period = { ...period };
       period.writeOffDeposit = value;
@@ -1598,6 +1615,10 @@ class Class_OtherNode {
     return this.state_period.allowance;
   }
   set allowance(value) {
+    if (!isInteger(value) && value !== '') {
+      return;
+    }
+
     this.setState_period((period) => ({
       ...period,
       allowance: value,
@@ -1618,6 +1639,10 @@ class Class_OtherNode {
     return this.state_period.actualPrice;
   }
   set actualPrice(string) {
+    if (!isInteger(string) && string !== '') {
+      return;
+    }
+
     const isEmpty = !!string;
 
     this.setState_period((period) => ({

@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { useRouter } from 'next/router';
 
 // antd
 import { Badge } from 'antd';
@@ -40,6 +41,8 @@ import { useVipInfo } from 'hooks/globalState/useVipInfo';
 import { AppContext } from 'pages/_app';
 
 import { optionsCreator_currency } from 'js/utils/options/options';
+
+import { apiGetContract } from 'js/api/api_quotation';
 
 // ============================================================================
 
@@ -97,7 +100,7 @@ type Tstate_incomeBillSerial = {
   foreignFee: string | null;
   // '國外匯費_外幣'
   foreignCurrencyFee: string | null;
-  // '兌換利益'
+  // '兌換損益'
   exchangeBenefits: string | null;
 };
 
@@ -120,6 +123,7 @@ type TconfigItem = {
     //
     accountantId?: string;
     update_incomeBill?: () => void;
+    router: ReturnType<typeof useRouter>;
   }) => TinputSelProps;
 };
 
@@ -209,6 +213,8 @@ const Summons_pre = (
 ) => {
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+
+  const router = useRouter();
 
   const {
     manager,
@@ -301,17 +307,18 @@ const Summons_pre = (
       </div>
 
       {keyArr.map((key) => {
-        const { style, className, createInputSelProps: createInputAttr } = cellPropsList_summon[key];
+        const { style, className, createInputSelProps: createInputSelProps } = cellPropsList_summon[key];
 
         // 要使!isPaperImported為true的狀態仍可以編輯
         // 將送進createInputAttr中的disabled回傳即可
-        const inputSelProps = createInputAttr({
+        const inputSelProps = createInputSelProps({
           disabled: disabled,
           isPaperImported,
           state_incomeBillSerial,
           setState_incomeBillSerial,
           accountantId,
           update_incomeBill,
+          router,
         });
 
         return (
@@ -388,10 +395,12 @@ const keyArr_foreign: TconfigKey[] = [
   'foreignCurrencyFee', // 外銷 國外匯費_外幣
   'foreignFee', // 外銷 國外匯費_新台幣
 
-  'exchangeBenefits', // 外銷 兌換利益
+  'exchangeBenefits', // 外銷 兌換損益
 
   'note', // 備註
 ];
+
+// MARK: cellPropsList_summon
 
 const cellPropsList_summon: TcellPropsList_summon = {
   btnPanel: {
@@ -459,9 +468,14 @@ const cellPropsList_summon: TcellPropsList_summon = {
   },
   contractNumber: {
     label: '合約編號',
-    style: { width: 100 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
+    style: { width: 120 },
+    createInputSelProps: ({
+      disabled,
+      state_incomeBillSerial,
+      setState_incomeBillSerial: setState_incomeBillSerial,
+      router,
+    }) => {
+      const inputProps: TinputSelProps['inputProps'] = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.contractNumber,
@@ -474,8 +488,44 @@ const cellPropsList_summon: TcellPropsList_summon = {
             });
           },
         },
-      },
-    }),
+      };
+
+      const pushToAccountReceivable = async () => {
+        await apiGetContract({
+          filter: {
+            contractNumber: {
+              $eq: state_incomeBillSerial.contractNumber,
+            },
+          },
+        })
+          .then((res) => {
+            const contract = res.data[0];
+
+            if (contract) {
+              router.push({
+                pathname: '/worksDepartment/contractList/contract/accountReceivable',
+                query: {
+                  contractId: contract.id,
+                  version: '1',
+                },
+              });
+            }
+          })
+          .catch(() => {
+            myAlert.info({ title: '查無此合約' });
+          });
+      };
+
+      const node = (
+        <span className={'cursor-pointer'} onClick={() => pushToAccountReceivable()}>
+          {state_incomeBillSerial.contractNumber}
+        </span>
+      );
+
+      const props = disabled ? { node } : { inputProps };
+
+      return props;
+    },
   },
   projectName: {
     label: '工程名稱',
@@ -1345,7 +1395,9 @@ const cellPropsList_summon: TcellPropsList_summon = {
   exchangeBenefits: {
     label: (
       <span className={classNames(scss.tipLabel, scss.plus)}>
-        兌換利益 <Tip content={calcIncomeBillExchangeBenefits.description} />
+        {/* 兌換損益 <Tip content={calcIncomeBillExchangeBenefits.description} /> */}
+        兌換損益
+        <Tip content={<span className="whitespace-pre-wrap">{calcIncomeBillExchangeBenefits.description}</span>} />
       </span>
     ),
     style: { width: 150 },
@@ -1354,27 +1406,34 @@ const cellPropsList_summon: TcellPropsList_summon = {
       let exchangeBenefits = Number(state_incomeBillSerial.exchangeBenefits ?? '0');
       exchangeBenefits = new Decimal(exchangeBenefits).toDecimalPlaces(0).toNumber();
 
-      const { type, value } = reducer_input({
-        disabled: true,
-        value: exchangeBenefits,
-      });
+      // w -----------------------------------------------------
+      // exchangeBenefit若為負數，代表收益，正數代表損失
+      // 與慣例不符對UX不好，因此在這裡將數值正負反轉
+      exchangeBenefits = -exchangeBenefits;
+      // w -----------------------------------------------------
+
+      // const { type, value } = reducer_input({
+      //   disabled: true,
+      //   value: exchangeBenefits,
+      // });
 
       const inputSelProps: TinputSelProps = {
         disabled: true,
-        showBaseline: 'auto',
-        inputProps: {
-          props: {
-            className: 'text-right',
-            type,
-            value,
-            onChange: (e) => {
-              // setState_incomeBillSerial((state) => ({
-              //   ...state,
-              //   exchangeBenefits: e.target.value,
-              // }));
-            },
-          },
-        },
+        showBaseline: 'invisible',
+        node: exchangeBenefits,
+        // inputProps: {
+        //   props: {
+        //     className: 'text-right',
+        //     type,
+        //     value,
+        //     onChange: (e) => {
+        //       // setState_incomeBillSerial((state) => ({
+        //       //   ...state,
+        //       //   exchangeBenefits: e.target.value,
+        //       // }));
+        //     },
+        //   },
+        // },
       };
 
       return inputSelProps;

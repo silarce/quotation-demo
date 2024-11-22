@@ -5,4 +5,9 @@ function checkIsFloat(value: string | number, decimal = 2): boolean {
   return reg.test(String(value));
 }
 
-export { checkIsFloat };
+const isInteger = (value: string | number): boolean => {
+  // ^-?[1-9]\d*$
+  return /^\d+$/.test(String(value));
+};
+
+export { checkIsFloat, isInteger };

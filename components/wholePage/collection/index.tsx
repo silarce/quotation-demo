@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
@@ -412,6 +412,35 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   }, [data_accountantPreset]);
 
   // ----------------------------------------------------------------------------
+
+  // region COMPONENT
+
+  // const ContractSelector = useMemo(() => {
+  //   const ContractSelector = selectModalCreator_multi<['contract']>({
+  //     selectorArr: [
+  //       {
+  //         key: 'contract',
+  //         limit: 1,
+  //         caption: '付款匯入合約',
+  //         // customParams: {
+  //         //   filter: {
+  //         //     currency: {
+  //         //       // $eq: 'TWD 新臺幣',
+  //         //       $ne: 'TWD 新臺幣',
+  //         //     },
+  //         //     // isForeingn: {
+  //         //     //   $eq: true,
+  //         //     // },
+  //         //   },
+  //         // },
+  //       },
+  //     ],
+  //   });
+
+  //   return ContractSelector;
+  // }, []);
+
+  // ----------------------------------------------------------------------------
   // region RENDER
   return (
     <SubLayer
@@ -476,12 +505,23 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
         <ContractSelector
           showModal={!!accountantWillImport}
+          dynaSelectorPropsList={[
+            {
+              filter: () => {
+                return {
+                  currency: {
+                    $eq: accountantWillImport?.currency,
+                  },
+                };
+              },
+            },
+          ]}
           onConfirm={(arr) => {
             const contract = arr[0][0];
             const accountReceivableId: string | undefined | null = contract?.accountReceivableId;
 
             const accountantCurrency = accountantWillImport?.currency || ('TWD' as Tcurrency);
-            const contractCurrency = contract.currency;
+            const contractCurrency = contract?.currency;
 
             if (accountReceivableId === null) {
               myAlert.info({ title: '該合約尚未建立應收帳款' });

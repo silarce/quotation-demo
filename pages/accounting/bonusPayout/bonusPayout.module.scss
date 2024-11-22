@@ -18,7 +18,7 @@
 
 .content {
     width: 100%;
-    overflow-y: auto;
+    // overflow-y: auto;
     top: 0;
 }
 
@@ -28,19 +28,19 @@
     gap: 0px;
     width: auto;
     // margin-left: 20px;
-    margin-right: 20px;
+    // margin-right: 20px;
     // overflow-x: hidden;
-    max-height: 500px; // 最大高度設定為300px
+    // max-height: 500px; // 最大高度設定為300px
 }
 
-//#region 結算薪資作業
+//#region 薪資維護
 .thead1 {
     position: -webkit-sticky; /* 為兼容性增加前綴 */
     position: sticky;
     top: 0;
     z-index: 1000; /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns: repeat(31, 100px); /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns: repeat(6, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
@@ -54,11 +54,11 @@
     // padding: 0 10px; /* 添加內邊距來讓文字不會緊貼邊緣 */
 }
 
-.thead1 span:nth-child(1),
 .thead1 span:nth-child(2),
-.thead1 span:nth-child(3) {
+.thead1 span:nth-child(3),
+.thead1 span:nth-child(4) {
     position: sticky;
-    background-color: $bgc01; /* 固定欄位的背景顏色 */
+    // background-color: $bgc01; /* 固定欄位的背景顏色 */
     z-index: 1001; /* 確保固定欄位在最上層 */
     // padding: 0 10px; /* 添加內邊距 */
     
@@ -83,8 +83,8 @@
 .thead1 span:nth-child(3) {
     left: 230px;
     /* 第三欄固定 */
-    background-color: $bgc01;
-    border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+    // background-color: $bgc01;
+    // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
 }
   
 //#endregion
@@ -108,17 +108,17 @@ div.panelHeader1 {
 
     .row01 {
         display: grid;
-        grid-template-columns: repeat(31, 100px); /* 設定25欄，這樣每欄寬度一致 */
+        grid-template-columns: repeat(5, 150px) 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
         gap: 5px;
         position: relative;  /* 確保 sticky 定位可以參照這個容器 */
     }
 
     /* 設置前三欄為 sticky */
-    .row01 span:nth-child(1),
     .row01 span:nth-child(2),
-    .row01 span:nth-child(3) {
+    .row01 span:nth-child(3),
+    .row01 span:nth-child(4) {
         position: sticky;
-        background-color: white; /* 固定欄位的背景顏色 */
+        // background-color: white; /* 固定欄位的背景顏色 */
         z-index: 1001; /* 確保這些欄位在其他欄位上層 */
         // padding: 0 10px; /* 增加內邊距，根據需要調整 */
         
@@ -137,7 +137,7 @@ div.panelHeader1 {
     .row01 span:nth-child(3) {
         left: 230px;
         /* 第三欄固定 */
-        border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+        // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
         // padding:0px;
     }
 }
@@ -168,11 +168,32 @@ div.panelHeader1 {
     }
 }
 
+.longredsquarebtn {
+    height: 39px;
+    width: 139px;
+    // padding: 0px 40px;
+    border: solid 1px #ea1833;
+    ;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ea1833;
+    ;
+    transform: translateY(2px);
 
+    &:hover {
+        border: solid 1px #ea1833;
+        background-color: #ea18341d
+    }
 
-
-
-
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #ea1833;
+    }
+}
 
 
 
@@ -183,10 +204,10 @@ div.panelHeader1 {
     top: 0;
     z-index: 1000; // 確保元素位於其他內容的上層
     display: grid;
-    grid-template-columns: 50px 1fr 1fr 10px;
+    grid-template-columns:50px 1fr 1fr 10px;
     gap: 5px;
-    height: 70px;
-    padding: 0 30px;
+    height: 50px;
+    padding: 0px 30px;
     background-color: $bgc01;
 
     >* {
@@ -200,25 +221,26 @@ div.panelHeader1 {
 
     >span {
         font-weight: 400;
-        font-size: 20px;
+        font-size: 18px;
         color: #404040;
+        
     }
 }
 
 //#endregion
 
-
 div.panelHeader2 {
     gap: 5px;
-    height: 70px;
-    padding: 0 30px;
+    height: 50px;
+    padding:10px 30px;
     border-bottom: solid 1px $colorBorder01;
-
+    background-color: #ffeeee;
     .row01,
     .row02 {
         span {
             font-weight: 400;
-            font-size: 16px;
+            font-size: 18px;
+            
         }
 
         .clientName,
@@ -229,9 +251,18 @@ div.panelHeader2 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 50px 1fr 1fr 10px;
+        grid-template-columns:50px 1fr 1fr 50px;
+        // row-gap: 5px; /* 僅應用於行間距 */
+        // column-gap: 5px; /* 僅應用於列間距 */
         gap: 5px;
+        height: 50px;
+        cursor: pointer;
+
     }
+    &:hover {
+        background-color: #ffeeee; // 設定粉紅色背景
+    }
+    
 }
 
 
@@ -277,5 +308,35 @@ div.panelHeader2 {
     &:focus {
         background-color: $bgc01;
         border: solid 1px #ea1833;
+    }
+}
+
+
+div.panelHeader3 {
+    gap: 5px;
+    height: 50px;
+    padding:10px 30px;
+    border-bottom: solid 1px $colorBorder01;
+    // border-top:solid 3px $colorBorder01;
+
+    .row01,
+    .row02 {
+        span {
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns:50px 1fr 1fr 10px;
+        gap: 5px;
+        height: 50px;
+        cursor: pointer;
     }
 }

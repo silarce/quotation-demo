@@ -2034,25 +2034,44 @@ export default function AddPurchaseOrder() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain ? "1px solid black" : ""), width: '95%' }}
-                                                // style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                // maxLength={5}
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                readOnly={!editmain ? true : false}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editmain ? "1px solid black" : "",
+                                                    width: '95%',
+                                                }}
+                                                type={editmain ? "number" : "text"}
+                                                value={
+                                                    editmain
+                                                        ? _item.quantity !== undefined
+                                                            ? _item.quantity
+                                                            : 0
+                                                        : _item.quantity
+                                                            ? parseFloat(_item.quantity).toLocaleString(undefined, {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2,
+                                                            })
+                                                            : "0.00"
+                                                }
+                                                readOnly={!editmain}
                                                 onChange={(e) => {
-                                                    // handleNumberChange(index, "quantity", e.target.value)
-                                                    const newData = [...data2];
-                                                    const newQuantity = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        quantity: newQuantity,
-                                                        totalprice: ((parseFloat(newQuantity || '0') * newData[index].unitprice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
-
-                                                    };
-                                                    setData2(newData);
+                                                    if (editmain) {
+                                                        const newData = [...data2];
+                                                        const newQuantity = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity: newQuantity,
+                                                            totalprice: (
+                                                                parseFloat(newQuantity || '0') * parseFloat(newData[index].unitprice || '0')
+                                                            ).toLocaleString(undefined, {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2,
+                                                            }),
+                                                        };
+                                                        setData2(newData);
+                                                    }
                                                 }}
                                             />
+
                                         </span>
                                         <span>
                                             <input
@@ -2077,41 +2096,64 @@ export default function AddPurchaseOrder() {
                                             </button>
 
                                         </span> */}
-                                        {/* <span>
+                                        <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (editmain ? "1px solid black" : ""), width: '95%' }}
-                                                // style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                value={_item.unitprice !== undefined ? _item.unitprice.toLocaleString() : ''}
-                                                readOnly={!editmain ? true : false}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editmain ? "1px solid black" : "",
+                                                    width: '95%',
+                                                }}
+                                                type={editmain ? "number" : "text"}
+                                                value={
+                                                    editmain
+                                                        ? _item.unitprice !== undefined
+                                                            ? _item.unitprice
+                                                            : ""
+                                                        : _item.unitprice
+                                                            ? parseFloat(_item.unitprice).toLocaleString(undefined, {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2,
+                                                            })
+                                                            : "0.00"
+                                                }
+                                                readOnly={!editmain}
                                                 onChange={(e) => {
-                                                    // handleStringChange(index, "unitprice", e.target.value);
-                                                    const newData = [...data2];
-                                                    const newUnitPrice = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        unitprice: newUnitPrice,
-                                                        totalprice: ((parseFloat(newUnitPrice || '0') * newData[index].quantity || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })).toString()
-                                                    };
-                                                    setData2(newData);
+                                                    if (editmain) {
+                                                        const newData = [...data2];
+                                                        const newUnitPrice = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: newUnitPrice,
+                                                            totalprice: (
+                                                                parseFloat(newUnitPrice || '0') * parseFloat(newData[index].quantity || '0')
+                                                            ).toLocaleString(undefined, {
+                                                                minimumFractionDigits: 2,
+                                                                maximumFractionDigits: 2,
+                                                            }),
+                                                        };
+                                                        setData2(newData);
+                                                    }
                                                 }}
                                             />
-                                        </span> */}
-                                        {/* <span>
+
+                                        </span>
+                                        <span>
                                             <input
                                                 ref={totalpriceRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                value={_item.totalprice !== undefined ? _item.totalprice.toLocaleString() : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
-                                                onChange={(e) => {
-                                                    handleStringChange(index, "totalprice", e.target.value);
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    width: '95%',
                                                 }}
+                                                type="text"
+                                                value={
+                                                    _item.totalprice !== undefined
+                                                        ? _item.totalprice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                                        : "0.00"
+                                                }
+                                                readOnly
                                             />
-                                        </span> */}
+                                        </span>
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
@@ -2206,7 +2248,7 @@ export default function AddPurchaseOrder() {
                                         <img src={icon_fc_quotereq.src} alt="checkquotereqhistory" style={{ width: '25px', height: '25px' }} />
                                     </button>
                                 </div> */}
-                                {/* <div>
+                                <div>
                                     <input
                                         type="text"
                                         placeholder='單價'
@@ -2222,8 +2264,8 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(totalPrice.toString());
                                         }}
                                     />
-                                </div> */}
-                                {/* <div>
+                                </div>
+                                <div>
                                     <input
                                         type="text"
                                         placeholder='金額'
@@ -2233,7 +2275,7 @@ export default function AddPurchaseOrder() {
                                             setHandinputtotalprice(e.target.value.toString())
                                         }}
                                     />
-                                </div> */}
+                                </div>
                                 <div>
                                     <input
                                         type="text"
