@@ -73,13 +73,6 @@ const InputSel_cooked = (props: Parameters<typeof InputSel>[0]) => {
   return <InputSel showBaseline="auto" {...props} />;
 };
 
-// const InputSel_meme_forInput = memo(InputSel_cooked, (prev, next) => {
-//   const { value: oldValue } = prev?.inputProps?.props ?? {};
-//   const { value: newValue } = next?.inputProps?.props ?? {};
-
-//   return oldValue === newValue && prev.disabled === next.disabled;
-// });
-
 const InputSel_meme_forSelect = memo(InputSel_cooked, (prev, next) => {
   const { value: _oldValue, options: oldOptions } = prev?.selectProps?.props ?? {};
   const { value: _newValue, options: newOptions } = next?.selectProps?.props ?? {};
