@@ -272,6 +272,7 @@ export default function bonusMaintenance() {
             myAlert.success({ title: '更新成功' })
             GetSalaryBonus();
             setEditlist(false);
+            setAllChecked(false);
 
 
         } catch (error: any) {
@@ -319,6 +320,7 @@ export default function bonusMaintenance() {
             console.log(responsedata); // 檢查排序後的資料
             setEmployeedata(responsedata);
             setFilteredData(responsedata);
+
 
         } catch (error: any) {
             console.log(error.message);
@@ -1367,6 +1369,7 @@ export default function bonusMaintenance() {
                                                         setbonuspeopledata(bonuspeopleDetail);
                                                         console.log(bonuspeopleDetail);
                                                         setOriginalLeavedata(bonuspeople);
+                                                        setAllChecked(false);
                                                     }}>
                                                         <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                                     </button>
@@ -1577,27 +1580,37 @@ export default function bonusMaintenance() {
                             <div style={{ overflowY: 'auto', height: '500px', borderTop: '1px solid #ccc' }}>
                                 {/* 全選功能的 Checkbox */}
 
-                                {filteredData.map((item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader3}>
-                                        <div className={`${scss.row01}`}>
-                                            <span>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={bonuspeople.some((person) => person.id === item.id)}
-                                                    onChange={(e) => handleCheckboxChange(item, e.target.checked)}
-                                                    disabled={!editbtn} // 當 editbtn 為 false 時禁用
-                                                    style={{
-                                                        transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
-                                                        margin: "0 10px", // 調整外邊距，讓顯示更美觀
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>{item.id_number}</span>
-                                            <span>{item.ch_name}</span>
-                                            <span></span>
-                                        </div>
-                                    </CellWithBar>
-                                ))}
+                                {filteredData.map((item, index) => {
+                                    const isChecked = bonuspeople.some((person) => person.id === item.id);
+
+                                    return (
+                                        <CellWithBar key={index} className={scss.panelHeader3}>
+                                            <div
+                                                className={`${scss.row01}`}
+                                                onClick={() => editbtn && handleCheckboxChange(item, !isChecked)} // 點擊整個列勾選/取消
+                                                style={{ cursor: editbtn ? "pointer" : "default" }} // 當 `editbtn` 為 false 時，禁用點擊效果
+                                            >
+                                                <span>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={(e) => handleCheckboxChange(item, e.target.checked)}
+                                                        disabled={!editbtn} // 當 `editbtn` 為 false 時禁用
+                                                        onClick={(e) => e.stopPropagation()} // 防止點擊 checkbox 時觸發整行的 onClick
+                                                        style={{
+                                                            transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
+                                                            margin: "0 10px", // 調整外邊距，讓顯示更美觀
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span>{item.id_number}</span>
+                                                <span>{item.ch_name}</span>
+                                                <span></span>
+                                            </div>
+                                        </CellWithBar>
+                                    );
+                                })}
+
                             </div>
 
                         </div>
