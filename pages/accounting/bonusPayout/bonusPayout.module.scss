@@ -40,7 +40,7 @@
     top: 0;
     z-index: 1000; /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns: repeat(6, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns: repeat(7, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
@@ -108,7 +108,7 @@ div.panelHeader1 {
 
     .row01 {
         display: grid;
-        grid-template-columns: repeat(5, 150px) 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+        grid-template-columns: repeat(7, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
         gap: 5px;
         position: relative;  /* 確保 sticky 定位可以參照這個容器 */
     }
