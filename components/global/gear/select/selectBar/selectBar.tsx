@@ -6,16 +6,9 @@ import InputSel, { TselectProps } from '../../inputAndSel/inputSel';
 // css
 import scss from './selectBar.module.scss';
 
-export type { TselectProps };
+// ================================================================================
 
-export default function SelectBar({
-  selectPropsArr,
-  disabled,
-  style,
-  className,
-  menuPortalTarget,
-}: {
-  // selectPropsArr: TselectProps[]
+interface TselectBarProps {
   selectPropsArr: {
     placeholder?: string;
     boxStyle?: CSSProperties;
@@ -25,7 +18,12 @@ export default function SelectBar({
   style?: CSSProperties;
   className?: string;
   menuPortalTarget?: TselectProps['menuPortalTarget'];
-}) {
+}
+export type { TselectProps, TselectBarProps };
+
+// ================================================================================
+
+export default function SelectBar({ selectPropsArr, disabled, style, className, menuPortalTarget }: TselectBarProps) {
   // ------------------------------------------------------------------------
   return (
     <div className={classNames(scss.selectBar, className)}>

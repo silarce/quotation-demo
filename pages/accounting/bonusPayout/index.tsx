@@ -34,13 +34,14 @@ import icon_search2 from 'public/image/icon/search.svg';
 //時間
 import moment from "moment";
 import { Modal, Radio, Space } from "antd";
-import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
+// import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
+import { SelectBar_date, useYearMonth_options } from "js/utils/helpers/hook/useYearMonth";
 import DragableModal from "components/global/gear/dragableModal/dragableModal";
 
 
 
 export default function BonusPayout() {
-    const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
+    const { thisYear, thisMonth } = useYearMonth_options();
 
     //#region =============【路由參數】===============================================================================
     const router = useRouter();
@@ -157,20 +158,14 @@ export default function BonusPayout() {
     //新增按鈕
     const panelList: TpanelList = [
     ];
-    const selectPropsArr = useYearMonth_selectBar_query({
-        year: year as string,
-        month: month as string,
-        yearOptionArr,
-        monthOptionArr,
-    });
+    // const selectPropsArr = useYearMonth_selectBar_query({
+    //     year: year as string,
+    //     month: month as string,
+    //     yearOptionArr,
+    //     monthOptionArr,
+    // });
 
-    const selectPropsArr2 =({
-        year: year as string,
-        month: month as string,
-        yearOptionArr,
-        monthOptionArr,
-    });
-    
+
 
     //#endregion
 
@@ -259,13 +254,18 @@ export default function BonusPayout() {
 
 
 
-    const GenerateSalary = async () => {
+    const GenerateBonus = async () => {
+        if(bonustype===''){
+            myAlert.warning({title:'請選擇獎金種類'});
+            return;
+        }
         try {
             setIsLoading(true);
 
             const conditionModel = {
-                date: year + '-' + month,
-                type: '編輯中'
+                // date: year + '-' + month,
+                // type: '編輯中'
+                bonus_category: bonustype
             };
 
             const inputModel = {
@@ -275,13 +275,36 @@ export default function BonusPayout() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Salary/GenerateSalary?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/Salary/GenerateBonus`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
 
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
+            let responsedata = await response.json();
+            const renamedData = responsedata.map((item: any) => {
+                const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料;
+                return {
+                    id: item.id,
+                    id_number: employeeData?.id_number || '',
+                    department: item.department || '',
+                    start_date: employeeData?.start_date || '',
+                    annual_leave_days: item.annual_leave_days || '0',
+                    comp_time: item.comp_time || '0',
+                    ch_name: employeeData?.ch_name || '',
+                };
+            });
+
+            console.log(renamedData); // 檢查重命名後的資料結構
+            setData(renamedData);
+            console.log(serial_id);
+            console.log(serial_uuid);
+
 
         } catch (error: any) {
             console.log(error.message);
@@ -1071,12 +1094,12 @@ export default function BonusPayout() {
                 customeRight={
                     [
                         <span>
-                            <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
+                            <span style={{ display: `${(data.length <= 0) ? '' : 'none'}` }}>
                                 <button className={scss.longsquarebtn}
                                     onClick={() => {
                                         // GenerateSalary();
-                                        alert(`${parseInt((year as string))-1911}-${bonustype}`)
-
+                                        // alert(`${parseInt((year as string))-1911}-${bonustype}`)
+                                        GenerateBonus()
                                     }}
                                     title="獎金結算">
                                     獎金結算
@@ -1146,7 +1169,7 @@ export default function BonusPayout() {
                     //         color:'#ea1833'
                     //     }}>尚未產生本月薪資帳簿!!</span>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ paddingLeft:'50px' }}>
+                        <span style={{ paddingLeft: '50px' }}>
 
                             <div style={{ position: 'relative', width: '250px' }}>
                                 <select
@@ -1200,13 +1223,15 @@ export default function BonusPayout() {
 
                         </span>
                         <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
-                            <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
+                            <SelectBar_date key="selectBar" className="ml-10" haveMonth={false} />
+
+
                             {/* {serial_id}<br />
                             {serial_uuid} */}
                             {/* {status} */}
-                            
+
                         </span>
-                        {parseInt(year as string)-1911}
+                        {parseInt(year as string) - 1911}
                         {bonustype}
                     </div>
 
@@ -1225,8 +1250,9 @@ export default function BonusPayout() {
                             <span>員工編號</span>
                             <span>部門</span>
                             <span>到職日</span>
+                            <span>姓名</span>
                             <span>年資</span>
-                            <span>獎金</span>                            
+                            <span>獎金</span>
                             <span>備註</span>
                             <span></span>
                         </div>

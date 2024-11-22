@@ -33,13 +33,15 @@ import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 //時間
 import moment from "moment";
 import { Modal, Radio, Space } from "antd";
-import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
+// import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
+
+import { SelectBar_date, useYearMonth_options } from "js/utils/helpers/hook/useYearMonth";
 import DragableModal from "components/global/gear/dragableModal/dragableModal";
 
 
 
 export default function SalarySettlement() {
-    const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
+    const { thisYear, thisMonth } = useYearMonth_options();
 
     //#region =============【路由參數】===============================================================================
     const router = useRouter();
@@ -163,12 +165,7 @@ export default function SalarySettlement() {
     //新增按鈕
     const panelList: TpanelList = [
     ];
-    const selectPropsArr = useYearMonth_selectBar_query({
-        year: year as string,
-        month: month as string,
-        yearOptionArr,
-        monthOptionArr,
-    });
+
 
     //#endregion
 
@@ -928,7 +925,7 @@ export default function SalarySettlement() {
                     //     }}>尚未產生本月薪資帳簿!!</span>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={{ padding: '0px 10px' }}>
-                            <SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />
+                            <SelectBar_date key="selectBar" className="ml-10" />
                         </span>
                         <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
                             {/* {serial_id}<br />
@@ -942,9 +939,17 @@ export default function SalarySettlement() {
             <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.content}>
 
-                    <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
+                    <div className={scss.body_content1}
+                        style={{
+                            maxHeight: `${windowSize.height - 198}px`,
+                            overflowX: 'auto'
+                        }}>
                         <div className={scss.thead1}>
-                            <span>員工編號</span>
+                            <span
+                                style={{
+                                    width: '300px',
+                                    backgroundColor: '#f5f5f5'
+                                }}>員工編號</span>
                             <span>部門</span>
                             <span>姓名</span>
                             <span>到職日</span>
@@ -992,7 +997,11 @@ export default function SalarySettlement() {
                                     return (
                                         <CellWithBar key={index} className={scss.panelHeader1}>
                                             <div className={scss.row01}>
-                                                <span>{_item.id_number}</span>
+                                                <span
+                                                    style={{
+                                                        width: '300px',
+                                                        backgroundColor: 'white'
+                                                    }}>{_item.id_number}</span>
                                                 <span>{_item.department}</span>
                                                 <span>{_item.ch_name}</span>
                                                 <span>{getTaiwanDateStr(_item.start_date)}</span>
