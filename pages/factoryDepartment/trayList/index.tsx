@@ -348,100 +348,139 @@ export default function TrayList() {
     };
 
     //#region 轉換編碼
-    // const getDataTrans = async () => {
-    //     try {
-    //         const conditionModel = {
-    //             type: "select",
-    //             data2: datatrans
-    //         };
+    const getDataTrans = async () => {
+        try {
+            const conditionModel = {
+                type: "select",
+                data2: datatrans
+            };
 
-    //         const inputModel = {
-    //             TypeName: 'ERP',
-    //             ServiceName: 'WareHouseService',
-    //             FunctionName: 'no',
-    //             FilterConditions: JSON.stringify(conditionModel),
-    //         };
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    //         const response = await fetch(`${setting.apipath}/WareHouse/GetDataTrans?${queryParams}`);
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetDataTrans?${queryParams}`);
 
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch data');
-    //         }
-    //         const data = await response.json();
-    //         // console.log('Fetched data:', data);
-    //         setDataTrans(data);
-    //         await new Promise(resolve => setTimeout(resolve, 500));
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            // console.log('Fetched data:', data);
+            setDataTrans(data);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            console.log(data);
 
 
-    //     } catch (error: any) {
-    //         setError(error.message);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-    // useEffect(() => {
-    //     if (datatrans.length > 0) {
-    //         const updatedDataTrans = datatrans.map(item => {
-    //             const whpname = recodeWhpid(item.length, item.width, item.childlength, item.childwidth);
-    //             return { ...item, whpname };
-    //         });
-    //         // console.log('Updated data:', updatedDataTrans);
-    //         setDataTrans(updatedDataTrans); // 更新狀態
-    //     }
-    // }, [datatrans]);
+    useEffect(() => {
+        if (datatrans.length > 0) {
+            const updatedDataTrans = datatrans.map(item => {
+                const whpname = recodeWhpid(item.length, item.width, item.childlength, item.childwidth);
+                return { ...item, whpname };
+            });
+            // console.log('Updated data:', updatedDataTrans);
+            setDataTrans(updatedDataTrans); // 更新狀態
+        }
+    }, [datatrans]);
 
-    // const DataTrans = async () => {
-    //     // console.log('Updated data:', updatedDataTrans);
-    //     console.log(datatrans);
-    //     // return;
-    //     try {
-    //         setIsLoading(true);
+    const DataTrans = async () => {
+        // console.log('Updated data:', updatedDataTrans);
+        console.log(datatrans);
+        // return;
+        try {
+            setIsLoading(true);
 
-    //         const conditionModel = {
-    //             type: "Update",
-    //             data2: datatrans
-    //         };
+            const conditionModel = {
+                type: "Update",
+                data2: datatrans
+            };
 
-    //         var inputModel = {
-    //             TypeName: 'ERP',
-    //             ServiceName: 'WareHouseService',
-    //             FunctionName: 'no',
-    //             FilterConditions: JSON.stringify(conditionModel),
-    //         };
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-    //         const response = await fetch(`${setting.apipath}/WareHouse/DataTrans`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify(inputModel)
-    //         });
+            const response = await fetch(`${setting.apipath}/WareHouse/DataTrans`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
 
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch dataTrans');
-    //         }
+            if (!response.ok) {
+                throw new Error('Failed to fetch dataTrans');
+            }
 
-    //         const responseData = await response.json();
-    //     } catch (error: any) {
-    //         setError(error.message);
-    //         console.error('Transfer failed:', error);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
+            const responseData = await response.json();
+        } catch (error: any) {
+            setError(error.message);
+            console.error('Transfer failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
     //#endregion 轉換編碼
 
+    const [leftcount3, setLeftCount3] = useState<number>(0);
+    const [rightcount3, setRightCount3] = useState<number>(0);
 
-
+    const isLeftHidden = leftcount3 === 3;
+    const isRightHidden = leftcount3 !== 3;
+    const isFinalHidden = rightcount3 !== 9;
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList}
+                customeLeft={
+                    [
+                        <>
+                            <div>
+                                {!isLeftHidden && (
+                                    <div>
+                                        <button onClick={() => setLeftCount3(leftcount3 + 1)}>
+                                            <span style={{ width: '10px' }}>&nbsp;</span>
+                                        </button>
+                                    </div>
+                                )}
+
+                                {!isRightHidden && (
+                                    <div>
+                                        <button onClick={() => setRightCount3(rightcount3 + 1)}>
+                                            <span style={{ width: '10px' }}>&nbsp;</span>
+                                        </button>
+                                    </div>
+                                )}
+
+                                {!isFinalHidden && (
+                                    <div>
+                                        <button onClick={getDataTrans}>取得</button>
+                                        <button onClick={DataTrans}>轉換</button>
+                                        <button onClick={()=>{
+                                           setLeftCount3(0);
+                                           setRightCount3(0);
+                                        }}>關閉</button>
+                                    </div>
+                                )}
+                            </div>
+
+                        </>
+                    ]}
+            />
             <div className={scss.main}>
                 <div className={scss.left}>
-                    {/* <button onClick={() => { getDataTrans() }}>取得</button>
-                    <button onClick={() => { DataTrans() }}>轉換</button> */}
+
                     <div>
                         <Thead01 type={'Tray'} />
                         <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />

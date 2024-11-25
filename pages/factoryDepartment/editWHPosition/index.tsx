@@ -167,49 +167,49 @@ export default function EditWHPosition() {
                 if (editstatus === "編輯") {
 
 
-                    if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
-                        data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
-                        data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
-                        data1.spec === '' || data1.spec === undefined || data1.spec === null &&
-                        data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
-                    ) {
-                        myAlert.warning({ title: '請確實填寫儲位資訊' });
-                    } else {
-                        myAlert.confirm({
-                            title: '確定修改?',
-                            content: <>
-                                <h1>修改後無法再編輯</h1>
-                            </>,
-                            props: {
-                                onOk: () => {
-                                    setDisabled(true);
-                                    handleSave();
-                                }
+                    // if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
+                    //     data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
+                    //     data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
+                    //     data1.spec === '' || data1.spec === undefined || data1.spec === null &&
+                    //     data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
+                    // ) {
+                    //     myAlert.warning({ title: '請確實填寫儲位資訊' });
+                    // } else {
+                    myAlert.confirm({
+                        title: '確定修改?',
+                        content: <>
+                            <h1>修改後無法再編輯</h1>
+                        </>,
+                        props: {
+                            onOk: () => {
+                                setDisabled(true);
+                                handleSave();
                             }
-                        });
-                    }
+                        }
+                    });
+                    // }
                 } else {
-                    if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
-                        data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
-                        data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
-                        data1.spec === '' || data1.spec === undefined || data1.spec === null &&
-                        data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
-                    ) {
-                        myAlert.warning({ title: '請確實填寫儲位資訊' });
-                    } else {
-                        myAlert.confirm({
-                            title: '確定修改?',
-                            content: <>
-                                <h1>修改後無法再編輯</h1>
-                            </>,
-                            props: {
-                                onOk: () => {
-                                    setDisabled(true);
-                                    handleSave();
-                                }
+                    // if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
+                    //     data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
+                    //     data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
+                    //     data1.spec === '' || data1.spec === undefined || data1.spec === null &&
+                    //     data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
+                    // ) {
+                    // myAlert.warning({ title: '請確實填寫儲位資訊' });
+                    // } else {
+                    myAlert.confirm({
+                        title: '確定修改?',
+                        content: <>
+                            <h1>修改後無法再編輯</h1>
+                        </>,
+                        props: {
+                            onOk: () => {
+                                setDisabled(true);
+                                handleSave();
                             }
-                        });
-                    }
+                        }
+                    });
+                    // }
                 }
             },
         },
@@ -381,7 +381,7 @@ export default function EditWHPosition() {
 
                 console.log(inputModel);
 
-                const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionByID`, {
+                const response = await fetch(`${setting.apipath}/WareHouse/UpdateWHPositionAndInventoryByID`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1112,14 +1112,17 @@ export default function EditWHPosition() {
                             {...inputSelProps}
                             caption="數量"
                             disabled={disabled}
-                            // disabled={true}
                             inputProps={{
                                 props: {
                                     value: data1.quantity,
-                                    onChange: (e) => handleChange('quantity', parseInt(e.target.value)),
+                                    onChange: (e) => {
+                                        const inputValue = e.target.value;
+                                        handleChange('quantity', inputValue === '' ? 0 : parseInt(inputValue, 10));
+                                    },
                                 },
                             }}
                         />
+
                         <InputSel
                             {...inputSelProps}
                             caption="單位"
