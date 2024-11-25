@@ -2111,10 +2111,10 @@ const extractPdfPartFromClassProduct = ({
 
       let unit_str = '';
 
-      if (typeof list_acce.unit === 'object') {
+      if (typeof acce.unit === 'object') {
         unit_str = 'm\u00B2';
       } else {
-        unit_str = list_acce.unit as string;
+        unit_str = acce.unit as string;
       }
 
       let partName = acce.name.replaceAll('60A', '');
