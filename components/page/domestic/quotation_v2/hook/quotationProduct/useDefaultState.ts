@@ -39,7 +39,7 @@ const useDefaultState = ({
     raw_productArr_copy.forEach((raw) => {
       keyArr.push(raw.id);
 
-      const stateProd: TstateProdData & { id: string } = {
+      const stateProdData: TstateProdData & { id: string } = {
         id: raw.id,
         itemName: raw.itemName,
         discount: raw.discount,
@@ -119,20 +119,20 @@ const useDefaultState = ({
         bearingName: raw.bearingName,
 
         quantity: raw.quantity,
-        unitPrice: `${raw.unitPrice || 0}`,
-        totalPrice: `${raw.totalPrice || 0}`,
-        price: `${raw.price || 0}`,
-        dualPrice: `${raw.dualPrice || 0}`,
+        price: `${raw.price || 0}`, // 牌價
+        dualPrice: `${raw.dualPrice || 0}`, // 牌價複價
+        unitPrice: `${raw.unitPrice || 0}`, // 單價 會乘上折數的價格
+        totalPrice: `${raw.totalPrice || 0}`, // 複價 會乘上折數的價格
 
         attachedToProductId: raw.attachedToProductId,
         rootProductId: raw.rootProductId,
       };
 
-      dict[stateProd.id] = {
-        key: stateProd.id,
-        data: stateProd,
-        doorModel: doorModelDict?.[stateProd.doorModelName] || null,
-      };
+      // dict[stateProdData.id] = {
+      //   key: stateProdData.id,
+      //   data_prod: stateProdData,
+      //   doorModel: doorModelDict?.[stateProdData.doorModelName] || null,
+      // };
     });
 
     return {

@@ -7,7 +7,24 @@ import { TstateProd } from '../../type';
 import { TnodeConfig } from './config';
 
 // DTO
-import { TdoorModelInfoDto } from 'js/api/api_product';
+import {
+  TdoorModelInfoDto,
+  //
+  TdoorGeneralSpecsDto,
+  //
+  TdoorComponentListDto,
+  TdoorSlatDto,
+  TdoorBottomBarDto,
+  TdoorGuideRailDto,
+  TdoorSidePlateDto,
+  TdoorRollerDto,
+  TdoorMotorDto,
+  TdoorMotorAccessoriesDto,
+  TdoorHeadBoxDto,
+  TdoorMiddlePillarDto,
+  TdoorBackBoneDto,
+  //
+} from 'js/api/dtoTypes';
 // =======================================================================
 interface Interface_ClassProd_base {
   readonly state: TstateProd;
@@ -222,7 +239,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     nodeConfig: TnodeConfig;
   }) {
     this.state = stateProd;
-    this.data = this.state.data;
+    this.data = this.state.data_prod;
     this.setState = setStateProd;
     this.nodeConfig = customizeNodeConfig(nodeConfig);
   } // constructor
@@ -232,12 +249,12 @@ class ClassProd_base implements Interface_ClassProd_base {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   readonly state: TstateProd;
-  readonly data: TstateProd['data'];
+  readonly data: TstateProd['data_prod'];
   private setState: React.Dispatch<React.SetStateAction<TstateProd>>;
-  private setData<K extends keyof TstateProd['data']>(key: K, value: TstateProd['data'][K]) {
+  private setData<K extends keyof TstateProd['data_prod']>(key: K, value: TstateProd['data_prod'][K]) {
     this.setState((prev) => {
       const copy = { ...prev };
-      copy.data[key] = value;
+      copy.data_prod[key] = value;
 
       return copy;
     });

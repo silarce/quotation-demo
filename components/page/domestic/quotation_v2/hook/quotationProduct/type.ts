@@ -1,7 +1,27 @@
-import { TdoorModelInfoDto } from 'js/api/api_product';
+// DTO
+import {
+  TdoorModelInfoDto,
+  //
+  TdoorGeneralSpecsDto,
+  //
+  TdoorComponentListDto,
+  TdoorSlatDto,
+  TdoorBottomBarDto,
+  TdoorGuideRailDto,
+  TdoorSidePlateDto,
+  TdoorRollerDto,
+  TdoorMotorDto,
+  TdoorMotorAccessoriesDto,
+  TdoorHeadBoxDto,
+  TdoorMiddlePillarDto,
+  TdoorBackBoneDto,
+  TdoorComponentType,
+  //
+} from 'js/api/dtoTypes';
 
 // interface TprodData {}
 
+// MARK:TstateProdData
 interface TstateProdData {
   //
   readonly id: string | null | undefined;
@@ -150,14 +170,14 @@ interface TstateProdData {
 
   // 數量
   quantity: number;
-  // 單價
-  unitPrice: `${number}` | '';
-  // 複價
-  totalPrice: `${number}` | '';
   // 牌價
   price: `${number}` | '';
   // 牌價複價
   dualPrice: `${number}` | '';
+  // 單價
+  unitPrice: `${number}` | '';
+  // 複價
+  totalPrice: `${number}` | '';
 
   // 排序
   // order: number;
@@ -169,9 +189,62 @@ interface TstateProdData {
   rootProductId: string;
 }
 
+// MARK:TstateComponentData
+interface TstateComponentData<RAWDATA> {
+  type: TdoorComponentType;
+  //
+  // 輸出
+  name: string; // 名稱
+  number: string; // 代號
+  desc: string; // 說明
+  material: string; // 材料
+  materialSurface: string | null; // 表面
+  density: `${number}` | null; // 重量基重
+  isPainted: boolean; // 烤漆
+  unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
+  quantity: `${number}`; // 數量
+  price: number; // 牌價
+  dualPrice: number; // 牌價複價 // 虛值
+  unitPrice: `${number}` | ''; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
+  totalPrice: number; // 複價 = 單價 * 數量 // 虛值
+  //
+  rawData: RAWDATA;
+
+  //
+  // reqBody: {
+  //   id: string;
+  //   type: TdoorComponentType;
+  //   number: string;
+  //   material: string;
+  //   materialSurface: string | null | undefined;
+  //   isPainted: boolean;
+  //   price: number;
+  //   quantity: string;
+  //   order: number;
+  //   desc: string | null;
+  //   density: string | null;
+
+  //   bom: unknown; //  送給後端的東西，前端完全不會用到
+  //   rawData: { foo: 'foo' }; //  送給後端的物件，後端說隨便送，但必須是物件，且必須要送
+  // };
+}
+
+// MARK: TstateProd
 interface TstateProd {
   readonly key: string;
-  data: TstateProdData;
+  data_prod: TstateProdData;
+  data_componentDict: {
+    slats?: TdoorComponentType;
+    bottomBars?: TdoorComponentType;
+    guideRails?: TdoorComponentType;
+    sidePlates?: TdoorComponentType;
+    rollers?: TdoorComponentType;
+    motors?: TdoorComponentType;
+    motorAccessories?: TdoorComponentType;
+    headBoxes?: TdoorComponentType;
+    middlePillar?: TdoorComponentType;
+    backBone?: TdoorComponentType;
+  };
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 }
 

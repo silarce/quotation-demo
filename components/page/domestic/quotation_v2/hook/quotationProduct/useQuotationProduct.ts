@@ -12,8 +12,6 @@ import type {
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-import type { TstateProd, TstateProdDict } from './type';
-
 // import { ClassProd_SJ202 } from './class/prod/classProd_SJ302';
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
 
@@ -28,6 +26,9 @@ import {
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
+// type
+import type { TstateProd, TstateProdDict } from './type';
+
 // ================================================================================
 
 type TsetProd = React.Dispatch<React.SetStateAction<TstateProd>>;
@@ -37,7 +38,6 @@ type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
 // ================================================================================
 
 const useQuotationProduct = ({
-  //
   raw_productArr,
   disabled,
 }: {
@@ -108,7 +108,7 @@ const useQuotationProduct = ({
         throw new Error('classProdDict發生錯誤，key與state.key不一致');
       }
 
-      const { doorModelName } = state.data;
+      const { doorModelName } = state.data_prod;
 
       if (!(doorModelName in lookup_classProd)) {
         return;
