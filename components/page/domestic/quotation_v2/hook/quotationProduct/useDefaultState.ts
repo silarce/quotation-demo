@@ -9,7 +9,7 @@ import type {
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-import type { TstateProd, TstateProdData, TstateProdDict } from './type';
+import type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData } from './type';
 
 interface TdefaultState {
   stateProdDict: TstateProdDict;
@@ -39,7 +39,7 @@ const useDefaultState = ({
     raw_productArr_copy.forEach((raw) => {
       keyArr.push(raw.id);
 
-      const stateProdData: TstateProdData & { id: string } = {
+      const data_prod: TstateProdData & { id: string } = {
         id: raw.id,
         itemName: raw.itemName,
         discount: raw.discount,
@@ -128,11 +128,94 @@ const useDefaultState = ({
         rootProductId: raw.rootProductId,
       };
 
-      // dict[stateProdData.id] = {
-      //   key: stateProdData.id,
-      //   data_prod: stateProdData,
-      //   doorModel: doorModelDict?.[stateProdData.doorModelName] || null,
-      // };
+      // ________________________________________________________________________________
+      // ________________________________________________________________________________
+
+      const componentsArr = raw.items[0]?.components;
+
+      const data_componentDict: TstateProd['data_componentDict'] = componentsArr.reduce((componentDict, item) => {
+        const {
+          //
+          type,
+          number,
+          desc,
+          material,
+          materialSurface,
+          density,
+          isPainted,
+          quantity,
+          price,
+          rawData,
+        } = item;
+
+        const data_component = {
+          type,
+          number,
+          desc,
+          material,
+          materialSurface,
+          density,
+          isPainted,
+          quantity,
+          price,
+          rawData,
+        } as TstateComponentData<typeof type>;
+
+        switch (type) {
+          case 'slat':
+            componentDict['slat'] = data_component as TstateComponentData<'slat'>;
+            break;
+          case 'bottomBar':
+            componentDict['bottomBar'] = data_component as TstateComponentData<'bottomBar'>;
+            break;
+          case 'guideRail':
+            componentDict['guideRail'] = data_component as TstateComponentData<'guideRail'>;
+            break;
+          case 'sidePlate':
+            componentDict['sidePlate'] = data_component as TstateComponentData<'sidePlate'>;
+            break;
+          case 'roller':
+            componentDict['roller'] = data_component as TstateComponentData<'roller'>;
+            break;
+          case 'motor':
+            componentDict['motor'] = data_component as TstateComponentData<'motor'>;
+            break;
+
+          case 'motorAccessories':
+            componentDict['motorAccessories'] = data_component as TstateComponentData<'motorAccessories'>;
+            break;
+
+          case 'headBox':
+            componentDict['headBox'] = data_component as TstateComponentData<'headBox'>;
+            break;
+
+          case 'middlePillar':
+            componentDict['middlePillar'] = data_component as TstateComponentData<'middlePillar'>;
+            break;
+
+          case 'backBone':
+            componentDict['backBone'] = data_component as TstateComponentData<'backBone'>;
+            break;
+
+          default:
+            break;
+        }
+
+        // componentDict['slat'] = data_component;
+
+        return componentDict;
+      }, {} as TstateProd['data_componentDict']);
+
+      // ________________________________________________________________________________
+      // ________________________________________________________________________________
+
+      dict[data_prod.id] = {
+        key: data_prod.id,
+        data_prod: data_prod,
+        data_componentDict,
+
+        doorModel: doorModelDict?.[data_prod.doorModelName] || null,
+      };
     });
 
     return {
