@@ -97,7 +97,13 @@ import {
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // hook
-// import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
+import {
+  TdoorComponentType_old,
+  TupdateQuotationProductComponentDto_old,
+  TquotationProductComponentDto_old,
+  TcreateQuotationProductComponentDto_old,
+  TquotationProductItemDto_old,
+} from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
@@ -403,8 +409,8 @@ export default function Worksheet({
       init({
         worksheetId: activeWorksheetId!,
         itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0],
-        contractProductItemArr: contractProductItems ?? [],
+        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
+        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
         qty: contractProductItems?.length ?? 0,
         originalAccessories: activeWorksheetOriginalAccessories,
       });
