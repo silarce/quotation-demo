@@ -81,6 +81,27 @@ const options_doorType = optionsCreator_quoteType();
 
 // region TYPE
 
+type TdoorComponentType_old = Extract<
+  TdoorComponentType,
+  'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox'
+>;
+
+type TupdateQuotationProductComponentDto_old = Omit<TupdateQuotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TquotationProductComponentDto_old = Omit<TquotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TcreateQuotationProductComponentDto_old = Omit<TcreateQuotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TquotationProductItemDto_old = Omit<TquotationProductItemDto, 'components'> & {
+  components: TquotationProductComponentDto_old[];
+};
+
 type TavalibleComponentIdList = {
   slat: string;
   bottomBar: string;
@@ -92,24 +113,34 @@ type TavalibleComponentIdList = {
   headBox: string;
 };
 
+// type TcreateComponentList = {
+//   slat: TcreateQuotationProductComponentDto;
+//   bottomBar: TcreateQuotationProductComponentDto;
+//   guideRail: TcreateQuotationProductComponentDto;
+//   sidePlate: TcreateQuotationProductComponentDto;
+//   roller: TcreateQuotationProductComponentDto;
+//   motor: TcreateQuotationProductComponentDto;
+//   motorAccessories: TcreateQuotationProductComponentDto;
+//   headBox: TcreateQuotationProductComponentDto;
+// };
 type TcreateComponentList = {
-  slat: TcreateQuotationProductComponentDto;
-  bottomBar: TcreateQuotationProductComponentDto;
-  guideRail: TcreateQuotationProductComponentDto;
-  sidePlate: TcreateQuotationProductComponentDto;
-  roller: TcreateQuotationProductComponentDto;
-  motor: TcreateQuotationProductComponentDto;
-  motorAccessories: TcreateQuotationProductComponentDto;
-  headBox: TcreateQuotationProductComponentDto;
+  slat: TcreateQuotationProductComponentDto_old;
+  bottomBar: TcreateQuotationProductComponentDto_old;
+  guideRail: TcreateQuotationProductComponentDto_old;
+  sidePlate: TcreateQuotationProductComponentDto_old;
+  roller: TcreateQuotationProductComponentDto_old;
+  motor: TcreateQuotationProductComponentDto_old;
+  motorAccessories: TcreateQuotationProductComponentDto_old;
+  headBox: TcreateQuotationProductComponentDto_old;
 };
 
 type Tworksheet = {
-  contractProductItem_ori: TquotationProductItemDto | undefined;
-  contractProductItemArr_ori: TquotationProductItemDto[] | undefined;
+  contractProductItem_ori: TquotationProductItemDto_old | undefined;
+  contractProductItemArr_ori: TquotationProductItemDto_old[] | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   // componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
-  componentList: { [key in TdoorComponentType]: TupdateQuotationProductComponentDto } | undefined;
+  componentList: { [key in TdoorComponentType_old]: TupdateQuotationProductComponentDto_old } | undefined;
   accessories: TquotationProductAccessoryDto[];
 
   // 從後端取得，在init與calcData取得
@@ -1581,7 +1612,7 @@ const useWorksheet = create<Tworksheet>(
       const createComponentList_partial: Partial<TcreateComponentList> = {};
 
       componentIdListEntries.forEach(([theKey, value]) => {
-        const key = theKey as TdoorComponentType;
+        const key = theKey as TdoorComponentType_old;
 
         const bom = doorProductBom![key];
 
@@ -2473,3 +2504,11 @@ const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', 
 
 // =====================================================================
 export { useWorksheet };
+
+export type {
+  TdoorComponentType_old,
+  TupdateQuotationProductComponentDto_old,
+  TquotationProductComponentDto_old,
+  TcreateQuotationProductComponentDto_old,
+  TquotationProductItemDto_old,
+};
