@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -44,19 +45,27 @@ const useQuotationProduct = ({
   raw_productArr: undefined | TquotationProductDto[];
   disabled: boolean;
 }) => {
+  // 門型列表
   const { doorModelDict, isReady } = useGlobal_doorModel();
+
+  // ------------------------------------------------------------------------
 
   // region STATE
   const defaultState = useDefaultState({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
   });
+  // 深拷貝，避免在編輯狀態內的物件時影響原始的defaultState
+  const defaultState_copy = useMemo(() => {
+    return _.cloneDeep(defaultState);
+  }, [defaultState, disabled]);
 
   const [cellKeyArr, setCellKeyArr] = useState<TcellKey[]>([...defaultKeyArr]); // 欄位的key
-  const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState.prodKeyArr); // 主產品的key
-
-  const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState.stateProdDict);
+  const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
+
+  // state用來儲存資料狀態
+  const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
 
   // -----------------------------------------------------------------------
 
@@ -96,6 +105,7 @@ const useQuotationProduct = ({
 
   // region COOKED
 
+  // class用來管理資料狀態
   const classProdDict = useMemo(() => {
     if (!doorModelDict) {
       return {};
@@ -141,11 +151,9 @@ const useQuotationProduct = ({
   // region useEffect
 
   useEffect(() => {
-    setState_prodDict(defaultState.stateProdDict);
-    setProdKeyArr(defaultState.prodKeyArr);
-  }, [defaultState, disabled]);
-
-  // console.log(classProdDict);
+    setState_prodDict(defaultState_copy.stateProdDict);
+    setProdKeyArr(defaultState_copy.prodKeyArr);
+  }, [defaultState_copy, disabled]);
 
   return {
     classProdDict,
