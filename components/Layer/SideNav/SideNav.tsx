@@ -12,7 +12,7 @@ const { Panel } = Collapse;
 import style from './side.module.scss';
 
 // 路由表
-import sidePathList from './pathList';
+import { sidePathList } from './pathList/side';
 
 // context
 import { LayerCtx } from '../Layer';
@@ -68,7 +68,7 @@ export default function SideNav() {
               className={style.collapse}
               defaultActiveKey={[linkList.defaultCollapse || '0']}
               ghost
-              onChange={() => {}}
+              onChange={() => { }}
             >
               <Panel header={label} key={`${index}`}>
                 <ul>
