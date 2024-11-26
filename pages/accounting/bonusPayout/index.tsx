@@ -73,7 +73,7 @@ export default function BonusPayout() {
     const [serial_uuid, setSerial_uuid] = useState<string>("");
     const [status, setStatus] = useState<string>("");
     const [currenindex, setCurrentIndex] = useState<number>(0);
-    const [bonustype, setBonusType] = useState<string>("");
+    const [bonustype, setBonusType] = useState<string>("選擇獎金種類");
 
     //手key輸入
 
@@ -101,7 +101,7 @@ export default function BonusPayout() {
             // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
             GetSalaryBonusCategory();
             GetReviewFlow();
-            GetEmployee();
+            GetBonusLedgerByDate(bonustype);
             hasFetchedData.current = true;
         }
     }, []);
@@ -209,54 +209,55 @@ export default function BonusPayout() {
 
 
 
-    // const GetSalaryBonus = async () => {
-    //     try {
-    //         setIsLoading(true);
+    const GetBonusLedgerByDate = async (bonusType: any) => {
+        try {
+            setIsLoading(true);
 
-    //         const conditionModel = {
-    //             // 在這裡可以填入查詢條件
-    //         };
+            const conditionModel = {
+                date: `${year}-${month}`,
+                type: bonusType,
+            };
 
-    //         const inputModel = {
-    //             TypeName: 'ERP',
-    //             ServiceName: 'SalaryService',
-    //             FunctionName: 'no',
-    //             FilterConditions: JSON.stringify(conditionModel),
-    //         };
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    //         const response = await fetch(`${setting.apipath}/Salary/GetSalaryBonus?${queryParams}`);
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/Salary/GetBonusLedgerByDate?${queryParams}`);
 
-    //         if (!response.ok) {
-    //             throw new Error('Failed to fetch data');
-    //         }
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
 
-    //         let responsedata = await response.json();
+            const responsedata = await response.json();
+            console.log('原始資料:', responsedata);
 
-    //         // 根據 item_name 和 seniority 進行排序
-    //         responsedata = responsedata.sort((a: any, b: any) => {
-    //             const itemNameComparison = a.item_name.localeCompare(b.item_name); // 先依據 item_name 排序
-    //             if (itemNameComparison !== 0) {
-    //                 return itemNameComparison; // 如果 item_name 不同，直接返回比較結果
-    //             }
-    //             // 如果 item_name 相同，再比較 seniority
-    //             return a.seniority - b.seniority;
-    //         });
+            setStatus(responsedata[0].status);
+            // 統一結構
+            let normalizedData = normalizeData(responsedata);
 
-    //         console.log(responsedata); // 檢查排序後的資料
-    //         setData(responsedata);
-    //     } catch (error: any) {
-    //         console.log(error.message);
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
+            normalizedData = normalizedData.sort((a: any, b: any) => {
+                const aIdNumber = a.employee.id_number ? a.employee.id_number || '' : '';
+                const bIdNumber = b.employee.id_number ? b.employee.id_number || '' : '';
+                return aIdNumber.localeCompare(bIdNumber);
+            });
+            setData(normalizedData);
+
+        } catch (error: any) {
+            console.error(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
 
     const GenerateBonus = async () => {
-        if(bonustype===''){
-            myAlert.warning({title:'請選擇獎金種類'});
+        if (bonustype === '') {
+            myAlert.warning({ title: '請選擇獎金種類' });
             return;
         }
         try {
@@ -287,23 +288,25 @@ export default function BonusPayout() {
                 throw new Error('Failed to fetch data');
             }
             let responsedata = await response.json();
-            const renamedData = responsedata.map((item: any) => {
-                const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料;
-                return {
-                    id: item.id,
-                    id_number: employeeData?.id_number || '',
-                    department: item.department || '',
-                    start_date: employeeData?.start_date || '',
-                    annual_leave_days: item.annual_leave_days || '0',
-                    comp_time: item.comp_time || '0',
-                    ch_name: employeeData?.ch_name || '',
-                };
-            });
+            // const renamedData = responsedata.map((item: any) => {
+            //     const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料;
+            //     return {
+            //         id: item.id,
+            //         id_number: employeeData?.id_number || '',
+            //         department: item.department || '',
+            //         start_date: employeeData?.start_date || '',
+            //         annual_leave_days: item.annual_leave_days || '0',
+            //         comp_time: item.comp_time || '0',
+            //         ch_name: employeeData?.ch_name || '',
+            //     };
+            // });
 
-            console.log(renamedData); // 檢查重命名後的資料結構
-            setData(renamedData);
-            console.log(serial_id);
-            console.log(serial_uuid);
+            // console.log(renamedData); // 檢查重命名後的資料結構
+            // 統一結構
+            handleData(responsedata);
+            console.log(responsedata);
+            console.log(responsedata.length);
+            SettleBonusLedger(responsedata);
 
 
         } catch (error: any) {
@@ -313,23 +316,59 @@ export default function BonusPayout() {
         }
     };
 
-    const UpdateSalaryBonusById = async (item: any) => {
+    const SettleBonusLedger = async (resdata: any) => {
+        if (bonustype === '') {
+            myAlert.warning({ title: '請選擇獎金種類' });
+            return;
+        }
         try {
             setIsLoading(true);
 
-            // 將 item.employee 處理為僅包含 id 的陣列
-            const employeeIds = JSON.parse(item.employee).map((emp: any) => emp.id);
+            const conditionModel = {
+                date: year + '-' + month,
+                // type: '編輯中'
+                data: resdata,
+                bonus_name: bonustype
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'SalaryService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/Salary/SettleBonusLedger`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let responsedata = await response.json();
+
+
+        } catch (error: any) {
+            console.log(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const UpdateBonusLedgerById = async (item: any) => {
+        try {
+            setIsLoading(true);
+
 
 
             const conditionModel = {
                 id: item.id,
-                category: item.category,
-                item_name: item.item_name,
-                seniority: item.seniority,
                 bonus: item.bonus,
-                month: item.month,
-                note: item.note,
-                employee_id: employeeIds
+                note: item.note
             };
 
             var inputModel = {
@@ -341,7 +380,7 @@ export default function BonusPayout() {
 
             console.log(JSON.stringify(conditionModel));
 
-            const response = await fetch(`${setting.apipath}/Salary/UpdateSalaryBonusById`, {
+            const response = await fetch(`${setting.apipath}/Salary/UpdateBonusLedgerById`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -352,7 +391,7 @@ export default function BonusPayout() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const responsedata = await response.json();
+            // const responsedata = await response.json();
             myAlert.success({ title: '更新成功' })
             // GetSalaryBonus();
             setEditlist(false);
@@ -369,94 +408,6 @@ export default function BonusPayout() {
 
 
     }
-    //借用審核的取員工資料
-    const GetEmployee = async () => {
-        try {
-            setIsLoading(true);
-
-            const conditionModel = {
-                // 在這裡可以填入查詢條件
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Review/GetEmployeeTitle?${queryParams}`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            let responsedata = await response.json();
-
-            // 根據 `employee[0].id_number` 進行排序
-            responsedata = responsedata.sort((a: any, b: any) => {
-                const aId = a.id_number ? a.id_number || '' : '';
-                return aId.localeCompare(aId);
-            });
-
-            console.log(responsedata); // 檢查排序後的資料
-            setEmployeedata(responsedata);
-            setFilteredData(responsedata);
-
-        } catch (error: any) {
-            console.log(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    }
-    // const SettlePayroll = async () => {
-    //     myAlert.confirm({
-    //         title: '確定要結算薪資嗎?',
-    //         props: {
-    //             onOk: async () => {
-
-
-    //                 try {
-    //                     const conditionModel = {
-    //                         date: moment().format('YYYY-MM-DD HH:mm:ss'),
-    //                         data: data
-    //                     };
-
-
-    //                     var inputModel = {
-    //                         TypeName: 'ERP',
-    //                         ServiceName: 'SalaryService',
-    //                         FunctionName: 'no',
-    //                         FilterConditions: JSON.stringify(conditionModel),
-    //                     };
-
-    //                     const response = await fetch(`${setting.apipath}/Salary/SettlePayroll`, {
-    //                         method: 'POST',
-    //                         headers: {
-    //                             'Content-Type': 'application/json',
-    //                         },
-    //                         body: JSON.stringify(inputModel)
-    //                     });
-
-
-    //                     if (!response.ok) {
-    //                         throw new Error('Failed to fetch data');
-    //                     }
-
-    //                     const responsedata = await response.json();
-
-
-    //                 } catch (error: any) {
-    //                     console.log(error.message);
-    //                 }
-    //                 finally {
-    //                 }
-    //             }
-    //         }
-    //     });
-    // };
-
 
 
     const AddSalaryBonus = async () => {
@@ -875,7 +826,7 @@ export default function BonusPayout() {
             title: '確定更新嗎?',
             props: {
                 onOk: () => {
-                    UpdateSalaryBonusById(item);
+                    UpdateBonusLedgerById(item);
                 }
             }
         });
@@ -1085,7 +1036,36 @@ export default function BonusPayout() {
     };
 
 
+    const normalizeData = (data: any[]) => {
+        return data.map((item) => {
+            // 檢查 employee 欄位是否為字串，如果是字串則解析
+            const employeeData = typeof item.employee === "string"
+                ? JSON.parse(item.employee)[0] // 假設只有一個員工資料
+                : item.employee;
 
+            return {
+                id: item.id,
+                bonusName: item.bonus_name || item.item_name || "無名稱",
+                bonus: item.bonus,
+                note: item.note,
+                seniority: item.seniority || 0,
+                employee: {
+                    id: employeeData?.id || "",
+                    id_number: employeeData?.id_number || "未知",
+                    ch_name: employeeData?.ch_name || "未知",
+                    start_date: employeeData?.start_date || "",
+                    name: employeeData?.name || "",
+                },
+            };
+        });
+    };
+
+
+    const handleData = (apiResponse: any[]) => {
+        const normalizedData = normalizeData(apiResponse);
+        setData(normalizedData);
+        console.log(normalizedData);
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1134,7 +1114,7 @@ export default function BonusPayout() {
                                 </span>
 
                                 <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, paddingLeft: '10px' }}>
-                                    {/* <button className={scss.longredsquarebtn}
+                                    <button className={scss.longredsquarebtn}
                                         onClick={() => {
                                             // SettlePayroll();
 
@@ -1142,7 +1122,7 @@ export default function BonusPayout() {
                                         }}
                                         title="確認結算">
                                         確認結算
-                                    </button> */}
+                                    </button>
                                 </span>
                             </span>
                             <span style={{ display: `${status === "審核中" ? '' : 'none'}` }}>
@@ -1177,6 +1157,7 @@ export default function BonusPayout() {
                                         const selectedBonusType = e.target.value;
                                         console.log("選擇的獎金種類:", selectedBonusType);
                                         setBonusType(selectedBonusType);
+                                        GetBonusLedgerByDate(selectedBonusType);
                                     }}
                                     style={{
                                         width: '100%',
@@ -1222,17 +1203,18 @@ export default function BonusPayout() {
 
 
                         </span>
-                        <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
+                        <span style={{ padding: '0px 0px', fontSize: '18px', color: '#14256a' }}>
                             <SelectBar_date key="selectBar" className="ml-10" haveMonth={false} />
-
-
-                            {/* {serial_id}<br />
-                            {serial_uuid} */}
-                            {/* {status} */}
+                        </span>
+                        {/* {parseInt(year as string) - 1911}
+                        {bonustype} */}
+                        <span style={{ padding: '0px 10px', fontSize: '16px', color: '#14256a' }}>
+                            {status}<br />
+                            發放人數：{data.length}人
+                        </span>
+                        <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
 
                         </span>
-                        {parseInt(year as string) - 1911}
-                        {bonustype}
                     </div>
 
                 ]}
@@ -1249,8 +1231,8 @@ export default function BonusPayout() {
                             </span>
                             <span>員工編號</span>
                             <span>部門</span>
-                            <span>到職日</span>
                             <span>姓名</span>
+                            <span>到職日</span>
                             <span>年資</span>
                             <span>獎金</span>
                             <span>備註</span>
@@ -1258,40 +1240,78 @@ export default function BonusPayout() {
                         </div>
                         <span>
                             {data && (
-                                data.map((_item: any, index: number) => {
-                                    // 計算總薪資
-
-                                    return (
-                                        <CellWithBar key={index} className={scss.panelHeader1}>
-                                            <div className={scss.row01}>
-                                                <span>
-                                                    {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
+                                data.map((_item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader1}>
+                                        <div className={scss.row01}>
+                                            <span>
+                                                {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                         <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                     </button> */}
-                                                    <button onClick={() => { handleEdit(index) }}>
-                                                        <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
-                                                    </button>
-                                                    <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
-                                                        <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                    <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
-                                                        <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                </span>
-                                                <span>{_item.category}</span>
-                                                <span>1</span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                            </div>
-                                        </CellWithBar>
-                                    );
-                                })
+                                                <button onClick={() => { handleEdit(index) }}>
+                                                    <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                    <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
+                                            <span>{_item.employee.id_number}</span>
+                                            <span>{_item.employee.name}</span>
+                                            <span>{_item.employee.ch_name}</span>
+                                            <span>{getTaiwanDateStr(_item.employee.start_date)}</span>
+                                            <span>{_item.seniority}</span>
+                                            <span>
+                                                <input
+                                                    ref={bonusRefs.current[index]}
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                        width: '100px',
+                                                    }}
+                                                    readOnly={!(editlist && editlistindex === index)}
+                                                    type={editlist && editlistindex === index ? "number" : "text"}
+                                                    value={editlist && editlistindex === index ? _item.bonus : Number(_item.bonus).toLocaleString()}
+                                                    onChange={(e) => {
+                                                        const newData = [...data];
+                                                        const newBonus = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            bonus: editall ? newBonus : parseFloat(newBonus.replace(/,/g, '')),
+                                                        };
+                                                        setData(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={noteRefs.current[index]}
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                        width: '100%',
+                                                    }}
+                                                    readOnly={!(editlist && editlistindex === index)}
+                                                    type={editlist && editlistindex === index ? "text" : "text"}
+                                                    value={editlist && editlistindex === index ? _item.note : _item.note}
+                                                    onChange={(e) => {
+                                                        const newData = [...data];
+                                                        const newNote = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            note: editall ? newNote : newNote,
+                                                        };
+                                                        setData(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
                             )}
+
+
                         </span>
                     </div>
                     <div></div>

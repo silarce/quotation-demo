@@ -35,16 +35,20 @@
 
 //#region 薪資維護
 .thead1 {
-    position: -webkit-sticky; /* 為兼容性增加前綴 */
+    position: -webkit-sticky;
+    /* 為兼容性增加前綴 */
     position: sticky;
     top: 0;
-    z-index: 1000; /* 確保元素位於其他內容的上層 */
+    z-index: 1000;
+    /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns: repeat(7, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns: 100px repeat(6, 150px)300px 10px;
+    /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
-    background-color: $bgc01; /* 設定背景顏色 */
+    background-color: $bgc01;
+    /* 設定背景顏色 */
 }
 
 .thead1 span {
@@ -59,9 +63,10 @@
 .thead1 span:nth-child(4) {
     position: sticky;
     // background-color: $bgc01; /* 固定欄位的背景顏色 */
-    z-index: 1001; /* 確保固定欄位在最上層 */
+    // z-index: 1001;
+    /* 確保固定欄位在最上層 */
     // padding: 0 10px; /* 添加內邊距 */
-    
+
 }
 
 .thead1 span:nth-child(1) {
@@ -86,7 +91,7 @@
     // background-color: $bgc01;
     // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
 }
-  
+
 //#endregion
 
 div.panelHeader1 {
@@ -108,9 +113,11 @@ div.panelHeader1 {
 
     .row01 {
         display: grid;
-        grid-template-columns: repeat(7, 150px)300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+        grid-template-columns:100px repeat(6, 150px)300px 10px;
+        /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
         gap: 5px;
-        position: relative;  /* 確保 sticky 定位可以參照這個容器 */
+        position: relative;
+        /* 確保 sticky 定位可以參照這個容器 */
     }
 
     /* 設置前三欄為 sticky */
@@ -119,9 +126,10 @@ div.panelHeader1 {
     .row01 span:nth-child(4) {
         position: sticky;
         // background-color: white; /* 固定欄位的背景顏色 */
-        z-index: 1001; /* 確保這些欄位在其他欄位上層 */
+        // z-index: 1001;
+        /* 確保這些欄位在其他欄位上層 */
         // padding: 0 10px; /* 增加內邊距，根據需要調整 */
-        
+
     }
 
     .row01 span:nth-child(1) {
@@ -204,7 +212,7 @@ div.panelHeader1 {
     top: 0;
     z-index: 1000; // 確保元素位於其他內容的上層
     display: grid;
-    grid-template-columns:50px 1fr 1fr 10px;
+    grid-template-columns: 50px 1fr 1fr 10px;
     gap: 5px;
     height: 50px;
     padding: 0px 30px;
@@ -223,7 +231,7 @@ div.panelHeader1 {
         font-weight: 400;
         font-size: 18px;
         color: #404040;
-        
+
     }
 }
 
@@ -232,15 +240,16 @@ div.panelHeader1 {
 div.panelHeader2 {
     gap: 5px;
     height: 50px;
-    padding:10px 30px;
+    padding: 10px 30px;
     border-bottom: solid 1px $colorBorder01;
     background-color: #ffeeee;
+
     .row01,
     .row02 {
         span {
             font-weight: 400;
             font-size: 18px;
-            
+
         }
 
         .clientName,
@@ -251,7 +260,7 @@ div.panelHeader2 {
 
     .row01 {
         display: grid;
-        grid-template-columns:50px 1fr 1fr 50px;
+        grid-template-columns: 50px 1fr 1fr 50px;
         // row-gap: 5px; /* 僅應用於行間距 */
         // column-gap: 5px; /* 僅應用於列間距 */
         gap: 5px;
@@ -259,10 +268,11 @@ div.panelHeader2 {
         cursor: pointer;
 
     }
+
     &:hover {
         background-color: #ffeeee; // 設定粉紅色背景
     }
-    
+
 }
 
 
@@ -315,7 +325,7 @@ div.panelHeader2 {
 div.panelHeader3 {
     gap: 5px;
     height: 50px;
-    padding:10px 30px;
+    padding: 10px 30px;
     border-bottom: solid 1px $colorBorder01;
     // border-top:solid 3px $colorBorder01;
 
@@ -334,7 +344,7 @@ div.panelHeader3 {
 
     .row01 {
         display: grid;
-        grid-template-columns:50px 1fr 1fr 10px;
+        grid-template-columns: 50px 1fr 1fr 10px;
         gap: 5px;
         height: 50px;
         cursor: pointer;

@@ -117,7 +117,7 @@ export default function bonusMaintenance() {
             // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
             GetSalaryBonus();
             GetReviewFlow();
-            GetEmployee();
+            // GetEmployee();
             hasFetchedData.current = true;
         }
     }, []);
@@ -287,23 +287,28 @@ export default function bonusMaintenance() {
 
     }
     //借用審核的取員工資料
-    const GetEmployee = async () => {
+    const GetEmployee = async (type: any, seniority_seniority_senior: any) => {
         try {
             setIsLoading(true);
+            // console.log(type);
+            // console.log(seniority_seniority_senior);
+            // return;
 
             const conditionModel = {
                 // 在這裡可以填入查詢條件
+                seniority: type === 'SeniorityBased' ? seniority_seniority_senior : 0,
+                seniority_senior: type === 'SeniorityBased' ? seniority_seniority_senior : 1000
             };
 
             const inputModel = {
                 TypeName: 'ERP',
-                ServiceName: 'ReviewService',
+                ServiceName: 'SalaryService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/Review/GetEmployeeTitle?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/Salary/GetEmployeeWithSeniority?${queryParams}`);
 
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
@@ -907,21 +912,30 @@ export default function bonusMaintenance() {
     const isSelectingRef = useRef(false);
     // 監聽條件變更
     useEffect(() => {
-        // filterData();
         if (isSelectingRef.current) return;
-        let filteredData = employeedata
-            .filter((item) => !selectedItems.some((selected) => selected.id_number === item.id_number));
 
+        // 過濾掉已選擇的項目
+        let filteredData = employeedata.filter(
+            (item) => !selectedItems.some((selected) => selected.id_number === item.id_number)
+        );
+
+        // 根據搜尋條件過濾
         if (searchText) {
-            filteredData = filteredData.filter(item =>
+            filteredData = filteredData.filter((item) =>
                 item.ch_name.toString().includes(searchText.trim())
             );
         }
 
+        // 根據選擇的部門過濾
+        if (selectedDepartment) {
+            filteredData = filteredData.filter(
+                (item) => item.department_name === selectedDepartment
+            );
+        }
 
         setFilteredData(filteredData);
-        console.log(filteredData.length)
-    }, [searchText, selectedItems]);
+        console.log(filteredData.length);
+    }, [searchText, selectedDepartment, selectedItems]);
 
 
     const handleAdd = () => {
@@ -981,6 +995,8 @@ export default function bonusMaintenance() {
 
     // 單選功能
     const handleCheckboxChange = (item: any, isChecked: boolean) => {
+        console.log(item);
+        // return;
         if (isChecked) {
             // 加入選中的資料，排除重複
             if (!bonuspeople.some((person) => person.id === item.id)) {
@@ -989,8 +1005,10 @@ export default function bonusMaintenance() {
                     {
                         id: item.id,
                         id_number: item.id_number,
+                        department_name: item.department_name,
                         start_date: '',
                         ch_name: item.ch_name,
+                        seniority: item.seniority
                     },
                 ]);
             }
@@ -1194,7 +1212,7 @@ export default function bonusMaintenance() {
                                                         style={{
                                                             backgroundColor: 'transparent',
                                                             borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '100%'
+                                                            width: '50px'
                                                         }}
                                                         readOnly={!(editlist && editlistindex === index)}
                                                         type={editlist && editlistindex === index ? "number" : "text"}
@@ -1215,7 +1233,7 @@ export default function bonusMaintenance() {
                                                             }
                                                         }}
                                                     />
-
+                                                    年
                                                 </span>
                                                 <span>
                                                     <input
@@ -1370,6 +1388,11 @@ export default function bonusMaintenance() {
                                                         console.log(bonuspeopleDetail);
                                                         setOriginalLeavedata(bonuspeople);
                                                         setAllChecked(false);
+                                                        // alert(_item.seniority);
+                                                        GetEmployee(`${(
+                                                            _item.item_name === "全勤獎金" || _item.item_name === "飲料津貼") ?
+                                                            "NoneSeniorityBased" : "SeniorityBased"}`,
+                                                            _item.seniority)
                                                     }}>
                                                         <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                                     </button>
@@ -1417,29 +1440,105 @@ export default function bonusMaintenance() {
                         // seteditbtn(false);   // 將 editbtn 設為 false
                         setbonuspeopledata([]);
                         setAllChecked(false);
+                        setSelectedDepartment("全部部門");
+
                     }}
                     width="1002px"
                     closable={false} // 移除右上角的叉叉
                     style={{ top: 150 }}
                     bodyStyle={{ padding: 0, height: '520px', overflow: 'hidden' }} // 限制 Modal 高度並防止溢出
                     title={
-                        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                {/* 搜索輸入框 */}
-                                <div style={{ display: "inline-flex", alignItems: "center", borderBottom: "1px solid #c1c1c1" }}>
-                                    <input
-                                        type="text"
-                                        placeholder="搜尋關鍵字"
-                                        value={searchText}
-                                        style={{ padding: "4px 5px", width: "350px", fontSize: "16px", border: "none", outline: "none" }}
-                                        onChange={(e) => setSearchText(e.target.value)}
-                                    />
-                                    <span style={{ padding: "4px 12px" }}>
-                                        <img src={icon_search2.src} alt="search" style={{ height: "20px", width: "20px" }} />
-                                    </span>
+                        <>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                {/* 全部清除按鈕，固定在左邊 */}
+                                {bonuspeople.length}
+                                <button
+                                    onClick={() => {
+                                        myAlert.confirm({
+                                            title: '確定全部清除嗎?',
+                                            content: null,
+                                            props: {
+                                                onOk: async () => {
+                                                    setbonuspeopledata([]); // 清空 bonuspeople
+                                                    setAllChecked(false); // 取消全選
+                                                }
+                                            }
+                                        });
+                                    }}
+                                    style={{
+                                        padding: "6px 12px",
+                                        fontSize: "14px",
+                                        backgroundColor: "#ea1833",
+                                        color: "#fff",
+                                        border: "none",
+                                        borderRadius: "4px",
+                                        cursor: "pointer",
+                                        visibility: `${editbtn === true ? 'visible' : 'hidden'}`, // 隱藏但保留空間
+                                    }}
+                                >
+                                    全部清除
+                                </button>
+
+                                {/* 搜尋框和下拉選單，固定在左邊和右邊 */}
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                                    {/* 新增下拉選單（移到左邊） */}
+                                    <select
+                                        style={{
+                                            padding: "6px 12px",
+                                            fontSize: "16px",
+                                            borderBottom: "1px solid #c1c1c1",
+                                            cursor: "pointer",
+                                            color: "#14256a",
+                                            outline: "none",
+                                        }}
+                                        onChange={(e) => setSelectedDepartment(e.target.value)}
+                                        value={selectedDepartment}
+                                    >
+                                        <option value="">全部部門</option>
+                                        {Array.from(new Set(employeedata.map(item => item.department_name)))
+                                            .filter(Boolean) // 避免空值
+                                            .map((dept, index) => (
+                                                <option key={index} value={dept}>
+                                                    {dept}
+                                                </option>
+                                            ))}
+                                    </select>
+
+                                    {/* 搜尋框 */}
+                                    <div
+                                        style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            borderBottom: "1px solid #c1c1c1",
+                                        }}
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="搜尋關鍵字"
+                                            value={searchText}
+                                            style={{
+                                                padding: "4px 5px",
+                                                width: "350px",
+                                                fontSize: "16px",
+                                                border: "none",
+                                                outline: "none",
+                                            }}
+                                            onChange={(e) => setSearchText(e.target.value)}
+                                        />
+                                        <span style={{ padding: "4px 12px" }}>
+                                            <img
+                                                src={icon_search2.src}
+                                                alt="search"
+                                                style={{ height: "20px", width: "20px" }}
+                                            />
+                                        </span>
+                                    </div>
                                 </div>
+
                             </div>
-                        </div>
+
+                        </>
+
                     }
 
                     footer={
@@ -1516,7 +1615,9 @@ export default function bonusMaintenance() {
 
                         </span>
                         <span>員工編號</span>
+                        <span>部門</span>
                         <span>姓名</span>
+                        <span>年資</span>
                         <span></span>
                     </div>
 
@@ -1545,7 +1646,9 @@ export default function bonusMaintenance() {
                                                 )} */}
                                             </span>
                                             <span>{item.id_number}</span>
+                                            <span>{item.department_name}</span>
                                             <span>{item.ch_name}</span>
+                                            <span>{item.seniority}</span>
                                             <span>
                                                 {editbtn && (
                                                     <button onClick={() => { handleRemove(item) }}
@@ -1555,7 +1658,11 @@ export default function bonusMaintenance() {
                                                         <img src={icon_cir_remove.src} alt="remove"
                                                             style={{ width: '30px', height: '30px' }} />
                                                     </button>
-                                                )}</span>
+                                                )}
+                                            </span>
+                                            <span>
+
+                                            </span>
                                         </div>
                                     </CellWithBar>
                                 ))}
@@ -1577,7 +1684,7 @@ export default function bonusMaintenance() {
                                 </span>
 
                             </label>
-                            <div style={{ overflowY: 'auto', height: '500px', borderTop: '1px solid #ccc' }}>
+                            <div style={{ overflowY: 'auto', height: '220px', borderTop: '1px solid #ccc' }}>
                                 {/* 全選功能的 Checkbox */}
 
                                 {filteredData.map((item, index) => {
@@ -1604,8 +1711,9 @@ export default function bonusMaintenance() {
                                                     />
                                                 </span>
                                                 <span>{item.id_number}</span>
+                                                <span>{item.department_name}</span>
                                                 <span>{item.ch_name}</span>
-                                                <span></span>
+                                                <span>{item.seniority}</span>
                                             </div>
                                         </CellWithBar>
                                     );
