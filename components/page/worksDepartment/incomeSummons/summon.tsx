@@ -1415,6 +1415,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       // 與慣例不符對UX不好，因此在這裡將數值正負反轉
       exchangeBenefits = -exchangeBenefits;
       // w -----------------------------------------------------
+      const exchangeBenefits_str = exchangeBenefits.toLocaleString();
 
       // const { type, value } = reducer_input({
       //   disabled: true,
@@ -1424,7 +1425,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       const inputSelProps: TinputSelProps = {
         disabled: true,
         showBaseline: 'invisible',
-        node: exchangeBenefits,
+        node: exchangeBenefits_str,
         // inputProps: {
         //   props: {
         //     className: 'text-right',
