@@ -7,7 +7,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 
 import { AppContext } from 'pages/_app';
-import { erpFeaturesLookup, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList';
+import { erpFeaturesLookup, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
 
 // globalState
 import { useUrlHistory } from 'hooks/globalState/useUrlHistory';

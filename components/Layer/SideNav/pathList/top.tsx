@@ -1,0 +1,148 @@
+import icon_home from 'public/image/icon/home.svg';
+import icon_setting from 'public/image/icon/setting.svg';
+import icon_domestic from 'public/image/icon/domestic.svg';
+import icon_foreign from 'public/image/icon/foreign.svg';
+import icon_project from 'public/image/icon/project.svg';
+import icon_warehouse from 'public/image/icon/warehouse.svg';
+import icon_shareform from 'public/image/icon/sharedform.svg';
+
+import { erpFeaturesLookup, TtopPathListConfig, devPass } from './type';
+
+import { sidePathList } from './side';
+
+const {
+    BasicDataCreation,
+    HRAuthoritySetup,
+    legacyContractIntegration,
+    domestic,
+    statisticsTable,
+    worksDepartment,
+    accountsReceivable,
+    accountingDepartment,
+    worksDepartment_worksheet,
+    worksDepartment_deliveryList,
+    incomeBill,
+    fac,
+} = erpFeaturesLookup;
+
+const homePath = sidePathList['/home'].path
+const settingPath = sidePathList['/setting'].path
+const domesticPath = sidePathList['/domestic'].path
+const worksDepartmentPath = sidePathList['/worksDepartment'].path
+const accounting = sidePathList['/accounting'].path
+const factoryDepartment = sidePathList['/factoryDepartment'].path
+const documentManagementPath = sidePathList['/documentManagement'].path
+const researchDepartmentPath = sidePathList['/researchDepartment'].path
+
+export const topPathList: TtopPathListConfig[] = [
+    {
+        icon: icon_home,
+        label: '首頁',
+        path: homePath,
+        href: {
+            pathname: '/home/dailyReport',
+            query: { isMine: 'true' },
+        },
+        erpFeature: 'allPass',
+    },
+    {
+        icon: icon_setting,
+        label: '公司設定',
+        path: settingPath,
+        href: {
+            pathname: settingPath + '/company-info',
+        },
+        erpFeature: [BasicDataCreation, HRAuthoritySetup],
+    },
+    {
+        icon: icon_domestic,
+        label: '營業部',
+        subLabel: '-國內工程',
+        path: domesticPath,
+        href: {
+            pathname: domesticPath + '/quotationList',
+            query: {
+                status: 'Budget',
+            },
+        },
+        hrefList: {
+            domestic: {
+                pathname: domesticPath + '/quotationList',
+                query: {
+                    status: 'Budget',
+                },
+            },
+            legacyContractIntegration: {
+                pathname: domesticPath + '/legacyContractIntegration',
+            },
+            statisticsTable: {
+                pathname: domesticPath + '/legacyContractIntegration',
+            },
+            accountsReceivable: {
+                pathname: domesticPath + '/quotationList',
+                query: {
+                    status: 'Pending',
+                },
+            },
+        },
+        erpFeature: [domestic, legacyContractIntegration, statisticsTable, accountsReceivable],
+    },
+    {
+        icon: icon_project,
+        label: '工務部',
+        path: worksDepartmentPath,
+        href: {
+            pathname: worksDepartmentPath + '/contractList',
+        },
+        erpFeature: [
+            worksDepartment,
+            accountsReceivable,
+            worksDepartment_worksheet,
+            worksDepartment_deliveryList,
+            domestic,
+            incomeBill,
+        ],
+    },
+    {
+        icon: icon_project,
+        label: '會計部',
+        path: accounting,
+        href: {
+            pathname: accounting + '/collection',
+        },
+        erpFeature: [accountsReceivable, accountingDepartment],
+    },
+    {
+        icon: icon_warehouse,
+        label: '廠務部',
+        path: factoryDepartment,
+        href: {
+            pathname: factoryDepartment + '/wareHouseList',
+            query: {
+                type: 'WareHouse',
+            },
+        },
+        erpFeature: [fac],
+    },
+    {
+        icon: icon_shareform,
+        label: '審核管理',
+        path: documentManagementPath,
+        href: {
+            pathname: documentManagementPath + '/reviewList',
+            query: {
+                type: 'Review',
+            },
+        },
+        erpFeature: [fac],
+    },
+    {
+        icon: icon_project,
+        label: '研發部',
+        path: researchDepartmentPath,
+        href: {
+            pathname: researchDepartmentPath + '/workSheet',
+        },
+        erpFeature: devPass,
+    },
+];
