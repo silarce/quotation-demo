@@ -25,6 +25,7 @@ interface Tpanel_btn {
   img?: string;
   custom?: undefined;
   searchGroup?: undefined;
+  defaultValue?: undefined;
 }
 
 // 搜尋input
@@ -95,7 +96,7 @@ export default function PanelList({ panelList }: { panelList: TpanelList }) {
         }
 
         // 通常的按鈕bar
-        const { label, type, onClick, placeholder, className, img } = item;
+        const { label, type, onClick, placeholder, className, img, defaultValue } = item;
 
         return (
           <Fragment key={index}>
@@ -108,7 +109,12 @@ export default function PanelList({ panelList }: { panelList: TpanelList }) {
             ) : type === 'exportButton' ? (
               <ExportButton label={label} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : type === 'inputSearch' ? (
-              <InputSearch placeholder={placeholder} onClick={onClick} className={classNames(scss.btn, className)} />
+              <InputSearch
+                placeholder={placeholder}
+                onClick={onClick}
+                className={classNames(scss.btn, className)}
+                defaultValue={defaultValue}
+              />
             ) : null}
           </Fragment>
         );

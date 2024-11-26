@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -12,76 +12,64 @@ import { Pagination } from 'antd';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+
 // api
-import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
+import { useEmployee, Tparams } from 'js/api/api_employee';
 
 // css
 import style from './employees.module.scss';
-import { TuserDto } from 'js/api/dtoTypes';
+
+// ==================================================
+
+interface Tquery {
+  keyWord?: string;
+  page?: `${number}`;
+}
+
 // ==================================================
 
 export default function Employees() {
   const router = useRouter();
+  const query = router.query as Tquery;
+  const { keyWord, page = '1' } = query;
+
   const [isLoading, setIsLoading] = useState(false);
 
   // ====================================================
-  const [params, setParams] = useState<TapiGetEmployeeParams>({
-    order: 'ASC',
-    page: 1,
-    pageSize: 12,
-    sort: 'idNumber',
-    filter: {
-      $or: {
-        idNumber: {
-          $contains: router.query.searchValue,
-        },
-        chName: {
-          $contains: router.query.searchValue,
+
+  const params = useMemo(() => {
+    const params: Tparams = {
+      order: 'ASC',
+      page: Number(page),
+      pageSize: 12,
+      sort: 'idNumber',
+      filter: {
+        $or: {
+          idNumber: {
+            $contains: keyWord,
+          },
+          chName: {
+            $contains: keyWord,
+          },
         },
       },
-    },
-    populate: ['jobs.department'],
-  });
+      populate: ['jobs.department'],
+    };
+
+    return params;
+  }, [query]);
 
   const { data, update } = useEmployee(params);
   const employeeList = data?.data || [];
   const meta = data?.meta;
 
-  // 搜尋功能
-  const searchStaff = (searchValue: string) => {
-    if (isLoading) {
-      return;
-    }
-
-    router.push({
-      pathname: '/setting/employees',
-      query: {
-        searchValue,
-      },
-    });
-    setParams((params) => ({
-      ...params,
-      page: 1,
-      filter: {
-        $or: {
-          idNumber: {
-            $contains: searchValue,
-          },
-          chName: {
-            $contains: searchValue,
-          },
-        },
-      },
-    }));
-  };
-
   // ====================================================
   const setPage = (page: number) => {
-    setParams((params) => {
-      params.page = page;
-
-      return { ...params };
+    router.replace({
+      query: {
+        ...query,
+        page,
+      },
     });
   };
 
@@ -95,13 +83,22 @@ export default function Employees() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params]);
 
-  // ====================================================
+  // ====================================================\
+
   const panelList: TpanelList = [
     {
       type: 'inputSearch',
       placeholder: '編號/模糊姓名',
-      onClick: searchStaff,
-      defaultValue: router.query.searchValue as string,
+      onClick: (v) => {
+        router.replace({
+          query: {
+            ...query,
+            keyWord: v,
+            page: 1,
+          },
+        });
+      },
+      defaultValue: keyWord,
     },
     {
       type: 'myButton',

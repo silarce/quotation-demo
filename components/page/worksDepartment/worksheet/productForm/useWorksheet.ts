@@ -221,12 +221,12 @@ type Tworksheet = {
 
     setMotor_str: (props: {
       key:
-        | 'horsepower'
-        | 'vendor'
-        | 'electricMotorChainType'
-        | 'hasMotorSupportStand'
-        | 'motorLockBox'
-        | 'electricMotorDirection';
+      | 'horsepower'
+      | 'vendor'
+      | 'electricMotorChainType'
+      | 'hasMotorSupportStand'
+      | 'motorLockBox'
+      | 'electricMotorDirection';
       value: string;
     }) => void;
   };
@@ -1249,6 +1249,7 @@ const useWorksheet = create<Tworksheet>(
         getOptions_guideRail,
         getOptions_bottomBarAngleIronAndPlate,
         guideRail,
+        generalSpec
       } = get();
 
       const isSpecialProd = getIsSpecialProd();
@@ -1337,10 +1338,14 @@ const useWorksheet = create<Tworksheet>(
 
       await update_generalSpec();
 
+      if (!get().generalSpec) {
+        return
+      }
+
       set(
         produce((state) => {
           const { defaultHp, defaultVendor, defaultBoxB, defaultBoxD } = produceMotor(
-            state.generalSpec.motors[state.generalSpec.defaultMotorIndex]
+            state.generalSpec?.motors[state.generalSpec.defaultMotorIndex]
           );
 
           state.motor.horsepower = defaultHp;
@@ -1590,10 +1595,10 @@ const useWorksheet = create<Tworksheet>(
         } catch (error) {
           const err = error as AxiosError<
             | {
-                error: string;
-                message: string;
-                statusCode: number;
-              }
+              error: string;
+              message: string;
+              statusCode: number;
+            }
             | undefined
           >;
 
@@ -1936,7 +1941,7 @@ const getOptions_bottomBarAngleIronAndPlate = (doorModelName: TdoorModel | undef
   if (doorModelName && doorModelName in lookup_options_bottomBarAngleIronAndPlate) {
     const { angleIron, plate } =
       lookup_options_bottomBarAngleIronAndPlate[
-        doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
+      doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
       ];
 
     return {
@@ -2020,8 +2025,8 @@ const getOptions_guideRail = ({
 const getOptions_doorModelInfo = (
   doorModelInfoList:
     | {
-        [key: string]: TdoorModelInfoDto;
-      }
+      [key: string]: TdoorModelInfoDto;
+    }
     | undefined
 ) => {
   const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
@@ -2131,14 +2136,14 @@ const getOptions_diameter = (rollerArr: TdoorRollerDto[]) => {
 
 // 取得各項馬達預設值
 const produceMotor = (defaultMotor: TdoorGeneralSpecsMotorDto) => {
-  const boxList = defaultMotor.box;
+  const boxList = defaultMotor?.box;
 
   const defaultVendor = !boxList ? '東元' : '東元' in boxList || 'default' in boxList ? '東元' : '大同';
 
   const box = boxList?.東元 || boxList?.default || boxList?.大同;
 
   const { boxB, boxD } = box ?? {};
-  let defaultHp = defaultMotor.hp;
+  let defaultHp = defaultMotor?.hp;
 
   if (defaultHp === '1.5') {
     defaultHp = '1 1/2';
