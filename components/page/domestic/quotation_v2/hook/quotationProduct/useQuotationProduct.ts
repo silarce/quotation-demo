@@ -15,7 +15,7 @@ import type {
 
 // import { ClassProd_SJ202 } from './class/prod/classProd_SJ302';
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
-import { lookup_classComponent } from './class/component';
+import { lookup_classComponent, Tlookup_classComponent } from './class/component';
 
 import {
   TconfigItem,
@@ -41,12 +41,37 @@ import type {
   //
   // TstateComponentData,
   // TcomponentRawDataDict,
+  Tdata_componentDict,
   TsetComponent,
 } from './type';
 
 // ================================================================================
 
 type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
+
+type TclassComponentDict = {
+  [K in keyof Tlookup_classComponent]?: K extends 'slat'
+    ? InstanceType<Tlookup_classComponent['slat']>
+    : K extends 'bottomBar'
+    ? InstanceType<Tlookup_classComponent['bottomBar']>
+    : K extends 'guideRail'
+    ? InstanceType<Tlookup_classComponent['guideRail']>
+    : K extends 'sidePlate'
+    ? InstanceType<Tlookup_classComponent['sidePlate']>
+    : K extends 'roller'
+    ? InstanceType<Tlookup_classComponent['roller']>
+    : K extends 'motor'
+    ? InstanceType<Tlookup_classComponent['motor']>
+    : K extends 'motorAccessories'
+    ? InstanceType<Tlookup_classComponent['motorAccessories']>
+    : K extends 'headBox'
+    ? InstanceType<Tlookup_classComponent['headBox']>
+    : K extends 'middlePillar'
+    ? InstanceType<Tlookup_classComponent['middlePillar']>
+    : K extends 'backBone'
+    ? InstanceType<Tlookup_classComponent['backBone']>
+    : never;
+};
 
 // ================================================================================
 
@@ -192,16 +217,29 @@ const useQuotationProduct = ({
 
     const data_componentDict = activeClassProd.state.data_componentDict;
 
-    // lookup_classComponent
-    const classComponent_slat = lookup_classComponent['slat'];
+    const dict = Object.entries(data_componentDict).reduce((acc, [key, value]) => {
+      const theKey = key as keyof Tdata_componentDict;
 
-    const foo = new classComponent_slat({
-      state_component: data_componentDict['slat']!,
-      setState_component: createSetComponent({
-        pordKey: activeClassProd.state.key,
-        componentKey: 'slat',
-      }),
-    });
+      const ComponentClass = lookup_classComponent[theKey];
+
+      // acc[theKey] = new ComponentClass(value);
+      // if (theKey === 'slat') {
+      //   acc['slat'] = new ComponentClass(value) as TclassComponentDict['slat'];
+      // }
+
+      return acc;
+    }, {} as TclassComponentDict);
+
+    // lookup_classComponent
+    // const classComponent_slat = lookup_classComponent['slat'];
+
+    // const foo = new classComponent_slat({
+    //   state_component: data_componentDict['slat']!,
+    //   setState_component: createSetComponent({
+    //     pordKey: activeClassProd.state.key,
+    //     componentKey: 'slat',
+    //   }),
+    // });
 
     // return activeClassProd.state.data_componentDict;
   }, [activeClassProd]);
