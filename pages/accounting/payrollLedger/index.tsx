@@ -99,6 +99,7 @@ export default function PayrollLedger() {
     const comp_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_minuteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const self_contributed_retirement_fundRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
 
     // popout
     const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
@@ -243,6 +244,7 @@ export default function PayrollLedger() {
                     leave_day: item.leave_day || '0',
                     leave_detail: item.leave_detail || '{}',
                     leave_day_pay: item.leave_day_pay || '0',
+                    self_contributed_retirement_fund: item.self_contributed_retirement_fund || '0'
                 };
             });
 
@@ -391,7 +393,11 @@ export default function PayrollLedger() {
 
                     <div className={scss.body_content1}>
                         <div className={scss.thead1}>
-                            <span>員工編號</span>
+                            <span
+                                style={{
+                                    width: '300px',
+                                    backgroundColor: '#f5f5f5'
+                                }}>員工編號</span>
                             <span>部門</span>
                             <span>姓名</span>
                             <span>到職日</span>
@@ -420,6 +426,7 @@ export default function PayrollLedger() {
                             <span>遲到次數</span>
                             <span>遲到分數</span>
                             <span>遲到扣款</span>
+                            <span>自提退休金</span>
                             <span>本月應扣</span>
                             <span>本月實領</span>
                         </div>
@@ -439,7 +446,11 @@ export default function PayrollLedger() {
                                     return (
                                         <CellWithBar key={index} className={scss.panelHeader1}>
                                             <div className={scss.row01}>
-                                                <span>{_item.id_number}</span>
+                                                <span
+                                                    style={{
+                                                        width: '300px',
+                                                        backgroundColor: 'white'
+                                                    }}>{_item.id_number}</span>
                                                 <span>{_item.department}</span>
                                                 <span>{_item.ch_name}</span>
                                                 <span>{getTaiwanDateStr(_item.start_date)}</span>
@@ -677,6 +688,19 @@ export default function PayrollLedger() {
                                                         type={"number"}
                                                         value={Number(_item.late_deduction).toLocaleString()}
                                                     />
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={self_contributed_retirement_fundRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={true}
+                                                        type="text" // 改為 text
+                                                        value={Number(_item.self_contributed_retirement_fund).toLocaleString()} // 保持格式化
+                                                    />
+
                                                 </span>
                                                 <span>
                                                     {_item.deduction_total.toLocaleString()}

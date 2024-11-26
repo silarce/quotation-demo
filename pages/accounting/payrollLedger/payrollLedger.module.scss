@@ -40,7 +40,7 @@
     top: 0;
     z-index: 1000; /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns: repeat(31, 100px); /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns: repeat(32, 100px); /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
@@ -59,7 +59,7 @@
 .thead1 span:nth-child(3) {
     position: sticky;
     background-color: $bgc01; /* 固定欄位的背景顏色 */
-    z-index: 1001; /* 確保固定欄位在最上層 */
+    // z-index: 1001; /* 確保固定欄位在最上層 */
     // padding: 0 10px; /* 添加內邊距 */
     
 }
@@ -108,7 +108,7 @@ div.panelHeader1 {
 
     .row01 {
         display: grid;
-        grid-template-columns: repeat(31, 100px); /* 設定25欄，這樣每欄寬度一致 */
+        grid-template-columns: repeat(32, 100px); /* 設定25欄，這樣每欄寬度一致 */
         gap: 5px;
         position: relative;  /* 確保 sticky 定位可以參照這個容器 */
     }
@@ -119,7 +119,7 @@ div.panelHeader1 {
     .row01 span:nth-child(3) {
         position: sticky;
         background-color: white; /* 固定欄位的背景顏色 */
-        z-index: 1001; /* 確保這些欄位在其他欄位上層 */
+        // z-index: 1001; /* 確保這些欄位在其他欄位上層 */
         // padding: 0 10px; /* 增加內邊距，根據需要調整 */
         
     }
