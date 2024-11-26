@@ -8,10 +8,11 @@ import styled from './nav.module.scss';
 // 路由表
 import {
   TtopPathListConfig,
-  topPathList,
   erpFeaturesLookup,
   swappedErpFeaturesLookup,
-} from 'components/Layer/SideNav/pathList';
+} from 'components/Layer/SideNav/pathList/type';
+
+import { topPathList } from 'components/Layer/SideNav/pathList/top';
 
 // context
 import { LayerCtx } from 'components/Layer/Layer';
@@ -25,12 +26,12 @@ export default function Nav() {
   return (
     <div className={styled.container}>
       {topPathList.map((item, index) => {
-        const { icon, path01, href, hrefList, label, subLabel, erpFeature } = item;
-        const reg = new RegExp(`^${path01}`);
+        const { icon, path, href, hrefList, label, subLabel, erpFeature } = item;
+        const reg = new RegExp(`^${path}`);
         let active = reg.test(pathname) ? styled.active : '';
 
-        if (path01 === '/') {
-          active = pathname === path01 ? styled.active : '';
+        if (path === '/') {
+          active = pathname === path ? styled.active : '';
         }
 
         const isPassed = checkErpFeature({ erpFeature, userErpFeature });
