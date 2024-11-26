@@ -2,7 +2,7 @@ import { devPass, TsidePathConfig } from "../type";
 
 export default function SidePathResearch (){
     return ((): TsidePathConfig => {
-        const path = '/research';
+        const path = '/researchDepartment';
 
         return {
             path,
