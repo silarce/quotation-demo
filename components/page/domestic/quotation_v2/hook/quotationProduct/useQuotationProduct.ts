@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
@@ -15,24 +15,36 @@ import type {
 
 // import { ClassProd_SJ202 } from './class/prod/classProd_SJ302';
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
+import { lookup_classComponent } from './class/component';
 
 import {
   TconfigItem,
   TcellKey,
   TnodeConfig,
+  //
   defaultKeyArr,
   createNodeConfig_prime,
   nodeConfig_origin,
+  //
+  defaultKeyArr_component,
 } from './class/prod/config';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 // type
-import type { TstateProd, TstateProdDict } from './type';
+import type {
+  TstateProd,
+  TsetProd,
+  //
+  // TstateProdData,
+  TstateProdDict,
+  //
+  // TstateComponentData,
+  // TcomponentRawDataDict,
+  TsetComponent,
+} from './type';
 
 // ================================================================================
-
-type TsetProd = React.Dispatch<React.SetStateAction<TstateProd>>;
 
 type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
 
@@ -87,7 +99,6 @@ const useQuotationProduct = ({
           ...prev,
           [key]: {
             ...prev[key],
-            // ...newState, newState若是函數，這個寫法不會壞掉?
             ...newStateValue,
           },
         };
@@ -95,6 +106,33 @@ const useQuotationProduct = ({
     };
 
     return setProd;
+  };
+
+  const createSetComponent = <T extends keyof TstateProd['data_componentDict']>({
+    pordKey,
+    componentKey,
+  }: {
+    pordKey: string;
+    componentKey: T;
+  }): TsetComponent<T> => {
+    const setComponent: TsetComponent<T> = (newStateComponent) => {
+      setState_prodDict((prev) => {
+        const copy = { ...prev };
+        const prod = copy[pordKey];
+        const data_componentDict = prod.data_componentDict;
+
+        const newStateValue =
+          typeof newStateComponent === 'function'
+            ? newStateComponent(data_componentDict[componentKey])
+            : newStateComponent;
+
+        data_componentDict[componentKey] = newStateValue;
+
+        return copy;
+      });
+    };
+
+    return setComponent;
   };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
@@ -146,6 +184,27 @@ const useQuotationProduct = ({
 
     return classProdDict[activeProdKey];
   }, [activeProdKey, classProdDict]);
+
+  const activeClassComponentArr = useMemo(() => {
+    if (!activeClassProd) {
+      return undefined;
+    }
+
+    const data_componentDict = activeClassProd.state.data_componentDict;
+
+    // lookup_classComponent
+    const classComponent_slat = lookup_classComponent['slat'];
+
+    const foo = new classComponent_slat({
+      state_component: data_componentDict['slat']!,
+      setState_component: createSetComponent({
+        pordKey: activeClassProd.state.key,
+        componentKey: 'slat',
+      }),
+    });
+
+    // return activeClassProd.state.data_componentDict;
+  }, [activeClassProd]);
 
   // -----------------------------------------------------------------------
   // region useEffect

@@ -19,35 +19,7 @@ import {
   //
 } from 'js/api/dtoTypes';
 
-// interface TprodData {}
-
-// type TcomponentRawData =
-//   | TdoorSlatDto
-//   | TdoorBottomBarDto
-//   | TdoorGuideRailDto
-//   | TdoorSidePlateDto
-//   | TdoorRollerDto
-//   | TdoorMotorDto
-//   | TdoorMotorAccessoriesDto
-//   | TdoorHeadBoxDto
-//   | TdoorMiddlePillarDto
-//   | TdoorBackBoneDto;
-
-// TdoorComponentType
-
-// type TcomponentRawDataDict = {
-//   slats: TdoorSlatDto;
-//   bottomBars: TdoorBottomBarDto;
-//   guideRails: TdoorGuideRailDto;
-//   sidePlates: TdoorSidePlateDto;
-//   rollers: TdoorRollerDto;
-//   motors: TdoorMotorDto;
-//   motorAccessories: TdoorMotorAccessoriesDto;
-//   headBoxes: TdoorHeadBoxDto;
-//   middlePillar: TdoorMiddlePillarDto;
-//   backBone: TdoorBackBoneDto;
-// };
-
+// 確保key是TdoorComponentType
 type TcomponentRawDataDict = {
   [K in TdoorComponentType]: K extends 'slat'
     ? TdoorSlatDto
@@ -242,7 +214,6 @@ interface TstateProdData {
 
 // MARK:TstateComponentData
 interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
-  // type: TdoorComponentType;
   type: T;
   //
   // 輸出
@@ -269,23 +240,25 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   //
 }
 
+type Tdata_componentDict = {
+  slat?: TstateComponentData<'slat'>;
+  bottomBar?: TstateComponentData<'bottomBar'>;
+  guideRail?: TstateComponentData<'guideRail'>;
+  sidePlate?: TstateComponentData<'sidePlate'>;
+  roller?: TstateComponentData<'roller'>;
+  motor?: TstateComponentData<'motor'>;
+  motorAccessories?: TstateComponentData<'motorAccessories'>;
+  headBox?: TstateComponentData<'headBox'>;
+  middlePillar?: TstateComponentData<'middlePillar'>;
+  backBone?: TstateComponentData<'backBone'>;
+};
+
 // MARK: TstateProd
 interface TstateProd {
   readonly key: string;
   data_prod: TstateProdData;
 
-  data_componentDict: {
-    slat?: TstateComponentData<'slat'>;
-    bottomBar?: TstateComponentData<'bottomBar'>;
-    guideRail?: TstateComponentData<'guideRail'>;
-    sidePlate?: TstateComponentData<'sidePlate'>;
-    roller?: TstateComponentData<'roller'>;
-    motor?: TstateComponentData<'motor'>;
-    motorAccessories?: TstateComponentData<'motorAccessories'>;
-    headBox?: TstateComponentData<'headBox'>;
-    middlePillar?: TstateComponentData<'middlePillar'>;
-    backBone?: TstateComponentData<'backBone'>;
-  };
+  data_componentDict: Tdata_componentDict;
 
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 }
@@ -294,4 +267,21 @@ interface TstateProdDict {
   [key: string]: TstateProd;
 }
 
-export type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData };
+//控制TstateProd
+type TsetProd = React.Dispatch<React.SetStateAction<TstateProd>>;
+// 控制data_componentDict[T]
+type TsetComponent<T extends keyof Tdata_componentDict> = //
+  React.Dispatch<React.SetStateAction<Tdata_componentDict[T]>>;
+
+export type {
+  TstateProd,
+  TsetProd,
+  //
+  TstateProdData,
+  TstateProdDict,
+  //
+  TstateComponentData,
+  TcomponentRawDataDict,
+  Tdata_componentDict,
+  TsetComponent,
+};
