@@ -91,10 +91,11 @@ export default function AddEmployee() {
           const id = postBody.id;
 
           await apiPatchEmployee(postBody, id);
-          router.push({
-            pathname: `/setting/employees`,
-          });
+          // router.push({
+          //   pathname: `/setting/employees`,
+          // });
           myAlert.success({ title: '變更人員資料完成' });
+          updateEmployee();
         } catch (error) {
           const err = error as Error;
           const title = '變更人員資料失敗、未知原因';

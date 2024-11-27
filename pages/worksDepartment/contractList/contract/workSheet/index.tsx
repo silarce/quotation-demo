@@ -31,21 +31,6 @@ import ProductCard, {
 } from 'components/page/worksDepartment/worksheet/productCard';
 import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
-import {
-  Form_product_basic,
-  Form_product_ABCD,
-  Form_product_motor,
-  Form_product_headBox,
-  Form_product_roller,
-  Form_product_slat,
-  Form_product_guideRail,
-  Form_product_bottomBar,
-  Form_product_sidePlate,
-  Form_product_accessories,
-  Form_product_other,
-  //
-  WorksheetTable,
-} from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
 // import WorkSheetProductOutline, {
 //   Tcontrol_productOutline,
@@ -97,7 +82,13 @@ import {
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // hook
-// import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
+import {
+  TdoorComponentType_old,
+  TupdateQuotationProductComponentDto_old,
+  TquotationProductComponentDto_old,
+  TcreateQuotationProductComponentDto_old,
+  TquotationProductItemDto_old,
+} from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
@@ -125,6 +116,7 @@ import type {
 // zustand // hook
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
+import WorksheetForm from './WorksheetForm';
 
 // ====================================================================
 
@@ -403,8 +395,8 @@ export default function Worksheet({
       init({
         worksheetId: activeWorksheetId!,
         itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0],
-        contractProductItemArr: contractProductItems ?? [],
+        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
+        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
         qty: contractProductItems?.length ?? 0,
         originalAccessories: activeWorksheetOriginalAccessories,
       });
@@ -832,71 +824,7 @@ export default function Worksheet({
 // ===========================================================================
 // ===========================================================================
 
-const WorksheetForm = ({
-  //
-  reqPatchWorkSheet,
-  disabled,
-}: {
-  reqPatchWorkSheet: () => void;
-  disabled?: boolean;
-}) => {
-  // // 這個做法畫面會閃一下 不理想
 
-  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
-    useShallow((state) => ({
-      shouldCalcData: state.shouldCalcData,
-      shouldCalcData2: state.shouldCalcData2,
-      calcData_2: state.calcData_2,
-    }))
-  );
-
-  return (
-    <form className={scss.productForm}>
-      <div>
-        <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
-        <Form_product_basic disabled={disabled} />
-      </div>
-      <div className={scss.mainFormWrapper}>
-        <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
-        <div className={scss.formGrid}>
-          <Form_product_ABCD disabled={disabled} />
-          <Form_product_motor disabled={disabled} />
-          <Form_product_headBox disabled={disabled} />
-          <Form_product_roller disabled={disabled} />
-          <Form_product_slat disabled={disabled} />
-          <Form_product_guideRail disabled={disabled} />
-          <Form_product_bottomBar disabled={disabled} />
-          <Form_product_sidePlate disabled={disabled} />
-          <Form_product_other disabled={disabled} />
-        </div>
-        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
-      </div>
-      <div>
-        <Form_product_accessories disabled={disabled} />
-      </div>
-      <div className={classNames('relative', disabled && 'hidden')}>
-        <MyButton_v2 px="px32" className={classNames('block m-auto')} onClick={calcData_2}>
-          取得剩餘資料
-        </MyButton_v2>
-        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
-      </div>
-      <div className="relative">
-        <WorksheetTable />
-        {shouldCalcData2 && <div className={scss.cover}></div>}
-      </div>
-      <div className={classNames('relative', disabled && 'hidden')}>
-        <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
-          確認上傳
-        </MyButton_v2>
-        <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
-      </div>
-    </form>
-  );
-};
-
-// ===========================================================================
-// ===========================================================================
-// ============================================================================
 
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {

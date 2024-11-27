@@ -81,6 +81,27 @@ const options_doorType = optionsCreator_quoteType();
 
 // region TYPE
 
+type TdoorComponentType_old = Extract<
+  TdoorComponentType,
+  'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox'
+>;
+
+type TupdateQuotationProductComponentDto_old = Omit<TupdateQuotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TquotationProductComponentDto_old = Omit<TquotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TcreateQuotationProductComponentDto_old = Omit<TcreateQuotationProductComponentDto, 'type'> & {
+  type: TdoorComponentType_old;
+};
+
+type TquotationProductItemDto_old = Omit<TquotationProductItemDto, 'components'> & {
+  components: TquotationProductComponentDto_old[];
+};
+
 type TavalibleComponentIdList = {
   slat: string;
   bottomBar: string;
@@ -92,24 +113,34 @@ type TavalibleComponentIdList = {
   headBox: string;
 };
 
+// type TcreateComponentList = {
+//   slat: TcreateQuotationProductComponentDto;
+//   bottomBar: TcreateQuotationProductComponentDto;
+//   guideRail: TcreateQuotationProductComponentDto;
+//   sidePlate: TcreateQuotationProductComponentDto;
+//   roller: TcreateQuotationProductComponentDto;
+//   motor: TcreateQuotationProductComponentDto;
+//   motorAccessories: TcreateQuotationProductComponentDto;
+//   headBox: TcreateQuotationProductComponentDto;
+// };
 type TcreateComponentList = {
-  slat: TcreateQuotationProductComponentDto;
-  bottomBar: TcreateQuotationProductComponentDto;
-  guideRail: TcreateQuotationProductComponentDto;
-  sidePlate: TcreateQuotationProductComponentDto;
-  roller: TcreateQuotationProductComponentDto;
-  motor: TcreateQuotationProductComponentDto;
-  motorAccessories: TcreateQuotationProductComponentDto;
-  headBox: TcreateQuotationProductComponentDto;
+  slat: TcreateQuotationProductComponentDto_old;
+  bottomBar: TcreateQuotationProductComponentDto_old;
+  guideRail: TcreateQuotationProductComponentDto_old;
+  sidePlate: TcreateQuotationProductComponentDto_old;
+  roller: TcreateQuotationProductComponentDto_old;
+  motor: TcreateQuotationProductComponentDto_old;
+  motorAccessories: TcreateQuotationProductComponentDto_old;
+  headBox: TcreateQuotationProductComponentDto_old;
 };
 
 type Tworksheet = {
-  contractProductItem_ori: TquotationProductItemDto | undefined;
-  contractProductItemArr_ori: TquotationProductItemDto[] | undefined;
+  contractProductItem_ori: TquotationProductItemDto_old | undefined;
+  contractProductItemArr_ori: TquotationProductItemDto_old[] | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   // componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
-  componentList: { [key in TdoorComponentType]: TupdateQuotationProductComponentDto } | undefined;
+  componentList: { [key in TdoorComponentType_old]: TupdateQuotationProductComponentDto_old } | undefined;
   accessories: TquotationProductAccessoryDto[];
 
   // 從後端取得，在init與calcData取得
@@ -190,12 +221,12 @@ type Tworksheet = {
 
     setMotor_str: (props: {
       key:
-        | 'horsepower'
-        | 'vendor'
-        | 'electricMotorChainType'
-        | 'hasMotorSupportStand'
-        | 'motorLockBox'
-        | 'electricMotorDirection';
+      | 'horsepower'
+      | 'vendor'
+      | 'electricMotorChainType'
+      | 'hasMotorSupportStand'
+      | 'motorLockBox'
+      | 'electricMotorDirection';
       value: string;
     }) => void;
   };
@@ -1218,6 +1249,7 @@ const useWorksheet = create<Tworksheet>(
         getOptions_guideRail,
         getOptions_bottomBarAngleIronAndPlate,
         guideRail,
+        generalSpec
       } = get();
 
       const isSpecialProd = getIsSpecialProd();
@@ -1306,10 +1338,14 @@ const useWorksheet = create<Tworksheet>(
 
       await update_generalSpec();
 
+      if (!get().generalSpec) {
+        return
+      }
+
       set(
         produce((state) => {
           const { defaultHp, defaultVendor, defaultBoxB, defaultBoxD } = produceMotor(
-            state.generalSpec.motors[state.generalSpec.defaultMotorIndex]
+            state.generalSpec?.motors[state.generalSpec.defaultMotorIndex]
           );
 
           state.motor.horsepower = defaultHp;
@@ -1559,10 +1595,10 @@ const useWorksheet = create<Tworksheet>(
         } catch (error) {
           const err = error as AxiosError<
             | {
-                error: string;
-                message: string;
-                statusCode: number;
-              }
+              error: string;
+              message: string;
+              statusCode: number;
+            }
             | undefined
           >;
 
@@ -1581,7 +1617,7 @@ const useWorksheet = create<Tworksheet>(
       const createComponentList_partial: Partial<TcreateComponentList> = {};
 
       componentIdListEntries.forEach(([theKey, value]) => {
-        const key = theKey as TdoorComponentType;
+        const key = theKey as TdoorComponentType_old;
 
         const bom = doorProductBom![key];
 
@@ -1905,7 +1941,7 @@ const getOptions_bottomBarAngleIronAndPlate = (doorModelName: TdoorModel | undef
   if (doorModelName && doorModelName in lookup_options_bottomBarAngleIronAndPlate) {
     const { angleIron, plate } =
       lookup_options_bottomBarAngleIronAndPlate[
-        doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
+      doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
       ];
 
     return {
@@ -1989,8 +2025,8 @@ const getOptions_guideRail = ({
 const getOptions_doorModelInfo = (
   doorModelInfoList:
     | {
-        [key: string]: TdoorModelInfoDto;
-      }
+      [key: string]: TdoorModelInfoDto;
+    }
     | undefined
 ) => {
   const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
@@ -2100,14 +2136,14 @@ const getOptions_diameter = (rollerArr: TdoorRollerDto[]) => {
 
 // 取得各項馬達預設值
 const produceMotor = (defaultMotor: TdoorGeneralSpecsMotorDto) => {
-  const boxList = defaultMotor.box;
+  const boxList = defaultMotor?.box;
 
   const defaultVendor = !boxList ? '東元' : '東元' in boxList || 'default' in boxList ? '東元' : '大同';
 
   const box = boxList?.東元 || boxList?.default || boxList?.大同;
 
   const { boxB, boxD } = box ?? {};
-  let defaultHp = defaultMotor.hp;
+  let defaultHp = defaultMotor?.hp;
 
   if (defaultHp === '1.5') {
     defaultHp = '1 1/2';
@@ -2473,3 +2509,11 @@ const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', 
 
 // =====================================================================
 export { useWorksheet };
+
+export type {
+  TdoorComponentType_old,
+  TupdateQuotationProductComponentDto_old,
+  TquotationProductComponentDto_old,
+  TcreateQuotationProductComponentDto_old,
+  TquotationProductItemDto_old,
+};

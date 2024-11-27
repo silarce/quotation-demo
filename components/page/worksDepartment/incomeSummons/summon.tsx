@@ -28,8 +28,6 @@ import { TreqPatch } from 'pages/worksDepartment/incomeSummons';
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 // import { UpDownArrow } from 'components/global/myAntd/collapse';
 
-import scss from './summon.module.scss';
-
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits } from 'js/utils/calc/calcIncomeBill';
@@ -43,6 +41,9 @@ import { AppContext } from 'pages/_app';
 import { optionsCreator_currency } from 'js/utils/options/options';
 
 import { apiGetContract } from 'js/api/api_quotation';
+
+// css
+import scss from './summon.module.scss';
 
 // ============================================================================
 
@@ -475,21 +476,6 @@ const cellPropsList_summon: TcellPropsList_summon = {
       setState_incomeBillSerial: setState_incomeBillSerial,
       router,
     }) => {
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-center',
-          value: state_incomeBillSerial.contractNumber,
-          onChange: (e) => {
-            setState_incomeBillSerial((prev) => {
-              return {
-                ...prev,
-                contractNumber: e.target.value,
-              };
-            });
-          },
-        },
-      };
-
       const pushToAccountReceivable = async () => {
         await apiGetContract({
           filter: {
@@ -516,15 +502,33 @@ const cellPropsList_summon: TcellPropsList_summon = {
           });
       };
 
-      const node = (
-        <span className={'cursor-pointer'} onClick={() => pushToAccountReceivable()}>
-          {state_incomeBillSerial.contractNumber}
-        </span>
-      );
+      const inputSelProps: TinputSelProps = {
+        inputProps: {
+          props: {
+            value: state_incomeBillSerial.contractNumber,
+            onChange: (e) => {
+              setState_incomeBillSerial((prev) => {
+                return {
+                  ...prev,
+                  contractNumber: e.target.value,
+                };
+              });
+            },
+          },
+        },
+      };
 
-      const props = disabled ? { node } : { inputProps };
+      if (disabled && !!state_incomeBillSerial.contractNumber) {
+        inputSelProps.onClick = pushToAccountReceivable;
+        inputSelProps.disabled = false;
+        inputSelProps.showBaseline = 'invisible';
 
-      return props;
+        const inputPropsProps = inputSelProps.inputProps!.props!;
+        inputPropsProps.readOnly = true;
+        inputPropsProps.className = scss.inputLink;
+      }
+
+      return inputSelProps;
     },
   },
   projectName: {
@@ -1411,6 +1415,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       // 與慣例不符對UX不好，因此在這裡將數值正負反轉
       exchangeBenefits = -exchangeBenefits;
       // w -----------------------------------------------------
+      const exchangeBenefits_str = exchangeBenefits.toLocaleString();
 
       // const { type, value } = reducer_input({
       //   disabled: true,
@@ -1420,7 +1425,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       const inputSelProps: TinputSelProps = {
         disabled: true,
         showBaseline: 'invisible',
-        node: exchangeBenefits,
+        node: exchangeBenefits_str,
         // inputProps: {
         //   props: {
         //     className: 'text-right',

@@ -967,7 +967,9 @@ export type TdoorComponentType =
   | 'roller'
   | 'motor'
   | 'motorAccessories'
-  | 'headBox';
+  | 'headBox'
+  | 'middlePillar'
+  | 'backBone';
 
 export type TquotationProductComponentDto = {
   id: string;

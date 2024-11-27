@@ -85,8 +85,8 @@ export const optionsCreator_gender = (): Toption[] => [
 
 // 婚姻狀況
 export const optionsCreator_marital = (): Toption[] => [
-  { value: '已婚', label: '未婚' },
-  { value: '未婚', label: '已婚' },
+  { value: '已婚', label: '已婚' },
+  { value: '未婚', label: '未婚' },
 ];
 
 // 扣稅類別
