@@ -35,15 +35,20 @@ import {
   TconfigItem,
   TcellKey,
   TnodeConfig,
-  TcellKey_component,
+
   //
   defaultKeyArr,
   createNodeConfig_prime,
   nodeConfig_origin,
   //
+} from './class/prod/config';
+
+import {
+  TnodeConfig_component,
+  TcellKey_component,
   defaultKeyArr_component,
   createNodeConfig_component,
-} from './class/prod/config';
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 

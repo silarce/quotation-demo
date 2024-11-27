@@ -54,6 +54,7 @@ export default function QuotationProdTable({
   // MARK:RENDER
   return (
     <>
+      {/* 主產品 product */}
       <div className={classNames(scss.prodTable, className)}>
         <QuotationRow_dndThead
           disabled={disabled}
@@ -151,8 +152,8 @@ export default function QuotationProdTable({
       </div>
 
       <br />
-
-      <div className={scss.prodComponent}>
+      {/* 材料配件 component */}
+      <div className={scss.componentTable}>
         <QuotationRow_dndThead
           disabled={disabled}
           keyArr={cellKeyArr_component}
@@ -243,32 +244,8 @@ export default function QuotationProdTable({
           })}
         </Table_dnd>
       </div>
-      {/* QuotationRow */}
-      {/* {activedClassComponentArr?.map((classComponent, index) => {
-        if (!classComponent) {
-          return null;
-        }
-
-        const { nodeConfig } = classComponent;
-
-        return (
-          <QuotationRow key={index}>
-            {cellKeyArr_component.map((cellKey) => {
-              const { style, className, createNode } = nodeConfig[cellKey];
-              const node = createNode({
-                disabled,
-                classComponent,
-              });
-
-              return (
-                <Cell key={cellKey} className={classNames(className)} style={style}>
-                  {node}
-                </Cell>
-              );
-            })}
-          </QuotationRow>
-        );
-      })} */}
+      {/* 選配設定 */}
+      <div className={scss.accessoryTable}></div>
     </>
   );
 }

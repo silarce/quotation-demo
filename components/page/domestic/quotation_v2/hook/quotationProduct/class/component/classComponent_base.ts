@@ -11,7 +11,7 @@ import {
   TsetComponent,
 } from '../../type';
 
-import { TnodeConfig_component } from '../prod/config';
+import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
 
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
 interface Interface_ClassComponent_base {

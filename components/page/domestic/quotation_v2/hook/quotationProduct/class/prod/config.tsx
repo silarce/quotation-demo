@@ -1,9 +1,11 @@
-import { memo } from 'react';
-
 import _ from 'lodash';
 
 // gear
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, {
+  TinputSelProps,
+  InputSel_s1,
+  InputSel_memo_select,
+} from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import {
   lookup_classProd,
@@ -27,13 +29,10 @@ import { TdoorModelInfoDto } from 'js/api/api_product';
 const options_quoteType = optionsCreator_quoteType();
 // =======================================================================
 
-interface TcoTconfigItem_base {
+interface TconfigItem_prod {
   readonly label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-}
-// ------------------------------------------------------------------------
-interface TconfigItem_prod extends TcoTconfigItem_base {
   createNode: (params: {
     //
     classProd: Interface_ClassProd_base;
@@ -62,35 +61,7 @@ type TnodeConfig = {
 
 // ----------------------------------------------------------------------------
 
-interface TconfigItem_component extends TcoTconfigItem_base {
-  createNode: (params: {
-    //
-    classComponent: Interface_ClassComponent_prime;
-    disabled: boolean;
-  }) => React.ReactNode;
-}
-
-type TcellKey_component = keyof Pick<Interface_ClassComponent_prime, 'name' | 'number' | 'desc'>;
-
-type TnodeConfig_component = {
-  readonly [key in TcellKey_component]: TconfigItem_component;
-};
-
 // =======================================================================
-
-const InputSel_cooked = (props: Parameters<typeof InputSel>[0]) => {
-  return <InputSel showBaseline="auto" {...props} />;
-};
-
-const InputSel_meme_forSelect = memo(InputSel_cooked, (prev, next) => {
-  const { value: _oldValue, options: oldOptions } = prev?.selectProps?.props ?? {};
-  const { value: _newValue, options: newOptions } = next?.selectProps?.props ?? {};
-
-  const oldValue = (_oldValue as { value: string }).value;
-  const newValue = (_newValue as { value: string }).value;
-
-  return oldValue === newValue && _.isEqual(oldOptions, newOptions) && prev.disabled === next.disabled;
-});
 
 // =======================================================================
 
@@ -126,7 +97,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_cooked inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -144,7 +115,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_cooked inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -165,7 +136,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_meme_forSelect selectProps={selectProps} disabled={disabled} />;
+      return <InputSel_memo_select selectProps={selectProps} disabled={disabled} />;
     },
   },
 
@@ -193,7 +164,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_cooked inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -213,7 +184,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_cooked inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -233,7 +204,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_cooked inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -254,7 +225,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_meme_forSelect disabled={disabled} selectProps={selectProps} />;
+      return <InputSel_memo_select disabled={disabled} selectProps={selectProps} />;
     },
   },
 
@@ -275,7 +246,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_meme_forSelect disabled={disabled} selectProps={selectProps} />;
+      return <InputSel_memo_select disabled={disabled} selectProps={selectProps} />;
     },
   },
 
@@ -285,7 +256,7 @@ const nodeConfig_origin: TnodeConfig = {
       width: 100,
     },
     createNode({ classProd }) {
-      // return <InputSel_cooked node={classProd.area} showBaseline="invisible" />;
+      // return <InputSel_s1 node={classProd.area} showBaseline="invisible" />;
       return classProd.area;
     },
   },
@@ -296,7 +267,7 @@ const nodeConfig_origin: TnodeConfig = {
       width: 100,
     },
     createNode({ classProd }) {
-      // return <InputSel_cooked node={classProd.volume} showBaseline="invisible" />;
+      // return <InputSel_s1 node={classProd.volume} showBaseline="invisible" />;
       return classProd.volume;
     },
   },
@@ -334,7 +305,7 @@ const createNodeConfig_prime = ({
       },
     };
 
-    return <InputSel_meme_forSelect selectProps={selectProps} disabled={disabled} />;
+    return <InputSel_memo_select selectProps={selectProps} disabled={disabled} />;
   };
 
   return nodeConfig_prime;
@@ -342,58 +313,16 @@ const createNodeConfig_prime = ({
 
 // ===============================================================================
 
-const defaultKeyArr_component: TcellKey_component[] = [
-  // 'name',
-  'number',
-  'desc',
-];
-
-const createNodeConfig_component = (): TnodeConfig_component => {
-  const nodeConfig_component: TnodeConfig_component = {
-    name: {
-      label: '名稱',
-      style: { width: 100 },
-      createNode({ disabled, classComponent }) {
-        return classComponent.name;
-      },
-    },
-    number: {
-      label: '代號',
-      style: { width: 100 },
-      createNode({ disabled, classComponent }) {
-        return classComponent.number;
-      },
-    },
-    desc: {
-      label: '說明',
-      style: { width: 200 },
-      createNode({ disabled, classComponent }) {
-        return classComponent.desc;
-      },
-    },
-  };
-
-  return nodeConfig_component;
-};
-
 // ===============================================================================
 export type {
   //
   TconfigItem_prod as TconfigItem,
   TcellKey,
   TnodeConfig,
-  //
-  TnodeConfig_component,
-  TcellKey_component,
 };
 export {
   //
   defaultKeyArr,
   createNodeConfig_prime,
   nodeConfig_origin,
-  //
-  // nodeConfig_component,
-  // copyNodeConfig_component,
-  defaultKeyArr_component,
-  createNodeConfig_component,
 };
