@@ -266,6 +266,7 @@ interface TstateProd {
   data_prod: TstateProdData;
 
   data_componentDict: Tdata_componentDict;
+  componentKeyArr: TdoorComponentType[];
 
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 }

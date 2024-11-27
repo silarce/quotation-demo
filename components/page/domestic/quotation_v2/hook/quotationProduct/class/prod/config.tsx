@@ -342,7 +342,11 @@ const createNodeConfig_prime = ({
 
 // ===============================================================================
 
-const defaultKeyArr_component: TcellKey_component[] = ['name', 'number', 'desc'];
+const defaultKeyArr_component: TcellKey_component[] = [
+  // 'name',
+  'number',
+  'desc',
+];
 
 const createNodeConfig_component = (): TnodeConfig_component => {
   const nodeConfig_component: TnodeConfig_component = {

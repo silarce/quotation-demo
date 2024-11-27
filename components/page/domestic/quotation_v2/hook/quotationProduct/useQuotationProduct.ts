@@ -131,6 +131,7 @@ const useQuotationProduct = ({
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
 
   // -----------------------------------------------------------------------
+  // region COOKED
 
   const nodeConfig_prime = useMemo(() => {
     return createNodeConfig_prime({
@@ -139,7 +140,7 @@ const useQuotationProduct = ({
   }, [doorModelDict]);
 
   // -----------------------------------------------------------------------
-  // region FUNCTION
+  // region STATE HANDLER
 
   const createSetProd = (key: string): TsetProd => {
     const setProd: TsetProd = (newState) => {
@@ -190,11 +191,30 @@ const useQuotationProduct = ({
     setActiveProdKey(stateProd?.key);
   };
 
+  const setComponentKeyArr = (newKeyArr: TdoorComponentType[]) => {
+    if (!activeProdKey) {
+      return;
+    }
+
+    setState_prodDict((prev) => {
+      const copy = { ...prev };
+      const activedProd = copy[activeProdKey];
+      activedProd.componentKeyArr = newKeyArr;
+
+      return copy;
+    });
+  };
+
   // -----------------------------------------------------------------------
 
   // region COOKED
 
+  const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
+
+  const componentKeyArr = activedProd?.componentKeyArr;
+
   // class用來管理資料狀態
+  // MARK:classProdDict
   const classProdDict = useMemo(() => {
     if (!doorModelDict) {
       return {};
@@ -228,7 +248,7 @@ const useQuotationProduct = ({
   }, [state_prodDict, nodeConfig_prime]);
 
   // MARK:activeClassProd
-  const activeClassProd = useMemo(() => {
+  const activedClassProd = useMemo(() => {
     if (!activeProdKey) {
       return undefined;
     }
@@ -236,21 +256,38 @@ const useQuotationProduct = ({
     return classProdDict[activeProdKey];
   }, [activeProdKey, classProdDict]);
 
-  const activeClassComponentArr = useMemo(() => {
-    if (!activeClassProd) {
+  // MARK:activeClassComponentArr
+  const activedClassComponentArr = useMemo(() => {
+    if (!activedClassProd) {
       return undefined;
     }
 
-    const data_componentDict = activeClassProd.state.data_componentDict;
+    const data_componentDict = activedClassProd.state.data_componentDict;
 
     const classComponentDict: TclassComponentDict = createClassComponentDict({
       data_componentDict,
-      activeClassProdKey: activeClassProd.state.key,
+      activeClassProdKey: activedClassProd.state.key,
       createSetComponent,
     });
 
     return Object.values(classComponentDict);
-  }, [activeClassProd]);
+  }, [activedClassProd]);
+
+  const activedClassComponentDict = useMemo(() => {
+    if (!activedClassProd) {
+      return undefined;
+    }
+
+    const data_componentDict = activedClassProd.state.data_componentDict;
+
+    const classComponentDict: TclassComponentDict = createClassComponentDict({
+      data_componentDict,
+      activeClassProdKey: activedClassProd.state.key,
+      createSetComponent,
+    });
+
+    return classComponentDict;
+  }, [activedClassProd]);
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -260,9 +297,12 @@ const useQuotationProduct = ({
     setProdKeyArr(defaultState_copy.prodKeyArr);
   }, [defaultState_copy, disabled]);
 
+  // -----------------------------------------------------------------------------
+  // MARK: RETURN
   return {
     classProdDict,
-    activeClassProd,
+    activedClassProd,
+    activedProd,
     //
     cellKeyArr,
     setCellKeyArr,
@@ -271,9 +311,12 @@ const useQuotationProduct = ({
     //
     choseActiveProd,
     //
-    activeClassComponentArr,
+    activedClassComponentArr,
+    activedClassComponentDict,
     cellKeyArr_component,
     setCellKeyArr_component,
+    componentKeyArr,
+    setComponentKeyArr,
   };
 };
 

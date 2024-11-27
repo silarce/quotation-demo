@@ -32,7 +32,7 @@ export default function QuotationProdTable({
   //
   //
   classProdDict,
-  activeClassProd,
+  activedClassProd: activeClassProd,
   //
   cellKeyArr,
   setCellKeyArr,
@@ -41,9 +41,12 @@ export default function QuotationProdTable({
   //
   choseActiveProd,
   //
-  activeClassComponentArr,
+  activedClassComponentArr,
+  activedClassComponentDict,
   cellKeyArr_component,
   setCellKeyArr_component,
+  componentKeyArr,
+  setComponentKeyArr,
 }: TuseQuotationProductInstance & {
   disabled: boolean;
   className?: string;
@@ -65,7 +68,9 @@ export default function QuotationProdTable({
               <Cell
                 className={classNames(nodeConfig_origin['itemName'].className)}
                 style={nodeConfig_origin['itemName'].style}
-              ></Cell>
+              >
+                {nodeConfig_origin['itemName'].label}
+              </Cell>
             </>
           }
         />
@@ -97,6 +102,7 @@ export default function QuotationProdTable({
                 //
                 rerenderTrigger01={classProd.state}
                 rerenderTrigger02={disabled}
+                rerenderTrigger03={cellKeyArr}
                 //
                 key={prodKey}
                 id={prodKey}
@@ -145,28 +151,100 @@ export default function QuotationProdTable({
       </div>
 
       <br />
-      <br />
-      <br />
-      <QuotationRow_dndThead
-        disabled={disabled}
-        keyArr={cellKeyArr_component}
-        onDragEnd={({ move }) => {
-          setCellKeyArr_component(move(cellKeyArr_component));
-        }}
-        configDict={nodeConfig_component_origin}
-        dragHandleInvisible={true}
-        // left={
-        //   <>
-        //     <Cell
-        //       className={classNames(nodeConfig_component_origin['itemName'].className)}
-        //       style={nodeConfig_component_origin['itemName'].style}
-        //     ></Cell>
-        //   </>
-        // }
-      />
 
+      <div className={scss.prodComponent}>
+        <QuotationRow_dndThead
+          disabled={disabled}
+          keyArr={cellKeyArr_component}
+          onDragEnd={({ move }) => {
+            setCellKeyArr_component(move(cellKeyArr_component));
+          }}
+          configDict={nodeConfig_component_origin}
+          dragHandleInvisible={true}
+          left={
+            <>
+              <Cell
+                className={classNames(nodeConfig_component_origin['name'].className)}
+                style={nodeConfig_component_origin['name'].style}
+              >
+                {nodeConfig_component_origin['name'].label}
+              </Cell>
+            </>
+          }
+        />
+        <Table_dnd
+          items={componentKeyArr ?? []}
+          onDragEnd={({ move }) => {
+            if (!componentKeyArr) {
+              return;
+            }
+
+            setComponentKeyArr(move(componentKeyArr));
+          }}
+        >
+          {componentKeyArr?.map((componentKey, index) => {
+            if (!activedClassComponentDict) {
+              return null;
+            }
+
+            const classComponent = activedClassComponentDict[componentKey];
+
+            if (!classComponent) {
+              return null;
+            }
+
+            const nodeConfig_itemName = classComponent.nodeConfig['name'];
+
+            const left = (
+              <>
+                <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+                  {nodeConfig_itemName.createNode({
+                    disabled,
+                    classComponent: classComponent,
+                  })}
+                </Cell>
+              </>
+            );
+
+            return (
+              <QuotationRow_dnd_memo
+                //
+                rerenderTrigger01={classComponent.state}
+                rerenderTrigger02={disabled}
+                rerenderTrigger03={cellKeyArr_component}
+                //
+                key={componentKey}
+                id={componentKey}
+                index={index}
+                //
+                // isActive={isActive}
+                left={left}
+                //
+                // onDragStart={(e) => {
+                //   choseActiveProd(undefined);
+                // }}
+              >
+                {cellKeyArr_component.map((cellKey, cIndex) => {
+                  const { style, className, createNode } = classComponent.nodeConfig[cellKey];
+
+                  const node = createNode({
+                    disabled,
+                    classComponent: classComponent,
+                  });
+
+                  return (
+                    <Cell key={cellKey} className={classNames(className)} style={style}>
+                      {node}
+                    </Cell>
+                  );
+                })}
+              </QuotationRow_dnd_memo>
+            );
+          })}
+        </Table_dnd>
+      </div>
       {/* QuotationRow */}
-      {activeClassComponentArr?.map((classComponent, index) => {
+      {/* {activedClassComponentArr?.map((classComponent, index) => {
         if (!classComponent) {
           return null;
         }
@@ -190,7 +268,7 @@ export default function QuotationProdTable({
             })}
           </QuotationRow>
         );
-      })}
+      })} */}
     </>
   );
 }
@@ -203,11 +281,12 @@ export default function QuotationProdTable({
 const QuotationRow_dnd_preMemo = (
   params: Parameters<typeof QuotationRow_dnd>[0] & {
     //
-    rerenderTrigger01: any;
-    rerenderTrigger02: any;
+    rerenderTrigger01?: any;
+    rerenderTrigger02?: any;
+    rerenderTrigger03?: any;
   }
 ) => {
-  const { rerenderTrigger01, rerenderTrigger02, ...rest } = params;
+  const { rerenderTrigger01, rerenderTrigger02, rerenderTrigger03, ...rest } = params;
 
   return <QuotationRow_dnd {...rest} />;
 };
@@ -218,7 +297,8 @@ const QuotationRow_dnd_memo = memo(QuotationRow_dnd_preMemo, (prev, next) => {
     prev.isActive === next.isActive &&
     prev.index === next.index &&
     prev.rerenderTrigger01 === next.rerenderTrigger01 &&
-    prev.rerenderTrigger02 === next.rerenderTrigger02
+    prev.rerenderTrigger02 === next.rerenderTrigger02 &&
+    prev.rerenderTrigger03 === next.rerenderTrigger03
 
     // 把rerenderTrigger設為陣列的方案發生問題
     // _.isEqual(prev.rerenderTrigger, next.rerenderTrigger)

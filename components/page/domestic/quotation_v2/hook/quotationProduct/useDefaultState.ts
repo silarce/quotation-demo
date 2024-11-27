@@ -42,13 +42,16 @@ const useDefaultState = ({
       keyArr.push(raw.id);
 
       const data_prod = createDateProd(raw);
-      const componentsArr = raw.items[0]?.components ?? [];
+      let componentsArr = raw.items[0]?.components ?? [];
+      componentsArr = _.sortBy(componentsArr, 'order');
       const data_componentDict = createData_componentDict(componentsArr);
+      const componentKeyArr = componentsArr.map((item) => item.type);
 
       dict[data_prod.id] = {
         key: data_prod.id,
         data_prod: data_prod,
         data_componentDict,
+        componentKeyArr,
 
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
       };
