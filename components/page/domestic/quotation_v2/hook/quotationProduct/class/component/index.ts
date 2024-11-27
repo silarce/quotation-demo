@@ -15,42 +15,53 @@ import { ClassCompnent_headBox } from './classComponent_headBox';
 import { ClassCompnent_middlePillar } from './classComponent_middlePillar';
 import { ClassCompnent_backBone } from './classComponent_backBone';
 
-type Tlookup_classComponent = {
-  [K in TdoorComponentType]: K extends 'slat'
-    ? Newable<ClassCompnent_slat>
-    : K extends 'bottomBar'
-    ? Newable<ClassCompnent_bottomBar>
-    : K extends 'guideRail'
-    ? Newable<ClassCompnent_guideRail>
-    : K extends 'sidePlate'
-    ? Newable<ClassCompnent_sidePlate>
-    : K extends 'roller'
-    ? Newable<ClassCompnent_roller>
-    : K extends 'motor'
-    ? Newable<ClassCompnent_motor>
-    : K extends 'motorAccessories'
-    ? Newable<ClassCompnent_motorAccessories>
-    : K extends 'headBox'
-    ? Newable<ClassCompnent_headBox>
-    : K extends 'middlePillar'
-    ? Newable<ClassCompnent_middlePillar>
-    : K extends 'backBone'
-    ? Newable<ClassCompnent_backBone>
-    : never;
-};
+// type Tlookup_classComponent = {
+//   [K in TdoorComponentType]: K extends 'slat'
+//     ? Newable<ClassCompnent_slat>
+//     : K extends 'bottomBar'
+//     ? Newable<ClassCompnent_bottomBar>
+//     : K extends 'guideRail'
+//     ? Newable<ClassCompnent_guideRail>
+//     : K extends 'sidePlate'
+//     ? Newable<ClassCompnent_sidePlate>
+//     : K extends 'roller'
+//     ? Newable<ClassCompnent_roller>
+//     : K extends 'motor'
+//     ? Newable<ClassCompnent_motor>
+//     : K extends 'motorAccessories'
+//     ? Newable<ClassCompnent_motorAccessories>
+//     : K extends 'headBox'
+//     ? Newable<ClassCompnent_headBox>
+//     : K extends 'middlePillar'
+//     ? Newable<ClassCompnent_middlePillar>
+//     : K extends 'backBone'
+//     ? Newable<ClassCompnent_backBone>
+//     : never;
+// };
 
-const lookup_classComponent: Tlookup_classComponent = {
-  slat: ClassCompnent_slat,
-  bottomBar: ClassCompnent_bottomBar,
-  guideRail: ClassCompnent_guideRail,
-  sidePlate: ClassCompnent_sidePlate,
-  roller: ClassCompnent_roller,
-  motor: ClassCompnent_motor,
-  motorAccessories: ClassCompnent_motorAccessories,
-  headBox: ClassCompnent_headBox,
-  middlePillar: ClassCompnent_middlePillar,
-  backBone: ClassCompnent_backBone,
-};
+// const lookup_classComponent: Tlookup_classComponent = {
+//   slat: ClassCompnent_slat,
+//   bottomBar: ClassCompnent_bottomBar,
+//   guideRail: ClassCompnent_guideRail,
+//   sidePlate: ClassCompnent_sidePlate,
+//   roller: ClassCompnent_roller,
+//   motor: ClassCompnent_motor,
+//   motorAccessories: ClassCompnent_motorAccessories,
+//   headBox: ClassCompnent_headBox,
+//   middlePillar: ClassCompnent_middlePillar,
+//   backBone: ClassCompnent_backBone,
+// };
 
-export type { Tlookup_classComponent };
-export { lookup_classComponent };
+export type { TdoorComponentType };
+export {
+  ClassCompnent_slat,
+  ClassCompnent_bottomBar,
+  ClassCompnent_guideRail,
+  ClassCompnent_sidePlate,
+  ClassCompnent_roller,
+  ClassCompnent_motor,
+  ClassCompnent_motorAccessories,
+  ClassCompnent_headBox,
+  ClassCompnent_middlePillar,
+  ClassCompnent_backBone,
+};

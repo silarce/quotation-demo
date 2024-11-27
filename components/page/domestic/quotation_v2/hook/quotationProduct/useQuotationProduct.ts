@@ -15,18 +15,34 @@ import type {
 
 // import { ClassProd_SJ202 } from './class/prod/classProd_SJ302';
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
-import { lookup_classComponent, Tlookup_classComponent } from './class/component';
+import {
+  //
+  TdoorComponentType,
+  //
+  ClassCompnent_slat,
+  ClassCompnent_bottomBar,
+  ClassCompnent_guideRail,
+  ClassCompnent_sidePlate,
+  ClassCompnent_roller,
+  ClassCompnent_motor,
+  ClassCompnent_motorAccessories,
+  ClassCompnent_headBox,
+  ClassCompnent_middlePillar,
+  ClassCompnent_backBone,
+} from './class/component';
 
 import {
   TconfigItem,
   TcellKey,
   TnodeConfig,
+  TcellKey_component,
   //
   defaultKeyArr,
   createNodeConfig_prime,
   nodeConfig_origin,
   //
   defaultKeyArr_component,
+  createNodeConfig_component,
 } from './class/prod/config';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
@@ -47,29 +63,37 @@ import type {
 
 // ================================================================================
 
+type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
+  pordKey,
+  componentKey,
+}: {
+  pordKey: string;
+  componentKey: T;
+}) => TsetComponent<T>;
+
 type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
 
 type TclassComponentDict = {
-  [K in keyof Tlookup_classComponent]?: K extends 'slat'
-    ? InstanceType<Tlookup_classComponent['slat']>
+  [K in TdoorComponentType]?: K extends 'slat'
+    ? ClassCompnent_slat
     : K extends 'bottomBar'
-    ? InstanceType<Tlookup_classComponent['bottomBar']>
+    ? ClassCompnent_bottomBar
     : K extends 'guideRail'
-    ? InstanceType<Tlookup_classComponent['guideRail']>
+    ? ClassCompnent_guideRail
     : K extends 'sidePlate'
-    ? InstanceType<Tlookup_classComponent['sidePlate']>
+    ? ClassCompnent_sidePlate
     : K extends 'roller'
-    ? InstanceType<Tlookup_classComponent['roller']>
+    ? ClassCompnent_roller
     : K extends 'motor'
-    ? InstanceType<Tlookup_classComponent['motor']>
+    ? ClassCompnent_motor
     : K extends 'motorAccessories'
-    ? InstanceType<Tlookup_classComponent['motorAccessories']>
+    ? ClassCompnent_motorAccessories
     : K extends 'headBox'
-    ? InstanceType<Tlookup_classComponent['headBox']>
+    ? ClassCompnent_headBox
     : K extends 'middlePillar'
-    ? InstanceType<Tlookup_classComponent['middlePillar']>
+    ? ClassCompnent_middlePillar
     : K extends 'backBone'
-    ? InstanceType<Tlookup_classComponent['backBone']>
+    ? ClassCompnent_backBone
     : never;
 };
 
@@ -100,6 +124,8 @@ const useQuotationProduct = ({
   const [cellKeyArr, setCellKeyArr] = useState<TcellKey[]>([...defaultKeyArr]); // 欄位的key
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
+
+  const [cellKeyArr_component, setCellKeyArr_component] = useState<TcellKey_component[]>([...defaultKeyArr_component]); // 欄位的key
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
@@ -133,7 +159,7 @@ const useQuotationProduct = ({
     return setProd;
   };
 
-  const createSetComponent = <T extends keyof TstateProd['data_componentDict']>({
+  const createSetComponent: TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
     pordKey,
     componentKey,
   }: {
@@ -217,31 +243,13 @@ const useQuotationProduct = ({
 
     const data_componentDict = activeClassProd.state.data_componentDict;
 
-    const dict = Object.entries(data_componentDict).reduce((acc, [key, value]) => {
-      const theKey = key as keyof Tdata_componentDict;
+    const classComponentDict: TclassComponentDict = createClassComponentDict({
+      data_componentDict,
+      activeClassProdKey: activeClassProd.state.key,
+      createSetComponent,
+    });
 
-      const ComponentClass = lookup_classComponent[theKey];
-
-      // acc[theKey] = new ComponentClass(value);
-      // if (theKey === 'slat') {
-      //   acc['slat'] = new ComponentClass(value) as TclassComponentDict['slat'];
-      // }
-
-      return acc;
-    }, {} as TclassComponentDict);
-
-    // lookup_classComponent
-    // const classComponent_slat = lookup_classComponent['slat'];
-
-    // const foo = new classComponent_slat({
-    //   state_component: data_componentDict['slat']!,
-    //   setState_component: createSetComponent({
-    //     pordKey: activeClassProd.state.key,
-    //     componentKey: 'slat',
-    //   }),
-    // });
-
-    // return activeClassProd.state.data_componentDict;
+    return Object.values(classComponentDict);
   }, [activeClassProd]);
 
   // -----------------------------------------------------------------------
@@ -262,12 +270,142 @@ const useQuotationProduct = ({
     setProdKeyArr,
     //
     choseActiveProd,
+    //
+    activeClassComponentArr,
+    cellKeyArr_component,
+    setCellKeyArr_component,
   };
 };
 
 // ================================================================================
 
+const createClassComponentDict = ({
+  //
+  data_componentDict,
+  activeClassProdKey,
+  createSetComponent,
+}: {
+  data_componentDict: Tdata_componentDict;
+  activeClassProdKey: string;
+  createSetComponent: TcreateSetComponent;
+}) => {
+  const slat =
+    data_componentDict['slat'] &&
+    new ClassCompnent_slat({
+      state_component: data_componentDict['slat'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'slat',
+      }),
+    });
+
+  const bottomBar =
+    data_componentDict['bottomBar'] &&
+    new ClassCompnent_bottomBar({
+      state_component: data_componentDict['bottomBar'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'bottomBar',
+      }),
+    });
+
+  const guideRail =
+    data_componentDict['guideRail'] &&
+    new ClassCompnent_guideRail({
+      state_component: data_componentDict['guideRail'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'guideRail',
+      }),
+    });
+
+  const sidePlate =
+    data_componentDict['sidePlate'] &&
+    new ClassCompnent_sidePlate({
+      state_component: data_componentDict['sidePlate'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'sidePlate',
+      }),
+    });
+
+  const roller =
+    data_componentDict['roller'] &&
+    new ClassCompnent_roller({
+      state_component: data_componentDict['roller'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'roller',
+      }),
+    });
+
+  const motor =
+    data_componentDict['motor'] &&
+    new ClassCompnent_motor({
+      state_component: data_componentDict['motor'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'motor',
+      }),
+    });
+
+  const motorAccessories =
+    data_componentDict['motorAccessories'] &&
+    new ClassCompnent_motorAccessories({
+      state_component: data_componentDict['motorAccessories'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'motorAccessories',
+      }),
+    });
+  const headBox =
+    data_componentDict['headBox'] &&
+    new ClassCompnent_headBox({
+      state_component: data_componentDict['headBox'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'headBox',
+      }),
+    });
+  const middlePillar =
+    data_componentDict['middlePillar'] &&
+    new ClassCompnent_middlePillar({
+      state_component: data_componentDict['middlePillar'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'middlePillar',
+      }),
+    });
+  const backBone =
+    data_componentDict['backBone'] &&
+    new ClassCompnent_backBone({
+      state_component: data_componentDict['backBone'],
+      setState_component: createSetComponent({
+        pordKey: activeClassProdKey,
+        componentKey: 'backBone',
+      }),
+    });
+
+  const classComponentDict: TclassComponentDict = {
+    slat,
+    bottomBar,
+    guideRail,
+    sidePlate,
+    roller,
+    motor,
+    motorAccessories,
+    headBox,
+    middlePillar,
+    backBone,
+  };
+
+  return classComponentDict;
+};
+
 // ================================================================================
+// createNodeConfig_component
+
+const nodeConfig_component_origin = createNodeConfig_component();
 
 export type { TuseQuotationProductInstance };
-export { useQuotationProduct, nodeConfig_origin };
+export { useQuotationProduct, nodeConfig_origin, nodeConfig_component_origin };

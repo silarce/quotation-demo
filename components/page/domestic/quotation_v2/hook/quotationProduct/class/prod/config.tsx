@@ -362,7 +362,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
     },
     desc: {
       label: '說明',
-      style: { width: 100 },
+      style: { width: 200 },
       createNode({ disabled, classComponent }) {
         return classComponent.desc;
       },
@@ -380,6 +380,7 @@ export type {
   TnodeConfig,
   //
   TnodeConfig_component,
+  TcellKey_component,
 };
 export {
   //

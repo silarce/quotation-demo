@@ -1,10 +1,17 @@
 // DTO
 import {
+  //
   TdoorModelInfoDto,
   //
   TdoorGeneralSpecsDto,
   //
   TdoorComponentListDto,
+  //
+  // TdoorComponentType的內容
+  // slat bottomBar guideRail sidePlate roller motor
+  // motorAccessories headBox middlePillar backBone
+  TdoorComponentType, // 材料配件的類型，字串
+  //
   TdoorSlatDto,
   TdoorBottomBarDto,
   TdoorGuideRailDto,
@@ -15,7 +22,6 @@ import {
   TdoorHeadBoxDto,
   TdoorMiddlePillarDto,
   TdoorBackBoneDto,
-  TdoorComponentType,
   //
 } from 'js/api/dtoTypes';
 
@@ -241,16 +247,17 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
 }
 
 type Tdata_componentDict = {
-  slat?: TstateComponentData<'slat'>;
-  bottomBar?: TstateComponentData<'bottomBar'>;
-  guideRail?: TstateComponentData<'guideRail'>;
-  sidePlate?: TstateComponentData<'sidePlate'>;
-  roller?: TstateComponentData<'roller'>;
-  motor?: TstateComponentData<'motor'>;
-  motorAccessories?: TstateComponentData<'motorAccessories'>;
-  headBox?: TstateComponentData<'headBox'>;
-  middlePillar?: TstateComponentData<'middlePillar'>;
-  backBone?: TstateComponentData<'backBone'>;
+  [key in TdoorComponentType]?: TstateComponentData<key>;
+  // slat?: TstateComponentData<'slat'>;
+  // bottomBar?: TstateComponentData<'bottomBar'>;
+  // guideRail?: TstateComponentData<'guideRail'>;
+  // sidePlate?: TstateComponentData<'sidePlate'>;
+  // roller?: TstateComponentData<'roller'>;
+  // motor?: TstateComponentData<'motor'>;
+  // motorAccessories?: TstateComponentData<'motorAccessories'>;
+  // headBox?: TstateComponentData<'headBox'>;
+  // middlePillar?: TstateComponentData<'middlePillar'>;
+  // backBone?: TstateComponentData<'backBone'>;
 };
 
 // MARK: TstateProd
