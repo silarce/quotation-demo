@@ -125,22 +125,22 @@ export default function SidePathAccountingDepartment() {
                         },
                     ],
                 },
-                {
-                    label: 'foo',
-                    erpFeature: devPass,
-                    list: [
-                        {
-                            label: 'foo',
-                            path: path + '/undefined',
-                            erpFeature: devPass,
-                        },
-                        {
-                            label: 'foo',
-                            path: path + '/undefined',
-                            erpFeature: devPass,
-                        },
-                    ],
-                },
+                // {
+                //     label: 'foo',
+                //     erpFeature: devPass,
+                //     list: [
+                //         {
+                //             label: 'foo',
+                //             path: path + '/undefined',
+                //             erpFeature: devPass,
+                //         },
+                //         {
+                //             label: 'foo',
+                //             path: path + '/undefined',
+                //             erpFeature: devPass,
+                //         },
+                //     ],
+                // },
             ],
         };
     })()
