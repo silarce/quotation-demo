@@ -281,10 +281,12 @@ export default function IncomeBillDetails({
             state_deduction,
             deductionTotal,
 
-            raw: { isForeign },
+            // incomeBillDate
+
+            raw: { isForeign, incomeBillDate },
           } = incomeBill;
 
-          const month = moment(receiveDate).month() + 1;
+          const month = moment(incomeBillDate).month() + 1;
           let hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}`;
 
           isForeign && (hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}&isForeign=true`);
