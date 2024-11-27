@@ -92,6 +92,7 @@ export default function SalarySettlement() {
     const comp_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_minuteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const self_contributed_retirement_fundRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
 
     // popout
     const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
@@ -251,6 +252,7 @@ export default function SalarySettlement() {
                         leave_day: item.leave_day || '0',
                         leave_detail: item.leave_detail || '{}',
                         leave_day_pay: item.leave_day_pay || '0',
+                        self_contributed_retirement_fund: item.self_contributed_retirement_fund || 0
                     };
                 });
 
@@ -978,6 +980,7 @@ export default function SalarySettlement() {
                             <span>遲到次數</span>
                             <span>遲到分數</span>
                             <span>遲到扣款</span>
+                            <span>自提退休金</span>
                             <span>本月應扣</span>
                             <span>本月實領</span>
                         </div>
@@ -987,7 +990,7 @@ export default function SalarySettlement() {
                                     // 計算總薪資
                                     const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0) - parseFloat(_item.leave_day_pay || 0);
                                     const earning_total = taxTotal + parseFloat(_item.overtime_pay || 0)
-                                    const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0) + parseFloat(_item.leave_day_pay || 0);
+                                    const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0) + parseFloat(_item.leave_day_pay || 0) + parseFloat(_item.self_contributed_retirement_fund || 0);
                                     _item.actual_salary = parseFloat(_item.salary || 0) - parseFloat(_item.leave_day_pay || 0)
                                     _item.earning_total = earning_total;
                                     _item.deduction_total = deduction_total;
@@ -1471,6 +1474,28 @@ export default function SalarySettlement() {
                                                             newData[index] = {
                                                                 ...newData[index],
                                                                 late_deduction: editall ? newLate_deduction : parseFloat(newLate_deduction.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={self_contributed_retirement_fundRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editall ? '1px solid gray' : 'none',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={!editall}
+                                                        type={editall ? "number" : "text"}
+                                                        value={editall ? _item.self_contributed_retirement_fund : Number(_item.self_contributed_retirement_fund).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newSelf_contributed_retirement_funde = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                self_contributed_retirement_fund: editall ? newSelf_contributed_retirement_funde : parseFloat(newSelf_contributed_retirement_funde.replace(/,/g, ''))
                                                             };
                                                             setData(newData);
                                                         }}

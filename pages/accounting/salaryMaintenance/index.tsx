@@ -91,6 +91,8 @@ export default function salaryMaintenance() {
     const late_minuteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const late_timeRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const salaryRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const self_contributed_retirement_fundRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const meal_allowanceRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
 
     // popout
     const [leavedaybar, setLeavedaybar] = useState<boolean>(false);
@@ -201,10 +203,31 @@ export default function salaryMaintenance() {
 
             let responsedata = await response.json();
 
+            console.log(responsedata);
+
+            const renamedData = responsedata.map((item: any) => {
+
+                return {
+                    id: item.id,
+                    id_number: item.employee[0]?.id_number || '',
+                    employee_id: item.employee[0]?.employee_id,
+                    department: item.employee[0]?.name || '',
+                    start_date: item.employee[0]?.start_date || '',
+                    ch_name: item.employee[0]?.ch_name || '',
+                    salary: item.salary || '0',
+                    supplement: item.supplement || '0',
+                    allowance: item.allowance || '0',
+                    self_contributed_retirement_fund: item.self_contributed_retirement_fund || '0',
+                    salary_type: item.salary_type || '0',
+                    meal_allowance: item.meal_allowance || '0',
+                };
+            });
+
+
             // 根據 `employee[0].id_number` 進行排序
-            responsedata = responsedata.sort((a: any, b: any) => {
-                const aIdNumber = a.employee ? a.employee[0]?.id_number || '' : '';
-                const bIdNumber = b.employee ? b.employee[0]?.id_number || '' : '';
+            responsedata = renamedData.sort((a: any, b: any) => {
+                const aIdNumber = a.id_number ? a.id_number || '' : '';
+                const bIdNumber = b.id_number ? b.id_number || '' : '';
                 return aIdNumber.localeCompare(bIdNumber);
             });
 
@@ -253,13 +276,17 @@ export default function salaryMaintenance() {
     const UpdateSalary = async (item: any) => {
         try {
             setIsLoading(true);
+            console.log(item);
             const conditionModel = {
                 id: item.id,
                 salary: item.salary,
                 allowance: item.allowance,
                 supplement: item.supplement,
                 employee_id: item.employee_id,
-                note: item.note
+                note: item.note,
+                self_contributed_retirement_fund: item.self_contributed_retirement_fund,
+                salary_type: item.salary_type,
+                meal_allowance: item.meal_allowance
             };
 
             var inputModel = {
@@ -930,6 +957,9 @@ export default function salaryMaintenance() {
                             <span>本薪(30天)</span>
                             <span>職務加給</span>
                             <span>工作津貼</span>
+                            <span>自提退休金</span>
+                            <span>伙食費</span>
+                            <span>人工類別</span>
 
                         </div>
                         <span>
@@ -962,10 +992,10 @@ export default function salaryMaintenance() {
                                                         <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                                     </button>
                                                 </span>
-                                                <span>{_item.employee[0].id_number}</span>
-                                                <span>{_item.employee[0].name}</span>
-                                                <span>{_item.employee[0].ch_name}</span>
-                                                <span>{getTaiwanDateStr(_item.employee[0].start_date)}</span>
+                                                <span>{_item.id_number}</span>
+                                                <span>{_item.department}</span>
+                                                <span>{_item.ch_name}</span>
+                                                <span>{getTaiwanDateStr(_item.start_date)}</span>
                                                 <span>
                                                     <input
                                                         ref={salaryRefs.current[index]}
@@ -1019,7 +1049,7 @@ export default function salaryMaintenance() {
                                                             borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
                                                             width: '100px'
                                                         }}
-                                                        readOnly={!editlist}
+                                                        readOnly={!(editlist && editlistindex === index)}
                                                         type={editlist && editlistindex === index ? "number" : "text"}
                                                         value={editlist && editlistindex === index ? _item.allowance : Number(_item.allowance).toLocaleString()}
                                                         onChange={(e) => {
@@ -1033,6 +1063,77 @@ export default function salaryMaintenance() {
                                                         }}
                                                     />
                                                 </span>
+                                                <span>
+                                                    <input
+                                                        ref={self_contributed_retirement_fundRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom:editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "number" : "text"}
+                                                        value={editlist ? _item.self_contributed_retirement_fund : Number(_item.self_contributed_retirement_fund).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newSelf_contributed_retirement_fund = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                self_contributed_retirement_fund: editlist ? newSelf_contributed_retirement_fund : parseFloat(newSelf_contributed_retirement_fund.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span>
+                                                    <input
+                                                        ref={meal_allowanceRefs.current[index]}
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100px'
+                                                        }}
+                                                        readOnly={!(editlist && editlistindex === index)}
+                                                        type={editlist && editlistindex === index ? "number" : "text"}
+                                                        value={editlist ? _item.meal_allowance : Number(_item.meal_allowance).toLocaleString()}
+                                                        onChange={(e) => {
+                                                            const newData = [...data];
+                                                            const newMeal_allowance = e.target.value;
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                meal_allowance: editlist ? newMeal_allowance : parseFloat(newMeal_allowance.replace(/,/g, ''))
+                                                            };
+                                                            setData(newData);
+                                                        }}
+                                                    />
+                                                </span>
+
+                                                <span>
+                                                    <select
+                                                        value={_item.salary_type || ""} // 確保當 _item.salary_type 為空或未定義時，默認為空字串
+                                                        onChange={(e) => {
+                                                            const newData = [...data]; // 複製 data
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                salary_type: e.target.value, // 更新 salary_type
+                                                            };
+                                                            setData(newData); // 更新 state
+                                                        }}
+                                                        disabled={!(editlist && editlistindex === index)} // 當 editlist 不為 true 時禁用下拉選單
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            cursor: editlist && editlistindex === index ?'pointer' : 'not-allowed', // 更改鼠標樣式以提示狀態
+                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                            width: '100px',
+                                                        }}
+                                                    >
+                                                        <option value="">請選擇</option>
+                                                        <option value="營業薪資">營業薪資</option>
+                                                        <option value="直接人工">直接人工</option>
+                                                        <option value="間接人工">間接人工</option>
+                                                    </select>
+                                                </span>
+
                                             </div>
                                         </CellWithBar>
                                     );
@@ -1164,6 +1265,22 @@ export default function salaryMaintenance() {
                                         </select>
                                     </span>
 
+                                    <span>
+                                        <input
+                                            type="text"
+                                            placeholder="請輸入日數"
+                                            value={item.leaveDays}
+                                            onChange={(e) => { }}
+                                            readOnly={!editbtn}  // 當 editbtn 為 false 時禁用輸入
+                                            style={{
+                                                fontSize: '18px',
+                                                width: '100%',
+                                                borderBottom: editbtn ? '1px solid #14256a' : 'none',  // 底線在 editbtn 為 true 時顯示
+                                                backgroundColor: 'transparent',
+                                                height: '50px'
+                                            }}
+                                        />
+                                    </span>
                                     <span>
                                         <input
                                             type="text"
