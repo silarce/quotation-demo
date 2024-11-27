@@ -274,12 +274,12 @@ interface TstateAccessoryData {
   codeName: string; //選配的id，也就是TdoorAccessoryDto.id
   name: string; //名稱
   unit: string; // 單位
-  quantity: number; // 數量
-  unitPrice: number; // 單價
-  totalPrice: number; // 複價
+  quantity: `${number}` | ''; // 數量
+  unitPrice: `${number}` | ''; // 單價
+  totalPrice: `${number}` | ''; // 複價
   originalPrice?: number | undefined;
-  price: number; // 牌價
-  dualPrice: number; // 牌價複價
+  price: `${number}` | ''; // 牌價
+  dualPrice: `${number}` | ''; // 牌價複價
   order: number;
   referenceSpec: string | null;
 }
@@ -318,6 +318,8 @@ type TsetProd = React.Dispatch<React.SetStateAction<TstateProd>>;
 type TsetComponent<T extends keyof Tdata_componentDict> = //
   React.Dispatch<React.SetStateAction<Tdata_componentDict[T]>>;
 
+type TsetAccessory = React.Dispatch<React.SetStateAction<TstateAccessoryData>>;
+
 export type {
   TstateProd,
   TsetProd,
@@ -329,4 +331,7 @@ export type {
   TcomponentRawDataDict,
   Tdata_componentDict,
   TsetComponent,
+  //
+  TstateAccessoryData,
+  TsetAccessory,
 };

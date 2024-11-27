@@ -61,7 +61,7 @@ const useDefaultState = ({
 
         data_accessoryDict,
         accessoryKeyArr,
-        
+
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
       };
     });
@@ -248,12 +248,39 @@ const createData_accessoryDict = (accessoriesArr: TquotationProductAccessoryDto[
   const dict: TstateProd['data_accessoryDict'] = {};
 
   accessoriesArr.forEach((acce) => {
-    const { id, codeName } = acce;
+    const {
+      id,
+      codeName,
+      name,
+      unit,
+      quantity,
+      unitPrice,
+      totalPrice,
+      originalPrice,
+      price,
+      dualPrice,
+      order,
+      referenceSpec,
+    } = acce;
+
+    const stateAcce: TstateProd['data_accessoryDict'][string] = {
+      codeName,
+      name,
+      unit,
+      quantity: `${quantity}`,
+      unitPrice: `${unitPrice}`,
+      totalPrice: `${totalPrice}`,
+      originalPrice,
+      price: `${price}`,
+      dualPrice: `${dualPrice}`,
+      order,
+      referenceSpec,
+    };
 
     if (!dict[codeName]) {
-      dict[codeName] = acce;
+      dict[codeName] = stateAcce;
     } else {
-      dict[id] = acce;
+      dict[id] = stateAcce;
     }
   });
 

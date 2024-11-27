@@ -3,9 +3,9 @@ import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // gear
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+// import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
-import { useDefaultState } from './useDefaultState';
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import type {
   TquotationProductDto,
@@ -13,7 +13,27 @@ import type {
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-// import { ClassProd_SJ202 } from './class/prod/classProd_SJ302';
+// -------------------------------------------------------------------------------
+import { useDefaultState } from './useDefaultState';
+// -------------------------------------------------------------------------------
+
+// type
+import type {
+  TstateProd,
+  TsetProd,
+  //
+  // TstateProdData,
+  TstateProdDict,
+  //
+  // TstateComponentData,
+  // TcomponentRawDataDict,
+  Tdata_componentDict,
+  TsetComponent,
+  //
+  TstateAccessoryData,
+  TsetAccessory,
+} from './type';
+
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
 import {
   //
@@ -49,22 +69,6 @@ import {
   defaultKeyArr_component,
   createNodeConfig_component,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
-
-import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
-
-// type
-import type {
-  TstateProd,
-  TsetProd,
-  //
-  // TstateProdData,
-  TstateProdDict,
-  //
-  // TstateComponentData,
-  // TcomponentRawDataDict,
-  Tdata_componentDict,
-  TsetComponent,
-} from './type';
 
 // ================================================================================
 
@@ -146,7 +150,12 @@ const useQuotationProduct = ({
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
+  //
+  //
+  //
+  //
 
+  // MARK:createSetProd
   const createSetProd = (key: string): TsetProd => {
     const setProd: TsetProd = (newState) => {
       setState_prodDict((prev) => {
@@ -165,6 +174,7 @@ const useQuotationProduct = ({
     return setProd;
   };
 
+  // MARK:createSetComponent
   const createSetComponent: TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
     pordKey,
     componentKey,
@@ -190,6 +200,22 @@ const useQuotationProduct = ({
     };
 
     return setComponent;
+  };
+
+  const createSetAccessory = ({ prodKey, accessoryKey }: { prodKey: string; accessoryKey: string }): TsetAccessory => {
+    const setAccessory: TsetAccessory = (newStateAcce) => {
+      setState_prodDict((prev) => {
+        const copy = { ...prev };
+        const accessoriesDict = copy[prodKey].data_accessoryDict;
+        const acce = accessoriesDict[accessoryKey];
+        const newStateValue = typeof newStateAcce === 'function' ? newStateAcce(acce) : newStateAcce;
+        accessoriesDict[accessoryKey] = newStateValue;
+
+        return copy;
+      });
+    };
+
+    return setAccessory;
   };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
@@ -457,3 +483,25 @@ const nodeConfig_component_origin = createNodeConfig_component();
 
 export type { TuseQuotationProductInstance };
 export { useQuotationProduct, nodeConfig_origin, nodeConfig_component_origin };
+
+// import { DeepReadonly } from 'ts-essentials';
+
+// interface Tfoo {
+//   a: {
+//     b: {
+//       c: string;
+//     };
+//   };
+// }
+
+// type Tfoo_readonly = DeepReadonly<Tfoo>;
+
+// const foo: Tfoo_readonly = {
+//   a: {
+//     b: {
+//       c: 'c',
+//     },
+//   },
+// };
+
+// foo.a.b.c = 'a';
