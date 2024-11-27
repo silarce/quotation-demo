@@ -55,3 +55,25 @@ $topBlockHeight: 50px;
     top: 0;
   }
 }
+
+@keyframes flashBackground {
+  0% {
+    background-color: white;
+  }
+  25% {
+    background-color: theme("colors.success");
+  }
+  50% {
+    background-color: white;
+  }
+  75% {
+    background-color: theme("colors.success");
+  }
+  100% {
+    background-color: white;
+  }
+}
+
+.targetFlash {
+  animation: flashBackground 2s;
+}

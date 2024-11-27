@@ -287,9 +287,9 @@ export default function IncomeBillDetails({
           } = incomeBill;
 
           const month = moment(incomeBillDate).month() + 1;
-          let hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}`;
+          let hrefToIncomeSummons = `/worksDepartment/incomeSummons?id=${id}&month=${month}`;
 
-          isForeign && (hrefToIncomeSummons = `/worksDepartment/incomeSummons?month=${month}&isForeign=true`);
+          isForeign && (hrefToIncomeSummons = hrefToIncomeSummons + '&isForeign=true');
 
           return (
             <Row key={id}>

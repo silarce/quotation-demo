@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import Decimal from 'decimal.js';
+import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -42,9 +43,10 @@ import {
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
 type Tquery = {
-  isForeign: 'true' | 'false';
-  year: string;
-  month: string;
+  isForeign?: 'true' | 'false';
+  year?: string;
+  month?: string;
+  id?: string;
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
@@ -65,6 +67,7 @@ export default function IncomeSummons() {
     isForeign = 'false',
     year = String(thisYear),
     month = String(thisMonth),
+    id,
   } = query;
 
   const month_whole = month.padStart(2, '0');
@@ -98,7 +101,7 @@ export default function IncomeSummons() {
   }, [isForeign, month_whole, year]);
 
   const {
-    data: data_incomeBill = [],
+    data: data_incomeBill,
     update: update_incomeBill,
     isFetching,
   } = useGetAccountReceivableIncomeBills({
@@ -108,7 +111,7 @@ export default function IncomeSummons() {
   const totals = useMemo(() => {
     let total_receivablePayment = new Decimal(0);
 
-    data_incomeBill.forEach((data) => {
+    data_incomeBill?.forEach((data) => {
       const receivablePayment = new Decimal(data.receivablePayment || 0);
       total_receivablePayment = total_receivablePayment.add(receivablePayment);
     });
@@ -322,6 +325,45 @@ export default function IncomeSummons() {
   ];
 
   // -----------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (data_incomeBill) {
+      const target = id && document.getElementById(id);
+
+      if (target) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              // 目標沒有被看見就滾動到目標
+              if (!entry.isIntersecting) {
+                target.scrollIntoView();
+              }
+
+              observer.disconnect();
+            });
+          },
+          { threshold: 0.2 } // 目標元素至少有 10% 可見時觸發回調
+        );
+
+        // 開始觀察目標元素
+        observer.observe(target);
+
+        const targetClassName = target.className;
+        target.className = classNames(targetClassName, scss.targetFlash);
+        setTimeout(() => {
+          target.className = targetClassName;
+        }, 2000);
+      }
+
+      const { id: removed, ...remainQuery } = query;
+
+      router.replace({
+        query: remainQuery,
+      });
+    }
+  }, [data_incomeBill, id, query, router]);
+
+  // -----------------------------------------------------------------------------
   // MARK: RENDER
   return (
     <SubLayer isLoading_subLayer={isFetching}>
@@ -348,9 +390,10 @@ export default function IncomeSummons() {
               })}
             </SummonsRow>
 
-            {data_incomeBill.map((data, index) => {
+            {data_incomeBill?.map((data, index) => {
               return (
                 <Summons
+                  id={data.id}
                   key={data.id}
                   incomeBillSerial={data}
                   reqPatch={reqPatch}
