@@ -1,5 +1,8 @@
 // 沒有把name送進去的元件，MyTimePicker_mui、CheckBar、InputSelBar
 
+import { memo } from 'react';
+import _ from 'lodash';
+
 import { CSSProperties, useState } from 'react';
 
 import classNames from 'classnames';
@@ -111,7 +114,7 @@ export type {
 
 // =============================================================================
 
-export default function InputSel({
+function InputSel({
   disabled,
   htmlFor,
   //
@@ -555,6 +558,7 @@ export default function InputSel({
 }
 
 // =============================================================================
+// =============================================================================
 
 const dealSelectProps = ({ selectProps }: { selectProps: TselectProps }) => {
   const {
@@ -623,3 +627,23 @@ const dealSelectProps = ({ selectProps }: { selectProps: TselectProps }) => {
     dynyOptions,
   };
 };
+
+// ===========================================================================
+
+const InputSel_s1 = (props: Parameters<typeof InputSel>[0]) => {
+  return <InputSel showBaseline="auto" {...props} />;
+};
+
+const InputSel_memo_select = memo(InputSel_s1, (prev, next) => {
+  const { value: _oldValue, options: oldOptions } = prev?.selectProps?.props ?? {};
+  const { value: _newValue, options: newOptions } = next?.selectProps?.props ?? {};
+
+  const oldValue = (_oldValue as { value: string }).value;
+  const newValue = (_newValue as { value: string }).value;
+
+  return oldValue === newValue && _.isEqual(oldOptions, newOptions) && prev.disabled === next.disabled;
+});
+
+// ===========================================================================
+export default InputSel;
+export { InputSel_s1, InputSel_memo_select };
