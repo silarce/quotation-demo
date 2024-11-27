@@ -286,8 +286,9 @@ export default function IncomeBillDetails({
             raw: { isForeign, incomeBillDate },
           } = incomeBill;
 
+          const year = moment(incomeBillDate).year();
           const month = moment(incomeBillDate).month() + 1;
-          let hrefToIncomeSummons = `/worksDepartment/incomeSummons?id=${id}&month=${month}`;
+          let hrefToIncomeSummons = `/worksDepartment/incomeSummons?id=${id}&year=${year}&month=${month}`;
 
           isForeign && (hrefToIncomeSummons = hrefToIncomeSummons + '&isForeign=true');
 
