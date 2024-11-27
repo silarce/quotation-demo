@@ -361,7 +361,7 @@ export default function IncomeSummons() {
         query: { ...remainQuery },
       });
     }
-  }, [data_incomeBill, id, query, router]);
+  }, [data_incomeBill]);
 
   // -----------------------------------------------------------------------------
   // MARK: RENDER
