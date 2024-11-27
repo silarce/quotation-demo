@@ -358,7 +358,7 @@ export default function IncomeSummons() {
       const { id: removed, ...remainQuery } = query;
 
       router.replace({
-        query: remainQuery,
+        query: { ...remainQuery },
       });
     }
   }, [data_incomeBill, id, query, router]);
