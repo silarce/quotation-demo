@@ -938,7 +938,10 @@ export type TquotationProductAccessoryDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  codeName: string; //代號
+  // codeName之所以是TdoorAccessoryDto.id
+  // 是因為那時codeName被棄用了，於是就直接用codeName裝TdoorAccessoryDto.id了
+  // 反語意化的爛主意
+  codeName: string; //選配的id，也就是TdoorAccessoryDto.id
   name: string; //名稱
   unit: string; // 單位
   quantity: number; // 數量
@@ -949,11 +952,18 @@ export type TquotationProductAccessoryDto = {
   dualPrice: number; // 牌價複價
   order: number;
   referenceSpec: string | null;
+  // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+  // 前端用不到
+  // category: unknown;
+  // electronicSuppliesCode: unknown;
+  // isElectronicSupplies: unknown;
+  // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 };
 
 export type TcreateQuotationProductAccessoryDto = Omit<
   TquotationProductAccessoryDto,
   'id' | 'createdAt' | 'updatedAt'
+  // | 'category' | 'electronicSuppliesCode' | 'isElectronicSupplies'
 > & { id?: string };
 
 export type TupdateQuotationProductAccessoryDto = Partial<

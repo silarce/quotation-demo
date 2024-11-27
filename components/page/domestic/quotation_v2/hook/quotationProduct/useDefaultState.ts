@@ -42,10 +42,16 @@ const useDefaultState = ({
       keyArr.push(raw.id);
 
       const data_prod = createDateProd(raw);
+
       let componentsArr = raw.items[0]?.components ?? [];
       componentsArr = _.sortBy(componentsArr, 'order');
       const data_componentDict = createData_componentDict(componentsArr);
       const componentKeyArr = componentsArr.map((item) => item.type);
+
+      let accessoriesArr = raw.items[0]?.accessories ?? [];
+      accessoriesArr = _.sortBy(accessoriesArr, 'order');
+      const data_accessoryDict = createData_accessoryDict(accessoriesArr);
+      const accessoryKeyArr = Object.keys(data_accessoryDict);
 
       dict[data_prod.id] = {
         key: data_prod.id,
@@ -53,6 +59,9 @@ const useDefaultState = ({
         data_componentDict,
         componentKeyArr,
 
+        data_accessoryDict,
+        accessoryKeyArr,
+        
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
       };
     });
@@ -213,23 +222,18 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
       case 'motor':
         componentDict['motor'] = data_component as TstateComponentData<'motor'>;
         break;
-
       case 'motorAccessories':
         componentDict['motorAccessories'] = data_component as TstateComponentData<'motorAccessories'>;
         break;
-
       case 'headBox':
         componentDict['headBox'] = data_component as TstateComponentData<'headBox'>;
         break;
-
       case 'middlePillar':
         componentDict['middlePillar'] = data_component as TstateComponentData<'middlePillar'>;
         break;
-
       case 'backBone':
         componentDict['backBone'] = data_component as TstateComponentData<'backBone'>;
         break;
-
       default:
         break;
     }
@@ -238,6 +242,22 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
   }, {} as TstateProd['data_componentDict']);
 
   return data_componentDict;
+};
+
+const createData_accessoryDict = (accessoriesArr: TquotationProductAccessoryDto[]) => {
+  const dict: TstateProd['data_accessoryDict'] = {};
+
+  accessoriesArr.forEach((acce) => {
+    const { id, codeName } = acce;
+
+    if (!dict[codeName]) {
+      dict[codeName] = acce;
+    } else {
+      dict[id] = acce;
+    }
+  });
+
+  return dict;
 };
 
 // ========================================================================

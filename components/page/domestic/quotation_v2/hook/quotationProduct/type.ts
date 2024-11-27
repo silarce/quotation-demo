@@ -4,8 +4,8 @@ import {
   TdoorModelInfoDto,
   //
   TdoorGeneralSpecsDto,
-  //
   TdoorComponentListDto,
+  TgenerateDoorProductBomDto,
   //
   // TdoorComponentType的內容
   // slat bottomBar guideRail sidePlate roller motor
@@ -23,34 +23,12 @@ import {
   TdoorMiddlePillarDto,
   TdoorBackBoneDto,
   //
+  TdoorAccessoryDto,
 } from 'js/api/dtoTypes';
 
-// 確保key是TdoorComponentType
-type TcomponentRawDataDict = {
-  [K in TdoorComponentType]: K extends 'slat'
-    ? TdoorSlatDto
-    : K extends 'bottomBar'
-    ? TdoorBottomBarDto
-    : K extends 'guideRail'
-    ? TdoorGuideRailDto
-    : K extends 'sidePlate'
-    ? TdoorSidePlateDto
-    : K extends 'roller'
-    ? TdoorRollerDto
-    : K extends 'motor'
-    ? TdoorMotorDto
-    : K extends 'motorAccessories'
-    ? TdoorMotorAccessoriesDto
-    : K extends 'headBox'
-    ? TdoorHeadBoxDto
-    : K extends 'middlePillar'
-    ? TdoorMiddlePillarDto
-    : K extends 'backBone'
-    ? TdoorBackBoneDto
-    : never;
-};
+// ========================================================================
 
-// MARK:TstateProdData
+// MARK:PROD
 interface TstateProdData {
   //
   readonly id: string | null | undefined;
@@ -218,7 +196,35 @@ interface TstateProdData {
   rootProductId: string;
 }
 
-// MARK:TstateComponentData
+// ========================================================================
+
+// region COMPONENT
+
+// 確保key是TdoorComponentType
+type TcomponentRawDataDict = {
+  [K in TdoorComponentType]: K extends 'slat'
+    ? TdoorSlatDto
+    : K extends 'bottomBar'
+    ? TdoorBottomBarDto
+    : K extends 'guideRail'
+    ? TdoorGuideRailDto
+    : K extends 'sidePlate'
+    ? TdoorSidePlateDto
+    : K extends 'roller'
+    ? TdoorRollerDto
+    : K extends 'motor'
+    ? TdoorMotorDto
+    : K extends 'motorAccessories'
+    ? TdoorMotorAccessoriesDto
+    : K extends 'headBox'
+    ? TdoorHeadBoxDto
+    : K extends 'middlePillar'
+    ? TdoorMiddlePillarDto
+    : K extends 'backBone'
+    ? TdoorBackBoneDto
+    : never;
+};
+
 interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   type: T;
   //
@@ -260,6 +266,30 @@ type Tdata_componentDict = {
   // backBone?: TstateComponentData<'backBone'>;
 };
 
+// ========================================================================
+
+// MARK:ACCESSORY
+
+interface TstateAccessoryData {
+  codeName: string; //選配的id，也就是TdoorAccessoryDto.id
+  name: string; //名稱
+  unit: string; // 單位
+  quantity: number; // 數量
+  unitPrice: number; // 單價
+  totalPrice: number; // 複價
+  originalPrice?: number | undefined;
+  price: number; // 牌價
+  dualPrice: number; // 牌價複價
+  order: number;
+  referenceSpec: string | null;
+}
+
+interface Tdata_accessoryDict {
+  [key: string]: TstateAccessoryData;
+}
+
+// ========================================================================
+
 // MARK: TstateProd
 interface TstateProd {
   readonly key: string;
@@ -268,7 +298,14 @@ interface TstateProd {
   data_componentDict: Tdata_componentDict;
   componentKeyArr: TdoorComponentType[];
 
+  data_accessoryDict: Tdata_accessoryDict;
+  accessoryKeyArr: string[];
+
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
+
+  // availableComponents: TdoorComponentListDto | undefined | null;
+  // generalSpecs: TdoorGeneralSpecsDto | undefined | null;
+  // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
 }
 
 interface TstateProdDict {
