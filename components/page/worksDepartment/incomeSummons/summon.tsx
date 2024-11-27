@@ -176,14 +176,16 @@ const SummonsRow_pre = (
     //
     className,
     children,
+    id,
   }: {
     className?: string;
     children: React.ReactNode;
+    id?: string;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
   return (
-    <div ref={ref} className={classNames(scss.row, className)}>
+    <div ref={ref} id={id} className={classNames(scss.row, className)}>
       {children}
     </div>
   );
@@ -196,6 +198,7 @@ const SummonsRow_pre = (
 const Summons_pre = (
   {
     //
+    id,
     className,
     incomeBillSerial,
     reqPatch,
@@ -203,6 +206,7 @@ const Summons_pre = (
     changeActive,
     isForeign,
   }: {
+    id?: string;
     className?: string;
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
@@ -282,7 +286,7 @@ const Summons_pre = (
   // MARK: RENDER
 
   return (
-    <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled, className)}>
+    <SummonsRow id={id} ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled, className)}>
       <div className={scss.btnPanel} style={cellPropsList_summon.btnPanel.style}>
         <div className={scss.reviewerBox}>
           <div onClick={handle_review} className={classNames(scss.reviewer, identity === 'cashier' && scss.isReviewer)}>

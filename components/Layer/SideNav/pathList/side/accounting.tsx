@@ -1,4 +1,4 @@
-import {  erpFeaturesLookup, TsidePathConfig } from "../type";
+import { devPass, erpFeaturesLookup, TsidePathConfig } from "../type";
 
 export default function SidePathAccountingDepartment() {
     return ((): TsidePathConfig => {
@@ -94,52 +94,52 @@ export default function SidePathAccountingDepartment() {
                         },
                     ],
                 },
+                {
+                    label: '薪資管理',
+                    erpFeature: [accountingDepartment],
+                    list: [
+                        {
+                            label: '結算薪資作業',
+                            path: path + '/salarySettlement',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '薪資帳簿',
+                            path: path + '/payrollLedger',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '薪資維護',
+                            path: path + '/salaryMaintenance',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '獎金/津貼維護',
+                            path: path + '/bonusMaintenance',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '獎金發放作業',
+                            path: path + '/bonusPayout',
+                            erpFeature: [accountingDepartment],
+                        },
+                    ],
+                },
                 // {
-                //   label: '薪資管理',
-                //   erpFeature: [accountingDepartment],
-                //   list: [
-                //     {
-                //       label: '結算薪資作業',
-                //       path: path + '/salarySettlement',
-                //       erpFeature: [accountingDepartment],
-                //     },
-                //     {
-                //       label: '薪資帳簿',
-                //       path: path + '/payrollLedger',
-                //       erpFeature: [accountingDepartment],
-                //     },
-                //     {
-                //       label: '薪資維護',
-                //       path: path + '/salaryMaintenance',
-                //       erpFeature: [accountingDepartment],
-                //     },
-                //     {
-                //       label: '獎金/津貼維護',
-                //       path: path + '/bonusMaintenance',
-                //       erpFeature: [accountingDepartment],
-                //     },
-                //     {
-                //       label: '獎金發放作業',
-                //       path: path + '/bonusPayout',
-                //       erpFeature: [accountingDepartment],
-                //     },
-                //   ],
-                // },
-                // {
-                //   label: 'foo',
-                //   erpFeature: devPass,
-                //   list: [
-                //     {
-                //       label: 'foo',
-                //       path: path + '/undefined',
-                //       erpFeature: devPass,
-                //     },
-                //     {
-                //       label: 'foo',
-                //       path: path + '/undefined',
-                //       erpFeature: devPass,
-                //     },
-                //   ],
+                //     label: 'foo',
+                //     erpFeature: devPass,
+                //     list: [
+                //         {
+                //             label: 'foo',
+                //             path: path + '/undefined',
+                //             erpFeature: devPass,
+                //         },
+                //         {
+                //             label: 'foo',
+                //             path: path + '/undefined',
+                //             erpFeature: devPass,
+                //         },
+                //     ],
                 // },
             ],
         };
