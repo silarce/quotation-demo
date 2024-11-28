@@ -69,7 +69,7 @@ import {
   TcellKey_component,
   defaultKeyArr_component,
   createNodeConfig_component,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 import { Interface_ClassAccessory, Class_accessory } from './class/accessory/classAccessory';
 import {

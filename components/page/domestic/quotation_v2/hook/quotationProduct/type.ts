@@ -235,8 +235,8 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   materialSurface: string | null; // 表面
   density: `${number}` | null; // 重量基重
   isPainted: boolean; // 烤漆
-  quantity: `${number}`; // 數量
-  price: number; // 牌價
+  quantity: `${number}` | ''; // 數量
+  price: `${number}` | ''; // 牌價
 
   //
   rawData: TcomponentRawDataDict[T];

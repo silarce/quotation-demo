@@ -199,7 +199,7 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
       density,
       isPainted,
       quantity,
-      price,
+      price: `${price}`,
       rawData,
     } as TstateComponentData<typeof type>;
 

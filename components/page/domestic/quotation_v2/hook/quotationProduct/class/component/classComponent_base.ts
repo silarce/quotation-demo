@@ -11,7 +11,7 @@ import {
   TsetComponent,
 } from '../../type';
 
-import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
+import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
 interface Interface_ClassComponent_base {
@@ -27,19 +27,19 @@ interface Interface_ClassComponent_base {
   materialSurface: string | null; // 表面
   density: `${number}` | null; // 重量基重
   isPainted: boolean; // 烤漆
-  quantity: `${number}`; // 數量
-  price: number; // 牌價
+  quantity: `${number}` | ''; // 數量
+  price: `${number}` | ''; // 牌價
 
-  // unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
-  // dualPrice: number; // 牌價複價 // 虛值
-  // unitPrice: `${number}` | ''; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
-  // totalPrice: number; // 複價 = 單價 * 數量 // 虛值
+  dualPrice: number; // 牌價複價 // 虛值
+  unitPrice: number; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
+  totalPrice: number; // 複價 = 單價 * 數量 // 虛值
 }
 
 interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
   readonly key: string;
   readonly name: string;
   readonly nodeConfig: TnodeConfig_component;
+  readonly unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
 }
 
 // type TconstructorProps<T extends keyof Tdata_componentDict> = {
@@ -112,21 +112,17 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.setState((prev) => ({ ...prev, price: value }));
   }
 
-  // get unit() {
-  //   return '未定';
-  // }
+  get dualPrice() {
+    return 9999;
+  }
 
-  // get dualPrice() {
-  //   return 0;
-  // }
+  get unitPrice() {
+    return 9999;
+  }
 
-  // get unitPrice() {
-  //   return '';
-  // }
-
-  // get totalPrice() {
-  //   return 0;
-  // }
+  get totalPrice() {
+    return 9999;
+  }
 } //  ClassCompnent_base
 
 export type { Interface_ClassComponent_base, Interface_ClassComponent_prime };
