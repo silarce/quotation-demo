@@ -95,7 +95,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     material: {
       label: '材料',
-      style: { width: 70 },
+      style: { width: 90 },
       createNode({ disabled, classComponent }) {
         const v = classComponent.material;
         const value = v ? { value: v, label: v } : null;
@@ -105,6 +105,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           disabled,
           selectProps: {
             props: {
+              placeholder: '',
               options: [],
               value,
               onChange(newValue) {
@@ -120,7 +121,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     materialSurface: {
       label: '表面',
-      style: { width: 50 },
+      style: { width: 60 },
       createNode({ disabled, classComponent }) {
         const v = classComponent.materialSurface;
         const value = v ? { value: v, label: v } : null;
@@ -130,6 +131,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           disabled,
           selectProps: {
             props: {
+              placeholder: '',
               options: [],
               value,
               onChange(newValue) {
@@ -145,7 +147,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     density: {
       label: '密度',
-      style: { width: 100 },
+      style: { width: 30 },
       createNode({ disabled, classComponent }) {
         return classComponent.density;
       },
@@ -153,7 +155,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     isPainted: {
       label: '烤漆',
-      style: { width: 100 },
+      style: { width: 30 },
       createNode({ disabled, classComponent }) {
         return (
           <Checkbox
@@ -169,7 +171,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     unit: {
       label: '單位',
-      style: { width: 100 },
+      style: { width: 30 },
       createNode({ disabled, classComponent }) {
         return classComponent.unit;
       },
@@ -177,13 +179,14 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     quantity: {
       label: '數量',
-      style: { width: 100 },
+      style: { width: 40 },
       createNode({ disabled, classComponent }) {
         const inputSelProps: TinputSelProps = {
           disabled,
           fontSize: '14',
           inputProps: {
             props: {
+              placeholder: '',
               type: 'number',
               value: classComponent.quantity,
               onChange(e) {
@@ -199,7 +202,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     price: {
       label: '牌價',
-      style: { width: 100 },
+      style: { width: 80 },
       createNode({ disabled, classComponent }) {
         const { value, type } = inputLocaleStringSwitcher(classComponent.price, disabled);
 
@@ -208,6 +211,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           fontSize: '14',
           inputProps: {
             props: {
+              placeholder: '',
               value,
               type,
               onChange(e) {
@@ -233,7 +237,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     unitPrice: {
       label: '單價',
-      style: { width: 100 },
+      style: { width: 80 },
       createNode({ disabled, classComponent }) {
         const unitPrice = classComponent.unitPrice.toLocaleString();
 
