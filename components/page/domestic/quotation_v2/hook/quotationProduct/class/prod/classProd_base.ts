@@ -57,6 +57,9 @@ interface Interface_ClassProd_base {
   // 才數 (台制單位，代表面積) 浮點數
   volume: `${number}` | '';
 
+  // 門片厚度 浮點數
+  thickness: `${number}` | null;
+
   // 材料
   materialName: string;
   // 表面
@@ -75,7 +78,7 @@ interface Interface_ClassProd_base {
   // 目前沒有需要顯示門軌名稱的地方，都是顯示圖檔
   guideRail: string | null;
   // 門軌圖檔的URL
-  guideRailImg: string | undefined | 'none';
+  // guideRailImg: string | undefined | 'none';
 
   // 門軌厚度 浮點數
   guideRailThickness: `${number}` | null;
@@ -104,7 +107,7 @@ interface Interface_ClassProd_base {
   // 彈射門
   // bounceDoor: boolean | null;
   // 彈射門寬度(公尺)
-  bounceDoorWidth: `${number}` | '' | null;
+  bounceDoorWidth: `${number}` | '';
   // 彈射門高度
   // bounceDoorHeight: number | null;
   // 彈射門長度
@@ -181,7 +184,7 @@ interface Interface_ClassProd_base {
   // 以上這些東西會從 get /products/door/calc-general-spec 取得
 
   // 數量 // 整數
-  quantity: number;
+  quantity: `${number}` | '';
   // 單價
   unitPrice: `${number}` | '';
   // 複價
@@ -371,6 +374,10 @@ class ClassProd_base implements Interface_ClassProd_base {
 
   get volume() {
     return this.data.volume ?? '';
+  }
+
+  get thickness() {
+    return `999` as `${number}`;
   }
 
   get materialName() {

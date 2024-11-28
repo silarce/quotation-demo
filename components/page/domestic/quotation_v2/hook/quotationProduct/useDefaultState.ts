@@ -160,7 +160,7 @@ const createDateProd = (raw: TquotationProductDto) => {
     bearingHousingSize: raw.bearingHousingSize,
     bearingName: raw.bearingName,
 
-    quantity: raw.quantity,
+    quantity: `${raw.quantity}`,
     price: `${raw.price || 0}`, // 牌價
     dualPrice: `${raw.dualPrice || 0}`, // 牌價複價
     unitPrice: `${raw.unitPrice || 0}`, // 單價 會乘上折數的價格

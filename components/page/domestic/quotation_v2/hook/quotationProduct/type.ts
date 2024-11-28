@@ -100,7 +100,7 @@ interface TstateProdData {
   // 彈射門
   bounceDoor: boolean | null;
   // 彈射門寬度(公尺)
-  bounceDoorWidth: `${number}` | '' | null;
+  bounceDoorWidth: `${number}` | '';
   // 彈射門高度
   // bounceDoorHeight: number | null;
   // 彈射門長度
@@ -176,7 +176,7 @@ interface TstateProdData {
   // 以上這些東西會從 get /products/door/calc-general-spec 取得
 
   // 數量
-  quantity: number;
+  quantity: `${number}` | '';
   // 牌價
   price: `${number}` | '';
   // 牌價複價

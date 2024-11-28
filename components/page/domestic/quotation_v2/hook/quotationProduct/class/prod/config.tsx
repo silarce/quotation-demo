@@ -1,10 +1,14 @@
 import _ from 'lodash';
 
+// antd
+import { Checkbox } from 'antd';
+
 // gear
 import InputSel, {
   TinputSelProps,
   InputSel_s1,
   InputSel_memo_select,
+  inputLocaleStringSwitcher,
 } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import {
@@ -25,6 +29,8 @@ import {
 } from 'js/utils/options/productOptions';
 
 import { TdoorModelInfoDto } from 'js/api/api_product';
+import { createAssetUrl } from 'js/api/api_product';
+import type { Toption, ToptionPlus } from 'js/utils/options/options';
 // =======================================================================
 const options_quoteType = optionsCreator_quoteType();
 // =======================================================================
@@ -42,17 +48,39 @@ interface TconfigItem_prod {
 
 type TcellKey = keyof Pick<
   Interface_ClassProd_base,
-  | 'itemName'
-  | 'discount'
-  | 'quoteType'
-  | 'doorModelName'
-  | 'fullWidth'
-  | 'WG'
-  | 'height'
-  | 'boxB'
-  | 'boxD'
-  | 'area'
-  | 'volume'
+  | 'itemName' // 項目名
+  | 'discount' // 折數
+  | 'quoteType' // 報價別
+  | 'doorModelName' // 門型
+  | 'fullWidth' // L(公尺)全寬
+  | 'WG' // WG(公尺)
+  | 'height' // h(公尺)
+  | 'boxB' // B(公尺)
+  | 'boxD' // D(公尺)
+  | 'area' // 面積
+  | 'volume' // 才數
+  //
+  | 'horsepower' // 馬力
+  | 'guideRail' // 門軌
+  | 'isAntiTyphoon' // 防颱
+  | 'hasSilencingStrip' // 門軌消音條
+  | 'thickness' // 門片厚度
+  | 'materialName' // 材料
+  | 'materialSurface' // 表面 // select
+  | 'bounceDoorWidth' // 彈射門寬度(m) // input
+  | 'guideRailThickness' // 門軌厚度 // select
+  | 'headBoxThickness' // 捲箱厚度 // select
+  | 'closingType' // 開閉方式 // select
+  | 'isIntegratedHeadBox' // 一體式捲箱 // checkbox
+  | 'isULGuideRail' // UL // checkbox
+  | 'notes' // 備註 // input
+  | 'quantity' // 數量 // input
+  | 'price' // 牌價 // input
+  | 'dualPrice' // 牌價複價 // input
+  | 'unitPrice' // 單價 // input
+  | 'totalPrice' // 複價 // input
+  | 'bottomBarAngleIron' // 底座角鐵 // select
+  | 'bottomBarPlate' // 底座板 // select
 >;
 
 type TnodeConfig = {
@@ -77,6 +105,28 @@ const defaultKeyArr: TcellKey[] = [
   'boxD',
   'area',
   'volume',
+
+  'horsepower',
+  'guideRail',
+  'isAntiTyphoon',
+  'hasSilencingStrip',
+  'thickness',
+  'materialName',
+  'materialSurface',
+  'bounceDoorWidth',
+  'guideRailThickness',
+  'headBoxThickness',
+  'closingType',
+  'isIntegratedHeadBox',
+  'isULGuideRail',
+  'notes',
+  'quantity',
+  'price',
+  'dualPrice',
+  'unitPrice',
+  'totalPrice',
+  'bottomBarAngleIron',
+  'bottomBarPlate',
 ];
 
 // =======================================================================
@@ -271,6 +321,509 @@ const nodeConfig_origin: TnodeConfig = {
       return classProd.volume;
     },
   },
+
+  horsepower: {
+    label: '馬力',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.horsepower;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.horsepower = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  guideRail: {
+    label: '門軌',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.guideRail;
+      const value = v ? { value: v, label: v } : null;
+
+      // createAssetUrl
+      // SJ302_30.svg
+
+      const options = [
+        {
+          value: 'SJ302_30.svg',
+          label: 'SJ302_30.svg',
+          icon: createAssetUrl('SJ302_30.svg'),
+        },
+        {
+          value: 'SJ302_30.svg',
+          label: 'SJ302_30.svg',
+          icon: createAssetUrl('SJ302_30.svg'),
+        },
+      ];
+
+      const inputProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          withIcon: true,
+          creOptionWithIconProps: {
+            showLabel: false,
+            imgProps: {
+              style: { height: '40px' },
+            },
+          },
+          creSingleValueWithIconProps: {
+            showLabel: false,
+            imgProps: {
+              style: { height: '40px' },
+            },
+          },
+          props: {
+            options: options,
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.guideRail = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  isAntiTyphoon: {
+    label: '防颱',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      return (
+        <Checkbox
+          checked={!!classProd.isAntiTyphoon}
+          onChange={(e) => {
+            classProd.isAntiTyphoon = e.target.checked;
+          }}
+          disabled={disabled}
+        />
+      );
+    },
+  },
+
+  hasSilencingStrip: {
+    label: '門軌消音條',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      return (
+        <Checkbox
+          checked={!!classProd.hasSilencingStrip}
+          onChange={(e) => {
+            classProd.hasSilencingStrip = e.target.checked;
+          }}
+          disabled={disabled}
+        />
+      );
+    },
+  },
+
+  thickness: {
+    label: '門片厚度',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      return classProd.thickness;
+    },
+  },
+
+  materialName: {
+    label: '材料',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.materialName;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.materialName = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  materialSurface: {
+    label: '表面',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.materialSurface;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.materialSurface = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  bounceDoorWidth: {
+    label: '彈射門寬度(m)',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: 'number',
+          value: classProd.bounceDoorWidth,
+          onChange: (e) => {
+            classProd.bounceDoorWidth = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  guideRailThickness: {
+    label: '門軌厚度',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.guideRailThickness;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.guideRailThickness = value as `${number}`;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  headBoxThickness: {
+    label: '捲箱厚度',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.headBoxThickness;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.headBoxThickness = value as `${number}`;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  closingType: {
+    label: '開閉方式',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.closingType;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.closingType = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  isIntegratedHeadBox: {
+    label: '一體式捲箱',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      return (
+        <Checkbox
+          checked={!!classProd.isIntegratedHeadBox}
+          onChange={(e) => {
+            classProd.isIntegratedHeadBox = e.target.checked;
+          }}
+          disabled={disabled}
+        />
+      );
+    },
+  },
+
+  isULGuideRail: {
+    label: 'UL',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      return (
+        <Checkbox
+          checked={!!classProd.isULGuideRail}
+          onChange={(e) => {
+            classProd.isULGuideRail = e.target.checked;
+          }}
+          disabled={disabled}
+        />
+      );
+    },
+  },
+
+  notes: {
+    label: '備註',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          value: classProd.notes,
+          onChange: (e) => {
+            classProd.notes = e.target.value;
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  quantity: {
+    label: '數量',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: 'number',
+          value: classProd.quantity,
+          onChange: (e) => {
+            classProd.quantity = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  price: {
+    label: '牌價',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const { value, type } = inputLocaleStringSwitcher(classProd.price, disabled);
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: type,
+          value: value,
+          onChange: (e) => {
+            classProd.price = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  dualPrice: {
+    label: '牌價複價',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const { value, type } = inputLocaleStringSwitcher(classProd.dualPrice, disabled);
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: type,
+          value: value,
+          onChange: (e) => {
+            classProd.dualPrice = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  unitPrice: {
+    label: '單價',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const { value, type } = inputLocaleStringSwitcher(classProd.unitPrice, disabled);
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: type,
+          value: value,
+          onChange: (e) => {
+            classProd.unitPrice = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  totalPrice: {
+    label: '複價',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const { value, type } = inputLocaleStringSwitcher(classProd.totalPrice, disabled);
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: type,
+          value: value,
+          onChange: (e) => {
+            classProd.totalPrice = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+    },
+  },
+
+  bottomBarAngleIron: {
+    label: '底座角鐵',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.bottomBarAngleIron;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.bottomBarAngleIron = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  bottomBarPlate: {
+    label: '底座板',
+    style: {
+      width: 100,
+    },
+    createNode({ disabled, classProd }) {
+      const v = classProd.bottomBarPlate;
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        selectProps: {
+          props: {
+            options: [],
+            value,
+            onChange: (option) => {
+              const value = option?.value || '';
+              classProd.bottomBarPlate = value;
+            },
+          },
+        },
+      };
+
+      return <InputSel_memo_select {...inputSelProps} />;
+    },
+  },
+
+  //
 }; // nodeConfig_origin
 
 // MARK: createNodeConfig_prime
