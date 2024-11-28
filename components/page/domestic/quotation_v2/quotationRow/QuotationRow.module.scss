@@ -5,6 +5,7 @@ $gap: 10px;
   display: flex;
   flex-wrap: nowrap;
   min-width: 100%;
+  width: fit-content;
   // background-color: black;
   // gap: $gap;
   // border: solid 1px black;
@@ -16,6 +17,7 @@ $gap: 10px;
   &.active {
     background-color: theme("colors.chosenBgc");
   }
+  // z-index: 1;
 }
 
 .row_dndThead {
