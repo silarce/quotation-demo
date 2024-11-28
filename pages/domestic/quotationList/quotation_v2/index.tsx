@@ -343,7 +343,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         <br />
         <br />
         <div className={'px-[50px]'}>
-          <QuotationProdTable disabled={disabled} {...instance_quotationProduct} />
+          <QuotationProdTable disabled={disabled} instance_useQuotationProductInstance={instance_quotationProduct} />
         </div>
 
         {/* prod */}
