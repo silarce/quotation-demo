@@ -338,10 +338,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
-  const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
+  const onWorkContactStateChange: TonStateChange = async ({ disabled, isLoading, isShowPattern }) => {
     setIsShowPattern(isShowPattern);
     setDisabed_workContactDoc(disabled);
     setIsLoading_workContact(isLoading);
+    setIsLoading(true);
+    await update();
+    setIsLoading(false);
   };
 
   // const clearShow = () => {
@@ -1301,6 +1304,12 @@ const usePanelList = ({
       label: '追加追減',
       onClick: () => {
         if (contract) {
+          if (!contract?.contractNumber) {
+            myAlert.info({ title: '請先建立功能聯絡單並設置工程編號' });
+
+            return;
+          }
+
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {
