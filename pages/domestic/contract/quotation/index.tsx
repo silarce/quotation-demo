@@ -338,10 +338,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
-  const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
+  const onWorkContactStateChange: TonStateChange = async ({ disabled, isLoading, isShowPattern }) => {
     setIsShowPattern(isShowPattern);
     setDisabed_workContactDoc(disabled);
     setIsLoading_workContact(isLoading);
+    setIsLoading(true);
+    await update();
+    setIsLoading(false);
   };
 
   // const clearShow = () => {
