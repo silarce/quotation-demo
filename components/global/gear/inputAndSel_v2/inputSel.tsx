@@ -30,6 +30,8 @@ import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './inputSel.module.scss';
 
+import inputLocaleStringSwitcher from 'js/utils/helpers/inputLocaleStringSwitcher';
+
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
 // =============================================================================
@@ -240,7 +242,8 @@ function InputSel({
           {...inputProps}
           wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
           props={{
-            disabled,
+            // disabled,
+            readOnly: disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
             // name不可以是`${number}`，會不正確的設置input的name
@@ -266,7 +269,8 @@ function InputSel({
           allowNewLineByUser={textareaProps.allowNewLineByUser}
           props={{
             name,
-            disabled,
+            // disabled,
+            readOnly: disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
             ...textareaProps?.props,
@@ -381,7 +385,8 @@ function InputSel({
           wrapperClassName={classNames(fontClassName, timePickerProps_mui.wrapperClassName)}
           wrapperStyle={timePickerProps_mui.wrapperStyle}
           props={{
-            disabled,
+            // disabled,
+            readOnly: disabled,
             //
             ...timePickerProps_mui.props,
             //
@@ -485,7 +490,8 @@ function InputSel({
                 wrapperClassName={classNames(fontClassName, inputPropsAndSelectProps.inputProps.wrapperClassName)}
                 wrapperStyle={inputPropsAndSelectProps.inputProps.wrapperStyle}
                 props={{
-                  disabled,
+                  // disabled,
+                  readOnly: disabled,
                   placeholder: `請輸入${caption ?? ''}`,
                   //
                   name: `${name}_inputPropsAndSelect_input`,
@@ -645,5 +651,6 @@ const InputSel_memo_select = memo(InputSel_s1, (prev, next) => {
 });
 
 // ===========================================================================
+
 export default InputSel;
-export { InputSel_s1, InputSel_memo_select };
+export { InputSel_s1, InputSel_memo_select, inputLocaleStringSwitcher };

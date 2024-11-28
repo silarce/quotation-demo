@@ -183,9 +183,11 @@ export default function Budget() {
           pathname: '/domestic/contract/quotation',
           query: {
             id: latestContent.contract?.id,
-            version: 1,
+            version: latestContent.contract?.version,
           },
         };
+
+        isAttachtQuotation && (href_contract.query.id = attachedToContractId);
 
         const href_quotation = {
           pathname: '/domestic/quotationList/quotation',

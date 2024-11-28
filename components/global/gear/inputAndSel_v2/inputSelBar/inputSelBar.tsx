@@ -55,7 +55,8 @@ const InputSelBar = ({
               {...itemProps}
               wrapperClassName={classNames(fontClassName, itemProps?.wrapperClassName)}
               props={{
-                disabled,
+                // disabled,
+                readOnly: disabled,
                 ...itemProps?.props,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
@@ -78,7 +79,8 @@ const InputSelBar = ({
               // wrapperClassName={itemProps?.wrapperClassName}
               // allowNewLineByUser={itemProps?.allowNewLineByUser}
               props={{
-                disabled,
+                // disabled,
+                readOnly: disabled,
                 ...itemProps?.props,
                 onFocus: (e) => {
                   onFocus && onFocus(e);
