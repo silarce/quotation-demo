@@ -35,6 +35,19 @@ import type {
 } from './type';
 
 import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
+
+import {
+  TconfigItem,
+  TcellKey,
+  TnodeConfig,
+
+  //
+  defaultKeyArr,
+  createNodeConfig_prime,
+  nodeConfig_origin,
+  //
+} from './class/prod/config';
+
 import {
   //
   TdoorComponentType,
@@ -52,23 +65,20 @@ import {
 } from './class/component';
 
 import {
-  TconfigItem,
-  TcellKey,
-  TnodeConfig,
-
-  //
-  defaultKeyArr,
-  createNodeConfig_prime,
-  nodeConfig_origin,
-  //
-} from './class/prod/config';
-
-import {
   TnodeConfig_component,
   TcellKey_component,
   defaultKeyArr_component,
   createNodeConfig_component,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config_component';
+
+import { Interface_ClassAccessory, Class_accessory } from './class/accessory/classAccessory';
+import {
+  TconfigItem_accessory,
+  TnodeConfig_accessory,
+  TcellKey_accessory,
+  defaultKeyArr_accessory,
+  createNodeConfig_accessory,
+} from './class/accessory/config';
 
 // ================================================================================
 
@@ -106,8 +116,18 @@ type TclassComponentDict = {
     : never;
 };
 
+interface TclassAccessoryDict {
+  [key: string]: Class_accessory;
+}
+
 // ================================================================================
 
+const nodeConfig_component_origin = createNodeConfig_component();
+const nodeConfig_accessory_origin = createNodeConfig_accessory();
+
+// ================================================================================
+
+// MARK:START
 const useQuotationProduct = ({
   raw_productArr,
   disabled,
@@ -135,6 +155,7 @@ const useQuotationProduct = ({
   const [activeProdKey, setActiveProdKey] = useState<string>();
 
   const [cellKeyArr_component, setCellKeyArr_component] = useState<TcellKey_component[]>([...defaultKeyArr_component]); // 欄位的key
+  const [cellKeyArr_accessory, setCellKeyArr_accessory] = useState<TcellKey_accessory[]>([...defaultKeyArr_accessory]); // 欄位的key
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
@@ -236,6 +257,20 @@ const useQuotationProduct = ({
     });
   };
 
+  const setAccessoryKeyArr = (newKeyArr: string[]) => {
+    if (!activeProdKey) {
+      return;
+    }
+
+    setState_prodDict((prev) => {
+      const copy = { ...prev };
+      const activedProd = copy[activeProdKey];
+      activedProd.accessoryKeyArr = newKeyArr;
+
+      return copy;
+    });
+  };
+
   // -----------------------------------------------------------------------
 
   // region COOKED
@@ -243,6 +278,7 @@ const useQuotationProduct = ({
   const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
 
   const componentKeyArr = activedProd?.componentKeyArr;
+  const accessoryKeyArr = activedProd?.accessoryKeyArr;
 
   // class用來管理資料狀態
   // MARK:classProdDict
@@ -320,6 +356,27 @@ const useQuotationProduct = ({
     return classComponentDict;
   }, [activedClassProd]);
 
+  const activedClassAccessoryDict = useMemo(() => {
+    if (!activedClassProd) {
+      return undefined;
+    }
+
+    const data_accessoryDict = activedClassProd.state.data_accessoryDict;
+
+    const classAccessoryDict: TclassAccessoryDict = {};
+    Object.entries(data_accessoryDict).forEach(([key, acce]) => {
+      classAccessoryDict[key] = new Class_accessory({
+        state_accessory: acce,
+        setState_accessory: createSetAccessory({
+          prodKey: activedClassProd.state.key,
+          accessoryKey: key,
+        }),
+      });
+    });
+
+    return classAccessoryDict;
+  }, [activedClassProd]);
+
   // -----------------------------------------------------------------------
   // region useEffect
 
@@ -348,11 +405,25 @@ const useQuotationProduct = ({
     setCellKeyArr_component,
     componentKeyArr,
     setComponentKeyArr,
+    //
+    activedClassAccessoryDict,
+    cellKeyArr_accessory,
+    setCellKeyArr_accessory,
+    accessoryKeyArr,
+    setAccessoryKeyArr,
+    //
+    nodeConfig_origin,
+    nodeConfig_component_origin,
+    nodeConfig_accessory_origin,
   };
 };
 
+// MARK: END
+//
+
 // ================================================================================
 
+// MARK:createClassComponentDict
 const createClassComponentDict = ({
   //
   data_componentDict,
@@ -477,12 +548,9 @@ const createClassComponentDict = ({
 };
 
 // ================================================================================
-// createNodeConfig_component
-
-const nodeConfig_component_origin = createNodeConfig_component();
 
 export type { TuseQuotationProductInstance };
-export { useQuotationProduct, nodeConfig_origin, nodeConfig_component_origin };
+export { useQuotationProduct };
 
 // import { DeepReadonly } from 'ts-essentials';
 

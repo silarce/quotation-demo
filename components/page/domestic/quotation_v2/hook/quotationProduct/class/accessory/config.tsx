@@ -22,7 +22,7 @@ interface TconfigItem_accessory {
   }) => React.ReactNode;
 }
 
-type TcellKey_accessory = keyof Pick<Interface_ClassAccessory, 'name' | 'unit'>;
+type TcellKey_accessory = keyof Pick<Interface_ClassAccessory, 'name' | 'unit' | 'quantity'>;
 
 type TnodeConfig_accessory = {
   readonly [key in TcellKey_accessory]: TconfigItem_accessory;
@@ -30,7 +30,7 @@ type TnodeConfig_accessory = {
 
 // ============================================================================
 
-const defaultKeyArr_accessory: TcellKey_accessory[] = ['name', 'unit'];
+const defaultKeyArr_accessory: TcellKey_accessory[] = ['unit', 'quantity'];
 
 // ============================================================================
 
@@ -51,11 +51,19 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
         return classAcce.unit;
       },
     },
+
+    quantity: {
+      label: '數量',
+      style: { width: 100 },
+      createNode({ disabled, classAcce }) {
+        return classAcce.quantity;
+      },
+    },
   };
 
   return nodeConfig;
 };
 
 // ============================================================================
-export type { TconfigItem_accessory, TnodeConfig_accessory };
+export type { TconfigItem_accessory, TnodeConfig_accessory, TcellKey_accessory };
 export { defaultKeyArr_accessory, createNodeConfig_accessory };

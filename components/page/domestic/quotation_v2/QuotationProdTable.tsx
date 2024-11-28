@@ -14,12 +14,7 @@ import {
 // css
 import scss from './QuotationProdTable.module.scss';
 
-import {
-  TuseQuotationProductInstance,
-  nodeConfig_origin,
-  nodeConfig_component_origin,
-} from './hook/quotationProduct/useQuotationProduct';
-import { IdcardFilled } from '@ant-design/icons';
+import { TuseQuotationProductInstance } from './hook/quotationProduct/useQuotationProduct';
 
 // ===================================================================
 
@@ -47,6 +42,16 @@ export default function QuotationProdTable({
   setCellKeyArr_component,
   componentKeyArr,
   setComponentKeyArr,
+  //
+  activedClassAccessoryDict,
+  cellKeyArr_accessory,
+  setCellKeyArr_accessory,
+  accessoryKeyArr,
+  setAccessoryKeyArr,
+  //
+  nodeConfig_origin,
+  nodeConfig_component_origin,
+  nodeConfig_accessory_origin,
 }: TuseQuotationProductInstance & {
   disabled: boolean;
   className?: string;
@@ -194,12 +199,12 @@ export default function QuotationProdTable({
               return null;
             }
 
-            const nodeConfig_itemName = classComponent.nodeConfig['name'];
+            const nodeConfig_name = classComponent.nodeConfig['name'];
 
             const left = (
               <>
-                <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
-                  {nodeConfig_itemName.createNode({
+                <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
+                  {nodeConfig_name.createNode({
                     disabled,
                     classComponent: classComponent,
                   })}
@@ -244,8 +249,89 @@ export default function QuotationProdTable({
           })}
         </Table_dnd>
       </div>
+      <br />
       {/* 選配設定 */}
-      <div className={scss.accessoryTable}></div>
+      <div className={scss.accessoryTable}>
+        <QuotationRow_dndThead
+          disabled={disabled}
+          keyArr={cellKeyArr_accessory}
+          onDragEnd={({ move }) => {
+            setCellKeyArr_accessory(move(cellKeyArr_accessory));
+          }}
+          configDict={nodeConfig_accessory_origin}
+          dragHandleInvisible={true}
+          left={
+            <>
+              <Cell
+                className={classNames(nodeConfig_accessory_origin['name'].className)}
+                style={nodeConfig_accessory_origin['name'].style}
+              >
+                {nodeConfig_accessory_origin['name'].label}
+              </Cell>
+            </>
+          }
+        />
+
+        <Table_dnd
+          items={accessoryKeyArr ?? []}
+          onDragEnd={({ move }) => {
+            if (!accessoryKeyArr) {
+              return;
+            }
+
+            setAccessoryKeyArr(move(accessoryKeyArr));
+          }}
+        >
+          {accessoryKeyArr?.map((acceKey, index) => {
+            if (!activedClassAccessoryDict) {
+              return null;
+            }
+
+            // 沒出錯的話，這是一定會有的
+            const classAccessory = activedClassAccessoryDict[acceKey];
+
+            const nodeConfig_name = classAccessory.nodeConfig['name'];
+
+            const left = (
+              <>
+                <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
+                  {nodeConfig_name.createNode({
+                    disabled,
+                    classAcce: classAccessory,
+                  })}
+                </Cell>
+              </>
+            );
+
+            return (
+              <QuotationRow_dnd_memo
+                rerenderTrigger01={classAccessory.state}
+                rerenderTrigger02={disabled}
+                rerenderTrigger03={cellKeyArr_accessory}
+                key={acceKey}
+                id={acceKey}
+                index={index}
+                left={left}
+              >
+                {cellKeyArr_accessory.map((cellKey) => {
+                  const { style, className, createNode } = classAccessory.nodeConfig[cellKey];
+
+                  const node = createNode({
+                    disabled,
+                    classAcce: classAccessory,
+                  });
+
+                  return (
+                    <Cell key={cellKey} className={classNames(className)} style={style}>
+                      {node}
+                    </Cell>
+                  );
+                })}
+              </QuotationRow_dnd_memo>
+            );
+          })}
+        </Table_dnd>
+      </div>
     </>
   );
 }
