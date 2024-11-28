@@ -1896,13 +1896,13 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 
-  // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
-  // ! 所以只設需要拿的東西
-  // contract?: TquotationContractDto;
-  contract?: {
-    // 設了populate卻不到，這個好像沒有?
-    id: string;
-  };
+  // // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
+  // // ! 所以只設需要拿的東西
+  contract?: TquotationContractDto;
+  // contract?: {
+  //   // 設了populate卻不到，這個好像沒有?
+  //   id: string;
+  // };
 
   // api文件上沒寫但應該會有的東西
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
