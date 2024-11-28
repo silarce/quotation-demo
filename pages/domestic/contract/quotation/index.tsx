@@ -1301,6 +1301,12 @@ const usePanelList = ({
       label: '追加追減',
       onClick: () => {
         if (contract) {
+          if (!contract?.contractNumber) {
+            myAlert.info({ title: '請先建立功能聯絡單並設置工程編號' });
+
+            return;
+          }
+
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {
