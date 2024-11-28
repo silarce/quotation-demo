@@ -30,6 +30,8 @@ import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './inputSel.module.scss';
 
+import inputLocaleStringSwitcher from 'js/utils/helpers/inputLocaleStringSwitcher';
+
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
 // =============================================================================
@@ -649,5 +651,6 @@ const InputSel_memo_select = memo(InputSel_s1, (prev, next) => {
 });
 
 // ===========================================================================
+
 export default InputSel;
-export { InputSel_s1, InputSel_memo_select };
+export { InputSel_s1, InputSel_memo_select, inputLocaleStringSwitcher };
