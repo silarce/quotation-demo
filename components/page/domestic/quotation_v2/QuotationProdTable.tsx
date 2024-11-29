@@ -119,6 +119,7 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
   return (
     <div className={classNames(scss.prodTable, className)}>
       <QuotationRow_dndThead
+        className={scss.rowThead}
         disabled={disabled}
         keyArr={cellKeyArr}
         onDragEnd={({ move }) => {
@@ -230,6 +231,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
   return (
     <div className={classNames(scss.componentTable, className)}>
       <QuotationRow_dndThead
+        className={scss.rowThead}
         disabled={disabled}
         keyArr={cellKeyArr_component}
         onDragEnd={({ move }) => {
@@ -336,6 +338,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
   return (
     <div className={classNames(scss.accessoryTable, className)}>
       <QuotationRow_dndThead
+        className={scss.rowThead}
         disabled={disabled}
         keyArr={cellKeyArr_accessory}
         onDragEnd={({ move }) => {

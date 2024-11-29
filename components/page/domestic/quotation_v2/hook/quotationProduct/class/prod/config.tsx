@@ -136,7 +136,7 @@ const defaultKeyArr: TcellKey[] = [
 const nodeConfig_origin: TnodeConfig = {
   itemName: {
     label: '項目',
-    style: { width: 150 },
+    style: { width: 100 },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
@@ -171,7 +171,7 @@ const nodeConfig_origin: TnodeConfig = {
 
   quoteType: {
     label: '報價別',
-    style: { width: 200 },
+    style: { width: 105 },
     createNode({ disabled, classProd }) {
       const selectProps: TinputSelProps['selectProps'] = {
         props: {
@@ -192,7 +192,7 @@ const nodeConfig_origin: TnodeConfig = {
 
   doorModelName: {
     label: '門型',
-    style: { width: 200 },
+    style: { width: 300 },
     createNode() {
       return null;
     },
@@ -201,7 +201,7 @@ const nodeConfig_origin: TnodeConfig = {
   fullWidth: {
     label: 'L', // 全寬
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -221,7 +221,7 @@ const nodeConfig_origin: TnodeConfig = {
   WG: {
     label: 'WG',
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -241,7 +241,7 @@ const nodeConfig_origin: TnodeConfig = {
   height: {
     label: 'h',
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -261,7 +261,7 @@ const nodeConfig_origin: TnodeConfig = {
   boxB: {
     label: 'B',
     style: {
-      width: 100,
+      width: 80,
     },
     createNode({ disabled, classProd }) {
       const selectProps: TinputSelProps['selectProps'] = {
@@ -282,7 +282,7 @@ const nodeConfig_origin: TnodeConfig = {
   boxD: {
     label: 'D',
     style: {
-      width: 100,
+      width: 80,
     },
     createNode({ disabled, classProd }) {
       const selectProps: TinputSelProps['selectProps'] = {
@@ -303,7 +303,7 @@ const nodeConfig_origin: TnodeConfig = {
   area: {
     label: '面積',
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ classProd }) {
       // return <InputSel_s1 node={classProd.area} showBaseline="invisible" />;
@@ -314,7 +314,7 @@ const nodeConfig_origin: TnodeConfig = {
   volume: {
     label: '才數',
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ classProd }) {
       // return <InputSel_s1 node={classProd.volume} showBaseline="invisible" />;
@@ -325,7 +325,7 @@ const nodeConfig_origin: TnodeConfig = {
   horsepower: {
     label: '馬力',
     style: {
-      width: 100,
+      width: 90,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.horsepower;
@@ -408,7 +408,7 @@ const nodeConfig_origin: TnodeConfig = {
   isAntiTyphoon: {
     label: '防颱',
     style: {
-      width: 100,
+      width: 60,
     },
     createNode({ disabled, classProd }) {
       return (
@@ -454,7 +454,7 @@ const nodeConfig_origin: TnodeConfig = {
   materialName: {
     label: '材料',
     style: {
-      width: 100,
+      width: 190,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.materialName;
@@ -481,7 +481,7 @@ const nodeConfig_origin: TnodeConfig = {
   materialSurface: {
     label: '表面',
     style: {
-      width: 100,
+      width: 80,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.materialSurface;
@@ -508,7 +508,7 @@ const nodeConfig_origin: TnodeConfig = {
   bounceDoorWidth: {
     label: '彈射門寬度(m)',
     style: {
-      width: 100,
+      width: 128,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -528,7 +528,7 @@ const nodeConfig_origin: TnodeConfig = {
   guideRailThickness: {
     label: '門軌厚度',
     style: {
-      width: 100,
+      width: 90,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.guideRailThickness;
@@ -555,7 +555,7 @@ const nodeConfig_origin: TnodeConfig = {
   headBoxThickness: {
     label: '捲箱厚度',
     style: {
-      width: 100,
+      width: 90,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.headBoxThickness;
@@ -582,7 +582,7 @@ const nodeConfig_origin: TnodeConfig = {
   closingType: {
     label: '開閉方式',
     style: {
-      width: 100,
+      width: 90,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.closingType;
@@ -664,7 +664,7 @@ const nodeConfig_origin: TnodeConfig = {
   quantity: {
     label: '數量',
     style: {
-      width: 100,
+      width: 55,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -684,7 +684,7 @@ const nodeConfig_origin: TnodeConfig = {
   price: {
     label: '牌價',
     style: {
-      width: 100,
+      width: 120,
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.price, disabled);
@@ -706,7 +706,7 @@ const nodeConfig_origin: TnodeConfig = {
   dualPrice: {
     label: '牌價複價',
     style: {
-      width: 100,
+      width: 140,
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.dualPrice, disabled);
@@ -728,7 +728,7 @@ const nodeConfig_origin: TnodeConfig = {
   unitPrice: {
     label: '單價',
     style: {
-      width: 100,
+      width: 120,
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.unitPrice, disabled);
@@ -750,7 +750,7 @@ const nodeConfig_origin: TnodeConfig = {
   totalPrice: {
     label: '複價',
     style: {
-      width: 100,
+      width: 140,
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.totalPrice, disabled);
@@ -772,7 +772,7 @@ const nodeConfig_origin: TnodeConfig = {
   bottomBarAngleIron: {
     label: '底座角鐵',
     style: {
-      width: 100,
+      width: 210,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.bottomBarAngleIron;
@@ -799,7 +799,7 @@ const nodeConfig_origin: TnodeConfig = {
   bottomBarPlate: {
     label: '底座板',
     style: {
-      width: 100,
+      width: 210,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.bottomBarPlate;
