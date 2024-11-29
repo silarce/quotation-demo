@@ -2,9 +2,7 @@ import { memo } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
 
-// antd
-import { Tabs } from 'antd';
-
+// component
 import {
   QuotationRow,
   Cell,
@@ -12,6 +10,12 @@ import {
   QuotationRow_dnd,
   Table_dnd,
 } from 'components/page/domestic/quotation_v2/quotationRow';
+
+// antd
+import { Tabs } from 'antd';
+
+// gear
+import { InputSel_s1 } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -118,6 +122,18 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
 
   return (
     <div className={classNames(scss.prodTable, className)}>
+      <div className={scss.tablePanel}>
+        <span className={scss.title}>主產品設定</span>
+        <InputSel_s1
+          //
+          caption="總折數 : "
+          wrapperStyle={{ width: 200, gap: 5 }}
+          disabled={disabled}
+          inputProps={{}}
+          fontSize="18"
+          captionSize="18"
+        />
+      </div>
       <QuotationRow_dndThead
         className={scss.rowThead}
         disabled={disabled}

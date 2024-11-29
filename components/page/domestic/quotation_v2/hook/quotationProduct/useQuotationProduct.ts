@@ -8,13 +8,12 @@ import _ from 'lodash';
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import type {
+  TquotationContentDto,
   TquotationProductDto,
   TquotationProductComponentDto,
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
-// -------------------------------------------------------------------------------
-import { useDefaultState } from './useDefaultState';
 // -------------------------------------------------------------------------------
 
 // type
@@ -80,6 +79,10 @@ import {
   createNodeConfig_accessory,
 } from './class/accessory/config';
 
+// hook
+import { useDefaultState } from './useDefaultState';
+import { useQuotationTotalPrice } from './useQuotationPrice';
+
 // ================================================================================
 
 type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
@@ -129,18 +132,38 @@ const nodeConfig_accessory_origin = createNodeConfig_accessory();
 
 // MARK:START
 const useQuotationProduct = ({
-  raw_productArr,
+  raw_quotationContent,
+  // raw_productArr,
   disabled,
 }: {
-  raw_productArr: undefined | TquotationProductDto[];
+  raw_quotationContent: TquotationContentDto | undefined;
+  // raw_productArr: undefined | TquotationProductDto[];
   disabled: boolean;
 }) => {
+  const raw_productArr = raw_quotationContent?.products;
+
+  // ------------------------------------------------------------------------
   // 門型列表
   const { doorModelDict, isReady } = useGlobal_doorModel();
 
   // ------------------------------------------------------------------------
 
   // region STATE
+
+  const {
+    state_quotationDiscount,
+    setState_quotationDiscount,
+    //
+    state_totalPrice,
+    setProdPriceTotal,
+    setTuneTotal,
+    setCurrency,
+    setExchangeRate,
+  } = useQuotationTotalPrice({
+    raw_quotationContent: raw_quotationContent,
+    disabled,
+  });
+
   const defaultState = useDefaultState({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,

@@ -9,6 +9,7 @@ import InputSel, {
   InputSel_s1,
   InputSel_memo_select,
   inputLocaleStringSwitcher,
+  InputSel_input_timeout,
 } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import {
@@ -31,6 +32,7 @@ import {
 import { TdoorModelInfoDto } from 'js/api/api_product';
 import { createAssetUrl } from 'js/api/api_product';
 import type { Toption, ToptionPlus } from 'js/utils/options/options';
+
 // =======================================================================
 const options_quoteType = optionsCreator_quoteType();
 // =======================================================================

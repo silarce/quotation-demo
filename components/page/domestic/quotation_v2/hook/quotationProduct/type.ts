@@ -24,6 +24,9 @@ import {
   TdoorBackBoneDto,
   //
   TdoorAccessoryDto,
+  //
+  //
+  Tcurrency,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
@@ -320,6 +323,29 @@ type TsetComponent<T extends keyof Tdata_componentDict> = //
 
 type TsetAccessory = React.Dispatch<React.SetStateAction<TstateAccessoryData>>;
 
+// ===========================================================================
+
+interface TstateTotalPrice {
+  prodPriceTotal: number; // 後端沒有
+
+  //
+  // quotationDiscount: `${number}` | ''; // 總折數 // 這個折數會作用在每個主產品上
+  averageDiscount: number; // 平均折數 // 浮點數
+
+  tuneTotal: `${number}` | ''; // 小計調整
+
+  subTotal: number; //小計
+  salesTax: number; // 營業稅
+  total: number; //總計
+
+  currency: Tcurrency; // 幣別
+  exchangeRate: `${number}` | ''; // 匯率(外幣兌新台幣)
+  foreignTotal: `${number}` | ''; // 外幣計價
+}
+
+type Tstate_quotaionDiscount = `${number}` | ''; // 總折數 // 這個折數會作用在每個主產品上
+
+// ===========================================================================
 export type {
   TstateProd,
   TsetProd,
@@ -334,4 +360,9 @@ export type {
   //
   TstateAccessoryData,
   TsetAccessory,
+  //
+  //
+  //
+  TstateTotalPrice,
+  Tstate_quotaionDiscount,
 };

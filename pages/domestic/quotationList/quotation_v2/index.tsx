@@ -221,10 +221,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
-  // console.log(content);
-
   const instance_quotationProduct = useQuotationProduct({
-    raw_productArr: content?.products,
+    raw_quotationContent: content,
+    // raw_productArr: content?.products,
     disabled,
   });
 

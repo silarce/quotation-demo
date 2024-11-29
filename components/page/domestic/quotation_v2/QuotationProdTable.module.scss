@@ -23,3 +23,15 @@
   top: 0;
   z-index: 2;
 }
+
+.tablePanel {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  align-items: flex-end;
+
+  .title {
+    font-size: 20px;
+    color: theme("colors.main");
+  }
+}
