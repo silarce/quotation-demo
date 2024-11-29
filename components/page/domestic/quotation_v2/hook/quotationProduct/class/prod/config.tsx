@@ -53,7 +53,8 @@ type TcellKey = keyof Pick<
   | 'quoteType' // 報價別
   | 'doorModelName' // 門型
   | 'fullWidth' // L(公尺)全寬
-  | 'WG' // WG(公尺)
+  // | 'WG' // WG(公尺)
+  | 'W'
   | 'height' // h(公尺)
   | 'boxB' // B(公尺)
   | 'boxD' // D(公尺)
@@ -99,7 +100,8 @@ const defaultKeyArr: TcellKey[] = [
   'quoteType',
   'doorModelName',
   'fullWidth',
-  'WG',
+  // 'WG',
+  'W',
   'height',
   'boxB',
   'boxD',
@@ -218,8 +220,8 @@ const nodeConfig_origin: TnodeConfig = {
     },
   },
 
-  WG: {
-    label: 'WG',
+  W: {
+    label: 'W',
     style: {
       width: 60,
     },
@@ -227,9 +229,9 @@ const nodeConfig_origin: TnodeConfig = {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
           type: 'number',
-          value: classProd.WG,
+          value: classProd.W,
           onChange: (e) => {
-            classProd.WG = e.target.value as `${number}` | '';
+            classProd.W = e.target.value as `${number}` | '';
           },
         },
       };
@@ -237,6 +239,26 @@ const nodeConfig_origin: TnodeConfig = {
       return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
     },
   },
+
+  // WG: {
+  //   label: 'WG',
+  //   style: {
+  //     width: 60,
+  //   },
+  //   createNode({ disabled, classProd }) {
+  //     const inputProps: TinputSelProps['inputProps'] = {
+  //       props: {
+  //         type: 'number',
+  //         value: classProd.WG,
+  //         onChange: (e) => {
+  //           classProd.WG = e.target.value as `${number}` | '';
+  //         },
+  //       },
+  //     };
+
+  //     return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+  //   },
+  // },
 
   height: {
     label: 'h',

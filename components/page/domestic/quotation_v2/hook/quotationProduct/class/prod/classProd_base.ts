@@ -44,8 +44,13 @@ interface Interface_ClassProd_base {
 
   // L(公尺)全寬 浮點數
   fullWidth: `${number}` | '';
+
   // WG(公尺) 浮點數
-  WG: `${number}` | '';
+  // WG: `${number}` | '';
+
+  // W(公尺) 浮點數
+  W: `${number}` | '';
+
   // h(公尺) 浮點數
   height: `${number}` | '';
   // B(公尺) 浮點數
@@ -328,14 +333,22 @@ class ClassProd_base implements Interface_ClassProd_base {
     return new Decimal(this.data.fullWidth).mul(1000).toNumber();
   }
 
-  get WG() {
-    return this.data.WG;
+  // get WG() {
+  //   return this.data.WG;
+  // }
+  // set WG(value) {
+  //   this.setData('WG', value);
+  // }
+  // get WG_mm() {
+  //   return new Decimal(this.data.WG).mul(1000).toNumber();
+  // }
+
+  // W要額外處理
+  get W() {
+    return '999' as `${number}`;
   }
-  set WG(value) {
-    this.setData('WG', value);
-  }
-  get WG_mm() {
-    return new Decimal(this.data.WG).mul(1000).toNumber();
+  set W(value) {
+    // this.setData('W', value);
   }
 
   get height() {
