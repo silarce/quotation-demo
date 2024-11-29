@@ -115,7 +115,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_memo_select {...inputSelProps} />;
       },
     },
 
@@ -141,7 +141,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_memo_select {...inputSelProps} />;
       },
     },
 
