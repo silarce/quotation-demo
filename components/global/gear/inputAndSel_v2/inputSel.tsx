@@ -1,10 +1,6 @@
 // 沒有把name送進去的元件，MyTimePicker_mui、CheckBar、InputSelBar
-
-import { memo } from 'react';
+import { CSSProperties, useState, useEffect, useRef, memo } from 'react';
 import _ from 'lodash';
-
-import { CSSProperties, useState } from 'react';
-
 import classNames from 'classnames';
 
 // component
@@ -97,22 +93,20 @@ type TinputSelProps = {
   name?: string;
 };
 
-export type {
+type Tprops_debounceInput = Omit<
   TinputSelProps,
-  //
-  TselectProps,
-  TinputProps,
-  TcheckboxProps,
-  TtextareaProps,
-  TinputSelBarProps_reduce,
-  TdatePickerProps,
-  TtimePickerProps,
-  TtimePickerProps_mui,
-  TinputSelBarProps,
-  TinputPropsAndSelectProps,
-  TcheckBoxProps_v2,
-  TradioProps,
-};
+  | 'selectProps'
+  | 'textareaProps'
+  | 'datePickerProps'
+  | 'timePickerProps'
+  | 'timePickerProps_mui'
+  | 'checkBoxProps'
+  | 'inputSelBarProps'
+  | 'inputPropsAndSelectProps'
+  | 'checkBoxProps_v2'
+  | 'radioProps'
+  | 'node'
+>;
 
 // =============================================================================
 
@@ -636,8 +630,53 @@ const dealSelectProps = ({ selectProps }: { selectProps: TselectProps }) => {
 
 // ===========================================================================
 
-const InputSel_s1 = (props: Parameters<typeof InputSel>[0]) => {
+const InputSel_s1 = (props: TinputSelProps) => {
   return <InputSel showBaseline="auto" {...props} />;
+};
+
+// 這個元件用來為input的onChange防抖，目的是避免過於頻繁的狀態更新造成效能浪費
+// 應該還可以再改良
+const InputSel_debounceInput = (props: Tprops_debounceInput & { timeout: number }) => {
+  const { timeout } = props;
+  const [value, setValue] = useState('');
+
+  const timeoutToken = useRef<NodeJS.Timeout | null>(null);
+
+  const inputProps = props.inputProps;
+  const originOnChange = inputProps?.props?.onChange;
+
+  useEffect(() => {
+    if (timeoutToken.current) {
+      return;
+    }
+
+    setValue((inputProps?.props?.value as string | undefined) ?? '');
+  }, [inputProps?.props?.value]);
+
+  return (
+    <InputSel
+      showBaseline="auto"
+      {...props}
+      //
+      inputProps={{
+        ...props.inputProps,
+        props: {
+          ...props.inputProps?.props,
+          value,
+          onChange(e) {
+            const v = e.target.value;
+            setValue(v);
+
+            timeoutToken.current && clearTimeout(timeoutToken.current);
+            timeoutToken.current = setTimeout(() => {
+              originOnChange?.(e);
+              timeoutToken.current = null;
+            }, timeout);
+          },
+        },
+      }}
+    />
+  );
 };
 
 const InputSel_memo_select = memo(InputSel_s1, (prev, next) => {
@@ -652,5 +691,29 @@ const InputSel_memo_select = memo(InputSel_s1, (prev, next) => {
 
 // ===========================================================================
 
+export type {
+  TinputSelProps,
+  Tprops_debounceInput,
+  //
+  TselectProps,
+  TinputProps,
+  TcheckboxProps,
+  TtextareaProps,
+  TinputSelBarProps_reduce,
+  TdatePickerProps,
+  TtimePickerProps,
+  TtimePickerProps_mui,
+  TinputSelBarProps,
+  TinputPropsAndSelectProps,
+  TcheckBoxProps_v2,
+  TradioProps,
+  //
+};
+
 export default InputSel;
-export { InputSel_s1, InputSel_memo_select, inputLocaleStringSwitcher };
+export {
+  InputSel_s1,
+  InputSel_memo_select,
+  inputLocaleStringSwitcher,
+  InputSel_debounceInput as InputSel_input_timeout,
+};
