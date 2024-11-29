@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
+import _ from 'lodash';
 
 // antd
 import { Popover } from 'antd';
@@ -44,13 +45,13 @@ interface Tform_pay {
   };
   // 總折數
   discountRate: {
-    value: TnumberStr;
-    onChange?: (value: TnumberStr) => void;
-    disabled?: boolean;
+    value: string;
+    // onChange?: (value: TnumberStr) => void;
+    // disabled?: boolean;
   };
   // 小計調整
   tuneTotal: {
-    value: TnumberStr;
+    value: string;
     onChange?: (value: TnumberStr) => void;
   };
   // 幣別
@@ -165,11 +166,15 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
               className={classNames(
                 //
                 'bg-transparent',
-                (disabled || discountRate.disabled) && scss.noBaseLine
+                // (disabled || discountRate.disabled) && scss.noBaseLine
+                scss.noBaseLine
               )}
               value={discountRate.value}
-              onChange={(e) => discountRate.onChange?.(e.target.value as `${number}` | '')}
-              readOnly={disabled || discountRate.disabled}
+              // onChange={(e) => {
+              //   discountRate.onChange?.(e.target.value as `${number}` | '');
+              // }}
+              // readOnly={disabled || discountRate.disabled}
+              readOnly={true}
             />
             <span>%</span>
           </div>
@@ -212,15 +217,23 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           <div>
             <input
               onWheel={(e) => e.currentTarget.blur()}
-              type="number"
+              type="text"
               className={classNames(
                 //
                 'bg-transparent',
                 disabled && scss.noBaseLine
               )}
-              disabled={disabled}
+              readOnly={disabled}
               value={tuneTotal.value}
-              onChange={(e) => tuneTotal.onChange?.(e.target.value as `${number}` | '')}
+              onChange={(e) => {
+                const value = e.target.value;
+
+                if (!_.isNumber(value)) {
+                  return;
+                }
+
+                tuneTotal.onChange?.(e.target.value as `${number}` | '');
+              }}
             />
           </div>
         </div>
@@ -301,7 +314,13 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           </div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">外幣計價</span>
+          <span className="relative">
+            {'外幣計價 '}
+            <Popover content={'外幣計價 = 總計 / 匯率'} trigger="hover">
+              <InfoCircleOutlined />
+            </Popover>
+          </span>
+
           <div>
             <input className={classNames('bg-transparent', scss.noBaseLine)} value={foreignTotal} readOnly={true} />
           </div>

@@ -439,6 +439,17 @@ const useQuotationProduct = ({
     nodeConfig_origin,
     nodeConfig_component_origin,
     nodeConfig_accessory_origin,
+    //
+    //
+    //
+    state_quotationDiscount, // 總折數
+    setState_quotationDiscount,
+    //
+    state_totalPrice, // 完整狀態
+    // setProdPriceTotal,
+    setTuneTotal,
+    setCurrency,
+    setExchangeRate,
   };
 };
 

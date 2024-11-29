@@ -74,11 +74,16 @@ const useQuotationTotalPrice = ({
   };
 
   const setTuneTotal = (value: TstateTotalPrice['tuneTotal']) => {
+    if (!Number.isInteger(Number(value || 0))) {
+      return;
+    }
+
     setState_totalPrice((prev) => {
       let copy = { ...prev };
+
       copy.tuneTotal = value;
       const { tuneTotal, prodPriceTotal } = copy;
-      const subTotal = new Decimal(prodPriceTotal).add(tuneTotal).toNumber();
+      const subTotal = new Decimal(prodPriceTotal).add(tuneTotal || 0).toNumber();
       copy.subTotal = subTotal;
 
       const { salesTax, total, foreignTotal } = calcTotal(copy);
@@ -112,6 +117,9 @@ const useQuotationTotalPrice = ({
         NTD: copy.total,
         rate_currencyToNTD: copy.exchangeRate || 0,
       });
+      console.log(copy.total);
+      console.log(copy.exchangeRate);
+      console.log(foreignTotal);
 
       copy.foreignTotal = `${foreignTotal}`;
 
@@ -152,7 +160,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
     const tuneTotal = (raw?.tuneTotal ?? '0') as `${number}`;
     const subTotal = Number(raw?.subTotal ?? '0');
 
-    const prodPriceTotal = new Decimal(subTotal).add(tuneTotal).toNumber();
+    const prodPriceTotal = new Decimal(subTotal).minus(tuneTotal).toNumber();
 
     const defaultState: TstateTotalPrice = {
       prodPriceTotal,
@@ -179,7 +187,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
 const calcTotal = (state: TstateTotalPrice) => {
   const { subTotal, exchangeRate } = state;
 
-  const salesTax = new Decimal(subTotal).mul(taxRate).toNumber();
+  const salesTax = new Decimal(subTotal).mul(taxRate).toDecimalPlaces(0).toNumber();
   const total = new Decimal(subTotal).add(salesTax).toNumber();
 
   const foreignTotal = calcNTDToCurrency({

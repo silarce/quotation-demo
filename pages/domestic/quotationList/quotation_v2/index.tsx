@@ -227,6 +227,17 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     disabled,
   });
 
+  const {
+    state_quotationDiscount, // 總折數
+    setState_quotationDiscount,
+    //
+    state_totalPrice, // 完整狀態
+    // setProdPriceTotal,
+    setTuneTotal,
+    setCurrency,
+    setExchangeRate,
+  } = instance_quotationProduct;
+
   const { state_profile, setState_profile } = useProfile({
     disabled,
     quotationContent: content,
@@ -280,15 +291,31 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const props_payInfo: Tprops_quotationPayInfo['form'] = {
     haveTax: { value: true },
-    discountRate: { value: '999' },
-    tuneTotal: { value: '999' },
-    currency: { value: 'foo' },
-    exchangeRate: { value: '999' },
-    avgDiscount_withQty: 'foo',
-    subTotal: 'foo',
-    salesTax: 'foo',
-    total: 'foo',
-    foreignTotal: 'foo',
+    discountRate: { value: state_quotationDiscount },
+    tuneTotal: {
+      // value: state_totalPrice.tuneTotal,
+      value: disabled ? Number(state_totalPrice.tuneTotal).toLocaleString() : state_totalPrice.tuneTotal,
+      onChange(value) {
+        setTuneTotal(value);
+      },
+    },
+    currency: {
+      value: state_totalPrice.currency,
+      onChange(value) {
+        setCurrency(value);
+      },
+    },
+    exchangeRate: {
+      value: state_totalPrice.exchangeRate,
+      onChange(value) {
+        setExchangeRate(value);
+      },
+    },
+    avgDiscount_withQty: state_totalPrice.averageDiscount,
+    subTotal: Number(state_totalPrice.subTotal).toLocaleString(),
+    salesTax: Number(state_totalPrice.salesTax).toLocaleString(),
+    total: Number(state_totalPrice.total).toLocaleString(),
+    foreignTotal: Number(state_totalPrice.foreignTotal).toLocaleString(),
 
     // deliveryLocation: kit_payInfo.deliveryLocation,
     // deliveryDate: kit_payInfo.deliveryDate,

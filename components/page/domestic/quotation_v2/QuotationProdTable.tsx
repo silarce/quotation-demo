@@ -121,7 +121,7 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
   } = instance_useQuotationProductInstance;
 
   return (
-    <div className={classNames(scss.prodTable, className)}>
+    <div>
       <div className={scss.tablePanel}>
         <span className={scss.title}>主產品設定</span>
         <InputSel_s1
@@ -134,100 +134,102 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
           captionSize="18"
         />
       </div>
-      <QuotationRow_dndThead
-        className={scss.rowThead}
-        disabled={disabled}
-        keyArr={cellKeyArr}
-        onDragEnd={({ move }) => {
-          setCellKeyArr(move(cellKeyArr));
-        }}
-        configDict={nodeConfig_origin}
-        dragHandleInvisible={true}
-        left={
-          <>
-            <Cell
-              className={classNames(nodeConfig_origin['itemName'].className)}
-              style={nodeConfig_origin['itemName'].style}
-            >
-              {nodeConfig_origin['itemName'].label}
-            </Cell>
-          </>
-        }
-      />
-      <Table_dnd
-        items={prodKeyArr}
-        onDragEnd={({ move }) => {
-          setProdKeyArr(move(prodKeyArr));
-        }}
-      >
-        {prodKeyArr.map((prodKey, index) => {
-          const classProd = classProdDict[prodKey];
-          const isActive = activeClassProd === classProd;
-
-          const nodeConfig_itemName = classProd.nodeConfig['itemName'];
-
-          const left = (
+      <div className={classNames(scss.prodTable, className)}>
+        <QuotationRow_dndThead
+          className={scss.rowThead}
+          disabled={disabled}
+          keyArr={cellKeyArr}
+          onDragEnd={({ move }) => {
+            setCellKeyArr(move(cellKeyArr));
+          }}
+          configDict={nodeConfig_origin}
+          dragHandleInvisible={true}
+          left={
             <>
-              <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
-                {nodeConfig_itemName.createNode({
-                  disabled,
-                  classProd,
-                })}
+              <Cell
+                className={classNames(nodeConfig_origin['itemName'].className)}
+                style={nodeConfig_origin['itemName'].style}
+              >
+                {nodeConfig_origin['itemName'].label}
               </Cell>
             </>
-          );
+          }
+        />
+        <Table_dnd
+          items={prodKeyArr}
+          onDragEnd={({ move }) => {
+            setProdKeyArr(move(prodKeyArr));
+          }}
+        >
+          {prodKeyArr.map((prodKey, index) => {
+            const classProd = classProdDict[prodKey];
+            const isActive = activeClassProd === classProd;
 
-          return (
-            <QuotationRow_dnd_memo
-              //
-              rerenderTrigger01={classProd.state}
-              rerenderTrigger02={disabled}
-              rerenderTrigger03={cellKeyArr}
-              //
-              key={prodKey}
-              id={prodKey}
-              index={index}
-              //
-              isActive={isActive}
-              left={left}
-              //
-              onDragStart={(e) => {
-                choseActiveProd(undefined);
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                choseActiveProd(classProd.state);
+            const nodeConfig_itemName = classProd.nodeConfig['itemName'];
 
-                // if (!isActive) {
-                //   choseActiveProd(classProd.state);
+            const left = (
+              <>
+                <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+                  {nodeConfig_itemName.createNode({
+                    disabled,
+                    classProd,
+                  })}
+                </Cell>
+              </>
+            );
 
-                //   const handler = () => {
-                //     choseActiveProd(undefined);
-                //     window?.removeEventListener('click', handler);
-                //   };
+            return (
+              <QuotationRow_dnd_memo
+                //
+                rerenderTrigger01={classProd.state}
+                rerenderTrigger02={disabled}
+                rerenderTrigger03={cellKeyArr}
+                //
+                key={prodKey}
+                id={prodKey}
+                index={index}
+                //
+                isActive={isActive}
+                left={left}
+                //
+                onDragStart={(e) => {
+                  choseActiveProd(undefined);
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  choseActiveProd(classProd.state);
 
-                //   window?.addEventListener('click', handler);
-                // }
-              }}
-            >
-              {cellKeyArr.map((cellKey, cIndex) => {
-                const { style, className, createNode } = classProd.nodeConfig[cellKey];
+                  // if (!isActive) {
+                  //   choseActiveProd(classProd.state);
 
-                const node = createNode({
-                  disabled,
-                  classProd,
-                });
+                  //   const handler = () => {
+                  //     choseActiveProd(undefined);
+                  //     window?.removeEventListener('click', handler);
+                  //   };
 
-                return (
-                  <Cell key={cellKey} className={classNames(className)} style={style}>
-                    {node}
-                  </Cell>
-                );
-              })}
-            </QuotationRow_dnd_memo>
-          );
-        })}
-      </Table_dnd>
+                  //   window?.addEventListener('click', handler);
+                  // }
+                }}
+              >
+                {cellKeyArr.map((cellKey, cIndex) => {
+                  const { style, className, createNode } = classProd.nodeConfig[cellKey];
+
+                  const node = createNode({
+                    disabled,
+                    classProd,
+                  });
+
+                  return (
+                    <Cell key={cellKey} className={classNames(className)} style={style}>
+                      {node}
+                    </Cell>
+                  );
+                })}
+              </QuotationRow_dnd_memo>
+            );
+          })}
+        </Table_dnd>
+      </div>
     </div>
   );
 };
