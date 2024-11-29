@@ -19,7 +19,7 @@ export const calcProductArea = ({
     .toFixed(2)
     .toString();
 
-  return area;
+  return area as `${number}`;
 };
 
 /**計算主產品才數 */

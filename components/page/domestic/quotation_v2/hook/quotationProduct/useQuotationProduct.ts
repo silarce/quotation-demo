@@ -223,6 +223,7 @@ const useQuotationProduct = ({
     return setComponent;
   };
 
+  // MARK:createSetAccessory
   const createSetAccessory = ({ prodKey, accessoryKey }: { prodKey: string; accessoryKey: string }): TsetAccessory => {
     const setAccessory: TsetAccessory = (newStateAcce) => {
       setState_prodDict((prev) => {

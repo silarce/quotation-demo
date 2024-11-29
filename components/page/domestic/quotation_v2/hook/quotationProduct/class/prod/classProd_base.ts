@@ -25,6 +25,20 @@ import {
   TdoorBackBoneDto,
   //
 } from 'js/api/dtoTypes';
+
+// utils
+import { checkIsFloat } from 'js/utils/checkValue';
+import {
+  calcProductArea,
+  calcProductVolume,
+  calcProductWG_withWAndG,
+  calcProductFullWidth,
+  calcW,
+  calcW_2,
+  // findBDoptions,
+  calcFullHeight,
+  calcAngleIronSize,
+} from 'js/utils/product/calc';
 // =======================================================================
 interface Interface_ClassProd_base {
   readonly state: TstateProd;
@@ -234,7 +248,7 @@ const customizeNodeConfig = (nodeConfig: TnodeConfig) => {
 };
 
 // ================================================================================
-
+// MARK: START
 class ClassProd_base implements Interface_ClassProd_base {
   // MARK: constructor
   constructor({
@@ -246,6 +260,8 @@ class ClassProd_base implements Interface_ClassProd_base {
     setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
     nodeConfig: TnodeConfig;
   }) {
+    // cloneDeep對效能的負擔太大了
+    // this.state = _.cloneDeep(stateProd);
     this.state = stateProd;
     this.data = this.state.data_prod;
     this.setState = setStateProd;
@@ -256,10 +272,29 @@ class ClassProd_base implements Interface_ClassProd_base {
   readonly nodeConfig: TnodeConfig;
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
-  readonly state: TstateProd;
-  readonly data: TstateProd['data_prod'];
-  private setState: React.Dispatch<React.SetStateAction<TstateProd>>;
-  private setData<K extends keyof TstateProd['data_prod']>(key: K, value: TstateProd['data_prod'][K]) {
+  private readonly setState: React.Dispatch<React.SetStateAction<TstateProd>>;
+
+  state: TstateProd;
+  data: TstateProd['data_prod'];
+  private render() {
+    this.setState({ ...this.state });
+  }
+
+  // private setData(newStateData: TstateProd) {
+  //   this.setState(newStateData);
+  // }
+
+  // private setData(newStateData: React.SetStateAction<TstateProd['data_prod']>) {
+  //   const newStateDataValue = typeof newStateData === 'function' ? newStateData(this.data) : newStateData;
+  //   this.setState((prev) => {
+  //     const copy = { ...prev };
+  //     copy.data_prod = newStateDataValue;
+
+  //     return copy;
+  //   });
+  // }
+
+  private setData_simple<K extends keyof TstateProd['data_prod']>(key: K, value: TstateProd['data_prod'][K]) {
     this.setState((prev) => {
       const copy = { ...prev };
       copy.data_prod[key] = value;
@@ -267,6 +302,7 @@ class ClassProd_base implements Interface_ClassProd_base {
       return copy;
     });
   }
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
@@ -299,38 +335,49 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.itemName;
   }
   set itemName(value) {
-    this.setData('itemName', value);
+    this.setData_simple('itemName', value);
   }
 
   get discount() {
     return this.data.discount;
   }
   set discount(value) {
-    this.setData('discount', value);
+    if (checkIsFloat3(value)) {
+      return;
+    }
+
+    this.setData_simple('discount', value);
   }
 
   get quoteType() {
     return this.data.quoteType;
   }
   set quoteType(value) {
-    this.setData('quoteType', value);
+    this.setData_simple('quoteType', value);
   }
 
   get doorModelName() {
     return this.data.doorModelName;
   }
   set doorModelName(value) {
-    this.setData('doorModelName', value);
+    this.setData_simple('doorModelName', value);
   }
 
   get fullWidth() {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    this.setData('fullWidth', value);
+    if (!checkIsFloat3(value)) {
+      return;
+    }
+
+    this.data.fullWidth = value;
+    this.data.area = this.calcArea();
+
+    this.render();
   }
   get fullWidth_mm() {
-    return new Decimal(this.data.fullWidth).mul(1000).toNumber();
+    return new Decimal(this.data.fullWidth || 0).mul(1000).toNumber();
   }
 
   // get WG() {
@@ -355,7 +402,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.height;
   }
   set height(value) {
-    this.setData('height', value);
+    this.setData_simple('height', value);
   }
   get height_mm() {
     return new Decimal(this.data.height).mul(1000).toNumber();
@@ -365,7 +412,11 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.boxB;
   }
   set boxB(value) {
-    this.setData('boxB', value);
+    if (checkIsFloat3(value)) {
+      return;
+    }
+
+    this.setData_simple('boxB', value);
   }
   get boxB_mm() {
     return new Decimal(this.data.boxB).mul(1000).toNumber();
@@ -375,7 +426,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.boxD;
   }
   set boxD(value) {
-    this.setData('boxD', value);
+    this.setData_simple('boxD', value);
   }
   get boxD_mm() {
     return new Decimal(this.data.boxD).mul(1000).toNumber();
@@ -397,49 +448,49 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.materialName;
   }
   set materialName(value) {
-    this.setData('materialName', value);
+    this.setData_simple('materialName', value);
   }
 
   get materialSurface() {
     return this.data.materialSurface;
   }
   set materialSurface(value) {
-    this.setData('materialSurface', value);
+    this.setData_simple('materialSurface', value);
   }
 
   get horsepower() {
     return this.data.horsepower;
   }
   set horsepower(value) {
-    this.setData('horsepower', value);
+    this.setData_simple('horsepower', value);
   }
 
   get motorVendor() {
     return this.data.motorVendor;
   }
   set motorVendor(value) {
-    this.setData('motorVendor', value);
+    this.setData_simple('motorVendor', value);
   }
 
   get motorVoltage() {
     return this.data.motorVoltage;
   }
   set motorVoltage(value) {
-    this.setData('motorVoltage', value);
+    this.setData_simple('motorVoltage', value);
   }
 
   get motorPhase() {
     return this.data.motorPhase;
   }
   set motorPhase(value) {
-    this.setData('motorPhase', value);
+    this.setData_simple('motorPhase', value);
   }
 
   get guideRail() {
     return this.data.guideRail;
   }
   set guideRail(value) {
-    this.setData('guideRail', value);
+    this.setData_simple('guideRail', value);
   }
 
   get guideRailImg() {
@@ -454,118 +505,150 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.guideRailThickness;
   }
   set guideRailThickness(value) {
-    this.setData('guideRailThickness', value);
+    this.setData_simple('guideRailThickness', value);
   }
 
   get hasSilencingStrip() {
     return this.data.hasSilencingStrip;
   }
   set hasSilencingStrip(value) {
-    this.setData('hasSilencingStrip', value);
+    this.setData_simple('hasSilencingStrip', value);
   }
 
   get isULGuideRail() {
     return this.data.isULGuideRail;
   }
   set isULGuideRail(value) {
-    this.setData('isULGuideRail', value);
+    this.setData_simple('isULGuideRail', value);
   }
 
   get isIntegratedHeadBox() {
     return this.data.isIntegratedHeadBox;
   }
   set isIntegratedHeadBox(value) {
-    this.setData('isIntegratedHeadBox', value);
+    this.setData_simple('isIntegratedHeadBox', value);
   }
 
   get headBoxThickness() {
     return this.data.headBoxThickness;
   }
   set headBoxThickness(value) {
-    this.setData('headBoxThickness', value);
+    this.setData_simple('headBoxThickness', value);
   }
 
   get isAntiTyphoon() {
     return this.data.isAntiTyphoon;
   }
   set isAntiTyphoon(value) {
-    this.setData('isAntiTyphoon', value);
+    this.setData_simple('isAntiTyphoon', value);
   }
 
   get bounceDoorWidth() {
     return this.data.bounceDoorWidth;
   }
   set bounceDoorWidth(value) {
-    this.setData('bounceDoorWidth', value);
-    this.setData('bounceDoor', !!value);
+    if (checkIsFloat3(value)) {
+      return;
+    }
+
+    this.setData_simple('bounceDoorWidth', value);
+    this.setData_simple('bounceDoor', !!value);
   }
 
   get closingType() {
     return this.data.closingType;
   }
   set closingType(value) {
-    this.setData('closingType', value);
+    this.setData_simple('closingType', value);
   }
 
   get notes() {
     return this.data.notes;
   }
   set notes(value) {
-    this.setData('notes', value);
+    this.setData_simple('notes', value);
   }
 
   get bottomBarAngleIron() {
     return this.data.bottomBarAngleIron;
   }
   set bottomBarAngleIron(value) {
-    this.setData('bottomBarAngleIron', value);
+    this.setData_simple('bottomBarAngleIron', value);
   }
 
   get bottomBarPlate() {
     return this.data.bottomBarPlate;
   }
   set bottomBarPlate(value) {
-    this.setData('bottomBarPlate', value);
+    this.setData_simple('bottomBarPlate', value);
   }
 
   get quantity() {
     return this.data.quantity;
   }
   set quantity(value) {
-    this.setData('quantity', value);
+    this.setData_simple('quantity', value);
   }
 
   get unitPrice() {
     return this.data.unitPrice;
   }
   set unitPrice(value) {
-    this.setData('unitPrice', value);
+    this.setData_simple('unitPrice', value);
   }
 
   get totalPrice() {
     return this.data.totalPrice;
   }
   set totalPrice(value) {
-    this.setData('totalPrice', value);
+    this.setData_simple('totalPrice', value);
   }
 
   get price() {
     return this.data.price;
   }
   set price(value) {
-    this.setData('price', value);
+    this.setData_simple('price', value);
   }
 
   get dualPrice() {
     return this.data.dualPrice;
   }
   set dualPrice(value) {
-    this.setData('dualPrice', value);
+    this.setData_simple('dualPrice', value);
   }
 
   //  endregion  輸出
   // -----------------------------------------------------------------------------------
+
+  // region METHOD
+
+  private calcArea() {
+    const fullWidth = this.fullWidth_mm;
+    const height = this.height_mm;
+    const boxb = this.boxB_mm;
+
+    let area = calcProductArea({ fullWidth, height, boxb });
+    area = new Decimal(area).div(1000000).toDecimalPlaces(2).toString() as `${number}`;
+
+    return area;
+  }
+
+  // endregion METHOD
+
+  // -----------------------------------------------------------------------------------
 } // ClassProd_base
+// MARK: END
+
+// ================================================================================
+
+const checkIsFloat3 = (v: Parameters<typeof checkIsFloat>[0]) => {
+  if (v === '') {
+    return true;
+  }
+
+  return checkIsFloat(v, 3);
+};
 
 // ================================================================================
 
