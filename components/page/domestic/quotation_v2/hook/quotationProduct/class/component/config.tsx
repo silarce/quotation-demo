@@ -1,15 +1,15 @@
 // gear
-import InputSel, {
-  TinputSelProps,
-  InputSel_s1,
-  InputSel_memo_select,
-  inputLocaleStringSwitcher,
-} from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
+import {
+  InputSel_prod,
+  InputSel_prod_memo_select,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
 import {
   lookup_classProd,
   Interface_ClassProd_base,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
+
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from './classComponent_base';
 
 import { TdoorModelInfoDto } from 'js/api/api_product';
@@ -73,7 +73,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
   const nodeConfig_component: TnodeConfig_component = {
     name: {
       label: '名稱',
-      style: { width: 60 },
+      style: { width: 80 },
       createNode({ disabled, classComponent }) {
         return classComponent.name;
       },
@@ -101,7 +101,6 @@ const createNodeConfig_component = (): TnodeConfig_component => {
         const value = v ? { value: v, label: v } : null;
 
         const inputSelProps: TinputSelProps = {
-          fontSize: '14',
           disabled,
           selectProps: {
             props: {
@@ -115,7 +114,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_memo_select {...inputSelProps} />;
+        return <InputSel_prod_memo_select {...inputSelProps} />;
       },
     },
 
@@ -127,7 +126,6 @@ const createNodeConfig_component = (): TnodeConfig_component => {
         const value = v ? { value: v, label: v } : null;
 
         const inputSelProps: TinputSelProps = {
-          fontSize: '14',
           disabled,
           selectProps: {
             props: {
@@ -141,13 +139,13 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_memo_select {...inputSelProps} />;
+        return <InputSel_prod_memo_select {...inputSelProps} />;
       },
     },
 
     density: {
       label: '密度',
-      style: { width: 30 },
+      style: { width: 40 },
       createNode({ disabled, classComponent }) {
         return classComponent.density;
       },
@@ -155,7 +153,10 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     isPainted: {
       label: '烤漆',
-      style: { width: 30 },
+      style: {
+        width: 40,
+        textAlign: 'center',
+      },
       createNode({ disabled, classComponent }) {
         return (
           <Checkbox
@@ -171,7 +172,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     unit: {
       label: '單位',
-      style: { width: 30 },
+      style: { width: 40 },
       createNode({ disabled, classComponent }) {
         return classComponent.unit;
       },
@@ -183,7 +184,6 @@ const createNodeConfig_component = (): TnodeConfig_component => {
       createNode({ disabled, classComponent }) {
         const inputSelProps: TinputSelProps = {
           disabled,
-          fontSize: '14',
           inputProps: {
             props: {
               placeholder: '',
@@ -196,21 +196,22 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_prod {...inputSelProps} />;
       },
     },
 
     price: {
       label: '牌價',
-      style: { width: 80 },
+      style: { width: 80, textAlign: 'right' },
       createNode({ disabled, classComponent }) {
         const { value, type } = inputLocaleStringSwitcher(classComponent.price, disabled);
 
         const inputSelProps: TinputSelProps = {
           disabled,
-          fontSize: '14',
+
           inputProps: {
             props: {
+              className: 'text-right',
               placeholder: '',
               value,
               type,
@@ -221,13 +222,16 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_prod {...inputSelProps} />;
       },
     },
 
     dualPrice: {
       label: '牌價複價',
-      style: { width: 100 },
+      style: {
+        width: 100,
+        textAlign: 'right',
+      },
       createNode({ disabled, classComponent }) {
         const dualPrice = classComponent.dualPrice.toLocaleString();
 
@@ -237,7 +241,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     unitPrice: {
       label: '單價',
-      style: { width: 80 },
+      style: { width: 80, textAlign: 'right' },
       createNode({ disabled, classComponent }) {
         const unitPrice = classComponent.unitPrice.toLocaleString();
 
@@ -247,7 +251,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     totalPrice: {
       label: '複價',
-      style: { width: 100 },
+      style: { width: 100, textAlign: 'right' },
       createNode({ disabled, classComponent }) {
         const totalPrice = classComponent.totalPrice.toLocaleString();
 

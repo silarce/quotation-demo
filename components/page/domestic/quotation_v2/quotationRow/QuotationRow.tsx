@@ -218,7 +218,8 @@ function QuotationRow_dndThead({
                 className={classNames(
                   //
                   scss.cell_dnd,
-                  disabled && scss.disabled
+                  disabled && scss.disabled,
+                  'text-lg text-main'
                 )}
               >
                 {label}

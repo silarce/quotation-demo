@@ -6,11 +6,13 @@ import { Checkbox } from 'antd';
 // gear
 import InputSel, {
   TinputSelProps,
-  InputSel_s1,
-  InputSel_memo_select,
   inputLocaleStringSwitcher,
   InputSel_input_timeout,
 } from 'components/global/gear/inputAndSel_v2/inputSel';
+import {
+  InputSel_prod,
+  InputSel_prod_memo_select,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
 import {
   lookup_classProd,
@@ -151,7 +153,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -169,7 +171,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -190,7 +192,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select selectProps={selectProps} disabled={disabled} />;
+      return <InputSel_prod_memo_select selectProps={selectProps} disabled={disabled} />;
     },
   },
 
@@ -218,7 +220,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -238,7 +240,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -258,7 +260,7 @@ const nodeConfig_origin: TnodeConfig = {
   //       },
   //     };
 
-  //     return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+  //     return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
   //   },
   // },
 
@@ -278,7 +280,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -299,7 +301,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select disabled={disabled} selectProps={selectProps} />;
+      return <InputSel_prod_memo_select disabled={disabled} selectProps={selectProps} />;
     },
   },
 
@@ -320,7 +322,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select disabled={disabled} selectProps={selectProps} />;
+      return <InputSel_prod_memo_select disabled={disabled} selectProps={selectProps} />;
     },
   },
 
@@ -330,7 +332,7 @@ const nodeConfig_origin: TnodeConfig = {
       width: 60,
     },
     createNode({ classProd }) {
-      // return <InputSel_s1 node={classProd.area} showBaseline="invisible" />;
+      // return <InputSel_prod node={classProd.area} showBaseline="invisible" />;
       return classProd.area;
     },
   },
@@ -341,7 +343,7 @@ const nodeConfig_origin: TnodeConfig = {
       width: 60,
     },
     createNode({ classProd }) {
-      // return <InputSel_s1 node={classProd.volume} showBaseline="invisible" />;
+      // return <InputSel_prod node={classProd.volume} showBaseline="invisible" />;
       return classProd.volume;
     },
   },
@@ -355,7 +357,7 @@ const nodeConfig_origin: TnodeConfig = {
       const v = classProd.horsepower;
       const value = v ? { value: v, label: v } : null;
 
-      const inputProps: TinputSelProps = {
+      const inputSeleProps: TinputSelProps = {
         disabled,
         selectProps: {
           props: {
@@ -369,7 +371,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod_memo_select {...inputSeleProps} disabled={disabled} />;
     },
   },
 
@@ -398,7 +400,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       ];
 
-      const inputProps: TinputSelProps = {
+      const inputSelProps: TinputSelProps = {
         disabled,
         selectProps: {
           withIcon: true,
@@ -425,7 +427,9 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select inputProps={inputProps} disabled={disabled} />;
+      console.log(options);
+
+      return <InputSel_prod_memo_select {...inputSelProps} disabled={disabled} />;
     },
   },
 
@@ -433,6 +437,7 @@ const nodeConfig_origin: TnodeConfig = {
     label: '防颱',
     style: {
       width: 60,
+      textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
       return (
@@ -451,6 +456,7 @@ const nodeConfig_origin: TnodeConfig = {
     label: '門軌消音條',
     style: {
       width: 100,
+      textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
       return (
@@ -471,7 +477,7 @@ const nodeConfig_origin: TnodeConfig = {
       width: 100,
     },
     createNode({ disabled, classProd }) {
-      return classProd.thickness;
+      return classProd.thickness + ' t';
     },
   },
 
@@ -498,7 +504,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -525,7 +531,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -545,7 +551,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -562,6 +568,7 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
+            // options的label要加上單位't';
             options: [],
             value,
             onChange: (option) => {
@@ -572,7 +579,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -589,6 +596,7 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
+            // options的label要加上單位't';
             options: [],
             value,
             onChange: (option) => {
@@ -599,7 +607,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -626,7 +634,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -634,6 +642,7 @@ const nodeConfig_origin: TnodeConfig = {
     label: '一體式捲箱',
     style: {
       width: 100,
+      textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
       return (
@@ -651,7 +660,8 @@ const nodeConfig_origin: TnodeConfig = {
   isULGuideRail: {
     label: 'UL',
     style: {
-      width: 100,
+      width: 50,
+      textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
       return (
@@ -669,7 +679,7 @@ const nodeConfig_origin: TnodeConfig = {
   notes: {
     label: '備註',
     style: {
-      width: 100,
+      width: 150,
     },
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
@@ -681,7 +691,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -701,7 +711,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -709,12 +719,14 @@ const nodeConfig_origin: TnodeConfig = {
     label: '牌價',
     style: {
       width: 120,
+      textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.price, disabled);
 
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
+          className: 'text-right',
           type: type,
           value: value,
           onChange: (e) => {
@@ -723,7 +735,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -731,12 +743,14 @@ const nodeConfig_origin: TnodeConfig = {
     label: '牌價複價',
     style: {
       width: 140,
+      textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.dualPrice, disabled);
 
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
+          className: 'text-right',
           type: type,
           value: value,
           onChange: (e) => {
@@ -745,7 +759,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -753,12 +767,14 @@ const nodeConfig_origin: TnodeConfig = {
     label: '單價',
     style: {
       width: 120,
+      textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.unitPrice, disabled);
 
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
+          className: 'text-right',
           type: type,
           value: value,
           onChange: (e) => {
@@ -767,7 +783,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -775,12 +791,14 @@ const nodeConfig_origin: TnodeConfig = {
     label: '複價',
     style: {
       width: 140,
+      textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
       const { value, type } = inputLocaleStringSwitcher(classProd.totalPrice, disabled);
 
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
+          className: 'text-right',
           type: type,
           value: value,
           onChange: (e) => {
@@ -789,7 +807,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_s1 inputProps={inputProps} disabled={disabled} />;
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
     },
   },
 
@@ -816,7 +834,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -843,7 +861,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_memo_select {...inputSelProps} />;
+      return <InputSel_prod_memo_select {...inputSelProps} />;
     },
   },
 
@@ -882,7 +900,7 @@ const createNodeConfig_prime = ({
       },
     };
 
-    return <InputSel_memo_select selectProps={selectProps} disabled={disabled} />;
+    return <InputSel_prod_memo_select selectProps={selectProps} disabled={disabled} />;
   };
 
   return nodeConfig_prime;

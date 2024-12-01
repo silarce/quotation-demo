@@ -1,12 +1,8 @@
 import _ from 'lodash';
 
 // gear
-import InputSel, {
-  TinputSelProps,
-  InputSel_s1,
-  InputSel_memo_select,
-  inputLocaleStringSwitcher,
-} from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
+import { InputSel_prod } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
 import { Interface_ClassAccessory } from './classAccessory';
 
@@ -58,7 +54,7 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
 
     unit: {
       label: '單位',
-      style: { width: 100 },
+      style: { width: 50 },
       createNode({ disabled, classAcce }) {
         return classAcce.unit;
       },
@@ -66,9 +62,10 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
 
     quantity: {
       label: '數量',
-      style: { width: 100 },
+      style: { width: 50 },
       createNode({ disabled, classAcce }) {
         const inputSelProps: TinputSelProps = {
+          disabled,
           inputProps: {
             props: {
               type: 'number',
@@ -80,19 +77,21 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_prod {...inputSelProps} />;
       },
     },
 
     price: {
       label: '牌價',
-      style: { width: 100 },
+      style: { width: 100, textAlign: 'right' },
       createNode({ disabled, classAcce }) {
         const { value, type } = inputLocaleStringSwitcher(classAcce.price, disabled);
 
         const inputSelProps: TinputSelProps = {
+          disabled,
           inputProps: {
             props: {
+              className: 'text-right',
               value,
               type,
               onChange(e) {
@@ -102,37 +101,31 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
           },
         };
 
-        return <InputSel_s1 {...inputSelProps} />;
+        return <InputSel_prod {...inputSelProps} />;
       },
     },
 
     dualPrice: {
       label: '牌價複價',
-      style: { width: 100 },
+      style: { width: 100, textAlign: 'right' },
       createNode({ disabled, classAcce }) {
-        const node = Number(classAcce.dualPrice).toLocaleString();
-
-        return <InputSel node={node} showBaseline="invisible" />;
+        return Number(classAcce.dualPrice).toLocaleString();
       },
     },
 
     unitPrice: {
       label: '單價',
-      style: { width: 100 },
+      style: { width: 100, textAlign: 'right' },
       createNode({ disabled, classAcce }) {
-        const node = Number(classAcce.unitPrice).toLocaleString();
-
-        return <InputSel node={node} showBaseline="invisible" />;
+        return Number(classAcce.unitPrice).toLocaleString();
       },
     },
 
     totalPrice: {
       label: '複價',
-      style: { width: 100 },
+      style: { width: 100, textAlign: 'right' },
       createNode({ disabled, classAcce }) {
-        const node = Number(classAcce.totalPrice).toLocaleString();
-
-        return <InputSel node={node} showBaseline="invisible" />;
+        return Number(classAcce.totalPrice).toLocaleString();
       },
     },
   };
