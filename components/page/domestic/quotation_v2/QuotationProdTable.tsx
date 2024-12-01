@@ -1,9 +1,11 @@
-import { memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
 
 // component
 import {
+  Tprops_cell,
+  //
   QuotationRow,
   Cell,
   QuotationRow_dndThead,
@@ -16,6 +18,11 @@ import { Tabs } from 'antd';
 
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
+
+// icon
+import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
+import iconReset from 'public/image/icon/reset.svg';
+import iconChange from 'public/image/icon/change.svg';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -105,7 +112,12 @@ const QuotationRow_dnd_memo = memo(QuotationRow_dnd_preMemo, (prev, next) => {
 });
 
 // MARK:Table_prod
-const Table_prod = ({ instance_useQuotationProductInstance, disabled, className }: TtableProps) => {
+const Table_prod = ({
+  //
+  instance_useQuotationProductInstance,
+  disabled,
+  className,
+}: TtableProps) => {
   const {
     classProdDict,
     activedClassProd: activeClassProd,
@@ -157,6 +169,9 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
           dragHandleInvisible={true}
           left={
             <>
+              <Cell_delete className={'invisible'} onClick={() => {}} />
+              <Cell_copy className={'invisible'} onClick={() => {}} />
+              <Cell_indexNumber />
               <Cell
                 className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
                 style={nodeConfig_origin['itemName'].style}
@@ -180,10 +195,10 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
 
             const left = (
               <>
-                <Cell
-                  className={classNames('text-base', nodeConfig_itemName.className)}
-                  style={nodeConfig_itemName.style}
-                >
+                <Cell_delete onClick={() => {}} />
+                <Cell_copy onClick={() => {}} />
+                <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+                <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
                   {nodeConfig_itemName.createNode({
                     disabled,
                     classProd,
@@ -234,7 +249,7 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
                   });
 
                   return (
-                    <Cell key={cellKey} className={classNames('text-base', className)} style={style}>
+                    <Cell key={cellKey} className={classNames(className)} style={style}>
                       {node}
                     </Cell>
                   );
@@ -259,6 +274,12 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
     setComponentKeyArr,
     nodeConfig_component_origin,
   } = instance_useQuotationProductInstance;
+
+  const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setActiveIndex(undefined);
+  }, [instance_useQuotationProductInstance]);
 
   return (
     <div className={classNames(scss.componentTable, className)}>
@@ -307,7 +328,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 
           const left = (
             <>
-              <Cell className={classNames('text-base', nodeConfig_name.className)} style={nodeConfig_name.style}>
+              <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
                 {nodeConfig_name.createNode({
                   disabled,
                   classComponent: classComponent,
@@ -326,10 +347,14 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
               key={componentKey}
               id={componentKey}
               index={index}
+              isActive={activeIndex === index}
               //
               // isActive={isActive}
               left={left}
               //
+              onClick={() => {
+                setActiveIndex(index);
+              }}
               // onDragStart={(e) => {
               //   choseActiveProd(undefined);
               // }}
@@ -343,7 +368,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
                 });
 
                 return (
-                  <Cell key={cellKey} className={classNames('text-base', className)} style={style}>
+                  <Cell key={cellKey} className={classNames(className)} style={style}>
                     {node}
                   </Cell>
                 );
@@ -367,6 +392,12 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
     nodeConfig_accessory_origin,
   } = instance_useQuotationProductInstance;
 
+  const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    setActiveIndex(undefined);
+  }, [instance_useQuotationProductInstance]);
+
   return (
     <div className={classNames(scss.accessoryTable, className)}>
       <QuotationRow_dndThead
@@ -380,6 +411,8 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         dragHandleInvisible={true}
         left={
           <>
+            <Cell_delete className={'invisible'} onClick={() => {}} />
+            <Cell_indexNumber className="invisible" />
             <Cell
               className={classNames('text-xl text-main', nodeConfig_accessory_origin['name'].className)}
               style={nodeConfig_accessory_origin['name'].style}
@@ -412,7 +445,9 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
           const left = (
             <>
-              <Cell className={classNames('text-base', nodeConfig_name.className)} style={nodeConfig_name.style}>
+              <Cell_delete onClick={() => {}} />
+              <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+              <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
                 {nodeConfig_name.createNode({
                   disabled,
                   classAcce: classAccessory,
@@ -429,7 +464,9 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
               key={acceKey}
               id={acceKey}
               index={index}
+              isActive={activeIndex === index}
               left={left}
+              onClick={() => setActiveIndex(index)}
             >
               {cellKeyArr_accessory.map((cellKey) => {
                 const { style, className, createNode } = classAccessory.nodeConfig[cellKey];
@@ -440,7 +477,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
                 });
 
                 return (
-                  <Cell key={cellKey} className={classNames('text-base', className)} style={style}>
+                  <Cell key={cellKey} className={classNames(className)} style={style}>
                     {node}
                   </Cell>
                 );
@@ -450,5 +487,41 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         })}
       </Table_dnd>
     </div>
+  );
+};
+
+// ===================================================================
+
+const Cell_indexNumber = (props: Tprops_cell) => {
+  return <Cell className={classNames('w-5')} {...props} />;
+};
+
+const Cell_delete = ({
+  //
+  onClick,
+  className,
+  ...props
+}: Omit<Tprops_cell, 'children' | 'onClick'> & {
+  onClick: () => void;
+}) => {
+  return (
+    <Cell className={classNames('w-5 text-center', className)} {...props}>
+      <IconDelete01 onClick={onClick} />
+    </Cell>
+  );
+};
+
+const Cell_copy = ({
+  //
+  onClick,
+  className,
+  ...props
+}: Omit<Tprops_cell, 'children' | 'onClick'> & {
+  onClick: () => void;
+}) => {
+  return (
+    <Cell className={classNames('w-5 text-center', className)} {...props}>
+      <IconCopy onClick={onClick} />
+    </Cell>
   );
 };

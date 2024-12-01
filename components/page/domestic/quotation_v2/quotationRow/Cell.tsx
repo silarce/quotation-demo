@@ -55,7 +55,11 @@ const Cell_pre = (
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
   return (
-    <div ref={ref} {...props_cell} className={classNames(scss.cell, invisible && scss.invisible, className)}>
+    <div
+      ref={ref}
+      {...props_cell}
+      className={classNames('text-base', scss.cell, invisible && scss.invisible, className)}
+    >
       {children}
     </div>
   );

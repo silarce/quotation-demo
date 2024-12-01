@@ -427,8 +427,6 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      console.log(options);
-
       return <InputSel_prod_memo_select {...inputSelProps} disabled={disabled} />;
     },
   },

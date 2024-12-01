@@ -17,6 +17,13 @@ $gap: 15px;
   &.active {
     background-color: theme("colors.chosenBgc");
   }
+  &:hover {
+    background-color: theme("colors.hoverBgc");
+    &.active {
+      background-color: theme("colors.chosenBgc");
+    }
+  }
+
   // z-index: 1;
 }
 
@@ -41,6 +48,7 @@ $gap: 15px;
   @extend .item;
   position: sticky;
   left: 0;
+  padding-left: 10px;
   background-color: inherit;
   padding-right: $gap;
   z-index: 1;
