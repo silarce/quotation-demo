@@ -60,7 +60,7 @@ export const apiGetAssets = async (path: string) => {
 };
 
 export const createAssetUrl = (assetName: string) => {
-  const domain = axios.defaults.baseURL;
+  const domain = axi.defaults.baseURL;
 
   return `${domain}/products/assets/door-track/${assetName}`;
 };
