@@ -117,9 +117,6 @@ const useQuotationTotalPrice = ({
         NTD: copy.total,
         rate_currencyToNTD: copy.exchangeRate || 0,
       });
-      console.log(copy.total);
-      console.log(copy.exchangeRate);
-      console.log(foreignTotal);
 
       copy.foreignTotal = `${foreignTotal}`;
 

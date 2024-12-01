@@ -228,8 +228,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   const {
-    state_quotationDiscount, // 總折數
-    setState_quotationDiscount,
+    quotationDiscount: state_quotationDiscount, // 總折數
+    setQuotationDiscount: setState_quotationDiscount,
     //
     state_totalPrice, // 完整狀態
     // setProdPriceTotal,

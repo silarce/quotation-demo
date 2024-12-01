@@ -154,6 +154,7 @@ const useQuotationProduct = ({
     state_quotationDiscount,
     setState_quotationDiscount,
     //
+
     state_totalPrice,
     setProdPriceTotal,
     setTuneTotal,
@@ -293,6 +294,12 @@ const useQuotationProduct = ({
 
       return copy;
     });
+  };
+
+  const setQuotationDiscount = (value: typeof state_quotationDiscount) => {
+    setState_quotationDiscount(value);
+    // 總折數改變後要重新計算主產品的金額
+    //
   };
 
   // -----------------------------------------------------------------------
@@ -442,8 +449,8 @@ const useQuotationProduct = ({
     //
     //
     //
-    state_quotationDiscount, // 總折數
-    setState_quotationDiscount,
+    quotationDiscount: state_quotationDiscount, // 總折數
+    setQuotationDiscount,
     //
     state_totalPrice, // 完整狀態
     // setProdPriceTotal,

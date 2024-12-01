@@ -118,6 +118,9 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
     choseActiveProd,
     //
     nodeConfig_origin,
+    //
+    quotationDiscount,
+    setQuotationDiscount,
   } = instance_useQuotationProductInstance;
 
   return (
@@ -129,7 +132,15 @@ const Table_prod = ({ instance_useQuotationProductInstance, disabled, className 
           caption="總折數 : "
           wrapperStyle={{ width: 200, gap: 5 }}
           disabled={disabled}
-          inputProps={{}}
+          inputProps={{
+            props: {
+              type: 'number',
+              value: quotationDiscount,
+              onChange(e) {
+                setQuotationDiscount(e.target.value as `${number}` | '');
+              },
+            },
+          }}
           fontSize="18"
           captionSize="18"
         />
