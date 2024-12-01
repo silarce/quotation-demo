@@ -18,6 +18,7 @@ import { Tabs } from 'antd';
 
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -142,7 +143,7 @@ const Table_prod = ({
         <InputSel_prod
           //
           caption="總折數 : "
-          wrapperStyle={{ width: 200, gap: 5 }}
+          wrapperStyle={{ width: 130, gap: 5 }}
           disabled={disabled}
           inputProps={{
             props: {
@@ -156,6 +157,9 @@ const Table_prod = ({
           fontSize="18"
           captionSize="18"
         />
+        {/* <SquareBtn className="ml-2" sharp="mini">
+          編輯欄位排序
+        </SquareBtn> */}
       </div>
       <div className={classNames(scss.prodTable, className)}>
         <QuotationRow_dndThead

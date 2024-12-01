@@ -30,6 +30,7 @@ $gap: 15px;
 .row_dndThead {
   @extend .row;
   background-color: theme("colors.bgc01");
+  border-bottom: solid 5px white;
   // color: white;
 }
 
