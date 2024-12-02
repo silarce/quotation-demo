@@ -5,11 +5,6 @@ import {
   InputSel_prod_memo_select,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
-import {
-  lookup_classProd,
-  Interface_ClassProd_base,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
-
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from './classComponent_base';
 
 import { TdoorModelInfoDto } from 'js/api/api_product';

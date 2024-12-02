@@ -1,12 +1,12 @@
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
-import { createAssetUrl } from 'js/api/api_product';
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+// type
 import { TstateProd } from '../../type';
 import { TnodeConfig } from './config';
-
-// DTO
 import {
   TdoorModelInfoDto,
   //
@@ -23,8 +23,28 @@ import {
   TdoorHeadBoxDto,
   TdoorMiddlePillarDto,
   TdoorBackBoneDto,
+
   //
+  TdoorModel,
 } from 'js/api/dtoTypes';
+
+// api
+import {
+  Thp,
+  //
+  TpcgsPrams,
+  apiGetProdCalcGeneralSpec,
+  //
+  TpcdsPrams,
+  apiGetProdCalcDetailSpec,
+  //
+  TpacParams,
+  apiGetProdAvailableComponents,
+  //
+  TgetBoxDParams,
+  apiGetboxD,
+} from 'js/api/api_product';
+import { createAssetUrl } from 'js/api/api_product';
 
 // utils
 import { checkIsFloat } from 'js/utils/checkValue';
@@ -38,9 +58,13 @@ import {
   // findBDoptions,
   calcFullHeight,
   calcAngleIronSize,
+  calcProductWG,
 } from 'js/utils/product/calc';
+
 // =======================================================================
 interface Interface_ClassProd_base {
+  doorModel: string;
+
   readonly state: TstateProd;
   readonly nodeConfig: TnodeConfig;
   //
@@ -55,6 +79,7 @@ interface Interface_ClassProd_base {
   quoteType: string;
   // 門型
   doorModelName: string;
+  // doorModelName: TdoorModel;
 
   // L(公尺)全寬 浮點數
   fullWidth: `${number}` | '';
@@ -228,6 +253,15 @@ interface Interface_ClassProd_base {
   // -----------------------------------------------------------------------
 }
 
+interface Interface_ClassProd_prime extends Interface_ClassProd_base {
+  doorModel: TdoorModel;
+  onFullWidthChange: () => Promise<Interface_ClassProd_base>;
+}
+
+interface Interface_ClassProd_special extends Interface_ClassProd_base {
+  doorModel: 'special';
+}
+
 // ================================================================================
 
 // 在子類別中，可以透過customizeNodeConfig方法來覆寫nodeConfig
@@ -249,6 +283,10 @@ const customizeNodeConfig = (nodeConfig: TnodeConfig) => {
 
 // ================================================================================
 // MARK: START
+//
+//
+//
+//
 class ClassProd_base implements Interface_ClassProd_base {
   // MARK: constructor
   constructor({
@@ -269,6 +307,7 @@ class ClassProd_base implements Interface_ClassProd_base {
   } // constructor
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
+  doorModel: TdoorModel = 'SJ-302';
   readonly nodeConfig: TnodeConfig;
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -372,7 +411,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     }
 
     this.data.fullWidth = value;
-    this.data.area = this.calcArea();
+    this.data.area = calcArea(this);
 
     this.render();
   }
@@ -392,10 +431,25 @@ class ClassProd_base implements Interface_ClassProd_base {
 
   // W要額外處理
   get W() {
-    return '999' as `${number}`;
+    const WG_mm = new Decimal(this.data.WG).mul(1000).toNumber();
+    const G = this.data.guideRailG || 0;
+
+    const W_num = calcW({
+      WG: WG_mm,
+      G,
+    });
+
+    return new Decimal(W_num).div(1000).toString() as `${number}` | '';
   }
-  set W(value) {
-    // this.setData('W', value);
+  set W(v) {
+    const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
+
+    const WG_mm = calcProductWG_withWAndG({
+      W: v_num,
+      G: this.data.guideRailG || 0,
+    });
+
+    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}` | '';
   }
 
   get height() {
@@ -621,24 +675,201 @@ class ClassProd_base implements Interface_ClassProd_base {
   //  endregion  輸出
   // -----------------------------------------------------------------------------------
 
-  // region METHOD
+  // region API UPDATE
+  //
+  //
+  //
+  //
 
-  private calcArea() {
-    const fullWidth = this.fullWidth_mm;
-    const height = this.height_mm;
-    const boxb = this.boxB_mm;
-
-    let area = calcProductArea({ fullWidth, height, boxb });
-    area = new Decimal(area).div(1000000).toDecimalPlaces(2).toString() as `${number}`;
-
-    return area;
+  // MARK:init
+  async init() {
+    const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+    this.state.generalSpecs = generalSpecs;
   }
 
-  // endregion METHOD
+  // MARK:updateGeneralSpec
+  private async updateGeneralSpec() {
+    // await reqGetProdCalcGeneralSpec(this).then((res) => (this.state.generalSpecs = res));
+    const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+    this.state.generalSpecs = generalSpecs;
+
+    if (!generalSpecs) {
+      this.data.gapA = '';
+      this.data.gapC = '';
+      this.data.gearNumber = null;
+      this.data.weight = null;
+      this.data.thickness = '';
+      this.data.sprocketWheelModel = null;
+      this.data.sprocketWheelTeethNumber = null;
+      this.data.sprocketWheelChains = null;
+      this.data.bearingInnerDiameter = null;
+      this.data.diameter = null;
+      this.data.bearingHousingTotalLength = null;
+      this.data.slatLength = null;
+      this.data.guideRailLength = null;
+      this.data.headBoxLength = null;
+      this.data.bearingHousingSize = null;
+      this.data.bearingName = null;
+
+      this.data.motorPhase = null;
+      this.data.motorVendor = null;
+      this.data.motorVoltage = null;
+      this.data.horsepower = '';
+      this.data.boxB = '';
+      this.data.boxD = '';
+
+      return;
+    }
+
+    generalSpecs.bearingInnerDiameter === 'N/A' && (generalSpecs.bearingInnerDiameter = '');
+    generalSpecs.bearingName === 'N/A' && (generalSpecs.bearingName = '');
+    generalSpecs.gearNumber === 'N/A' && (generalSpecs.gearNumber = '');
+    generalSpecs.sprocketWheelModel === 'N/A' && (generalSpecs.sprocketWheelModel = '');
+    generalSpecs.sprocketWheelTeethNumber === 'N/A' && (generalSpecs.sprocketWheelTeethNumber = '');
+
+    this.data.gapA = `${generalSpecs.gapA}`;
+    this.data.gapC = `${generalSpecs.gapC}`;
+    this.data.gearNumber = generalSpecs.gearNumber || null;
+    this.data.weight = `${generalSpecs.weight}`;
+    this.data.thickness = generalSpecs.thickness as `${number}`;
+    this.data.sprocketWheelModel = generalSpecs.sprocketWheelModel || null;
+    this.data.sprocketWheelTeethNumber = generalSpecs.sprocketWheelTeethNumber || null;
+    this.data.sprocketWheelChains = `${generalSpecs.sprocketWheelChains}`;
+    this.data.bearingInnerDiameter = generalSpecs.bearingInnerDiameter || null;
+    this.data.diameter = `${generalSpecs.diameter}`;
+    this.data.bearingHousingTotalLength = `${generalSpecs.bearingHousingTotalLength}`;
+    this.data.slatLength = generalSpecs.slatLength;
+    this.data.guideRailLength = generalSpecs.guideRailLength;
+    this.data.headBoxLength = generalSpecs.headBoxLength;
+    this.data.bearingHousingSize = generalSpecs.bearingHousingSize;
+    this.data.bearingName = generalSpecs.bearingName || null;
+
+    const WG_mm = calcProductWG({
+      fullWidth: this.fullWidth_mm,
+      gapA: this.data.gapA,
+      gapC: this.data.gapC,
+    });
+
+    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+
+    this.data.thickness = generalSpecs.thickness as `${number}`;
+
+    const {
+      //
+      hp,
+      box: { default: defaultVendor, 大同, 東元 } = {},
+    } = generalSpecs.motors[generalSpecs.defaultMotorIndex];
+    this.data.horsepower = hp === 'N/A' ? '' : hp;
+
+    if (東元) {
+      this.data.motorVendor = '東元';
+      this.data.boxB = new Decimal(東元.boxB).div(1000).toString() as `${number}`;
+    } else if (defaultVendor) {
+      this.data.motorVendor = '東元';
+      this.data.boxB = new Decimal(defaultVendor.boxB).div(1000).toString() as `${number}`;
+    } else if (大同) {
+      this.data.motorVendor = '大同';
+      this.data.boxB = new Decimal(大同.boxB).div(1000).toString() as `${number}`;
+    } else {
+      this.data.motorVendor = null;
+      this.data.boxB = '';
+    }
+
+    const boxD = await reqGetBoxD(this);
+    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
+
+    this.data.area = calcArea(this);
+
+    this.render();
+  }
+
+  // -----------------------------------------------------------------------------------
+
+  // region HANDLER
+
+  async onFullWidthChange() {
+    this.updateGeneralSpec();
+
+    return this;
+  }
+
+  // endregion HANDLER
 
   // -----------------------------------------------------------------------------------
 } // ClassProd_base
 // MARK: END
+
+// ================================================================================
+// ================================================================================
+// ================================================================================
+
+// region API
+
+const reqGetProdCalcGeneralSpec = async (
+  //
+  classProd: ClassProd_base
+  //
+) => {
+  // '1/4' | '1/3' | '1/2' | '3/4' | '1' | '1 1/2' | '2' | '3' | '5';
+  const hp = classProd.horsepower.replaceAll('HP', '') as Thp;
+
+  const body: TpcgsPrams = {
+    // classProd.doorModelName的實際型別為string而非TpcgsPrams['modelName']
+    // 預期可能會422，但已在catch處理
+    modelName: classProd.doorModelName as TpcgsPrams['modelName'],
+    height: classProd.height_mm,
+    //
+    fullWidth: classProd.fullWidth_mm,
+    WG: undefined, // 不使用WG，統一使用fullWidth
+    //
+    isAntiTyphoon: !!classProd.isAntiTyphoon,
+    hp: hp || undefined,
+  };
+
+  return await apiGetProdCalcGeneralSpec(body)
+    .then((res) => res)
+    .catch(() => {
+      myAlert.err({ title: '取得產品規格失敗' });
+
+      return null;
+    });
+};
+
+const reqGetBoxD = async (classProd: ClassProd_base) => {
+  const body: TgetBoxDParams = {
+    modelName: classProd.doorModel,
+    rollerDiameter: Number(classProd.data.diameter || 0),
+    sidePlateSizeB: classProd.boxB_mm,
+    hp: classProd.data.horsepower,
+    motorVendor: classProd.data.motorVendor || '',
+  };
+
+  return await apiGetboxD(body)
+    .then((res) => res.sidePlateSizeD)
+    .catch(() => {
+      myAlert.err({ title: '取得boxD失敗' });
+
+      return null;
+    });
+};
+
+// const reqGetSlatCount = async (body: TpcdsPrams) => {
+//   await apiGetProdCalcDetailSpec(body)
+//     .then((res) => res.slatCount)
+//     .catch(() => {
+//       myAlert.err({ title: '取得門片數量失敗' });
+//     });
+// };
+
+// const reqGetAvailableComponents = async (body: TpacParams) => {
+//   return await apiGetProdAvailableComponents(body)
+//     .then((res) => res)
+//     .catch(() => {
+//       myAlert.err({ title: '取得材料配件失敗' });
+
+//       return null;
+//     });
+// };
 
 // ================================================================================
 
@@ -650,7 +881,18 @@ const checkIsFloat3 = (v: Parameters<typeof checkIsFloat>[0]) => {
   return checkIsFloat(v, 3);
 };
 
+const calcArea = (classProd: ClassProd_base) => {
+  const fullWidth = classProd.fullWidth_mm;
+  const height = classProd.height_mm;
+  const boxb = classProd.boxB_mm;
+
+  let area = calcProductArea({ fullWidth, height, boxb });
+  area = new Decimal(area).div(1000000).toDecimalPlaces(2).toString() as `${number}`;
+
+  return area;
+};
+
 // ================================================================================
 
 export { ClassProd_base };
-export type { Interface_ClassProd_base };
+export type { Interface_ClassProd_base, Interface_ClassProd_prime, Interface_ClassProd_special };

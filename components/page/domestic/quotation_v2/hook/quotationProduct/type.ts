@@ -27,6 +27,7 @@ import {
   //
   //
   Tcurrency,
+  TdoorModel,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
@@ -41,6 +42,10 @@ interface TstateProdData {
   discount: string;
   // 報價別
   quoteType: string;
+  //
+  // 這兩個作法太複雜了
+  // doorModelName: TdoorModel | string;
+  // doorModelName: P['isSpecialDoor'] extends true ? string : TdoorModel;
   // 門型
   doorModelName: string;
 
@@ -143,15 +148,18 @@ interface TstateProdData {
   // W 這些要做成component
 
   //
+  // 門片 - 捲片支數 // 從apiGetProdCalcDetailSpec取得
+  slatCount: `${number}` | null;
+  // 底座 - 開口 // 從doorModel.guideRails取得
+  guideRailsOpening: string | null;
+
   // 以下這些東西會從 get /products/door/calc-general-spec 取得
-  gapA: string | null;
-  gapC: string | null;
+  gapA: `${number}` | '';
+  gapC: `${number}` | '';
   gearNumber: string | null;
   weight: string | null;
   // 門片厚度 浮點數
   thickness: `${number}` | '';
-  // 門片 - 捲片支數
-  slatCount: `${number}` | null;
   // 鏈齒輪 - 鏈齒輪番號
   sprocketWheelModel: string | null;
   // 鏈齒輪 - 大鏈輪
@@ -164,8 +172,6 @@ interface TstateProdData {
   diameter: `${number}` | null;
   // 捲軸 - 總長
   bearingHousingTotalLength: `${number}` | null;
-  // 底座 - 開口
-  guideRailsOpening: string | null;
   // 門片長度
   slatLength: number | null;
   // 門軌長度
@@ -306,8 +312,8 @@ interface TstateProd {
 
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 
+  generalSpecs: TdoorGeneralSpecsDto | undefined | null;
   // availableComponents: TdoorComponentListDto | undefined | null;
-  // generalSpecs: TdoorGeneralSpecsDto | undefined | null;
   // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
 }
 

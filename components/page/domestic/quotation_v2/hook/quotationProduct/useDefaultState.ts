@@ -53,7 +53,7 @@ const useDefaultState = ({
       const data_accessoryDict = createData_accessoryDict(accessoriesArr);
       const accessoryKeyArr = Object.keys(data_accessoryDict);
 
-      dict[data_prod.id] = {
+      const state: TstateProd = {
         key: data_prod.id,
         data_prod: data_prod,
         data_componentDict,
@@ -63,7 +63,10 @@ const useDefaultState = ({
         accessoryKeyArr,
 
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
+        generalSpecs: undefined,
       };
+
+      dict[data_prod.id] = state;
     });
 
     return {
@@ -88,6 +91,7 @@ const createDateProd = (raw: TquotationProductDto) => {
     quoteType: raw.quoteType,
     doorModelName: raw.doorModelName,
     fullWidth: new Decimal(raw.fullWidth).div(1000).toString() as `${number}` | '',
+    // WG: new Decimal(raw.WG).div(1000).toString() as `${number}` | '',
     WG: new Decimal(raw.WG).div(1000).toString() as `${number}` | '',
     height: new Decimal(raw.height).div(1000).toString() as `${number}` | '',
     boxB: new Decimal(raw.boxB).div(1000).toString() as `${number}` | '',
@@ -141,8 +145,8 @@ const createDateProd = (raw: TquotationProductDto) => {
     // installationFeeTotalPrice: `${raw.installationFeeTotalPrice || 0}` as `${number}`,
     // W 這些要做成component
 
-    gapA: raw.gapA,
-    gapC: raw.gapC,
+    gapA: (raw.gapA || '') as `${number}` | '',
+    gapC: (raw.gapC || '') as `${number}` | '',
     gearNumber: raw.gearNumber,
     weight: raw.weight,
     thickness: raw.thickness as `${number}` | '',

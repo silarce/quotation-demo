@@ -16,7 +16,8 @@ import {
 
 import {
   lookup_classProd,
-  Interface_ClassProd_base,
+  // Interface_ClassProd_base,
+  Interface_ClassProd_prime,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from '../component/classComponent_base';
 
@@ -45,13 +46,13 @@ interface TconfigItem_prod {
   className?: string;
   createNode: (params: {
     //
-    classProd: Interface_ClassProd_base;
+    classProd: Interface_ClassProd_prime;
     disabled: boolean;
   }) => React.ReactNode;
 }
 
 type TcellKey = keyof Pick<
-  Interface_ClassProd_base,
+  Interface_ClassProd_prime,
   | 'itemName' // 項目名
   | 'discount' // 折數
   | 'quoteType' // 報價別
@@ -216,6 +217,9 @@ const nodeConfig_origin: TnodeConfig = {
           value: classProd.fullWidth,
           onChange: (e) => {
             classProd.fullWidth = e.target.value as `${number}` | '';
+          },
+          onBlur() {
+            classProd.onFullWidthChange();
           },
         },
       };

@@ -39,6 +39,7 @@ export type {
   TdoorGeneralSpecsDto,
   TpacParams,
   TdoorComponentListDto,
+  TpcdsPrams,
   TgenerateDoorProductBomDto_ComponentInfo,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto,

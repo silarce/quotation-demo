@@ -2566,23 +2566,23 @@ export type TdoorGeneralSpecsMotorBoxDto = {
 
 export type TdoorGeneralSpecsMotorDto = {
   box?: TdoorGeneralSpecsMotorBoxDto;
-  hp: string;
+  hp: string | 'N/A';
 };
 
 export type TdoorGeneralSpecsDto = {
   bearingHousingSize: number; // 軸承座寸法
   bearingHousingTotalLength: number; // 軸承座總長(=捲軸長度)
-  bearingInnerDiameter: string; // 軸承內徑
-  bearingName: string; // 軸承
+  bearingInnerDiameter: string | 'N/A'; // 軸承內徑
+  bearingName: string | 'N/A'; // 軸承
   defaultMotorIndex: number;
   density: number; // 密度
   diameter: number; // 捲軸直徑
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
-  gearNumber: string;
-  sprocketWheelModel: string;
-  sprocketWheelTeethNumber: string;
+  gearNumber: string | 'N/A';
+  sprocketWheelModel: string | 'N/A';
+  sprocketWheelTeethNumber: string | 'N/A';
   sprocketWheelChains: number;
   weight: number;
   slatLength: number; // 門片長度

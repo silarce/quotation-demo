@@ -1,4 +1,4 @@
-import { ClassProd_base, Interface_ClassProd_base } from './classProd_base';
+import { ClassProd_base, Interface_ClassProd_base, Interface_ClassProd_prime } from './classProd_base';
 
 import { ClassProd_SJ202 } from './classProd_SJ302';
 
@@ -7,4 +7,4 @@ const lookup_classProd = {
 };
 
 export { lookup_classProd };
-export type { Interface_ClassProd_base };
+export type { Interface_ClassProd_base, Interface_ClassProd_prime };
