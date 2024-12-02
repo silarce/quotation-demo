@@ -1,6 +1,6 @@
-import { Interface_ClassProd_prime, ClassProd_base } from './classProd_base';
+import { Interface_ClassProd_prime, ClassProd_prime } from './classProd_base';
 
-class ClassProd_SJ202 extends ClassProd_base implements Interface_ClassProd_prime {
+class ClassProd_SJ202 extends ClassProd_prime implements Interface_ClassProd_prime {
   readonly doorModel = 'SJ-302';
 }
 

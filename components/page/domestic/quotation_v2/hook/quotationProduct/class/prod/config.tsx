@@ -17,7 +17,9 @@ import {
 import {
   lookup_classProd,
   // Interface_ClassProd_base,
+  Interface_ClassProd_base2,
   Interface_ClassProd_prime,
+  Interface_ClassProd_special,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from '../component/classComponent_base';
 
@@ -46,7 +48,7 @@ interface TconfigItem_prod {
   className?: string;
   createNode: (params: {
     //
-    classProd: Interface_ClassProd_prime;
+    classProd: Interface_ClassProd_base2;
     disabled: boolean;
   }) => React.ReactNode;
 }
@@ -219,7 +221,7 @@ const nodeConfig_origin: TnodeConfig = {
             classProd.fullWidth = e.target.value as `${number}` | '';
           },
           onBlur() {
-            classProd.onFullWidthChange();
+            classProd.onFullWidthChange?.();
           },
         },
       };

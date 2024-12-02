@@ -33,7 +33,13 @@ import type {
   TsetAccessory,
 } from './type';
 
-import { lookup_classProd, Interface_ClassProd_base } from './class/prod/lookup_classProd';
+import { lookup_classProd } from './class/prod/lookup_classProd';
+import {
+  Interface_ClassProd_base,
+  Interface_ClassProd_base2,
+  Interface_ClassProd_prime,
+  Interface_ClassProd_special,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
 
 import {
   TconfigItem,
@@ -318,7 +324,8 @@ const useQuotationProduct = ({
       return {};
     }
 
-    const dict: { [key: string]: Interface_ClassProd_base } = {};
+    // const dict: { [key: string]: Interface_ClassProd_base } = {};
+    const dict: { [key: string]: Interface_ClassProd_prime | Interface_ClassProd_special } = {};
 
     Object.entries(state_prodDict).forEach(([key, state]) => {
       if (state.key !== key) {
@@ -327,11 +334,7 @@ const useQuotationProduct = ({
 
       const { doorModelName } = state.data_prod;
 
-      if (!(doorModelName in lookup_classProd)) {
-        return;
-      }
-
-      const prodName = doorModelName as keyof typeof lookup_classProd;
+      const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
 
       const theClass = lookup_classProd[prodName];
 
