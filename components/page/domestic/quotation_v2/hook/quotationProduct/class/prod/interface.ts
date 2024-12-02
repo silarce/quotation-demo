@@ -125,7 +125,7 @@ interface Interface_ClassProd_base {
   // guideRailImg: string | undefined | 'none';
 
   // 門軌厚度 浮點數
-  guideRailThickness: `${number}` | null;
+  guideRailThickness: `${number}` | '';
   // 門軌消音條
   hasSilencingStrip: boolean | null;
   // guideRailG為門軌的width
@@ -248,7 +248,7 @@ interface Interface_ClassProd_base {
   // rootProductId: string;
   // -----------------------------------------------------------------------
 
-  changeDoorModel: (doorModel: TdoorModelInfoDto | null) => Interface_ClassProd_base;
+  changeDoorModel: (props: { name: string; doorModel: TdoorModelInfoDto | null }) => Interface_ClassProd_base;
 
   // onFullWidthChange?: () => Promise<Interface_ClassProd_base> | undefined;
 
@@ -258,12 +258,12 @@ interface Interface_ClassProd_base {
 
 interface Interface_ClassProd_base2 extends Interface_ClassProd_base {
   doorModel: string;
-  onFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
+  afterFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
 }
 
 interface Interface_ClassProd_prime extends Interface_ClassProd_base2 {
   doorModel: TdoorModel;
-  onFullWidthChange: NonNullable<Interface_ClassProd_base2['onFullWidthChange']>;
+  afterFullWidthChange: NonNullable<Interface_ClassProd_base2['afterFullWidthChange']>;
 }
 
 // MARK:Interface_ClassProd_special

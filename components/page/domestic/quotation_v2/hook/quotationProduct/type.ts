@@ -82,7 +82,8 @@ interface TstateProdData {
   // 目前沒有需要顯示門軌名稱的地方，都是顯示圖檔
   guideRail: string | null;
   // 門軌厚度 浮點數
-  guideRailThickness: `${number}` | null;
+  // guideRailThickness: `${number}` | null;
+  guideRailThickness: `${number}` | '';
   // 門軌消音條
   hasSilencingStrip: boolean | null;
   // guideRailG為門軌的width

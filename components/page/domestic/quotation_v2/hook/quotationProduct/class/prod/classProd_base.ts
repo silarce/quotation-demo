@@ -159,11 +159,7 @@ class ClassProd_base implements Interface_ClassProd_base {
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
-  changeDoorModel(doorModel: TdoorModelInfoDto | null) {
-    this.state.doorModel = doorModel;
 
-    return this;
-  }
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
@@ -204,9 +200,9 @@ class ClassProd_base implements Interface_ClassProd_base {
   get doorModelName() {
     return this.data.doorModelName;
   }
-  set doorModelName(value) {
-    this.setData_simple('doorModelName', value);
-  }
+  // set doorModelName(value) {
+  //   this.setData_simple('doorModelName', value);
+  // }
 
   get fullWidth() {
     return this.data.fullWidth;
@@ -350,7 +346,30 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.guideRail;
   }
   set guideRail(value) {
-    this.setData_simple('guideRail', value);
+    this.data.guideRail = value;
+    const guideRail = this.data.guideRail;
+
+    const guideRails = this.state.doorModel?.guideRails ?? [];
+
+    const guideRailInfo = guideRails.find((item) => item.imgSrc === guideRail);
+
+    const data = this.data;
+
+    if (guideRailInfo) {
+      data.guideRailThickness = guideRailInfo.thickness.replaceAll('t', '') as `${number}`;
+      data.hasSilencingStrip = guideRailInfo.hasSilencingStrip;
+      data.isAntiTyphoon = guideRailInfo.withHook;
+      data.guideRailsOpening = guideRailInfo.opening;
+      data.guideRailG = guideRailInfo.width;
+    } else {
+      data.guideRailThickness = '';
+      data.hasSilencingStrip = null;
+      data.isAntiTyphoon = null;
+      data.guideRailsOpening = null;
+      data.guideRailG = null;
+    }
+
+    this.render();
   }
 
   get guideRailImg() {
@@ -365,15 +384,22 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.guideRailThickness;
   }
   set guideRailThickness(value) {
+    // 門軌厚度的選項是從availableComponents中取得的
+    // 門軌厚度的選項是從availableComponents中取得的
+    // 門軌厚度的選項是從availableComponents中取得的
+    // 門軌厚度的選項是從availableComponents中取得的
+    // 門軌厚度的選項是從availableComponents中取得的
+    // 門軌厚度的選項是從availableComponents中取得的
+
     this.setData_simple('guideRailThickness', value);
   }
 
   get hasSilencingStrip() {
     return this.data.hasSilencingStrip;
   }
-  set hasSilencingStrip(value) {
-    this.setData_simple('hasSilencingStrip', value);
-  }
+  // set hasSilencingStrip(value) {
+  //   this.setData_simple('hasSilencingStrip', value);
+  // }
 
   get isULGuideRail() {
     return this.data.isULGuideRail;
@@ -399,9 +425,9 @@ class ClassProd_base implements Interface_ClassProd_base {
   get isAntiTyphoon() {
     return this.data.isAntiTyphoon;
   }
-  set isAntiTyphoon(value) {
-    this.setData_simple('isAntiTyphoon', value);
-  }
+  // set isAntiTyphoon(value) {
+  //   this.setData_simple('isAntiTyphoon', value);
+  // }
 
   get bounceDoorWidth() {
     return this.data.bounceDoorWidth;
@@ -491,6 +517,7 @@ class ClassProd_base implements Interface_ClassProd_base {
   async init() {
     const generalSpecs = await reqGetProdCalcGeneralSpec(this);
     this.state.generalSpecs = generalSpecs;
+    this.render();
   }
 
   // MARK:updateGeneralSpec
@@ -586,12 +613,38 @@ class ClassProd_base implements Interface_ClassProd_base {
 
     this.data.area = calcArea(this);
 
-    this.render();
+    // this.render();
   }
 
   // -----------------------------------------------------------------------------------
 
   // region HANDLER
+
+  changeDoorModel({ name, doorModel }: { name: string; doorModel: TdoorModelInfoDto | null }) {
+    this.state.doorModel = doorModel;
+    this.data.doorModelName = name;
+
+    if (!doorModel) {
+      return this;
+    }
+
+    const {
+      name: doorModelName,
+      thickness,
+      // density,
+      // guideRails,
+      // slatMaterials,
+    } = doorModel;
+
+    name !== doorModelName && myAlert.notify.warning({ message: 'name與doorModelName不一致' });
+    this.data.doorModelName = doorModelName;
+
+    this.data.thickness = thickness.replaceAll('t', '') as `${number}`;
+
+    this.render();
+
+    return this;
+  }
 
   // async onFullWidthChange() {
   //   this.updateGeneralSpec();
@@ -614,17 +667,6 @@ class ClassProd_base implements Interface_ClassProd_base {
 // ================================================================================
 // ================================================================================
 // ================================================================================
-
-//MARK:ClassProd_prime
-class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
-  doorModel: TdoorModel = 'SJ-302';
-
-  async onFullWidthChange() {
-    this.updateGeneralSpec();
-
-    return this;
-  }
-}
 
 // ================================================================================
 // ================================================================================
@@ -720,7 +762,19 @@ const calcArea = (classProd: ClassProd_base) => {
 };
 
 // ================================================================================
+//MARK:ClassProd_prime
+class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
+  doorModel: TdoorModel = 'SJ-302';
 
+  async afterFullWidthChange() {
+    this.updateGeneralSpec();
+    this.render();
+
+    return this;
+  }
+}
+
+// ================================================================================
 export { ClassProd_base, ClassProd_prime };
 export type {
   Interface_ClassProd_base,

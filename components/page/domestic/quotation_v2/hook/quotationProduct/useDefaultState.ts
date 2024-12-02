@@ -108,7 +108,7 @@ const createDateProd = (raw: TquotationProductDto) => {
     motorPhase: raw.motorPhase,
 
     guideRail: raw.guideRail,
-    guideRailThickness: raw.guideRailThickness as `${number}` | null,
+    guideRailThickness: (raw.guideRailThickness || '') as `${number}` | '',
     hasSilencingStrip: raw.hasSilencingStrip,
     guideRailG: raw.guideRailG,
     isULGuideRail: raw.isULGuideRail,

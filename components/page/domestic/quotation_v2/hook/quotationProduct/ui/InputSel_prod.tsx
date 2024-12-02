@@ -4,6 +4,10 @@ import _ from 'lodash';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 const InputSel_prod = (props: TinputSelProps) => {
+  if (props.selectProps?.props && !('menuPortalTarget' in props.selectProps.props)) {
+    props.selectProps.props.menuPortalTarget = undefined;
+  }
+
   return <InputSel showBaseline="auto" fontSize="16" {...props} />;
 };
 

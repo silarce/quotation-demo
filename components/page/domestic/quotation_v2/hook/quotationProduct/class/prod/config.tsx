@@ -221,7 +221,7 @@ const nodeConfig_origin: TnodeConfig = {
             classProd.fullWidth = e.target.value as `${number}` | '';
           },
           onBlur() {
-            classProd.onFullWidthChange?.();
+            classProd.afterFullWidthChange?.();
           },
         },
       };
@@ -388,23 +388,23 @@ const nodeConfig_origin: TnodeConfig = {
     },
     createNode({ disabled, classProd }) {
       const v = classProd.guideRail;
-      const value = v ? { value: v, label: v } : null;
+      const value = v
+        ? {
+            value: v,
+            label: v,
+            icon: createAssetUrl(v),
+          }
+        : null;
 
-      // createAssetUrl
-      // SJ302_30.svg
+      const { guideRails = [] } = classProd.state.doorModel ?? {};
 
-      const options = [
-        {
-          value: 'SJ302_30.svg',
-          label: 'SJ302_30.svg',
-          icon: createAssetUrl('SJ302_30.svg'),
-        },
-        {
-          value: 'SJ302_30.svg',
-          label: 'SJ302_30.svg',
-          icon: createAssetUrl('SJ302_30.svg'),
-        },
-      ];
+      const options = guideRails.map(({ imgSrc }) => {
+        return {
+          value: imgSrc,
+          label: imgSrc,
+          icon: createAssetUrl(imgSrc),
+        };
+      });
 
       const inputSelProps: TinputSelProps = {
         disabled,
@@ -447,10 +447,10 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.isAntiTyphoon}
-          onChange={(e) => {
-            classProd.isAntiTyphoon = e.target.checked;
-          }}
-          disabled={disabled}
+          // onChange={(e) => {
+          //   classProd.isAntiTyphoon = e.target.checked;
+          // }}
+          disabled={true}
         />
       );
     },
@@ -466,10 +466,10 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.hasSilencingStrip}
-          onChange={(e) => {
-            classProd.hasSilencingStrip = e.target.checked;
-          }}
-          disabled={disabled}
+          // onChange={(e) => {
+          //   classProd.hasSilencingStrip = e.target.checked;
+          // }}
+          disabled={true}
         />
       );
     },
@@ -899,7 +899,10 @@ const createNodeConfig_prime = ({
         onChange: (option) => {
           const doorModelName = option?.value || '';
           classProd.doorModelName = doorModelName;
-          classProd.changeDoorModel(doorModelDict?.[doorModelName] || null);
+          classProd.changeDoorModel({
+            name: doorModelName,
+            doorModel: doorModelDict?.[doorModelName] || null,
+          });
         },
       },
     };
