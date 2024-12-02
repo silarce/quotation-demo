@@ -392,6 +392,7 @@ const dlExcel = async ({
         materialName = 'SST316#';
       } else if (
         //
+        doorModelName.includes('SJ-305D') &&
         materialName.includes('SST') &&
         !materialName.includes('304') &&
         !materialName.includes('316')
