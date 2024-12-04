@@ -31,7 +31,6 @@ import ProductCard, {
 } from 'components/page/worksDepartment/worksheet/productCard';
 import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
-
 // import WorkSheetProductOutline, {
 //   Tcontrol_productOutline,
 //   ToldProductOutline,
@@ -823,8 +822,6 @@ export default function Worksheet({
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
-
-
 
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {
