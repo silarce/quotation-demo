@@ -90,7 +90,7 @@ const ExportToIncomeBill = ({
         }}
       />
 
-      <InputSel
+      {/* <InputSel
         className="mt-3"
         radioProps={{
           props: {
@@ -110,7 +110,7 @@ const ExportToIncomeBill = ({
             },
           ],
         }}
-      />
+      /> */}
 
       <div className="flex gap-5 mt-10 justify-center">
         <MyButton_v2 px="px22" py="py6" onClick={handle_onConfirm}>
