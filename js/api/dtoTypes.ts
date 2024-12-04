@@ -3938,7 +3938,8 @@ export type TcreateAccountReceivableAccountsDto = {
   accountantId: string[];
   incomeBillDate: string;
   splitPayment: number;
-  isForeign: boolean;
+  // isForeign: boolean;
+  // isForeign: undefined;
 };
 
 // apiPatchAccountReceivableAccountant用的
