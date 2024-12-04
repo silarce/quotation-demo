@@ -1108,6 +1108,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
     emptySomeProperty: status === 'Bidding',
   });
 
+  const {
+    visible: pdfModalVisible_noDiscount,
+    setVisible: setPdfModalVisible_noDiscount,
+    pdfData: pdfData_noDiscount,
+  } = useModalQuotationPdf({
+    quotationContent: latestContent,
+    emptySomeProperty: status === 'Bidding',
+    noDiscount: true,
+  });
+
   // --------------------------------------------------------------------------
 
   // region props
@@ -2097,6 +2107,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
           單價分析
         </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => setPdfModalVisible_noDiscount(true)}>
+          {'匯出報價單(無折扣)'}
+        </MyButton_v2>,
       ]}
     >
       匯出
@@ -2569,6 +2582,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
             setPdfModalVisible(false);
           }}
           fileName={latestContent.quotationNumber}
+        />
+      )}
+
+      {latestContent && (
+        <QuotationPdf
+          visible={pdfModalVisible_noDiscount}
+          pdfData={pdfData_noDiscount}
+          onCancel={() => {
+            setPdfModalVisible_noDiscount(false);
+          }}
+          fileName={latestContent.quotationNumber + '無折扣'}
         />
       )}
 

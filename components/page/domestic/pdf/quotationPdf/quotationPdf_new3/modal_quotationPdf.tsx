@@ -39,6 +39,7 @@ import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
 import { findGuideRailUnicode } from 'config/product/lookup';
 import { companyInfo } from 'config/companyInfo';
 import { lookup_quoteType_doorModelName } from 'js/utils/options/productOptions';
+import { taxRate } from 'config/config_common';
 
 // utils
 import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
@@ -1007,10 +1008,12 @@ const quotationProdAndOther_ToProdArr = ({
   quotationProductArr,
   quotationOtherArr,
   checkIsSpecialDoor,
+  noDiscount,
 }: {
   quotationProductArr: TquotationProductDto[];
   quotationOtherArr: TquotationContentOtherDto[];
   checkIsSpecialDoor: (doorModelName: string) => boolean;
+  noDiscount?: boolean;
 }): Tprod[] => {
   const productArr: Tprod[] = (() => {
     return quotationProductArr.map((pro) => {
@@ -1031,13 +1034,25 @@ const quotationProdAndOther_ToProdArr = ({
         closingType,
         horsepower,
         // quantity,
-        unitPrice,
-        // totalPrice,
+
+        unitPrice, // 單價 打折後的價格
+        price, // 牌價 沒有打折的價格
+        totalPrice,
+        dualPrice,
+
         notes,
         guideRail,
         //
         reduceQty,
       } = pro;
+
+      let thePrice = unitPrice;
+      let theTotalPrice = totalPrice;
+
+      if (noDiscount) {
+        thePrice = price;
+        theTotalPrice = dualPrice;
+      }
 
       const name = (() => {
         if (quoteType === '捲門') {
@@ -1049,11 +1064,14 @@ const quotationProdAndOther_ToProdArr = ({
 
       const isSpecialDoor = checkIsSpecialDoor(doorModelName);
 
-      let { quantity, totalPrice } = pro;
+      let {
+        quantity,
+        //  dualPrice
+      } = pro;
 
       if (reduceQty) {
         quantity = -reduceQty;
-        totalPrice = new Decimal(unitPrice).mul(-reduceQty).toNumber();
+        theTotalPrice = new Decimal(thePrice).mul(-reduceQty).toNumber();
       }
 
       const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toNumber();
@@ -1126,12 +1144,12 @@ const quotationProdAndOther_ToProdArr = ({
         horsepower,
         closingType: closingType ?? '',
         qty: String(quantity) + ' ' + unit,
-        unitPrice: unitPrice.toLocaleString(),
-        totalPrice: totalPrice.toLocaleString(),
+        unitPrice: thePrice.toLocaleString(),
+        totalPrice: theTotalPrice.toLocaleString(),
         notes,
         //
-        unitPrice_num: unitPrice,
-        totalPrice_num: totalPrice,
+        unitPrice_num: thePrice,
+        totalPrice_num: theTotalPrice,
         qty_num: quantity,
         guideRailForExcel: doorRailForExcel,
         unit,
@@ -1179,11 +1197,13 @@ const useModalQuotationPdf = ({
   quotationContent,
   attachedProdArr,
   emptySomeProperty,
+  noDiscount,
 }: {
   quotationContent: TquotationContentDto | undefined;
   // 原本會使用quotationContent裡的products，但如果有attachedProdArr，就會以attachedProdArr替代
   attachedProdArr?: TquotationProductDto[];
   emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
+  noDiscount?: boolean;
 }) => {
   const [visible, setVisible] = useState(false);
   // const [pdfData, setPdfData] = useState<TpdfData>();
@@ -1262,11 +1282,59 @@ const useModalQuotationPdf = ({
       };
     });
 
+    let quotationProductArr = attachedProdArr || products;
+
+    // 設置noDiscount為true會改取牌價與牌價複價
+    quotationProductArr = _.sortBy(quotationProductArr, 'order');
+    const prodArr = quotationProdAndOther_ToProdArr({
+      quotationProductArr: quotationProductArr,
+      quotationOtherArr: others ?? [],
+      checkIsSpecialDoor,
+      noDiscount,
+    });
+
+    // 設置noDiscount為true，要以quotationProductArr計算總金額
+    const { theSubTotal, theTax, theTotal } = (() => {
+      if (!noDiscount) {
+        return {
+          theSubTotal: subTotal,
+          theTax: salesTax,
+          theTotal: total,
+        };
+      }
+
+      const theSubTotal = prodArr
+        .reduce((acc, prod) => {
+          acc = acc.add(prod.totalPrice_num);
+
+          return acc;
+        }, new Decimal(0))
+        .toNumber();
+
+      let theTax = 0;
+
+      if (salesTax) {
+        theTax = new Decimal(theSubTotal).mul(taxRate).toDecimalPlaces(0).toNumber();
+      }
+
+      const theTotal = new Decimal(theSubTotal).add(theTax).toNumber();
+
+      return {
+        theSubTotal,
+        theTax,
+        theTotal,
+      };
+    })();
+
     const bottom: Tbottom = {
-      subTotal: subTotal.toLocaleString(),
-      tax: salesTax.toLocaleString(),
-      total: total.toLocaleString(),
-      total_chinese: changeNumberMoneyToChinese(total),
+      // subTotal: subTotal.toLocaleString(),
+      // tax: salesTax.toLocaleString(),
+      // total: total.toLocaleString(),
+      // total_chinese: changeNumberMoneyToChinese(total),
+      subTotal: theSubTotal.toLocaleString(),
+      tax: theTax.toLocaleString(),
+      total: theTotal.toLocaleString(),
+      total_chinese: changeNumberMoneyToChinese(theTotal),
 
       deliveryLocation,
       deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
@@ -1275,141 +1343,20 @@ const useModalQuotationPdf = ({
       qrArr: quotationRanges ?? [],
       agentName: agentEmployee?.chName ?? '',
       //
-      subTotal_num: subTotal,
-      tax_num: salesTax,
-      total_num: total,
+      subTotal_num: theSubTotal,
+      tax_num: theTax,
+      total_num: theTotal,
     };
     // attachedProdArr
 
-    let quotationProductArr = attachedProdArr || products;
-
-    quotationProductArr = _.sortBy(quotationProductArr, 'order');
-
-    const prodArr = quotationProdAndOther_ToProdArr({
-      quotationProductArr: quotationProductArr,
-      quotationOtherArr: others ?? [],
-      checkIsSpecialDoor,
-    });
-
     return { top, prodArr, bottom };
   }, [quotationContent, emptySomeProperty]);
-
-  // useEffect(() => {
-  //   if (!quotationContent) {
-  //     return;
-  //   }
-
-  //   const {
-  //     quotationNumber,
-  //     quotationDate,
-  //     validityPeriod,
-  //     customer,
-  //     projectName,
-  //     county,
-  //     district,
-  //     address,
-  //     // contactPerson,
-  //     // contactNumber,
-  //     // faxNumber,
-  //     //
-  //     subTotal,
-  //     salesTax,
-  //     total,
-  //     deliveryLocation,
-  //     deliveryDate,
-  //     paymentMethods,
-  //     annotations,
-  //     quotationRanges,
-  //     agentEmployee,
-  //     products,
-  //     others,
-  //   } = quotationContent;
-
-  //   let {
-  //     // customerName,
-  //     contactPerson,
-  //     contactNumber,
-  //     faxNumber,
-  //   } = quotationContent;
-
-  //   let customerName = customer?.name ?? '';
-
-  //   if (emptySomeProperty) {
-  //     customerName = '';
-  //     contactPerson = '';
-  //     contactNumber = '';
-  //     faxNumber = '';
-  //   }
-
-  //   const projectWholeAddress = `${county}${district}${address}`;
-
-  //   const top: Ttop = {
-  //     contactPerson,
-  //     customerName: customerName,
-  //     contactNumber,
-  //     faxNumber,
-
-  //     quotationNumber,
-  //     validityPeriod,
-  //     quotationDate: getTaiwanDateStr(quotationDate, { withUnit: true }) ?? '',
-
-  //     projectName,
-  //     projectWholeAddress,
-  //   };
-
-  //   const paymentMethodsArr = paymentMethods.map((pm) => {
-  //     let value: string | number = new Decimal(pm.totalPaymentRatio || 0).toNumber();
-  //     value = value ? String(value) : '';
-
-  //     return {
-  //       label: pm.milestone,
-  //       value: value,
-  //     };
-  //   });
-
-  //   const bottom: Tbottom = {
-  //     subTotal: subTotal.toLocaleString(),
-  //     tax: salesTax.toLocaleString(),
-  //     total: total.toLocaleString(),
-  //     total_chinese: changeNumberMoneyToChinese(total),
-
-  //     deliveryLocation,
-  //     deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
-  //     paymentMethods: paymentMethodsArr,
-  //     notesArr: annotations ?? [],
-  //     qrArr: quotationRanges ?? [],
-  //     agentName: agentEmployee?.chName ?? '',
-  //     //
-  //     subTotal_num: subTotal,
-  //     tax_num: salesTax,
-  //     total_num: total,
-  //   };
-  //   // attachedProdArr
-
-  //   let quotationProductArr = attachedProdArr || products;
-
-  //   quotationProductArr = _.sortBy(quotationProductArr, 'order');
-
-  //   const prodArr = quotationProdAndOther_ToProdArr({
-  //     quotationProductArr: quotationProductArr,
-  //     quotationOtherArr: others ?? [],
-  //     checkIsSpecialDoor,
-  //   });
-
-  //   setPdfData({ top, prodArr, bottom });
-  // }, [
-  //   quotationContent,
-  //   emptySomeProperty,
-  //   // attachedProdArr
-  // ]);
 
   return {
     visible,
     setVisible,
     pdfData,
   };
-
-  //
 };
 
 export { useModalQuotationPdf };
