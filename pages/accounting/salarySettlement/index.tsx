@@ -275,7 +275,8 @@ export default function SalarySettlement() {
 
             const conditionModel = {
                 date: year + '-' + month,
-                type: '編輯中'
+                type: '編輯中',
+                serial_id: year.toString() + month.toString()
             };
 
             const inputModel = {
@@ -525,7 +526,7 @@ export default function SalarySettlement() {
                 const conditionModel = {
                     document_id: serial_id,
                     document_uuid: serial_uuid,
-                    document_type: "薪資帳簿",
+                    document_type: "薪資單",
                     review_id: review_flow,
                     query: review_query,
                     user_id: userInfo?.employee?.id.toString(),
@@ -552,7 +553,7 @@ export default function SalarySettlement() {
                 if (!response.ok) {
                     throw new Error('Failed to fetch data');
                 }
-                const responsedata = await response.json();
+                // const responsedata = await response.json();
                 setReviewflowdata([]);
                 GetReviewById(serial_uuid);
                 setStatus("審核中");
@@ -843,6 +844,17 @@ export default function SalarySettlement() {
     }
 
     //#endregion
+    const handlechose = (item: any) => {
+        handleRowClick(item.id);
+    }
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -999,7 +1011,10 @@ export default function SalarySettlement() {
                                     _item.net_pay = net_pay;
                                     return (
                                         <CellWithBar key={index} className={scss.panelHeader1}>
-                                            <div className={scss.row01}>
+                                            <div
+                                                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                onClick={() => handlechose(_item)}
+                                            >
                                                 <span
                                                     style={{
                                                         width: '300px',

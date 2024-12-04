@@ -30,11 +30,12 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import { Input } from 'antd';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import InputSelBar from 'components/global/gear/inputAndSel/inputSelBar/inputSelBar';
+import InputSelBar, { TselInputPropsArr } from 'components/global/gear/inputAndSel/inputSelBar/inputSelBar';
 import MyButton from 'components/global/gear/button/myButton';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { setting } from '../wareHouseList/index';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 
 
 const optionsCounty = optionsCreator_county();
@@ -71,6 +72,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
     const [update_at, setUpdate_at] = useState<string | null>(null);
     const [update_by, setUpdate_by] = useState<string | null>(null);
     const [url, setUrl] = useState<string | null>(null);
+    const [warehouseType, setWarehouseType] = useState<string>('');
 
     // 時間設定
     const [localTime, setLocalTime] = useState('');
@@ -97,7 +99,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             type: 'redButton',
             label: '新增',
             onClick: () => {
-                console.log(whname+"/"+position+'/'+create_by);
+                console.log(whname + "/" + position + '/' + create_by);
                 if (whname === '' || whname === undefined || whname === null &&
                     position === '' || position === undefined || position === null &&
                     create_by === '' || create_by === undefined || create_by === null
@@ -144,11 +146,13 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
         try {
             setIsLoading(true);
             const conditionModel = {
-                whname: whname as string | undefined,
-                position: position as string | undefined,
-                create_by: create_by as string | undefined,
-                created_at: localTime as string | undefined,
-                url: url as string | undefined,
+                whname: whname,
+                position: position,
+                create_by: create_by,
+                created_at: localTime,
+                url: url,
+                type: selectedValue,
+                note: textareaValue
             };
             console.log(created_at);
 
@@ -193,7 +197,53 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
     // const check: any()=>{
     //     const alert
     // }
+    const [selectedValue, setSelectedValue] = useState('一般倉庫');
+    const [inputValue, setInputValue] = useState('');
+    const [textareaValue, setTextareaValue] = useState('');
 
+    const propsArr: TselInputPropsArr = [
+        // {
+        //     type: 'input',
+        //     placeholder: '輸入值',
+        //     props: {
+        //         value: inputValue,
+        //         onChange: (e:any) => setInputValue(e.target.value),
+        //     },
+        //     style: {
+        //         borderBottom: '1px solid #14256a',
+        //     },
+        // },
+        {
+            type: 'select',
+            placeholder: '倉庫類型',
+            props: {
+                value: selectedValue,
+                options: [
+                    { value: '一般倉庫', label: '一般倉庫' },
+                    { value: '立體倉庫', label: '立體倉庫' },
+                ],
+                onChange: (option: any) => setSelectedValue(option?.value),
+            },
+            style: {
+                color: 'orange'
+                // fontSize: '8px', // 設定字體大小
+                // borderBottom: '1px solid #14256a',
+                // fontWeight:'bolder'
+                // color:'red'
+            },
+        },
+        // {
+        //     type: 'textarea',
+        //     placeholder: '備註',
+        //     props: {
+        //         value: textareaValue,
+        //         onChange: (e:any) => setTextareaValue(e.target.value),
+        //     },
+        //     style: {
+        //         borderBottom: '1px solid #14256a',
+        //     },
+        // },
+    ];
 
     return (
         <SubLayer isLoading_subLayer={false}>
@@ -204,6 +254,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="倉庫名稱"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
                             disabled={disabled}
                             inputProps={{
                                 props: {
@@ -215,6 +266,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="倉庫位置"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
                             disabled={disabled}
                             inputProps={{
                                 props: {
@@ -223,9 +275,67 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                                 },
                             }}
                         />
+                        {/* <InputSelBar
+                            label="倉庫類型"
+                            propsArr={propsArr}
+                            // isMust={true}
+                            width="100%"
+                            gap="18px"
+                            // padding="8px"
+                            // hrColor="#ccc"
+                            // showBaseline="always"
+                            disabled={false}
+                        /> */}
+                        {/* <div>
+                            <p>選擇的值：{selectedValue}</p>
+                        </div> */}
+                        {/* <SelectBar
+
+                            selectPropsArr={[
+                                {
+                                    boxStyle: { color: 'red' },
+                                    placeholder: '選擇倉庫類型',
+                                    selectProps: {
+                                        value: warehouseType, // 將 value 與選項匹配
+                                        options,
+                                        onChange: (selectedOption) => {
+                                            setWarehouseType(selectedOption?.value || ''); // 將選中的值設置到 state
+                                            console.log('選擇的值:', selectedOption?.value); // 可選，方便 debug
+                                        },
+                                    },
+                                },
+                            ]}
+                        /> */}
+                        <InputSel
+                            caption="倉庫類型"
+                            disabled={disabled}
+                            selectProps={{
+                                props: {
+                                    menuPortalTarget: undefined,
+                                    styles: {
+                                        menuPortal: (base) => ({
+                                            ...base,
+                                            zIndex: 3,
+                                        }),
+                                    },
+                                    options: [
+                                        { value: '一般倉庫', label: '一般倉庫' },
+                                        { value: '立體倉庫', label: '立體倉庫' },
+                                    ],
+                                    onChange: (option: any) => setSelectedValue(option?.value),
+                                    value: selectedValue
+                                        ? {
+                                            value: selectedValue,
+                                            label: selectedValue,
+                                        }
+                                        : null,
+                                },
+                            }}
+                        />
                         <InputSel
                             {...inputSelProps}
                             caption="建立人員"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
                             disabled={!disabled}
                             inputProps={{
                                 props: {
@@ -237,6 +347,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="建立時間"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
                             disabled={true}
                             inputProps={{
                                 props: {
@@ -249,11 +360,24 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                         <InputSel
                             {...inputSelProps}
                             caption="IP位址"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
                             disabled={disabled}
                             inputProps={{
                                 props: {
                                     // value: data1.whpname,
                                     onChange: (e) => setUrl(e.target.value.trim())
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="備註"
+                            captionStyle={{ fontSize: '20px', fontWeight: '500' }}
+                            disabled={disabled}
+                            inputProps={{
+                                props: {
+                                    // value: data1.whpname,
+                                    onChange: (e) => setTextareaValue(e.target.value.trim())
                                 },
                             }}
                         />

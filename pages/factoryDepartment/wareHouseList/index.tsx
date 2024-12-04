@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -12,7 +12,30 @@ import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHea
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import { AppContext } from 'pages/_app';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+//icon
+import icon_search from 'public/image/icon/fc_search.svg';
+import icon_clear from 'public/image/icon/fc_clear.svg';
+import InputSel from "components/global/gear/inputAndSel_v2/inputSel";
+import { inputSelProps } from "components/page/worksDepartment/ui/wrapper_inpuSel_01";
+import icon_fc_add from 'public/image/icon/fc_add.svg';
+import icon_cancel from 'public/image/icon/fc_cancel.svg';
+import icon_fc_check from 'public/image/icon/fc_check.svg';
+import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg';
+import icon_delete from 'public/image/icon/fc_delete.svg';
+import icon_add from 'public/image/icon/fc_add2.svg';
+import icon_eye from 'public/image/icon/eyeOpen.svg';
+import icon_eye_gray from 'public/image/icon/eyeProhibit.svg';
+import icon_cir_add from 'public/image/icon/addCircle.svg';
+import icon_cir_remove from 'public/image/icon/removeCircle.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_search2 from 'public/image/icon/search.svg';
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 
 
@@ -50,6 +73,10 @@ export default function WareHouseList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const { userInfo } = useContext(AppContext);
+
+    const urlRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    const noteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+
 
     const searchTargetList = [
         {
@@ -147,13 +174,227 @@ export default function WareHouseList() {
         }
     };
 
+    const UpdateWareHouse = async (item: any) => {
+        try {
+            setIsLoading(true);
+
+            const conditionModel = {
+                id: item.id,
+                note: item.note,
+                employee_id: userInfo?.employee?.id
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(JSON.stringify(conditionModel));
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdateWareHouse`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                myAlert.err({ title: 'UpdateWareHouse', content: `API Status: ${response.status}` });
+                return;
+            }
+
+            // 解析 API 響應
+            const result = await response.json(); // 解析為 JSON 格式
+
+            // 根據 API 回應處理結果
+            if (result.success) {
+                // 成功，顯示提示
+                // myAlert.success({ title: '成功', content: result.message });
+                myAlert.success({ title: result.message });
+                setEditlist(false);
+                fetchData();
+
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
+
+
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+
+
+
+    }
+
+    const getTrayByWareHouse = (item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) => {
+        handleRowClick(item.id)
+        router.push({
+            pathname: `/factoryDepartment/trayList`,
+            query: {
+                type: 'Tray',
+                whid: item.id,
+                whname: item.whname,
+                url: url,
+                traycalled: traycalled,
+                traycalledname: traycalledname,
+                traytransfer: traytransfer,
+                whnamecalled: whnamecalled,
+                firstin: 1
+            },
+        });
+    }
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
+
+    // 組件清單編輯
+    const [editlist, setEditlist] = useState<boolean>(false);
+    const [editlistindex, setEditlistindex] = useState<number>(0);
+    const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
+    const quantityRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+    // 組件編輯
+    const handleEdit = async (index: any, item: any) => {
+        if (editlist === true) {
+            myAlert.warning({ title: '獎金維護中，請先結束編輯狀態' })
+            return;
+        }
+        handleRowClick(item.id);
+        setOriginaleditlistdata(data);
+        setEditlist(!editlist);
+        setEditlistindex(index);
+    };
+
+    // 組件取消編輯
+    const handleCancel = async (index: any) => {
+        setEditlist(!editlist);
+        setData(originaleditlistdata);
+        setSelectedItemId('');
+    };
+
+    // 更新組件清單
+    const handleUpdate = (index: number, item: any) => {
+        myAlert.confirm({
+            title: '確定更新嗎?',
+            props: {
+                onOk: () => {
+                    UpdateWareHouse(item);
+
+                }
+            }
+        });
+    };
+
     return (
 
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList} />
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList}
+                customeLeft={[
+
+
+
+                ]} />
             <div>
                 <Thead01 type={'WareHouse'} />
-                <Tbody01 type={'WareHouse'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                {/* <Tbody01 type={'WareHouse'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} /> */}
+                <div>
+                    {/* {error && <p>Error: {error}</p>} */}
+                    {data && (
+                        data.map((_item: any, index: number) => (
+                            <CellWithBar key={index} className={scss.panelHeader}>
+                                <div
+                                    key={index}
+                                    className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                // onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+                                >
+                                    <span>
+                                        <button onClick={() => { handleEdit(index, _item) }}>
+                                            <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                            <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                            <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                    </span>
+                                    <span>{_item.whname}</span>
+                                    <span>{_item.type}</span>
+                                    <span>
+                                        <input
+                                            ref={noteRefs.current[index]}
+                                            style={{
+                                                backgroundColor: 'transparent',
+                                                borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                width: '100%'
+                                            }}
+                                            readOnly={!(editlist && editlistindex === index)}
+                                            type={editlist && editlistindex === index ? "text" : "text"}
+                                            value={editlist && editlistindex === index ? _item.note : _item.note}
+                                            onChange={(e) => {
+                                                const newData = [...data];
+                                                const newNote = e.target.value;
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    note: editlist ? newNote : newNote
+                                                };
+                                                setData(newData);
+                                            }}
+                                        />
+                                    </span>
+                                    <span style={{ color: '#14256a', fontWeight: 'bolder' }}>{_item.traycodetotal}</span>
+                                    {/* <span>{convertToYearMonthDay('Datea', _item.created_at)}</span> */}
+                                    {/* <span>{_item.create_by}</span> */}
+                                    <span>{_item.position}</span>
+                                    <span>{_item.update_by}</span>
+                                    {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
+                                    <span>{getTaiwanDateStr(_item.update_at)}</span>
+                                    <span>
+                                        <input
+                                            ref={urlRefs.current[index]}
+                                            style={{
+                                                backgroundColor: 'transparent',
+                                                borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                width: '100%'
+                                            }}
+                                            readOnly={!(editlist && editlistindex === index)}
+                                            type={editlist && editlistindex === index ? "text" : "text"}
+                                            value={editlist && editlistindex === index ? _item.url : _item.url}
+                                            onChange={(e) => {
+                                                const newData = [...data];
+                                                const newUrl = e.target.value;
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    url: editlist ? newUrl : newUrl
+                                                };
+                                                setData(newData);
+                                            }}
+                                        />
+                                    </span>
+                                    <span ><IconDetail onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)} /></span>
+                                    <span></span>
+                                </div>
+                            </CellWithBar>
+                        ))
+                    )}
+                </div>
+
             </div>
         </SubLayer>
     )
