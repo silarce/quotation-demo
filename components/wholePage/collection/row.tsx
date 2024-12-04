@@ -170,7 +170,13 @@ const Row = ({
         content: (
           <ExportToIncomeBill
             onConfirm={({ isoString, splitPayment: separatePayment }) =>
-              reqPatchIsImported(data_accountant.id, isoString, separatePayment)
+              reqPatchIsImported(
+                //
+                data_accountant.id,
+                isoString,
+                separatePayment,
+                data_accountant.currency !== 'TWD 新臺幣'
+              )
             }
             onCancel={modal.destroy}
             quota={quota}
