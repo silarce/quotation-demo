@@ -75,6 +75,8 @@ export const lookup_guideRailUnicode: {
   SJ302_60: '\uE011',
   // SJ-312
   SJ312_106_60t: '\uE014',
+  // SJ-305D
+  SJ305D_22: '\uE010',
 };
 
 export const findGuideRailUnicode = ({ guideRail }: { guideRail: string }) => {
