@@ -221,12 +221,12 @@ type Tworksheet = {
 
     setMotor_str: (props: {
       key:
-      | 'horsepower'
-      | 'vendor'
-      | 'electricMotorChainType'
-      | 'hasMotorSupportStand'
-      | 'motorLockBox'
-      | 'electricMotorDirection';
+        | 'horsepower'
+        | 'vendor'
+        | 'electricMotorChainType'
+        | 'hasMotorSupportStand'
+        | 'motorLockBox'
+        | 'electricMotorDirection';
       value: string;
     }) => void;
   };
@@ -1249,7 +1249,7 @@ const useWorksheet = create<Tworksheet>(
         getOptions_guideRail,
         getOptions_bottomBarAngleIronAndPlate,
         guideRail,
-        generalSpec
+        generalSpec,
       } = get();
 
       const isSpecialProd = getIsSpecialProd();
@@ -1339,7 +1339,7 @@ const useWorksheet = create<Tworksheet>(
       await update_generalSpec();
 
       if (!get().generalSpec) {
-        return
+        return;
       }
 
       set(
@@ -1595,10 +1595,10 @@ const useWorksheet = create<Tworksheet>(
         } catch (error) {
           const err = error as AxiosError<
             | {
-              error: string;
-              message: string;
-              statusCode: number;
-            }
+                error: string;
+                message: string;
+                statusCode: number;
+              }
             | undefined
           >;
 
@@ -1941,7 +1941,7 @@ const getOptions_bottomBarAngleIronAndPlate = (doorModelName: TdoorModel | undef
   if (doorModelName && doorModelName in lookup_options_bottomBarAngleIronAndPlate) {
     const { angleIron, plate } =
       lookup_options_bottomBarAngleIronAndPlate[
-      doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
+        doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
       ];
 
     return {
@@ -2025,8 +2025,8 @@ const getOptions_guideRail = ({
 const getOptions_doorModelInfo = (
   doorModelInfoList:
     | {
-      [key: string]: TdoorModelInfoDto;
-    }
+        [key: string]: TdoorModelInfoDto;
+      }
     | undefined
 ) => {
   const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
@@ -2400,14 +2400,16 @@ const takeGenerateDoorProductBom = ({
   const body_slat: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.slat,
     material: slat.material || '',
-    materialSurface: (reduceMaterialSurface(slat.surface) || null) as TmaterialSurface,
+    // materialSurface: (reduceMaterialSurface(slat.surface) || null) as TmaterialSurface,
+    materialSurface: (slat.surface || null) as TmaterialSurface,
     isPainted: false,
   };
 
   const body_guideRail: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.guideRail,
     material: guideRail.material || '',
-    materialSurface: (reduceMaterialSurface(guideRail.surface) || null) as TmaterialSurface,
+    // materialSurface: (reduceMaterialSurface(guideRail.surface) || null) as TmaterialSurface,
+    materialSurface: (guideRail.surface || null) as TmaterialSurface,
     isPainted: false,
     thickness: guideRail.guideRailThickness,
   };
@@ -2415,7 +2417,8 @@ const takeGenerateDoorProductBom = ({
   const body_headBox: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.headBox,
     material: headBox.material || '',
-    materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
+    // materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
+    materialSurface: (headBox.surface || null) as TmaterialSurface,
     isPainted: false,
   };
 
@@ -2425,6 +2428,7 @@ const takeGenerateDoorProductBom = ({
     // 在報價單的classProduct特別把bottomBar的表面拿掉，因此這邊做一樣的處理
     // 只是不知道是為什麼
     // materialSurface: (reduceMaterialSurface(bottomBar.surface) || null) as TmaterialSurface,
+    materialSurface: (bottomBar.surface || null) as TmaterialSurface,
     isPainted: false,
   };
 

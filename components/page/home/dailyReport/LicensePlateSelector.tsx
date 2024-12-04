@@ -85,4 +85,5 @@ const licensePlateArrOption = [
   { value: 'BJJ-3939', label: 'BJJ-3939' },
   { value: '3208-J9', label: '3208-J9' },
   { value: 'BGF-0950', label: 'BGF-0950' },
+  { value: 'ACQ-3939', label: 'ACQ-3939' },
 ] as const;
