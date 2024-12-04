@@ -1186,12 +1186,12 @@ const useModalQuotationPdf = ({
   emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
 }) => {
   const [visible, setVisible] = useState(false);
-  const [pdfData, setPdfData] = useState<TpdfData>();
+  // const [pdfData, setPdfData] = useState<TpdfData>();
   const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
-  useEffect(() => {
+  const pdfData = useMemo(() => {
     if (!quotationContent) {
-      return;
+      return undefined;
     }
 
     const {
@@ -1291,12 +1291,117 @@ const useModalQuotationPdf = ({
       checkIsSpecialDoor,
     });
 
-    setPdfData({ top, prodArr, bottom });
-  }, [
-    quotationContent,
-    emptySomeProperty,
-    // attachedProdArr
-  ]);
+    return { top, prodArr, bottom };
+  }, [quotationContent, emptySomeProperty]);
+
+  // useEffect(() => {
+  //   if (!quotationContent) {
+  //     return;
+  //   }
+
+  //   const {
+  //     quotationNumber,
+  //     quotationDate,
+  //     validityPeriod,
+  //     customer,
+  //     projectName,
+  //     county,
+  //     district,
+  //     address,
+  //     // contactPerson,
+  //     // contactNumber,
+  //     // faxNumber,
+  //     //
+  //     subTotal,
+  //     salesTax,
+  //     total,
+  //     deliveryLocation,
+  //     deliveryDate,
+  //     paymentMethods,
+  //     annotations,
+  //     quotationRanges,
+  //     agentEmployee,
+  //     products,
+  //     others,
+  //   } = quotationContent;
+
+  //   let {
+  //     // customerName,
+  //     contactPerson,
+  //     contactNumber,
+  //     faxNumber,
+  //   } = quotationContent;
+
+  //   let customerName = customer?.name ?? '';
+
+  //   if (emptySomeProperty) {
+  //     customerName = '';
+  //     contactPerson = '';
+  //     contactNumber = '';
+  //     faxNumber = '';
+  //   }
+
+  //   const projectWholeAddress = `${county}${district}${address}`;
+
+  //   const top: Ttop = {
+  //     contactPerson,
+  //     customerName: customerName,
+  //     contactNumber,
+  //     faxNumber,
+
+  //     quotationNumber,
+  //     validityPeriod,
+  //     quotationDate: getTaiwanDateStr(quotationDate, { withUnit: true }) ?? '',
+
+  //     projectName,
+  //     projectWholeAddress,
+  //   };
+
+  //   const paymentMethodsArr = paymentMethods.map((pm) => {
+  //     let value: string | number = new Decimal(pm.totalPaymentRatio || 0).toNumber();
+  //     value = value ? String(value) : '';
+
+  //     return {
+  //       label: pm.milestone,
+  //       value: value,
+  //     };
+  //   });
+
+  //   const bottom: Tbottom = {
+  //     subTotal: subTotal.toLocaleString(),
+  //     tax: salesTax.toLocaleString(),
+  //     total: total.toLocaleString(),
+  //     total_chinese: changeNumberMoneyToChinese(total),
+
+  //     deliveryLocation,
+  //     deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
+  //     paymentMethods: paymentMethodsArr,
+  //     notesArr: annotations ?? [],
+  //     qrArr: quotationRanges ?? [],
+  //     agentName: agentEmployee?.chName ?? '',
+  //     //
+  //     subTotal_num: subTotal,
+  //     tax_num: salesTax,
+  //     total_num: total,
+  //   };
+  //   // attachedProdArr
+
+  //   let quotationProductArr = attachedProdArr || products;
+
+  //   quotationProductArr = _.sortBy(quotationProductArr, 'order');
+
+  //   const prodArr = quotationProdAndOther_ToProdArr({
+  //     quotationProductArr: quotationProductArr,
+  //     quotationOtherArr: others ?? [],
+  //     checkIsSpecialDoor,
+  //   });
+
+  //   setPdfData({ top, prodArr, bottom });
+  // }, [
+  //   quotationContent,
+  //   emptySomeProperty,
+  //   // attachedProdArr
+  // ]);
 
   return {
     visible,
