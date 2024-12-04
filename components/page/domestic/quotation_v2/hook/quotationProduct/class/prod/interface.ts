@@ -67,6 +67,8 @@ interface Interface_ClassProd_base {
 
   readonly state: TstateProd;
   nodeConfig: TnodeConfig;
+
+  isFetching: boolean;
   //
   //
   readonly id: string | null | undefined;

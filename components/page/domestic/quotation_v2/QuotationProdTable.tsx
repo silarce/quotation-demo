@@ -14,7 +14,7 @@ import {
 } from 'components/page/domestic/quotation_v2/quotationRow';
 
 // antd
-import { Tabs } from 'antd';
+import { Tabs, Spin } from 'antd';
 
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
@@ -52,6 +52,8 @@ interface TtableProps {
 export default function QuotationProdTable(tableProps: Tprops) {
   const { instance_useQuotationProductInstance, disabled, className } = tableProps;
 
+  const activedProd = instance_useQuotationProductInstance.activedProd;
+
   // MARK:RENDER
   return (
     <div className={className}>
@@ -59,22 +61,33 @@ export default function QuotationProdTable(tableProps: Tprops) {
       <Table_prod instance_useQuotationProductInstance={instance_useQuotationProductInstance} disabled={disabled} />
       <br />
 
-      <Tabs>
+      <Spin spinning={activedProd?.isFetching}>
+        <Table_component
+          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+          disabled={disabled}
+        />
+      </Spin>
+      <br />
+      <Spin spinning={activedProd?.isFetching}>
+        <Table_accessory
+          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+          disabled={disabled}
+        />
+      </Spin>
+      {/* <Tabs>
         <Tabs.TabPane tab="材料配件" key="1">
-          {/* 材料配件 component */}
           <Table_component
             instance_useQuotationProductInstance={instance_useQuotationProductInstance}
             disabled={disabled}
           />
         </Tabs.TabPane>
         <Tabs.TabPane tab="選配設定" key="2">
-          {/* 選配設定 */}
           <Table_accessory
             instance_useQuotationProductInstance={instance_useQuotationProductInstance}
             disabled={disabled}
           />
         </Tabs.TabPane>
-      </Tabs>
+      </Tabs> */}
     </div>
   );
 }
@@ -134,6 +147,7 @@ const Table_prod = ({
     //
     quotationDiscount,
     setQuotationDiscount,
+    //
   } = instance_useQuotationProductInstance;
 
   return (
@@ -212,53 +226,55 @@ const Table_prod = ({
             );
 
             return (
-              <QuotationRow_dnd_memo
-                //
-                rerenderTrigger01={classProd.state}
-                rerenderTrigger02={disabled}
-                rerenderTrigger03={cellKeyArr}
-                //
-                key={prodKey}
-                id={prodKey}
-                index={index}
-                //
-                isActive={isActive}
-                left={left}
-                //
-                onDragStart={(e) => {
-                  choseActiveProd(undefined);
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  choseActiveProd(classProd.state);
+              <Spin key={prodKey} spinning={classProd.isFetching}>
+                <QuotationRow_dnd_memo
+                  //
+                  rerenderTrigger01={classProd.state}
+                  rerenderTrigger02={disabled}
+                  rerenderTrigger03={cellKeyArr}
+                  //
+                  key={prodKey}
+                  id={prodKey}
+                  index={index}
+                  //
+                  isActive={isActive}
+                  left={left}
+                  //
+                  onDragStart={(e) => {
+                    choseActiveProd(undefined);
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    choseActiveProd(classProd.state);
 
-                  // if (!isActive) {
-                  //   choseActiveProd(classProd.state);
+                    // if (!isActive) {
+                    //   choseActiveProd(classProd.state);
 
-                  //   const handler = () => {
-                  //     choseActiveProd(undefined);
-                  //     window?.removeEventListener('click', handler);
-                  //   };
+                    //   const handler = () => {
+                    //     choseActiveProd(undefined);
+                    //     window?.removeEventListener('click', handler);
+                    //   };
 
-                  //   window?.addEventListener('click', handler);
-                  // }
-                }}
-              >
-                {cellKeyArr.map((cellKey, cIndex) => {
-                  const { style, className, createNode } = classProd.nodeConfig[cellKey];
+                    //   window?.addEventListener('click', handler);
+                    // }
+                  }}
+                >
+                  {cellKeyArr.map((cellKey, cIndex) => {
+                    const { style, className, createNode } = classProd.nodeConfig[cellKey];
 
-                  const node = createNode({
-                    disabled,
-                    classProd,
-                  });
+                    const node = createNode({
+                      disabled,
+                      classProd,
+                    });
 
-                  return (
-                    <Cell key={cellKey} className={classNames(className)} style={style}>
-                      {node}
-                    </Cell>
-                  );
-                })}
-              </QuotationRow_dnd_memo>
+                    return (
+                      <Cell key={cellKey} className={classNames(className)} style={style}>
+                        {node}
+                      </Cell>
+                    );
+                  })}
+                </QuotationRow_dnd_memo>
+              </Spin>
             );
           })}
         </Table_dnd>

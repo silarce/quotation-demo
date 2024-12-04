@@ -160,10 +160,15 @@ class ClassProd_base implements Interface_ClassProd_base {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
+  get isFetching() {
+    return !!this.state.isFetching;
+  }
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
   // region 輸出
+
   get key() {
     return this.state.key;
   }
@@ -515,14 +520,17 @@ class ClassProd_base implements Interface_ClassProd_base {
 
   // MARK:init
   async init() {
+    this.state.isFetching = true;
+    this.render();
+
     const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+    this.state.isFetching = false;
     this.state.generalSpecs = generalSpecs;
     this.render();
   }
 
   // MARK:updateGeneralSpec
   protected async updateGeneralSpec() {
-    // await reqGetProdCalcGeneralSpec(this).then((res) => (this.state.generalSpecs = res));
     const generalSpecs = await reqGetProdCalcGeneralSpec(this);
     this.state.generalSpecs = generalSpecs;
 
@@ -767,7 +775,11 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   doorModel: TdoorModel = 'SJ-302';
 
   async afterFullWidthChange() {
-    this.updateGeneralSpec();
+    this.state.isFetching = true;
+    this.render();
+
+    await this.updateGeneralSpec();
+    this.state.isFetching = false;
     this.render();
 
     return this;

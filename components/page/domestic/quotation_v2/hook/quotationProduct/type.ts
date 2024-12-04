@@ -316,6 +316,8 @@ interface TstateProd {
   generalSpecs: TdoorGeneralSpecsDto | undefined | null;
   // availableComponents: TdoorComponentListDto | undefined | null;
   // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
+  //
+  isFetching?: boolean;
 }
 
 interface TstateProdDict {
