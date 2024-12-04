@@ -114,6 +114,13 @@ type TreqPostPatchIsImported = (
   isForeign: boolean
 ) => Promise<void>;
 
+type TreqPostAccountReceivableAccountant = (props: {
+  accountReceivableId: string;
+  accountant: TaccountantDto;
+  incomeBillDate: string;
+  splitPayment: number;
+}) => Promise<void>;
+
 type TreqDelete = (id: string) => Promise<void>;
 
 export type {
@@ -325,14 +332,13 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   };
 
   // 匯入發票
-  const reqPostAccountReceivableAccountant: TreqPostPatchIsImported = async (
-    //
+  const reqPostAccountReceivableAccountant: TreqPostAccountReceivableAccountant = async ({
     accountReceivableId,
+    accountant,
     incomeBillDate,
     splitPayment,
-    isForeign
-  ) => {
-    if (!accountantWillImport) {
+  }) => {
+    if (!accountant) {
       alert('accountantId為undefined');
 
       return;
@@ -341,10 +347,10 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     try {
       // apiPostAccountReceivableAccountant 最後的單字是Accountant不是Accounts
       await apiPostAccountReceivableAccountant(accountReceivableId, {
-        accountantId: [accountantWillImport.id],
+        accountantId: [accountant.id],
         incomeBillDate,
         splitPayment: splitPayment,
-        isForeign,
+        isForeign: accountant.currency !== 'TWD 新臺幣',
       });
       await update_accountant();
     } catch (error) {
@@ -372,13 +378,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       content: (
         <ExportToIncomeBill
           onConfirm={({ isoString, splitPayment }) =>
-            reqPostAccountReceivableAccountant(
-              //
+            reqPostAccountReceivableAccountant({
               accountReceivableId,
-              isoString,
+              accountant: accountantWillImport,
+              incomeBillDate: isoString,
               splitPayment,
-              accountantWillImport.currency !== 'TWD 新臺幣'
-            )
+            })
           }
           onCancel={modal.destroy}
           quota={quota}
