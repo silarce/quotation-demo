@@ -925,6 +925,7 @@ export default function AddPurchaseRequisition() {
         setStatus("未儲存");
         setNote("")
         setData2([]);
+        setCreate_byin(userInfo?.employee?.chName as string);
     }
 
 

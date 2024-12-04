@@ -123,6 +123,11 @@ export default function SidePathAccountingDepartment() {
                             path: path + '/bonusPayout',
                             erpFeature: [accountingDepartment],
                         },
+                        {
+                            label: '年終獎金維護',
+                            path: path + '/yearEndBonusMaintenance',
+                            erpFeature: [accountingDepartment],
+                        },
                     ],
                 },
                 // {

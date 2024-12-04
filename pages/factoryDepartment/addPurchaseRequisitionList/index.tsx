@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './addPurchaseRequisition.module.scss';
+import scss from './addPurchaseRequisitionList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -47,7 +47,7 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function AddPurchaseRequisition() {
+export default function AddPurchaseRequisitionList() {
 
     //路由參數
     const router = useRouter();
@@ -315,7 +315,7 @@ export default function AddPurchaseRequisition() {
         try {
             //  console.log(userInfo);
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
                 // keyword: "search" as string | undefined,
             };
 
@@ -1150,6 +1150,35 @@ export default function AddPurchaseRequisition() {
         })
     };
 
+    const handleAddDetail = () => {
+        const emptyDetail = {
+            purchaserequisitiondetailuuid: "",
+            productuuid: "",
+            productid: "",
+            quantity: 0,
+            totalprice: 0,
+            note: "",
+            purchaserequisitionid: "",
+            unitprice: 0,
+            purchaserequisitionuuid: "",
+            name: "",
+            spec: "",
+            unit: "",
+            suppliername: null,
+            deliverydate: null,
+            status: null,
+            quotereqdetailuuid: null,
+            suppliertaxid: null,
+            supplieraddress: null,
+            supplierphone: null,
+            suppliercontact: null,
+            supplierfax: null
+        };
+
+        // 將空資料新增進陣列
+        setData2((prevData) => [...prevData, emptyDetail]);
+
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
@@ -1159,7 +1188,7 @@ export default function AddPurchaseRequisition() {
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        {/* <div className={scss.head_head1}>
                             <div>
                                 <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -1167,10 +1196,6 @@ export default function AddPurchaseRequisition() {
                                 </button>
                             </div>
                             <div>
-                                {/* <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
-                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button> */}
                                 <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPR() }} title="新增單據">
                                     <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
                                     新增
@@ -1212,43 +1237,41 @@ export default function AddPurchaseRequisition() {
                                     送出
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.head_content1}>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="請購單號"
+                                            captionStyle={{fontSize:'20px'}}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
                                                     value: purchaserequisitionid || ' ',
                                                 },
                                             }}
-                                        />
-
-                                    </div>
-                                    <div>
+                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="請購日期"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
                                                     value: getTaiwanDateStr(create_atin || '') || '',
                                                 },
                                             }}
-                                        />
 
-                                    </div>
-                                    <div>
+                                        />
                                         <InputSel
                                             caption="需用日期"
                                             className="global_tip_must"
                                             // disabled={status === "未儲存" ? false : true}
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                            // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
                                             datePickerProps={{
                                                 props: {
                                                     value: need_date ? moment(need_date) : null,
@@ -1256,9 +1279,12 @@ export default function AddPurchaseRequisition() {
                                                 },
                                             }}
                                         />
+
                                     </div>
+                                    <div></div>
+                                    <div></div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="製單人員"
                                             disabled={true}
@@ -1267,7 +1293,7 @@ export default function AddPurchaseRequisition() {
                                                     value: create_byin,
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                                 <div className={scss.head_content2}>
@@ -1275,10 +1301,11 @@ export default function AddPurchaseRequisition() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註"
-                                            disabled={status === "未儲存" ? false : true}
+                                            captionStyle={{ fontSize: '18px' }}
+                                            disabled={false}
                                             inputProps={{
                                                 props: {
-                                                    value: note || ' ',
+                                                    value: note,
                                                     onChange: (e) => { setNote(e.target.value) }
                                                 },
                                             }}
@@ -1287,17 +1314,6 @@ export default function AddPurchaseRequisition() {
                                     <div></div>
                                     <div></div>
                                 </div>
-                                <div className={scss.head_content3}>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.head_foot1}>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-
                             </div>
                             <div>
                                 <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
@@ -1326,14 +1342,44 @@ export default function AddPurchaseRequisition() {
                                 </div>
                             </div>
                         </div>
-                        <div className={scss.head_foot2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                        <div
+                            style={{ paddingBottom: '18px' }}
+                        >
+                            <span
+                                style={{
+                                    height: '50px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    justifyContent: 'center', // 水平置中
+                                    alignItems: 'center',     // 垂直置中
+                                    fontSize: '18px'
+                                }}
+                            >
+                                請購項目
+                            </span>
                         </div>
+                        <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                            <button onClick={() => { handleAddDetail() }} style={{fontSize:'18px'}} >
+                                <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                                新增品項
+                            </button>
+                        </span>
                         <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                            <Thead01 type={'AddPR_ReqList'} />
+                            {/* <Thead01 type={'AddPR_ReqList'} /> */}
+                            <div className={scss.thead20}>
+                                <span>
+
+                                </span>
+                                <span>序</span>
+                                <span>料號</span>
+                                <span>品名</span>
+                                <span>規格</span>
+                                <span>數量</span>
+                                <span>單位</span>
+                                <span>備註(用途說明)</span>
+                                <span></span>
+                                <span></span>
+                            </div>
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
@@ -1356,25 +1402,24 @@ export default function AddPurchaseRequisition() {
                                             <input
                                                 ref={nameRefs.current[index]}
                                                 // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%',borderBottom:'1px solid black' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
-                                                readOnly
+                                                // readOnly
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
                                                 }}
                                             />
                                         </span>
-                                        {/* <span>{_item.spec}</span> */}
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', width: '95%',borderBottom:'1px solid black' }}
                                                 type="text"
                                                 value={_item.spec !== undefined ? _item.spec : ''}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                // readOnly
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
                                                 }}
@@ -1426,6 +1471,7 @@ export default function AddPurchaseRequisition() {
                                     </div>
                                 </CellWithBar>
                             ))}
+
 
 
                             <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
@@ -1512,8 +1558,6 @@ export default function AddPurchaseRequisition() {
 
                         <div className={scss.body_foot1}>
                             <div>
-                                {/* (1).可自行輸入請購項目。<br />
-                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
                                 {filteredData.length > 0 && (
                                     <ul ref={dropdownRef}
                                         style={{
@@ -1564,12 +1608,6 @@ export default function AddPurchaseRequisition() {
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-
 
                 <DragableModal
                     handleText="品項查詢"
