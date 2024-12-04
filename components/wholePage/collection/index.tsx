@@ -110,7 +110,8 @@ type TreqPostPatchIsImported = (
   //
   accountantId: string,
   incomeBillDate: string,
-  splitPayment: number
+  splitPayment: number,
+  isForeign: boolean
 ) => Promise<void>;
 
 type TreqDelete = (id: string) => Promise<void>;
@@ -297,7 +298,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     //
     accountantId,
     incomeBillDate,
-    splitPayment
+    splitPayment,
+    isForeign
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -309,6 +311,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       accountantId: [accountantId],
       incomeBillDate,
       splitPayment,
+      isForeign,
     };
 
     // apiPostAccountReceivableAccounts 最後的單字是Accounts不是Accountant
@@ -326,7 +329,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     //
     accountReceivableId,
     incomeBillDate,
-    splitPayment
+    splitPayment,
+    isForeign
   ) => {
     if (!accountantWillImport) {
       alert('accountantId為undefined');
@@ -340,6 +344,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         accountantId: [accountantWillImport.id],
         incomeBillDate,
         splitPayment: splitPayment,
+        isForeign,
       });
       await update_accountant();
     } catch (error) {
@@ -367,7 +372,13 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       content: (
         <ExportToIncomeBill
           onConfirm={({ isoString, splitPayment }) =>
-            reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)
+            reqPostAccountReceivableAccountant(
+              //
+              accountReceivableId,
+              isoString,
+              splitPayment,
+              accountantWillImport.currency !== 'TWD 新臺幣'
+            )
           }
           onCancel={modal.destroy}
           quota={quota}
