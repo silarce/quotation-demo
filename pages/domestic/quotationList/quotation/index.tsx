@@ -2374,7 +2374,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //
         tagList={tagList}
         customeLeft={customeLeft}
-        customeRight={customeRight}
+        customeRight={disabled ? customeRight : undefined}
         panelList={panelList}
       />
 
