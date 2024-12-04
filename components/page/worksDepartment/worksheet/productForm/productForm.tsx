@@ -1530,7 +1530,7 @@ const Table_bottomBar = () => {
       <div className={scss.cell}>{guideRail.guideRailsOpening}</div>
 
       <div className={scss.cell}>表面</div>
-      <div className={scss.cell}>{guideRail.surface}</div>
+      <div className={scss.cell}>{bottomBar.surface}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>
