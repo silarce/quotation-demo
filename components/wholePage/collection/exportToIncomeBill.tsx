@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Moment } from 'moment';
 
 // gaer
@@ -10,7 +10,7 @@ import scss from './exportToIncomeBill.module.scss';
 
 // ============================================================================
 
-type TonConfirm = (params: { isoString: string; splitPayment: number }) => Promise<void>;
+type TonConfirm = (params: { isoString: string; splitPayment: number; isForeign: boolean }) => Promise<void>;
 
 // ============================================================================
 
@@ -30,6 +30,7 @@ const ExportToIncomeBill = ({
 }) => {
   const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
   const [state_splitPayment, setState_splitPayment] = useState<number>(quota);
+  const [isForeign, setIsForeign] = useState<boolean>(false);
 
   const handle_onConfirm = async () => {
     if (!state_incomeBillDate) {
@@ -47,9 +48,14 @@ const ExportToIncomeBill = ({
     await onConfirm({
       isoString: state_incomeBillDate.toISOString(),
       splitPayment: state_splitPayment,
+      isForeign,
     });
     onCancel();
   };
+
+  useEffect(() => {
+    currency !== 'TWD' && setIsForeign(true);
+  }, []);
 
   return (
     <div className="w-[300px]">
@@ -81,6 +87,28 @@ const ExportToIncomeBill = ({
               setState_splitPayment(Number(e.target.value));
             },
           },
+        }}
+      />
+
+      <InputSel
+        className="mt-3"
+        radioProps={{
+          props: {
+            value: isForeign,
+            onChange(e) {
+              setIsForeign(e.target.value);
+            },
+          },
+          radioPropsArr: [
+            {
+              value: false,
+              children: '國內收入',
+            },
+            {
+              value: true,
+              children: '國外收入',
+            },
+          ],
         }}
       />
 

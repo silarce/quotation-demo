@@ -21,3 +21,90 @@
     color: #979797;
   }
 }
+
+div.panelHeader {
+  // padding: 17px 30px;
+  border-bottom: solid 1px $colorBorder01;
+
+  //   background-color: rgb(245, 104, 69);
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    height:80px;
+    display: grid;
+    grid-template-columns: 100px 100px 100px 400px 100px 100px 100px 100px 150px 100px;
+    gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 30px 30px;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
+  }
+}
+
+.longsquarebtn {
+  height: 39px;
+  width: 139px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+      border: solid 1px #c1c1c1;
+      background-color: #c1c1c17c
+  }
+
+  &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
+  }
+}
+
+.longredsquarebtn {
+  height: 39px;
+  width: 139px;
+  // padding: 0px 40px;
+  border: solid 1px #ea1833;
+  ;
+  background-color: $bgc01;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ea1833;
+  ;
+  transform: translateY(2px);
+
+  &:hover {
+      border: solid 1px #ea1833;
+      background-color: #ea18341d
+  }
+
+  &:focus {
+      background-color: $bgc01;
+      border: solid 1px #ea1833;
+  }
+}

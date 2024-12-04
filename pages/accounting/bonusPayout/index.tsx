@@ -48,6 +48,7 @@ export default function BonusPayout() {
     const {
         year = thisYear.toString(),
         month = thisMonth.toString(),
+        bonustype,
         viewtype
     } = router.query;
     //#endregion
@@ -73,7 +74,8 @@ export default function BonusPayout() {
     const [serial_uuid, setSerial_uuid] = useState<string>("");
     const [status, setStatus] = useState<string>("");
     const [currenindex, setCurrentIndex] = useState<number>(0);
-    const [bonustype, setBonusType] = useState<string>("選擇獎金種類");
+    const [bonustypein, setBonusType] = useState<string>(bonustype as string || "選擇獎金種類");
+
 
     //手key輸入
 
@@ -101,7 +103,7 @@ export default function BonusPayout() {
             // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
             GetSalaryBonusCategory();
             GetReviewFlow();
-            GetBonusLedgerByDate(bonustype);
+            GetBonusLedgerByDate(bonustypein);
             hasFetchedData.current = true;
         }
     }, []);
@@ -128,7 +130,8 @@ export default function BonusPayout() {
     useEffect(() => {
         setData([]);
         // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
-    }, [year, month]);
+        GetBonusLedgerByDate(bonustypein);
+    }, [year, bonustype, bonustypein]);
 
 
     //#endregion
@@ -235,15 +238,21 @@ export default function BonusPayout() {
             const responsedata = await response.json();
             console.log('原始資料:', responsedata);
 
-            setStatus(responsedata[0].status);
+            // setStatus(responsedata[0].status);
             // 統一結構
-            let normalizedData = normalizeData(responsedata);
+            let normalizedData = normalizeData(responsedata, "Get");
 
             normalizedData = normalizedData.sort((a: any, b: any) => {
                 const aIdNumber = a.employee.id_number ? a.employee.id_number || '' : '';
                 const bIdNumber = b.employee.id_number ? b.employee.id_number || '' : '';
                 return aIdNumber.localeCompare(bIdNumber);
             });
+
+            console.log(normalizedData);
+            setSerial_id(normalizedData[0]?.serial_id);
+            setSerial_uuid(normalizedData[0]?.serial_uuid);
+            setStatus(`${normalizedData[0]?.status || ''}`);
+            // console.log(item);
             setData(normalizedData);
 
         } catch (error: any) {
@@ -256,7 +265,7 @@ export default function BonusPayout() {
 
 
     const GenerateBonus = async () => {
-        if (bonustype === '') {
+        if (bonustypein === '') {
             myAlert.warning({ title: '請選擇獎金種類' });
             return;
         }
@@ -266,7 +275,7 @@ export default function BonusPayout() {
             const conditionModel = {
                 // date: year + '-' + month,
                 // type: '編輯中'
-                bonus_category: bonustype
+                bonus_category: bonustypein
             };
 
             const inputModel = {
@@ -306,7 +315,7 @@ export default function BonusPayout() {
             handleData(responsedata);
             console.log(responsedata);
             console.log(responsedata.length);
-            SettleBonusLedger(responsedata);
+            // SettleBonusLedger(handleData(responsedata));
 
 
         } catch (error: any) {
@@ -317,7 +326,7 @@ export default function BonusPayout() {
     };
 
     const SettleBonusLedger = async (resdata: any) => {
-        if (bonustype === '') {
+        if (bonustypein === '') {
             myAlert.warning({ title: '請選擇獎金種類' });
             return;
         }
@@ -328,7 +337,8 @@ export default function BonusPayout() {
                 date: year + '-' + month,
                 // type: '編輯中'
                 data: resdata,
-                bonus_name: bonustype
+                bonus_name: bonustypein,
+                serial_id: year.toString() + month.toString(),
             };
 
             const inputModel = {
@@ -585,13 +595,13 @@ export default function BonusPayout() {
                 // return;
                 const review_query = {
                     year: year,
-                    month: month,
+                    bonustype: bonustypein
                 };
 
                 const conditionModel = {
                     document_id: serial_id,
                     document_uuid: serial_uuid,
-                    document_type: "薪資帳簿",
+                    document_type: "獎金",
                     review_id: review_flow,
                     query: review_query,
                     user_id: userInfo?.employee?.id.toString(),
@@ -791,19 +801,22 @@ export default function BonusPayout() {
     const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
     const quantityRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     // 組件編輯
-    const handleEdit = async (index: any) => {
+    const handleEdit = async (index: any, item: any) => {
         if (editlist === true) {
             myAlert.warning({ title: '獎金維護中，請先結束編輯狀態' })
             return;
         }
+        handleRowClick(item.id);
         setOriginaleditlistdata(data);
         setEditlist(!editlist);
         setEditlistindex(index);
+
     };
     // 組件取消編輯
     const handleCancel = async (index: any) => {
         setEditlist(!editlist);
         setData(originaleditlistdata);
+        setSelectedItemId('');
     };
 
     // 從組件清單移除
@@ -955,7 +968,7 @@ export default function BonusPayout() {
 
     //確認結算
     const handleeditconfirm = () => {
-        setDocumenttitle(`【薪資單】【${parseFloat(year.toString()) - 1911}年${month}月份_薪資單】_${userInfo?.employee?.chName.toString()}`)
+        setDocumenttitle(`【${bonustypein}】【${parseFloat(year.toString()) - 1911}年】_${userInfo?.employee?.chName.toString()}`)
         sentToReview("送審");
     }
 
@@ -1036,7 +1049,7 @@ export default function BonusPayout() {
     };
 
 
-    const normalizeData = (data: any[]) => {
+    const normalizeData = (data: any[], type: any) => {
         return data.map((item) => {
             // 檢查 employee 欄位是否為字串，如果是字串則解析
             const employeeData = typeof item.employee === "string"
@@ -1044,28 +1057,85 @@ export default function BonusPayout() {
                 : item.employee;
 
             return {
-                id: item.id,
-                bonusName: item.bonus_name || item.item_name || "無名稱",
                 bonus: item.bonus,
-                note: item.note,
-                seniority: item.seniority || 0,
+                bonus_name: item.bonus_name || item.item_name || "無名稱",
+                create_at: item.create_at,
+                create_by: item.create_by,
+                date: item.date,
                 employee: {
                     id: employeeData?.id || "",
                     id_number: employeeData?.id_number || "未知",
                     ch_name: employeeData?.ch_name || "未知",
                     start_date: employeeData?.start_date || "",
-                    name: employeeData?.name || "",
+                    name: employeeData?.department_name || "",
                 },
+                employee_id: item.employee_id,
+                id: item.id,
+                note: item.note,
+                serial_id: item.serial_id,
+                serial_uuid: item.serial_uuid,
+                status: item.status,
+                update_at: item.update_at,
+                update_by: item.update_by,
+                seniority: type === "Get" ? item.seniority : employeeData?.seniority || "",
+                // seniority: calculateSeniority(employeeData?.start_date) || 0
+
             };
         });
     };
 
 
     const handleData = (apiResponse: any[]) => {
-        const normalizedData = normalizeData(apiResponse);
+        const normalizedData = normalizeData(apiResponse, "Generate");
         setData(normalizedData);
         console.log(normalizedData);
+        SettleBonusLedger(normalizedData);
     };
+
+
+    const calculateSeniority = (startDate: string | null): string => {
+        // 確保 startDate 不為 null
+        if (!startDate) {
+            return "未提供日期"; // 或其他適合的回傳值
+        }
+
+        const start = new Date(startDate); // 將 start_date 字串轉換為 Date
+        if (isNaN(start.getTime())) {
+            return "無效日期格式"; // 若無效日期，返回提示
+        }
+
+        const now = new Date(); // 當前日期
+
+        // 獲取時間戳（毫秒）
+        const diffInMs = now.getTime() - start.getTime();
+
+        // 轉換為年月日
+        const diffInYears = diffInMs / (1000 * 60 * 60 * 24 * 365.25); // 一年的毫秒數（考慮閏年）
+        const years = Math.floor(diffInYears); // 年數
+        const months = Math.floor((diffInYears - years) * 12); // 剩餘的月數
+
+        if (years >= 1) {
+            // 超過一年
+            return `${years}.${Math.round((months / 12) * 10)}年`;
+        } else if (months >= 1) {
+            // 少於一年，但超過一個月
+            return `${months}.${Math.round(((diffInYears - years - months / 12) * 30) / 3)}月`;
+        } else {
+            // 少於一個月，直接計算天數並轉換為月數
+            const days = diffInMs / (1000 * 60 * 60 * 24); // 總天數
+            const fractionalMonths = days / 30; // 將天數轉換為月數
+            return `${fractionalMonths.toFixed(1)}月`;
+        }
+    };
+
+
+
+
+    // 測試
+    // const startDate = "2023-11-27T02:26:34.221Z";
+    // console.log(calculateSeniority(startDate)); // 結果: 0.1年（假設今天為 2024-12-02）
+
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1073,8 +1143,8 @@ export default function BonusPayout() {
             <PageHeader02 tag={'獎金發放作業'} panelList={undefined}
                 customeRight={
                     [
-                        <span>
-                            <span style={{ display: `${(data.length <= 0) ? '' : 'none'}` }}>
+                        <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
+                            <span style={{ display: `${(data.length <= 0 && bonustypein !== '選擇獎金種類') ? '' : 'none'}` }}>
                                 <button className={scss.longsquarebtn}
                                     onClick={() => {
                                         // GenerateSalary();
@@ -1153,25 +1223,27 @@ export default function BonusPayout() {
 
                             <div style={{ position: 'relative', width: '250px' }}>
                                 <select
+                                    value={bonustypein} // 綁定到狀態
+                                    disabled={viewtype === 'review'}
                                     onChange={(e) => {
                                         const selectedBonusType = e.target.value;
                                         console.log("選擇的獎金種類:", selectedBonusType);
                                         setBonusType(selectedBonusType);
-                                        GetBonusLedgerByDate(selectedBonusType);
+                                        // 這裡是處理你需要的邏輯
                                     }}
                                     style={{
                                         width: '100%',
                                         border: '1px solid #c1c1c1',
                                         backgroundColor: '#F5F5F5',
-                                        padding: '6px 20px',
+                                        padding: '7px 20px',
                                         color: '#14256a',
                                         fontSize: '16px',
-                                        appearance: 'none', // 隱藏原生箭頭
+                                        appearance: 'none',
                                         cursor: 'pointer',
-                                        outline: 'none', // 移除選中時的外框
+                                        outline: 'none',
                                     }}
                                 >
-                                    <option value="" disabled selected>
+                                    <option value="">
                                         選擇獎金種類
                                     </option>
                                     {bonustypedata.map((bonusType: string, index: number) => (
@@ -1180,6 +1252,7 @@ export default function BonusPayout() {
                                         </option>
                                     ))}
                                 </select>
+
                                 {/* 自訂 "V" 形箭頭 */}
                                 <div
                                     style={{
@@ -1210,10 +1283,10 @@ export default function BonusPayout() {
                         {bonustype} */}
                         <span style={{ padding: '0px 10px', fontSize: '16px', color: '#14256a' }}>
                             {status}<br />
-                            發放人數：{data.length}人
+                            發放人數：{data.length}
                         </span>
                         <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
-
+                            {/* {bonustypein} */}
                         </span>
                     </div>
 
@@ -1242,12 +1315,13 @@ export default function BonusPayout() {
                             {data && (
                                 data.map((_item, index) => (
                                     <CellWithBar key={index} className={scss.panelHeader1}>
-                                        <div className={scss.row01}>
+                                        <div
+                                            className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}>
                                             <span>
                                                 {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                         <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                     </button> */}
-                                                <button onClick={() => { handleEdit(index) }}>
+                                                <button onClick={() => { handleEdit(index, _item) }} style={{ display: `${(status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
                                                     <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
                                                 </button>
                                                 <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
