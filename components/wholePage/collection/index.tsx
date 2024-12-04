@@ -318,7 +318,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       accountantId: [accountantId],
       incomeBillDate,
       splitPayment,
-      isForeign,
+      // isForeign,
     };
 
     // apiPostAccountReceivableAccounts 最後的單字是Accounts不是Accountant
@@ -350,7 +350,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         accountantId: [accountant.id],
         incomeBillDate,
         splitPayment: splitPayment,
-        isForeign: accountant.currency !== 'TWD 新臺幣',
+        // isForeign: accountant.currency !== 'TWD 新臺幣',
       });
       await update_accountant();
     } catch (error) {
