@@ -446,7 +446,36 @@ export default function TrayList() {
                 customeLeft={
                     [
                         <>
-                            <div>
+
+
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span style={{ padding: '0px 10px' }}>
+                                    {/* <button className={scss.longsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            alert("入庫");
+                                        }}
+                                        title="">
+                                        入庫
+                                    </button> */}
+                                </span>
+                                <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
+                                {/* <button className={scss.longsquarebtn}
+                                        onClick={() => {
+                                            // SettlePayroll();
+
+                                            alert("出庫");
+                                        }}
+                                        title="">
+                                        出庫
+                                    </button> */}
+                                </span>
+                            </div>
+
+
+
+                            {/* <div>
                                 {!isLeftHidden && (
                                     <div>
                                         <button onClick={() => setLeftCount3(leftcount3 + 1)}>
@@ -473,7 +502,7 @@ export default function TrayList() {
                                         }}>關閉</button>
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
 
                         </>
                     ]}
