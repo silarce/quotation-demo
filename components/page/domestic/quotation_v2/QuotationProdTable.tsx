@@ -61,14 +61,14 @@ export default function QuotationProdTable(tableProps: Tprops) {
       <Table_prod instance_useQuotationProductInstance={instance_useQuotationProductInstance} disabled={disabled} />
       <br />
 
-      <Spin spinning={activedProd?.isFetching}>
+      <Spin spinning={!!activedProd?.isFetching}>
         <Table_component
           instance_useQuotationProductInstance={instance_useQuotationProductInstance}
           disabled={disabled}
         />
       </Spin>
       <br />
-      <Spin spinning={activedProd?.isFetching}>
+      <Spin spinning={!!activedProd?.isFetching}>
         <Table_accessory
           instance_useQuotationProductInstance={instance_useQuotationProductInstance}
           disabled={disabled}
