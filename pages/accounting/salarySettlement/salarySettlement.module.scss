@@ -18,7 +18,7 @@
 
 .content {
     width: 100%;
-    // overflow-y: auto;
+    overflow-y: auto;
     top: 0;
 }
 
@@ -92,27 +92,34 @@
 
 
 div.panelHeader1 {
-    padding: 10px 20px;
     border-bottom: solid 1px $colorBorder01;
-
+    
     .row01,
     .row02 {
         span {
             font-weight: 400;
             font-size: 16px;
         }
-
+        
         .clientName,
         .country {
             color: $colorMain;
         }
     }
-
+    
     .row01 {
+        padding: 10px 20px;
         display: grid;
         grid-template-columns: repeat(32, 100px); /* 設定25欄，這樣每欄寬度一致 */
         gap: 5px;
-        position: relative;  /* 確保 sticky 定位可以參照這個容器 */
+        // position: relative;  /* 確保 sticky 定位可以參照這個容器 */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+  
+    .selectedRow {
+      background-color: #ecf1ff;
+      /* 當前選擇項目的背景顏色 */
     }
 
     /* 設置前三欄為 sticky */

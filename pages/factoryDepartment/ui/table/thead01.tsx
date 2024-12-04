@@ -8,11 +8,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   if (type === "WareHouse") {
     return (
       <div className={style.thead}>
+        <span></span>
         <span>倉庫名稱</span>
+        <span>倉庫類型</span>
+        <span>倉庫內容</span>
         <span>托盤數量</span>
+        <span>倉庫位置</span>
         <span>修改人員</span>
         <span>修改時間</span>
-        <span>倉庫位置</span>
         <span>IP位址</span>
         <span>{/* 按鈕格 留白 */}</span>
       </div>
