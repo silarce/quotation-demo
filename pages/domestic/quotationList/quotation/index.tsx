@@ -1101,12 +1101,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const {
     visible: pdfModalVisible,
-    setVisible: setPdfModalVisible,
+    // setVisible: setPdfModalVisible,
+    showPdf,
+    showPdf_noDiscount,
+    hidePdf,
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: latestContent,
     emptySomeProperty: status === 'Bidding',
   });
+
+  // const {
+  //   visible: pdfModalVisible_noDiscount,
+  //   setVisible: setPdfModalVisible_noDiscount,
+  //   pdfData: pdfData_noDiscount,
+  // } = useModalQuotationPdf({
+  //   quotationContent: latestContent,
+  //   emptySomeProperty: status === 'Bidding',
+  //   noDiscount: true,
+  // });
 
   // --------------------------------------------------------------------------
 
@@ -2091,11 +2104,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // placement="bottomRight"
       itemArr={[
         //
-        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => setPdfModalVisible(true)}>
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
           匯出報價單
         </MyButton_v2>,
         <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
           單價分析
+        </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+          {'匯出報價單(無折扣)'}
         </MyButton_v2>,
       ]}
     >
@@ -2374,7 +2390,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //
         tagList={tagList}
         customeLeft={customeLeft}
-        customeRight={customeRight}
+        customeRight={disabled ? customeRight : undefined}
         panelList={panelList}
       />
 
@@ -2565,9 +2581,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <QuotationPdf
           visible={pdfModalVisible}
           pdfData={pdfData}
-          onCancel={() => {
-            setPdfModalVisible(false);
-          }}
+          onCancel={hidePdf}
           fileName={latestContent.quotationNumber}
         />
       )}
