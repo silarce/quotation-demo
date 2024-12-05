@@ -1197,166 +1197,208 @@ const useModalQuotationPdf = ({
   quotationContent,
   attachedProdArr,
   emptySomeProperty,
-  noDiscount,
-}: {
+}: // noDiscount,
+{
   quotationContent: TquotationContentDto | undefined;
   // 原本會使用quotationContent裡的products，但如果有attachedProdArr，就會以attachedProdArr替代
   attachedProdArr?: TquotationProductDto[];
   emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
-  noDiscount?: boolean;
+  // noDiscount?: boolean;
 }) => {
   const [visible, setVisible] = useState(false);
+  const [noDiscount, setNoDiscount] = useState(false);
+
   // const [pdfData, setPdfData] = useState<TpdfData>();
   const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
   const pdfData = useMemo(() => {
-    if (!quotationContent) {
+    if (!quotationContent || !visible) {
       return undefined;
     }
 
-    const {
-      quotationNumber,
-      quotationDate,
-      validityPeriod,
-      customer,
-      projectName,
-      county,
-      district,
-      address,
-      // contactPerson,
-      // contactNumber,
-      // faxNumber,
-      //
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate,
-      paymentMethods,
-      annotations,
-      quotationRanges,
-      agentEmployee,
-      products,
-      others,
-    } = quotationContent;
-
-    let {
-      // customerName,
-      contactPerson,
-      contactNumber,
-      faxNumber,
-    } = quotationContent;
-
-    let customerName = customer?.name ?? '';
-
-    if (emptySomeProperty) {
-      customerName = '';
-      contactPerson = '';
-      contactNumber = '';
-      faxNumber = '';
-    }
-
-    const projectWholeAddress = `${county}${district}${address}`;
-
-    const top: Ttop = {
-      contactPerson,
-      customerName: customerName,
-      contactNumber,
-      faxNumber,
-
-      quotationNumber,
-      validityPeriod,
-      quotationDate: getTaiwanDateStr(quotationDate, { withUnit: true }) ?? '',
-
-      projectName,
-      projectWholeAddress,
-    };
-
-    const paymentMethodsArr = paymentMethods.map((pm) => {
-      let value: string | number = new Decimal(pm.totalPaymentRatio || 0).toNumber();
-      value = value ? String(value) : '';
-
-      return {
-        label: pm.milestone,
-        value: value,
-      };
-    });
-
-    let quotationProductArr = attachedProdArr || products;
-
-    // 設置noDiscount為true會改取牌價與牌價複價
-    quotationProductArr = _.sortBy(quotationProductArr, 'order');
-    const prodArr = quotationProdAndOther_ToProdArr({
-      quotationProductArr: quotationProductArr,
-      quotationOtherArr: others ?? [],
-      checkIsSpecialDoor,
+    return createPdfData({
+      quotationContent,
+      emptySomeProperty,
+      attachedProdArr,
       noDiscount,
+      checkIsSpecialDoor,
     });
+  }, [visible, quotationContent, emptySomeProperty, attachedProdArr, noDiscount, checkIsSpecialDoor]);
 
-    // 設置noDiscount為true，要以quotationProductArr計算總金額
-    const { theSubTotal, theTax, theTotal } = (() => {
-      if (!noDiscount) {
-        return {
-          theSubTotal: subTotal,
-          theTax: salesTax,
-          theTotal: total,
-        };
-      }
+  const showPdf = () => {
+    setVisible(true);
+    setNoDiscount(false);
+  };
 
-      const theSubTotal = prodArr
-        .reduce((acc, prod) => {
-          acc = acc.add(prod.totalPrice_num);
+  const showPdf_noDiscount = () => {
+    setVisible(true);
+    setNoDiscount(true);
+  };
 
-          return acc;
-        }, new Decimal(0))
-        .toNumber();
-
-      let theTax = 0;
-
-      if (salesTax) {
-        theTax = new Decimal(theSubTotal).mul(taxRate).toDecimalPlaces(0).toNumber();
-      }
-
-      const theTotal = new Decimal(theSubTotal).add(theTax).toNumber();
-
-      return {
-        theSubTotal,
-        theTax,
-        theTotal,
-      };
-    })();
-
-    const bottom: Tbottom = {
-      // subTotal: subTotal.toLocaleString(),
-      // tax: salesTax.toLocaleString(),
-      // total: total.toLocaleString(),
-      // total_chinese: changeNumberMoneyToChinese(total),
-      subTotal: theSubTotal.toLocaleString(),
-      tax: theTax.toLocaleString(),
-      total: theTotal.toLocaleString(),
-      total_chinese: changeNumberMoneyToChinese(theTotal),
-
-      deliveryLocation,
-      deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
-      paymentMethods: paymentMethodsArr,
-      notesArr: annotations ?? [],
-      qrArr: quotationRanges ?? [],
-      agentName: agentEmployee?.chName ?? '',
-      //
-      subTotal_num: theSubTotal,
-      tax_num: theTax,
-      total_num: theTotal,
-    };
-    // attachedProdArr
-
-    return { top, prodArr, bottom };
-  }, [quotationContent, emptySomeProperty]);
+  const hidePdf = () => {
+    setVisible(false);
+  };
 
   return {
     visible,
-    setVisible,
+    // setVisible,
     pdfData,
+    //
+    showPdf,
+    showPdf_noDiscount,
+    hidePdf,
   };
+};
+
+const createPdfData = ({
+  quotationContent,
+  emptySomeProperty,
+  attachedProdArr,
+  noDiscount,
+  checkIsSpecialDoor,
+}: {
+  quotationContent: TquotationContentDto;
+  emptySomeProperty: boolean | undefined;
+  attachedProdArr: TquotationProductDto[] | undefined;
+  noDiscount: boolean | undefined;
+  checkIsSpecialDoor: (doorModelName: string) => boolean;
+}) => {
+  const {
+    quotationNumber,
+    quotationDate,
+    validityPeriod,
+    customer,
+    projectName,
+    county,
+    district,
+    address,
+    // contactPerson,
+    // contactNumber,
+    // faxNumber,
+    //
+    subTotal,
+    salesTax,
+    total,
+    deliveryLocation,
+    deliveryDate,
+    paymentMethods,
+    annotations,
+    quotationRanges,
+    agentEmployee,
+    products,
+    others,
+  } = quotationContent;
+
+  let {
+    // customerName,
+    contactPerson,
+    contactNumber,
+    faxNumber,
+  } = quotationContent;
+
+  let customerName = customer?.name ?? '';
+
+  if (emptySomeProperty) {
+    customerName = '';
+    contactPerson = '';
+    contactNumber = '';
+    faxNumber = '';
+  }
+
+  const projectWholeAddress = `${county}${district}${address}`;
+
+  const top: Ttop = {
+    contactPerson,
+    customerName: customerName,
+    contactNumber,
+    faxNumber,
+
+    quotationNumber,
+    validityPeriod,
+    quotationDate: getTaiwanDateStr(quotationDate, { withUnit: true }) ?? '',
+
+    projectName,
+    projectWholeAddress,
+  };
+
+  const paymentMethodsArr = paymentMethods.map((pm) => {
+    let value: string | number = new Decimal(pm.totalPaymentRatio || 0).toNumber();
+    value = value ? String(value) : '';
+
+    return {
+      label: pm.milestone,
+      value: value,
+    };
+  });
+
+  let quotationProductArr = attachedProdArr || products;
+
+  // 設置noDiscount為true會改取牌價與牌價複價
+  quotationProductArr = _.sortBy(quotationProductArr, 'order');
+  const prodArr = quotationProdAndOther_ToProdArr({
+    quotationProductArr: quotationProductArr,
+    quotationOtherArr: others ?? [],
+    checkIsSpecialDoor,
+    noDiscount,
+  });
+
+  // 設置noDiscount為true，要以quotationProductArr計算總金額
+  const { theSubTotal, theTax, theTotal } = (() => {
+    if (!noDiscount) {
+      return {
+        theSubTotal: subTotal,
+        theTax: salesTax,
+        theTotal: total,
+      };
+    }
+
+    const theSubTotal = prodArr
+      .reduce((acc, prod) => {
+        acc = acc.add(prod.totalPrice_num);
+
+        return acc;
+      }, new Decimal(0))
+      .toNumber();
+
+    let theTax = 0;
+
+    if (salesTax) {
+      theTax = new Decimal(theSubTotal).mul(taxRate).toDecimalPlaces(0).toNumber();
+    }
+
+    const theTotal = new Decimal(theSubTotal).add(theTax).toNumber();
+
+    return {
+      theSubTotal,
+      theTax,
+      theTotal,
+    };
+  })();
+
+  const bottom: Tbottom = {
+    // subTotal: subTotal.toLocaleString(),
+    // tax: salesTax.toLocaleString(),
+    // total: total.toLocaleString(),
+    // total_chinese: changeNumberMoneyToChinese(total),
+    subTotal: theSubTotal.toLocaleString(),
+    tax: theTax.toLocaleString(),
+    total: theTotal.toLocaleString(),
+    total_chinese: changeNumberMoneyToChinese(theTotal),
+
+    deliveryLocation,
+    deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
+    paymentMethods: paymentMethodsArr,
+    notesArr: annotations ?? [],
+    qrArr: quotationRanges ?? [],
+    agentName: agentEmployee?.chName ?? '',
+    //
+    subTotal_num: theSubTotal,
+    tax_num: theTax,
+    total_num: theTotal,
+  };
+  // attachedProdArr
+
+  return { top, prodArr, bottom };
 };
 
 export { useModalQuotationPdf };
