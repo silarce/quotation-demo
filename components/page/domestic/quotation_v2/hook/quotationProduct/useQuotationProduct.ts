@@ -419,6 +419,16 @@ const useQuotationProduct = ({
     setProdKeyArr(defaultState_copy.prodKeyArr);
   }, [defaultState_copy, disabled]);
 
+  useEffect(() => {
+    if (!activedClassProd) {
+      return;
+    }
+
+    if (!activedClassProd.isInited) {
+      activedClassProd.init();
+    }
+  }, [activeProdKey]);
+
   // -----------------------------------------------------------------------------
   // MARK: RETURN
   return {

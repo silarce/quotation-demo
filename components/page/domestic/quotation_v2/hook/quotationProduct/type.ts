@@ -314,7 +314,7 @@ interface TstateProd {
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 
   generalSpecs: TdoorGeneralSpecsDto | undefined | null;
-  // availableComponents: TdoorComponentListDto | undefined | null;
+  availableComponents: TdoorComponentListDto | undefined | null;
   // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
   //
   isFetching?: boolean;

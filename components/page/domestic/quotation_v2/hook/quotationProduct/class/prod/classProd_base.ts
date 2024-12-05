@@ -180,6 +180,11 @@ class ClassProd_base implements Interface_ClassProd_base {
     return !!this.state.isFetching;
   }
 
+  protected set isFetching(value) {
+    this.state.isFetching = value;
+    this.render();
+  }
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
@@ -534,8 +539,20 @@ class ClassProd_base implements Interface_ClassProd_base {
   //
   //
 
-  checkValid_doorModelName() {
+  get isValid_doorModelName() {
     return this.doorModelName in doorModelNameLookup;
+  }
+
+  get isInited() {
+    let isInit = true;
+
+    if (this.state.generalSpecs === undefined) {
+      isInit = false;
+    } else if (this.state.availableComponents === undefined) {
+      isInit = false;
+    }
+
+    return isInit;
   }
 
   // MARK:init
@@ -544,6 +561,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     this.render();
 
     const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+    await this.updateAvailableComponents();
     this.state.isFetching = false;
     this.state.generalSpecs = generalSpecs;
     this.render();
@@ -552,7 +570,7 @@ class ClassProd_base implements Interface_ClassProd_base {
   // MARK:updateGeneralSpec
   // modelName height fullWidth WG isAntiTyphoon hp
   protected async updateGeneralSpec() {
-    const isValid = this.checkValid_doorModelName();
+    const isValid = this.isValid_doorModelName;
 
     const generalSpecs = isValid ? await reqGetProdCalcGeneralSpec(this) : null;
     this.state.generalSpecs = generalSpecs;
@@ -649,7 +667,7 @@ class ClassProd_base implements Interface_ClassProd_base {
   // MARK:updateSlatCount
   // modelName height boxB
   protected async updateSlatCount() {
-    const isValid = this.checkValid_doorModelName();
+    const isValid = this.isValid_doorModelName;
 
     if (!isValid) {
       this.data.slatCount = null;
@@ -665,6 +683,34 @@ class ClassProd_base implements Interface_ClassProd_base {
 
     const res = await reqGetSlatCount(body);
     res !== null ? (this.data.slatCount = `${res}`) : (this.data.slatCount = null);
+
+    return this;
+  }
+
+  protected async updateAvailableComponents() {
+    if (!this.isValid_doorModelName) {
+      this.state.availableComponents = null;
+      // this.state.data_componentDict = {};
+      // this.state.componentKeyArr = [];
+
+      return this;
+    }
+
+    const body: TpacParams = {
+      modelName: this.doorModelName as TdoorModel,
+      weight: Number(this.data.weight || 0),
+      isAntiTyphoon: !!this.data.isAntiTyphoon,
+      rollerDiameter: Number(this.data.diameter || 0),
+    };
+    const res = await reqGetAvailableComponents(body);
+
+    if (!res) {
+      this.state.availableComponents = null;
+      // this.state.data_componentDict = {};
+      // this.state.componentKeyArr = [];
+    } else {
+      this.state.availableComponents = res;
+    }
 
     return this;
   }
@@ -730,7 +776,9 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     this.state.isFetching = true;
     this.render();
 
-    await this.updateGeneralSpec().then((classProd) => classProd.updateSlatCount());
+    await this.updateGeneralSpec();
+    await this.updateSlatCount();
+    await this.updateAvailableComponents();
     this.state.isFetching = false;
     this.render();
 
@@ -804,15 +852,15 @@ const reqGetSlatCount = async (body: TpcdsPrams) => {
     });
 };
 
-// const reqGetAvailableComponents = async (body: TpacParams) => {
-//   return await apiGetProdAvailableComponents(body)
-//     .then((res) => res)
-//     .catch(() => {
-//       myAlert.err({ title: '取得材料配件失敗' });
+const reqGetAvailableComponents = async (body: TpacParams) => {
+  return await apiGetProdAvailableComponents(body)
+    .then((res) => res)
+    .catch(() => {
+      myAlert.err({ title: '取得材料配件失敗' });
 
-//       return null;
-//     });
-// };
+      return null;
+    });
+};
 
 // ================================================================================
 

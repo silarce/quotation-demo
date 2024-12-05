@@ -54,6 +54,8 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   const activedProd = instance_useQuotationProductInstance.activedProd;
 
+  // console.log(activedProd);
+
   // MARK:RENDER
   return (
     <div className={className}>

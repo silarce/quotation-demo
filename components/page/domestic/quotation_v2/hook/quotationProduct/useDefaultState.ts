@@ -64,6 +64,7 @@ const useDefaultState = ({
 
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
         generalSpecs: undefined,
+        availableComponents: undefined,
       };
 
       dict[data_prod.id] = state;

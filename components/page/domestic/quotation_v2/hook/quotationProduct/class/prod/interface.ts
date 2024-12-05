@@ -250,6 +250,12 @@ interface Interface_ClassProd_base {
   // rootProductId: string;
   // -----------------------------------------------------------------------
 
+  isInited: boolean;
+
+  // -----------------------------------------------------------------------
+
+  init: () => Promise<void>;
+
   changeDoorModel: (props: { name: string; doorModel: TdoorModelInfoDto | null }) => Interface_ClassProd_base;
 
   // onFullWidthChange?: () => Promise<Interface_ClassProd_base> | undefined;
