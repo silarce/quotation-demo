@@ -415,9 +415,28 @@ const useQuotationProduct = ({
   // region useEffect
 
   useEffect(() => {
-    setState_prodDict(defaultState_copy.stateProdDict);
-    setProdKeyArr(defaultState_copy.prodKeyArr);
+    if (disabled) {
+      setState_prodDict(defaultState_copy.stateProdDict);
+      setProdKeyArr(defaultState_copy.prodKeyArr);
+    }
   }, [defaultState_copy, disabled]);
+
+  // useEffect(() => {
+  //   setState_prodDict(defaultState_copy.stateProdDict);
+  //   setProdKeyArr(defaultState_copy.prodKeyArr);
+  // }, [defaultState_copy, disabled]);
+
+  // useEffect(() => {
+  //   if (disabled) {
+  //     setState_prodDict(defaultState_copy.stateProdDict);
+  //     setProdKeyArr(defaultState_copy.prodKeyArr);
+  //   }
+  // }, [disabled]);
+
+  // useEffect(() => {
+  //   setState_prodDict(defaultState_copy.stateProdDict);
+  //   setProdKeyArr(defaultState_copy.prodKeyArr);
+  // }, [defaultState_copy]);
 
   useEffect(() => {
     if (!activedClassProd) {

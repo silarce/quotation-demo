@@ -724,6 +724,15 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this;
   }
 
+  protected async afterUpdateAvailableComponents() {
+    if (!this.state.availableComponents) {
+      this.state.data_componentDict = {};
+      this.state.componentKeyArr = [];
+
+      return this;
+    }
+  }
+
   // endregion HANDLER
 
   // -----------------------------------------------------------------------------------

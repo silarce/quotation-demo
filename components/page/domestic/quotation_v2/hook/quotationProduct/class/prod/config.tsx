@@ -363,11 +363,23 @@ const nodeConfig_origin: TnodeConfig = {
       const v = classProd.horsepower;
       const value = v ? { value: v, label: v } : null;
 
+      const motorArr = classProd.state.availableComponents?.motors;
+
+      let options: Toption[] | undefined = undefined;
+
+      if (motorArr) {
+        let hpArr = motorArr.map((motor) => motor.horsePower);
+        hpArr = _.uniq(hpArr);
+        options = hpArr.map((hp) => {
+          return { value: hp, label: hp };
+        });
+      }
+
       const inputSeleProps: TinputSelProps = {
         disabled,
         selectProps: {
           props: {
-            options: [],
+            options,
             value,
             onChange: (option) => {
               const value = option?.value || '';
