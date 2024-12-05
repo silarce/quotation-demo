@@ -70,6 +70,23 @@ import {
 
 // ================================================================================
 
+type TdoorModelNameLookup = {
+  [key in TdoorModel]: key;
+};
+
+// ================================================================================
+const doorModelNameLookup: TdoorModelNameLookup = {
+  'SJ-302': 'SJ-302',
+  'SJ-312': 'SJ-312',
+  'SJ-305D': 'SJ-305D',
+  'SJ-303A': 'SJ-303A',
+  'SJ-303AS': 'SJ-303AS',
+  'SJ-120A': 'SJ-120A',
+  'SJ-303S': 'SJ-303S',
+};
+
+// const doorModelNameArr = Object.keys(doorModelNameLookup) as TdoorModel[];
+
 // 在子類別中，可以透過customizeNodeConfig方法來覆寫nodeConfig
 // 務必要先進行深拷貝，避免影響到原本的nodeConfig
 const customizeNodeConfig = (nodeConfig: TnodeConfig) => {
@@ -88,13 +105,12 @@ const customizeNodeConfig = (nodeConfig: TnodeConfig) => {
 };
 
 // ================================================================================
-// MARK: START
+// MARK: ClassProd_base
 //
 //
 //
 //
 class ClassProd_base implements Interface_ClassProd_base {
-  // MARK: constructor
   constructor({
     stateProd,
     setStateProd,
@@ -518,6 +534,10 @@ class ClassProd_base implements Interface_ClassProd_base {
   //
   //
 
+  checkValid_doorModelName() {
+    return this.doorModelName in doorModelNameLookup;
+  }
+
   // MARK:init
   async init() {
     this.state.isFetching = true;
@@ -530,8 +550,11 @@ class ClassProd_base implements Interface_ClassProd_base {
   }
 
   // MARK:updateGeneralSpec
+  // modelName height fullWidth WG isAntiTyphoon hp
   protected async updateGeneralSpec() {
-    const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+    const isValid = this.checkValid_doorModelName();
+
+    const generalSpecs = isValid ? await reqGetProdCalcGeneralSpec(this) : null;
     this.state.generalSpecs = generalSpecs;
 
     if (!generalSpecs) {
@@ -559,7 +582,7 @@ class ClassProd_base implements Interface_ClassProd_base {
       this.data.boxB = '';
       this.data.boxD = '';
 
-      return;
+      return this;
     }
 
     generalSpecs.bearingInnerDiameter === 'N/A' && (generalSpecs.bearingInnerDiameter = '');
@@ -592,7 +615,6 @@ class ClassProd_base implements Interface_ClassProd_base {
     });
 
     this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
-
     this.data.thickness = generalSpecs.thickness as `${number}`;
 
     const {
@@ -617,11 +639,33 @@ class ClassProd_base implements Interface_ClassProd_base {
     }
 
     const boxD = await reqGetBoxD(this);
-    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
 
+    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
     this.data.area = calcArea(this);
 
-    // this.render();
+    return this;
+  }
+
+  // modelName height boxB
+  protected async updateSlatCount() {
+    const isValid = this.checkValid_doorModelName();
+
+    if (!isValid) {
+      this.data.slatCount = null;
+
+      return this;
+    }
+
+    const body: TpcdsPrams = {
+      modelName: this.doorModelName as TdoorModel,
+      height: this.height_mm,
+      B: this.boxB_mm,
+    };
+
+    const res = await reqGetSlatCount(body);
+    res !== null && (this.data.slatCount = `${res}`);
+
+    return this;
   }
 
   // -----------------------------------------------------------------------------------
@@ -675,6 +719,25 @@ class ClassProd_base implements Interface_ClassProd_base {
 // ================================================================================
 // ================================================================================
 // ================================================================================
+
+//MARK:ClassProd_prime
+class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
+  doorModel: TdoorModel = 'SJ-302';
+
+  // ---------------------------------------------------------------------------------
+  async afterFullWidthChange() {
+    this.state.isFetching = true;
+    this.render();
+
+    await this.updateGeneralSpec().then((classProd) => classProd.updateSlatCount());
+    this.state.isFetching = false;
+    this.render();
+
+    return this;
+  }
+} // ClassProd_prime
+
+// MARK: END
 
 // ================================================================================
 // ================================================================================
@@ -730,13 +793,15 @@ const reqGetBoxD = async (classProd: ClassProd_base) => {
     });
 };
 
-// const reqGetSlatCount = async (body: TpcdsPrams) => {
-//   await apiGetProdCalcDetailSpec(body)
-//     .then((res) => res.slatCount)
-//     .catch(() => {
-//       myAlert.err({ title: '取得門片數量失敗' });
-//     });
-// };
+const reqGetSlatCount = async (body: TpcdsPrams) => {
+  return await apiGetProdCalcDetailSpec(body)
+    .then((res) => res.slatCount)
+    .catch(() => {
+      myAlert.err({ title: '取得門片數量失敗' });
+
+      return null;
+    });
+};
 
 // const reqGetAvailableComponents = async (body: TpacParams) => {
 //   return await apiGetProdAvailableComponents(body)
@@ -770,21 +835,6 @@ const calcArea = (classProd: ClassProd_base) => {
 };
 
 // ================================================================================
-//MARK:ClassProd_prime
-class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
-  doorModel: TdoorModel = 'SJ-302';
-
-  async afterFullWidthChange() {
-    this.state.isFetching = true;
-    this.render();
-
-    await this.updateGeneralSpec();
-    this.state.isFetching = false;
-    this.render();
-
-    return this;
-  }
-}
 
 // ================================================================================
 export { ClassProd_base, ClassProd_prime };
