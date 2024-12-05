@@ -251,9 +251,9 @@
   gap: 0px;
   width: auto;
   // margin-top: 4px;
-  margin-left: 20px;
-  margin-right: 20px;
-  border:1px solid rgb(168, 168, 168);
+  // margin-left: 20px;
+  // margin-right: 20px;
+  // border:1px solid rgb(168, 168, 168);
   overflow-x: hidden;
   // background-color: gray;
   max-height: 350px;
@@ -321,7 +321,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 415px 415px 65px 50px 300px 65px;
+    grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 300px 65px;
     // gap: 5px;
   }
 }
@@ -686,7 +686,7 @@ div.panelHeader15 {
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 415px 415px 65px 50px 300px 65px 100px;
+  grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 300px 65px 100px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;

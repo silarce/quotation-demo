@@ -59,13 +59,6 @@ export default function AddPurchaseRequisitionList() {
         purchaseorderdetailuuid
     } = router.query;
 
-    const getQueryParam = (param: any) => {
-        if (Array.isArray(param)) {
-            return param[0];
-        }
-        return param;
-    };
-
 
     //登入者資料
     const { userInfo } = useContext(AppContext);
@@ -87,6 +80,7 @@ export default function AddPurchaseRequisitionList() {
     const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +95,7 @@ export default function AddPurchaseRequisitionList() {
     const [status, setStatus] = useState<string>("");
     const [purchaserequisitionid, setPurchaserequisitionid] = useState<string>("");
     const [purchaserequisitionuuid, setPurchaserequisitionuuid] = useState<string>("");
+    const [selectedValue, setSelectedValue] = useState('請選擇類別');
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -115,6 +110,7 @@ export default function AddPurchaseRequisitionList() {
     const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     //手key
+    const [currentindex, setCurrentIndex] = useState<number>(0);
     const [handinputname, setHandinputname] = useState<string>("");
     const [handinputspec, setHandinputspec] = useState<string>("");
     const [handinputquantity, setHandinputquantity] = useState<string>("");
@@ -262,6 +258,7 @@ export default function AddPurchaseRequisitionList() {
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
+        console.log(userInfo);
         if (!hasFetchedData.current) {
             getPurchaseRequisition();
             getProduct();
@@ -742,15 +739,6 @@ export default function AddPurchaseRequisitionList() {
     const [selectedsupplier, setSelectedsupplier] = useState<string>("");
 
 
-
-
-
-    //打開查詢modal
-    const productSearchModalOpen = async () => {
-        setModalData(data);
-        setProductSearchmodalopen(!productSearchmodalopen);
-    }
-
     //關閉詢價單modal
     const productSearchModalClose = async () => {
         setModalData([]);
@@ -783,6 +771,12 @@ export default function AddPurchaseRequisitionList() {
     // ];
 
     useEffect(() => {
+        console.log("OK");
+        console.log(searchbardata);
+        console.log(handinputproductid);
+        console.log(handinputname);
+        console.log(handinputspec);
+
         if (isSelectingRef.current) return;
 
         let filtered = searchbardata;
@@ -815,15 +809,18 @@ export default function AddPurchaseRequisitionList() {
             // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
             setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
 
+            console.log(showSuggestions);
+            console.log(filtered);
         }
         else {
+            console.log("shit");
             setHandinputproductuuid('');
             setFilteredData([]);
             setShowSuggestions(false);
         }
 
-
-    }, [handinputproductid, handinputname, handinputspec]);
+    }, [data2]);
+    // }, [handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -841,17 +838,46 @@ export default function AddPurchaseRequisitionList() {
         setHandinputspec(e.target.value);
     };
 
+    // const handleSelect = (item: DataItem) => {
+    //     console.log(item);
+    //     console.log(data2);
+    //     isSelectingRef.current = true;
+    //     // setHandinputproductuuid(item.id);
+    //     // setHandinputproductid(item.productid);
+    //     // setHandinputname(item.name);
+    //     // setHandinputspec(item.spec || "");
+    //     // setHandinputunit(item.unit);
+    //     // handleStringChange(currentindex, "productuuid", item.id);
+    //     handleStringChange(currentindex, "productid", item.productid);
+    //     handleStringChange(currentindex, "name", item.name);
+    //     handleStringChange(currentindex, "spec", item.spec);
+    //     handleStringChange(currentindex, "unit", item.unit);
+
+
+    //     setShowSuggestions(false);
+    // };
+
     const handleSelect = (item: DataItem) => {
+        console.log(item);
+        console.log(data2);
         isSelectingRef.current = true;
-        setHandinputproductuuid(item.id);
-        setHandinputproductid(item.productid);
-        setHandinputname(item.name);
-        setHandinputspec(item.spec || "");
-        setHandinputunit(item.unit);
-        setShowSuggestions(false);
+    
+        // 合併多個變更
+        const newData = [...data2];
+        newData[currentindex] = {
+            ...newData[currentindex],
+            productid: item.productid,
+            name: item.name,
+            spec: item.spec || "",
+            unit: item.unit,
+        };
+    
+        setData2(newData); // 一次更新所有變更
+        setShowSuggestions(false); // 隱藏建議
+
+        setSearchBarData(data);
     };
-
-
+    
 
 
 
@@ -1151,6 +1177,7 @@ export default function AddPurchaseRequisitionList() {
     };
 
     const handleAddDetail = () => {
+
         const emptyDetail = {
             purchaserequisitiondetailuuid: "",
             productuuid: "",
@@ -1255,6 +1282,18 @@ export default function AddPurchaseRequisitionList() {
                                         /> */}
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="申請人員"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: create_byin,
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="請購日期"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
@@ -1265,6 +1304,52 @@ export default function AddPurchaseRequisitionList() {
                                                 },
                                             }}
 
+                                        />
+                                        <InputSel
+                                            caption="請購類別"
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={false}
+                                            selectProps={{
+                                                props: {
+                                                    menuPortalTarget: undefined,
+                                                    styles: {
+                                                        menuPortal: (base) => ({
+                                                            ...base,
+                                                            zIndex: 1003,
+                                                        }),
+                                                    },
+                                                    options: [
+                                                        { value: '文具', label: '文具' },
+                                                        { value: '生產', label: '生產' },
+                                                        { value: '總務', label: '總務' },
+                                                    ],
+                                                    onChange: (option: any) => setSelectedValue(option?.value),
+                                                    value: selectedValue
+                                                        ? {
+                                                            value: selectedValue,
+                                                            label: selectedValue,
+                                                        }
+                                                        : null,
+                                                },
+                                            }}
+                                        />
+                                        {/* <button onClick={() => { alert("OK") }}>
+                                            ...
+                                        </button> */}
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="申請部門"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    value: userInfo?.employee?.jobs[0].department.name
+                                                },
+                                            }}
                                         />
                                         <InputSel
                                             caption="需用日期"
@@ -1282,25 +1367,15 @@ export default function AddPurchaseRequisitionList() {
 
                                     </div>
                                     <div></div>
-                                    <div></div>
                                     <div>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="製單人員"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: create_byin,
-                                                },
-                                            }}
-                                        /> */}
+
                                     </div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="備註"
+                                            caption="備註說明"
                                             captionStyle={{ fontSize: '18px' }}
                                             disabled={false}
                                             inputProps={{
@@ -1316,7 +1391,7 @@ export default function AddPurchaseRequisitionList() {
                                 </div>
                             </div>
                             <div>
-                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                {/* <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="單據狀態"
@@ -1328,18 +1403,7 @@ export default function AddPurchaseRequisitionList() {
                                             },
                                         }}
                                     />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="品項數量"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: data2.length || ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div
@@ -1357,205 +1421,164 @@ export default function AddPurchaseRequisitionList() {
                             >
                                 請購項目
                             </span>
+                            {/* {handinputproductid}/{handinputname}/{handinputspec}<br/>
+                            數量{searchbardata.length}
+                            數量{filteredData.length} */}
                         </div>
-                        <span style={{ paddingLeft: '22px', position: 'relative' }}>
-                            <button onClick={() => { handleAddDetail() }} style={{fontSize:'18px'}} >
-                                <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
-                                新增品項
-                            </button>
-                        </span>
-                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                            {/* <Thead01 type={'AddPR_ReqList'} /> */}
-                            <div className={scss.thead20}>
-                                <span>
+                        <div className={scss.head_content1}>
 
-                                </span>
-                                <span>序</span>
-                                <span>料號</span>
-                                <span>品名</span>
-                                <span>規格</span>
-                                <span>數量</span>
-                                <span>單位</span>
-                                <span>備註(用途說明)</span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader20}>
-                                    <div className={scss.row01}>
-                                        <span>
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="品項數量"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        type: "number",
+                                        // style: { color: 'red' },
+                                        value: data2.length,
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+
+                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                {/* <Thead01 type={'AddPR_ReqList'} /> */}
+                                <div className={scss.thead20}>
+                                    <span>
+
+                                    </span>
+                                    <span>序</span>
+                                    <span>料號</span>
+                                    <span>品名</span>
+                                    <span>規格</span>
+                                    <span>數量</span>
+                                    <span>單位</span>
+                                    <span>備註(用途說明)</span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                {data2.map((_item, index) => (
+                                    <CellWithBar key={index} className={scss.panelHeader20}>
+                                        <div className={scss.row01}>
+                                            <span>
+                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                    <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                                {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
+                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button> */}
-                                        </span>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
-                                        <span>
-                                            <input
-                                                ref={nameRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%',borderBottom:'1px solid black' }}
-                                                type="text"
-                                                value={_item.name !== undefined ? _item.name : ''}
-                                                // readOnly
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    handleStringChange(index, "name", e.target.value);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', width: '95%',borderBottom:'1px solid black' }}
-                                                type="text"
-                                                value={_item.spec !== undefined ? _item.spec : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                // readOnly
-                                                onChange={(e) => {
-                                                    handleStringChange(index, "spec", e.target.value);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                maxLength={5}
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
-                                                onChange={(e) => {
-                                                    handleNumberChange(index, "quantity", e.target.value);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={unitRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                value={_item.unit !== undefined ? _item.unit : ''}
-                                                readOnly
-                                                onChange={(e) => {
-                                                    handleStringChange(index, "unit", e.target.value);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                type="text"
-                                                value={_item.note !== undefined ? _item.note : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
-                                                onChange={(e) => {
-                                                    handleStringChange(index, "note", e.target.value);
-                                                }}
-                                            />
-                                        </span>
+                                            </span>
+                                            <span>{index + 1}</span>
+                                            <span>
+                                                {/* {_item.productid} */}
+                                                <input
+                                                    ref={productidRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    value={_item.productid !== undefined ? _item.productid : ''}
+                                                    // readOnly
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "productid", e.target.value);
+                                                        setCurrentIndex(index);
+                                                        setHandinputproductid(e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={nameRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    value={_item.name !== undefined ? _item.name : ''}
+                                                    // readOnly
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "name", e.target.value);
+                                                        setCurrentIndex(index);
+                                                        setHandinputname(e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={specRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    value={_item.spec !== undefined ? _item.spec : ''}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    // readOnly
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "spec", e.target.value);
+                                                        setCurrentIndex(index);
+                                                        setHandinputspec(e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={quantityRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    // maxLength={5}
+                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    // readOnly
+                                                    onChange={(e) => {
+                                                        handleNumberChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={unitRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    value={_item.unit !== undefined ? _item.unit : ''}
+                                                    // readOnly
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "unit", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={noteRefs.current[index]}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    type="text"
+                                                    value={_item.note !== undefined ? _item.note : ''}
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    // readOnly
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "note", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
 
 
-                                    </div>
-                                </CellWithBar>
-                            ))}
+                                        </div>
+                                    </CellWithBar>
 
+                                ))}
 
-
-                            <div className={scss.addbar} style={{ display: `${(purchaserequisitionid != '' && status === '未送出') ? '' : 'none'}`, borderBottom: '1px solid #c1c1c1' }}>
-                                <div>
-                                    <button onClick={() => { handleAddByHandKey() }} >
-                                        <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                    </button>
-                                </div>
-                                <div></div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder="請輸入料號"
-                                        value={handinputproductid}
-                                        onChange={handleProductidChange}
-                                        style={{ width: '100%' }}
-                                    />
-                                </div>
-                                <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='請輸入品項名稱'
-                                        value={handinputname}
-                                        onChange={(e) => setHandinputname(e.target.value)}
-                                    /> */}
-                                    <input
-                                        type="text"
-                                        placeholder="請輸入品項名稱"
-                                        value={handinputname}
-                                        onChange={handleNameChange}
-                                        style={{ width: '100%' }}
-                                    />
-
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder="請輸入品項規格"
-                                        value={handinputspec}
-                                        onChange={handleSpecChange}
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        style={{ backgroundColor: 'transparent', width: '50px' }}
-                                        type="text"
-                                        placeholder='數量'
-                                        value={handinputquantity}
-                                        onChange={(e) => {
-                                            const quantity = e.target.value;
-                                            // 若為無效數字或空字串，將 quantity 設為 0
-
-                                            setHandinputquantity(quantity);
-                                        }}
-                                    />
-
-
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder='單位'
-                                        value={handinputunit}
-                                        onChange={(e) => setHandinputunit(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <input
-                                        type="text"
-                                        placeholder='備註'
-                                        value={handinputnote}
-                                        onChange={(e) => setHandinputnote(e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    &nbsp;&nbsp;
-                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
-                                        <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                    </button>
-                                </div>
                             </div>
+                            <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                                <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }} >
+                                    <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                                    新增品項
+                                </button>
+                            </span>
+
                         </div>
-
-
                         <div className={scss.body_foot1}>
                             <div>
                                 {filteredData.length > 0 && (
