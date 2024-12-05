@@ -53,7 +53,12 @@ const useDefaultState = ({
       const data_accessoryDict = createData_accessoryDict(accessoriesArr);
       const accessoryKeyArr = Object.keys(data_accessoryDict);
 
-      const state: TstateProd = {
+      // 在這裡，generalSpecs與availableComponents必須是undefined
+      // undefined視為未曾初始化
+      const state: TstateProd & {
+        generalSpecs: undefined;
+        availableComponents: undefined;
+      } = {
         key: data_prod.id,
         data_prod: data_prod,
         data_componentDict,

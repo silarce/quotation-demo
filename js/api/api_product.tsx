@@ -4,6 +4,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
 import type {
+  TdoorModel,
   // TdoorMaterialDto,
   TdoorModelInfoDto,
   // TdoorGeneralSpecsMotorBoxPropertyDto,
@@ -48,6 +49,7 @@ export type {
   TdoorAccessoryDto,
   TgetBoxDParams,
   Thp,
+  TgetBoxDParams_strict,
 };
 // =======================================================================
 
@@ -268,7 +270,11 @@ type TgetBoxDParams = {
   rollerDiameter: number;
   sidePlateSizeB: number;
   hp: string;
-  motorVendor: string;
+  motorVendor: string; // 必須要送，但似乎任意字串都行
+};
+
+type TgetBoxDParams_strict = TgetBoxDParams & {
+  modelName: TdoorModel;
 };
 
 export const apiGetboxD = (params: TgetBoxDParams) => {

@@ -313,8 +313,8 @@ interface TstateProd {
 
   doorModel: TdoorModelInfoDto | null; // 若為null，基本上就是特殊門
 
-  generalSpecs: TdoorGeneralSpecsDto | undefined | null;
-  availableComponents: TdoorComponentListDto | undefined | null;
+  generalSpecs: TdoorGeneralSpecsDto | undefined | null; // undefined視為未曾初始化
+  availableComponents: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
   // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
   //
   isFetching?: boolean;
