@@ -646,6 +646,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this;
   }
 
+  // MARK:updateSlatCount
   // modelName height boxB
   protected async updateSlatCount() {
     const isValid = this.checkValid_doorModelName();
@@ -663,7 +664,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     };
 
     const res = await reqGetSlatCount(body);
-    res !== null && (this.data.slatCount = `${res}`);
+    res !== null ? (this.data.slatCount = `${res}`) : (this.data.slatCount = null);
 
     return this;
   }
