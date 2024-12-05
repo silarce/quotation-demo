@@ -364,10 +364,7 @@ export default function EditWHPosition() {
             try {
                 setIsLoading(true);
 
-                const conditionModel: {
-                    data: any,
-                    username: string | undefined,
-                } = {
+                const conditionModel= {
                     username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };
@@ -416,10 +413,7 @@ export default function EditWHPosition() {
             try {
                 setIsLoading(true);
 
-                const conditionModel: {
-                    data: any,
-                    username: string | undefined,
-                } = {
+                const conditionModel= {
                     username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };

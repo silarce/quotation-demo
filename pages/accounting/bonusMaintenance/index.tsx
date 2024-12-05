@@ -297,7 +297,7 @@ export default function bonusMaintenance() {
             const conditionModel = {
                 // 在這裡可以填入查詢條件
                 seniority: type === 'SeniorityBased' ? seniority_seniority_senior : 0,
-                seniority_senior: type === 'SeniorityBased' ? seniority_seniority_senior : 1000
+                seniority_senior: type === 'SeniorityBased' ? seniority_seniority_senior + 1 : 1000
             };
 
             const inputModel = {
@@ -763,11 +763,12 @@ export default function bonusMaintenance() {
     const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
     const quantityRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     // 組件編輯
-    const handleEdit = async (index: any) => {
+    const handleEdit = async (index: any, item: any) => {
         if (editlist === true) {
             myAlert.warning({ title: '獎金維護中，請先結束編輯狀態' })
             return;
         }
+        handleRowClick(item.id);
         setOriginaleditlistdata(data);
         setEditlist(!editlist);
         setEditlistindex(index);
@@ -776,6 +777,7 @@ export default function bonusMaintenance() {
     const handleCancel = async (index: any) => {
         setEditlist(!editlist);
         setData(originaleditlistdata);
+        setSelectedItemId('');
     };
 
     // 從組件清單移除
@@ -894,7 +896,6 @@ export default function bonusMaintenance() {
 
 
 
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
     const [selectedItems, setSelectedItems] = useState<any[]>([]); // 存儲已選中的項目
 
@@ -1018,7 +1019,12 @@ export default function bonusMaintenance() {
         }
     };
 
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1112,530 +1118,540 @@ export default function bonusMaintenance() {
 
                 ]}
             />
-            <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.content}>
+            {/* <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}> */}
+            {/* <div className={scss.content}> */}
 
-                    <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
-                        <div className={scss.thead1}>
-                            <span>
-                                <button onClick={() => { handleAdd() }}>
-                                    <img src={icon_cir_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
-                                </button>
-                            </span>
-                            <span>類別</span>
-                            <span>項目</span>
-                            <span>年資</span>
-                            <span>獎金</span>
-                            <span>發放月份</span>
-                            <span>發放人數</span>
-                            <span>發放對象</span>
-                            <span>備註</span>
-                            <span></span>
-                        </div>
-                        <span>
-                            {data && (
-                                data.map((_item: any, index: number) => {
-                                    // 計算總薪資
-                                    const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0) - parseFloat(_item.leave_day_pay || 0);
-                                    const earning_total = taxTotal + parseFloat(_item.overtime_pay || 0)
-                                    const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0) + parseFloat(_item.leave_day_pay || 0);
-                                    _item.actual_salary = parseFloat(_item.salary || 0) - parseFloat(_item.leave_day_pay || 0)
-                                    _item.earning_total = earning_total;
-                                    _item.deduction_total = deduction_total;
-                                    _item.subtotal = taxTotal;
-                                    const net_pay = parseFloat(_item.earning_total || 0) - parseFloat(_item.deduction_total || 0)
-                                    _item.net_pay = net_pay;
-                                    return (
-                                        <CellWithBar key={index} className={scss.panelHeader1}>
-                                            <div className={scss.row01}>
-                                                <span>
-                                                    {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
+            <div className={scss.body_content1} style={{ maxHeight: `${windowSize.height - 198}px` }}>
+                <div className={scss.thead1}>
+                    <span
+                        style={{
+                            width: '400px',
+                            backgroundColor: '#f5f5f5'
+                        }}>
+                        <button onClick={() => { handleAdd() }}>
+                            <img src={icon_cir_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
+                        </button>
+                    </span>
+                    <span>類別</span>
+                    <span>項目</span>
+                    <span>年資</span>
+                    <span>獎金</span>
+                    <span>發放月份</span>
+                    <span>發放人數</span>
+                    <span>發放對象</span>
+                    <span>備註</span>
+                    <span></span>
+                </div>
+                <span>
+                    {data && (
+                        data.map((_item: any, index: number) => {
+                            // 計算總薪資
+                            const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0) - parseFloat(_item.leave_day_pay || 0);
+                            const earning_total = taxTotal + parseFloat(_item.overtime_pay || 0)
+                            const deduction_total = parseFloat(_item.advance_payment || 0) + parseFloat(_item.income_tax || 0) + parseFloat(_item.labor_insurance_fee || 0) + parseFloat(_item.health_insurance_fee || 0) + parseFloat(_item.late_deduction || 0) + parseFloat(_item.leave_day_pay || 0);
+                            _item.actual_salary = parseFloat(_item.salary || 0) - parseFloat(_item.leave_day_pay || 0)
+                            _item.earning_total = earning_total;
+                            _item.deduction_total = deduction_total;
+                            _item.subtotal = taxTotal;
+                            const net_pay = parseFloat(_item.earning_total || 0) - parseFloat(_item.deduction_total || 0)
+                            _item.net_pay = net_pay;
+                            return (
+                                <CellWithBar key={index} className={scss.panelHeader1}>
+                                    <div
+                                        className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                    >
+                                        <span
+                                            style={{
+                                                width: '400px',
+                                                backgroundColor: 'white'
+                                            }}>
+                                            {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                                         <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                     </button> */}
-                                                    <button onClick={() => { handleEdit(index) }}>
-                                                        <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
-                                                    </button>
-                                                    <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
-                                                        <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                    <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
-                                                        <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
-                                                </span>
-                                                <span>
-                                                    <input
-                                                        ref={categoryRefs.current[index]}
-                                                        style={{
-                                                            backgroundColor: 'transparent',
-                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '100%'
-                                                        }}
-                                                        readOnly={!(editlist && editlistindex === index)}
-                                                        type={editlist && editlistindex === index ? "text" : "text"}
-                                                        value={editlist && editlistindex === index ? _item.category : _item.category}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newCategory = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                category: editlist ? newCategory : newCategory
-                                                            };
-                                                            setData(newData);
-                                                        }}
-                                                    />
-                                                </span>
-                                                <span>
-                                                    <input
-                                                        ref={item_nameRefs.current[index]}
-                                                        style={{
-                                                            backgroundColor: 'transparent',
-                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '100%'
-                                                        }}
-                                                        readOnly={!(editlist && editlistindex === index)}
-                                                        type={editlist && editlistindex === index ? "text" : "text"}
-                                                        value={editlist && editlistindex === index ? _item.item_name : _item.item_name}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newItem_name = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                item_name: editlist ? newItem_name : newItem_name
-                                                            };
-                                                            setData(newData);
-                                                        }}
-                                                    />
-                                                </span>
-                                                <span>
-                                                    <input
-                                                        ref={seniorityRefs.current[index]}
-                                                        style={{
-                                                            backgroundColor: 'transparent',
-                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '50px'
-                                                        }}
-                                                        readOnly={!(editlist && editlistindex === index)}
-                                                        type={editlist && editlistindex === index ? "number" : "text"}
-                                                        value={
-                                                            editlist && editlistindex === index
-                                                                ? _item.seniority
-                                                                : Number(_item.seniority).toLocaleString()
-                                                        }
-                                                        onChange={(e) => {
-                                                            if (editlist && editlistindex === index) {
-                                                                const newData = [...data];
-                                                                const newSeniority = e.target.value;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    seniority: newSeniority,
-                                                                };
-                                                                setData(newData);
-                                                            }
-                                                        }}
-                                                    />
-                                                    年
-                                                </span>
-                                                <span>
-                                                    <input
-                                                        ref={bonusRefs.current[index]}
-                                                        style={{
-                                                            backgroundColor: 'transparent',
-                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '100%'
-                                                        }}
-                                                        readOnly={!(editlist && editlistindex === index)}
-                                                        type={editlist && editlistindex === index ? "number" : "text"}
-                                                        value={editlist && editlistindex === index ? _item.bonus : Number(_item.bonus).toLocaleString()}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newBonus = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                bonus: editlist ? newBonus : parseFloat(newBonus.replace(/,/g, ''))
-                                                            };
-                                                            setData(newData);
-                                                        }}
-                                                    />
-                                                </span>
-                                                <span>
-                                                    {/* <input
+                                            <button onClick={() => { handleEdit(index, _item) }}>
+                                                <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                            </button>
+                                            <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            <button onClick={() => { handleCancel(index) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
+                                                <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={categoryRefs.current[index]}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                    width: '100%'
+                                                }}
+                                                readOnly={!(editlist && editlistindex === index)}
+                                                type={editlist && editlistindex === index ? "text" : "text"}
+                                                value={editlist && editlistindex === index ? _item.category : _item.category}
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newCategory = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        category: editlist ? newCategory : newCategory
+                                                    };
+                                                    setData(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={item_nameRefs.current[index]}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                    width: '100%'
+                                                }}
+                                                readOnly={!(editlist && editlistindex === index)}
+                                                type={editlist && editlistindex === index ? "text" : "text"}
+                                                value={editlist && editlistindex === index ? _item.item_name : _item.item_name}
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newItem_name = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        item_name: editlist ? newItem_name : newItem_name
+                                                    };
+                                                    setData(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={seniorityRefs.current[index]}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                    width: '50px'
+                                                }}
+                                                readOnly={!(editlist && editlistindex === index)}
+                                                type={editlist && editlistindex === index ? "number" : "text"}
+                                                value={
+                                                    editlist && editlistindex === index
+                                                        ? _item.seniority
+                                                        : Number(_item.seniority).toLocaleString()
+                                                }
+                                                onChange={(e) => {
+                                                    if (editlist && editlistindex === index) {
+                                                        const newData = [...data];
+                                                        const newSeniority = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            seniority: newSeniority,
+                                                        };
+                                                        setData(newData);
+                                                    }
+                                                }}
+                                            />
+                                            年
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={bonusRefs.current[index]}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                    width: '100%'
+                                                }}
+                                                readOnly={!(editlist && editlistindex === index)}
+                                                type={editlist && editlistindex === index ? "number" : "text"}
+                                                value={editlist && editlistindex === index ? _item.bonus : Number(_item.bonus).toLocaleString()}
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newBonus = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        bonus: editlist ? newBonus : parseFloat(newBonus.replace(/,/g, ''))
+                                                    };
+                                                    setData(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        {/* <input
                                                         ref={monthRefs.current[index]}
                                                         style={{
                                                             backgroundColor: 'transparent',
                                                             borderBottom: editlist ? '1px solid gray' : 'none',
                                                             width: '100px'
-                                                        }}
-                                                        readOnly={!editlist}
-                                                        type={editlist ? "text" : "text"}
-                                                        value={editlist ? _item.month : _item.month}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newMonth = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                month: editlist ? newMonth : newMonth
-                                                            };
-                                                            setData(newData);
-                                                        }}
-                                                    /> */}
-                                                    {editlist && editlistindex === index ? (
-                                                        <div
-                                                            style={{
-                                                                position: 'relative',
-                                                                width: '250px',
-                                                                borderBottom: '1px solid gray',
-                                                                // backgroundColor: 'white',
-                                                                cursor: 'pointer',
                                                             }}
-                                                        >
-                                                            {/* 點擊顯示下拉清單 */}
-                                                            <div
-                                                                style={{
-                                                                    backgroundColor: 'transparent',
-                                                                }}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation(); // 防止事件冒泡
-                                                                    const dropdown = e.currentTarget.nextElementSibling as HTMLElement; // 類型斷言
-                                                                    if (dropdown) {
-                                                                        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {_item.month || '未選擇月份'} {/* 如果月份為空顯示提示文字 */}
-                                                            </div>
-
-                                                            {/* 下拉清單 */}
-                                                            <div
-                                                                style={{
-                                                                    position: 'absolute',
-                                                                    top: '100%',
-                                                                    left: 0,
-                                                                    width: '100%',
-                                                                    // borderBottom: '1px solid gray',
-                                                                    // backgroundColor: 'white',
-                                                                    display: 'none',
-                                                                    zIndex: 9999, // 提升 z-index
-                                                                    maxHeight: '200px',
-                                                                    overflowY: 'auto',
-                                                                    border: '1px solid gray'
-                                                                }}
-                                                            >
-                                                                {Array.from({ length: 12 }, (_, i) => {
-                                                                    const monthValue = (i + 1).toString();
-                                                                    const isSelected = (_item.month || '').split(',').includes(monthValue);
-                                                                    return (
-                                                                        <div
-                                                                            key={monthValue}
-                                                                            style={{
-                                                                                backgroundColor: isSelected ? '#3363ff' : 'white',
-                                                                                color: isSelected ? 'white' : 'inherit',
-                                                                                cursor: 'pointer',
-
-                                                                            }}
-                                                                            onClick={() => {
-                                                                                const currentMonths = (_item.month || '').split(',').filter((m: any) => m); // 避免空值
-                                                                                const newMonths = isSelected
-                                                                                    ? currentMonths.filter((m: any) => m !== monthValue) // 移除選項
-                                                                                    : [...currentMonths, monthValue]; // 新增選項
-                                                                                const sortedMonths = newMonths.sort((a: any, b: any) => Number(a) - Number(b)); // 重新排列
-                                                                                const newData = [...data];
-                                                                                newData[index] = {
-                                                                                    ...newData[index],
-                                                                                    month: sortedMonths.join(','), // 更新為排序後的字串
-                                                                                };
-                                                                                setData(newData); // 更新 state
-                                                                            }}
-                                                                        >
-                                                                            {monthValue} 月
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <span>{_item.month || '未選擇月份'}</span> // 顯示非編輯模式的月份字串或提示文字
-                                                    )}
-
-                                                </span>
-                                                <span>{JSON.parse(data[index].employee).length}</span>
-                                                <span>
-                                                    <button onClick={() => {
-                                                        setCurrentEmp(_item.id);
-                                                        setCurrentIndex(index);
-                                                        setpeoplebar(true);
-
-                                                        // 判斷 leave_detail 是字串還是物件
-                                                        let bonuspeopleDetail = data[index].employee;
-
-                                                        // 若是 JSON 字串格式，解析為物件
-                                                        if (typeof bonuspeopleDetail === "string") {
-                                                            try {
-                                                                bonuspeopleDetail = JSON.parse(bonuspeopleDetail);
-                                                            } catch (error) {
-                                                                console.error("JSON 解析錯誤:", error);
-                                                                bonuspeopleDetail = {}; // 若解析失敗，則使用空物件作為預設
-                                                            }
-                                                        }
-
-                                                        // // 將 leaveDetail 轉換成陣列格式
-                                                        // const newbonuspeopleData = Object.entries(bonuspeopleDetail).map(([id, ch_name]) => ({
-                                                        //     id,
-                                                        //     ch_name
-                                                        // }));
-
-                                                        // 更新 leavedata state
-                                                        setbonuspeopledata(bonuspeopleDetail);
-                                                        console.log(bonuspeopleDetail);
-                                                        setOriginalLeavedata(bonuspeople);
-                                                        setAllChecked(false);
-                                                        // alert(_item.seniority);
-                                                        GetEmployee(`${(
-                                                            _item.item_name === "全勤獎金" || _item.item_name === "飲料津貼") ?
-                                                            "NoneSeniorityBased" : "SeniorityBased"}`,
-                                                            _item.seniority)
-                                                    }}>
-                                                        <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                                    </button>
-
-                                                </span>
-                                                <span>
-                                                    <input
-                                                        ref={noteRefs.current[index]}
+                                                            readOnly={!editlist}
+                                                            type={editlist ? "text" : "text"}
+                                                            value={editlist ? _item.month : _item.month}
+                                                            onChange={(e) => {
+                                                                const newData = [...data];
+                                                                const newMonth = e.target.value;
+                                                                newData[index] = {
+                                                                    ...newData[index],
+                                                                    month: editlist ? newMonth : newMonth
+                                                                    };
+                                                                    setData(newData);
+                                                                    }}
+                                                                    /> */}
+                                        {editlist && editlistindex === index ? (
+                                            <span >
+                                                <div
+                                                    style={{
+                                                        position: 'relative',
+                                                        width: '250px',
+                                                        borderBottom: '1px solid gray',
+                                                        // backgroundColor: 'white',
+                                                        cursor: 'pointer',
+                                                    }}
+                                                >
+                                                    {/* 點擊顯示下拉清單 */}
+                                                    <div
                                                         style={{
                                                             backgroundColor: 'transparent',
-                                                            borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
-                                                            width: '100%'
                                                         }}
-                                                        readOnly={!(editlist && editlistindex === index)}
-                                                        type={editlist && editlistindex === index ? "text" : "text"}
-                                                        value={editlist && editlistindex === index ? _item.note : _item.note}
-                                                        onChange={(e) => {
-                                                            const newData = [...data];
-                                                            const newNote = e.target.value;
-                                                            newData[index] = {
-                                                                ...newData[index],
-                                                                note: editlist ? newNote : newNote
-                                                            };
-                                                            setData(newData);
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // 防止事件冒泡
+                                                            const dropdown = e.currentTarget.nextElementSibling as HTMLElement; // 類型斷言
+                                                            if (dropdown) {
+                                                                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                                                            }
                                                         }}
-                                                    />
-                                                </span>
-                                                <span></span>
-                                            </div>
-                                        </CellWithBar>
-                                    );
-                                })
-                            )}
-                        </span>
-                    </div>
-                    <div></div>
-                </div>
-                <div>
+                                                    >
+                                                        {_item.month || '未選擇月份'} {/* 如果月份為空顯示提示文字 */}
+                                                    </div>
 
-                </div>
-                <Modal
-                    visible={peoplebar}
-                    onCancel={() => {
-                        setpeoplebar(false); // 關閉 Modal
-                        // seteditbtn(false);   // 將 editbtn 設為 false
-                        setbonuspeopledata([]);
-                        setAllChecked(false);
-                        setSelectedDepartment("全部部門");
+                                                    {/* 下拉清單 */}
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '100%',
+                                                            left: 0,
+                                                            width: '100%',
+                                                            // borderBottom: '1px solid gray',
+                                                            // backgroundColor: 'white',
+                                                            display: 'none',
+                                                            zIndex: 9999, // 提升 z-index
+                                                            maxHeight: '200px',
+                                                            overflowY: 'auto',
+                                                            border: '1px solid gray'
+                                                        }}
+                                                    >
+                                                        {Array.from({ length: 12 }, (_, i) => {
+                                                            const monthValue = (i + 1).toString();
+                                                            const isSelected = (_item.month || '').split(',').includes(monthValue);
+                                                            return (
+                                                                <div
+                                                                    key={monthValue}
+                                                                    style={{
+                                                                        backgroundColor: isSelected ? '#3363ff' : 'white',
+                                                                        color: isSelected ? 'white' : 'inherit',
+                                                                        cursor: 'pointer',
 
-                    }}
-                    width="1002px"
-                    closable={false} // 移除右上角的叉叉
-                    style={{ top: 150 }}
-                    bodyStyle={{ padding: 0, height: '520px', overflow: 'hidden' }} // 限制 Modal 高度並防止溢出
-                    title={
-                        <>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                                {/* 全部清除按鈕，固定在左邊 */}
-                                {bonuspeople.length}
-                                <button
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定全部清除嗎?',
-                                            content: null,
-                                            props: {
-                                                onOk: async () => {
-                                                    setbonuspeopledata([]); // 清空 bonuspeople
-                                                    setAllChecked(false); // 取消全選
+                                                                    }}
+                                                                    onClick={() => {
+                                                                        const currentMonths = (_item.month || '').split(',').filter((m: any) => m); // 避免空值
+                                                                        const newMonths = isSelected
+                                                                            ? currentMonths.filter((m: any) => m !== monthValue) // 移除選項
+                                                                            : [...currentMonths, monthValue]; // 新增選項
+                                                                        const sortedMonths = newMonths.sort((a: any, b: any) => Number(a) - Number(b)); // 重新排列
+                                                                        const newData = [...data];
+                                                                        newData[index] = {
+                                                                            ...newData[index],
+                                                                            month: sortedMonths.join(','), // 更新為排序後的字串
+                                                                        };
+                                                                        setData(newData); // 更新 state
+                                                                    }}
+                                                                >
+                                                                    {monthValue} 月
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </span>
+                                        ) : (
+                                            <span>{_item.month || '未選擇月份'}</span> // 顯示非編輯模式的月份字串或提示文字
+                                        )}
+
+                                        <span>{JSON.parse(data[index].employee).length}</span>
+                                        <span>
+                                            <button onClick={() => {
+                                                setCurrentEmp(_item.id);
+                                                setCurrentIndex(index);
+                                                setpeoplebar(true);
+
+                                                // 判斷 leave_detail 是字串還是物件
+                                                let bonuspeopleDetail = data[index].employee;
+
+                                                // 若是 JSON 字串格式，解析為物件
+                                                if (typeof bonuspeopleDetail === "string") {
+                                                    try {
+                                                        bonuspeopleDetail = JSON.parse(bonuspeopleDetail);
+                                                    } catch (error) {
+                                                        console.error("JSON 解析錯誤:", error);
+                                                        bonuspeopleDetail = {}; // 若解析失敗，則使用空物件作為預設
+                                                    }
                                                 }
-                                            }
-                                        });
-                                    }}
-                                    style={{
-                                        padding: "6px 12px",
-                                        fontSize: "14px",
-                                        backgroundColor: "#ea1833",
-                                        color: "#fff",
-                                        border: "none",
-                                        borderRadius: "4px",
-                                        cursor: "pointer",
-                                        visibility: `${editbtn === true ? 'visible' : 'hidden'}`, // 隱藏但保留空間
-                                    }}
-                                >
-                                    全部清除
-                                </button>
 
-                                {/* 搜尋框和下拉選單，固定在左邊和右邊 */}
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                                    {/* 新增下拉選單（移到左邊） */}
-                                    <select
-                                        style={{
-                                            padding: "6px 12px",
-                                            fontSize: "16px",
-                                            borderBottom: "1px solid #c1c1c1",
-                                            cursor: "pointer",
-                                            color: "#14256a",
-                                            outline: "none",
-                                        }}
-                                        onChange={(e) => setSelectedDepartment(e.target.value)}
-                                        value={selectedDepartment}
-                                    >
-                                        <option value="">全部部門</option>
-                                        {Array.from(new Set(employeedata.map(item => item.department_name)))
-                                            .filter(Boolean) // 避免空值
-                                            .map((dept, index) => (
-                                                <option key={index} value={dept}>
-                                                    {dept}
-                                                </option>
-                                            ))}
-                                    </select>
+                                                // // 將 leaveDetail 轉換成陣列格式
+                                                // const newbonuspeopleData = Object.entries(bonuspeopleDetail).map(([id, ch_name]) => ({
+                                                //     id,
+                                                //     ch_name
+                                                // }));
 
-                                    {/* 搜尋框 */}
-                                    <div
-                                        style={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            borderBottom: "1px solid #c1c1c1",
-                                        }}
-                                    >
-                                        <input
-                                            type="text"
-                                            placeholder="搜尋關鍵字"
-                                            value={searchText}
-                                            style={{
-                                                padding: "4px 5px",
-                                                width: "350px",
-                                                fontSize: "16px",
-                                                border: "none",
-                                                outline: "none",
-                                            }}
-                                            onChange={(e) => setSearchText(e.target.value)}
-                                        />
-                                        <span style={{ padding: "4px 12px" }}>
-                                            <img
-                                                src={icon_search2.src}
-                                                alt="search"
-                                                style={{ height: "20px", width: "20px" }}
+                                                // 更新 leavedata state
+                                                setbonuspeopledata(bonuspeopleDetail);
+                                                console.log(bonuspeopleDetail);
+                                                setOriginalLeavedata(bonuspeople);
+                                                setAllChecked(false);
+                                                // alert(_item.seniority);
+                                                GetEmployee(`${(
+                                                    _item.item_name === "全勤獎金" || _item.item_name === "飲料津貼") ?
+                                                    "NoneSeniorityBased" : "SeniorityBased"}`,
+                                                    _item.seniority)
+                                            }}>
+                                                <img src={icon_eye.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                            </button>
+
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                    width: '100%'
+                                                }}
+                                                readOnly={!(editlist && editlistindex === index)}
+                                                type={editlist && editlistindex === index ? "text" : "text"}
+                                                value={editlist && editlistindex === index ? _item.note : _item.note}
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newNote = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        note: editlist ? newNote : newNote
+                                                    };
+                                                    setData(newData);
+                                                }}
                                             />
                                         </span>
+                                        <span></span>
                                     </div>
-                                </div>
+                                </CellWithBar>
+                            );
+                        })
+                    )}
+                </span>
+            </div>
+            <div></div>
+            {/* </div> */}
+            <div>
 
-                            </div>
+            </div>
+            <Modal
+                visible={peoplebar}
+                onCancel={() => {
+                    setpeoplebar(false); // 關閉 Modal
+                    // seteditbtn(false);   // 將 editbtn 設為 false
+                    setbonuspeopledata([]);
+                    setAllChecked(false);
+                    setSelectedDepartment("全部部門");
 
-                        </>
-
-                    }
-
-                    footer={
-                        <div style={{ justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
-                            <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
-                                <span style={{ display: `${editlist && editlistindex === currenindex ? '' : 'none'}` }}>
-                                    <button
-                                        className={scss.minitabbtn}
-                                        onClick={() => {
-                                            seteditbtn(!editbtn);
-                                            setOriginalLeavedata(bonuspeople);
-                                        }}
-                                        style={{
-                                            display: `${editbtn === false ? '' : 'none'}`,
-                                            margin: '0px 20px'
-                                        }}
-                                    >
-                                        編輯
-                                    </button>
-                                </span>
-                            </span>
+                }}
+                width="1002px"
+                closable={false} // 移除右上角的叉叉
+                style={{ top: 150 }}
+                bodyStyle={{ padding: 0, height: '520px', overflow: 'hidden' }} // 限制 Modal 高度並防止溢出
+                title={
+                    <>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                            {/* 全部清除按鈕，固定在左邊 */}
+                            {bonuspeople.length}
                             <button
-                                className={scss.minitabbtn}
                                 onClick={() => {
                                     myAlert.confirm({
-                                        title: '確定要取消編輯嗎?',
+                                        title: '確定全部清除嗎?',
                                         content: null,
                                         props: {
                                             onOk: async () => {
-                                                seteditbtn(false);
-                                                setbonuspeopledata(originalleavedata);
-                                                // setpeoplebar(false);
+                                                setbonuspeopledata([]); // 清空 bonuspeople
+                                                setAllChecked(false); // 取消全選
                                             }
                                         }
-                                    })
-
-
+                                    });
                                 }}
                                 style={{
-                                    display: `${editbtn === true ? '' : 'none'}`,
-                                    margin: '0px 20px'
+                                    padding: "6px 12px",
+                                    fontSize: "14px",
+                                    backgroundColor: "#ea1833",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    cursor: "pointer",
+                                    visibility: `${editbtn === true ? 'visible' : 'hidden'}`, // 隱藏但保留空間
                                 }}
                             >
-                                取消
+                                全部清除
                             </button>
-                            <button
-                                className={scss.minitabbtn}
-                                onClick={() => {
-                                    setpeoplebar(false)
-                                    seteditbtn(false)
-                                }}
-                                style={{ display: `${editbtn === false ? '' : 'none'}` }}
-                            >
-                                關閉
-                            </button>
-                            <button
-                                className={scss.minitabredbtn}
-                                onClick={() => {
-                                    console.log(bonuspeople);
-                                    updateLeaveDetail(currentemp);
-                                    // setLeavedaybar(false);
-                                    seteditbtn(false);
-                                }}
-                                style={{ display: `${editbtn === true ? '' : 'none'}` }}
-                            >
-                                確定
-                            </button>
+
+                            {/* 搜尋框和下拉選單，固定在左邊和右邊 */}
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                                {/* 新增下拉選單（移到左邊） */}
+                                <select
+                                    style={{
+                                        padding: "6px 12px",
+                                        fontSize: "16px",
+                                        borderBottom: "1px solid #c1c1c1",
+                                        cursor: "pointer",
+                                        color: "#14256a",
+                                        outline: "none",
+                                    }}
+                                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                                    value={selectedDepartment}
+                                >
+                                    <option value="">全部部門</option>
+                                    {Array.from(new Set(employeedata.map(item => item.department_name)))
+                                        .filter(Boolean) // 避免空值
+                                        .map((dept, index) => (
+                                            <option key={index} value={dept}>
+                                                {dept}
+                                            </option>
+                                        ))}
+                                </select>
+
+                                {/* 搜尋框 */}
+                                <div
+                                    style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        borderBottom: "1px solid #c1c1c1",
+                                    }}
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="搜尋關鍵字"
+                                        value={searchText}
+                                        style={{
+                                            padding: "4px 5px",
+                                            width: "350px",
+                                            fontSize: "16px",
+                                            border: "none",
+                                            outline: "none",
+                                        }}
+                                        onChange={(e) => setSearchText(e.target.value)}
+                                    />
+                                    <span style={{ padding: "4px 12px" }}>
+                                        <img
+                                            src={icon_search2.src}
+                                            alt="search"
+                                            style={{ height: "20px", width: "20px" }}
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
                         </div>
-                    }
-                >
-                    {/* Header */}
-                    <div className={scss.thead2}>
-                        <span>
 
+                    </>
+
+                }
+
+                footer={
+                    <div style={{ justifyContent: 'center', gap: '10px', padding: '10px 44px' }}>
+                        <span style={{ display: `${(viewtype === "review" || status === "審核中" || status === "已核准") ? 'none' : ''}` }}>
+                            <span style={{ display: `${editlist && editlistindex === currenindex ? '' : 'none'}` }}>
+                                <button
+                                    className={scss.minitabbtn}
+                                    onClick={() => {
+                                        seteditbtn(!editbtn);
+                                        setOriginalLeavedata(bonuspeople);
+                                    }}
+                                    style={{
+                                        display: `${editbtn === false ? '' : 'none'}`,
+                                        margin: '0px 20px'
+                                    }}
+                                >
+                                    編輯
+                                </button>
+                            </span>
                         </span>
-                        <span>員工編號</span>
-                        <span>部門</span>
-                        <span>姓名</span>
-                        <span>年資</span>
-                        <span></span>
-                    </div>
+                        <button
+                            className={scss.minitabbtn}
+                            onClick={() => {
+                                myAlert.confirm({
+                                    title: '確定要取消編輯嗎?',
+                                    content: null,
+                                    props: {
+                                        onOk: async () => {
+                                            seteditbtn(false);
+                                            setbonuspeopledata(originalleavedata);
+                                            // setpeoplebar(false);
+                                        }
+                                    }
+                                })
 
-                    {/* Body Content */}
-                    <div style={{}}>
-                        <div
-                            className={scss.body_content1}
-                            style={{ overflowY: 'auto', borderBottom: '5px solid #e0e0e0' }} // 第一部分
+
+                            }}
+                            style={{
+                                display: `${editbtn === true ? '' : 'none'}`,
+                                margin: '0px 20px'
+                            }}
                         >
-                            <span style={{ overflowY: 'auto', height: '200px' }}>
-                                {bonuspeople && bonuspeople.map((item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader2}>
-                                        <div
-                                            key={index}
-                                            className={`${scss.row01}`}
-                                        >
-                                            <span>
-                                                {/* {editbtn && (
+                            取消
+                        </button>
+                        <button
+                            className={scss.minitabbtn}
+                            onClick={() => {
+                                setpeoplebar(false)
+                                seteditbtn(false)
+                            }}
+                            style={{ display: `${editbtn === false ? '' : 'none'}` }}
+                        >
+                            關閉
+                        </button>
+                        <button
+                            className={scss.minitabredbtn}
+                            onClick={() => {
+                                console.log(bonuspeople);
+                                updateLeaveDetail(currentemp);
+                                // setLeavedaybar(false);
+                                seteditbtn(false);
+                            }}
+                            style={{ display: `${editbtn === true ? '' : 'none'}` }}
+                        >
+                            確定
+                        </button>
+                    </div>
+                }
+            >
+                {/* Header */}
+                <div className={scss.thead2}>
+                    <span>
+
+                    </span>
+                    <span>員工編號</span>
+                    <span>部門</span>
+                    <span>姓名</span>
+                    <span>年資</span>
+                    <span></span>
+                </div>
+
+                {/* Body Content */}
+                <div style={{}}>
+                    <div
+                        className={scss.body_content1}
+                        style={{ overflowY: 'auto', borderBottom: '5px solid #e0e0e0' }} // 第一部分
+                    >
+                        <span style={{ overflowY: 'auto', height: '200px' }}>
+                            {bonuspeople && bonuspeople.map((item, index) => (
+                                <CellWithBar key={index} className={scss.panelHeader2}>
+                                    <div
+                                        key={index}
+                                        className={`${scss.row01}`}
+                                    >
+                                        <span>
+                                            {/* {editbtn && (
                                                     <button onClick={() => { handleRemove(item) }}
                                                         style={{
                                                             height: '20px'
@@ -1644,134 +1660,134 @@ export default function bonusMaintenance() {
                                                             style={{ width: '30px', height: '30px' }} />
                                                     </button>
                                                 )} */}
+                                        </span>
+                                        <span>{item.id_number}</span>
+                                        <span>{item.department_name}</span>
+                                        <span>{item.ch_name}</span>
+                                        <span>{item.seniority}</span>
+                                        <span>
+                                            {editbtn && (
+                                                <button onClick={() => { handleRemove(item) }}
+                                                    style={{
+                                                        height: '20px'
+                                                    }}>
+                                                    <img src={icon_cir_remove.src} alt="remove"
+                                                        style={{ width: '30px', height: '30px' }} />
+                                                </button>
+                                            )}
+                                        </span>
+                                        <span>
+
+                                        </span>
+                                    </div>
+                                </CellWithBar>
+                            ))}
+                        </span>
+                        <label style={{ display: "flex", alignItems: "center", padding: ' 10px 30px', fontSize: '16px', borderTop: '5px solid #ccc' }}>
+                            <input
+                                type="checkbox"
+                                checked={allChecked}
+                                onChange={handleSelectAll}
+                                disabled={!editbtn} // 當 editbtn 為 false 時禁用
+                                style={{
+                                    transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
+                                    margin: "0 10px", // 調整外邊距，讓顯示更美觀
+
+                                }}
+                            />
+                            <span style={{ paddingLeft: '20px' }}>
+                                全選
+                            </span>
+
+                        </label>
+                        <div style={{ overflowY: 'auto', height: '220px', borderTop: '1px solid #ccc' }}>
+                            {/* 全選功能的 Checkbox */}
+
+                            {filteredData.map((item, index) => {
+                                const isChecked = bonuspeople.some((person) => person.id === item.id);
+
+                                return (
+                                    <CellWithBar key={index} className={scss.panelHeader3}>
+                                        <div
+                                            className={`${scss.row01}`}
+                                            onClick={() => editbtn && handleCheckboxChange(item, !isChecked)} // 點擊整個列勾選/取消
+                                            style={{ cursor: editbtn ? "pointer" : "default" }} // 當 `editbtn` 為 false 時，禁用點擊效果
+                                        >
+                                            <span>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isChecked}
+                                                    onChange={(e) => handleCheckboxChange(item, e.target.checked)}
+                                                    disabled={!editbtn} // 當 `editbtn` 為 false 時禁用
+                                                    onClick={(e) => e.stopPropagation()} // 防止點擊 checkbox 時觸發整行的 onClick
+                                                    style={{
+                                                        transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
+                                                        margin: "0 10px", // 調整外邊距，讓顯示更美觀
+                                                    }}
+                                                />
                                             </span>
                                             <span>{item.id_number}</span>
                                             <span>{item.department_name}</span>
                                             <span>{item.ch_name}</span>
                                             <span>{item.seniority}</span>
-                                            <span>
-                                                {editbtn && (
-                                                    <button onClick={() => { handleRemove(item) }}
-                                                        style={{
-                                                            height: '20px'
-                                                        }}>
-                                                        <img src={icon_cir_remove.src} alt="remove"
-                                                            style={{ width: '30px', height: '30px' }} />
-                                                    </button>
-                                                )}
-                                            </span>
-                                            <span>
-
-                                            </span>
                                         </div>
                                     </CellWithBar>
-                                ))}
-                            </span>
-                            <label style={{ display: "flex", alignItems: "center", padding: ' 10px 30px', fontSize: '16px', borderTop: '5px solid #ccc' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={allChecked}
-                                    onChange={handleSelectAll}
-                                    disabled={!editbtn} // 當 editbtn 為 false 時禁用
-                                    style={{
-                                        transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
-                                        margin: "0 10px", // 調整外邊距，讓顯示更美觀
-
-                                    }}
-                                />
-                                <span style={{ paddingLeft: '20px' }}>
-                                    全選
-                                </span>
-
-                            </label>
-                            <div style={{ overflowY: 'auto', height: '220px', borderTop: '1px solid #ccc' }}>
-                                {/* 全選功能的 Checkbox */}
-
-                                {filteredData.map((item, index) => {
-                                    const isChecked = bonuspeople.some((person) => person.id === item.id);
-
-                                    return (
-                                        <CellWithBar key={index} className={scss.panelHeader3}>
-                                            <div
-                                                className={`${scss.row01}`}
-                                                onClick={() => editbtn && handleCheckboxChange(item, !isChecked)} // 點擊整個列勾選/取消
-                                                style={{ cursor: editbtn ? "pointer" : "default" }} // 當 `editbtn` 為 false 時，禁用點擊效果
-                                            >
-                                                <span>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isChecked}
-                                                        onChange={(e) => handleCheckboxChange(item, e.target.checked)}
-                                                        disabled={!editbtn} // 當 `editbtn` 為 false 時禁用
-                                                        onClick={(e) => e.stopPropagation()} // 防止點擊 checkbox 時觸發整行的 onClick
-                                                        style={{
-                                                            transform: "scale(1.5)", // 放大 1.5 倍，可根據需求調整
-                                                            margin: "0 10px", // 調整外邊距，讓顯示更美觀
-                                                        }}
-                                                    />
-                                                </span>
-                                                <span>{item.id_number}</span>
-                                                <span>{item.department_name}</span>
-                                                <span>{item.ch_name}</span>
-                                                <span>{item.seniority}</span>
-                                            </div>
-                                        </CellWithBar>
-                                    );
-                                })}
-
-                            </div>
+                                );
+                            })}
 
                         </div>
-                        {/* <hr style={{ border: 'solid 2px gray' }} /> */}
-                        {/* <div
+
+                    </div>
+                    {/* <hr style={{ border: 'solid 2px gray' }} /> */}
+                    {/* <div
                             className={scss.body_content1}
                             style={{ overflowY: 'auto', height: '500px', borderTop: '5px solid #ccc' }} // 第二部分
                         >
                            
                         </div> */}
 
-                    </div>
-                </Modal>
+                </div>
+            </Modal>
 
 
-                <DragableModal
-                    handleText="選擇審核流程"
-                    style={{ zIndex: '1001', width: '1000px' }}
-                    show={reviewbar}
-                    onCrossClick={() => { setReviewbar(false) }}>
-                    <div style={{ padding: '0px 5px' }}>
-                        <span style={{ fontSize: '18px' }}>送審主旨</span>
-                        <input placeholder="主旨"
-                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
-                            value={documenttitle}
-                            onChange={(e) => { setDocumenttitle(e.target.value) }}
-                        />
-                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
-                            <Space direction="vertical">
-                                {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
-                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                                            {_item.name}：
-                                            {_item.stages.map((_stage: any, index: number) => (
-                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
-                                                    {_stage.review_type}：{_stage.stage_user_name}
-                                                    {index < _item.stages.length - 1 && (
-                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Radio>
-                                ))}
-                            </Space>
-                        </Radio.Group>
-                    </div>
-                </DragableModal>
+            <DragableModal
+                handleText="選擇審核流程"
+                style={{ zIndex: '1001', width: '1000px' }}
+                show={reviewbar}
+                onCrossClick={() => { setReviewbar(false) }}>
+                <div style={{ padding: '0px 5px' }}>
+                    <span style={{ fontSize: '18px' }}>送審主旨</span>
+                    <input placeholder="主旨"
+                        style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                        value={documenttitle}
+                        onChange={(e) => { setDocumenttitle(e.target.value) }}
+                    />
+                    <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                        <Space direction="vertical">
+                            {reviewdata.map((_item: any) => (
+                                <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                    <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                        {_item.name}：
+                                        {_item.stages.map((_stage: any, index: number) => (
+                                            <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                {_stage.review_type}：{_stage.stage_user_name}
+                                                {index < _item.stages.length - 1 && (
+                                                    <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Radio>
+                            ))}
+                        </Space>
+                    </Radio.Group>
+                </div>
+            </DragableModal>
 
 
 
 
-            </div>
+            {/* </div> */}
         </SubLayer>
 
     )
