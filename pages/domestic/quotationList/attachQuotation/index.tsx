@@ -20,6 +20,9 @@ import Decimal from 'decimal.js';
 import _ from 'lodash';
 import { AxiosError } from 'axios';
 
+// antd
+import Dropdown from 'components/global/gear/dropdown/Dropdown';
+
 // components
 import QuotationProfile, { Tcontrol_profile, useProfile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationSinature_3, {
@@ -48,6 +51,7 @@ import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButto
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -452,11 +456,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const {
     visible: pdfModalVisible,
-    setVisible: setPdfModalVisible,
+    // setVisible: setPdfModalVisible,
+    showPdf,
+    showPdf_noDiscount,
+    hidePdf,
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: theContent,
-    attachedProdArr: [...(contractProdArr ?? []), ...(contentProdArr ?? [])],
+    // attachedProdArr: [...(contractProdArr ?? []), ...(contentProdArr ?? [])],
+    attachedProdArr: useMemo(() => {
+      return [...(contractProdArr ?? []), ...(contentProdArr ?? [])];
+    }, [contractProdArr, contentProdArr]),
   });
 
   // -----------------------------------------------------
@@ -1257,8 +1267,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     );
   };
 
-  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
-
   const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
     const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
       {
@@ -1346,20 +1354,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
   const panel_noEditable: TpanelList = [
-    {
-      className: classNames(style.panelListBtn, style.plus),
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setPdfModalVisible(true),
-    },
-    {
-      className: classNames(style.panelListBtn, style.plus),
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
+    // {
+    //   className: classNames(style.panelListBtn, style.plus),
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   onClick: () => showPdf(),
+    // },
+    // {
+    //   className: classNames(style.panelListBtn, style.plus),
+    //   type: 'myButton',
+    //   label: '匯出材料/配件',
+    //   img: iconUpload.src,
+    //   onClick: () => setShowPdf_part(true),
+    // },
     isAllReviewedBeforePending && quotationId
       ? {
           className: classNames(style.panelListBtn, style.plus),
@@ -1478,6 +1486,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return panel_editable;
     }
   })();
+
+  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
+
+  const customeRight = [
+    <Dropdown
+      key="1"
+      // placement="bottomRight"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
+          匯出報價單
+        </MyButton_v2>,
+        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+          單價分析
+        </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+          {'匯出報價單(無折扣)'}
+        </MyButton_v2>,
+      ]}
+    >
+      匯出
+    </Dropdown>,
+  ];
 
   // --------------------------------------------------------------------------
 
@@ -1618,6 +1649,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <PageHeader02
         tag={`報價編號 ${theContent?.quotationNumber || ''}　追加追減報價單`}
         customeLeft={customeLeft}
+        customeRight={disabled ? customeRight : undefined}
         panelList={panelList}
       />
 
@@ -1878,9 +1910,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {theContent && (
         <QuotationPdf
           visible={pdfModalVisible}
-          onCancel={() => {
-            setPdfModalVisible(false);
-          }}
+          onCancel={hidePdf}
           pdfData={pdfData}
           fileName={`報價單-${theContent?.quotationNumber}`}
           // productArr_f={Object.values(productList)}
