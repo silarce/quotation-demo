@@ -210,9 +210,9 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.discount;
   }
   set discount(value) {
-    if (checkIsFloat3(value)) {
-      return;
-    }
+    // if (checkIsFloat3(value)) {
+    //   return;
+    // }
 
     this.setData_simple('discount', value);
   }
@@ -227,17 +227,18 @@ class ClassProd_base implements Interface_ClassProd_base {
   get doorModelName() {
     return this.data.doorModelName;
   }
-  // set doorModelName(value) {
-  //   this.setData_simple('doorModelName', value);
-  // }
+  set doorModelName(value) {
+    this.data.doorModelName = value;
+    this.render();
+  }
 
   get fullWidth() {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    if (!checkIsFloat3(value)) {
-      return;
-    }
+    // if (!checkIsFloat3(value)) {
+    //   return;
+    // }
 
     this.data.fullWidth = value;
     this.data.area = calcArea(this);
@@ -295,11 +296,12 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.boxB;
   }
   set boxB(value) {
-    if (checkIsFloat3(value)) {
-      return;
-    }
+    // if (checkIsFloat3(value)) {
+    //   return;
+    // }
 
-    this.setData_simple('boxB', value);
+    this.data.boxB = value;
+    this.render();
   }
   get boxB_mm() {
     return new Decimal(this.data.boxB).mul(1000).toNumber();
@@ -461,9 +463,9 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.bounceDoorWidth;
   }
   set bounceDoorWidth(value) {
-    if (checkIsFloat3(value)) {
-      return;
-    }
+    // if (checkIsFloat3(value)) {
+    //   return;
+    // }
 
     this.setData_simple('bounceDoorWidth', value);
     this.setData_simple('bounceDoor', !!value);

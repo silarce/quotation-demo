@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // antd
 import { Checkbox } from 'antd';
@@ -32,14 +33,25 @@ import {
   optionsCreator_closingType,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
+  optionsCreator_boxB_SJ302,
+  optionsCreator_boxB_SJ303A,
+  optionsCreator_boxB_SJ312,
+  optionsCreator_boxB_SJ305D,
+  optionsCreator_horsePower,
+  lookup_options_bottomBarAngleIronAndPlate,
+  optionsCreator_doorModelName,
+  lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 import { TdoorModelInfoDto } from 'js/api/api_product';
 import { createAssetUrl } from 'js/api/api_product';
 import type { Toption, ToptionPlus } from 'js/utils/options/options';
 
+import { TdoorModel } from 'js/api/dtoTypes';
+
 // =======================================================================
 const options_quoteType = optionsCreator_quoteType();
+
 // =======================================================================
 
 interface TconfigItem_prod {
@@ -137,6 +149,32 @@ const defaultKeyArr: TcellKey[] = [
   'bottomBarAngleIron',
   'bottomBarPlate',
 ];
+
+// =======================================================================
+
+// const lookup_options_boxB: {
+//   [doorType: string]: Toption[] | undefined;
+// } = {
+//   'SJ-302': optionsCreator_boxB_SJ302(),
+//   'SJ-303A': optionsCreator_boxB_SJ303A(),
+//   'SJ-303AS': optionsCreator_boxB_SJ303A(),
+//   'SJ-305D': optionsCreator_boxB_SJ305D(),
+//   'SJ-312': optionsCreator_boxB_SJ312(),
+// };
+
+type Tlookup_options_boxB = {
+  [key in TdoorModel]: Toption[] | undefined;
+};
+
+const lookup_options_boxB: Tlookup_options_boxB = {
+  'SJ-302': optionsCreator_boxB_SJ302(),
+  'SJ-312': optionsCreator_boxB_SJ312(),
+  'SJ-305D': optionsCreator_boxB_SJ305D(),
+  'SJ-303A': optionsCreator_boxB_SJ303A(),
+  'SJ-303AS': optionsCreator_boxB_SJ303A(),
+  'SJ-120A': undefined,
+  'SJ-303S': undefined,
+};
 
 // =======================================================================
 
@@ -296,9 +334,11 @@ const nodeConfig_origin: TnodeConfig = {
       width: 80,
     },
     createNode({ disabled, classProd }) {
+      const options = lookup_options_boxB[classProd.doorModelName as TdoorModel] || [];
+
       const selectProps: TinputSelProps['selectProps'] = {
         props: {
-          options: undefined,
+          options,
           value: classProd.boxB ? { value: classProd.boxB, label: classProd.boxB } : null,
           onChange: (option) => {
             const value = (option?.value || '') as `${number}` | '';
@@ -370,8 +410,25 @@ const nodeConfig_origin: TnodeConfig = {
       if (motorArr) {
         let hpArr = motorArr.map((motor) => motor.horsePower);
         hpArr = _.uniq(hpArr);
-        options = hpArr.map((hp) => {
-          return { value: hp, label: hp };
+
+        const theIndex = hpArr.indexOf('1.5HP');
+
+        if (theIndex > -1) {
+          hpArr[theIndex] = '1 1/2HP';
+        }
+
+        // optionsCreator_horsePower是已經排序好的options
+        // 這樣處理省下排序的麻煩
+        options = optionsCreator_horsePower();
+        options = options.filter((hp) => {
+          return hpArr.includes(hp.value);
+        });
+
+        // 如果hp中含有options中沒有的值，就加進options
+        hpArr.forEach((hp) => {
+          if (!options?.find((option) => option.value === hp)) {
+            options?.push({ value: hp, label: hp });
+          }
         });
       }
 
