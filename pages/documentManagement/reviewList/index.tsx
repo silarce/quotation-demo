@@ -43,6 +43,7 @@ import PurchaseRequisitionList from 'pages/factoryDepartment/purchaseRequisition
 import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
 import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 import SalarySettlement from 'pages/accounting/salarySettlement';
+import BonusPayout from 'pages/accounting/bonusPayout';
 
 
 
@@ -509,13 +510,24 @@ export default function ReviewList() {
                     },
                 }, undefined, { shallow: true });
             }
-            else if (reviewtype==="薪資帳簿"){
+            else if (reviewtype==="薪資單"){
                 const parsedQuery = JSON.parse(itemQuery.query);
                 console.log(parsedQuery);
                 router.replace({
                     query: {
                         year: parsedQuery.year,
                         month: parsedQuery.month,
+                        viewtype: 'review'
+                    },
+                }, undefined, { shallow: true });
+            }
+            else if (reviewtype==="獎金"){
+                const parsedQuery = JSON.parse(itemQuery.query);
+                console.log(parsedQuery);
+                router.replace({
+                    query: {
+                        year: parsedQuery.year,
+                        bonustype:parsedQuery.bonustype,
                         viewtype: 'review'
                     },
                 }, undefined, { shallow: true });
@@ -1299,7 +1311,8 @@ export default function ReviewList() {
                                             {reviewtype === "採購單" && <PurchaseOrderList key={theKey} />}
                                             {reviewtype === "進貨單" && <ProdReceiptList key={theKey} />}
                                             {reviewtype === "報價單" && <Quotation key={theKey} />}
-                                            {reviewtype === "薪資帳簿" && <SalarySettlement key={theKey} />}
+                                            {reviewtype === "薪資單" && <SalarySettlement key={theKey} />}
+                                            {reviewtype === "獎金" && <BonusPayout key={theKey} />}
                                         </div>
                                     ) : (
                                         <p>頁面加載中...</p> // 可以顯示一個載入中的提示

@@ -119,6 +119,7 @@ type TreqPostAccountReceivableAccountant = (props: {
   accountant: TaccountantDto;
   incomeBillDate: string;
   splitPayment: number;
+  isForeign: boolean;
 }) => Promise<void>;
 
 type TreqDelete = (id: string) => Promise<void>;
@@ -318,7 +319,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       accountantId: [accountantId],
       incomeBillDate,
       splitPayment,
-      // isForeign,
+      isForeign,
     };
 
     // apiPostAccountReceivableAccounts 最後的單字是Accounts不是Accountant
@@ -337,6 +338,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     accountant,
     incomeBillDate,
     splitPayment,
+    isForeign,
   }) => {
     if (!accountant) {
       alert('accountantId為undefined');
@@ -350,7 +352,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         accountantId: [accountant.id],
         incomeBillDate,
         splitPayment: splitPayment,
-        // isForeign: accountant.currency !== 'TWD 新臺幣',
+        isForeign,
       });
       await update_accountant();
     } catch (error) {
@@ -377,12 +379,13 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       title: '匯入發票',
       content: (
         <ExportToIncomeBill
-          onConfirm={({ isoString, splitPayment }) =>
+          onConfirm={({ isoString, splitPayment, isForeign }) =>
             reqPostAccountReceivableAccountant({
               accountReceivableId,
               accountant: accountantWillImport,
               incomeBillDate: isoString,
               splitPayment,
+              isForeign,
             })
           }
           onCancel={modal.destroy}
@@ -527,6 +530,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 return {
                   currency: {
                     $eq: accountantWillImport?.currency,
+                  },
+                  accountReceivableId: {
+                    $notNull: true,
                   },
                 };
               },

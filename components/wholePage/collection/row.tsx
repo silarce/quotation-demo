@@ -169,13 +169,13 @@ const Row = ({
         title: '匯入紙本應收帳款',
         content: (
           <ExportToIncomeBill
-            onConfirm={({ isoString, splitPayment: separatePayment }) =>
+            onConfirm={({ isoString, splitPayment: separatePayment, isForeign }) =>
               reqPatchIsImported(
                 //
                 data_accountant.id,
                 isoString,
                 separatePayment,
-                data_accountant.currency !== 'TWD 新臺幣'
+                isForeign
               )
             }
             onCancel={modal.destroy}
