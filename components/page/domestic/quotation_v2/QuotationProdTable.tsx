@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
+import { useInView } from 'react-intersection-observer';
 
 // component
 import {
@@ -28,7 +29,7 @@ import iconChange from 'public/image/icon/change.svg';
 // css
 import scss from './QuotationProdTable.module.scss';
 
-import { TuseQuotationProductInstance } from './hook/quotationProduct/useQuotationProduct';
+import { TuseQuotationProductInstance, TstateProd } from './hook/quotationProduct/useQuotationProduct';
 
 // ===================================================================
 
@@ -137,6 +138,7 @@ const Table_prod = ({
   const {
     classProdDict,
     activedClassProd: activeClassProd,
+    activedProd,
     //
     cellKeyArr,
     setCellKeyArr,
@@ -150,6 +152,12 @@ const Table_prod = ({
     quotationDiscount,
     setQuotationDiscount,
     //
+    //
+    //
+    state_prodDict,
+    createSetProd,
+    lookup_classProd,
+    nodeConfig_prime,
   } = instance_useQuotationProductInstance;
 
   return (
@@ -208,76 +216,109 @@ const Table_prod = ({
           }}
         >
           {prodKeyArr.map((prodKey, index) => {
-            const classProd = classProdDict[prodKey];
-            const isActive = activeClassProd === classProd;
-
-            const nodeConfig_itemName = classProd.nodeConfig['itemName'];
-
-            const left = (
-              <>
-                <Cell_delete onClick={() => {}} />
-                <Cell_copy onClick={() => {}} />
-                <Cell_indexNumber>{index + 1}</Cell_indexNumber>
-                <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
-                  {nodeConfig_itemName.createNode({
-                    disabled,
-                    classProd,
-                  })}
-                </Cell>
-              </>
-            );
+            const stateProd = state_prodDict[prodKey];
+            const isActive = activedProd === stateProd;
 
             return (
-              <Spin key={prodKey} spinning={classProd.isFetching}>
-                <QuotationRow_dnd_memo
-                  //
-                  rerenderTrigger01={classProd.state}
-                  rerenderTrigger02={disabled}
-                  rerenderTrigger03={cellKeyArr}
-                  //
-                  key={prodKey}
-                  id={prodKey}
-                  index={index}
-                  //
-                  isActive={isActive}
-                  left={left}
-                  //
-                  onDragStart={(e) => {
-                    choseActiveProd(undefined);
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    choseActiveProd(classProd.state);
-
-                    // if (!isActive) {
-                    //   choseActiveProd(classProd.state);
-
-                    //   const handler = () => {
-                    //     choseActiveProd(undefined);
-                    //     window?.removeEventListener('click', handler);
-                    //   };
-
-                    //   window?.addEventListener('click', handler);
-                    // }
-                  }}
-                >
-                  {cellKeyArr.map((cellKey, cIndex) => {
-                    const { style, className, createNode } = classProd.nodeConfig[cellKey];
-
-                    const node = createNode({
-                      disabled,
-                      classProd,
-                    });
-
-                    return (
-                      <Cell key={cellKey} className={classNames(className)} style={style}>
-                        {node}
-                      </Cell>
-                    );
-                  })}
-                </QuotationRow_dnd_memo>
-              </Spin>
+              <QuotationRow_dealClass_memo
+                key={prodKey}
+                stateProd={stateProd}
+                disabled={disabled}
+                isActive={isActive}
+                nodeConfig_prime={nodeConfig_prime}
+                cellKeyArr={cellKeyArr}
+                index={index}
+                //
+                prodKey={prodKey}
+                lookup_classProd={lookup_classProd}
+                createSetProd={createSetProd}
+                choseActiveProd={choseActiveProd}
+              />
             );
+
+            // const stateProd = state_prodDict[prodKey];
+            // const { doorModelName } = stateProd.data_prod;
+            // const prodName = (
+            //   doorModelName in lookup_classProd ? doorModelName : 'special'
+            // ) as keyof typeof lookup_classProd;
+
+            // const TheClass = lookup_classProd[prodName];
+
+            // const classProd = new TheClass({
+            //   stateProd: stateProd,
+            //   setStateProd: createSetProd(prodKey),
+            //   nodeConfig: nodeConfig_prime,
+            // });
+
+            // const isActive = activeClassProd === classProd;
+
+            // const nodeConfig_itemName = classProd.nodeConfig['itemName'];
+
+            // const left = (
+            //   <>
+            //     <Cell_delete onClick={() => {}} />
+            //     <Cell_copy onClick={() => {}} />
+            //     <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+            //     <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+            //       {nodeConfig_itemName.createNode({
+            //         disabled,
+            //         classProd,
+            //       })}
+            //     </Cell>
+            //   </>
+            // );
+
+            // return (
+            //   <Spin key={prodKey} spinning={classProd.isFetching}>
+            //     <QuotationRow_dnd_memo
+            //       //
+            //       rerenderTrigger01={classProd.state}
+            //       rerenderTrigger02={disabled}
+            //       rerenderTrigger03={cellKeyArr}
+            //       //
+            //       key={prodKey}
+            //       id={prodKey}
+            //       index={index}
+            //       //
+            //       isActive={isActive}
+            //       left={left}
+            //       //
+            //       onDragStart={(e) => {
+            //         choseActiveProd(undefined);
+            //       }}
+            //       onClick={(e) => {
+            //         e.stopPropagation();
+            //         choseActiveProd(classProd.state);
+
+            //         // if (!isActive) {
+            //         //   choseActiveProd(classProd.state);
+
+            //         //   const handler = () => {
+            //         //     choseActiveProd(undefined);
+            //         //     window?.removeEventListener('click', handler);
+            //         //   };
+
+            //         //   window?.addEventListener('click', handler);
+            //         // }
+            //       }}
+            //     >
+            //       {cellKeyArr.map((cellKey, cIndex) => {
+            //         const { style, className, createNode } = classProd.nodeConfig[cellKey];
+
+            //         const node = createNode({
+            //           disabled,
+            //           classProd,
+            //         });
+
+            //         return (
+            //           <Cell key={cellKey} className={classNames(className)} style={style}>
+            //             {node}
+            //           </Cell>
+            //         );
+            //       })}
+            //     </QuotationRow_dnd_memo>
+            //   </Spin>
+            // );
           })}
         </Table_dnd>
       </div>
@@ -547,3 +588,120 @@ const Cell_copy = ({
     </Cell>
   );
 };
+
+const QuotationRow_dealClass = ({
+  //
+  stateProd,
+  lookup_classProd,
+  createSetProd,
+  prodKey,
+  nodeConfig_prime,
+  isActive,
+  index,
+  disabled,
+  cellKeyArr,
+  choseActiveProd,
+}: {
+  stateProd: TstateProd;
+  lookup_classProd: TuseQuotationProductInstance['lookup_classProd'];
+  createSetProd: TuseQuotationProductInstance['createSetProd'];
+  prodKey: string;
+  nodeConfig_prime: TuseQuotationProductInstance['nodeConfig_prime'];
+  isActive: boolean;
+  index: number;
+  disabled: boolean;
+  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
+  choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
+}) => {
+  const [viewRef, inView] = useInView();
+
+  const { doorModelName } = stateProd.data_prod;
+  const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
+
+  const TheClass = lookup_classProd[prodName];
+
+  const classProd = new TheClass({
+    stateProd: stateProd,
+    setStateProd: createSetProd(prodKey),
+    nodeConfig: nodeConfig_prime,
+  });
+
+  const nodeConfig_itemName = classProd.nodeConfig['itemName'];
+
+  const left = (
+    <>
+      <Cell_delete onClick={() => {}} />
+      <Cell_copy onClick={() => {}} />
+      <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+      <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+        {nodeConfig_itemName.createNode({
+          disabled,
+          classProd,
+        })}
+      </Cell>
+    </>
+  );
+
+  return (
+    <div ref={viewRef}>
+      <Spin key={prodKey} spinning={classProd.isFetching}>
+        <QuotationRow_dnd
+          //
+          // rerenderTrigger01={classProd.state}
+          // rerenderTrigger02={disabled}
+          // rerenderTrigger03={cellKeyArr}
+          //
+          key={prodKey}
+          id={prodKey}
+          index={index}
+          //
+          isActive={isActive}
+          left={left}
+          //
+          onDragStart={(e) => {
+            choseActiveProd(undefined);
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            choseActiveProd(classProd.state);
+          }}
+          className="min-h-11"
+        >
+          {inView &&
+            cellKeyArr.map((cellKey, cIndex) => {
+              const { style, className, createNode } = classProd.nodeConfig[cellKey];
+
+              const node = createNode({
+                disabled,
+                classProd,
+              });
+
+              return (
+                <Cell key={cellKey} className={classNames(className)} style={style}>
+                  {node}
+                </Cell>
+              );
+            })}
+        </QuotationRow_dnd>
+      </Spin>
+    </div>
+  );
+};
+
+const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
+  // stateProd
+  // disabled
+  // isActive
+  // nodeConfig_prime
+  // cellKeyArr
+  // index
+
+  return (
+    prev.stateProd === next.stateProd &&
+    prev.disabled === next.disabled &&
+    prev.isActive === next.isActive &&
+    prev.nodeConfig_prime === next.nodeConfig_prime &&
+    prev.cellKeyArr === next.cellKeyArr &&
+    prev.index === next.index
+  );
+});

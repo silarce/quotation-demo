@@ -489,6 +489,17 @@ const useQuotationProduct = ({
     setTuneTotal,
     setCurrency,
     setExchangeRate,
+    //
+    //
+    //
+    state_prodDict,
+
+    createSetProd,
+    createSetComponent,
+    createSetAccessory,
+
+    lookup_classProd,
+    nodeConfig_prime,
   };
 };
 
@@ -623,7 +634,7 @@ const createClassComponentDict = ({
 
 // ================================================================================
 
-export type { TuseQuotationProductInstance };
+export type { TuseQuotationProductInstance, TstateProd };
 export { useQuotationProduct };
 
 // import { DeepReadonly } from 'ts-essentials';
