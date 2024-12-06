@@ -70,7 +70,7 @@ export default function RecordList({ control }: { control: Tcontrol }) {
           <span>{'防颱'}</span>
         </div>
         <div className={scss.cell} style={config.agent.style}>
-          <span>{'經辦'}</span>
+          <span>{'開立'}</span>
         </div>
         <div className={scss.cell} style={config.btn.style}></div>
       </div>
