@@ -881,6 +881,7 @@ export const useGetWorksheet_id = (id: string | undefined | null, { params }: { 
       'records.contractProductItems',
       'records.reviewSalesEmployee',
       'records.reviewManagerEmployee',
+      'records.agentEmployee',
       'latestRecord.reviewSalesEmployee',
       'latestRecord.reviewManagerEmployee',
       'latestRecord.contractProductItems.components',
