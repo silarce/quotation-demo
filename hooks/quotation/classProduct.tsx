@@ -804,6 +804,7 @@ class Class_product {
       notes: this._prodData.notes,
 
       close: this._prodData.close,
+      bounceDoorWidth: this._prodData.bounceDoorWidth,
     };
 
     this._quantity = String(this._prodData.quantity);

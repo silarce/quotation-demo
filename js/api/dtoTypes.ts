@@ -3605,6 +3605,9 @@ export type TworksheetRecordDto = {
   managerReviewAt: string | null;
   // 版本
   version: number;
+
+  agentEmployeeId: string | null;
+  agentEmployee?: TemployeeDto;
 };
 
 type TworksheetStatus = 'edit' | 'reviewing' | 'conform';

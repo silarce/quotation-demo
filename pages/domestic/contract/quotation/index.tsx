@@ -21,6 +21,10 @@ import PageHeader02, {
   TlinkArr,
 } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// antd
+import { Collapse } from 'antd';
+import Dropdown from 'components/global/gear/dropdown/Dropdown';
+
 // composition
 import MeetingMinutes_contract, {
   TimperativeHandle as TimperativeHandle_meetingMinutes,
@@ -63,12 +67,8 @@ import QuotationPdf_part, {
   extractPdfPartFromClassProduct,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 
-// antd
-import { Collapse } from 'antd';
-const { Panel } = Collapse;
-
 // gear
-
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
@@ -97,6 +97,8 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
+// icon
+import iconUpload from 'public/image/icon/upload.svg';
 // =============================================================
 
 // region TYPE
@@ -123,6 +125,10 @@ type TpanelListList = {
 
 // =============================================================
 // =============================================================
+// =============================================================
+
+const { Panel } = Collapse;
+
 // =============================================================
 export default function Quotation() {
   const router = useRouter();
@@ -362,7 +368,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const {
     visible: visible_pdf,
-    setVisible: setVisible_pdf,
+    // setVisible: setVisible_pdf,
+    showPdf,
+    showPdf_noDiscount,
+    hidePdf,
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: content,
@@ -716,8 +725,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     switch02,
     disabed_workContactDoc,
     state_meeting,
-    setVisible_pdf,
-    setShowPdf_part,
+    // setVisible_pdf,
+    // showPdf,
+    // setShowPdf_part,
   });
 
   const pdfPartPropsArr = useMemo(() => {
@@ -740,6 +750,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // attachProdList,
     productList,
   ]);
+
+  const customeRight = [
+    <Dropdown
+      key="1"
+      // placement="bottomRight"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
+          匯出報價單
+        </MyButton_v2>,
+        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+          單價分析
+        </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+          {'匯出報價單(無折扣)'}
+        </MyButton_v2>,
+      ]}
+    >
+      匯出
+    </Dropdown>,
+  ];
 
   // --------------------------Z---------------------------------------------
 
@@ -805,6 +836,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <PageHeader02
         tagList={tabList}
         panelList={dynaPanelList || panelList}
+        customeRight={customeRight}
         //  linkList={linkArr}
       />
       {/*  */}
@@ -976,7 +1008,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <QuotationPdf
         //
         visible={visible_pdf}
-        onCancel={() => setVisible_pdf(false)}
+        onCancel={hidePdf}
         pdfData={pdfData}
         fileName={contract?.contractNumber ?? ''}
       />
@@ -1226,9 +1258,10 @@ const usePanelList = ({
   switch02,
   disabed_workContactDoc,
   state_meeting,
-  setVisible_pdf,
-  setShowPdf_part,
-}: {
+}: // setVisible_pdf,
+// showPdf,
+// setShowPdf_part,
+{
   id: string | undefined;
   version: string | undefined;
   contract: TquotationContractDto | undefined;
@@ -1246,8 +1279,9 @@ const usePanelList = ({
   disabed_workContactDoc: boolean;
   state_meeting: Tstate_meetingMinutes;
   //
-  setVisible_pdf: (value: React.SetStateAction<boolean>) => void;
-  setShowPdf_part: (value: React.SetStateAction<boolean>) => void;
+  // setVisible_pdf: (value: React.SetStateAction<boolean>) => void;
+  // showPdf: () => void;
+  // setShowPdf_part: (value: React.SetStateAction<boolean>) => void;
 }) => {
   const router = useRouter();
 
@@ -1279,16 +1313,16 @@ const usePanelList = ({
             },
           }
         : null)(),
-    {
-      type: 'myButton',
-      label: '匯出合約',
-      onClick: () => setVisible_pdf(true),
-    },
-    {
-      type: 'myButton',
-      label: '單價分析',
-      onClick: () => setShowPdf_part(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出合約',
+    //   onClick: showPdf,
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '單價分析',
+    //   onClick: () => setShowPdf_part(true),
+    // },
     {
       type: 'myButton',
       label: '合約審核表',
