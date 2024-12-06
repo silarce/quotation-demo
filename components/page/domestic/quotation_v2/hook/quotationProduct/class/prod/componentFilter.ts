@@ -1,5 +1,3 @@
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 import type { TdoorComponentListDto } from 'js/api/dtoTypes';
 
 const filter_slat = (
@@ -233,4 +231,48 @@ const filter_headBox = ({
     headBox,
     optionalHeadBoxes: optionalArr,
   };
+};
+
+const filter_backBone = ({
+  backBones,
+}: // params,
+{
+  backBones: TdoorComponentListDto['backBone'];
+  // params:{}
+}) => {
+  const backBone = backBones?.[0] || null;
+  const optionalArr = backBones?.filter(() => true) ?? [];
+
+  return {
+    backBone,
+    optionalBackBones: optionalArr,
+  };
+};
+
+const filter_middlePillar = ({
+  middlePillars,
+}: {
+  middlePillars: TdoorComponentListDto['middlePillar'];
+  // params:{};
+}) => {
+  const middlePillar = middlePillars?.[0] || null;
+  const optionalArr = middlePillars?.filter(() => true) ?? [];
+
+  return {
+    middlePillar,
+    optionalMiddlePillars: optionalArr,
+  };
+};
+
+export {
+  filter_slat,
+  filter_bottomBar,
+  filter_guideRail,
+  filter_sidePlate,
+  filter_roller,
+  filter_motor,
+  filter_motorAccessory,
+  filter_headBox,
+  filter_backBone,
+  filter_middlePillar,
 };
