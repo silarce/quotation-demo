@@ -26,6 +26,8 @@ type Trecord = {
   reviewManagerName: string;
   reveiwManagerStatus: TstatusLabelProps['dotColor'];
 
+  agent: string;
+
   onDetailClick?: (e: React.MouseEvent) => void;
 };
 
@@ -67,6 +69,9 @@ export default function RecordList({ control }: { control: Tcontrol }) {
         <div className={scss.cell} style={config.isAntyTyphoon.style}>
           <span>{'防颱'}</span>
         </div>
+        <div className={scss.cell} style={config.agent.style}>
+          <span>{'開立'}</span>
+        </div>
         <div className={scss.cell} style={config.btn.style}></div>
       </div>
 
@@ -83,6 +88,7 @@ export default function RecordList({ control }: { control: Tcontrol }) {
           reviewSalesStatus,
           reviewManagerName,
           reveiwManagerStatus,
+          agent,
           onDetailClick,
         } = record;
 
@@ -118,6 +124,7 @@ export default function RecordList({ control }: { control: Tcontrol }) {
               <div className={scss.cell} style={config.material.style}>
                 <span>{material}</span>
               </div>
+
               <div className={scss.cell} style={config.isAntyTyphoon.style}>
                 <InputSel
                   showBaseline="invisible"
@@ -129,6 +136,9 @@ export default function RecordList({ control }: { control: Tcontrol }) {
                     },
                   }}
                 />
+              </div>
+              <div className={scss.cell} style={config.agent.style}>
+                <span>{agent}</span>
               </div>
               <div className={scss.cell} style={config.btn.style}>
                 <IconDetail onClick={onDetailClick} />
@@ -166,17 +176,17 @@ const config: Tconfig = {
   },
   fullWidth: {
     style: {
-      width: '140px',
+      width: '100px',
     },
   },
   height: {
     style: {
-      width: '140px',
+      width: '100px',
     },
   },
   qty: {
     style: {
-      width: '140px',
+      width: '100px',
     },
   },
   material: {
@@ -186,12 +196,17 @@ const config: Tconfig = {
   },
   isAntyTyphoon: {
     style: {
+      width: '100px',
+    },
+  },
+  agent: {
+    style: {
       width: '140px',
     },
   },
   btn: {
     style: {
-      width: '100px',
+      width: '50px',
     },
   },
 };

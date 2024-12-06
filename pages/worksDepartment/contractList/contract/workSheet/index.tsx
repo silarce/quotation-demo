@@ -571,6 +571,7 @@ export default function Worksheet({
         reviewManagerEmployee,
         toReviewManager,
         managerReviewAt,
+        agentEmployee,
       } = record;
 
       const contractProductItem = contractProductItems?.[0];
@@ -618,6 +619,7 @@ export default function Worksheet({
         reviewSalesStatus,
         reviewManagerName: reviewManagerEmployee?.chName ?? '',
         reveiwManagerStatus,
+        agent: agentEmployee?.chName ?? '',
 
         onDetailClick: () => {
           setActiveRecordId(record.id);
