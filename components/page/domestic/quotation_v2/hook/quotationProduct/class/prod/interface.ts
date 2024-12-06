@@ -266,7 +266,8 @@ interface Interface_ClassProd_base {
 
 interface Interface_ClassProd_base2 extends Interface_ClassProd_base {
   doorModel: string;
-  afterFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
+  // afterFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
+  afterFullWidthChange?: () => Promise<void>;
 }
 
 interface Interface_ClassProd_prime extends Interface_ClassProd_base2 {

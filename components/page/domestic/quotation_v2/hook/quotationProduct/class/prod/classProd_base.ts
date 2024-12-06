@@ -181,10 +181,10 @@ class ClassProd_base implements Interface_ClassProd_base {
     return !!this.state.isFetching;
   }
 
-  protected set isFetching(value) {
-    this.state.isFetching = value;
-    this.render();
-  }
+  // protected set isFetching(value) {
+  //   this.state.isFetching = value;
+  //   this.render();
+  // }
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -304,7 +304,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     this.render();
   }
   get boxB_mm() {
-    return new Decimal(this.data.boxB).mul(1000).toNumber();
+    return new Decimal(this.data.boxB || 0).mul(1000).toNumber();
   }
 
   get boxD() {
@@ -564,46 +564,56 @@ class ClassProd_base implements Interface_ClassProd_base {
     this.state.isFetching = true;
     this.render();
 
-    await this.updateGeneralSpec();
-    await this.updateAvailableComponents();
+    if (this.isValid_doorModelName) {
+      try {
+        const generalSpec = await reqGetProdCalcGeneralSpec(this);
+        this.state.generalSpecs = generalSpec;
+
+        const availableComponents = await reqGetAvailableComponents(this);
+        this.state.availableComponents = availableComponents;
+      } catch {
+        this.state.generalSpecs = null;
+        this.state.availableComponents = null;
+      }
+    }
+
     this.state.isFetching = false;
-    // this.state.generalSpecs = generalSpecs;
     this.render();
   }
 
   // MARK:updateGeneralSpec
   // modelName height fullWidth WG isAntiTyphoon hp
-  protected async updateGeneralSpec() {
-    const generalSpecs = await reqGetProdCalcGeneralSpec(this);
-    this.state.generalSpecs = generalSpecs;
+  // protected async updateGeneralSpec() {
+  //   const generalSpecs = await reqGetProdCalcGeneralSpec(this);
+  //   this.state.generalSpecs = generalSpecs;
 
-    return this;
-  }
+  //   return this;
+  // }
 
   // MARK:updateSlatCount
   // modelName height boxB
-  protected async updateSlatCount() {
-    const res = await reqGetSlatCount(this);
-    this.data.slatCount = res === null ? null : `${res}`;
+  // protected async updateSlatCount() {
+  //   const res = await reqGetSlatCount(this).catch((res) => res);
+  //   this.data.slatCount = res === null ? null : `${res}`;
 
-    return this;
-  }
+  //   return this;
+  // }
 
   // MARK:updateAvailableComponents
   // doorModelName weight isAntiTyphoon diameter
-  protected async updateAvailableComponents() {
-    const res = await reqGetAvailableComponents(this);
-    this.state.availableComponents = res;
+  // protected async updateAvailableComponents() {
+  //   const res = await reqGetAvailableComponents(this);
+  //   this.state.availableComponents = res;
 
-    return this;
-  }
+  //   return this;
+  // }
 
   // MARK:updateBoxD
   // modelName rollerDiameter sidePlateSizeB hp motorVendor
-  protected async updateBoxD() {
-    const res = await reqGetBoxD(this);
-    this.data.boxD = new Decimal(res || 0).div(1000).toString() as `${number}`;
-  }
+  // protected async updateBoxD() {
+  //   const res = await reqGetBoxD(this);
+  //   this.data.boxD = new Decimal(res || 0).div(1000).toString() as `${number}`;
+  // }
 
   // -----------------------------------------------------------------------------------
 
@@ -636,36 +646,40 @@ class ClassProd_base implements Interface_ClassProd_base {
   }
 
   // MARK:handle_afterUpdateGeneralSpec
-  protected async afterUpdateGeneralSpec() {
-    const generalSpecs = this.state.generalSpecs;
+  protected afterUpdateGeneralSpec(generalSpecs: TdoorGeneralSpecsDto) {
+    // const generalSpecs = this.state.generalSpecs;
 
-    if (!generalSpecs) {
-      this.data.gapA = '';
-      this.data.gapC = '';
-      this.data.gearNumber = null;
-      this.data.weight = null;
-      this.data.thickness = '';
-      this.data.sprocketWheelModel = null;
-      this.data.sprocketWheelTeethNumber = null;
-      this.data.sprocketWheelChains = null;
-      this.data.bearingInnerDiameter = null;
-      this.data.diameter = null;
-      this.data.bearingHousingTotalLength = null;
-      this.data.slatLength = null;
-      this.data.guideRailLength = null;
-      this.data.headBoxLength = null;
-      this.data.bearingHousingSize = null;
-      this.data.bearingName = null;
+    // if (!generalSpecs) {
+    //   throw new Error('in afterUpdateGeneralSpec, generalSpecs is undefined or null');
+    // }
 
-      this.data.motorPhase = null;
-      this.data.motorVendor = null;
-      this.data.motorVoltage = null;
-      this.data.horsepower = '';
-      this.data.boxB = '';
-      this.data.boxD = '';
+    // if (!generalSpecs) {
+    //   this.data.gapA = '';
+    //   this.data.gapC = '';
+    //   this.data.gearNumber = null;
+    //   this.data.weight = null;
+    //   this.data.thickness = '';
+    //   this.data.sprocketWheelModel = null;
+    //   this.data.sprocketWheelTeethNumber = null;
+    //   this.data.sprocketWheelChains = null;
+    //   this.data.bearingInnerDiameter = null;
+    //   this.data.diameter = null;
+    //   this.data.bearingHousingTotalLength = null;
+    //   this.data.slatLength = null;
+    //   this.data.guideRailLength = null;
+    //   this.data.headBoxLength = null;
+    //   this.data.bearingHousingSize = null;
+    //   this.data.bearingName = null;
 
-      return this;
-    }
+    //   this.data.motorPhase = null;
+    //   this.data.motorVendor = null;
+    //   this.data.motorVoltage = null;
+    //   this.data.horsepower = '';
+    //   this.data.boxB = '';
+    //   this.data.boxD = '';
+
+    //   return this;
+    // }
 
     generalSpecs.bearingInnerDiameter === 'N/A' && (generalSpecs.bearingInnerDiameter = '');
     generalSpecs.bearingName === 'N/A' && (generalSpecs.bearingName = '');
@@ -721,19 +735,11 @@ class ClassProd_base implements Interface_ClassProd_base {
     }
 
     this.data.area = calcArea(this);
-    await this.updateBoxD();
 
     return this;
   }
 
-  protected async afterUpdateAvailableComponents() {
-    if (!this.state.availableComponents) {
-      this.state.data_componentDict = {};
-      this.state.componentKeyArr = [];
-
-      return this;
-    }
-  }
+  protected afterUpdateAvailableComponents(availableComponents: TdoorComponentListDto) {}
 
   // endregion HANDLER
 
@@ -750,18 +756,71 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   doorModel: TdoorModel = 'SJ-302';
 
   // ---------------------------------------------------------------------------------
+
+  protected clearGeneralSpec() {
+    this.data.gapA = '';
+    this.data.gapC = '';
+    this.data.gearNumber = null;
+    this.data.weight = null;
+    this.data.thickness = '';
+    this.data.sprocketWheelModel = null;
+    this.data.sprocketWheelTeethNumber = null;
+    this.data.sprocketWheelChains = null;
+    this.data.bearingInnerDiameter = null;
+    this.data.diameter = null;
+    this.data.bearingHousingTotalLength = null;
+    this.data.slatLength = null;
+    this.data.guideRailLength = null;
+    this.data.headBoxLength = null;
+    this.data.bearingHousingSize = null;
+    this.data.bearingName = null;
+
+    this.data.motorPhase = null;
+    this.data.motorVendor = null;
+    this.data.motorVoltage = null;
+    this.data.horsepower = '';
+    this.data.boxB = '';
+    this.data.boxD = '';
+
+    return this;
+  }
+
+  protected clearComponent() {
+    this.state.availableComponents = null;
+    this.state.data_componentDict = {};
+    this.state.componentKeyArr = [];
+  }
+
+  protected async reqChain_01() {
+    try {
+      const generalSpec = await reqGetProdCalcGeneralSpec(this);
+      this.state.generalSpecs = generalSpec;
+      this.afterUpdateGeneralSpec(generalSpec);
+
+      const boxD = await reqGetBoxD(this);
+      this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
+
+      const slatCount = await reqGetSlatCount(this);
+      this.data.slatCount = slatCount === null ? null : `${slatCount}`;
+
+      const availableComponents = await reqGetAvailableComponents(this);
+      this.state.availableComponents = availableComponents;
+      this.afterUpdateAvailableComponents(availableComponents);
+    } catch (error) {
+      this.clearGeneralSpec();
+      this.clearComponent();
+    }
+  }
+
+  // ---------------------------------------------------------------------------------
   async afterFullWidthChange() {
     this.state.isFetching = true;
     this.render();
 
-    await this.updateGeneralSpec();
-    await this.afterUpdateGeneralSpec();
-    await this.updateSlatCount();
-    await this.updateAvailableComponents();
+    await this.reqChain_01();
+
     this.state.isFetching = false;
     this.render();
-
-    return this;
   }
 } // ClassProd_prime
 
@@ -773,13 +832,9 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
 // region API
 
-const reqGetProdCalcGeneralSpec = async (
-  //
-  classProd: ClassProd_base
-  //
-) => {
+const reqGetProdCalcGeneralSpec = async (classProd: ClassProd_base) => {
   if (!classProd.isValid_doorModelName) {
-    return null;
+    return Promise.reject(null);
   }
 
   // '1/4' | '1/3' | '1/2' | '3/4' | '1' | '1 1/2' | '2' | '3' | '5';
@@ -804,13 +859,34 @@ const reqGetProdCalcGeneralSpec = async (
     .catch(() => {
       myAlert.err({ title: '取得產品規格失敗' });
 
-      return null;
+      return Promise.reject(null);
+    });
+};
+
+const reqGetAvailableComponents = async (classProd: ClassProd_base) => {
+  if (!classProd.isValid_doorModelName) {
+    return Promise.reject(null);
+  }
+
+  const body: TpacParams = {
+    modelName: classProd.doorModelName as TdoorModel,
+    weight: Number(classProd.data.weight || 0),
+    isAntiTyphoon: !!classProd.data.isAntiTyphoon,
+    rollerDiameter: Number(classProd.data.diameter || 0),
+  };
+
+  return await apiGetProdAvailableComponents(body)
+    .then((res) => res)
+    .catch(() => {
+      myAlert.err({ title: '取得材料配件失敗' });
+
+      return Promise.reject(null);
     });
 };
 
 const reqGetBoxD = async (classProd: ClassProd_base) => {
   if (!classProd.isValid_doorModelName) {
-    return null;
+    return Promise.reject(null);
   }
 
   const body: TgetBoxDParams_strict = {
@@ -826,7 +902,7 @@ const reqGetBoxD = async (classProd: ClassProd_base) => {
     .catch(() => {
       myAlert.err({ title: '取得boxD失敗' });
 
-      return null;
+      return Promise.reject(null);
     });
 };
 
@@ -842,7 +918,7 @@ const reqGetBoxD = async (classProd: ClassProd_base) => {
 
 const reqGetSlatCount = async (classProd: ClassProd_base) => {
   if (!classProd.isValid_doorModelName) {
-    return null;
+    return Promise.reject(null);
   }
 
   const body: TpcdsPrams = {
@@ -856,7 +932,7 @@ const reqGetSlatCount = async (classProd: ClassProd_base) => {
     .catch(() => {
       myAlert.err({ title: '取得門片數量失敗' });
 
-      return null;
+      return Promise.reject(null);
     });
 };
 
@@ -869,26 +945,6 @@ const reqGetSlatCount = async (classProd: ClassProd_base) => {
 //       return null;
 //     });
 // };
-const reqGetAvailableComponents = async (classProd: ClassProd_base) => {
-  if (!classProd.isValid_doorModelName) {
-    return null;
-  }
-
-  const body: TpacParams = {
-    modelName: classProd.doorModelName as TdoorModel,
-    weight: Number(classProd.data.weight || 0),
-    isAntiTyphoon: !!classProd.data.isAntiTyphoon,
-    rollerDiameter: Number(classProd.data.diameter || 0),
-  };
-
-  return await apiGetProdAvailableComponents(body)
-    .then((res) => res)
-    .catch(() => {
-      myAlert.err({ title: '取得材料配件失敗' });
-
-      return null;
-    });
-};
 
 // ================================================================================
 
