@@ -202,6 +202,7 @@ export default function AddPurchaseRequisitionList() {
     const panelList: TpanelList = [
         // { searchGroup },
         {
+
             type: 'myButton',
             label: '返回',
             onClick: () => {
@@ -217,6 +218,7 @@ export default function AddPurchaseRequisitionList() {
                     }
                 });
             },
+
         },
     ];
     //#endregion
@@ -421,7 +423,7 @@ export default function AddPurchaseRequisitionList() {
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
     //請購單申請
-    const AddPurchaseRequisition = async () => {
+    const NewAddPurchaseRequisition = async () => {
 
         console.log(data2);
         // return;
@@ -431,10 +433,9 @@ export default function AddPurchaseRequisitionList() {
                 create_at: create_atin,
                 need_date: moment(need_date).format('YYYY-MM-DD'),
                 create_by: userInfo?.employee?.id.toString(),
-                note: note
+                note: note,
+                data2: data2
             };
-
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -446,7 +447,7 @@ export default function AddPurchaseRequisitionList() {
             console.log(JSON.stringify(conditionModel));
             console.log(JSON.stringify(inputModel));
 
-            const response = await fetch(`${setting.apipath}/WareHouse/AddPurchaseRequisition`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/NewAddPurchaseRequisition`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -457,22 +458,19 @@ export default function AddPurchaseRequisitionList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
-            myAlert.info(
-                {
-                    title: '單據新增成功',
-                    content: `請購單據號碼為:${data[0].purchaserequisitionid}`
-                })
+            const result = await response.json();
 
-            setData2([]);
-            setPurchaserequisitionid(data[0].purchaserequisitionid);
-            setPurchaserequisitionuuid(data[0].id);
-            setStatus("未送出");
-            getPurchaseRequisition();
-
-            // getProduct();
-
-            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: result.message });
+                setPurchaserequisitionid(result.purchaserequisitionid);
+                setPurchaserequisitionuuid(result.purchaserequisitionuuid);
+                setStatus("編輯中");
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
 
         } catch (error: any) {
             setError(error.message);
@@ -567,7 +565,7 @@ export default function AddPurchaseRequisitionList() {
 
     // 送出按鈕
     function handleAddPR() {
-        AddPurchaseRequisition();
+        // AddPurchaseRequisition();
     }
 
 
@@ -662,9 +660,16 @@ export default function AddPurchaseRequisitionList() {
 
     // 從口袋清單移除
     const handleRemove = (index: number, item: any) => {
-        const updatedData = data2.filter((_, i) => i !== index);
-        setData2(updatedData);
-        RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
+        myAlert.confirm({
+            title: '確定移除?',
+            props: {
+                onOk: () => {
+                    const updatedData = data2.filter((_, i) => i !== index);
+                    setData2(updatedData);
+                }
+            }
+        });
+        // RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
     };
 
     // 改變數字口袋清單值
@@ -678,15 +683,51 @@ export default function AddPurchaseRequisitionList() {
         setData2(newData);
     };
     // 改變文字口袋清單值
-    const handleStringChange = (index: any, target: any, value: any) => {
-        const newData = [...data2];
-        const newValue = value;
-        newData[index] = {
-            ...newData[index],
-            [target]: newValue,
-        };
-        setData2(newData);
+    // const handleStringChange = (index: any, target: any, value: any) => {
+    //     const newData = [...data2];
+    //     const newValue = value;
+    //     newData[index] = {
+    //         ...newData[index],
+    //         [target]: newValue,
+    //     };
+    //     setData2(newData);
+    // };
+
+
+    const handleStringChange = (index: number, key: string, value: string) => {
+        // 更新 data2 的值
+        const updatedData2 = [...data2];
+        updatedData2[index][key] = value;
+        setData2(updatedData2);
+
+        if (key === 'productid' || key === 'name' || key === 'spec') {
+
+            // 更新建議選單的過濾邏輯
+            const filters = {
+                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
+                name: updatedData2[index].name?.trim().toLowerCase() || "",
+                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
+            };
+
+            if (Object.values(filters).some(filter => filter !== "")) {
+                // 過濾符合條件的數據
+                const filtered = data.filter(item =>
+                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
+                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
+                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
+                );
+
+                setFilteredData(filtered);
+                setShowSuggestions(true);
+            } else {
+                // 若所有條件都為空，隱藏建議選單
+                setShowSuggestions(false);
+            }
+        }
     };
+
+
+
 
     // 還原口袋清單
     const handleRestore = () => {
@@ -813,14 +854,13 @@ export default function AddPurchaseRequisitionList() {
             console.log(filtered);
         }
         else {
-            console.log("shit");
             setHandinputproductuuid('');
             setFilteredData([]);
             setShowSuggestions(false);
         }
 
-    }, [data2]);
-    // }, [handinputproductid, handinputname, handinputspec]);
+        // }, [data2]);
+    }, [handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
@@ -857,28 +897,44 @@ export default function AddPurchaseRequisitionList() {
     //     setShowSuggestions(false);
     // };
 
-    const handleSelect = (item: DataItem) => {
-        console.log(item);
-        console.log(data2);
-        isSelectingRef.current = true;
-    
-        // 合併多個變更
-        const newData = [...data2];
-        newData[currentindex] = {
-            ...newData[currentindex],
-            productid: item.productid,
-            name: item.name,
-            spec: item.spec || "",
-            unit: item.unit,
+    // const handleSelect = (item: DataItem) => {
+    //     console.log(item);
+    //     console.log(data2);
+    //     isSelectingRef.current = true;
+
+    //     // 合併多個變更
+    //     const newData = [...data2];
+    //     newData[currentindex] = {
+    //         ...newData[currentindex],
+    //         productid: item.productid,
+    //         name: item.name,
+    //         spec: item.spec || "",
+    //         unit: item.unit,
+    //     };
+
+    //     setData2(newData); // 一次更新所有變更
+    //     setShowSuggestions(false); // 隱藏建議
+
+    //     setSearchBarData(data);
+    // };
+
+    const handleSelect = (selectedItem: any) => {
+        const updatedData2 = [...data2];
+        const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
+        updatedData2[index] = {
+            ...updatedData2[index],
+            productuuid: selectedItem.id,
+            productid: selectedItem.productid,
+            name: selectedItem.name,
+            spec: selectedItem.spec,
+            unit: selectedItem.unit,
         };
-    
-        setData2(newData); // 一次更新所有變更
-        setShowSuggestions(false); // 隱藏建議
+        setData2(updatedData2);
 
-        setSearchBarData(data);
+        // 清除建議選單
+        setFilteredData([]);
+        setShowSuggestions(false);
     };
-    
-
 
 
     const [dragging, setDragging] = useState(false);
@@ -1210,8 +1266,39 @@ export default function AddPurchaseRequisitionList() {
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag='新增請購單' panelList={panelList} />
-            {/* <div className={scss.main}> */}
+            <PageHeader02 tag='新增請購單' panelList={panelList}
+                customeRight={[
+                    <>
+                        <button
+                            className={scss.shortsquarebtn}
+                            style={{
+                                display: `${status === "未送出" ? '' : 'none'}`
+                            }}
+                        >
+                            編輯
+                        </button>
+                        <button
+                            className={scss.shortredsquarebtn}
+                            style={{
+                                display: `${status === "" ? '' : 'none'}`
+                            }}
+                            onClick={() => {
+                                NewAddPurchaseRequisition();
+                            }}
+                        >
+                            儲存
+                        </button>
+                    </>
+                ]
+                }
+                customeLeft={
+                    [
+                        <>
+                            <span style={{fontSize:'18px'}}>
+                                {status}
+                            </span>
+                        </>
+                    ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
                     <div className={scss.content}>
@@ -1269,17 +1356,18 @@ export default function AddPurchaseRequisitionList() {
                             <div>
                                 <div className={scss.head_content1}>
                                     <div>
-                                        {/* <InputSel
+                                        <InputSel
                                             {...inputSelProps}
                                             caption="請購單號"
-                                            captionStyle={{fontSize:'20px'}}
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
                                                     value: purchaserequisitionid || ' ',
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="申請人員"
@@ -1292,7 +1380,7 @@ export default function AddPurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="請購日期"
                                             captionStyle={{ fontSize: '18px' }}
@@ -1304,6 +1392,19 @@ export default function AddPurchaseRequisitionList() {
                                                 },
                                             }}
 
+                                        /> */}
+                                        <InputSel
+                                            caption="請購日期"
+                                            className="global_tip_must"
+                                            disabled={status === "未送出" ? true : false}
+                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            datePickerProps={{
+                                                props: {
+                                                    value: create_atin ? moment(create_atin) : null,
+                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                },
+                                            }}
                                         />
                                         <InputSel
                                             caption="請購類別"
@@ -1341,6 +1442,19 @@ export default function AddPurchaseRequisitionList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="排版用"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
+                                            disabled={true}
+                                            className='invisible'
+                                            inputProps={{
+                                                props: {
+                                                    value: ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="申請部門"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
@@ -1367,9 +1481,6 @@ export default function AddPurchaseRequisitionList() {
 
                                     </div>
                                     <div></div>
-                                    <div>
-
-                                    </div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
@@ -1377,6 +1488,7 @@ export default function AddPurchaseRequisitionList() {
                                             {...inputSelProps}
                                             caption="備註說明"
                                             captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -1462,21 +1574,13 @@ export default function AddPurchaseRequisitionList() {
                                     <CellWithBar key={index} className={scss.panelHeader20}>
                                         <div className={scss.row01}>
                                             <span>
-                                                {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
                                                 <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                     {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                     <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
-                                                {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                                {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
                                             </span>
                                             <span>{index + 1}</span>
                                             <span>
-                                                {/* {_item.productid} */}
                                                 <input
                                                     ref={productidRefs.current[index]}
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
@@ -1488,7 +1592,7 @@ export default function AddPurchaseRequisitionList() {
                                                     onChange={(e) => {
                                                         handleStringChange(index, "productid", e.target.value);
                                                         setCurrentIndex(index);
-                                                        setHandinputproductid(e.target.value);
+                                                        // setHandinputproductid(e.target.value);
                                                     }}
                                                 />
                                             </span>
@@ -1504,7 +1608,7 @@ export default function AddPurchaseRequisitionList() {
                                                     onChange={(e) => {
                                                         handleStringChange(index, "name", e.target.value);
                                                         setCurrentIndex(index);
-                                                        setHandinputname(e.target.value);
+                                                        // setHandinputname(e.target.value);
                                                     }}
                                                 />
                                             </span>
@@ -1519,7 +1623,7 @@ export default function AddPurchaseRequisitionList() {
                                                     onChange={(e) => {
                                                         handleStringChange(index, "spec", e.target.value);
                                                         setCurrentIndex(index);
-                                                        setHandinputspec(e.target.value);
+                                                        // setHandinputspec(e.target.value);
                                                     }}
                                                 />
                                             </span>
@@ -1533,7 +1637,8 @@ export default function AddPurchaseRequisitionList() {
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     // readOnly
                                                     onChange={(e) => {
-                                                        handleNumberChange(index, "quantity", e.target.value);
+                                                        // handleNumberChange(index, "quantity", e.target.value);
+                                                        handleStringChange(index, "quantity", e.target.value);
                                                     }}
                                                 />
                                             </span>
