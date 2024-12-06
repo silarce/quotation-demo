@@ -99,6 +99,8 @@ type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
   componentKey: T;
 }) => TsetComponent<T>;
 
+type TcreateSetAccessory = (props: { prodKey: string; accessoryKey: string }) => TsetAccessory;
+
 type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
 
 type TclassComponentDict = {
@@ -190,9 +192,6 @@ const useQuotationProduct = ({
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
 
-  // -----------------------------------------------------------------------
-  // region COOKED
-
   const nodeConfig_prime = useMemo(() => {
     return createNodeConfig_prime({
       doorModelDict,
@@ -201,6 +200,153 @@ const useQuotationProduct = ({
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
+  //
+  //
+  //
+  //
+
+  const choseActiveProd = (stateProd: TstateProd | undefined) => {
+    setActiveProdKey(stateProd?.key);
+  };
+
+  const setComponentKeyArr = (newKeyArr: TdoorComponentType[]) => {
+    if (!activeProdKey) {
+      return;
+    }
+
+    setState_prodDict((prev) => {
+      const copy = { ...prev };
+      const activedProd = copy[activeProdKey];
+      activedProd.componentKeyArr = newKeyArr;
+
+      return copy;
+    });
+  };
+
+  const setAccessoryKeyArr = (newKeyArr: string[]) => {
+    if (!activeProdKey) {
+      return;
+    }
+
+    setState_prodDict((prev) => {
+      const copy = { ...prev };
+      const activedProd = copy[activeProdKey];
+      activedProd.accessoryKeyArr = newKeyArr;
+
+      return copy;
+    });
+  };
+
+  const setQuotationDiscount = (value: typeof state_quotationDiscount) => {
+    setState_quotationDiscount(value);
+    // 總折數改變後要重新計算主產品的金額
+    //
+  };
+
+  // -----------------------------------------------------------------------
+
+  // region COOKED
+
+  const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
+
+  const componentKeyArr = activedProd?.componentKeyArr;
+  const accessoryKeyArr = activedProd?.accessoryKeyArr;
+
+  // class用來管理資料狀態
+  // MARK:classProdDict
+  // const classProdDict = useMemo(() => {
+  //   if (!doorModelDict) {
+  //     return {};
+  //   }
+
+  //   // const dict: { [key: string]: Interface_ClassProd_base } = {};
+  //   const dict: { [key: string]: Interface_ClassProd_prime | Interface_ClassProd_special } = {};
+
+  //   Object.entries(state_prodDict).forEach(([key, state]) => {
+  //     if (state.key !== key) {
+  //       throw new Error('classProdDict發生錯誤，key與state.key不一致');
+  //     }
+
+  //     const { doorModelName } = state.data_prod;
+
+  //     const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
+
+  //     const theClass = lookup_classProd[prodName];
+
+  //     dict[key] = new theClass({
+  //       stateProd: state,
+  //       setStateProd: createSetProd(key),
+  //       nodeConfig: nodeConfig_prime,
+  //     });
+  //   });
+
+  //   return dict;
+  // }, [state_prodDict, nodeConfig_prime]);
+
+  // const activedClassProd = useMemo(() => {
+  //   if (!activeProdKey) {
+  //     return undefined;
+  //   }
+
+  //   return classProdDict[activeProdKey];
+  // }, [activeProdKey, classProdDict]);
+
+  // const activedClassComponentArr = useMemo(() => {
+  //   if (!activedClassProd) {
+  //     return undefined;
+  //   }
+
+  //   const data_componentDict = activedClassProd.state.data_componentDict;
+
+  //   const classComponentDict: TclassComponentDict = createClassComponentDict({
+  //     data_componentDict,
+  //     activeClassProdKey: activedClassProd.state.key,
+  //     createSetComponent,
+  //   });
+
+  //   return Object.values(classComponentDict);
+  // }, [activedClassProd]);
+
+  // const activedClassComponentDict = useMemo(() => {
+  //   if (!activedClassProd) {
+  //     return undefined;
+  //   }
+
+  //   const data_componentDict = activedClassProd.state.data_componentDict;
+
+  //   const classComponentDict: TclassComponentDict = createClassComponentDict({
+  //     data_componentDict,
+  //     activeClassProdKey: activedClassProd.state.key,
+  //     createSetComponent,
+  //   });
+
+  //   return classComponentDict;
+  // }, [activedClassProd]);
+
+  // const activedClassAccessoryDict = useMemo(() => {
+  //   if (!activedClassProd) {
+  //     return undefined;
+  //   }
+
+  //   const data_accessoryDict = activedClassProd.state.data_accessoryDict;
+
+  //   const classAccessoryDict: TclassAccessoryDict = {};
+  //   Object.entries(data_accessoryDict).forEach(([key, acce]) => {
+  //     classAccessoryDict[key] = new Class_accessory({
+  //       state_accessory: acce,
+  //       setState_accessory: createSetAccessory({
+  //         prodKey: activedClassProd.state.key,
+  //         accessoryKey: key,
+  //       }),
+  //     });
+  //   });
+
+  //   return classAccessoryDict;
+  // }, [activedClassProd]);
+
+  // -----------------------------------------------------------------------
+
+  // region CREATE CLASS
   //
   //
   //
@@ -254,7 +400,7 @@ const useQuotationProduct = ({
   };
 
   // MARK:createSetAccessory
-  const createSetAccessory = ({ prodKey, accessoryKey }: { prodKey: string; accessoryKey: string }): TsetAccessory => {
+  const createSetAccessory: TcreateSetAccessory = ({ prodKey, accessoryKey }) => {
     const setAccessory: TsetAccessory = (newStateAcce) => {
       setState_prodDict((prev) => {
         const copy = { ...prev };
@@ -270,146 +416,45 @@ const useQuotationProduct = ({
     return setAccessory;
   };
 
-  const choseActiveProd = (stateProd: TstateProd | undefined) => {
-    setActiveProdKey(stateProd?.key);
-  };
-
-  const setComponentKeyArr = (newKeyArr: TdoorComponentType[]) => {
-    if (!activeProdKey) {
-      return;
-    }
-
-    setState_prodDict((prev) => {
-      const copy = { ...prev };
-      const activedProd = copy[activeProdKey];
-      activedProd.componentKeyArr = newKeyArr;
-
-      return copy;
-    });
-  };
-
-  const setAccessoryKeyArr = (newKeyArr: string[]) => {
-    if (!activeProdKey) {
-      return;
-    }
-
-    setState_prodDict((prev) => {
-      const copy = { ...prev };
-      const activedProd = copy[activeProdKey];
-      activedProd.accessoryKeyArr = newKeyArr;
-
-      return copy;
-    });
-  };
-
-  const setQuotationDiscount = (value: typeof state_quotationDiscount) => {
-    setState_quotationDiscount(value);
-    // 總折數改變後要重新計算主產品的金額
-    //
-  };
-
-  // -----------------------------------------------------------------------
-
-  // region COOKED
-
-  const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
-
-  const componentKeyArr = activedProd?.componentKeyArr;
-  const accessoryKeyArr = activedProd?.accessoryKeyArr;
-
-  // class用來管理資料狀態
-  // MARK:classProdDict
-  const classProdDict = useMemo(() => {
-    if (!doorModelDict) {
+  const createActivedClassAccessoryDict = (activedProd: TstateProd | undefined) => {
+    if (!activedProd) {
       return {};
     }
 
-    // const dict: { [key: string]: Interface_ClassProd_base } = {};
-    const dict: { [key: string]: Interface_ClassProd_prime | Interface_ClassProd_special } = {};
+    return createAccessoryDict({
+      activedProd,
+      createSetAccessory,
+    });
+  };
 
-    Object.entries(state_prodDict).forEach(([key, state]) => {
-      if (state.key !== key) {
-        throw new Error('classProdDict發生錯誤，key與state.key不一致');
-      }
-
-      const { doorModelName } = state.data_prod;
-
+  const createClassProd = useCallback(
+    (stateProd: TstateProd) => {
+      const { doorModelName } = stateProd.data_prod;
       const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
 
-      const theClass = lookup_classProd[prodName];
+      const TheClass = lookup_classProd[prodName];
 
-      dict[key] = new theClass({
-        stateProd: state,
-        setStateProd: createSetProd(key),
+      const classProd = new TheClass({
+        stateProd: stateProd,
+        setStateProd: createSetProd(stateProd.key),
         nodeConfig: nodeConfig_prime,
       });
-    });
 
-    return dict;
-  }, [state_prodDict, nodeConfig_prime]);
+      return classProd;
+    },
+    [nodeConfig_prime]
+  );
 
-  // MARK:activeClassProd
-  const activedClassProd = useMemo(() => {
-    if (!activeProdKey) {
-      return undefined;
+  const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
+    if (!activedProd) {
+      return {};
     }
 
-    return classProdDict[activeProdKey];
-  }, [activeProdKey, classProdDict]);
-
-  // MARK:activeClassComponentArr
-  const activedClassComponentArr = useMemo(() => {
-    if (!activedClassProd) {
-      return undefined;
-    }
-
-    const data_componentDict = activedClassProd.state.data_componentDict;
-
-    const classComponentDict: TclassComponentDict = createClassComponentDict({
-      data_componentDict,
-      activeClassProdKey: activedClassProd.state.key,
+    return createClassComponentDict_v2({
+      activedProd,
       createSetComponent,
     });
-
-    return Object.values(classComponentDict);
-  }, [activedClassProd]);
-
-  const activedClassComponentDict = useMemo(() => {
-    if (!activedClassProd) {
-      return undefined;
-    }
-
-    const data_componentDict = activedClassProd.state.data_componentDict;
-
-    const classComponentDict: TclassComponentDict = createClassComponentDict({
-      data_componentDict,
-      activeClassProdKey: activedClassProd.state.key,
-      createSetComponent,
-    });
-
-    return classComponentDict;
-  }, [activedClassProd]);
-
-  const activedClassAccessoryDict = useMemo(() => {
-    if (!activedClassProd) {
-      return undefined;
-    }
-
-    const data_accessoryDict = activedClassProd.state.data_accessoryDict;
-
-    const classAccessoryDict: TclassAccessoryDict = {};
-    Object.entries(data_accessoryDict).forEach(([key, acce]) => {
-      classAccessoryDict[key] = new Class_accessory({
-        state_accessory: acce,
-        setState_accessory: createSetAccessory({
-          prodKey: activedClassProd.state.key,
-          accessoryKey: key,
-        }),
-      });
-    });
-
-    return classAccessoryDict;
-  }, [activedClassProd]);
+  };
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -439,20 +484,20 @@ const useQuotationProduct = ({
   // }, [defaultState_copy]);
 
   useEffect(() => {
-    if (!activedClassProd) {
-      return;
-    }
+    if (activedProd) {
+      const activedClassProd = createClassProd(activedProd);
 
-    if (!activedClassProd.isInited) {
-      activedClassProd.init();
+      if (!activedClassProd.isInited) {
+        activedClassProd.init();
+      }
     }
   }, [activeProdKey]);
 
   // -----------------------------------------------------------------------------
   // MARK: RETURN
   return {
-    classProdDict,
-    activedClassProd,
+    // classProdDict,
+    // activedClassProd,
     activedProd,
     //
     cellKeyArr,
@@ -462,14 +507,14 @@ const useQuotationProduct = ({
     //
     choseActiveProd,
     //
-    activedClassComponentArr,
-    activedClassComponentDict,
+    // activedClassComponentArr,
+    // activedClassComponentDict,
     cellKeyArr_component,
     setCellKeyArr_component,
     componentKeyArr,
     setComponentKeyArr,
     //
-    activedClassAccessoryDict,
+    // activedClassAccessoryDict,
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
     accessoryKeyArr,
@@ -494,12 +539,12 @@ const useQuotationProduct = ({
     //
     state_prodDict,
 
-    createSetProd,
-    createSetComponent,
-    createSetAccessory,
+    // lookup_classProd,
+    // nodeConfig_prime,
 
-    lookup_classProd,
-    nodeConfig_prime,
+    createActivedClassComponentDict,
+    createActivedClassAccessoryDict,
+    createClassProd,
   };
 };
 
@@ -630,6 +675,153 @@ const createClassComponentDict = ({
   };
 
   return classComponentDict;
+};
+
+const createClassComponentDict_v2 = ({
+  //
+  activedProd,
+  createSetComponent,
+}: {
+  activedProd: TstateProd;
+  createSetComponent: TcreateSetComponent;
+}) => {
+  const data_componentDict = activedProd.data_componentDict;
+  const activeProdKey = activedProd.key;
+
+  const slat =
+    data_componentDict['slat'] &&
+    new ClassCompnent_slat({
+      state_component: data_componentDict['slat'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'slat',
+      }),
+    });
+
+  const bottomBar =
+    data_componentDict['bottomBar'] &&
+    new ClassCompnent_bottomBar({
+      state_component: data_componentDict['bottomBar'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'bottomBar',
+      }),
+    });
+
+  const guideRail =
+    data_componentDict['guideRail'] &&
+    new ClassCompnent_guideRail({
+      state_component: data_componentDict['guideRail'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'guideRail',
+      }),
+    });
+
+  const sidePlate =
+    data_componentDict['sidePlate'] &&
+    new ClassCompnent_sidePlate({
+      state_component: data_componentDict['sidePlate'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'sidePlate',
+      }),
+    });
+
+  const roller =
+    data_componentDict['roller'] &&
+    new ClassCompnent_roller({
+      state_component: data_componentDict['roller'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'roller',
+      }),
+    });
+
+  const motor =
+    data_componentDict['motor'] &&
+    new ClassCompnent_motor({
+      state_component: data_componentDict['motor'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'motor',
+      }),
+    });
+
+  const motorAccessories =
+    data_componentDict['motorAccessories'] &&
+    new ClassCompnent_motorAccessories({
+      state_component: data_componentDict['motorAccessories'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'motorAccessories',
+      }),
+    });
+  const headBox =
+    data_componentDict['headBox'] &&
+    new ClassCompnent_headBox({
+      state_component: data_componentDict['headBox'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'headBox',
+      }),
+    });
+  const middlePillar =
+    data_componentDict['middlePillar'] &&
+    new ClassCompnent_middlePillar({
+      state_component: data_componentDict['middlePillar'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'middlePillar',
+      }),
+    });
+  const backBone =
+    data_componentDict['backBone'] &&
+    new ClassCompnent_backBone({
+      state_component: data_componentDict['backBone'],
+      setState_component: createSetComponent({
+        pordKey: activeProdKey,
+        componentKey: 'backBone',
+      }),
+    });
+
+  const classComponentDict: TclassComponentDict = {
+    slat,
+    bottomBar,
+    guideRail,
+    sidePlate,
+    roller,
+    motor,
+    motorAccessories,
+    headBox,
+    middlePillar,
+    backBone,
+  };
+
+  return classComponentDict;
+};
+
+const createAccessoryDict = ({
+  activedProd,
+  createSetAccessory,
+}: {
+  activedProd: TstateProd;
+  createSetAccessory: TcreateSetAccessory;
+}) => {
+  const data_accessoryDict = activedProd.data_accessoryDict;
+
+  const classAccessoryDict: TclassAccessoryDict = {};
+  Object.entries(data_accessoryDict).forEach(([key, acce]) => {
+    classAccessoryDict[key] = new Class_accessory({
+      state_accessory: acce,
+      setState_accessory: createSetAccessory({
+        prodKey: activedProd.key,
+        accessoryKey: key,
+      }),
+    });
+  });
+
+  return classAccessoryDict;
 };
 
 // ================================================================================
