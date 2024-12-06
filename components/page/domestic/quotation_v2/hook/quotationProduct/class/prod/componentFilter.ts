@@ -118,15 +118,12 @@ const filter_sidePlate = (
   };
 };
 
-const filter_roller = ({
-  rollers,
-  params,
-}: {
-  rollers: TdoorComponentListDto['rollers'];
+const filter_roller = (
+  rollers: TdoorComponentListDto['rollers'],
   params: {
     diameter: string;
-  };
-}) => {
+  }
+) => {
   const { diameter } = params;
 
   const optionalArr = rollers.filter((roller) => {
@@ -180,17 +177,14 @@ const filter_motor = (
   };
 };
 
-const filter_motorAccessory = ({
-  motorAccessories,
-  params,
-}: {
-  motorAccessories: TdoorComponentListDto['motorAccessories'];
+const filter_motorAccessory = (
+  motorAccessories: TdoorComponentListDto['motorAccessories'],
   params: {
     chains: number; // 鍊條排數
     bearingType: string; // 軸承
     gearNumber: string;
-  };
-}) => {
+  }
+) => {
   const { chains, bearingType, gearNumber } = params;
 
   const optionalArr = motorAccessories.filter((motorAccessory) => {
@@ -209,16 +203,13 @@ const filter_motorAccessory = ({
   };
 };
 
-const filter_headBox = ({
-  headBoxes,
-  params,
-}: {
-  headBoxes: TdoorComponentListDto['headBoxes'];
+const filter_headBox = (
+  headBoxes: TdoorComponentListDto['headBoxes'],
   params: {
     thickness: `${number}` | number; // 厚度 // 主產品設定裡的捲箱厚度
     isIntegrated: boolean; // 一體式捲箱
-  };
-}) => {
+  }
+) => {
   const { thickness, isIntegrated } = params;
 
   const optionalArr = headBoxes.filter((headBox) => {
@@ -233,13 +224,7 @@ const filter_headBox = ({
   };
 };
 
-const filter_backBone = ({
-  backBones,
-}: // params,
-{
-  backBones: TdoorComponentListDto['backBone'];
-  // params:{}
-}) => {
+const filter_backBone = (backBones: TdoorComponentListDto['backBone']) => {
   const backBone = backBones?.[0] || null;
   const optionalArr = backBones?.filter(() => true) ?? [];
 
@@ -249,12 +234,7 @@ const filter_backBone = ({
   };
 };
 
-const filter_middlePillar = ({
-  middlePillars,
-}: {
-  middlePillars: TdoorComponentListDto['middlePillar'];
-  // params:{};
-}) => {
+const filter_middlePillar = (middlePillars: TdoorComponentListDto['middlePillar']) => {
   const middlePillar = middlePillars?.[0] || null;
   const optionalArr = middlePillars?.filter(() => true) ?? [];
 

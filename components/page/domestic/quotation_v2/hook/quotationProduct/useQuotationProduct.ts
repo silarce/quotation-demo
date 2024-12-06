@@ -554,128 +554,128 @@ const useQuotationProduct = ({
 // ================================================================================
 
 // MARK:createClassComponentDict
-const createClassComponentDict = ({
-  //
-  data_componentDict,
-  activeClassProdKey,
-  createSetComponent,
-}: {
-  data_componentDict: Tdata_componentDict;
-  activeClassProdKey: string;
-  createSetComponent: TcreateSetComponent;
-}) => {
-  const slat =
-    data_componentDict['slat'] &&
-    new ClassCompnent_slat({
-      state_component: data_componentDict['slat'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'slat',
-      }),
-    });
+// const createClassComponentDict = ({
+//   //
+//   data_componentDict,
+//   activeClassProdKey,
+//   createSetComponent,
+// }: {
+//   data_componentDict: Tdata_componentDict;
+//   activeClassProdKey: string;
+//   createSetComponent: TcreateSetComponent;
+// }) => {
+//   const slat =
+//     data_componentDict['slat'] &&
+//     new ClassCompnent_slat({
+//       state_component: data_componentDict['slat'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'slat',
+//       }),
+//     });
 
-  const bottomBar =
-    data_componentDict['bottomBar'] &&
-    new ClassCompnent_bottomBar({
-      state_component: data_componentDict['bottomBar'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'bottomBar',
-      }),
-    });
+//   const bottomBar =
+//     data_componentDict['bottomBar'] &&
+//     new ClassCompnent_bottomBar({
+//       state_component: data_componentDict['bottomBar'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'bottomBar',
+//       }),
+//     });
 
-  const guideRail =
-    data_componentDict['guideRail'] &&
-    new ClassCompnent_guideRail({
-      state_component: data_componentDict['guideRail'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'guideRail',
-      }),
-    });
+//   const guideRail =
+//     data_componentDict['guideRail'] &&
+//     new ClassCompnent_guideRail({
+//       state_component: data_componentDict['guideRail'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'guideRail',
+//       }),
+//     });
 
-  const sidePlate =
-    data_componentDict['sidePlate'] &&
-    new ClassCompnent_sidePlate({
-      state_component: data_componentDict['sidePlate'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'sidePlate',
-      }),
-    });
+//   const sidePlate =
+//     data_componentDict['sidePlate'] &&
+//     new ClassCompnent_sidePlate({
+//       state_component: data_componentDict['sidePlate'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'sidePlate',
+//       }),
+//     });
 
-  const roller =
-    data_componentDict['roller'] &&
-    new ClassCompnent_roller({
-      state_component: data_componentDict['roller'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'roller',
-      }),
-    });
+//   const roller =
+//     data_componentDict['roller'] &&
+//     new ClassCompnent_roller({
+//       state_component: data_componentDict['roller'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'roller',
+//       }),
+//     });
 
-  const motor =
-    data_componentDict['motor'] &&
-    new ClassCompnent_motor({
-      state_component: data_componentDict['motor'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'motor',
-      }),
-    });
+//   const motor =
+//     data_componentDict['motor'] &&
+//     new ClassCompnent_motor({
+//       state_component: data_componentDict['motor'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'motor',
+//       }),
+//     });
 
-  const motorAccessories =
-    data_componentDict['motorAccessories'] &&
-    new ClassCompnent_motorAccessories({
-      state_component: data_componentDict['motorAccessories'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'motorAccessories',
-      }),
-    });
-  const headBox =
-    data_componentDict['headBox'] &&
-    new ClassCompnent_headBox({
-      state_component: data_componentDict['headBox'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'headBox',
-      }),
-    });
-  const middlePillar =
-    data_componentDict['middlePillar'] &&
-    new ClassCompnent_middlePillar({
-      state_component: data_componentDict['middlePillar'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'middlePillar',
-      }),
-    });
-  const backBone =
-    data_componentDict['backBone'] &&
-    new ClassCompnent_backBone({
-      state_component: data_componentDict['backBone'],
-      setState_component: createSetComponent({
-        pordKey: activeClassProdKey,
-        componentKey: 'backBone',
-      }),
-    });
+//   const motorAccessories =
+//     data_componentDict['motorAccessories'] &&
+//     new ClassCompnent_motorAccessories({
+//       state_component: data_componentDict['motorAccessories'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'motorAccessories',
+//       }),
+//     });
+//   const headBox =
+//     data_componentDict['headBox'] &&
+//     new ClassCompnent_headBox({
+//       state_component: data_componentDict['headBox'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'headBox',
+//       }),
+//     });
+//   const middlePillar =
+//     data_componentDict['middlePillar'] &&
+//     new ClassCompnent_middlePillar({
+//       state_component: data_componentDict['middlePillar'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'middlePillar',
+//       }),
+//     });
+//   const backBone =
+//     data_componentDict['backBone'] &&
+//     new ClassCompnent_backBone({
+//       state_component: data_componentDict['backBone'],
+//       setState_component: createSetComponent({
+//         pordKey: activeClassProdKey,
+//         componentKey: 'backBone',
+//       }),
+//     });
 
-  const classComponentDict: TclassComponentDict = {
-    slat,
-    bottomBar,
-    guideRail,
-    sidePlate,
-    roller,
-    motor,
-    motorAccessories,
-    headBox,
-    middlePillar,
-    backBone,
-  };
+//   const classComponentDict: TclassComponentDict = {
+//     slat,
+//     bottomBar,
+//     guideRail,
+//     sidePlate,
+//     roller,
+//     motor,
+//     motorAccessories,
+//     headBox,
+//     middlePillar,
+//     backBone,
+//   };
 
-  return classComponentDict;
-};
+//   return classComponentDict;
+// };
 
 const createClassComponentDict_v2 = ({
   //
