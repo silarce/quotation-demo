@@ -630,6 +630,7 @@ const QuotationRow_dealClass = ({
 
   const left = (
     <>
+      <div ref={viewRef} className={scss.viewIndicator} />
       <Cell_delete onClick={() => {}} />
       <Cell_copy onClick={() => {}} />
       <Cell_indexNumber>{index + 1}</Cell_indexNumber>
@@ -643,48 +644,49 @@ const QuotationRow_dealClass = ({
   );
 
   return (
-    <div ref={viewRef}>
-      <Spin key={prodKey} spinning={classProd.isFetching}>
-        <QuotationRow_dnd
-          //
-          // rerenderTrigger01={classProd.state}
-          // rerenderTrigger02={disabled}
-          // rerenderTrigger03={cellKeyArr}
-          //
-          key={prodKey}
-          id={prodKey}
-          index={index}
-          //
-          isActive={isActive}
-          left={left}
-          //
-          onDragStart={(e) => {
-            choseActiveProd(undefined);
-          }}
-          onClick={(e) => {
-            e.stopPropagation();
-            choseActiveProd(classProd.state);
-          }}
-          className="min-h-11"
-        >
-          {inView &&
-            cellKeyArr.map((cellKey, cIndex) => {
-              const { style, className, createNode } = classProd.nodeConfig[cellKey];
+    <Spin spinning={classProd.isFetching}>
+      <QuotationRow_dnd
+        //
+        // rerenderTrigger01={classProd.state}
+        // rerenderTrigger02={disabled}
+        // rerenderTrigger03={cellKeyArr}
+        //
+        key={prodKey}
+        id={prodKey}
+        index={index}
+        //
+        isActive={isActive}
+        left={left}
+        //
+        onDragStart={(e) => {
+          choseActiveProd(undefined);
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          choseActiveProd(classProd.state);
+        }}
+        className="min-h-11"
+      >
+        {cellKeyArr.map((cellKey, cIndex) => {
+          const { style, className, createNode } = classProd.nodeConfig[cellKey];
 
-              const node = createNode({
-                disabled,
-                classProd,
-              });
+          if (!inView) {
+            return <div key={cellKey} className={classNames(className)} style={style} />;
+          }
 
-              return (
-                <Cell key={cellKey} className={classNames(className)} style={style}>
-                  {node}
-                </Cell>
-              );
-            })}
-        </QuotationRow_dnd>
-      </Spin>
-    </div>
+          const node = createNode({
+            disabled,
+            classProd,
+          });
+
+          return (
+            <Cell key={cellKey} className={classNames(className)} style={style}>
+              {node}
+            </Cell>
+          );
+        })}
+      </QuotationRow_dnd>
+    </Spin>
   );
 };
 
