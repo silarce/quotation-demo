@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Button, Collapse, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -58,6 +58,9 @@ import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
+import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
+
+import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PurchaseRequisitionList() {
     //登入者資料
@@ -85,7 +88,7 @@ export default function PurchaseRequisitionList() {
     const [searchdata, setSearchdata] = useState<any[]>([]);
 
 
-    
+
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
 
@@ -96,6 +99,8 @@ export default function PurchaseRequisitionList() {
 
 
     //api
+
+    //取請購主檔
     const getPurchaseRequisition = async () => {
         try {
             setIsLoading(true);
@@ -113,7 +118,7 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionWithReviews?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -131,6 +136,145 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    //取請購明細
+    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisitionDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+            // setData1(data);
+            return responsedata
+
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                user_id: userInfo?.employee?.id.toString()
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            // setIsLoading(false);
+        }
+    };
+
+    //#endregion
+
 
 
 
@@ -140,6 +284,16 @@ export default function PurchaseRequisitionList() {
     // 點擊處理函數
     const handleRowClick = (itemId: string) => {
         setSelectedItemId(itemId);
+    };
+
+    const [details, setDetails] = useState<Record<number, any[]>>({});
+
+    const handlePanelClick = async (id: number) => {
+        const detailData = await getPurchaseRequisitionDetail(id);
+        setDetails((prevDetails) => ({
+            ...prevDetails,
+            [id]: detailData,
+        }));
     };
 
 
@@ -152,27 +306,193 @@ export default function PurchaseRequisitionList() {
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                     {data && (
                         data.map((_item: any, index: number) => (
+
                             <CellWithBar key={index} className={scss.panelHeader15}>
-                                <div
-                                    key={index}
-                                    className={`${scss.row01} 
-                                    ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
-                                // onClick={() => { GetPurchaseRequisition(_item) }}
+                                <Collapse
+                                    defaultActiveKey={[]}
+                                    className={scss.customCollapse}
+                                    onChange={(key) => {
+                                        if (key.includes("1")) {
+                                            handlePanelClick(_item.purchaserequisitionuuid);
+                                        }
+                                    }}
                                 >
-                                    <span>{index + 1}</span>
-                                    <span>{_item.purchaserequisitionid}</span>
-                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                    {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                                    <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
-                                        {_item.status}
-                                    </span>
-                                    <span>{_item.note}</span>
-                                    {/* <span>{_item.create_by}</span> */}
-                                    {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
-                                </div>
+                                    <Panel
+                                        style={{ backgroundColor: 'transparent', border: '0' }}
+                                        key="1"
+                                        showArrow={false}
+                                        header={(
+                                            <>
+                                                <div
+                                                    key={index}
+                                                    className={`${scss.row01} 
+                                                ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                                >
+                                                    <span>{index + 1}</span>
+                                                    <span>{_item.purchaserequisitionid}</span>
+                                                    <span style={{ color: '#ea1833' }}>
+                                                        {_item.status}
+                                                    </span>
+                                                    <span>
+                                                        {getTaiwanDateStr(_item.create_at)}
+                                                    </span>
+                                                    <span>
+                                                        {getTaiwanDateStr(_item.need_date)}
+                                                    </span>
+                                                    <span>
+                                                        {_item.create_by}
+                                                    </span>
+                                                    <span>{_item.note}</span>
+                                                    <span>
+                                                        <IconDetail onClick={() => {
+                                                            router.push({
+                                                                pathname: `/factoryDepartment/PRequisitionDetail`,
+                                                                query: {
+                                                                    purchaserequisitionuuid: _item.purchaserequisitionuuid,
+                                                                    purchaserequisitionid: _item.purchaserequisitionid
+                                                                },
+                                                            });
+                                                        }} />
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    key={index}
+                                                    className={`${scss.row02}`}
+                                                    style={{ 
+                                                        display: 'flex', 
+                                                        alignItems: 'center', 
+                                                        gap: '20px',
+                                                        padding:'10px 20px',
+                                                        cursor: 'pointer',
+                                                    }} // 水平排列
+                                                >
+                                                    {_item.stages.map((item: any, index: number) => {
+                                                        // 判斷圈圈顏色
+                                                        let circleColor = 'gray'; // 預設為灰色
+                                                        let textColor = 'gray'; // 預設文字顏色為灰色
+
+                                                        if (item.review_order === 1 || item.review_status === '核准') {
+                                                            circleColor = 'green';
+                                                            textColor = 'black'; // 綠色的時候文字變為黑色
+                                                        } else if (
+                                                            item.review_status === '簽核中' &&
+                                                            index > 0 &&
+                                                            _item.stages[index - 1].review_order + 1 === item.review_order
+                                                        ) {
+                                                            circleColor = 'red';
+                                                            textColor = 'black'; // 紅色的時候文字變為黑色
+                                                        }
+
+                                                        return (
+                                                            <div
+                                                                key={index}
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '10px',
+                                                                }}
+                                                            >
+                                                                {/* 灰色框框 */}
+                                                                <div
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        backgroundColor: "#f5f5f5",
+                                                                        borderRadius: '15px',
+                                                                        padding: '5px 10px',
+                                                                        gap: '10px',
+                                                                    }}
+                                                                >
+                                                                    {/* 左邊的圈圈 */}
+                                                                    <div
+                                                                        style={{
+                                                                            width: '10px',
+                                                                            height: '10px',
+                                                                            borderRadius: '50%',
+                                                                            backgroundColor: circleColor,
+                                                                        }}
+                                                                    ></div>
+                                                                    {/* 名稱 */}
+                                                                    <span style={{ color: textColor }}>
+                                                                        {item.review_status}&nbsp;
+                                                                        {item.review_person_name}
+                                                                    </span>
+                                                                </div>
+
+                                                                {/* 右邊的箭頭，最後一筆不顯示 */}
+                                                                {index < _item.stages.length - 1 && (
+                                                                    <div style={{ fontSize: '20px', color: 'black' }}>
+                                                                        <svg
+                                                                            width="32"
+                                                                            height="11"
+                                                                            viewBox="0 0 32 11"
+                                                                            fill="none"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            <line
+                                                                                x1="0.5"
+                                                                                y1="5.5"
+                                                                                x2="30.5"
+                                                                                y2="5.5"
+                                                                                stroke="#404040"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                            ></line>
+                                                                            <path
+                                                                                d="M27 2L31 5.5L27 9"
+                                                                                stroke="#404040"
+                                                                                stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                            ></path>
+                                                                        </svg>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+
+
+                                            </>
+
+                                        )}
+                                    >
+                                        <div>
+                                            <table className={scss.detailTable}>
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ width: '50px' }}>序</th>
+                                                        <th style={{ width: '100px' }}>料號</th>
+                                                        <th style={{ width: '300px' }}>名稱</th>
+                                                        <th style={{ width: '400px' }}>規格</th>
+                                                        <th>數量</th>
+                                                        <th>單價</th>
+                                                        <th>金額</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {details[_item.purchaserequisitionuuid]?.map((detail: any, detailIndex: number) => (
+                                                        <tr key={detailIndex}>
+                                                            <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                                            <td style={{ width: '100px' }}>{detail.productid}</td>
+                                                            <td style={{ width: '300px' }}>{detail.name}</td>
+                                                            <td style={{ width: '400px' }}>{detail.spec}</td>
+                                                            <td style={{ color: '#ea1833' }}>{detail.alreadyinquantity}</td>
+                                                            <td>{detail.quantity?.toLocaleString()}</td>
+                                                            <td>{detail.unitprice?.toLocaleString()}</td>
+                                                            <td>{detail.totalprice?.toLocaleString()}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </Panel>
+                                </Collapse>
                             </CellWithBar>
                         ))
                     )}
+
                 </div>
 
             </div>

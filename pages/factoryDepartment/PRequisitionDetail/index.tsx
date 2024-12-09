@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './addPurchaseRequisitionList.module.scss';
+import scss from './PRequisitionDetail.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -47,7 +47,7 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function AddPurchaseRequisitionList() {
+export default function PRequisitionDetail() {
 
     //路由參數
     const router = useRouter();
@@ -56,7 +56,8 @@ export default function AddPurchaseRequisitionList() {
         purchaseorderuuid,
         create_at,
         create_by,
-        purchaseorderdetailuuid
+        purchaserequisitionuuid,
+        purchaserequisitionid
     } = router.query;
 
 
@@ -93,8 +94,8 @@ export default function AddPurchaseRequisitionList() {
     const [note, setNote] = useState<string>("");
     const [need_date, setNeed_date] = useState<string>("");
     const [status, setStatus] = useState<string>("");
-    const [purchaserequisitionid, setPurchaserequisitionid] = useState<string>("");
-    const [purchaserequisitionuuid, setPurchaserequisitionuuid] = useState<string>("");
+    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>(purchaserequisitionid as string);
+    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>(purchaserequisitionuuid as string);
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
 
     //搜尋
@@ -408,19 +409,19 @@ export default function AddPurchaseRequisitionList() {
             // setIsLoading(false);
         }
     };
-    useEffect(() => {
-        if (purchaseorderuuid) {
-            if (purchaseorderuuidin != purchaseorderuuid) {
-                setData2([]);
-            }
-            getProductById(purchaseorderuuid);
-            if (purchaseorderdetailuuid) {
-            }
-            setPurchaseorderuuidin(purchaseorderuuid as string);
-            setCreate_atin(create_at as string);
-            setCreate_byin(create_by as string);
-        }
-    }, [purchaseorderuuid, purchaseorderdetailuuid]);
+    // useEffect(() => {
+    //     if (purchaseorderuuid) {
+    //         if (purchaseorderuuidin != purchaseorderuuid) {
+    //             setData2([]);
+    //         }
+    //         getProductById(purchaseorderuuid);
+    //         if (purchaseorderdetailuuid) {
+    //         }
+    //         setPurchaseorderuuidin(purchaseorderuuid as string);
+    //         setCreate_atin(create_at as string);
+    //         setCreate_byin(create_by as string);
+    //     }
+    // }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
     //請購單申請
     const NewAddPurchaseRequisition = async () => {
@@ -463,8 +464,8 @@ export default function AddPurchaseRequisitionList() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                setPurchaserequisitionid(result.purchaserequisitionid);
-                setPurchaserequisitionuuid(result.purchaserequisitionuuid);
+                setPurchaserequisitionidin(result.purchaserequisitionid);
+                setPurchaserequisitionuuidin(result.purchaserequisitionuuid);
                 setStatus("編輯中");
             } else {
                 // 失敗，顯示錯誤提示
@@ -1008,71 +1009,6 @@ export default function AddPurchaseRequisitionList() {
         };
     }, []);
 
-
-    const handlePreAddPR = () => {
-        setPurchaserequisitionid("儲存後產生");
-        setStatus("未儲存");
-        setNote("");
-        // setCreate_byin(userInfo?.username as string);
-        setCreate_byin(userInfo?.employee?.chName.toString() || '');
-        setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setNeed_date(moment().format('YYYY-MM-DD') || '');
-        setData2([]);
-    }
-
-    const handlecancelAddPR = () => {
-        setPurchaserequisitionid("");
-        setStatus("");
-        setData2([]);
-        setNote("");
-        setNeed_date(moment().toString());
-    }
-
-    const handlesaveAddPRDetail = () => {
-
-        let needDateObj = new Date(need_date);
-        let createAtinObj = new Date(create_atin);
-
-        if (data2.length === 0) {
-            myAlert.warning({ title: "尚未加入任何請購項目" });
-            return;
-        }
-        else {
-
-            const hasZeroQuantity = data2.some(item => item.quantity === 0 || item.quantity === '');
-
-            if (hasZeroQuantity) {
-                myAlert.warning({ title: "請購項目中有數量為0的項目，請檢查並修正。" });
-            } else {
-                myAlert.confirm({
-                    title: '確定要送出請購單嗎?',
-                    content: <>
-                        <h1>請檢查品名、數量是否正確</h1>
-                    </>,
-                    props: {
-                        onOk: async () => {
-                            ClosePurchaseRequisition();
-                            setPurchaserequisitionid("");
-                            setPurchaserequisitionuuid("");
-                            setCreate_atin(moment().format('YYYY-MM-DD') || '');
-                            setNeed_date(moment().format('YYYY-MM-DD') || '');
-                            setStatus("");
-                            setNote("")
-                            setData2([]);
-
-                            await router.push({
-                                pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {
-                                    purchaserequisitionid: purchaserequisitionid
-                                },
-                            });
-                        }
-                    }
-                });
-            }
-        }
-    }
-
     const dropdownRef = useRef<HTMLUListElement | null>(null);
 
     useEffect(() => {
@@ -1157,79 +1093,9 @@ export default function AddPurchaseRequisitionList() {
         // setSearchdata(data);
     }
 
-    const handlechangepr = (item: any) => {
-        handleRowClick(item.purchaserequisitionid);
-        setData2([]);
-        setPurchaserequisitionid(item.purchaserequisitionid);
-        setPurchaserequisitionuuid(item.purchaserequisitionuuid);
-        setStatus(item.status);
-        setNote(item.note);
-        setCreate_atin(item.create_at);
-        setNeed_date(item.need_date);
-        setCreate_byin(item.create_by);
-        getPurchaseRequisitionDetail(item.purchaserequisitionuuid);
-    }
-
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const handleRowClick = (itemId: string) => {
         setSelectedItemId(itemId);
-    };
-
-    const handleDeletePR = async (id: any) => {
-
-        myAlert.confirm({
-            title: '確定要刪除這筆單據嗎?',
-            content: <>
-                <h1>刪除後將無法復原</h1>
-            </>,
-            props: {
-                onOk: async () => {
-                    try {
-                        setIsLoading(true);
-                        const conditionModel = {
-                            id: id
-                        };
-
-
-                        var inputModel = {
-                            TypeName: 'ERP',
-                            ServiceName: 'WareHouseService',
-                            FunctionName: 'no',
-                            FilterConditions: JSON.stringify(conditionModel),
-                        };
-
-                        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-                        const response = await fetch(`${setting.apipath}/WareHouse/DeletePurchaseRequisition?${queryParams}`);
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch data');
-                        }
-                        const responseData = await response.text();
-
-                        myAlert.success({ title: '刪除成功' });
-
-                        setPurchaserequisitionid('');
-                        setCreate_atin('');
-                        setNeed_date('');
-                        setNote('');
-                        setCreate_byin('');
-                        setStatus('');
-                        setData2([]);
-                        getPurchaseRequisition();
-                        // setKeyword3('');
-
-
-
-                    } catch (error: any) {
-                        setError(error.message);
-                    }
-                    finally {
-                        setIsLoading(false);
-                    }
-
-                }
-            }
-        })
     };
 
     const handleAddDetail = () => {
@@ -1294,7 +1160,7 @@ export default function AddPurchaseRequisitionList() {
                 customeLeft={
                     [
                         <>
-                            <span style={{fontSize:'18px',paddingLeft:'10px'}}>
+                            <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
                                 {status}
                             </span>
                         </>
@@ -1406,7 +1272,7 @@ export default function AddPurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             caption="請購類別"
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -1434,7 +1300,7 @@ export default function AddPurchaseRequisitionList() {
                                                         : null,
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                         {/* <button onClick={() => { alert("OK") }}>
                                             ...
                                         </button> */}
@@ -1736,292 +1602,6 @@ export default function AddPurchaseRequisitionList() {
                         </div>
                     </div>
                 </div>
-
-                <DragableModal
-                    handleText="品項查詢"
-                    style={{ zIndex: '1000', width: '900px' }}
-                    show={productSearchmodalopen}
-                    onCrossClick={productSearchModalClose}
-                >
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>類別：</span>
-                        <span style={{ fontSize: '16px' }}>
-                            <select value={selectedOption}
-                                style={{ borderBottom: '1px solid #c1c1c1' }}
-                                onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                <option value="物料">物料</option>
-                            </select>
-                        </span>
-
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>查詢：</span>
-                        <span style={{ fontSize: '16px' }}>
-                            <form onSubmit={handleSubmit}>
-                                <input
-                                    type="text"
-                                    placeholder='　料號'
-                                    value={keyword1}
-                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword1(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder='　名稱'
-                                    value={keyword2}
-                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword2(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder='　規格'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                                <button type="submit">
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </form>
-                        </span>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'AddPR_GetProduct'} />
-                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {modaldata && (
-                                modaldata.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader19}>
-                                        <div className={scss.row01}>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.count}</span>
-                                            <span>
-                                                <button onClick={() => { getProductById(_item.id) }}>
-                                                    <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                    {/* </Modal> */}
-                </DragableModal>
-
-                <DragableModal
-                    handleText="查找單據"
-                    style={{ zIndex: '1001', width: '1000px' }}
-                    show={searchmodalopen}
-                    onCrossClick={SearchModalClose}
-                >
-                    {/* <Modal
-                        visible={searchmodalopen}
-                        footer={null}
-                        onCancel={SearchModalClose}
-                        width="1000px"
-                        maskClosable={false}
-                        // title='單據查找'
-                        // title={
-                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                        //     <span>查詢條件</span>
-                        //     <span >筆數：共 {data.length} 筆</span>
-                        // </div>
-
-                        // }
-                        // centered
-                        style={{ top: 200 }}
-                    > */}
-
-                    <div className={scss.modal_head_head1}>
-                        <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
-                        </div>
-                        <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
-                        </div>
-                    </div>
-                    <div className={scss.modal_head_content1}>
-                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <select
-                                        value={keyword3 || ''}
-                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                            setKeyword3(e.target.value);
-                                            e.target.blur(); // 讓 select 失去焦點
-                                        }}
-                                        disabled={false}
-                                        style={{
-                                            fontSize: '18px',
-                                            borderBottom: '1px solid #14256a',
-                                            color: '#14256a'
-                                        }}
-                                    >
-                                        <option value="">全部</option>
-                                        <option value="未送出">未送出</option>
-                                    </select>
-
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="起始日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: keywordstartdate || null,
-                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
-                                            }
-                                        }}
-                                    />
-
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="截止日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: keywordenddate || null,
-                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
-                                            }
-                                        }}
-                                    />
-
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購單號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword2 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div >
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
-                                    <span>
-                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
-                                    </span>
-                                    {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
-                                </div>
-                            </form>
-                        </div>
-                        <div style={{
-                            maxHeight: '465.81px',
-                            overflowY: 'auto',
-                            border: '1px solid #c1c1c1',
-                            // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
-                            // padding: '10px',
-                            // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
-                        }}>
-                            <Thead01 type={'PurchaseRequisition'} />
-                            {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {searchdata && (
-                                searchdata.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader15}>
-                                        <div
-                                            key={index}
-                                            className={`${scss.row01} ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
-                                            onClick={() => { handlechangepr(_item) }}>
-                                            <span>{index + 1}</span>
-                                            <span>{_item.purchaserequisitionid}</span>
-                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                            {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                                            <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
-                                                {_item.status}
-                                            </span>
-                                            <span>{_item.note}</span>
-                                            {/* <span>{_item.create_by}</span> */}
-                                            {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
-                        </div>
-
-                    </div>
-                    {/* </Modal > */}
-                </DragableModal>
 
 
 
