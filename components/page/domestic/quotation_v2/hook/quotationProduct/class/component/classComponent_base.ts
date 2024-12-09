@@ -21,7 +21,7 @@ interface Interface_ClassComponent_base {
   // readonly key: string;
   // readonly name: string;
 
-  number: string; // 代號
+  number: string | undefined; // 代號
   desc: string; // 說明
   material: string; // 材料
   materialSurface: string | null; // 表面

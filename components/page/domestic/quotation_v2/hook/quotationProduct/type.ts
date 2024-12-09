@@ -239,7 +239,7 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   type: T;
   //
   // 輸出
-  number: string; // 代號
+  number: string | undefined; // 代號 來自於 door/generate-door-product-bom
   desc: string; // 說明
   material: string; // 材料
   materialSurface: string | null; // 表面
@@ -249,8 +249,9 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   price: `${number}` | ''; // 牌價
 
   //
-  rawData: TcomponentRawDataDict[T];
+  rawData: TcomponentRawDataDict[T] | null; // 來自於availableComponent的資料
   //
+  optionalComponent?: TcomponentRawDataDict[T][] | null; // 來自於availableComponent的資料
 
   // 這幾個寫在class裡面
   // name: string; // 名稱
