@@ -174,6 +174,7 @@ const lookup_options_boxB: Tlookup_options_boxB = {
   'SJ-303AS': optionsCreator_boxB_SJ303A(),
   'SJ-120A': undefined,
   'SJ-303S': undefined,
+  W2: undefined,
 };
 
 // =======================================================================
@@ -561,23 +562,21 @@ const nodeConfig_origin: TnodeConfig = {
     },
     createNode({ disabled, classProd }) {
       const v = classProd.materialName;
-      const value = v ? { value: v, label: v } : null;
 
       const inputSelProps: TinputSelProps = {
-        disabled,
-        selectProps: {
+        disabled: false,
+        inputProps: {
           props: {
-            options: [],
-            value,
-            onChange: (option) => {
-              const value = option?.value || '';
-              classProd.materialName = value;
+            value: v,
+            onChange: (e) => {
+              classProd.materialName = e.target.value;
             },
+            readOnly: disabled,
           },
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod {...inputSelProps} />;
     },
   },
 
