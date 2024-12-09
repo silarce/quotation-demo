@@ -281,7 +281,6 @@ export const useGetQuotation_id_2 = (
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
         await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
-          console.log(wholeProdArr);
           res.latestContent.products = wholeProdArr;
         });
       }

@@ -169,8 +169,14 @@ const Row = ({
         title: '匯入紙本應收帳款',
         content: (
           <ExportToIncomeBill
-            onConfirm={({ isoString, splitPayment: separatePayment }) =>
-              reqPatchIsImported(data_accountant.id, isoString, separatePayment)
+            onConfirm={({ isoString, splitPayment: separatePayment, isForeign }) =>
+              reqPatchIsImported(
+                //
+                data_accountant.id,
+                isoString,
+                separatePayment,
+                isForeign
+              )
             }
             onCancel={modal.destroy}
             quota={quota}

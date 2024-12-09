@@ -31,7 +31,6 @@ import ProductCard, {
 } from 'components/page/worksDepartment/worksheet/productCard';
 import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
-
 // import WorkSheetProductOutline, {
 //   Tcontrol_productOutline,
 //   ToldProductOutline,
@@ -572,6 +571,7 @@ export default function Worksheet({
         reviewManagerEmployee,
         toReviewManager,
         managerReviewAt,
+        agentEmployee,
       } = record;
 
       const contractProductItem = contractProductItems?.[0];
@@ -619,6 +619,7 @@ export default function Worksheet({
         reviewSalesStatus,
         reviewManagerName: reviewManagerEmployee?.chName ?? '',
         reveiwManagerStatus,
+        agent: agentEmployee?.chName ?? '',
 
         onDetailClick: () => {
           setActiveRecordId(record.id);
@@ -823,8 +824,6 @@ export default function Worksheet({
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
-
-
 
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {

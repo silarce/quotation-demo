@@ -3594,6 +3594,9 @@ export type TworksheetRecordDto = {
   managerReviewAt: string | null;
   // 版本
   version: number;
+
+  agentEmployeeId: string | null;
+  agentEmployee?: TemployeeDto;
 };
 
 type TworksheetStatus = 'edit' | 'reviewing' | 'conform';
@@ -3938,6 +3941,8 @@ export type TcreateAccountReceivableAccountsDto = {
   accountantId: string[];
   incomeBillDate: string;
   splitPayment: number;
+  isForeign: boolean;
+  // isForeign: undefined;
 };
 
 // apiPatchAccountReceivableAccountant用的

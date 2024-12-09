@@ -19,17 +19,15 @@ import {
   WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
-
 export default function WorksheetForm({
-  reqPatchWorkSheet = () => { },
+  reqPatchWorkSheet = () => {},
   disabled = false,
-  uploadButton = true
+  uploadButton = true,
 }: {
   reqPatchWorkSheet?: () => void;
   disabled?: boolean;
-  uploadButton?: boolean
+  uploadButton?: boolean;
 }) {
-
   const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
       shouldCalcData: state.shouldCalcData,
@@ -72,13 +70,14 @@ export default function WorksheetForm({
         <WorksheetTable />
         {shouldCalcData2 && <div className={scss.cover}></div>}
       </div>
-      {uploadButton && <div className={classNames('relative', disabled && 'hidden')}>
-        <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
-          確認上傳
-        </MyButton_v2>
-        <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
-      </div>}
-
+      {uploadButton && (
+        <div className={classNames('relative', disabled && 'hidden')}>
+          <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
+            確認上傳
+          </MyButton_v2>
+          <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
+        </div>
+      )}
     </form>
   );
 }
