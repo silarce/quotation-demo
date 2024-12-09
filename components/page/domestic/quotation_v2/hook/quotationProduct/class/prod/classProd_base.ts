@@ -649,6 +649,70 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this;
   }
 
+  // endregion HANDLER
+
+  // -----------------------------------------------------------------------------------
+} // ClassProd_base
+// MARK: END
+
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+
+//MARK:ClassProd_prime
+class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
+  doorModel: TdoorModel = 'SJ-302';
+
+  // ---------------------------------------------------------------------------------
+
+  protected clearGeneralSpec() {
+    this.data.gapA = '';
+    this.data.gapC = '';
+    this.data.gearNumber = null;
+    this.data.weight = null;
+    this.data.thickness = '';
+    this.data.sprocketWheelModel = null;
+    this.data.sprocketWheelTeethNumber = null;
+    this.data.sprocketWheelChains = null;
+    this.data.bearingInnerDiameter = null;
+    this.data.diameter = null;
+    this.data.bearingHousingTotalLength = null;
+    this.data.slatLength = null;
+    this.data.guideRailLength = null;
+    this.data.headBoxLength = null;
+    this.data.bearingHousingSize = null;
+    this.data.bearingName = null;
+
+    this.data.motorPhase = null;
+    this.data.motorVendor = null;
+    this.data.motorVoltage = null;
+    this.data.horsepower = '';
+    this.data.boxB = '';
+    this.data.boxD = '';
+
+    return this;
+  }
+
+  protected clearComponent() {
+    this.state.availableComponents = null;
+    this.state.data_componentDict = {};
+    this.state.componentKeyArr = [];
+  }
+
+  //-------------------------------------------------------------------------------
+
   // MARK:handle_afterUpdateGeneralSpec
   protected afterUpdateGeneralSpec(generalSpecs: TdoorGeneralSpecsDto) {
     // const generalSpecs = this.state.generalSpecs;
@@ -750,58 +814,9 @@ class ClassProd_base implements Interface_ClassProd_base {
     });
 
     return {};
-  } // afterUpdateAvailableComponents
+  } // handleAvailableComponentsUpdated
 
-  // endregion HANDLER
-
-  // -----------------------------------------------------------------------------------
-} // ClassProd_base
-// MARK: END
-
-// ================================================================================
-// ================================================================================
-// ================================================================================
-
-//MARK:ClassProd_prime
-class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
-  doorModel: TdoorModel = 'SJ-302';
-
-  // ---------------------------------------------------------------------------------
-
-  protected clearGeneralSpec() {
-    this.data.gapA = '';
-    this.data.gapC = '';
-    this.data.gearNumber = null;
-    this.data.weight = null;
-    this.data.thickness = '';
-    this.data.sprocketWheelModel = null;
-    this.data.sprocketWheelTeethNumber = null;
-    this.data.sprocketWheelChains = null;
-    this.data.bearingInnerDiameter = null;
-    this.data.diameter = null;
-    this.data.bearingHousingTotalLength = null;
-    this.data.slatLength = null;
-    this.data.guideRailLength = null;
-    this.data.headBoxLength = null;
-    this.data.bearingHousingSize = null;
-    this.data.bearingName = null;
-
-    this.data.motorPhase = null;
-    this.data.motorVendor = null;
-    this.data.motorVoltage = null;
-    this.data.horsepower = '';
-    this.data.boxB = '';
-    this.data.boxD = '';
-
-    return this;
-  }
-
-  protected clearComponent() {
-    this.state.availableComponents = null;
-    this.state.data_componentDict = {};
-    this.state.componentKeyArr = [];
-  }
-
+  // region reqChain
   protected async reqChain_01() {
     try {
       const generalSpec = await reqGetProdCalcGeneralSpec(this);
@@ -837,6 +852,18 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
 // MARK: END
 
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
 // ================================================================================
 // ================================================================================
 // ================================================================================
