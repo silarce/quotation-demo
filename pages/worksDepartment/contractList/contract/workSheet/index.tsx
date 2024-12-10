@@ -124,7 +124,11 @@ import WorksheetForm from './WorksheetForm';
 // ====================================================================
 
 type Tquery = {
-  contractId: string | undefined;
+  contractId?: string | undefined;
+
+  activeWorksheetId?: string | undefined;
+  activedProdId?: string | undefined;
+  activeRecordId?: string | undefined;
 };
 
 // ====================================================================
@@ -163,26 +167,34 @@ export default function Worksheet({
 
   // ----------------------------------------------------------------
   const router = useRouter();
-  const { contractId } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const {
+    contractId,
+
+    //
+    activeWorksheetId,
+    activedProdId,
+    activeRecordId,
+  } = query;
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
-  const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
+  // const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
   const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
 
   // const [activeWorksheetOriginalAccessories, setActiveWorksheetOriginalAccessories] = useState<
   //   TquotationProductAccessoryDto[]
   // >([]);
 
-  const [activedProdId, setActivedProdId] = useState<string>();
+  // const [activedProdId, setActivedProdId] = useState<string>();
 
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
 
-  const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
+  // const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   const [showReviewerSelector, setShowReviewerSelector] = useState(false);
@@ -192,6 +204,12 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   let isReviewer = false;
+
+  console.log(query.activeWorksheetId);
+  console.log(activeWorksheetId);
+
+  console.log(query.activedProdId);
+  console.log(activedProdId);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -218,6 +236,8 @@ export default function Worksheet({
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
 
   const { doorModelList, update: update_doorModel, checkIsSpecialDoor } = useApiGetProdDoorModels();
+
+  console.log(query);
 
   // -------------------------------------------------------------------------
 
@@ -531,12 +551,22 @@ export default function Worksheet({
           isActive: activeWorksheetId === worksheet.id,
           reviewStatus,
           onClick: () => {
-            setActiveWorksheetId(worksheet.id);
+            // setActiveWorksheetId(worksheet.id);
+
             // setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
+            // setActivedProdId(prod.id);
 
-            setActivedProdId(prod.id);
+            // setActiveRecordId(undefined);
 
-            setActiveRecordId(undefined);
+            router.replace({
+              query: {
+                ...query,
+                activeWorksheetId: worksheet.id,
+                activedProdId: prod.id,
+                activeRecordId: undefined,
+              },
+            });
+
             setDisabled(true);
             setIsLastestRecord(false);
           },
@@ -664,7 +694,14 @@ export default function Worksheet({
         agent: agentEmployee?.chName ?? '',
 
         onDetailClick: () => {
-          setActiveRecordId(record.id);
+          // setActiveRecordId(record.id);
+          // setQuery('activeRecordId', record.id);
+          router.replace({
+            query: {
+              ...query,
+              activeRecordId: record.id,
+            },
+          });
 
           if (index === 0) {
             setIsLastestRecord(true);
@@ -695,7 +732,15 @@ export default function Worksheet({
       type: 'myButton',
       label: '關閉工作表',
       onClick: () => {
-        setActiveRecordId(undefined);
+        // setActiveRecordId(undefined);
+        // setQuery('activeRecordId', undefined);
+        router.replace({
+          query: {
+            ...query,
+            activeRecordId: undefined,
+          },
+        });
+
         setIsLastestRecord(false);
       },
     },
