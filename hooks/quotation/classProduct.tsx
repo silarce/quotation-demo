@@ -2755,6 +2755,10 @@ class Class_product {
       this._prodData.guideRailG = this.options_doorTrack?.[0]?.width ?? 0;
     }
 
+    if (this.isW2) {
+      this.close = '手動';
+    }
+
     this.toGetInstallationFee();
     this.subComList.distributionBox.quantity = '1';
 
