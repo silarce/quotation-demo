@@ -11,6 +11,8 @@ import { AxiosError } from 'axios';
 import { createUseInfinite } from './createUseInfinite';
 import moment, { Moment } from 'moment';
 
+import { TgetReviewById, apiGetReviewById } from 'js/api/api_netCore/api_review';
+
 // type
 import type {
   TapiError,
@@ -83,6 +85,13 @@ import type {
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
+
+type TworksheetDto_addition = TworksheetDto & {
+  recordsWithReview?: {
+    record: TworksheetRecordDto;
+    review: TgetReviewById;
+  }[];
+};
 
 export type {
   TapiError,
@@ -871,9 +880,20 @@ const apiGetWorksheet_id = async (id: string, params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetWorksheet_id = (id: string | undefined | null, { params }: { params?: Tparams } = {}) => {
+export const useGetWorksheet_id = (
+  id: string | undefined | null,
+  {
+    //
+    params,
+    recordsWithReview = false,
+  }: {
+    //
+    params?: Tparams;
+    recordsWithReview?: boolean;
+  } = {}
+) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [res, setRes] = useState<TworksheetDto>();
+  const [res, setRes] = useState<TworksheetDto_addition>();
 
   params = {
     populate: [
@@ -897,11 +917,28 @@ export const useGetWorksheet_id = (id: string | undefined | null, { params }: { 
 
     try {
       setIsLoading(true);
-      const res = await apiGetWorksheet_id(id, params);
+      const res_origin = await apiGetWorksheet_id(id, params);
 
-      if (res) {
-        setRes(res);
+      if (!res_origin) {
+        return res_origin;
       }
+
+      const res = res_origin as TworksheetDto_addition;
+
+      if (recordsWithReview) {
+        const records = res.records ?? [];
+
+        const recordsWithReview: NonNullable<TworksheetDto_addition['recordsWithReview']> = [];
+
+        for (const record of records) {
+          const review = await apiGetReviewById(record.id);
+          recordsWithReview.push({ record, review: review[0] });
+        }
+
+        res.recordsWithReview = recordsWithReview;
+      }
+
+      setRes(res);
 
       return res;
     } catch (error) {

@@ -197,19 +197,13 @@ export default function Worksheet({
   // const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
-  const [showReviewerSelector, setShowReviewerSelector] = useState(false);
+  // const [showReviewerSelector, setShowReviewerSelector] = useState(false);
 
   const [showReviewModal, setShowReviewModal] = useState<boolean>();
 
   // -------------------------------------------------------------------------
 
   let isReviewer = false;
-
-  console.log(query.activeWorksheetId);
-  console.log(activeWorksheetId);
-
-  console.log(query.activedProdId);
-  console.log(activedProdId);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -233,11 +227,11 @@ export default function Worksheet({
   // ________________________________________________________________________
   // ________________________________________________________________________
 
-  const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
+  const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId, {
+    recordsWithReview: true,
+  });
 
   const { doorModelList, update: update_doorModel, checkIsSpecialDoor } = useApiGetProdDoorModels();
-
-  console.log(query);
 
   // -------------------------------------------------------------------------
 
@@ -358,46 +352,51 @@ export default function Worksheet({
   };
 
   // 送審
-  const rewSubmitWorksheet = async (employeeId: string) => {
+  const rewSubmitWorksheet = async ({ review_id, document_title }: { review_id: string; document_title: string }) => {
     //
-    // const reqAddReview = async ({
-    //   userId,
-    //   review_id,
-    //   document_title,
-    //   document_uuid,
-    // }: {
-    //   userId: string;
-    //   review_id: string;
-    //   document_title: string;
-    //   document_uuid: string;
-    // }) => {
-    //   apiAddReview({
-    //     review_id: review_id,
-    //     document_id: '',
-    //     document_uuid: document_uuid,
-    //     document_type: '工作表',
-    //     user_id: userId,
-    //     document_title,
-    //   });
-    // };
 
-    // ReviewFlowSelector.open2({
-    //   userId,
-    //   onConfirm: ({ reviewFlowId, purpose }) => {},
-    // });
-
-    if (!activeRecordId) {
+    if (!activeRecordId || !userId) {
       return;
     }
 
-    try {
-      await apiPatchWorksheetRecordSubmit(activeRecordId, {
-        reviewSalesEmployeeId: employeeId,
-      });
-      setShowReviewerSelector(false);
-      await refreshData();
-    } catch (error) {}
+    const body: Parameters<typeof apiAddReview>[0] = {
+      review_id: review_id,
+      document_id: '',
+      document_uuid: activeRecordId,
+      document_type: '工作表',
+      user_id: userId,
+      document_title,
+      query,
+    };
+
+    await apiAddReview(body);
+
+    // if (!activeRecordId) {
+    //   return;
+    // }
+
+    // try {
+    //   await apiPatchWorksheetRecordSubmit(activeRecordId, {
+    //     reviewSalesEmployeeId: employeeId,
+    //   });
+    //   setShowReviewerSelector(false);
+    //   await refreshData();
+    // } catch (error) {}
   };
+
+  // const rewSubmitWorksheet = async (employeeId: string) => {
+  //   if (!activeRecordId) {
+  //     return;
+  //   }
+
+  //   try {
+  //     await apiPatchWorksheetRecordSubmit(activeRecordId, {
+  //       reviewSalesEmployeeId: employeeId,
+  //     });
+  //     setShowReviewerSelector(false);
+  //     await refreshData();
+  //   } catch (error) {}
+  // };
 
   // 審核
   const reqReviewWorksheet = async (isPass: boolean) => {
@@ -751,7 +750,18 @@ export default function Worksheet({
       type: 'redButton',
       label: '送審',
       onClick: () => {
-        setShowReviewerSelector(true);
+        // setShowReviewerSelector(true);
+        const { destroy } = ReviewFlowSelector.open2({
+          userId,
+          onConfirm: ({ reviewFlowId, purpose }) => {
+            reviewFlowId &&
+              rewSubmitWorksheet({
+                review_id: reviewFlowId,
+                document_title: purpose,
+              });
+            destroy();
+          },
+        });
       },
     });
   }
@@ -858,7 +868,7 @@ export default function Worksheet({
       <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
       <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
 
-      <SelectorGroup
+      {/* <SelectorGroup
         showModal={showReviewerSelector}
         onConfirm={(arr) => {
           const employee = arr[0][0];
@@ -870,7 +880,7 @@ export default function Worksheet({
           }
         }}
         onCancel={() => setShowReviewerSelector(false)}
-      />
+      /> */}
 
       <MultButtonModal
         visible={!!showReviewModal}
