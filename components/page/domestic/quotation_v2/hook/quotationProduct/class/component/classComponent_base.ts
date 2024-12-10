@@ -11,6 +11,8 @@ import {
   TsetComponent,
 } from '../../type';
 
+import { Interface_ClassProd_prime } from '../prod/interface';
+
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
@@ -52,17 +54,21 @@ interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
   readonly state: TstateComponentData<T>;
   private readonly setState: TsetComponent<T>;
+  private classProd: Interface_ClassProd_prime;
   //
   constructor({
     //
     state_component,
     setState_component,
+    activedClassProd,
   }: {
     state_component: TstateComponentData<T>;
     setState_component: TsetComponent<T>;
+    activedClassProd: Interface_ClassProd_prime;
   }) {
     this.state = state_component;
     this.setState = setState_component;
+    this.classProd = activedClassProd;
   } // constructor close
 
   get number() {

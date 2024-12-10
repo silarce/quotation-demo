@@ -247,11 +247,6 @@ const useQuotationProduct = ({
 
   // region COOKED
 
-  const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
-
-  const componentKeyArr = activedProd?.componentKeyArr;
-  const accessoryKeyArr = activedProd?.accessoryKeyArr;
-
   // class用來管理資料狀態
   // MARK:classProdDict
   // const classProdDict = useMemo(() => {
@@ -352,6 +347,11 @@ const useQuotationProduct = ({
   //
   //
 
+  const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
+
+  const componentKeyArr = activedProd?.componentKeyArr;
+  const accessoryKeyArr = activedProd?.accessoryKeyArr;
+
   // MARK:createSetProd
   const createSetProd = (key: string): TsetProd => {
     const setProd: TsetProd = (newState) => {
@@ -445,16 +445,45 @@ const useQuotationProduct = ({
     [nodeConfig_prime]
   );
 
-  const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
+  // const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
+  //   if (!activedProd) {
+  //     return {};
+  //   }
+
+  //   return createClassComponentDict_v2({
+  //     activedProd,
+  //     createSetComponent,
+  //   });
+  // };
+
+  const createActivedClassComponentDict = (
+    // activedClassProd: Interface_ClassProd_prime | undefined | null
+    activedProd: TstateProd | undefined
+  ) => {
     if (!activedProd) {
       return {};
     }
 
+    const activedClassProd = createClassProd(activedProd);
+
+    if (activedClassProd.doorModel === 'special') {
+      return {};
+    }
+
     return createClassComponentDict_v2({
-      activedProd,
+      activedClassProd,
       createSetComponent,
     });
   };
+
+  // const activedClassProd = useMemo(() => {
+  //   // if (!activedProd) {
+  //   //   return null;
+  //   // }
+  //   // console.log('fooo');
+  //   // const activedClassProd = createClassProd(activedProd);
+  //   // return activedClassProd;
+  // }, [activedProd]);
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -679,14 +708,14 @@ const useQuotationProduct = ({
 
 const createClassComponentDict_v2 = ({
   //
-  activedProd,
+  activedClassProd,
   createSetComponent,
 }: {
-  activedProd: TstateProd;
+  activedClassProd: Interface_ClassProd_prime;
   createSetComponent: TcreateSetComponent;
 }) => {
-  const data_componentDict = activedProd.data_componentDict;
-  const activeProdKey = activedProd.key;
+  const data_componentDict = activedClassProd.state.data_componentDict;
+  const activeProdKey = activedClassProd.key;
 
   const slat =
     data_componentDict['slat'] &&
@@ -696,6 +725,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'slat',
       }),
+      activedClassProd,
     });
 
   const bottomBar =
@@ -706,6 +736,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'bottomBar',
       }),
+      activedClassProd,
     });
 
   const guideRail =
@@ -716,6 +747,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'guideRail',
       }),
+      activedClassProd,
     });
 
   const sidePlate =
@@ -726,6 +758,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'sidePlate',
       }),
+      activedClassProd,
     });
 
   const roller =
@@ -736,6 +769,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'roller',
       }),
+      activedClassProd,
     });
 
   const motor =
@@ -746,6 +780,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'motor',
       }),
+      activedClassProd,
     });
 
   const motorAccessories =
@@ -756,6 +791,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'motorAccessories',
       }),
+      activedClassProd,
     });
   const headBox =
     data_componentDict['headBox'] &&
@@ -765,6 +801,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'headBox',
       }),
+      activedClassProd,
     });
   const middlePillar =
     data_componentDict['middlePillar'] &&
@@ -774,6 +811,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'middlePillar',
       }),
+      activedClassProd,
     });
   const backBone =
     data_componentDict['backBone'] &&
@@ -783,6 +821,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'backBone',
       }),
+      activedClassProd,
     });
 
   const classComponentDict: TclassComponentDict = {
