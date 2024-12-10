@@ -17,11 +17,13 @@ interface TconfigItem_component {
   readonly label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  createNode: (params: {
-    //
-    classComponent: Interface_ClassComponent_prime;
-    disabled: boolean;
-  }) => React.ReactNode;
+  createNode:
+    | ((params: {
+        //
+        classComponent: Interface_ClassComponent_prime;
+        disabled: boolean;
+      }) => React.ReactNode)
+    | null;
 }
 
 type TcellKey_component = keyof Pick<
@@ -139,10 +141,10 @@ const createNodeConfig_component = (): TnodeConfig_component => {
     },
 
     density: {
-      label: '密度',
-      style: { width: 40 },
-      createNode({ disabled, classComponent }) {
-        return classComponent.density;
+      label: '重量基重',
+      style: { width: 80 },
+      createNode() {
+        return null;
       },
     },
 

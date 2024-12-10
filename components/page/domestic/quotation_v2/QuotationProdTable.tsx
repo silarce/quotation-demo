@@ -317,7 +317,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
           const left = (
             <>
               <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
-                {nodeConfig_name.createNode({
+                {nodeConfig_name.createNode?.({
                   disabled,
                   classComponent: classComponent,
                 })}
@@ -350,7 +350,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
               {cellKeyArr_component.map((cellKey, cIndex) => {
                 const { style, className, createNode } = classComponent.nodeConfig[cellKey];
 
-                const node = createNode({
+                const node = createNode?.({
                   disabled,
                   classComponent: classComponent,
                 });
