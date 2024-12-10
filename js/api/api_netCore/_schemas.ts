@@ -78,14 +78,14 @@ interface TgetReivewById {
 }
 
 interface TaddReivew {
-  review_id: string; // 審核流程id
-  document_id: string; // 單號
-  document_uuid: string; // 唯一識別id
-  document_type: string; // ex:請購單
+  review_id: TgetReivewById['id']; // 審核流程id
+  document_id: string; // 單號 // 基本上會是serial_number，但不一定，也不是非serial_number不可
+  document_uuid: string; // 唯一識別id // 被審核資料的唯一識別id
+  document_type: string; // ex:請購單 // 任意字串
   // username: string;
   user_id: string;
-  document_title: string; // ex:請購單20241024
-  // 取得資料用的query
+  document_title: string; // ex:請購單20241024 // 任意字串
+  // get被審核資料時用的query
   query: {
     [key: string]: string | number;
   };
