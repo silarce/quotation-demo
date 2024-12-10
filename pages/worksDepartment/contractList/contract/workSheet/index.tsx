@@ -12,6 +12,8 @@ import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
+
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -79,6 +81,8 @@ import {
 } from 'js/api/api_engineering';
 
 import { useApiGetProdDoorModels } from 'js/api/api_product';
+
+import { apiAddReview } from 'js/api/api_netCore/api_review';
 
 // hook
 import {
@@ -167,9 +171,11 @@ export default function Worksheet({
   const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
   const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
 
-  const [activeWorksheetOriginalAccessories, setActiveWorksheetOriginalAccessories] = useState<
-    TquotationProductAccessoryDto[]
-  >([]);
+  // const [activeWorksheetOriginalAccessories, setActiveWorksheetOriginalAccessories] = useState<
+  //   TquotationProductAccessoryDto[]
+  // >([]);
+
+  const [activedProdId, setActivedProdId] = useState<string>();
 
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
@@ -241,6 +247,12 @@ export default function Worksheet({
   if (toReviewSales && reviewSalesEmployee?.id === userId) {
     isReviewer = true;
   }
+
+  const activedProd = useMemo(() => {
+    return finalProduct.find((prod) => prod.id === activedProdId);
+  }, [activedProdId, finalProduct]);
+
+  const activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[] = activedProd?.items?.[0].accessories ?? [];
 
   // -------------------------------------------------------------------------
 
@@ -327,6 +339,33 @@ export default function Worksheet({
 
   // 送審
   const rewSubmitWorksheet = async (employeeId: string) => {
+    //
+    // const reqAddReview = async ({
+    //   userId,
+    //   review_id,
+    //   document_title,
+    //   document_uuid,
+    // }: {
+    //   userId: string;
+    //   review_id: string;
+    //   document_title: string;
+    //   document_uuid: string;
+    // }) => {
+    //   apiAddReview({
+    //     review_id: review_id,
+    //     document_id: '',
+    //     document_uuid: document_uuid,
+    //     document_type: '工作表',
+    //     user_id: userId,
+    //     document_title,
+    //   });
+    // };
+
+    // ReviewFlowSelector.open2({
+    //   userId,
+    //   onConfirm: ({ reviewFlowId, purpose }) => {},
+    // });
+
     if (!activeRecordId) {
       return;
     }
@@ -493,7 +532,10 @@ export default function Worksheet({
           reviewStatus,
           onClick: () => {
             setActiveWorksheetId(worksheet.id);
-            setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
+            // setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
+
+            setActivedProdId(prod.id);
+
             setActiveRecordId(undefined);
             setDisabled(true);
             setIsLastestRecord(false);
