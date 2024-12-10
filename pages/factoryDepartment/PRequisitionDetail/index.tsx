@@ -29,7 +29,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
-import { Modal } from 'antd';
+import { Modal, Radio, Space } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
@@ -42,6 +42,8 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import icon_review from 'public/image/icon/review.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -53,12 +55,15 @@ export default function PRequisitionDetail() {
     const router = useRouter();
     const {
         firstin,
-        purchaseorderuuid,
+        need_date,
         create_at,
         create_by,
         purchaserequisitionuuid,
-        purchaserequisitionid
+        purchaserequisitionid,
+        item
     } = router.query;
+
+    const parsedItem = item ? JSON.parse(item as string) : null;
 
 
     //登入者資料
@@ -82,6 +87,8 @@ export default function PRequisitionDetail() {
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const [isLoading, setIsLoading] = useState(false);
@@ -91,12 +98,18 @@ export default function PRequisitionDetail() {
     const [create_atin, setCreate_atin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
     const [create_byin, setCreate_byin] = useState<string>("");
-    const [note, setNote] = useState<string>("");
-    const [need_date, setNeed_date] = useState<string>("");
-    const [status, setStatus] = useState<string>("");
-    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>(purchaserequisitionid as string);
-    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>(purchaserequisitionuuid as string);
+    const [notein, setNotein] = useState<string>("");
+    const [need_datein, setNeed_datein] = useState<string>("");
+    const [statusin, setStatusin] = useState<string>("");
+    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
+    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
+
+    //編輯時保留原始資料
+    const [originalcreate_at, setOriginalcreate_at] = useState<string>("");
+    const [originalneed_date, setOriginalneed_date] = useState<string>("");
+    const [originalnote, setOriginalnote] = useState<string>("");
+    const [originaldata2, setOriginaldata2] = useState<any[]>([]);
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -123,6 +136,8 @@ export default function PRequisitionDetail() {
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
 
+    const [isEditing, setIsEditing] = useState(false);
+
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
@@ -132,17 +147,7 @@ export default function PRequisitionDetail() {
     //#region 上方功能列
 
     //搜尋功能
-    const searchTargetList = [
-        {
-            placeholder: '物料號碼',
-        },
-        {
-            placeholder: '物料名稱',
-        },
-        {
-            placeholder: '物料規格',
-        },
-    ];
+
 
     //搜尋功能
     const doSearch = (valueArr: (string | Toption | null)[]) => {
@@ -152,129 +157,53 @@ export default function PRequisitionDetail() {
         // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
     };
 
-    // 搜尋功能
-    const searchGroup = {
-        searchTargetList,
-        doSearch,
-    };
-
-    const searchData = async (keyword1: string, keyword2: string, keyword3: string) => {
-        try {
-            setIsLoading(true);
-            // keywordSpec
-            const conditionModel: { keyword1: string | undefined, keyword2: string | undefined, keyword3: string | undefined } = {
-                keyword1: keyword1 as string | undefined,
-                keyword2: keyword2 as string | undefined,
-                keyword3: keyword3 as string | undefined,
-            };
 
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            //erpAPI
-            const response = await fetch(`${setting.apipath}/WareHouse/SearchProductById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            let data = await response.json();
-            setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
 
 
 
     //新增按鈕
     const panelList: TpanelList = [
-        // { searchGroup },
-        {
 
-            type: 'myButton',
-            label: '返回',
-            onClick: () => {
-                myAlert.confirm({
-                    title: '確定要返回請購管理嗎?',
-                    content: <>
-                        <h1>未儲存的資料將不會保留</h1>
-                    </>,
-                    props: {
-                        onOk: () => {
-                            router.back();
-                        }
-                    }
-                });
-            },
-
-        },
     ];
     //#endregion
 
-    const getPurchaseRequisition = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                type: "未送出",
-                username: userInfo?.employee?.id.toString()
-            };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisition?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-
-            setSearchdata(data);
-            setPrdata(data);
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
+    //頁面進入
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
         console.log(userInfo);
         if (!hasFetchedData.current) {
-            getPurchaseRequisition();
             getProduct();
+            GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
 
-    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
+    useEffect(() => {
+        NewGetPurchaseRequisitionDetailById(parsedItem?.purchaserequisitionuuid);
+        GetReviewById(parsedItem?.purchaserequisitionuuid);
+        setPurchaserequisitionuuidin(parsedItem?.purchaserequisitionuuid);
+        setPurchaserequisitionidin(parsedItem?.purchaserequisitionid);
+        setCreate_byin(parsedItem?.create_by);
+        setCreate_atin(parsedItem?.create_at);
+        setNeed_datein(parsedItem?.need_date);
+        setStatusin(parsedItem?.status);
+        setNotein(parsedItem?.note);
+
+    }, [item]);
+
+
+
+    // newapi
+
+    //取請購明細
+    const NewGetPurchaseRequisitionDetailById = async (purchaserequisitionuuid: any) => {
         try {
             // setIsLoading(true);
-            const conditionModel: {
-                purchaserequisitionuuid: string | undefined
-            } = {
+            const conditionModel = {
                 purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
             };
 
@@ -287,15 +216,16 @@ export default function PRequisitionDetail() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
+            const responsedata = await response.json();
             // setData1(data);
 
-            setData2(data);
-            console.log(data2);
+            console.log(responsedata);
+            setData2(responsedata);
+            // return responsedata
 
 
         } catch (error: any) {
@@ -305,6 +235,370 @@ export default function PRequisitionDetail() {
             // setIsLoading(false);
         }
     };
+
+    //更新請購單和請購單明細
+    const NewUpdatePurchaserequisitionDetail = async () => {
+        try {
+            const conditionModel = {
+                purchaserequisitionid: purchaserequisitionidin,
+                purchaserequisitionuuid: purchaserequisitionuuidin,
+                create_at: create_atin,
+                need_date: need_datein,
+                note: notein,
+                data2: data2
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdatePurchaserequisitionDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: result.message });
+                NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+
+    //#region 審核
+    const [review_flow, setReview_flow] = useState<string>("");
+    const [reviewbar, setReviewbar] = useState<boolean>(false);
+    const [reviewdata, setReviewdata] = useState<any[]>([]);
+    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+    const [documenttitle, setDocumenttitle] = useState<string>("");
+    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
+
+    //取全部的自訂流程
+    const GetReviewFlow = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                user_id: userInfo?.employee?.id.toString()
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewdata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewdata(data);
+
+
+        } catch (error: any) {
+            console.log(error);
+            // setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    //取單據的審核流程
+    const GetReviewById = async (document_uuid: any) => {
+        try {
+            setReviewflowdata([]);
+            setReviewflowdata2([]);
+            // setIsLoading(true);
+
+            const conditionModel = {
+                document_uuid: document_uuid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+            // 檢查響應狀態
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 檢查響應內容是否為空
+            const text = await response.text();
+            if (text.trim() === '') {
+                // console.log('No data returned');
+                return;
+            }
+
+            // 解析 JSON
+            const data = JSON.parse(text);
+
+            console.log(data);
+
+            // 檢查資料是否存在且有效
+            if (data && data.length > 0) {
+                setReviewflowdata(data);
+            } else {
+                console.log('No valid data');
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            // setIsLoading(false);
+        }
+    };
+
+    const [value, setValue] = useState<number | null>(null);
+    const onChange = (e: any) => {
+        setValue(e.target.value);
+    };
+
+    const setReview = async (item: any) => {
+        setReview_flow(item.id);
+        setReviewflowdata2(item.stages);
+    }
+
+    const sentToReview = async (type: any) => {
+
+        try {
+            if (review_flow === "") {
+                setReviewbar(true);
+                handleChoseflow();
+            }
+            else {
+                const review_query = {
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    purchaserequisitionid: purchaserequisitionidin,
+                    create_at: create_atin,
+                    create_by: create_byin,
+                    status: '詢價中',
+                    need_date: need_datein,
+                    note: notein,
+                    firstin: 1,
+                };
+
+                const conditionModel = {
+                    document_id: purchaserequisitionidin,
+                    document_uuid: purchaserequisitionuuidin,
+                    document_type: "請購單",
+                    review_id: review_flow,
+                    query: review_query,
+                    user_id: userInfo?.employee?.id.toString(),
+                    document_title: documenttitle
+                };
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'ReviewService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                console.log(JSON.stringify(conditionModel));
+
+                const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await response.json();
+                setReviewflowdata([]);
+                GetReviewById(purchaserequisitionuuidin);
+
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                //改變單據狀態
+                const conditionModel2 = {
+                    type: type,
+                    purchaserequisitionuuid: purchaserequisitionuuidin,
+                    username: userInfo?.employee?.id.toString()
+                };
+
+
+                var inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'WareHouseService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel2),
+                };
+
+                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+                const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+                if (!response2.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data2 = await response2.json();
+
+                NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
+
+                setStatusin("審核中");
+
+
+
+
+
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
+    const handleChoseflow = () => {
+        setReviewbar(true);
+        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
+    }
+
+    const handleGetReviewBack = () => {
+        myAlert.confirm({
+            title: '確定要抽單嗎?',
+            props: {
+                onOk: async () => {
+                    try {
+                        setIsLoading(true);
+                        const conditionModel = {
+                            document_uuid: purchaserequisitionuuidin,
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+
+                        setReviewflowdata([]);
+                        setStatusin("詢價中");
+                        setReview_flow("");
+                        setValue(null);
+                        GetReviewHistory(purchaserequisitionuuidin);
+
+                    } catch (error: any) {
+                        console.log(error.message);
+                    }
+                    finally {
+                        setIsLoading(false);
+                    }
+                }
+            }
+        });
+    }
+
+    const GetReviewHistory = async (id: any) => {
+        try {
+            // setIsLoading(true);
+            // alert(purchaserequisitionidin);
+            const conditionModel = {
+                document_uuid: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'ReviewService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const text = await response.text();
+            if (!text) {
+                // console.log('No data returned');
+                setReviewhistorydata([]);
+                return;
+            }
+
+            const data = JSON.parse(text);
+            setReviewhistorydata(data);
+            console.log(reviewhistroydata);
+
+
+        } catch (error: any) {
+            console.log(error);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+    //#endregion
+
+
 
 
 
@@ -348,11 +642,7 @@ export default function PRequisitionDetail() {
     };
 
 
-    useEffect(() => {
-        setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.employee?.chName.toString() || '');
-        setNeed_date(moment().format('YYYY-MM-DD') || '');
-    }, []);
+
 
     //取所有物料，for查詢代入用
     const getProductById = async (productuuid: any) => {
@@ -409,19 +699,6 @@ export default function PRequisitionDetail() {
             // setIsLoading(false);
         }
     };
-    // useEffect(() => {
-    //     if (purchaseorderuuid) {
-    //         if (purchaseorderuuidin != purchaseorderuuid) {
-    //             setData2([]);
-    //         }
-    //         getProductById(purchaseorderuuid);
-    //         if (purchaseorderdetailuuid) {
-    //         }
-    //         setPurchaseorderuuidin(purchaseorderuuid as string);
-    //         setCreate_atin(create_at as string);
-    //         setCreate_byin(create_by as string);
-    //     }
-    // }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
     //請購單申請
     const NewAddPurchaseRequisition = async () => {
@@ -434,7 +711,7 @@ export default function PRequisitionDetail() {
                 create_at: create_atin,
                 need_date: moment(need_date).format('YYYY-MM-DD'),
                 create_by: userInfo?.employee?.id.toString(),
-                note: note,
+                note: notein,
                 data2: data2
             };
 
@@ -466,7 +743,7 @@ export default function PRequisitionDetail() {
                 myAlert.success({ title: result.message });
                 setPurchaserequisitionidin(result.purchaserequisitionid);
                 setPurchaserequisitionuuidin(result.purchaserequisitionuuid);
-                setStatus("編輯中");
+                setStatusin("編輯中");
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
@@ -505,7 +782,7 @@ export default function PRequisitionDetail() {
 
             console.log(purchaserequisitionuuid);
 
-            getPurchaseRequisitionDetail(purchaserequisitionuuid);
+            NewGetPurchaseRequisitionDetailById(purchaserequisitionuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -514,9 +791,6 @@ export default function PRequisitionDetail() {
             setIsLoading(false);
         }
     };
-
-
-    //請購單申請
     const ClosePurchaseRequisition = async () => {
 
         console.log(data2);
@@ -561,14 +835,6 @@ export default function PRequisitionDetail() {
 
 
     //#endregion
-
-    //#region 按鈕作動區
-
-    // 送出按鈕
-    function handleAddPR() {
-        // AddPurchaseRequisition();
-    }
-
 
     // 手key加入
     const handleAddByHandKey = async () => {
@@ -628,7 +894,7 @@ export default function PRequisitionDetail() {
 
                 setData2(prevData2 => [...prevData2, data]);
 
-                getPurchaseRequisitionDetail(purchaserequisitionuuid);
+                NewGetPurchaseRequisitionDetailById(purchaserequisitionuuid);
 
 
             } catch (error: any) {
@@ -696,14 +962,11 @@ export default function PRequisitionDetail() {
 
 
     const handleStringChange = (index: number, key: string, value: string) => {
-        // 更新 data2 的值
-        const updatedData2 = [...data2];
-        updatedData2[index][key] = value;
-        setData2(updatedData2);
+        const updatedData2 = [...data2];  // 使用淺拷貝
+        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
+        setData2(updatedData2);  // 更新data2
 
         if (key === 'productid' || key === 'name' || key === 'spec') {
-
-            // 更新建議選單的過濾邏輯
             const filters = {
                 productid: updatedData2[index].productid?.trim().toLowerCase() || "",
                 name: updatedData2[index].name?.trim().toLowerCase() || "",
@@ -711,7 +974,6 @@ export default function PRequisitionDetail() {
             };
 
             if (Object.values(filters).some(filter => filter !== "")) {
-                // 過濾符合條件的數據
                 const filtered = data.filter(item =>
                     (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
                     (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
@@ -721,11 +983,22 @@ export default function PRequisitionDetail() {
                 setFilteredData(filtered);
                 setShowSuggestions(true);
             } else {
-                // 若所有條件都為空，隱藏建議選單
                 setShowSuggestions(false);
             }
         }
     };
+
+    // 確保在進入編輯模式時，原始資料被正確保存
+    const enterEditMode = () => {
+        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+        setIsEditing(true); // 進入編輯模式
+    };
+
+    const cancelEditMode = () => {
+        setData2([...originaldata2]); // 確保還原為原始資料
+        setIsEditing(false); // 退出編輯模式
+    };
+
 
 
 
@@ -734,16 +1007,13 @@ export default function PRequisitionDetail() {
     const handleRestore = () => {
         setData2(data2restore);
     }
-
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
-        searchData(keyword1, keyword2, keyword3)
-    };
-
     //#endregion
 
 
-
+    useEffect(() => {
+        console.log(originaldata2);
+        console.log(data2);
+    }, [isEditing]);
 
 
     //#region modal
@@ -1129,39 +1399,137 @@ export default function PRequisitionDetail() {
 
     };
 
+
+    const handleEdit = () => {
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginalnote(notein);
+        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+        setIsEditing(true) // 進入編輯模式
+    };
+
+    const handleCancel = () => {
+        setCreate_atin(originalcreate_at);
+        setNeed_datein(originalneed_date);
+        setNotein(originalnote);
+        setData2([...originaldata2]);  // 確保還原為原始資料
+        setIsEditing(false);  // 結束編輯模式
+    };
+
+
+
+
+
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag='新增請購單' panelList={panelList}
                 customeRight={[
                     <>
-                        <button
-                            className={scss.shortsquarebtn}
-                            style={{
-                                display: `${status === "未送出" ? '' : 'none'}`
-                            }}
-                        >
-                            編輯
-                        </button>
-                        <button
-                            className={scss.shortredsquarebtn}
-                            style={{
-                                display: `${status === "" ? '' : 'none'}`
-                            }}
-                            onClick={() => {
-                                NewAddPurchaseRequisition();
-                            }}
-                        >
-                            儲存
-                        </button>
+                        {/* 編輯按鈕 */}
+                        {statusin === "詢價中" && !isEditing && (
+
+                            <>
+                                <button
+                                    className={scss.shortredsquarebtn}
+                                    onClick={() => { sentToReview("審核") }}
+                                    title="單據送審"
+                                >
+                                    送審
+                                </button>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handleEdit()
+                                    }}
+                                >
+                                    編輯
+                                </button>
+                            </>
+                        )}
+
+                        {statusin === "審核中" && (
+                            <>
+                                <button
+                                    className={scss.shortredsquarebtn}
+                                    style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
+                                    title="單據抽回"
+                                    onClick={() => { handleGetReviewBack() }}>
+                                    抽單
+                                </button>
+
+                            </>
+                        )}
+                        {!isEditing && (
+                            <>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        myAlert.confirm({
+                                            title: '確定要返回請購單列表嗎?',
+                                            content: <>
+                                                <h1>未儲存的資料將不會保留</h1>
+                                            </>,
+                                            props: {
+                                                onOk: () => {
+                                                    router.back();
+                                                }
+                                            }
+                                        })
+                                    }}
+                                >
+                                    返回
+                                </button >
+                            </>
+                        )}
+                        {/* 儲存按鈕 */}
+                        {statusin === "詢價中" && isEditing && (
+                            <>
+                                <button
+                                    className={scss.shortredsquarebtn}
+                                    onClick={() => {
+                                        setIsEditing(false); // 儲存後結束編輯模式
+                                        NewUpdatePurchaserequisitionDetail()
+
+                                        // NewAddPurchaseRequisition(); // 實際儲存邏輯
+                                    }}
+                                >
+                                    儲存
+                                </button>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        myAlert.confirm({
+                                            title: '確定要取消嗎?',
+                                            content: <>
+                                                <h1>未儲存的資料將不會保留</h1>
+                                            </>,
+                                            props: {
+                                                onOk: () => {
+                                                    handleCancel()
+                                                }
+                                            }
+                                        })
+                                    }}
+                                >
+                                    取消
+                                </button>
+
+                            </>
+
+                        )}
                     </>
+
+
                 ]
                 }
                 customeLeft={
                     [
                         <>
                             <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
-                                {status}
+                                {statusin}
                             </span>
                         </>
                     ]} />
@@ -1230,7 +1598,7 @@ export default function PRequisitionDetail() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: purchaserequisitionid || ' ',
+                                                    value: purchaserequisitionidin || ' ',
                                                 },
                                             }}
                                         />
@@ -1262,7 +1630,7 @@ export default function PRequisitionDetail() {
                                         <InputSel
                                             caption="請購日期"
                                             className="global_tip_must"
-                                            disabled={status === "未送出" ? true : false}
+                                            disabled={!isEditing}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             datePickerProps={{
@@ -1321,6 +1689,19 @@ export default function PRequisitionDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="排版用"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ paddingBottom: '10px' }}
+                                            disabled={true}
+                                            className='invisible'
+                                            inputProps={{
+                                                props: {
+                                                    value: ' ',
+                                                },
+                                            }}
+                                        />
+                                        {/* <InputSel
+                                            {...inputSelProps}
                                             caption="申請部門"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
@@ -1330,17 +1711,17 @@ export default function PRequisitionDetail() {
                                                     value: userInfo?.employee?.jobs[0].department.name
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                         <InputSel
                                             caption="需用日期"
                                             className="global_tip_must"
-                                            // disabled={status === "未儲存" ? false : true}
+                                            disabled={!isEditing}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             datePickerProps={{
                                                 props: {
-                                                    value: need_date ? moment(need_date) : null,
-                                                    onChange: (e) => { setNeed_date(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
+                                                    value: need_datein ? moment(need_datein) : null,
+                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
                                         />
@@ -1350,19 +1731,19 @@ export default function PRequisitionDetail() {
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
-                                        {/* <InputSel
+                                        <InputSel
                                             {...inputSelProps}
                                             caption="備註說明"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={false}
+                                            disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: note,
-                                                    onChange: (e) => { setNote(e.target.value) }
+                                                    value: notein,
+                                                    onChange: (e) => { setNotein(e.target.value) }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                     </div>
                                     <div></div>
                                     <div></div>
@@ -1399,9 +1780,6 @@ export default function PRequisitionDetail() {
                             >
                                 請購項目
                             </span>
-                            {/* {handinputproductid}/{handinputname}/{handinputspec}<br/>
-                            數量{searchbardata.length}
-                            數量{filteredData.length} */}
                         </div>
                         <div className={scss.head_content1}>
 
@@ -1432,6 +1810,8 @@ export default function PRequisitionDetail() {
                                     <span>規格</span>
                                     <span>數量</span>
                                     <span>單位</span>
+                                    <span>單價</span>
+                                    <span>總價</span>
                                     <span>備註(用途說明)</span>
                                     <span></span>
                                     <span></span>
@@ -1440,7 +1820,7 @@ export default function PRequisitionDetail() {
                                     <CellWithBar key={index} className={scss.panelHeader20}>
                                         <div className={scss.row01}>
                                             <span>
-                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                <button style={{ display: (statusin === "詢價中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                     {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                     <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
@@ -1450,11 +1830,13 @@ export default function PRequisitionDetail() {
                                                 <input
                                                     ref={productidRefs.current[index]}
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                     type="text"
                                                     value={_item.productid !== undefined ? _item.productid : ''}
                                                     // readOnly
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
                                                         handleStringChange(index, "productid", e.target.value);
                                                         setCurrentIndex(index);
@@ -1466,11 +1848,13 @@ export default function PRequisitionDetail() {
                                                 <input
                                                     ref={nameRefs.current[index]}
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                     type="text"
                                                     value={_item.name !== undefined ? _item.name : ''}
                                                     // readOnly
                                                     // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
                                                         handleStringChange(index, "name", e.target.value);
                                                         setCurrentIndex(index);
@@ -1481,11 +1865,13 @@ export default function PRequisitionDetail() {
                                             <span>
                                                 <input
                                                     ref={specRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                     type="text"
                                                     value={_item.spec !== undefined ? _item.spec : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     // readOnly
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
                                                         handleStringChange(index, "spec", e.target.value);
                                                         setCurrentIndex(index);
@@ -1496,25 +1882,30 @@ export default function PRequisitionDetail() {
                                             <span>
                                                 <input
                                                     ref={quantityRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    // maxLength={5}
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    // readOnly
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        borderBottom: isEditing ? "1px solid black" : "",
+                                                        width: '95%',
+                                                    }}
+                                                    type={isEditing ? 'number' : 'text'}
+                                                    // value={Number(_item.quantity)}
+                                                    // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    value={isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()}
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
-                                                        // handleNumberChange(index, "quantity", e.target.value);
-                                                        handleStringChange(index, "quantity", e.target.value);
+                                                        handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
                                                     }}
                                                 />
                                             </span>
                                             <span>
                                                 <input
                                                     ref={unitRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                     type="text"
                                                     value={_item.unit !== undefined ? _item.unit : ''}
                                                     // readOnly
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
                                                         handleStringChange(index, "unit", e.target.value);
                                                     }}
@@ -1522,13 +1913,52 @@ export default function PRequisitionDetail() {
                                             </span>
                                             <span>
                                                 <input
+                                                    ref={unitpriceRefs.current[index]}
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        borderBottom: isEditing ? "1px solid black" : "",
+                                                        width: '95%',
+                                                    }}
+                                                    type={isEditing ? 'number' : 'text'}
+                                                    // value={Number(_item.quantity)}
+                                                    // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
+                                                    readOnly={!isEditing}
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={totalpriceRefs.current[index]}
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        // borderBottom: isEditing ? "1px solid black" : "",
+                                                        width: '95%',
+                                                    }}
+                                                    type={isEditing ? 'number' : 'text'}
+                                                    // value={Number(_item.quantity)}
+                                                    // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                    value={isEditing ? _item.totalprice : Number(_item.totalprice).toLocaleString()}
+                                                    // readOnly={!isEditing}
+                                                    readOnly
+                                                    onChange={(e) => {
+                                                        handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
                                                     ref={noteRefs.current[index]}
                                                     // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                     type="text"
                                                     value={_item.note !== undefined ? _item.note : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                     // readOnly
+                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                    readOnly={!isEditing}
                                                     onChange={(e) => {
                                                         handleStringChange(index, "note", e.target.value);
                                                     }}
@@ -1542,13 +1972,14 @@ export default function PRequisitionDetail() {
                                 ))}
 
                             </div>
-                            <span style={{ paddingLeft: '22px', position: 'relative' }}>
-                                <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }} >
-                                    <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
-                                    新增品項
-                                </button>
-                            </span>
-
+                            {statusin === "詢價中" && isEditing && (
+                                <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                                    <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
+                                        <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                                        新增品項
+                                    </button>
+                                </span>
+                            )}
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
@@ -1600,10 +2031,126 @@ export default function PRequisitionDetail() {
                             <div>
                             </div>
                         </div>
+                        <div
+                            style={{
+                                paddingTop: '18px',
+                                paddingBottom: '18px'
+                            }}
+                        >
+                            <span
+                                style={{
+                                    height: '50px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    justifyContent: 'center', // 水平置中
+                                    alignItems: 'center',     // 垂直置中
+                                    fontSize: '18px'
+                                }}
+                            >
+                                審核流程
+                            </span>
+                        </div>
+                        <div className={scss.body_foot2}>
+                            <div>
+                                {reviewflowdata.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚未送審
+                                    </div>
+                                ) : (
+                                    reviewflowdata.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-evenly', // 水平均分
+                                                alignItems: 'center', // 垂直置中
+                                                gap: '10px',
+                                            }}
+                                        >
+                                            {item.stages.map((stage: any, stageIndex: any) => (
+                                                <div
+                                                    key={stageIndex}
+                                                    style={{
+                                                        flex: 1, // 平均分配空間
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center', // 子項目置中
+                                                        textAlign: 'center', // 文字置中
+                                                        margin: '0 10px',
+                                                    }}
+                                                >
+                                                    <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                                                        {stage.review_title}
+                                                    </span>
+                                                    <br />
+                                                    <div
+                                                        style={{
+                                                            fontSize: '18px',
+                                                            display: 'flex', // 使名字和圖示並排
+                                                            alignItems: 'center', // 讓它們垂直對齊
+                                                            textAlign: 'left', // 讓文字靠左對齊
+                                                        }}
+                                                    >
+                                                        <span>{stage.review_person}</span>
+                                                        {stage.review_time !== "0001-01-01T00:00:00" && (
+                                                            <span style={{ paddingLeft: '5px' }}>
+                                                                <img
+                                                                    src={icon_review.src}
+                                                                    alt="review_status"
+                                                                    style={{
+                                                                        width: '25px',
+                                                                        height: '25px',
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))
+                                )}
+
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-
+                {/* 審核 */}
+                <DragableModal
+                    handleText="選擇審核流程"
+                    style={{ zIndex: '1001', width: '1000px' }}
+                    show={reviewbar}
+                    onCrossClick={() => { setReviewbar(false) }}>
+                    <div style={{ padding: '0px 5px' }}>
+                        <span style={{ fontSize: '18px' }}>送審主旨</span>
+                        <input placeholder="主旨"
+                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                            value={documenttitle}
+                            onChange={(e) => { setDocumenttitle(e.target.value) }}
+                        />
+                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                            <Space direction="vertical">
+                                {reviewdata.map((_item: any) => (
+                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
+                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                                            {_item.name}：
+                                            {_item.stages.map((_stage: any, index: number) => (
+                                                <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                                                    {_stage.review_type}：{_stage.stage_user_name}
+                                                    {index < _item.stages.length - 1 && (
+                                                        <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Radio>
+                                ))}
+                            </Space>
+                        </Radio.Group>
+                    </div>
+                </DragableModal>
 
             </div>
         </SubLayer >

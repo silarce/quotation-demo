@@ -38,6 +38,7 @@ import icon_print from 'public/image/icon/fc_printer.svg';
 import { color } from 'html2canvas/dist/types/css/types/color';
 import { orange } from '@mui/material/colors';
 import icon_remove from 'public/image/icon/fc_remove.svg';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_fc_arrow_up from 'public/image/icon/fc_arrow_up.svg';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
@@ -45,7 +46,6 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
-import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import icon_sent_review from 'public/image/icon/fc_sent_review.svg';
 import icon_sent_review_gray from 'public/image/icon/fc_sent_review_gray.svg';
 import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
@@ -59,7 +59,8 @@ import icon_fc_quotereq from 'public/image/icon/fc_quotereq.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
-
+import icon_search2 from 'public/image/icon/search.svg';
+import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PurchaseRequisitionList() {
@@ -86,6 +87,18 @@ export default function PurchaseRequisitionList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+
+    //搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
 
 
@@ -297,15 +310,143 @@ export default function PurchaseRequisitionList() {
     };
 
 
+    //單據查詢過濾關鍵字
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
+
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.purchaserequisitionid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={'請購單列表'} />
+            <PageHeader02 tag={'請購單列表'}
+                customeRight={[
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
+                            gap: '20px', // 元素之間的間距
+                            flexWrap: 'wrap', // 如果空間不足，讓元素換行
+                        }}
+                    >
+                        {/* 第一個選項 */}
+                        <div>
+                            <select
+                                value={keyword3 || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                    setKeyword3(e.target.value);
+                                    e.target.blur(); // 讓 select 失去焦點
+                                }}
+                                disabled={false} // 根據需求設置是否禁用
+                                style={{
+                                    fontSize: '18px',
+                                    borderBottom: '1px solid #14256a',
+                                    color: '#14256a',
+                                }}
+                            >
+                                <option value="">全部</option> {/* 預設選項 */}
+                                <option value="詢價中">詢價中</option>
+                                <option value="已核准">已核准</option>
+                                <option value="已結案">已結案</option>
+                            </select>
+                        </div>
+
+                        {/* 第二個選項 */}
+                        <div>
+                            <InputSel
+                                caption="起始日期"
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                datePickerProps={{
+                                    props: {
+                                        value: keywordstartdate || null,
+                                        onChange: (e: Moment | null) => {
+                                            setKeywordstartdate(e);
+                                        },
+                                    },
+                                }}
+                            />
+                        </div>
+
+                        {/* 第三個選項 */}
+                        <div>
+                            <InputSel
+                                caption="截止日期"
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                datePickerProps={{
+                                    props: {
+                                        value: keywordenddate || null,
+                                        onChange: (e: Moment | null) => {
+                                            setKeywordenddate(e);
+                                        },
+                                    },
+                                }}
+                            />
+                        </div>
+
+                        {/* 第四個選項 */}
+                        <div>
+                            <input
+                                type="text"
+                                placeholder='請輸入單號'
+                                value={keyword2}
+                                style={{ padding: '4px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                onChange={(e) => setKeyword2(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+
+                ]} />
             <div>
                 <Thead01 type={'PRequisition'} />
                 <div>
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                    {data && (
-                        data.map((_item: any, index: number) => (
+                    {searchdata && (
+                        searchdata.map((_item: any, index: number) => (
 
                             <CellWithBar key={index} className={scss.panelHeader15}>
                                 <Collapse
@@ -348,8 +489,13 @@ export default function PurchaseRequisitionList() {
                                                             router.push({
                                                                 pathname: `/factoryDepartment/PRequisitionDetail`,
                                                                 query: {
-                                                                    purchaserequisitionuuid: _item.purchaserequisitionuuid,
-                                                                    purchaserequisitionid: _item.purchaserequisitionid
+                                                                    // purchaserequisitionuuid: _item.purchaserequisitionuuid,
+                                                                    // purchaserequisitionid: _item.purchaserequisitionid,
+                                                                    // create_at: _item.create_at,
+                                                                    // need_date: _item.need_date,
+                                                                    // create_by: _item.create_by,
+                                                                    // status: _item.status
+                                                                    item: JSON.stringify(_item),
                                                                 },
                                                             });
                                                         }} />
@@ -358,98 +504,103 @@ export default function PurchaseRequisitionList() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row02}`}
-                                                    style={{ 
-                                                        display: 'flex', 
-                                                        alignItems: 'center', 
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
                                                         gap: '20px',
-                                                        padding:'10px 20px',
+                                                        padding: '10px 20px',
                                                         cursor: 'pointer',
                                                     }} // 水平排列
                                                 >
-                                                    {_item.stages.map((item: any, index: number) => {
-                                                        // 判斷圈圈顏色
-                                                        let circleColor = 'gray'; // 預設為灰色
-                                                        let textColor = 'gray'; // 預設文字顏色為灰色
+                                                    {_item.stages.length === 0 ? (
+                                                        <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
+                                                    ) : (
+                                                        _item.stages.map((item: any, index: number) => {
+                                                            // 判斷圈圈顏色
+                                                            let circleColor = 'gray'; // 預設為灰色
+                                                            let textColor = 'gray'; // 預設文字顏色為灰色
 
-                                                        if (item.review_order === 1 || item.review_status === '核准') {
-                                                            circleColor = 'green';
-                                                            textColor = 'black'; // 綠色的時候文字變為黑色
-                                                        } else if (
-                                                            item.review_status === '簽核中' &&
-                                                            index > 0 &&
-                                                            _item.stages[index - 1].review_order + 1 === item.review_order
-                                                        ) {
-                                                            circleColor = 'red';
-                                                            textColor = 'black'; // 紅色的時候文字變為黑色
-                                                        }
+                                                            if (item.review_order === 1 || item.review_status === '核准') {
+                                                                circleColor = 'green';
+                                                                textColor = 'black'; // 綠色的時候文字變為黑色
+                                                            } else if (
+                                                                item.review_status === '簽核中' &&
+                                                                index > 0 &&
+                                                                _item.stages[index - 1].review_order + 1 === item.review_order
+                                                            ) {
+                                                                circleColor = 'red';
+                                                                textColor = 'black'; // 紅色的時候文字變為黑色
+                                                            }
 
-                                                        return (
-                                                            <div
-                                                                key={index}
-                                                                style={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '10px',
-                                                                }}
-                                                            >
-                                                                {/* 灰色框框 */}
+                                                            return (
                                                                 <div
+                                                                    key={index}
                                                                     style={{
                                                                         display: 'flex',
                                                                         alignItems: 'center',
-                                                                        backgroundColor: "#f5f5f5",
-                                                                        borderRadius: '15px',
-                                                                        padding: '5px 10px',
                                                                         gap: '10px',
                                                                     }}
                                                                 >
-                                                                    {/* 左邊的圈圈 */}
+                                                                    {/* 灰色框框 */}
                                                                     <div
                                                                         style={{
-                                                                            width: '10px',
-                                                                            height: '10px',
-                                                                            borderRadius: '50%',
-                                                                            backgroundColor: circleColor,
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            backgroundColor: "#f5f5f5",
+                                                                            borderRadius: '15px',
+                                                                            padding: '5px 10px',
+                                                                            gap: '10px',
                                                                         }}
-                                                                    ></div>
-                                                                    {/* 名稱 */}
-                                                                    <span style={{ color: textColor }}>
-                                                                        {item.review_status}&nbsp;
-                                                                        {item.review_person_name}
-                                                                    </span>
-                                                                </div>
-
-                                                                {/* 右邊的箭頭，最後一筆不顯示 */}
-                                                                {index < _item.stages.length - 1 && (
-                                                                    <div style={{ fontSize: '20px', color: 'black' }}>
-                                                                        <svg
-                                                                            width="32"
-                                                                            height="11"
-                                                                            viewBox="0 0 32 11"
-                                                                            fill="none"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                        >
-                                                                            <line
-                                                                                x1="0.5"
-                                                                                y1="5.5"
-                                                                                x2="30.5"
-                                                                                y2="5.5"
-                                                                                stroke="#404040"
-                                                                                stroke-linecap="round"
-                                                                                stroke-linejoin="round"
-                                                                            ></line>
-                                                                            <path
-                                                                                d="M27 2L31 5.5L27 9"
-                                                                                stroke="#404040"
-                                                                                stroke-linecap="round"
-                                                                                stroke-linejoin="round"
-                                                                            ></path>
-                                                                        </svg>
+                                                                    >
+                                                                        {/* 左邊的圈圈 */}
+                                                                        <div
+                                                                            style={{
+                                                                                width: '10px',
+                                                                                height: '10px',
+                                                                                borderRadius: '50%',
+                                                                                backgroundColor: circleColor,
+                                                                            }}
+                                                                        ></div>
+                                                                        {/* 名稱 */}
+                                                                        <span style={{ color: textColor }}>
+                                                                            {item.review_status}&nbsp;
+                                                                            {item.review_person_name}
+                                                                        </span>
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
+
+                                                                    {/* 右邊的箭頭，最後一筆不顯示 */}
+                                                                    {index < _item.stages.length - 1 && (
+                                                                        <div style={{ fontSize: '20px', color: 'black' }}>
+                                                                            <svg
+                                                                                width="32"
+                                                                                height="11"
+                                                                                viewBox="0 0 32 11"
+                                                                                fill="none"
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                            >
+                                                                                <line
+                                                                                    x1="0.5"
+                                                                                    y1="5.5"
+                                                                                    x2="30.5"
+                                                                                    y2="5.5"
+                                                                                    stroke="#404040"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                ></line>
+                                                                                <path
+                                                                                    d="M27 2L31 5.5L27 9"
+                                                                                    stroke="#404040"
+                                                                                    stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                ></path>
+                                                                            </svg>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })
+                                                    )}
+
                                                 </div>
 
 
@@ -478,7 +629,6 @@ export default function PurchaseRequisitionList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td style={{ color: '#ea1833' }}>{detail.alreadyinquantity}</td>
                                                             <td>{detail.quantity?.toLocaleString()}</td>
                                                             <td>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>
