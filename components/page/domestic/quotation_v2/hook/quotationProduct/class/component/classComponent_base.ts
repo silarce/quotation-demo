@@ -15,6 +15,9 @@ import { Interface_ClassProd_prime } from '../prod/interface';
 
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
+import type { Toption } from 'js/utils/options/options';
+
+// ========================================================================
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
 interface Interface_ClassComponent_base {
   // readonly state: TstateComponentData<T>;
@@ -35,6 +38,11 @@ interface Interface_ClassComponent_base {
   dualPrice: number; // 牌價複價 // 虛值
   unitPrice: number; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
   totalPrice: number; // 複價 = 單價 * 數量 // 虛值
+
+  //
+
+  options_material: Toption[] | undefined;
+  options_materialSurface: Toption[] | undefined;
 }
 
 interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
@@ -128,6 +136,15 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
 
   get totalPrice() {
     return 9999;
+  }
+  // -----------------------------------------------------------------------
+
+  get options_material() {
+    return this.classProd.options_material;
+  }
+
+  get options_materialSurface() {
+    return this.classProd.options_surface;
   }
 } //  ClassCompnent_base
 

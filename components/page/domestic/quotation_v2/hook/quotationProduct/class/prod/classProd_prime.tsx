@@ -122,30 +122,7 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
     materialName: {
       ...nodeConfig.materialName,
       createNode: ({ disabled }) => {
-        const options = (() => {
-          const doorModel = classProd.state.doorModel;
-
-          if (!doorModel) {
-            return undefined;
-          }
-
-          const slatMaterialsArr = doorModel.slatMaterials;
-          const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
-          const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
-
-          const options = orderedArr.map((item) => {
-            return {
-              value: item.name,
-              label: item.name,
-            };
-          });
-
-          // 把黑鐵的label改為鐵材烤漆
-          const blackIron = options.find((item) => item.value === '黑鐵');
-          blackIron && (blackIron.label = '鐵材烤漆');
-
-          return options;
-        })();
+        const options = classProd.options_material;
 
         const v = classProd.materialName;
         const value = v ? { value: v, label: v } : null;
@@ -171,22 +148,7 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
     materialSurface: {
       ...nodeConfig.materialSurface,
       createNode: ({ disabled }) => {
-        const options = (() => {
-          let options = options_surface_onlyPaint;
-
-          const isSST = checkIsSST(classProd.data.materialName);
-          const isGalvanized = checkIsGalvanized(classProd.data.materialName); // 是否鍍鋅
-
-          if (isSST) {
-            options = options_surface;
-          }
-
-          if (!isGalvanized) {
-            options = options.filter((item) => item.value !== '無烤漆');
-          }
-
-          return options;
-        })();
+        const options = classProd.options_surface;
         const v = classProd.data.materialSurface;
         const value = v ? { value: v, label: v } : null;
 
@@ -220,10 +182,16 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
 class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
   doorModel: TdoorModel = 'SJ-302';
 
+  _options_material: Toption[] | undefined;
+  _options_surface: Toption[] | undefined;
+
   constructor(props: ConstructorParameters<typeof ClassProd_base>[0]) {
     super(props);
 
     const nodeConfig = this.nodeConfig;
+
+    this._options_material = createOptions_material(this);
+    this._options_surface = createOptions_surface(this);
 
     this._nodeConfig = customizeNodeConfig({
       classProd: this,
@@ -234,45 +202,12 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   // ---------------------------------------------------------------------------------
 
   // region options
-  // get options_material() {
-  //   const doorModel = this.state.doorModel;
-
-  //   if (!doorModel) {
-  //     return undefined;
-  //   }
-
-  //   const slatMaterialsArr = doorModel.slatMaterials;
-  //   const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
-  //   const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
-
-  //   const options: Toption[] = orderedArr.map((item) => {
-  //     return {
-  //       value: item.name,
-  //       label: item.name,
-  //     };
-  //   });
-
-  //   // 把黑鐵的label改為鐵材烤漆
-  //   const blackIron = options.find((item) => item.value === '黑鐵');
-  //   blackIron && (blackIron.label = '鐵材烤漆');
-
-  //   return options;
-  // }
-
-  // get options_surface() {
-  //   let options = options_surface_onlyPaint;
-
-  //   const isSST = checkIsSST(this.data.materialName);
-  //   const isGalvanized = checkIsGalvanized(this.data.materialName); // 是否鍍鋅
-
-  //   if (isSST) {
-  //     options = options_surface;
-  //   } else if (isGalvanized) {
-  //     options = options.filter((item) => item.value !== '無烤漆');
-  //   }
-
-  //   return options;
-  // }
+  get options_material() {
+    return this._options_material;
+  }
+  get options_surface() {
+    return this._options_surface;
+  }
 
   // ---------------------------------------------------------------------------------
 
@@ -568,6 +503,50 @@ const reqGetSlatCount = async (classProd: ClassProd_base) => {
 //       return null;
 //     });
 // };
+
+// ========================================================================
+
+const createOptions_material = (classProd: ClassProd_prime) => {
+  const doorModel = classProd.state.doorModel;
+
+  if (!doorModel) {
+    return undefined;
+  }
+
+  const slatMaterialsArr = doorModel.slatMaterials;
+  const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+  const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
+
+  const options = orderedArr.map((item) => {
+    return {
+      value: item.name,
+      label: item.name,
+    };
+  });
+
+  // 把黑鐵的label改為鐵材烤漆
+  const blackIron = options.find((item) => item.value === '黑鐵');
+  blackIron && (blackIron.label = '鐵材烤漆');
+
+  return options;
+};
+
+const createOptions_surface = (classProd: ClassProd_prime) => {
+  let options = options_surface_onlyPaint;
+
+  const isSST = checkIsSST(classProd.data.materialName);
+  const isGalvanized = checkIsGalvanized(classProd.data.materialName); // 是否鍍鋅
+
+  if (isSST) {
+    options = options_surface;
+  }
+
+  if (!isGalvanized) {
+    options = options.filter((item) => item.value !== '無烤漆');
+  }
+
+  return options;
+};
 
 // ========================================================================
 export type { Interface_ClassProd_prime };

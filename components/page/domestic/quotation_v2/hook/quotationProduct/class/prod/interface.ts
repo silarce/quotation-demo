@@ -269,6 +269,7 @@ interface Interface_ClassProd_base2 extends Interface_ClassProd_base {
   doorModel: string;
   //
   // options_material?: Toption[] | undefined;
+  // options_surface?: Toption[] | undefined;
   // afterFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
   afterFullWidthChange?: () => Promise<void>;
 }
@@ -276,7 +277,8 @@ interface Interface_ClassProd_base2 extends Interface_ClassProd_base {
 interface Interface_ClassProd_prime extends Interface_ClassProd_base2 {
   doorModel: TdoorModel;
   //
-  // options_material: Toption[] | undefined;
+  options_material: Toption[] | undefined;
+  options_surface: Toption[] | undefined;
   // options_material: NonNullable<Interface_ClassProd_base2['options_material']>;
   //
   afterFullWidthChange: NonNullable<Interface_ClassProd_base2['afterFullWidthChange']>;

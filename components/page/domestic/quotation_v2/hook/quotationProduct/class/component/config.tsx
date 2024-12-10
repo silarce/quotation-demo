@@ -100,7 +100,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           selectProps: {
             props: {
               placeholder: '',
-              options: [],
+              options: classComponent.options_material,
               value,
               onChange(newValue) {
                 classComponent.material = newValue?.value ?? '';
@@ -125,7 +125,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
           selectProps: {
             props: {
               placeholder: '',
-              options: [],
+              options: classComponent.options_materialSurface,
               value,
               onChange(newValue) {
                 classComponent.materialSurface = newValue?.value ?? '';
