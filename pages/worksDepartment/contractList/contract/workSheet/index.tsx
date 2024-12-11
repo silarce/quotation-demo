@@ -133,15 +133,15 @@ type Tquery = {
 
 // ====================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee']>({
-  selectorArr: [
-    {
-      key: 'employee',
-      caption: '請選擇審核業務',
-      limit: 1,
-    },
-  ],
-});
+// const SelectorGroup = selectModalCreator_multi<['employee']>({
+//   selectorArr: [
+//     {
+//       key: 'employee',
+//       caption: '請選擇審核業務',
+//       limit: 1,
+//     },
+//   ],
+// });
 
 // ====================================================================
 
@@ -662,14 +662,9 @@ export default function Worksheet({
   // ___________________________________________________________________________
 
   const control_recordList: Tcontrol_recordList = useMemo(() => {
-    let recordsWithReview = worksheetData?.recordsWithReview ?? [];
-    recordsWithReview = _.sortBy(recordsWithReview, (item) => {
-      return item.record.version;
-    }).reverse();
+    const records = _.sortBy(worksheetData?.records, 'version').reverse();
 
-    // const records = _.sortBy(worksheetData?.records, 'version').reverse();
-
-    const recordArr: Trecord[] = recordsWithReview.map(({ record, reviewArr }, index) => {
+    const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
         reviewSalesEmployee,
@@ -679,6 +674,7 @@ export default function Worksheet({
         toReviewManager,
         managerReviewAt,
         agentEmployee,
+        addition: { reviewArr } = {},
       } = record;
 
       const contractProductItem = contractProductItems?.[0];

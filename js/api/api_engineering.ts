@@ -86,11 +86,14 @@ import type {
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
 
-type TworksheetDto_addition = TworksheetDto & {
-  recordsWithReview?: {
-    record: TworksheetRecordDto;
+type TworksheetRecordDto_addition = TworksheetRecordDto & {
+  addition?: {
     reviewArr?: TgetReviewById[] | undefined;
-  }[];
+  };
+};
+
+type TworksheetDto_addition = TworksheetDto & {
+  records: TworksheetRecordDto_addition[];
 };
 
 export type {
@@ -926,16 +929,14 @@ export const useGetWorksheet_id = (
       const res = res_origin as TworksheetDto_addition;
 
       if (recordsWithReview) {
-        const records = res.records ?? [];
-
-        const recordsWithReview: NonNullable<TworksheetDto_addition['recordsWithReview']> = [];
+        const records = (res.records ?? []) as TworksheetRecordDto_addition[];
 
         for (const record of records) {
           const reviewArr = await apiGetReviewById(record.id);
-          recordsWithReview.push({ record, reviewArr });
+          record.addition = {
+            reviewArr,
+          };
         }
-
-        res.recordsWithReview = recordsWithReview;
       }
 
       setRes(res);
@@ -1033,6 +1034,7 @@ export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
     try {
       setIsLoading(true);
       const res = await apiGetWorksheetRecord_id(recordId);
+
       setRes(res);
     } catch (error) {
       const err = error as AxiosError;
