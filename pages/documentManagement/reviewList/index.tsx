@@ -43,6 +43,7 @@ import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
 import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 import SalarySettlement from 'pages/accounting/salarySettlement';
 import BonusPayout from 'pages/accounting/bonusPayout';
+import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
 
 export default function ReviewList() {
   // 路由參數
@@ -53,7 +54,7 @@ export default function ReviewList() {
   const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
 
   // 登入者資料
-  const { userInfo } = useContext(AppContext);
+  const { userInfo, erpFeature } = useContext(AppContext);
   // 資料列宣告
   const [data, setData] = useState<any[]>([]);
   const [data2, setData2] = useState<any[]>([]);
@@ -530,6 +531,15 @@ export default function ReviewList() {
           undefined,
           { shallow: true }
         );
+      } else if (reviewtype === '工作表') {
+        const parsedQuery = JSON.parse(itemQuery.query);
+        const query = {
+          ...parsedQuery,
+          //   status,
+          viewtype: 'review',
+        };
+
+        router.replace({ query }, undefined, { shallow: true });
       }
     }
     // }, [itemQuery, reviewtype]);
@@ -1392,6 +1402,9 @@ export default function ReviewList() {
                       {reviewtype === '報價單' && <Quotation key={theKey} />}
                       {reviewtype === '薪資單' && <SalarySettlement key={theKey} />}
                       {reviewtype === '獎金' && <BonusPayout key={theKey} />}
+                      {reviewtype === '工作表' && (
+                        <Worksheet key={theKey} userInfo={userInfo!} userErpFeature={erpFeature} isAdmin={false} />
+                      )}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示
