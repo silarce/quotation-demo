@@ -503,7 +503,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         <span>序</span>
         <span>名稱</span>
-        <span>審核流程</span>
+        <span>流程關卡→</span>
         {/* <span>單號</span>
         <span>人員</span> */}
         <span></span>

@@ -470,7 +470,7 @@ export default function PurchaseRequisitionList() {
                                                 ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span>{_item.purchaserequisitionid}</span>
+                                                    <span style={{fontSize:'18px'}}>{_item.purchaserequisitionid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>
