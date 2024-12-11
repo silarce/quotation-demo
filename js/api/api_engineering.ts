@@ -89,7 +89,7 @@ type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
 type TworksheetDto_addition = TworksheetDto & {
   recordsWithReview?: {
     record: TworksheetRecordDto;
-    review: TgetReviewById;
+    reviewArr?: TgetReviewById[] | undefined;
   }[];
 };
 
@@ -931,8 +931,8 @@ export const useGetWorksheet_id = (
         const recordsWithReview: NonNullable<TworksheetDto_addition['recordsWithReview']> = [];
 
         for (const record of records) {
-          const review = await apiGetReviewById(record.id);
-          recordsWithReview.push({ record, review: review[0] });
+          const reviewArr = await apiGetReviewById(record.id);
+          recordsWithReview.push({ record, reviewArr });
         }
 
         res.recordsWithReview = recordsWithReview;

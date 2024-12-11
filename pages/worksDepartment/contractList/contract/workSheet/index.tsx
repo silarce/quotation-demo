@@ -145,6 +145,37 @@ const SelectorGroup = selectModalCreator_multi<['employee']>({
 
 // ====================================================================
 
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+// 這兩支 api 等於沒有了
+// @Patch('engineering/worksheet/worksheet-record/:id/submit')
+// @Patch('engineering/worksheet/worksheet-record/:id/review')
+
 export default function Worksheet({
   isAdmin,
   userErpFeature,
@@ -631,9 +662,14 @@ export default function Worksheet({
   // ___________________________________________________________________________
 
   const control_recordList: Tcontrol_recordList = useMemo(() => {
-    const records = _.sortBy(worksheetData?.records, 'version').reverse();
+    let recordsWithReview = worksheetData?.recordsWithReview ?? [];
+    recordsWithReview = _.sortBy(recordsWithReview, (item) => {
+      return item.record.version;
+    }).reverse();
 
-    const recordArr: Trecord[] = records.map((record, index) => {
+    // const records = _.sortBy(worksheetData?.records, 'version').reverse();
+
+    const recordArr: Trecord[] = recordsWithReview.map(({ record, reviewArr }, index) => {
       const {
         contractProductItems,
         reviewSalesEmployee,
@@ -661,21 +697,21 @@ export default function Worksheet({
       const fullWidth_m = new Decimal(fullWidth).div(1000).toString();
       const height_m = new Decimal(height).div(1000).toString();
 
-      let reviewSalesStatus: Trecord['reviewSalesStatus'] = 'gray';
+      // let reviewSalesStatus: Trecord['reviewSalesStatus'] = 'gray';
 
-      if (salesReviewAt) {
-        reviewSalesStatus = 'green';
-      } else if (toReviewSales) {
-        reviewSalesStatus = 'red';
-      }
+      // if (salesReviewAt) {
+      //   reviewSalesStatus = 'green';
+      // } else if (toReviewSales) {
+      //   reviewSalesStatus = 'red';
+      // }
 
-      let reveiwManagerStatus: Trecord['reveiwManagerStatus'] = 'gray';
+      // let reveiwManagerStatus: Trecord['reveiwManagerStatus'] = 'gray';
 
-      if (managerReviewAt) {
-        reveiwManagerStatus = 'green';
-      } else if (toReviewManager) {
-        reveiwManagerStatus = 'red';
-      }
+      // if (managerReviewAt) {
+      //   reveiwManagerStatus = 'green';
+      // } else if (toReviewManager) {
+      //   reveiwManagerStatus = 'red';
+      // }
 
       const control_record: Trecord = {
         itemName,
@@ -686,11 +722,13 @@ export default function Worksheet({
         material: materialName,
         isAntiTyphoon: isAntiTyphoon ?? false,
 
-        reviewSalesName: reviewSalesEmployee?.chName ?? '',
-        reviewSalesStatus,
-        reviewManagerName: reviewManagerEmployee?.chName ?? '',
-        reveiwManagerStatus,
+        // reviewSalesName: reviewSalesEmployee?.chName ?? '',
+        // reviewSalesStatus,
+        // reviewManagerName: reviewManagerEmployee?.chName ?? '',
+        // reveiwManagerStatus,
         agent: agentEmployee?.chName ?? '',
+
+        reviewFlowData: reviewArr,
 
         onDetailClick: () => {
           // setActiveRecordId(record.id);
