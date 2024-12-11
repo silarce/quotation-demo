@@ -449,6 +449,7 @@ export default function Worksheet({
     };
 
     await apiAddReview(body);
+    await refreshData();
 
     // if (!activeRecordId) {
     //   return;
