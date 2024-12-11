@@ -1170,8 +1170,8 @@ export default function ProductList() {
     }
     useEffect(() => {
         // 更新 addproductid，基於最新的 state
-        // setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
-        setAddProductid(type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+        setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+        // setAddProductid(type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
 
     }, [type1selectedvalue, type2selectedvalue, type3inputedvalue, type4selectedvalue, type5selectedvalue]);
 
@@ -1184,21 +1184,21 @@ export default function ProductList() {
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAddProductid(e.target.value);    
-        // const inputValue = e.target.value;
-        // const newValue = inputValue.slice(2);
-        // setAddProductid("SJ" + newValue);    
-        // if (addproductid === "SJ") {
+        const inputValue = e.target.value;
+        const newValue = inputValue.slice(2);
+        setAddProductid("SJ" + newValue);    
+        if (addproductid === "SJ") {
 
-        //     setType1SelectedOption('');
-        //     setType1SelectedValue('');
-        //     setType2SelectedOption('');
-        //     setType2SelectedValue('');
-        //     setType3InputedValue('');
-        //     setType4SelectedOption('');
-        //     setType4SelectedValue('');
-        //     setType5SelectedOption('');
-        //     setType5SelectedValue('');
-        // }
+            setType1SelectedOption('');
+            setType1SelectedValue('');
+            setType2SelectedOption('');
+            setType2SelectedValue('');
+            setType3InputedValue('');
+            setType4SelectedOption('');
+            setType4SelectedValue('');
+            setType5SelectedOption('');
+            setType5SelectedValue('');
+        }
     };
 
 
@@ -1829,7 +1829,7 @@ export default function ProductList() {
                                     </button>
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div style={{display:'none'}}>
+                                    <div>
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}

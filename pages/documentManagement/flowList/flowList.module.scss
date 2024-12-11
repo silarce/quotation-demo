@@ -751,8 +751,9 @@ div.panelHeader21 {
 
     .row01,
     .row02 {
+        padding:5px 20px;
         padding-left: 20px;
-
+        height: 40px;
         // padding-top:10px;
         span {
             font-weight: 400;
@@ -767,7 +768,7 @@ div.panelHeader21 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 60px 30px 150px 800px 30px;
+        grid-template-columns: 60px 30px 250px 1000px 30px;
         gap: 15px;
         // border-bottom: 1px solid #ddd;
         cursor: pointer;
@@ -891,8 +892,9 @@ div.panelHeader22 {
 
     .row01,
     .row02 {
+        padding:5px 20px;
         padding-left: 20px;
-
+        height: 40px;
         span {
             font-weight: 400;
             font-size: 18px;
@@ -928,7 +930,7 @@ div.panelHeader22 {
     // margin-top: 5px;
     margin-left: 20px;
     margin-right: 20px;
-    margin-bottom: 5px;
+    // margin-bottom: 5px;
     // padding-top:20px;
 }
 
@@ -949,4 +951,64 @@ div.panelHeader22 {
     border: 1px solid #ccc;
     cursor: move;
 }
+  
+
+.shortsquarebtn {
+    display: inline-flex; // 確保內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 避免過短導致內容擠壓
+    padding: 0 12px; // 適量的左右間距
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 包括 padding 在內計算寬高
+    transform: translateY(0px);
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c;
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
+}
+
+  
+  
+.shortredsquarebtn {
+    display: inline-flex; // 使內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 使用 min-width 以適應不同文字長度
+    padding: 0 12px; // 控制左右間距
+    border: solid 1px #ea1833;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ea1833;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 確保寬高包括 padding
+    transform: translateY(0px);
+
+    &:hover {
+        border: solid 1px #ea1833;
+        background-color: #ea18341d;
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #ea1833;
+    }
+}
+
   
