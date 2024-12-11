@@ -85,6 +85,8 @@ export default function ReviewList() {
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
+    const [options, setOptions] = useState<string[]>([]); // 用來存放唯一的 document_type 選項
+
 
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
@@ -510,7 +512,7 @@ export default function ReviewList() {
                     },
                 }, undefined, { shallow: true });
             }
-            else if (reviewtype==="薪資單"){
+            else if (reviewtype === "薪資單") {
                 const parsedQuery = JSON.parse(itemQuery.query);
                 console.log(parsedQuery);
                 router.replace({
@@ -521,13 +523,13 @@ export default function ReviewList() {
                     },
                 }, undefined, { shallow: true });
             }
-            else if (reviewtype==="獎金"){
+            else if (reviewtype === "獎金") {
                 const parsedQuery = JSON.parse(itemQuery.query);
                 console.log(parsedQuery);
                 router.replace({
                     query: {
                         year: parsedQuery.year,
-                        bonustype:parsedQuery.bonustype,
+                        bonustype: parsedQuery.bonustype,
                         viewtype: 'review'
                     },
                 }, undefined, { shallow: true });
@@ -643,7 +645,7 @@ export default function ReviewList() {
         console.log(filteredData);
 
         // 當 keyword2 和 keyword3 都為空時，恢復原始資料
-        if (!keyword2 && !keyword3) {
+        if (!keyword1 && !keyword2 && !keyword3) {
             if (tabnow === "待審核") {
                 setData(searchdata); // 恢復 data
             } else if (tabnow === "審核中") {
@@ -658,6 +660,11 @@ export default function ReviewList() {
         }
 
         // 根據 keyword2 篩選 document_id
+        if (keyword1) {
+            filteredData = filteredData.filter(item =>
+                item.document_type.toString().includes(keyword1.trim())
+            );
+        }
         if (keyword2) {
             filteredData = filteredData.filter(item =>
                 item.document_id.toString().includes(keyword2.trim())
@@ -693,7 +700,7 @@ export default function ReviewList() {
 
         // 更新篩選結果
         setFilteredData(filteredData);
-    }, [keyword2, keyword3]); // 加入 tabnow 依賴，確保切換 tab 時更新資料
+    }, [keyword1, keyword2, keyword3]); // 加入 tabnow 依賴，確保切換 tab 時更新資料
 
 
 
@@ -969,9 +976,71 @@ export default function ReviewList() {
         return Math.random();
     }, [router.query]);
 
+
+    useEffect(() => {
+        let dataSource: { document_type: string }[] = [];
+
+        switch (tabshow) {
+            case '待審核':
+                dataSource = data;
+                break;
+            case '審核中':
+                dataSource = data3;
+                break;
+            case '審核完成':
+                dataSource = data4;
+                break;
+            case '駁回':
+                dataSource = data5;
+                break;
+            default:
+                dataSource = [];
+                break;
+        }
+
+        // 使用 Set 過濾掉重複的 document_type
+        const uniqueOptions = Array.from(new Set(dataSource.map(item => item.document_type)));
+        setOptions(uniqueOptions);
+    }, [tabshow]); // 當 tabshow 改變時更新選項
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'審核清單'} panelList={panelList} />
+            <PageHeader02 tag={'審核清單'} panelList={panelList}
+                customeRight={[
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
+                            gap: '20px', // 元素之間的間距
+                            flexWrap: 'wrap', // 如果空間不足，讓元素換行
+                        }}
+                    >
+                        {/* 第一個選項 */}
+                        <div>
+                            <select
+                                value={keyword1 || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                    setKeyword1(e.target.value);
+                                    e.target.blur(); // 讓 select 失去焦點
+                                }}
+                                style={{
+                                    fontSize: '18px',
+                                    borderBottom: '1px solid #14256a',
+                                    color: '#14256a',
+                                    width: '200px'
+                                }}
+                            >
+                                <option value="">全部</option>
+                                {options.map((option, index) => (
+                                    <option key={index} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                ]} />
 
 
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>

@@ -40,7 +40,7 @@
     top: 0;
     z-index: 1000; /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns:100px repeat(4, 150px) 100px 200px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns:100px 100px repeat(3, 100px) 100px 200px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
@@ -108,7 +108,7 @@ div.panelHeader1 {
     .row01 {
         padding: 10px 20px;
         display: grid;
-        grid-template-columns:100px repeat(4, 150px) 100px 200px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+        grid-template-columns:100px 100px repeat(3, 100px) 100px 200px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
         gap: 5px;
         // position: relative;  /* 確保 sticky 定位可以參照這個容器 */
         cursor: pointer;
@@ -116,7 +116,7 @@ div.panelHeader1 {
     }
   
     .selectedRow {
-      background-color: #ecf1ff;
+      background-color: #ffeeee;
       /* 當前選擇項目的背景顏色 */
     }
 

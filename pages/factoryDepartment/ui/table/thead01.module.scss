@@ -883,10 +883,10 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 20px 150px 150px 150px 700px 50px;
+  grid-template-columns: 20px 150px 150px 150px 700px 50px 30px;
   gap: 5px;
-  height: 30px;
-  padding: 0 30px;
+  height: 40px;
+  padding: 0px 30px;
   background-color: $bgc01;
 
   >* {
@@ -900,7 +900,7 @@
 
   >span {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     color: #979797;
   }
 }
@@ -914,9 +914,9 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 80px 60px 150px 150px 300px 30px;
+  grid-template-columns: 60px 100px 80px 250px 250px 800px 30px;
   gap: 15px;
-  height: 30px;
+  height: 40px;
   padding: 0 20px;
   background-color: $bgc01;
 
@@ -931,7 +931,7 @@
 
   >span {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     color: #979797;
   }
 }
@@ -945,9 +945,9 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 800px 30px;
+  grid-template-columns: 60px 30px 250px 1000px 30px;
   gap: 15px;
-  height: 30px;
+  height: 40px;
   padding: 0 20px;
   background-color: $bgc01;
 
@@ -962,7 +962,7 @@
 
   >span {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     color: #979797;
   }
 }
@@ -978,7 +978,7 @@
   display: grid;
   grid-template-columns: 60px 60px 100px 140px 140px 30px;
   gap: 15px;
-  height: 30px;
+  height: 40px;
   padding: 0 20px;
   background-color: $bgc01;
 
@@ -993,7 +993,7 @@
 
   >span {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     color: #979797;
   }
 }
@@ -1370,5 +1370,43 @@
 }
 
 
+
+//#endregion
+
+
+
+
+
+
+
+
+//#region 新請購單
+.newthead1 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 150px 150px 150px 150px 600px 100px 30px;
+  gap: 15px;
+  height: 40px;
+  padding: 0px 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 16px;
+    color: #979797;
+  }
+}
 
 //#endregion
