@@ -91,6 +91,22 @@ interface TaddReivew {
   };
 }
 
+interface TgetReview {
+  id: string;
+  document_type: string;
+  document_id: string;
+  create_at: string;
+  create_by: string;
+  review_id: string;
+  current_stage: number;
+  prestage_review: string;
+  document_status: string;
+  query: string;
+  document_uuid: string;
+  document_title: string;
+  readed: boolean;
+}
+
 // ==============================================================================
 
 // region =Accountant=
@@ -395,6 +411,7 @@ export type {
   TreviewFlow,
   TaddReivew as TaddReview,
   TgetReivewById as TgetReviewById,
+  TgetReview,
   //
   TaccountantPresetDto,
   TcreateAccountantPresetDto,

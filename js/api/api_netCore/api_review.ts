@@ -12,6 +12,7 @@ import type {
   TreviewFlow,
   TgetReviewById,
   TaddReview,
+  TgetReview,
 } from './_schemas';
 
 const subRoot = 'Review';
@@ -20,20 +21,19 @@ const subRoot = 'Review';
 
 // Review/GetFlow
 
-// 基本上不會使用這個
-// const apiGetFlow = (username: string) => {
-//   const api = `${subRoot}/GetFlow`;
-//   const params = {
-//     username,
-//   };
+const apiGetFlow = (username: string) => {
+  const api = `${subRoot}/GetFlow`;
+  const params = {
+    username,
+  };
 
-//   return axi2
-//     .get<TreviewFlow[] | ''>(api, { params })
-//     .then(({ data }) => data)
-//     .catch((err: AxiosError) => {
-//       return Promise.reject(err);
-//     });
-// };
+  return axi2
+    .get<TreviewFlow[] | ''>(api, { params })
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      return Promise.reject(err);
+    });
+};
 
 // GetReviewFlow
 const apiGetReviewFlow = (user_id: string) => {
@@ -114,6 +114,18 @@ const apiGetReviewHistory = (id: string) => {
     .catch((err) => {
       return Promise.reject(err);
     });
+};
+
+const apiGetReview = async (user_id: string) => {
+  const api = '/Review/GetReview';
+  const params = {
+    user_id,
+  };
+
+  return axi2
+    .get<TgetReview[] | undefined>(api, { params })
+    .then(({ data }) => data || undefined)
+    .catch((err) => Promise.reject(err));
 };
 
 // ==============================================================================
@@ -300,5 +312,8 @@ export {
   apiAddReview,
   apiGetReviewBack,
   useGetReviewHistory,
+  //
+  apiGetFlow,
+  apiGetReview,
 };
-export type { TreviewFlow, TgetReviewById, TaddReview };
+export type { TreviewFlow, TgetReviewById, TaddReview, TgetReview };
