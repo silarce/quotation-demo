@@ -3,9 +3,10 @@ import { TemployeeDto } from '../dtoTypes';
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
 type Treview_status = '未審核' | '已審核' | '審核中';
-type Treview_status__stages = '提出' | '核准';
+type Treview_status__stages = '核准' | '提出' | '簽核中';
+type Tdocument_status = '審核中' | '駁回' | '核准' | '抽單';
 
-export type { Tinvoice_type, Ttax_type, Treview_status, Treview_status__stages };
+export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
 
 // ==============================================================================
 
@@ -61,7 +62,7 @@ interface TgetReivewById {
   document_uuid: string;
   document_id: string;
   current_stage: `${number}`;
-  document_status: string;
+  document_status: Tdocument_status;
   document_title: string;
   document_type: string;
   prestage_review: string;
