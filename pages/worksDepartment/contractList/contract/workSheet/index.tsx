@@ -82,7 +82,7 @@ import {
 
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
-import { apiAddReview } from 'js/api/api_netCore/api_review';
+import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 // hook
 import {
@@ -271,7 +271,7 @@ export default function Worksheet({
     update: update_activeRecord,
     isLoading: isLoading_activeRecord,
     clear: clear_activeRecord,
-  } = useApiGetWorksheetRecord_id(activeRecordId);
+  } = useApiGetWorksheetRecord_id(activeRecordId, { addition_reviewArr: true });
 
   const {
     // reviewSalesEmployeeId = null,
@@ -362,6 +362,21 @@ export default function Worksheet({
   };
 
   const reqPatchWorkSheet = async () => {
+    const isReviewed = (() => {
+      let isReviewed = false;
+
+      const reviewArr = activeRecordData!.addition?.reviewArr;
+
+      if (!reviewArr) {
+        return isReviewed;
+      }
+
+      const latestReview = reviewArr[reviewArr.length - 1];
+      isReviewed = latestReview?.stages.some((stage) => stage.review_status === '核准');
+
+      return isReviewed;
+    })();
+
     const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
 
     if (contractProductItems) {
@@ -372,6 +387,11 @@ export default function Worksheet({
       try {
         setIsLoading(true);
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
+
+        if (isReviewed) {
+          await apiGetReviewBack(activeRecordData!.id, { showSuccess: false });
+        }
+
         await refreshData();
         setDisabled(true);
         ref_main.current.scrollIntoView();
@@ -855,6 +875,8 @@ export default function Worksheet({
   const panelList = disabled ? panelList_notAllow : panelList_allow;
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_all={isLoading}>

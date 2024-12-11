@@ -57,8 +57,11 @@ const apiGetReviewById = (document_uuid: string) => {
   };
 
   return axi2
-    .get<TgetReviewById[]>(api, { params })
-    .then(({ data }) => data)
+    .get<TgetReviewById[] | undefined>(api, { params })
+    .then(({ data }) => {
+      // 沒有資料時會收到空字串
+      return data || undefined;
+    })
     .catch((err: AxiosError) => {
       return Promise.reject(err);
     });
@@ -83,7 +86,16 @@ const apiAddReview = (body: TaddReview) => {
 };
 
 // 抽單
-const apiGetReviewBack = (document_uuid: string) => {
+const apiGetReviewBack = (
+  document_uuid: string,
+  {
+    showSuccess = true,
+    showErr = true,
+  }: {
+    showSuccess?: boolean;
+    showErr?: boolean;
+  } = {}
+) => {
   const api = '/Review/GetReviewBack';
 
   const body = {
@@ -93,10 +105,10 @@ const apiGetReviewBack = (document_uuid: string) => {
   return axi2
     .post(api, body)
     .then(() => {
-      myAlert.success({ title: '抽單完成' });
+      showSuccess && myAlert.success({ title: '抽單完成' });
     })
     .catch((err) => {
-      myAlert.err({ title: '抽單失敗', content: err.message });
+      showErr && myAlert.err({ title: '抽單失敗', content: err.message });
     });
 };
 
@@ -240,6 +252,7 @@ const useGetReviewById = (
 
   return {
     raw,
+    latestRaw: raw?.[0],
     setRaw,
     update,
     isFetching,

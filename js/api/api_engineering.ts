@@ -1022,9 +1022,12 @@ const apiGetWorksheetRecord_id = async (id: string, params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
+export const useApiGetWorksheetRecord_id = (
+  recordId: string | undefined,
+  { addition_reviewArr = false }: { addition_reviewArr?: boolean } = {}
+) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [res, setRes] = useState<TworksheetRecordDto>();
+  const [res, setRes] = useState<TworksheetRecordDto_addition>();
 
   const update = async () => {
     if (!recordId) {
@@ -1035,7 +1038,22 @@ export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
       setIsLoading(true);
       const res = await apiGetWorksheetRecord_id(recordId);
 
+      if (!res) {
+        setRes(res);
+
+        return res;
+      }
+
+      if (addition_reviewArr) {
+        const reviewArr = await apiGetReviewById(res.id);
+        res.addition = {
+          reviewArr,
+        };
+      }
+
       setRes(res);
+
+      return res;
     } catch (error) {
       const err = error as AxiosError;
 
