@@ -45,7 +45,13 @@ import SalarySettlement from 'pages/accounting/salarySettlement';
 import BonusPayout from 'pages/accounting/bonusPayout';
 import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
 
+// global state
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+
 export default function ReviewList() {
+  // 全域狀態
+  const { update: global_updateReivew } = useGlobal_review();
+
   // 路由參數
   const router = useRouter();
   const { firstin } = router.query;
@@ -162,6 +168,8 @@ export default function ReviewList() {
       }
 
       const data = await response.json();
+
+      global_updateReivew(data || null);
 
       setData(data);
       setSearchdata(data);
