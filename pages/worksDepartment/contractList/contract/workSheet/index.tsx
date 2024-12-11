@@ -76,8 +76,8 @@ import {
   useGetWorksheet_id,
   apiPatchWorkSheetProducts,
   useApiGetWorksheetRecord_id,
-  apiPatchWorksheetRecordSubmit,
-  apiPatchWorksheetRecordReview,
+  // apiPatchWorksheetRecordSubmit,
+  // apiPatchWorksheetRecordReview,
 } from 'js/api/api_engineering';
 
 import { useApiGetProdDoorModels } from 'js/api/api_product';
@@ -230,11 +230,11 @@ export default function Worksheet({
 
   // const [showReviewerSelector, setShowReviewerSelector] = useState(false);
 
-  const [showReviewModal, setShowReviewModal] = useState<boolean>();
+  // const [showReviewModal, setShowReviewModal] = useState<boolean>();
 
   // -------------------------------------------------------------------------
 
-  let isReviewer = false;
+  // let isReviewer = false;
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -275,23 +275,22 @@ export default function Worksheet({
 
   const {
     // reviewSalesEmployeeId = null,
-    reviewSalesEmployee = null,
-    toReviewSales = null,
+    // reviewSalesEmployee = null,
+    // toReviewSales = null,
     // salesReviewAt = null,
-
     // reviewManagerEmployeeId = null,
-    reviewManagerEmployee = null,
-    toReviewManager = null,
+    // reviewManagerEmployee = null,
+    // toReviewManager = null,
     // managerReviewAt = null,
   } = activeRecordData ?? {};
 
-  if (toReviewManager && reviewManagerEmployee?.id === userId) {
-    isReviewer = true;
-  }
+  // if (toReviewManager && reviewManagerEmployee?.id === userId) {
+  //   isReviewer = true;
+  // }
 
-  if (toReviewSales && reviewSalesEmployee?.id === userId) {
-    isReviewer = true;
-  }
+  // if (toReviewSales && reviewSalesEmployee?.id === userId) {
+  //   isReviewer = true;
+  // }
 
   const activedProd = useMemo(() => {
     return finalProduct.find((prod) => prod.id === activedProdId);
@@ -466,17 +465,17 @@ export default function Worksheet({
   // };
 
   // 審核
-  const reqReviewWorksheet = async (isPass: boolean) => {
-    if (!activeRecordId) {
-      return;
-    }
+  // const reqReviewWorksheet = async (isPass: boolean) => {
+  //   if (!activeRecordId) {
+  //     return;
+  //   }
 
-    try {
-      await apiPatchWorksheetRecordReview(activeRecordId, { isPass });
-      await refreshData();
-      setShowReviewModal(false);
-    } catch (error) {}
-  };
+  //   try {
+  //     await apiPatchWorksheetRecordReview(activeRecordId, { isPass });
+  //     await refreshData();
+  //     setShowReviewModal(false);
+  //   } catch (error) {}
+  // };
 
   // -------------------------------------------------------------------------
 
@@ -836,15 +835,15 @@ export default function Worksheet({
     });
   }
 
-  if (isLastestRecord && isReviewer) {
-    panelList_notAllow.splice(-1, 0, {
-      type: 'myButton',
-      label: '審核',
-      onClick: () => {
-        setShowReviewModal(true);
-      },
-    });
-  }
+  // if (isLastestRecord && isReviewer) {
+  //   panelList_notAllow.splice(-1, 0, {
+  //     type: 'myButton',
+  //     label: '審核',
+  //     onClick: () => {
+  //       setShowReviewModal(true);
+  //     },
+  //   });
+  // }
 
   if (isLastestRecord) {
     panelList_notAllow.splice(-1, 0, {
@@ -954,7 +953,7 @@ export default function Worksheet({
         onCancel={() => setShowReviewerSelector(false)}
       /> */}
 
-      <MultButtonModal
+      {/* <MultButtonModal
         visible={!!showReviewModal}
         text={'是否通過審核?'}
         onCancel={() => setShowReviewModal(undefined)}
@@ -974,7 +973,7 @@ export default function Worksheet({
             onClick: () => setShowReviewModal(undefined),
           },
         ]}
-      />
+      /> */}
     </SubLayer>
   );
 }
