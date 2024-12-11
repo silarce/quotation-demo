@@ -765,56 +765,64 @@ div.panelHeader15 {
 }
 
 .shortsquarebtn {
-  height: 43.16px;
-  width: 78px;
-  // padding: 0px 40px;
-  border: solid 1px #c1c1c1;
-  background-color: $bgc01;
-  padding: 10px 22px;
-  // padding-top: 4px;
-  // padding-bottom: 4px;
-  font-weight: 500;
-  font-size: 16px;
-  color: #14256a;
-  transform: translateY(0px);
+    display: inline-flex; // 確保內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 避免過短導致內容擠壓
+    padding: 0 12px; // 適量的左右間距
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 包括 padding 在內計算寬高
+    transform: translateY(0px);
 
-  &:hover {
-      border: solid 1px #c1c1c1;
-      background-color: #c1c1c17c
-  }
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c;
+    }
 
-  &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1;
-  }
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
 }
 
-
+  
+  
 .shortredsquarebtn {
-  height: 43.16px;
-  width: 78px;
-  // padding: 0px 40px;
-  border: solid 1px #ea1833;
-  background-color: $bgc01;
-  padding: 10px 22px;
-  // padding-top: 4px;
-  // padding-bottom: 4px;
-  font-weight: 500;
-  font-size: 16px;
-  color: #ea1833;
-  ;
-  transform: translateY(0px);
+    display: inline-flex; // 使內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 使用 min-width 以適應不同文字長度
+    padding: 0 12px; // 控制左右間距
+    border: solid 1px #ea1833;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ea1833;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 確保寬高包括 padding
+    transform: translateY(0px);
 
-  &:hover {
-      border: solid 1px #ea1833;
-      background-color: #ea18341d
-  }
+    &:hover {
+        border: solid 1px #ea1833;
+        background-color: #ea18341d;
+    }
 
-  &:focus {
-      background-color: $bgc01;
-      border: solid 1px #ea1833;
-  }
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #ea1833;
+    }
 }
+
+  
 
 .body_foot2 {
     margin-top: 10px;
