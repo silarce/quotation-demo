@@ -64,6 +64,7 @@ export default function bonusMaintenance() {
     const [originalleavedata, setOriginalLeavedata] = useState<any[]>([]);
     const [originaldata, setOriginalData] = useState<any[]>([]);
     const [employeedata, setEmployeedata] = useState<any[]>([]);
+    const [employeedata2, setEmployeedata2] = useState<any[]>([]);
 
     //普通變數
     const [currentemp, setCurrentEmp] = useState<string>("");
@@ -117,6 +118,7 @@ export default function bonusMaintenance() {
             // GetPayrollByDate("編輯中' or status = '審核中' or status = '已核准");
             GetSalaryBonus();
             GetReviewFlow();
+            GetEmployee2('NoneSeniorityBased', '');
             // GetEmployee();
             hasFetchedData.current = true;
         }
@@ -245,7 +247,9 @@ export default function bonusMaintenance() {
                 bonus: item.bonus,
                 month: item.month,
                 note: item.note,
-                employee_id: employeeIds
+                employee_id: employeeIds,
+                is_regular: item.is_regular,
+                department: item.department
             };
 
             var inputModel = {
@@ -333,6 +337,54 @@ export default function bonusMaintenance() {
             setIsLoading(false);
         }
     }
+
+
+    const GetEmployee2 = async (type: any, seniority_seniority_senior: any) => {
+        try {
+            setIsLoading(true);
+            // console.log(type);
+            // console.log(seniority_seniority_senior);
+            // return;
+
+            const conditionModel = {
+                // 在這裡可以填入查詢條件
+                seniority: type === 'SeniorityBased' ? seniority_seniority_senior : 0,
+                seniority_senior: type === 'SeniorityBased' ? seniority_seniority_senior + 1 : 1000
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'SalaryService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/Salary/GetEmployeeWithSeniority?${queryParams}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            let responsedata = await response.json();
+
+            // 根據 `employee[0].id_number` 進行排序
+            responsedata = responsedata.sort((a: any, b: any) => {
+                const aId = a.id_number ? a.id_number || '' : '';
+                return aId.localeCompare(aId);
+            });
+
+            console.log(responsedata); // 檢查排序後的資料
+            setEmployeedata2(responsedata);
+
+
+        } catch (error: any) {
+            console.log(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     // const SettlePayroll = async () => {
     //     myAlert.confirm({
     //         title: '確定要結算薪資嗎?',
@@ -393,7 +445,9 @@ export default function bonusMaintenance() {
                 bonus: 0,
                 month: '',
                 note: '',
-                employee_id: '[]'
+                employee_id: '[]',
+                is_regular: true,
+                department: '全部'
             };
 
             var inputModel = {
@@ -1026,6 +1080,27 @@ export default function bonusMaintenance() {
         setSelectedItemId(itemId);
     };
 
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // 點擊空白處關閉下拉清單
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node) // 如果點擊目標不在下拉清單內
+            ) {
+                const dropdown = dropdownRef.current.querySelector('.dropdown-menu') as HTMLElement;
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
@@ -1125,15 +1200,17 @@ export default function bonusMaintenance() {
                 <div className={scss.thead1}>
                     <span
                         style={{
-                            width: '400px',
+                            width: '600px',
                             backgroundColor: '#f5f5f5'
                         }}>
                         <button onClick={() => { handleAdd() }}>
-                            <img src={icon_cir_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
+                            <img src={icon_add.src} alt="add" style={{ height: '25px', width: '25px' }} />
                         </button>
                     </span>
                     <span>類別</span>
                     <span>項目</span>
+                    <span>性質</span>
+                    <span>部門</span>
                     <span>年資</span>
                     <span>獎金</span>
                     <span>發放月份</span>
@@ -1162,7 +1239,7 @@ export default function bonusMaintenance() {
                                     >
                                         <span
                                             style={{
-                                                width: '400px',
+                                                width: '600px',
                                                 backgroundColor: 'white'
                                             }}>
                                             {/* <button onClick={() => { handleRemove(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
@@ -1178,6 +1255,7 @@ export default function bonusMaintenance() {
                                                 <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                         </span>
+
                                         <span>
                                             <input
                                                 ref={categoryRefs.current[index]}
@@ -1221,6 +1299,66 @@ export default function bonusMaintenance() {
                                                     setData(newData);
                                                 }}
                                             />
+                                        </span>
+                                        <span>
+                                            <select
+                                                disabled={!(editlist && editlistindex === index)}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderRadius: '4px',
+                                                    width: '100%',
+                                                    cursor: 'pointer',
+                                                    outline: 'none',
+                                                    boxShadow: 'none',
+                                                }}
+                                                value={_item.is_regular !== undefined ? (_item.is_regular === true ? 'true' : 'false') : ''} // 確保正確處理 false 值
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newIsRegular = e.target.value === 'true'; // 將選擇的值轉換為布林值
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        is_regular: editlist ? newIsRegular : newIsRegular,
+                                                    };
+                                                    setData(newData); // 更新數據
+                                                }}
+                                            >
+                                                <option value="" disabled>選擇類型</option> {/* 預設選項，無法選中 */}
+                                                <option value="true">固定</option>
+                                                <option value="false">非固定</option>
+                                            </select>
+                                        </span>
+                                        <span>
+                                            <select
+                                                disabled={!(editlist && editlistindex === index)}
+                                                style={{
+                                                    backgroundColor: 'transparent',
+                                                    borderRadius: '4px',
+                                                    width: '100%',
+                                                    cursor: 'pointer',
+                                                    outline: 'none',
+                                                    boxShadow: 'none',
+                                                }}
+                                                // value={selectedDepartment}
+                                                value={_item.department} // 確保正確處理 false 值
+                                                onChange={(e) => {
+                                                    const newData = [...data];
+                                                    const newDepartment = e.target.value; // 將選擇的值轉換為布林值
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        department: editlist ? newDepartment : newDepartment,
+                                                    };
+                                                    setData(newData); // 更新數據
+                                                }}
+                                            >
+                                                <option value="全部">全部</option>
+                                                {Array.from(new Set(employeedata2.map(item => item.department_name)))
+                                                    .filter(Boolean) // 避免空值
+                                                    .map((dept, index) => (
+                                                        <option key={index} value={dept}>
+                                                            {dept}
+                                                        </option>
+                                                    ))}
+                                            </select>
                                         </span>
                                         <span>
                                             <input
@@ -1294,81 +1432,79 @@ export default function bonusMaintenance() {
                                                                     }}
                                                                     /> */}
                                         {editlist && editlistindex === index ? (
-                                            <span >
+                                            <div
+                                                ref={dropdownRef} // 綁定下拉清單容器
+                                                style={{
+                                                    position: 'relative',
+                                                    width: '250px',
+                                                    borderBottom: '1px solid gray',
+                                                    cursor: 'pointer',
+                                                    fontSize: '16px'
+                                                }}
+                                            >
+                                                {/* 點擊顯示下拉清單 */}
                                                 <div
                                                     style={{
-                                                        position: 'relative',
-                                                        width: '250px',
-                                                        borderBottom: '1px solid gray',
-                                                        // backgroundColor: 'white',
-                                                        cursor: 'pointer',
+                                                        backgroundColor: 'transparent',
+                                                    }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // 防止事件冒泡
+                                                        const dropdown = e.currentTarget.nextElementSibling as HTMLElement; // 類型斷言
+                                                        if (dropdown) {
+                                                            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+                                                        }
                                                     }}
                                                 >
-                                                    {/* 點擊顯示下拉清單 */}
-                                                    <div
-                                                        style={{
-                                                            backgroundColor: 'transparent',
-                                                        }}
-                                                        onClick={(e) => {
-                                                            e.stopPropagation(); // 防止事件冒泡
-                                                            const dropdown = e.currentTarget.nextElementSibling as HTMLElement; // 類型斷言
-                                                            if (dropdown) {
-                                                                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                                                            }
-                                                        }}
-                                                    >
-                                                        {_item.month || '未選擇月份'} {/* 如果月份為空顯示提示文字 */}
-                                                    </div>
-
-                                                    {/* 下拉清單 */}
-                                                    <div
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '100%',
-                                                            left: 0,
-                                                            width: '100%',
-                                                            // borderBottom: '1px solid gray',
-                                                            // backgroundColor: 'white',
-                                                            display: 'none',
-                                                            zIndex: 9999, // 提升 z-index
-                                                            maxHeight: '200px',
-                                                            overflowY: 'auto',
-                                                            border: '1px solid gray'
-                                                        }}
-                                                    >
-                                                        {Array.from({ length: 12 }, (_, i) => {
-                                                            const monthValue = (i + 1).toString();
-                                                            const isSelected = (_item.month || '').split(',').includes(monthValue);
-                                                            return (
-                                                                <div
-                                                                    key={monthValue}
-                                                                    style={{
-                                                                        backgroundColor: isSelected ? '#3363ff' : 'white',
-                                                                        color: isSelected ? 'white' : 'inherit',
-                                                                        cursor: 'pointer',
-
-                                                                    }}
-                                                                    onClick={() => {
-                                                                        const currentMonths = (_item.month || '').split(',').filter((m: any) => m); // 避免空值
-                                                                        const newMonths = isSelected
-                                                                            ? currentMonths.filter((m: any) => m !== monthValue) // 移除選項
-                                                                            : [...currentMonths, monthValue]; // 新增選項
-                                                                        const sortedMonths = newMonths.sort((a: any, b: any) => Number(a) - Number(b)); // 重新排列
-                                                                        const newData = [...data];
-                                                                        newData[index] = {
-                                                                            ...newData[index],
-                                                                            month: sortedMonths.join(','), // 更新為排序後的字串
-                                                                        };
-                                                                        setData(newData); // 更新 state
-                                                                    }}
-                                                                >
-                                                                    {monthValue} 月
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
+                                                    {_item.month || '未選擇月份'} {/* 如果月份為空顯示提示文字 */}
                                                 </div>
-                                            </span>
+
+                                                {/* 下拉清單 */}
+                                                <div
+                                                    className="dropdown-menu" // 加上 class 以便選取
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        width: '100%',
+                                                        display: 'none',
+                                                        zIndex: 9999,
+                                                        maxHeight: '200px',
+                                                        overflowY: 'auto',
+                                                        border: '1px solid gray',
+                                                        fontSize: '16px'
+                                                    }}
+                                                >
+                                                    {Array.from({ length: 12 }, (_, i) => {
+                                                        const monthValue = (i + 1).toString();
+                                                        const isSelected = (_item.month || '').split(',').includes(monthValue);
+                                                        return (
+                                                            <div
+                                                                key={monthValue}
+                                                                style={{
+                                                                    backgroundColor: isSelected ? '#3363ff' : 'white',
+                                                                    color: isSelected ? 'white' : 'inherit',
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                                onClick={() => {
+                                                                    const currentMonths = (_item.month || '').split(',').filter((m: any) => m); // 避免空值
+                                                                    const newMonths = isSelected
+                                                                        ? currentMonths.filter((m: any) => m !== monthValue) // 移除選項
+                                                                        : [...currentMonths, monthValue]; // 新增選項
+                                                                    const sortedMonths = newMonths.sort((a: any, b: any) => Number(a) - Number(b)); // 重新排列
+                                                                    const newData = [...data];
+                                                                    newData[index] = {
+                                                                        ...newData[index],
+                                                                        month: sortedMonths.join(','), // 更新為排序後的字串
+                                                                    };
+                                                                    setData(newData); // 更新 state
+                                                                }}
+                                                            >
+                                                                {monthValue} 月
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
                                         ) : (
                                             <span>{_item.month || '未選擇月份'}</span> // 顯示非編輯模式的月份字串或提示文字
                                         )}
@@ -1467,7 +1603,7 @@ export default function bonusMaintenance() {
                     <>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
                             {/* 全部清除按鈕，固定在左邊 */}
-                            {bonuspeople.length}
+                            {/* {bonuspeople.length} */}
                             <button
                                 onClick={() => {
                                     myAlert.confirm({
@@ -1494,10 +1630,8 @@ export default function bonusMaintenance() {
                             >
                                 全部清除
                             </button>
-
-                            {/* 搜尋框和下拉選單，固定在左邊和右邊 */}
+                            {/*                             
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
-                                {/* 新增下拉選單（移到左邊） */}
                                 <select
                                     style={{
                                         padding: "6px 12px",
@@ -1512,15 +1646,13 @@ export default function bonusMaintenance() {
                                 >
                                     <option value="">全部部門</option>
                                     {Array.from(new Set(employeedata.map(item => item.department_name)))
-                                        .filter(Boolean) // 避免空值
+                                        .filter(Boolean)
                                         .map((dept, index) => (
                                             <option key={index} value={dept}>
                                                 {dept}
                                             </option>
                                         ))}
                                 </select>
-
-                                {/* 搜尋框 */}
                                 <div
                                     style={{
                                         display: "inline-flex",
@@ -1549,7 +1681,7 @@ export default function bonusMaintenance() {
                                         />
                                     </span>
                                 </div>
-                            </div>
+                            </div> */}
 
                         </div>
 
@@ -1683,7 +1815,78 @@ export default function bonusMaintenance() {
                                 </CellWithBar>
                             ))}
                         </span>
-                        <label style={{ display: "flex", alignItems: "center", padding: ' 10px 30px', fontSize: '16px', borderTop: '5px solid #ccc' }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", borderTop: '5px solid #ccc' }}>
+                            {/* 搜尋框和下拉選單，固定在左邊和右邊 */}
+                            <div
+                                style={{
+                                    padding: "6px 12px",
+                                    fontSize: "14px",
+                                    backgroundColor: "#ea1833",
+                                    color: "#fff",
+                                    border: "none",
+                                    borderRadius: "4px",
+                                    cursor: "pointer",
+                                    visibility: `${editbtn === true ? 'hidden' : 'hidden'}`, // 隱藏但保留空間
+                                }}
+                            >
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
+                                {/* 新增下拉選單（移到左邊） */}
+                                <select
+                                    style={{
+                                        padding: "6px 12px",
+                                        fontSize: "16px",
+                                        // borderBottom: "1px solid #c1c1c1",
+                                        cursor: "pointer",
+                                        color: "#14256a",
+                                        outline: "none",
+                                    }}
+                                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                                    value={selectedDepartment}
+                                >
+                                    <option value="">全部部門</option>
+                                    {Array.from(new Set(employeedata.map(item => item.department_name)))
+                                        .filter(Boolean) // 避免空值
+                                        .map((dept, index) => (
+                                            <option key={index} value={dept}>
+                                                {dept}
+                                            </option>
+                                        ))}
+                                </select>
+
+                                {/* 搜尋框 */}
+                                <div
+                                    style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        // borderBottom: "1px solid #c1c1c1",
+                                    }}
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="搜尋關鍵字"
+                                        value={searchText}
+                                        style={{
+                                            padding: "4px 5px",
+                                            width: "350px",
+                                            fontSize: "16px",
+                                            border: "none",
+                                            outline: "none",
+                                        }}
+                                        onChange={(e) => setSearchText(e.target.value)}
+                                    />
+                                    <span style={{ padding: "4px 12px" }}>
+                                        <img
+                                            src={icon_search2.src}
+                                            alt="search"
+                                            style={{ height: "20px", width: "20px" }}
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <label style={{ display: "flex", alignItems: "center", padding: ' 10px 30px', fontSize: '16px', borderTop: '1px solid #ccc' }}>
                             <input
                                 type="checkbox"
                                 checked={allChecked}
