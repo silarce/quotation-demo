@@ -390,20 +390,7 @@ export default function Worksheet({
   };
 
   const reqPatchWorkSheet = async () => {
-    const isReviewed = (() => {
-      let isReviewed = false;
-
-      const reviewArr = activeRecordData!.addition?.reviewArr;
-
-      if (!reviewArr) {
-        return isReviewed;
-      }
-
-      const latestReview = reviewArr[reviewArr.length - 1];
-      isReviewed = latestReview?.stages.some((stage) => stage.review_status === '核准');
-
-      return isReviewed;
-    })();
+    const document_status = activeRecordData!.addition?.reviewArr?.[0].document_status;
 
     const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
 
@@ -416,7 +403,7 @@ export default function Worksheet({
         setIsLoading(true);
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
 
-        if (isReviewed) {
+        if (document_status === '審核中' || document_status === '駁回') {
           await apiGetReviewBack(activeRecordData!.id, { showSuccess: false });
         }
 
