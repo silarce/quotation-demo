@@ -12,7 +12,7 @@ interface Tglobal_review {
   userId: string | undefined;
   reviewArr: TgetReview[] | undefined | null;
   reviewQty: number;
-  update: () => Promise<void>;
+  update: (newGetReview?: TgetReview[] | null) => Promise<void>;
   editUserId: (userId: string | undefined) => void;
 }
 
@@ -20,10 +20,18 @@ interface Tglobal_review {
 
 const useGlobal_review = create<Tglobal_review>()(
   immer((set, get) => {
-    const update = async () => {
+    //
+    const update = async (newGetReview?: TgetReview[] | null) => {
       const userId = get().userId;
 
-      console.log(userId);
+      if (newGetReview) {
+        set((state) => {
+          state.reviewArr = newGetReview;
+          state.reviewQty = newGetReview.length;
+        });
+
+        return;
+      }
 
       if (!userId) {
         set((state) => {
