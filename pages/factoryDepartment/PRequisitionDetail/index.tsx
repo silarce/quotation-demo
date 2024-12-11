@@ -1925,7 +1925,15 @@ export default function PRequisitionDetail() {
                                                     value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
                                                     readOnly={!isEditing}
                                                     onChange={(e) => {
-                                                        handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
+                                                        // handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
+                                                        const newData = [...data2];
+                                                        const newUnitprice = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            unitprice: isEditing ? newUnitprice : parseFloat(newUnitprice.replace(/,/g, ''))
+
+                                                        };
+                                                        setData2(newData);
                                                     }}
                                                 />
                                             </span>
