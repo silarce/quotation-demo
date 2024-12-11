@@ -92,6 +92,9 @@ export default function FlowList() {
 
     const [itemQuery, setItemQuery] = useState<any>({});
 
+    const stage_user_titleRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+
+    const [currentindex, setCurrentIndex] = useState<number>(0);
 
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
@@ -395,6 +398,27 @@ export default function FlowList() {
         setNewUserTitle("");
     };
 
+    const handleAddToData3 = () => {
+        // if (newUserName === "" && newUserTitle === "") {
+        //     myAlert.warning({ title: '職稱、姓名不可為空' });
+        //     return;
+        // }
+        console.log(data2);
+        const newStage = {
+            stage_order: items.length + 1,
+            review_type: newReviewType,
+            stage_user_uuid: newUserId,
+            stage_user_name: newUserName,
+            stage_user_title: newUserTitle, // 根據需求這裡可以變更
+        };
+
+        const updatedItems = [...items, newStage];
+        setItems(updatedItems);
+        setData2(updatedItems);
+        setNewUserName("");
+        setNewUserTitle("");
+    };
+
     const handleRemoveFromData2 = (indexToRemove: number) => {
         const updatedItems = items.filter((_, index) => index !== indexToRemove);
 
@@ -561,14 +585,21 @@ export default function FlowList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
 
-            setItems([]);
-            setFlowname("");
-            GetFlow();
-            setStatus("");
+            const result = await response.json();
 
-
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: result.message });
+                setItems([]);
+                setFlowname("");
+                GetFlow();
+                setStatus("");
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
 
         } catch (error: any) {
             // setError(error.message);
@@ -581,7 +612,7 @@ export default function FlowList() {
 
     const handleRemoveFlow = async (item: any) => {
         myAlert.confirm({
-            title: '確定刪除這筆流程嗎?',
+            title: '確定移除?',
             props: {
                 onOk: async () => {
                     try {
@@ -634,18 +665,94 @@ export default function FlowList() {
 
     }
 
+    const handleStringChange = (index: number, key: string, value: string) => {
+        const updatedItems = [...items];
+        updatedItems[index] = { ...updatedItems[index], [key]: value };
+        setItems(updatedItems);
+
+        if (key === "stage_user_title" || key === "stage_user_name") {
+            const filters = {
+                stage_user_title: updatedItems[index].stage_user_title?.trim() || "",
+                stage_user_name: updatedItems[index].stage_user_name?.trim() || ""
+            };
+
+            if (filters.stage_user_title || filters.stage_user_name) {
+                const matchedEmployees = employeedata.filter(emp =>
+                    (!filters.stage_user_title || (emp.title && emp.title.includes(filters.stage_user_title))) &&
+                    (!filters.stage_user_name || (emp.ch_name && emp.ch_name.includes(filters.stage_user_name)))
+                );
+
+                setEmployeeFilteredData(matchedEmployees);
+                setShowEmpSuggestions(true);
+            } else {
+                setShowEmpSuggestions(false);
+            }
+
+        }
+    };
+
+
+    const handleNewUserNameClick = (emp: any) => {
+        const updatedItems = [...items];
+        updatedItems[currentindex] = {
+            ...updatedItems[currentindex],
+            stage_user_name: emp.ch_name,
+            stage_user_title: emp.title,
+            stage_user_uuid: emp.id,
+        };
+        setItems(updatedItems);
+
+        // 更新 data2 確保一致性
+        setData2(updatedItems);
+
+        // 清除建議列表
+        setEmployeeFilteredData([]);
+        setShowEmpSuggestions(false);
+    };
+
+
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={'自訂審核'} panelList={panelList} />
+            <PageHeader02 tag={'自訂審核'} panelList={panelList}
+                customeLeft={[
+                    <>
+                        {/* {status} */}
+                    </>
+                ]}
+                customeRight={[
+                    <>
+                        <button
+                            className={scss.shortsquarebtn}
+                            onClick={status !== '未儲存' ? () => handleAddflow() : undefined}
+                            title="新增流程"
+                            style={{ display: `${status === '' ? '' : 'none'}` }}
+                        >
+                            新增
+                        </button>
+                        <button
+                            className={scss.shortredsquarebtn}
+                            onClick={() => { handleSaveFlow() }}
+                            title="儲存流程"
+                            style={{ display: `${status === '' ? 'none' : ''}` }}
+                        >
+                            儲存
+                        </button>
+                        <button
+                            className={scss.shortsquarebtn}
+                            onClick={() => { handleCanceladdflow() }}
+                            title="取消新增"
+                            style={{ display: `${status === '' ? 'none' : ''}` }}
+                        >
+                            取消
+                        </button>
+                    </>
+                ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
-                    <div className={scss.content}>
-
-                    </div>
-                </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        <div className={scss.head_head1}>
+                        {/* <div className={scss.head_head1}>
                             <div>
                                 <button
                                     className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn}
@@ -691,42 +798,50 @@ export default function FlowList() {
                             <div></div>
                             <div></div>
                             <div></div>
-                        </div>
+                        </div> */}
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.head_content1} style={{ fontSize: '16px' }}>
-                                    <div>
-                                        {/* 流程順序：新增流程{">"}輸入流程名稱{">"}新增流程關卡<br />
-                                        (1).可輸入職稱或人名帶入<br />
-                                        (2).流程第一關請選"提出"，中間關卡請選審查，最後一關請選核准<br />
-                                        (2).流程若有異動，請刪除原流程後重新新增<br /> */}
-                                    </div>
+                                    <div></div>
                                     <div></div>
                                     <div></div>
                                 </div>
                             </div>
                             <div>
-                                <div>
-                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="自訂數量"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { color: 'red' },
-                                                    value: `${data.length}`,
-                                                },
-                                            }}
-                                        />
-                                    </div>
-
-                                </div>
+                                <div></div>
                             </div>
                         </div>
-
-                        <div className={scss.body_content1}>
-
+                        <div
+                            style={{ paddingBottom: '18px' }}
+                        >
+                            <span
+                                style={{
+                                    height: '50px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    justifyContent: 'center', // 水平置中
+                                    alignItems: 'center',     // 垂直置中
+                                    fontSize: '18px'
+                                }}
+                            >
+                                流程清單
+                            </span>
+                        </div>
+                        <div className={scss.head_content1}>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="流程數量"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        type: "number",
+                                        // style: { color: 'red' },
+                                        value: data.length,
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div className={scss.body_content1} style={{ overflowX: 'auto', border: '1px solid rgb(168, 168, 168)' }}>
                             <Thead01 type={'FlowList'} />
                             <span>
                                 {data && (
@@ -747,12 +862,12 @@ export default function FlowList() {
                                                 <span>
                                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                         {_item.stages.map((_stage: any, stageIndex: number) => (
-                                                            <div key={_stage.stage_order} style={{ display: 'inline-block', width: '139px' }}>
+                                                            <div key={_stage.stage_order} style={{ display: 'inline-block', width: '150px' }}>
                                                                 {/* 如果是第一筆則不顯示箭頭 */}
                                                                 {stageIndex !== 0 && (
                                                                     <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
                                                                 )}
-                                                                <span style={{ padding: '0px 0px', backgroundColor: '#1061c4', color: 'white' }}>
+                                                                <span style={{ padding: '3px 9px', backgroundColor: '#1061c4', color: 'white',borderRadius:'6px' }}>
                                                                     {_stage.review_type}
                                                                 </span>
                                                                 <span>
@@ -768,220 +883,240 @@ export default function FlowList() {
                                     ))
                                 )}
                             </span>
-
-                        </div>
-                        <div className={scss.head_body}>
-                            <div>
-                                <div className={scss.foot_head1}>
-                                    <div>
-                                        <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>自訂流程</span>
-                                    </div>
-                                    <div></div>
-                                    <div></div>
-                                </div>
-                                <div className={scss.foot_head2}>
-                                    <div>
-
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="名稱"
-                                            className="global_tip_must"
-                                            disabled={status != "" ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    value: flowname || ' ',
-                                                    onChange: (e) => { setFlowname(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="建立日期"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="流程狀態"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: status || ' ',
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="關卡數"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: items.length,
-                                            },
-                                        }}
-                                    />
-                                </div>
-                            </div>
+                            {/* <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                                <button onClick={() => { handleAddflow() }} style={{ fontSize: '18px' }}>
+                                    <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                                    新增流程
+                                </button>
+                            </span> */}
                         </div>
 
-
-                        <div className={scss.foot_content1}>
-                            <Thead01 type={'FlowDetailList'} />
-                            <span>
-                                {items && items.slice(0, 100).map((_item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader22}>
-                                        <div
-                                            key={index}
-                                            className={`${scss.row01}`}
-                                            draggable="true"
-                                            onDragStart={(event) => handleDragStart(event, index)}
-                                            onDragEnter={(event) => handleDragEnter(event, index)}
-                                            onDragOver={handleDragOver}
-                                            onDrop={handleDrop}
-                                        >
-                                            <span>
-                                                {/* <button onClick={() => handleRemoveFromData2(index)}>移除</button> */}
-                                                <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} onClick={() => handleRemoveFromData2(index)} />
-                                            </span>
-                                            <span>{index + 1}</span>
-                                            <span>
-                                                <select
-                                                    value={_item.review_type}
-                                                    onChange={(e) => handleSelectChange(e, index)} // 新增事件處理函數
-                                                    style={{ fontSize: '18px', backgroundColor: 'transparent' }}
-                                                >
-                                                    <option value="提出">提出</option>
-                                                    <option value="審查">審查</option>
-                                                    <option value="核准">核准</option>
-                                                </select>
-
-                                            </span>
-                                            <span>{_item.stage_user_title}</span>
-                                            <span>{_item.stage_user_name}</span>
-                                            {/* <span>{_item.stage_user_title}</span> */}
-
-                                        </div>
-                                    </CellWithBar>
-                                ))}
+                        <div
+                            style={{ paddingTop: '18px', paddingBottom: '18px' }}
+                        >
+                            <span
+                                style={{
+                                    height: '50px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    justifyContent: 'center', // 水平置中
+                                    alignItems: 'center',     // 垂直置中
+                                    fontSize: '18px'
+                                }}
+                            >
+                                新增流程
                             </span>
-                            <div style={{ display: `${status !== "" ? '' : 'none'}` }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '0px 20px', fontSize: '18px', borderBottom: '1px solid #ccc', borderTop: '1px solid #ccc' }}>
-                                    <div style={{ width: '60px' }}>
-                                        {/* <button onClick={() => { handleClearNewUserName() }} style={{ display: `${newUserName || newUserTitle ? '' : 'none'}` }}>
-                                            <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
+                        </div>
 
-                                        <button>
-                                            <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
-                                        </button>
+                        <div style={{ display: `${status != "" ? '' : 'none'}` }}>
 
+                            <div className={scss.head_body}>
+                                <div>
+                                    <div className={scss.foot_head1}>
+                                        <div>
+                                            {/* <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>自訂流程</span> */}
+                                        </div>
+                                        <div></div>
+                                        <div></div>
                                     </div>
-                                    <div style={{ width: '60px' }}>
-                                    </div>
-                                    <div style={{ width: '100px' }}>
-                                        <select
-                                            value={newReviewType}
-                                            onChange={(e) => setNewReviewType(e.target.value)}
-                                            style={{ fontSize: '18px', backgroundColor: 'transparent' }}
-                                        >
-                                            <option value="提出">提出</option>
-                                            <option value="審查">審查</option>
-                                            <option value="核准">核准</option>
-                                        </select>
-                                    </div>
-                                    <div style={{ width: '140px' }}>
-                                        <input
-                                            type="text"
-                                            placeholder="職稱"
-                                            style={{ width: '100%', fontSize: '18px' }}
-                                            value={newUserTitle}
-                                            onChange={handleNewUserTitleChange}
-                                        />
-                                    </div>
-                                    <div style={{ width: '140px' }}>
-                                        <input
-                                            type="text"
-                                            placeholder="姓名"
-                                            style={{ width: '100%', fontSize: '18px' }}
-                                            value={newUserName}
-                                            onChange={handleNewUserNameChange}
-                                        />
-                                    </div>
-                                    <div style={{ width: '30px', padding: '0px 10px' }}>
-                                        {/* <button>
-                                            <img src={icon_fc_add.src} alt="add" style={{ width: '30px', height: '20px' }} onClick={handleAddToData2} />
-                                        </button>
-                                        &nbsp;
-                                        &nbsp;
-                                        &nbsp;
-                                        <button onClick={() => { handleClearNewUserName() }} style={{ display: `${newUserName || newUserTitle ? '' : 'none'}` }}>
-                                            <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
+                                    <div className={scss.foot_head2} style={{ paddingBottom: '18px' }}>
+                                        <div>
+                                        <InputSel
+                                                {...inputSelProps}
+                                                caption="流程名稱"
+                                                className="global_tip_must"
+                                                captionStyle={{ fontSize: '18px' }}
+                                                // wrapperStyle={{ paddingBottom: '10px' }}
+                                                disabled={status != "" ? false : true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: flowname || ' ',
+                                                        onChange: (e) => { setFlowname(e.target.value) }
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div></div>
+                                        <div></div>
                                     </div>
                                 </div>
                                 <div>
-                                    {employeefilteredData.length > 0 && (
-                                        <ul style={{
-                                            border: '1px solid #ccc',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
-                                            marginTop: '0px',
-                                            left: '220px',
-                                            position: 'absolute',
-                                            width: '400px',
-                                            backgroundColor: 'white',
-                                            zIndex: 1004, // 確保下拉清單在最上層,
-                                            display: `${showempSuggestions ? '' : 'none'}`
-                                        }}>
-                                            {employeefilteredData.map(emp => (
-                                                <li
-                                                    key={emp.id}
-                                                    onClick={() => handleNewUserNameclick(emp)}
-                                                    style={{
-                                                        fontSize: '18px',
-                                                        cursor: 'pointer',
-                                                        padding: '8px',
-                                                        border: '1px solid #c1c1c1',
-                                                        display: 'flex', // 使用 flexbox
-                                                        justifyContent: 'space-between', // 在項目之間創建間距
-                                                        alignItems: 'center'// 垂直置中
+                                    {/* <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                    {...inputSelProps}
+                                    caption="流程狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: status || ' ',
+                                            },
+                                            }}
+                                            />
+                                            <InputSel
+                                            {...inputSelProps}
+                                            caption="關卡數"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { color: 'red' },
+                                                    value: items.length,
+                                                    },
                                                     }}
-                                                >
-                                                    <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                                        <span style={{ width: '155px' }}>
-                                                            {emp.title}
-                                                        </span>
-                                                        <span style={{ width: '100px' }}>
-                                                            {emp.ch_name}
-                                                        </span>
-                                                        <span style={{ width: '120px' }}>
-                                                            {emp.department}
-                                                        </span>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
+                                                    />
+                                                    </div> */}
                                 </div>
+                            </div>
+
+                            <div className={scss.head_content1}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="關卡數量"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            type: "number",
+                                            // style: { color: 'red' },
+                                            value: items.length,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div className={scss.foot_content1} style={{ overflowX: 'auto', border: '1px solid rgb(168, 168, 168)' }}>
+
+                                <Thead01 type={'FlowDetailList'} />
+                                <span>
+                                    {items && items.slice(0, 100).map((_item, index) => (
+                                        <CellWithBar key={index} className={scss.panelHeader22}>
+                                            <div
+                                                key={index}
+                                                className={`${scss.row01}`}
+                                                draggable="true"
+                                                onDragStart={(event) => handleDragStart(event, index)}
+                                                onDragEnter={(event) => handleDragEnter(event, index)}
+                                                onDragOver={handleDragOver}
+                                                onDrop={handleDrop}
+                                            >
+                                                <span>
+                                                    {/* <button onClick={() => handleRemoveFromData2(index)}>移除</button> */}
+                                                    <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} onClick={() => handleRemoveFromData2(index)} />
+                                                </span>
+                                                <span>{index + 1}</span>
+                                                <span>
+                                                    <select
+                                                        value={
+                                                            index === 0 // 第一筆
+                                                                ? "提出"
+                                                                : index === items.length - 1 // 最後一筆
+                                                                    ? "核准"
+                                                                    : index > 1 // 不是第一筆或第二筆
+                                                                        ? "審查"
+                                                                        : _item.review_type // 第二筆保留原有值
+                                                        }
+                                                        onChange={(e) => handleSelectChange(e, index)}
+                                                        style={{ fontSize: '18px', backgroundColor: 'transparent' }}
+                                                    >
+                                                        <option value="提出">提出</option>
+                                                        <option value="審查">審查</option>
+                                                        <option value="核准">核准</option>
+                                                    </select>
+                                                </span>
+                                                <span>
+                                                    {/* {_item.stage_user_title} */}
+                                                    <input
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderBottom: (_item.stage_user_title !== '經辦' ? "1px solid black" : ""),
+                                                            width: '95%'
+                                                        }}
+                                                        type="text"
+                                                        readOnly={_item.stage_user_title === '經辦'}
+                                                        value={_item.stage_user_title || ''}
+                                                        onChange={(e) => {
+                                                            handleStringChange(index, "stage_user_title", e.target.value);
+                                                            setCurrentIndex(index);
+                                                        }}
+                                                    />
+
+                                                </span>
+                                                <span>
+                                                    {/* {_item.stage_user_name} */}
+                                                    <input
+                                                        ref={stage_user_titleRefs.current[index]}
+                                                        // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                        style={{ backgroundColor: 'transparent', borderBottom: (_item.stage_user_title !== '經辦' ? "1px solid black" : ""), width: '95%' }}
+                                                        type="text"
+                                                        readOnly={_item.stage_user_title === '經辦' ? true : false}
+                                                        value={_item.stage_user_name !== undefined ? _item.stage_user_name : ''}
+                                                        onChange={(e) => {
+                                                            handleStringChange(index, "stage_user_name", e.target.value);
+                                                            setCurrentIndex(index);
+                                                        }}
+                                                    />
+                                                </span>
+                                                {/* <span>{_item.stage_user_title}</span> */}
+
+                                            </div>
+                                        </CellWithBar>
+                                    ))}
+                                </span>
+                                <span style={{ paddingLeft: '22px', position: 'relative', height: '40px', paddingTop: '5px' }}>
+                                    <button onClick={() => { handleAddToData3() }} style={{ fontSize: '18px' }}>
+                                        <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                                        新增關卡
+                                    </button>
+                                </span>
+
+                            </div>
+                            <div style={{ padding:'0 20px',height: '300px' }}>
+                                {employeefilteredData.length > 0 && (
+                                    <ul style={{
+                                        border: '1px solid #c1c1c1',
+                                        maxHeight: '300px',
+                                        overflowY: 'auto',
+                                        marginTop: '0px',
+                                        left: '20px',
+                                        // position: 'absolute',
+                                        width: '1000px',
+                                        backgroundColor: 'white',
+                                        zIndex: 1004,
+                                        display: `${showempSuggestions ? '' : 'none'}`
+                                    }}>
+                                        {employeefilteredData.map(emp => (
+                                            <li
+                                                key={emp.id}
+                                                onClick={() => handleNewUserNameClick(emp)}
+                                                style={{
+                                                    fontSize: '18px',
+                                                    cursor: 'pointer',
+                                                    padding: '8px',
+                                                    border: '1px solid #c1c1c1',
+                                                    display: 'flex', // 使用 flexbox
+                                                    justifyContent: 'space-between', // 在項目之間創建間距
+                                                    alignItems: 'center'// 垂直置中
+                                                }}
+                                            >
+                                                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                                    <span style={{ width: '155px' }}>
+                                                        {emp.title}
+                                                    </span>
+                                                    <span style={{ width: '100px' }}>
+                                                        {emp.ch_name}
+                                                    </span>
+                                                    <span style={{ width: '120px' }}>
+                                                        {emp.department}
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
 
 
         </SubLayer >

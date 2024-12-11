@@ -272,7 +272,7 @@ export default function WareHouseList() {
     // 組件編輯
     const handleEdit = async (index: any, item: any) => {
         if (editlist === true) {
-            myAlert.warning({ title: '獎金維護中，請先結束編輯狀態' })
+            myAlert.warning({ title: '倉庫維護中，請先結束編輯狀態' })
             return;
         }
         handleRowClick(item.id);
@@ -394,6 +394,8 @@ export default function WareHouseList() {
                         ))
                     )}
                 </div>
+
+
 
             </div>
         </SubLayer>

@@ -40,7 +40,7 @@
     top: 0;
     z-index: 1000; /* 確保元素位於其他內容的上層 */
     display: grid;
-    grid-template-columns:100px repeat(2, 100px) 100px 150px 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+    grid-template-columns:100px repeat(4, 100px) 100px 150px 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
     gap: 5px;
     height: 40px;
     padding: 10px 20px;
@@ -56,7 +56,9 @@
 .thead1 span:nth-child(1),
 .thead1 span:nth-child(2),
 .thead1 span:nth-child(3),
-.thead1 span:nth-child(4) {
+.thead1 span:nth-child(4),
+.thead1 span:nth-child(5),
+.thead1 span:nth-child(6) {
     position: sticky;
     background-color: $bgc01; /* 固定欄位的背景顏色 */
     // z-index: 1001; /* 確保固定欄位在最上層 */
@@ -89,8 +91,22 @@
 .thead1 span:nth-child(4) {
     left: 335px;
     /* 第三欄固定 */
-    background-color: $bgc01;
+    // background-color: $bgc01;
+    // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+}
+.thead1 span:nth-child(5) {
+    left: 440px;
+    /* 第三欄固定 */
+    // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+    // padding:0px;
+    
+}
+.thead1 span:nth-child(6) {
+    left: 545px;
+    /* 第三欄固定 */
     border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+    // padding:0px;
+    
 }
   
 //#endregion
@@ -114,7 +130,7 @@ div.panelHeader1 {
     .row01 {
         padding: 10px 20px;
         display: grid;
-        grid-template-columns: 100px repeat(2, 100px) 100px 150px 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
+        grid-template-columns: 100px repeat(4, 100px) 100px 150px 250px 100px 100px 300px 10px; /* 設定列的寬度，使用 repeat 使得每一列大小一致 */
         gap: 5px;
         // position: relative;  /* 確保 sticky 定位可以參照這個容器 */
         cursor: pointer;
@@ -122,7 +138,7 @@ div.panelHeader1 {
     }
   
     .selectedRow {
-      background-color: #ecf1ff;
+      background-color: #ffeeee;
       /* 當前選擇項目的背景顏色 */
     }
 
@@ -130,7 +146,9 @@ div.panelHeader1 {
     .row01 span:nth-child(1),
     .row01 span:nth-child(2),
     .row01 span:nth-child(3),
-    .row01 span:nth-child(4) {
+    .row01 span:nth-child(4),
+    .row01 span:nth-child(5),
+    .row01 span:nth-child(6) {
         position: sticky;
         background-color: white; /* 固定欄位的背景顏色 */
         // background-color: white; /* 固定欄位的背景顏色 */
@@ -158,6 +176,20 @@ div.panelHeader1 {
     }
     .row01 span:nth-child(4) {
         left: 335px;
+        /* 第三欄固定 */
+        // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+        // padding:0px;
+        
+    }
+    .row01 span:nth-child(5) {
+        left: 440px;
+        /* 第三欄固定 */
+        // border-right: solid 1px #ddd; /* 加邊框區分欄位 */
+        // padding:0px;
+        
+    }
+    .row01 span:nth-child(6) {
+        left: 545px;
         /* 第三欄固定 */
         border-right: solid 1px #ddd; /* 加邊框區分欄位 */
         // padding:0px;
