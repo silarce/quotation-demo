@@ -60,6 +60,8 @@ const apiGetReviewById = (document_uuid: string) => {
     .get<TgetReviewById[] | undefined>(api, { params })
     .then(({ data }) => {
       // 沒有資料時會收到空字串
+      // 如果前後端的流程運作正確的話，TgetReviewById的item只會有一筆資料
+      // 超過一筆或沒有資料都是不正常的
       return data || undefined;
     })
     .catch((err: AxiosError) => {

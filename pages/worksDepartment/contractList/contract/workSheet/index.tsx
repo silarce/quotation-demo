@@ -351,9 +351,37 @@ export default function Worksheet({
       return;
     }
 
+    const theWorksheet = worksheetArr.find((worksheet) => worksheet.id === worksheetId);
+
+    if (!theWorksheet) {
+      myAlert.err({ title: '工作表不存在於worksheetArr' });
+
+      return;
+    }
+
+    const latestRecord = theWorksheet.latestRecord;
+
     try {
       setIsLoading(true);
       await apiDeleteWorksheet(worksheetId);
+
+      await apiGetReviewBack(latestRecord.id, {
+        showSuccess: false,
+      });
+
+      const isActive = activeWorksheetId === worksheetId;
+      const newQuery = { ...query };
+
+      if (isActive) {
+        delete newQuery.activeWorksheetId;
+        delete newQuery.activedProdId;
+        delete newQuery.activeRecordId;
+      }
+
+      router.replace({
+        query: newQuery,
+      });
+
       await refreshData();
     } catch (error) {
     } finally {
