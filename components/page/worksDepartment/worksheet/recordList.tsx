@@ -2,9 +2,10 @@ import classNames from 'classnames';
 import scss from './recordList.module.scss';
 
 // gear
-import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+// import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import { TgetReviewById, ReviewFlow } from 'components/composition/review/reviewFlow';
 
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
@@ -20,13 +21,15 @@ type Trecord = {
   material: string;
   isAntiTyphoon: boolean;
 
-  reviewSalesName: string;
-  reviewSalesStatus: TstatusLabelProps['dotColor'];
+  // reviewSalesName: string;
+  // reviewSalesStatus: TstatusLabelProps['dotColor'];
 
-  reviewManagerName: string;
-  reveiwManagerStatus: TstatusLabelProps['dotColor'];
+  // reviewManagerName: string;
+  // reveiwManagerStatus: TstatusLabelProps['dotColor'];
 
   agent: string;
+
+  reviewFlowData: TgetReviewById[] | undefined;
 
   onDetailClick?: (e: React.MouseEvent) => void;
 };
@@ -84,24 +87,25 @@ export default function RecordList({ control }: { control: Tcontrol }) {
           qty,
           material,
           isAntiTyphoon: isAntyTyphoon,
-          reviewSalesName,
-          reviewSalesStatus,
-          reviewManagerName,
-          reveiwManagerStatus,
+          // reviewSalesName,
+          // reviewSalesStatus,
+          // reviewManagerName,
+          // reveiwManagerStatus,
           agent,
+          reviewFlowData,
           onDetailClick,
         } = record;
 
-        const control_processChain: Tcontrol_processChain['statusArr'] = [
-          {
-            label: `業務 ${reviewSalesName}`,
-            dotColor: reviewSalesStatus,
-          },
-          {
-            label: `總經理 ${reviewManagerName}`,
-            dotColor: reveiwManagerStatus,
-          },
-        ];
+        // const control_processChain: Tcontrol_processChain['statusArr'] = [
+        //   {
+        //     label: `業務 ${reviewSalesName}`,
+        //     dotColor: reviewSalesStatus,
+        //   },
+        //   {
+        //     label: `總經理 ${reviewManagerName}`,
+        //     dotColor: reveiwManagerStatus,
+        //   },
+        // ];
 
         return (
           <CellWithBar key={index} className={scss.group}>
@@ -144,7 +148,8 @@ export default function RecordList({ control }: { control: Tcontrol }) {
                 <IconDetail onClick={onDetailClick} />
               </div>
             </div>
-            <ProcessChain className={scss.processChain} control={{ statusArr: control_processChain }} />
+            <ReviewFlow raw={reviewFlowData} className={scss.reviewFlow} />
+            {/* <ProcessChain className={scss.processChain} control={{ statusArr: control_processChain }} /> */}
           </CellWithBar>
         );
       })}
