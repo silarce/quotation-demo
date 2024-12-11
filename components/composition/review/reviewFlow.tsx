@@ -24,7 +24,7 @@ interface Tprops {
 
 // ======================================================================
 const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
-  const reviewFlow = raw?.[0];
+  const reviewFlow = raw?.[raw.length - 1];
   const haveReviewFlow = !!reviewFlow && reviewFlow.stages.length > 0;
 
   // ----------------------------------------------------------------------
@@ -138,4 +138,5 @@ const useReviewFlow = ({
   };
 };
 
-export { useReviewFlow };
+export type { TgetReviewById };
+export { useReviewFlow, ReviewFlow_pre as ReviewFlow };

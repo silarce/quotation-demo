@@ -11,6 +11,8 @@ import { AxiosError } from 'axios';
 import { createUseInfinite } from './createUseInfinite';
 import moment, { Moment } from 'moment';
 
+import { TgetReviewById, apiGetReviewById } from 'js/api/api_netCore/api_review';
+
 // type
 import type {
   TapiError,
@@ -83,6 +85,16 @@ import type {
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
+
+type TworksheetRecordDto_addition = TworksheetRecordDto & {
+  addition?: {
+    reviewArr?: TgetReviewById[] | undefined;
+  };
+};
+
+type TworksheetDto_addition = TworksheetDto & {
+  records: TworksheetRecordDto_addition[];
+};
 
 export type {
   TapiError,
@@ -871,9 +883,20 @@ const apiGetWorksheet_id = async (id: string, params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetWorksheet_id = (id: string | undefined | null, { params }: { params?: Tparams } = {}) => {
+export const useGetWorksheet_id = (
+  id: string | undefined | null,
+  {
+    //
+    params,
+    recordsWithReview = false,
+  }: {
+    //
+    params?: Tparams;
+    recordsWithReview?: boolean;
+  } = {}
+) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [res, setRes] = useState<TworksheetDto>();
+  const [res, setRes] = useState<TworksheetDto_addition>();
 
   params = {
     populate: [
@@ -897,11 +920,26 @@ export const useGetWorksheet_id = (id: string | undefined | null, { params }: { 
 
     try {
       setIsLoading(true);
-      const res = await apiGetWorksheet_id(id, params);
+      const res_origin = await apiGetWorksheet_id(id, params);
 
-      if (res) {
-        setRes(res);
+      if (!res_origin) {
+        return res_origin;
       }
+
+      const res = res_origin as TworksheetDto_addition;
+
+      if (recordsWithReview) {
+        const records = (res.records ?? []) as TworksheetRecordDto_addition[];
+
+        for (const record of records) {
+          const reviewArr = await apiGetReviewById(record.id);
+          record.addition = {
+            reviewArr,
+          };
+        }
+      }
+
+      setRes(res);
 
       return res;
     } catch (error) {
@@ -984,9 +1022,12 @@ const apiGetWorksheetRecord_id = async (id: string, params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
+export const useApiGetWorksheetRecord_id = (
+  recordId: string | undefined,
+  { addition_reviewArr = false }: { addition_reviewArr?: boolean } = {}
+) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [res, setRes] = useState<TworksheetRecordDto>();
+  const [res, setRes] = useState<TworksheetRecordDto_addition>();
 
   const update = async () => {
     if (!recordId) {
@@ -996,7 +1037,23 @@ export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
     try {
       setIsLoading(true);
       const res = await apiGetWorksheetRecord_id(recordId);
+
+      if (!res) {
+        setRes(res);
+
+        return res;
+      }
+
+      if (addition_reviewArr) {
+        const reviewArr = await apiGetReviewById(res.id);
+        res.addition = {
+          reviewArr,
+        };
+      }
+
       setRes(res);
+
+      return res;
     } catch (error) {
       const err = error as AxiosError;
 
@@ -1014,6 +1071,7 @@ export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
   };
 };
 
+// w棄用
 // 工作表送審
 export const apiPatchWorksheetRecordSubmit = async (recordId: string, body: TsubmitWorksheetProductsItemsDto) => {
   const api = `/engineering/worksheet/worksheet-record/${recordId}/submit`;
@@ -1033,6 +1091,7 @@ export const apiPatchWorksheetRecordSubmit = async (recordId: string, body: Tsub
     });
 };
 
+// w棄用
 // 工作表審核
 export const apiPatchWorksheetRecordReview = async (recordId: string, body: TreviewWorksheetProductsItemsDto) => {
   const api = `/engineering/worksheet/worksheet-record/${recordId}/review`;
