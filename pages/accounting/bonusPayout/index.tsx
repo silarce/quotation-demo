@@ -1319,7 +1319,7 @@ export default function BonusPayout() {
 
                         </span>
                         <span style={{ padding: '0px 0px', fontSize: '18px', color: '#14256a' }}>
-                            <SelectBar_date key="selectBar" className="ml-10" haveMonth={false} />
+                            <SelectBar_date key="selectBar" className="ml-10" haveMonth={false} disabled={viewtype === 'review'} />
                         </span>
                         {/* {parseInt(year as string) - 1911}
                         {bonustype} */}

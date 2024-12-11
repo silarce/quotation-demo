@@ -429,12 +429,19 @@ export default function PurchaseRequisitionList() {
 
                         {/* 第四個選項 */}
                         <div>
-                            <input
-                                type="text"
-                                placeholder='請輸入單號'
-                                value={keyword2}
-                                style={{ padding: '4px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
-                                onChange={(e) => setKeyword2(e.target.value)}
+                            <InputSel
+                                caption="單號"
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                inputProps={{
+                                    props: {
+                                        placeholder:'請輸入單號',
+                                        value: keyword2,
+                                        onChange: (e) => {
+                                            setKeyword2(e.target.value)
+                                        }
+                                    },
+                                }}
                             />
                         </div>
                     </div>
@@ -470,7 +477,7 @@ export default function PurchaseRequisitionList() {
                                                 ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span style={{fontSize:'18px'}}>{_item.purchaserequisitionid}</span>
+                                                    <span style={{ fontSize: '18px' }}>{_item.purchaserequisitionid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>

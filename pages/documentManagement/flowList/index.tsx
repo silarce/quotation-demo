@@ -435,37 +435,48 @@ export default function FlowList() {
     const handleDragStart = (event: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
     };
-
+    
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>, index: number) => {
         event.preventDefault();
         if (draggedIndex === null) return;
-
+    
         const newItems = [...items];
         const draggedItem = newItems[draggedIndex];
-
+    
         // 移除被拖動的元素
         newItems.splice(draggedIndex, 1);
         // 將被拖動的元素插入到新位置
         newItems.splice(index, 0, draggedItem);
-
+    
+        // 更新 `stage_order` 的值
+        const updatedItems = newItems.map((item, idx) => ({
+            ...item,
+            stage_order: idx + 1, // 根據新順序重新設定 stage_order
+        }));
+    
         setDraggedIndex(index);
-        setItems(newItems);
-        setData2(newItems);
+        setItems(updatedItems);
+        setData2(updatedItems);
     };
-
+    
     const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     };
-
+    
     const handleDrop = () => {
         setDraggedIndex(null);
     };
-
-    const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
-        const newItems = [...items];
-        newItems[index].review_type = event.target.value;
-        setItems(newItems);
-        setData2(newItems);
+    
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+        const updatedItems = items.map((item, i) => {
+            if (i === index) {
+                return { ...item, review_type: e.target.value }; // 更新選中的 review_type
+            }
+            return item;
+        });
+    
+        setItems(updatedItems);
+        setData2(updatedItems);
 
     };
 
@@ -553,6 +564,11 @@ export default function FlowList() {
             return;
         }
 
+
+        console.log(items);
+        console.log(data2);
+
+        // return;
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -699,17 +715,50 @@ export default function FlowList() {
             stage_user_name: emp.ch_name,
             stage_user_title: emp.title,
             stage_user_uuid: emp.id,
+            review_type: 
+                currentindex === 0
+                    ? "提出"
+                    : currentindex === updatedItems.length - 1
+                    ? "核准"
+                    : "審查",
         };
+    
         setItems(updatedItems);
-
-        // 更新 data2 確保一致性
         setData2(updatedItems);
-
+    
         // 清除建議列表
         setEmployeeFilteredData([]);
         setShowEmpSuggestions(false);
     };
-
+    
+    useEffect(() => {
+        const hasInconsistentReviewType = items.some((item, index) => {
+            const expectedType =
+                index === 0
+                    ? "提出"
+                    : index === items.length - 1
+                    ? "核准"
+                    : "審查";
+            return item.review_type !== expectedType;
+        });
+    
+        if (hasInconsistentReviewType) {
+            const updatedItems = items.map((item, index) => ({
+                ...item,
+                review_type:
+                    index === 0
+                        ? "提出"
+                        : index === items.length - 1
+                        ? "核准"
+                        : "審查",
+            }));
+    
+            setItems(updatedItems);
+            setData2(updatedItems);
+        }
+    }, [items]);
+    
+    
 
 
 
@@ -862,12 +911,12 @@ export default function FlowList() {
                                                 <span>
                                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                         {_item.stages.map((_stage: any, stageIndex: number) => (
-                                                            <div key={_stage.stage_order} style={{ display: 'inline-block', width: '150px' }}>
+                                                            <div key={_stage.stage_order} style={{ display: 'inline-block', width: '200px' }}>
                                                                 {/* 如果是第一筆則不顯示箭頭 */}
                                                                 {stageIndex !== 0 && (
                                                                     <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
                                                                 )}
-                                                                <span style={{ padding: '3px 9px', backgroundColor: '#1061c4', color: 'white',borderRadius:'6px' }}>
+                                                                <span style={{ padding: '3px 9px', backgroundColor: '#1061c4', color: 'white', borderRadius: '6px' }}>
                                                                     {_stage.review_type}
                                                                 </span>
                                                                 <span>
@@ -921,7 +970,7 @@ export default function FlowList() {
                                     </div>
                                     <div className={scss.foot_head2} style={{ paddingBottom: '18px' }}>
                                         <div>
-                                        <InputSel
+                                            <InputSel
                                                 {...inputSelProps}
                                                 caption="流程名稱"
                                                 className="global_tip_must"
@@ -1009,9 +1058,7 @@ export default function FlowList() {
                                                                 ? "提出"
                                                                 : index === items.length - 1 // 最後一筆
                                                                     ? "核准"
-                                                                    : index > 1 // 不是第一筆或第二筆
-                                                                        ? "審查"
-                                                                        : _item.review_type // 第二筆保留原有值
+                                                                    : _item.review_type // 預設值或已選中的值
                                                         }
                                                         onChange={(e) => handleSelectChange(e, index)}
                                                         style={{ fontSize: '18px', backgroundColor: 'transparent' }}
@@ -1020,6 +1067,7 @@ export default function FlowList() {
                                                         <option value="審查">審查</option>
                                                         <option value="核准">核准</option>
                                                     </select>
+
                                                 </span>
                                                 <span>
                                                     {/* {_item.stage_user_title} */}
@@ -1068,7 +1116,7 @@ export default function FlowList() {
                                 </span>
 
                             </div>
-                            <div style={{ padding:'0 20px',height: '300px' }}>
+                            <div style={{ padding: '0 20px', height: '300px' }}>
                                 {employeefilteredData.length > 0 && (
                                     <ul style={{
                                         border: '1px solid #c1c1c1',
