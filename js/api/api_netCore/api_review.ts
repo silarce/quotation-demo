@@ -88,6 +88,8 @@ const apiAddReview = (body: TaddReview) => {
 };
 
 // 抽單
+// 注意，已核准的文件，也就是TgetReivewById[document_status]==="核准"
+// 不應該抽單，會出問題(後端也沒有擋)
 const apiGetReviewBack = (
   document_uuid: string,
   {
