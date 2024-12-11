@@ -26,6 +26,9 @@ import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 // i18n
 import { useTranslation } from 'react-i18next';
 
+// global state
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+
 // -----------------------------------------------------------------------------------
 // 全域 css
 import '../styles/globals.scss';
@@ -87,6 +90,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   useGlobalErrorCatcher();
 
   const { i18n } = useTranslation();
+
+  // ----------------------------------------------------------------------------
+
+  const globalState_review = useGlobal_review();
+
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
@@ -109,7 +117,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       await apiLogin({ account, password });
       await updateUserInfo();
       await updateUserErpFeature();
-      // setIsLoged(true)
     } catch {
       myAlert.err({ title: '帳號或密碼錯誤' });
     }
@@ -140,6 +147,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    globalState_review.editUserId(userInfo?.employee?.id);
+    globalState_review.update();
+  }, [userInfo]);
 
   // -----------------------------------------------------------------------
   const appContextValue = {

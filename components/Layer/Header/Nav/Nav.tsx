@@ -20,10 +20,12 @@ import { topPathList } from 'components/Layer/SideNav/pathList/top';
 
 // context
 import { LayerCtx } from 'components/Layer/Layer';
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 export default function Nav() {
   const router = useRouter();
   const { userErpFeature } = useContext(LayerCtx);
+  const { reviewQty } = useGlobal_review();
 
   const pathname = router.pathname;
 
@@ -70,7 +72,7 @@ export default function Nav() {
         if (isDocumentManagement) {
           return (
             <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
-              <Badge key={index} count={99} offset={[10, -7]}>
+              <Badge key={index} count={reviewQty} offset={[10, -7]}>
                 <Image src={icon} alt={label + subLabel} />
                 <span>{label}</span>
                 {subLabel && <span>{subLabel}</span>}
