@@ -269,59 +269,101 @@ export default function BonusPayout() {
             myAlert.warning({ title: '請選擇獎金種類' });
             return;
         }
-        try {
-            setIsLoading(true);
 
-            const conditionModel = {
-                // date: year + '-' + month,
-                // type: '編輯中'
-                bonus_category: bonustypein
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'SalaryService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/Salary/GenerateBonus`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+        if (bonustypein === "年終獎金") {
+            try {
+                setIsLoading(true);
+    
+                const conditionModel = {
+                    // date: year + '-' + month,
+                    // type: '編輯中'
+                    // bonus_category: bonustypein
+                };
+    
+                const inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'SalaryService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+    
+                const response = await fetch(`${setting.apipath}/Salary/GenerateYearEndBonus`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                let responsedata = await response.json();
+                handleData(responsedata);
+                console.log(responsedata);
+                console.log(responsedata.length);
+    
+            } catch (error: any) {
+                console.log(error.message);
+            } finally {
+                setIsLoading(false);
             }
-            let responsedata = await response.json();
-            // const renamedData = responsedata.map((item: any) => {
-            //     const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料;
-            //     return {
-            //         id: item.id,
-            //         id_number: employeeData?.id_number || '',
-            //         department: item.department || '',
-            //         start_date: employeeData?.start_date || '',
-            //         annual_leave_days: item.annual_leave_days || '0',
-            //         comp_time: item.comp_time || '0',
-            //         ch_name: employeeData?.ch_name || '',
-            //     };
-            // });
+        } else {
 
-            // console.log(renamedData); // 檢查重命名後的資料結構
-            // 統一結構
-            handleData(responsedata);
-            console.log(responsedata);
-            console.log(responsedata.length);
-            // SettleBonusLedger(handleData(responsedata));
+            try {
+                setIsLoading(true);
+
+                const conditionModel = {
+                    // date: year + '-' + month,
+                    // type: '編輯中'
+                    bonus_category: bonustypein
+                };
+
+                const inputModel = {
+                    TypeName: 'ERP',
+                    ServiceName: 'SalaryService',
+                    FunctionName: 'no',
+                    FilterConditions: JSON.stringify(conditionModel),
+                };
+
+                const response = await fetch(`${setting.apipath}/Salary/GenerateBonus`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(inputModel)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                let responsedata = await response.json();
+                // const renamedData = responsedata.map((item: any) => {
+                //     const employeeData = item.employee ? JSON.parse(item.employee)[0] : {}; // 解析並取第一筆資料;
+                //     return {
+                //         id: item.id,
+                //         id_number: employeeData?.id_number || '',
+                //         department: item.department || '',
+                //         start_date: employeeData?.start_date || '',
+                //         annual_leave_days: item.annual_leave_days || '0',
+                //         comp_time: item.comp_time || '0',
+                //         ch_name: employeeData?.ch_name || '',
+                //     };
+                // });
+
+                // console.log(renamedData); // 檢查重命名後的資料結構
+                // 統一結構
+                handleData(responsedata);
+                console.log(responsedata);
+                console.log(responsedata.length);
+                // SettleBonusLedger(handleData(responsedata));
 
 
-        } catch (error: any) {
-            console.log(error.message);
-        } finally {
-            setIsLoading(false);
+            } catch (error: any) {
+                console.log(error.message);
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 

@@ -294,7 +294,7 @@ export default function AddPurchaseRequisition() {
     const getProduct = async () => {
         try {
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
             };
 
 
@@ -326,7 +326,7 @@ export default function AddPurchaseRequisition() {
     const getPickingList = async () => {
         try {
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
             };
 
 
@@ -468,7 +468,7 @@ export default function AddPurchaseRequisition() {
         // return;
         try {
             setIsLoading(true);
-            const conditionModel= {
+            const conditionModel = {
                 note: note,
                 username: userInfo?.employee?.id.toString()
             };
@@ -517,8 +517,68 @@ export default function AddPurchaseRequisition() {
         }
     };
 
+    const UpdatePickingList = async () => {
+
+        console.log(data2);
+        // return;
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                note: note,
+                username: userInfo?.employee?.id.toString()
+            };
 
 
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+            const response = await fetch(`${setting.apipath}/WareHouse/UpdatePickingList`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            myAlert.info(
+                {
+                    title: '單據新增成功',
+                    content: `領料單據號碼為:${data.pickinglistid}`
+                })
+
+            setPickinglistid(data.pickinglistid);
+            setPickinglistuuid(data.id);
+            setStatus(data.status);
+            setData2([]);
+            getPickingList();
+            // getProduct();
+
+            // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSavePickingList = async (type: any) => {
+        if (type === "未儲存") {
+            AddPickingList();
+        } else {
+            UpdatePickingList
+        }
+    }
 
     //#endregion
 
@@ -1815,8 +1875,8 @@ export default function AddPurchaseRequisition() {
                                 </button>
                                 &nbsp;
                                 <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                    onClick={() => { AddPickingList() }}
+                                    className={(status === '未儲存' || status === '領料中') ? scss.squarebtn : scss.disablesquarebtn}
+                                    onClick={() => { handleSavePickingList(status === "未儲存" ? '未儲存' : '領料中') }}
                                     title="儲存新增"
                                     disabled={status !== '未儲存'}
                                 >
@@ -1981,7 +2041,7 @@ export default function AddPurchaseRequisition() {
                                             </button> */}
                                             <button
                                                 onClick={() => { handleinbox(_item) }}
-                                                // disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
+                                            // disabled={parseFloat(_item.quantity) === parseFloat(_item.picking_qty)}
                                             >
                                                 <img
                                                     src={parseFloat(_item.quantity) === parseFloat(_item.picking_qty) ? icon_tray_out_gray.src : icon_tray_out.src}
@@ -2243,12 +2303,13 @@ export default function AddPurchaseRequisition() {
                                     maxHeight: '200px',
                                     overflowY: 'auto',
                                     marginTop: '0px',
-                                    right: '55px',
+                                    right: '240px',
                                     position: 'absolute',
                                     width: '150px',
                                     backgroundColor: 'white',
                                     zIndex: 1004, // 確保下拉清單在最上層,
-                                    display: `${showempSuggestions ? '' : 'none'}`
+                                    display: `${showempSuggestions ? '' : 'none'}`,
+                                    fontSize: '16px'
                                 }}>
                                     {employeefilteredData.map(emp => (
                                         <li
