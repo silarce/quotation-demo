@@ -3,8 +3,10 @@ import { TemployeeDto } from '../dtoTypes';
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
 type Treview_status = '未審核' | '已審核' | '審核中';
+type Treview_status__stages = '核准' | '提出' | '簽核中';
+type Tdocument_status = '審核中' | '駁回' | '核准' | '抽單';
 
-export type { Tinvoice_type, Ttax_type, Treview_status };
+export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
 
 // ==============================================================================
 
@@ -60,7 +62,7 @@ interface TgetReivewById {
   document_uuid: string;
   document_id: string;
   current_stage: `${number}`;
-  document_status: string;
+  document_status: Tdocument_status;
   document_title: string;
   document_type: string;
   prestage_review: string;
@@ -71,21 +73,21 @@ interface TgetReivewById {
     review_order: number;
     review_memo: string;
     review_person: string;
-    review_status: string;
+    review_status: Treview_status__stages;
     review_time: string | '0001-01-01T00:00:00'; // '0001-01-01T00:00:00'代表未審核
     review_title: string;
   }[];
 }
 
 interface TaddReivew {
-  review_id: string; // 審核流程id
-  document_id: string; // 單號
-  document_uuid: string; // 唯一識別id
-  document_type: string; // ex:請購單
+  review_id: TgetReivewById['id']; // 審核流程id
+  document_id: string; // 單號 // 基本上會是serial_number，但不一定，也不是非serial_number不可
+  document_uuid: string; // 唯一識別id // 被審核資料的唯一識別id
+  document_type: string; // ex:請購單 // 任意字串
   // username: string;
   user_id: string;
-  document_title: string; // ex:請購單20241024
-  // 取得資料用的query
+  document_title: string; // ex:請購單20241024 // 任意字串
+  // get被審核資料時用的query
   query: {
     [key: string]: string | number;
   };

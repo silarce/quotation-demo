@@ -57,8 +57,13 @@ const apiGetReviewById = (document_uuid: string) => {
   };
 
   return axi2
-    .get<TgetReviewById[]>(api, { params })
-    .then(({ data }) => data)
+    .get<TgetReviewById[] | undefined>(api, { params })
+    .then(({ data }) => {
+      // 沒有資料時會收到空字串
+      // 如果前後端的流程運作正確的話，TgetReviewById的item只會有一筆資料
+      // 超過一筆或沒有資料都是不正常的
+      return data || undefined;
+    })
     .catch((err: AxiosError) => {
       return Promise.reject(err);
     });
@@ -83,7 +88,18 @@ const apiAddReview = (body: TaddReview) => {
 };
 
 // 抽單
-const apiGetReviewBack = (document_uuid: string) => {
+// 注意，已核准的文件，也就是TgetReivewById[document_status]==="核准"
+// 不應該抽單，會出問題(後端也沒有擋)
+const apiGetReviewBack = (
+  document_uuid: string,
+  {
+    showSuccess = true,
+    showErr = true,
+  }: {
+    showSuccess?: boolean;
+    showErr?: boolean;
+  } = {}
+) => {
   const api = '/Review/GetReviewBack';
 
   const body = {
@@ -93,10 +109,10 @@ const apiGetReviewBack = (document_uuid: string) => {
   return axi2
     .post(api, body)
     .then(() => {
-      myAlert.success({ title: '抽單完成' });
+      showSuccess && myAlert.success({ title: '抽單完成' });
     })
     .catch((err) => {
-      myAlert.err({ title: '抽單失敗', content: err.message });
+      showErr && myAlert.err({ title: '抽單失敗', content: err.message });
     });
 };
 
@@ -130,6 +146,7 @@ const apiGetReview = async (user_id: string) => {
 
 // ==============================================================================
 
+// MARK:useGetFlow
 const useGetFlow = (
   // username: string | undefined,
   user_id: string | undefined,
@@ -206,6 +223,7 @@ const useGetFlow = (
   };
 };
 
+// MARK:useGetReviewById
 const useGetReviewById = (
   document_uuid: string | undefined,
   {
@@ -250,6 +268,7 @@ const useGetReviewById = (
 
   return {
     raw,
+    latestRaw: raw?.[0],
     setRaw,
     update,
     isFetching,
@@ -257,6 +276,7 @@ const useGetReviewById = (
   };
 };
 
+// MARK:useGetReviewHistory
 const useGetReviewHistory = (
   id: string | undefined,
   {
@@ -313,6 +333,7 @@ export {
   apiGetReviewBack,
   useGetReviewHistory,
   //
+  apiGetReviewById,
   apiGetFlow,
   apiGetReview,
 };
