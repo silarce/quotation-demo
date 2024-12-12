@@ -66,6 +66,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
             <div className={scss.height}>
               <div>{control.height}</div>
             </div>
+
             <DoorIcon className={scss.doorIcon} />
           </div>
           <div>
