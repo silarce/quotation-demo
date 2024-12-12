@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './PRequisitionDetail.module.scss';
+import scss from './POrderDetail.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -49,7 +49,7 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function PRequisitionDetail() {
+export default function POrderDetail() {
 
     //路由參數
     const router = useRouter();
@@ -97,12 +97,19 @@ export default function PRequisitionDetail() {
 
     const [create_atin, setCreate_atin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
+    const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
     const [create_byin, setCreate_byin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [need_datein, setNeed_datein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
     const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
     const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
+    const [suppliernamein, setSuppliernamein] = useState<string>("");
+    const [supplierphonein, setSupplierphonein] = useState<string>("");
+    const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
+    const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+    const [shippingaddressin, setShippingaddressin] = useState<string>("");
+    const [invoicein, setInvoicein] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
 
     //編輯時保留原始資料
@@ -190,16 +197,22 @@ export default function PRequisitionDetail() {
     }, []);
 
     useEffect(() => {
-        NewGetPurchaseRequisitionDetailById(parsedItem?.purchaserequisitionuuid);
-        GetReviewById(parsedItem?.purchaserequisitionuuid);
-        GetReviewHistory(parsedItem?.purchaserequisitionuuid);
-        setPurchaserequisitionuuidin(parsedItem?.purchaserequisitionuuid);
-        setPurchaserequisitionidin(parsedItem?.purchaserequisitionid);
+        NewGetPurchaseOrderDetailById(parsedItem?.purchaseorderuuid);
+        GetReviewById(parsedItem?.purchaseorderuuid);
+        GetReviewHistory(parsedItem?.purchaseorderuuid);
+        setPurchaseorderuuidin(parsedItem?.purchaseorderuuid);
+        setPurchaseorderidin(parsedItem?.purchaseorderid);
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
         setStatusin(parsedItem?.status);
         setNotein(parsedItem?.note);
+        setSuppliernamein(parsedItem?.suppliername);
+        setSupplieraddressin(parsedItem?.supplieraddress);
+        setSupplierphonein(parsedItem?.supplierphone);
+        setSuppliertaxidin(parsedItem?.suppliertaxid);
+        setShippingaddressin(parsedItem?.shippingaddress);
+        setInvoicein(parsedItem?.invoice);
 
     }, [item]);
 
@@ -208,11 +221,11 @@ export default function PRequisitionDetail() {
     // newapi
 
     //取請購明細
-    const NewGetPurchaseRequisitionDetailById = async (purchaserequisitionuuid: any) => {
+    const NewGetPurchaseOrderDetailById = async (id: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+                purchaseorderuuid: id as string | undefined,
             };
 
 
@@ -224,7 +237,7 @@ export default function PRequisitionDetail() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -280,7 +293,7 @@ export default function PRequisitionDetail() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
+                NewGetPurchaseOrderDetailById(purchaseorderuuidin);
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
@@ -470,20 +483,20 @@ export default function PRequisitionDetail() {
             // }
             // else {
             const review_query = {
-                purchaserequisitionuuid: purchaserequisitionuuidin,
-                purchaserequisitionid: purchaserequisitionidin,
+                purchaseorderuuid: purchaseorderuuidin,
+                purchaseorderid: purchaseorderidin,
                 create_at: create_atin,
                 create_by: create_byin,
-                status: '詢價中',
+                status: '採購中',
                 need_date: need_datein,
                 note: notein,
                 firstin: 1,
             };
 
             const conditionModel = {
-                document_id: purchaserequisitionidin,
-                document_uuid: purchaserequisitionuuidin,
-                document_type: "請購單",
+                document_id: purchaseorderidin,
+                document_uuid: purchaseorderuuidin,
+                document_type: "採購單",
                 review_id: review_flow,
                 query: review_query,
                 user_id: userInfo?.employee?.id.toString(),
@@ -512,7 +525,7 @@ export default function PRequisitionDetail() {
             }
             const data = await response.json();
             setReviewflowdata([]);
-            GetReviewById(purchaserequisitionuuidin);
+            GetReviewById(purchaseorderuuidin);
 
 
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -520,7 +533,7 @@ export default function PRequisitionDetail() {
             //改變單據狀態
             const conditionModel2 = {
                 type: type,
-                purchaserequisitionuuid: purchaserequisitionuuidin,
+                purchaseorderuuid: purchaseorderuuidin,
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -540,8 +553,8 @@ export default function PRequisitionDetail() {
             }
             const data2 = await response2.json();
 
-            NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
-            GetReviewById(purchaserequisitionuuidin)
+            NewGetPurchaseOrderDetailById(purchaseorderuuidin);
+            GetReviewById(purchaseorderuuidin)
             setStatusin("審核中");
             setReviewbar(false);
 
@@ -1245,11 +1258,11 @@ export default function PRequisitionDetail() {
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag='請購單' panelList={panelList}
+            <PageHeader02 tag='採購單' panelList={panelList}
                 customeRight={[
                     <>
                         {/* 編輯按鈕 */}
-                        {statusin === "詢價中" && !isEditing && (
+                        {statusin === "採購中" && !isEditing && (
 
                             <>
                                 <button
@@ -1301,7 +1314,7 @@ export default function PRequisitionDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         myAlert.confirm({
-                                            title: '確定要返回請購單列表嗎?',
+                                            title: '確定要返回採購單列表嗎?',
                                             content: <>
                                                 <h1>未儲存的資料將不會保留</h1>
                                             </>,
@@ -1318,7 +1331,7 @@ export default function PRequisitionDetail() {
                             </>
                         )}
                         {/* 儲存按鈕 */}
-                        {statusin === "詢價中" && isEditing && (
+                        {statusin === "採購中" && isEditing && (
                             <>
                                 <button
                                     className={scss.shortredsquarebtn}
@@ -1425,13 +1438,13 @@ export default function PRequisitionDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="請購單號"
+                                            caption="採購單號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: purchaserequisitionidin || ' ',
+                                                    value: purchaseorderidin || ' ',
                                                 },
                                             }}
                                         />
@@ -1447,21 +1460,8 @@ export default function PRequisitionDetail() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="請購日期"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin || '') || '',
-                                                },
-                                            }}
-
-                                        /> */}
                                         <InputSel
-                                            caption="請購日期"
+                                            caption="採購日期"
                                             className="global_tip_must"
                                             disabled={!isEditing}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
@@ -1502,9 +1502,7 @@ export default function PRequisitionDetail() {
                                                 },
                                             }}
                                         /> */}
-                                        {/* <button onClick={() => { alert("OK") }}>
-                                            ...
-                                        </button> */}
+
                                     </div>
                                     <div>
                                         <InputSel
@@ -1560,10 +1558,63 @@ export default function PRequisitionDetail() {
                                         />
 
                                     </div>
-                                    <div></div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="發票號碼"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: invoicein,
+                                                    onChange: (e) => { setInvoicein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商名稱"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliernamein,
+                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplieraddressin,
+                                                    onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="收貨地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: shippingaddressin,
+                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
+                                                },
+                                            }}
+                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註說明"
@@ -1578,7 +1629,22 @@ export default function PRequisitionDetail() {
                                             }}
                                         />
                                     </div>
-                                    <div></div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商電話"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplierphonein,
+                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+
+                                    </div>
                                     <div></div>
                                 </div>
                             </div>
@@ -1668,7 +1734,7 @@ export default function PRequisitionDetail() {
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (statusin === "詢價中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                        <button style={{ display: (statusin === "採購中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -1829,7 +1895,7 @@ export default function PRequisitionDetail() {
                                     })
                                 )}
                             </div>
-                            {statusin === "詢價中" && isEditing && (
+                            {statusin === "採購中" && isEditing && (
                                 <span style={{ paddingLeft: '22px', position: 'relative' }}>
                                     <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
                                         <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />

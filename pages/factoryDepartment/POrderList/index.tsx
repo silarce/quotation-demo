@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './PRequisitionList.module.scss';
+import scss from './POrderList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -63,7 +63,7 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
-export default function PRequisitionList() {
+export default function POrderList() {
     //登入者資料
     const { userInfo } = useContext(AppContext);
 
@@ -106,33 +106,33 @@ export default function PRequisitionList() {
 
 
     const panelList: TpanelList = [
-        {
-            type: 'addButton',
-            label: '新增請購單',
-            onClick: () => {
-                // setOpen(true);
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseRequisitionList`,
-                    query: {
-                        type: 'AddPurchaseRequisition',
-                    },
-                });
-            },
-        },
+        // {
+        //     type: 'addButton',
+        //     label: '新增採購單',
+        //     onClick: () => {
+        //         // setOpen(true);
+        //         router.push({
+        //             pathname: `/factoryDepartment/addPurchaseRequisitionList`,
+        //             query: {
+        //                 type: 'AddPurchaseRequisition',
+        //             },
+        //         });
+        //     },
+        // },
     ];
 
 
 
     //頁面進入
     useEffect(() => {
-        getPurchaseRequisition();
+        getPurchaseOrder();
     }, []);
 
 
     //api
 
     //取請購主檔
-    const getPurchaseRequisition = async () => {
+    const getPurchaseOrder = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -149,7 +149,7 @@ export default function PRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionWithReviews?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderWithReviews?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -168,11 +168,11 @@ export default function PRequisitionList() {
     };
 
     //取請購明細
-    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
+    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+                purchaseorderuuid: purchaseorderuuid as string | undefined,
             };
 
 
@@ -184,7 +184,7 @@ export default function PRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -192,6 +192,7 @@ export default function PRequisitionList() {
             // setData1(data);
             return responsedata
 
+            console.log()
 
         } catch (error: any) {
             setError(error.message);
@@ -320,7 +321,7 @@ export default function PRequisitionList() {
     const [details, setDetails] = useState<Record<number, any[]>>({});
 
     const handlePanelClick = async (id: number) => {
-        const detailData = await getPurchaseRequisitionDetail(id);
+        const detailData = await getPurchaseOrderDetail(id);
         setDetails((prevDetails) => ({
             ...prevDetails,
             [id]: detailData,
@@ -356,7 +357,7 @@ export default function PRequisitionList() {
         // 模糊查詢請購單號
         if (id) {
             filteredData = filteredData.filter(item =>
-                item.purchaserequisitionid.toString().includes(id)
+                item.purchaseorderid.toString().includes(id)
             );
         }
 
@@ -378,7 +379,7 @@ export default function PRequisitionList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={'請購單列表'}
+            <PageHeader02 tag={'採購單列表'}
                 customeLeft={[
                     <div
                         style={{
@@ -407,7 +408,7 @@ export default function PRequisitionList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="詢價中">詢價中</option>
+                                <option value="採購中">採購中</option>
                                 <option value="審核中">審核中</option>
                                 <option value="已核准">已核准</option>
                                 <option value="已結案">已結案</option>
@@ -474,7 +475,7 @@ export default function PRequisitionList() {
 
                 panelList={panelList} />
             <div>
-                <Thead01 type={'PRequisition'} />
+                <Thead01 type={'POrder'} />
                 <div>
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                     {searchdata && (
@@ -486,7 +487,7 @@ export default function PRequisitionList() {
                                     className={scss.customCollapse}
                                     onChange={(key) => {
                                         if (key.includes("1")) {
-                                            handlePanelClick(_item.purchaserequisitionuuid);
+                                            handlePanelClick(_item.purchaseorderuuid);
                                         }
                                     }}
                                 >
@@ -499,10 +500,10 @@ export default function PRequisitionList() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row01} 
-                                                ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                                ${_item.purchaseorderuuid === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span style={{ fontSize: '18px' }}>{_item.purchaserequisitionid}</span>
+                                                    <span style={{ fontSize: '18px' }}>{_item.purchaseorderid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>
@@ -519,14 +520,8 @@ export default function PRequisitionList() {
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({
-                                                                pathname: `/factoryDepartment/PRequisitionDetail`,
+                                                                pathname: `/factoryDepartment/POrderDetail`,
                                                                 query: {
-                                                                    // purchaserequisitionuuid: _item.purchaserequisitionuuid,
-                                                                    // purchaserequisitionid: _item.purchaserequisitionid,
-                                                                    // create_at: _item.create_at,
-                                                                    // need_date: _item.need_date,
-                                                                    // create_by: _item.create_by,
-                                                                    // status: _item.status
                                                                     item: JSON.stringify(_item),
                                                                 },
                                                             });
@@ -639,7 +634,7 @@ export default function PRequisitionList() {
                                                                 </div>
                                                             );
                                                         })
-                                                        
+
                                                     )}
 
                                                 </div>
@@ -664,7 +659,7 @@ export default function PRequisitionList() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {details[_item.purchaserequisitionuuid]?.map((detail: any, detailIndex: number) => (
+                                                    {details[_item.purchaseorderuuid]?.map((detail: any, detailIndex: number) => (
                                                         <tr key={detailIndex}>
                                                             <td style={{ width: '50px' }}>{detailIndex + 1}</td>
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>

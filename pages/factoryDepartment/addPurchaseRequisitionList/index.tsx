@@ -424,7 +424,10 @@ export default function AddPurchaseRequisitionList() {
 
     //請購單申請
     const NewAddPurchaseRequisition = async () => {
-
+        if (data2.length === 0) {
+            myAlert.warning({ title: "請購項目不可為空" })
+            return;
+        }
         console.log(data2);
         // return;
         try {
@@ -1294,7 +1297,7 @@ export default function AddPurchaseRequisitionList() {
                 customeLeft={
                     [
                         <>
-                            <span style={{fontSize:'18px',paddingLeft:'10px'}}>
+                            <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
                                 {status}
                             </span>
                         </>
