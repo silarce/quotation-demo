@@ -47,8 +47,8 @@ type Tstate_incomeBill = {
   // 票據到期日
   noteMaturityDate: string | null;
 
-  foreignCurrencyFee: string;
-  fee: string;
+  theFee: string; // 可能會是foreignCurrencyFee或fee
+  fee: string; // 國內匯費
   billSerialNumber: string;
   //
   //
@@ -68,11 +68,15 @@ export default function IncomeBillDetails({
   incomeBillList,
   reqPatchIncomeBill_feeAndDeduction,
   readonly,
+  totalOtherFee,
+  isForeign,
 }: {
   className?: string;
   incomeBillList: TincomeBillSerialDto[];
   reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
   readonly?: boolean;
+  totalOtherFee: string;
+  isForeign: boolean;
 }) {
   // ---------------------------------------------------------------------------
 
@@ -92,20 +96,7 @@ export default function IncomeBillDetails({
 
     setState_incomeBillArr((arr) => {
       const copy = [...arr];
-      copy[index].fee = value;
-
-      return copy;
-    });
-  };
-
-  const editForeignCurrencyFee = (index: number, value: string) => {
-    // if (!isInteger(value) && value !== '') {
-    //   return;
-    // }
-
-    setState_incomeBillArr((arr) => {
-      const copy = [...arr];
-      copy[index].foreignCurrencyFee = value;
+      copy[index].theFee = value;
 
       return copy;
     });
@@ -125,14 +116,14 @@ export default function IncomeBillDetails({
 
   // ---------------------------------------------------------------------------
 
-  const isForeign = incomeBillList.some((incomeBill) => incomeBill.isForeign);
+  // const isForeign = incomeBillList.some((incomeBill) => incomeBill.isForeign);
 
   const { totals, showTotals } = useMemo(() => {
     let showTotals = true;
 
     const totals = state_incomeBillArr.reduce(
       (acc, cur) => {
-        const { receivablePayment: price, fee, deductionTotal, receivableCurrency } = cur;
+        const { receivablePayment: price, theFee: fee, deductionTotal, receivableCurrency } = cur;
 
         const acc_priceNum = new Decimal(price || 0).add(acc.price).toNumber();
         const acc_feeNum = new Decimal(fee || 0).add(acc.fee).toNumber();
@@ -213,7 +204,7 @@ export default function IncomeBillDetails({
       });
 
       const theReceivablePayment: number = isForeign ? Number(receivableCurrencyPayment || 0) : receivablePayment || 0;
-      // const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
+      const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
 
       const state: Tstate_incomeBill = {
         id,
@@ -226,9 +217,8 @@ export default function IncomeBillDetails({
         receivablePayment: theReceivablePayment,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        // fee: theFee,
-        foreignCurrencyFee: String(foreignCurrencyFee || 0),
-        fee: String(fee || 0),
+        theFee: theFee,
+        fee: `${fee || 0}`,
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
@@ -292,7 +282,7 @@ export default function IncomeBillDetails({
             receivablePayment,
             noteNumber,
             noteMaturityDate,
-            foreignCurrencyFee,
+            theFee,
             fee,
             billSerialNumber,
             state_deduction,
@@ -339,17 +329,17 @@ export default function IncomeBillDetails({
                 />
               </div>
 
-              <div className={scss.cell} style={configList['foreignCurrencyFee'].style}>
+              <div className={scss.cell} style={configList['theFee'].style}>
                 <InputSel
                   showBaseline="auto"
                   disabled={disabled}
-                  // prefix={receivableCurrency}
+                  prefix={receivableCurrency}
                   inputProps={{
                     props: {
                       className: 'text-right',
                       type: disabled ? 'text' : 'number',
-                      value: disabled ? Number(foreignCurrencyFee).toLocaleString() : foreignCurrencyFee,
-                      onChange: (e) => editForeignCurrencyFee(index_state, e.target.value),
+                      value: disabled ? Number(theFee).toLocaleString() : theFee,
+                      onChange: (e) => editFee(index_state, e.target.value),
                       disabled: false,
                       readOnly: disabled,
                     },
@@ -357,20 +347,19 @@ export default function IncomeBillDetails({
                 />
               </div>
 
-              <div className={scss.cell} style={configList['fee'].style}>
+              <div
+                className={scss.cell}
+                style={{ ...configList['fee'].style, ...configList['fee'].dynaStyle?.(isForeign) }}
+              >
                 <InputSel
-                  showBaseline="auto"
-                  disabled={disabled}
-                  // prefix={receivableCurrency}
+                  showBaseline="invisible"
                   prefix={'TWD'}
                   inputProps={{
                     props: {
                       className: 'text-right',
-                      type: disabled ? 'text' : 'number',
-                      value: disabled ? Number(fee).toLocaleString() : fee,
-                      onChange: (e) => editFee(index_state, e.target.value),
-                      disabled: false,
-                      readOnly: disabled,
+                      value: Number(fee || 0).toLocaleString(),
+                      onChange: (e) => {},
+                      readOnly: true,
                     },
                   }}
                 />
@@ -405,7 +394,7 @@ export default function IncomeBillDetails({
           );
         })}
 
-        {showTotals && <Tfoot {...totals} />}
+        {showTotals && <Tfoot {...totals} totalOtherFee={totalOtherFee} />}
       </div>
 
       {/*  */}
@@ -429,11 +418,12 @@ const Thead = ({ isForeign }: { isForeign: boolean }) => {
   return (
     <Row className={scss.thead}>
       {keyArr_thead.map((key) => {
-        const { label, style } = configList[key];
+        const { label, style, dynaStyle } = configList[key];
         const theLabel = typeof label === 'function' ? label(isForeign) : label;
+        const theStyle = { ...style, ...dynaStyle?.(isForeign) };
 
         return (
-          <div key={key} className={scss.cell} style={style}>
+          <div key={key} className={scss.cell} style={theStyle}>
             {theLabel}
           </div>
         );
@@ -448,12 +438,14 @@ const Tfoot = ({
   fee,
   deductionTotal,
   currency,
+  totalOtherFee,
 }: {
   className?: string;
   price: number;
   fee: number;
   deductionTotal: number;
   currency: string;
+  totalOtherFee: string;
 }) => {
   return (
     <Row className={classNames(scss.tfoot, className)}>
@@ -471,11 +463,19 @@ const Tfoot = ({
           node={<div className="text-right">{price.toLocaleString()}</div>}
         />
       </div>
-      <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
+      <div className={classNames(scss.cell, scss.price)} style={configList['theFee'].style}>
         <InputSel
           showBaseline="invisible"
           prefix={currency}
           node={<div className="text-right">{fee.toLocaleString()}</div>}
+        />
+      </div>
+
+      <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
+        <InputSel
+          showBaseline="invisible"
+          prefix={'TWD'}
+          node={<div className="text-right">{Number(totalOtherFee).toLocaleString()}</div>}
         />
       </div>
 
@@ -505,11 +505,12 @@ type Tkey =
       | 'noteNumber' // 票據編號
       | 'noteMaturityDate' // 票據到期日
       //
-      | 'foreignCurrencyFee' // 國外匯費
-      | 'fee' // 國內匯費
+
       //
       | 'billSerialNumber' // 收入傳票序號
     >
+  | 'theFee' // 匯費
+  | 'fee' // 國內匯費
   | 'paymentType' // 收款方式
   | 'deductionTotal' // 扣款總額
   | 'btn';
@@ -518,27 +519,26 @@ type Tconfig = {
   // label: string;
   label: string | ((isForeign: boolean) => string);
   className?: string;
+  // style?: React.CSSProperties;
   style?: React.CSSProperties;
+  dynaStyle?: (isForeign: boolean) => React.CSSProperties;
 };
 
 type TconfigList = {
   [key in Tkey]: Tconfig;
 };
 
-const keyArr_half = [
+const keyArr_thead: Tkey[] = [
   //
+  'receiveDate',
+
   'paymentType',
   'importAccountingNumber',
   'noteNumber',
   'noteMaturityDate',
   'receivablePayment',
-] as const;
 
-const keyArr_thead: Tkey[] = [
-  //
-  'receiveDate',
-  ...keyArr_half,
-  'foreignCurrencyFee',
+  'theFee',
   'fee',
   'billSerialNumber',
   'deductionTotal',
@@ -572,8 +572,11 @@ const configList: TconfigList = {
     label: '票據到期日',
     style: { width: '120px' },
   },
-  foreignCurrencyFee: {
-    label: '外幣匯費',
+  theFee: {
+    // label: '匯費',
+    label: (isForeign) => {
+      return isForeign ? '外幣匯費' : '匯費';
+    },
     style: {
       width: '130px',
     },
@@ -582,6 +585,13 @@ const configList: TconfigList = {
     label: '國內匯費',
     style: {
       width: '130px',
+    },
+    dynaStyle: (isForeign) => {
+      if (!isForeign) {
+        return { display: 'none' };
+      }
+
+      return {};
     },
   },
   billSerialNumber: {

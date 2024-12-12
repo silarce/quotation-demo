@@ -390,8 +390,7 @@ export default function AccountReceivable({
 
       await apiPatchIncomeBill(state_incomeBill.id, {
         ...state_incomeBill.raw,
-        foreignCurrencyFee: state_incomeBill.foreignCurrencyFee || null,
-        fee: Number(state_incomeBill.fee),
+        fee: Number(state_incomeBill.theFee),
         incomeBillDeduction: accountsReceivableDeduction,
       });
     }
@@ -607,6 +606,8 @@ export default function AccountReceivable({
           incomeBillList={incomeBillList}
           reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
           readonly={readonly}
+          totalOtherFee={accountReceivable.totalOtherFee}
+          isForeign={accountReceivable.currency !== 'TWD 新臺幣'}
         />
 
         {/* 扣款明細 */}
