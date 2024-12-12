@@ -9,6 +9,8 @@ import { axi, domain } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
 import { AxiosError } from 'axios';
 
+import { apiGetReviewById } from './api_netCore/api_review';
+
 // type
 import type {
   Tparams,
@@ -34,6 +36,12 @@ import type {
   TbonusDto,
   TcopyQuotationDto,
 } from './dtoTypes';
+
+import type { TworksheetDto_addition } from 'js/api/api_engineering';
+
+type TquotationContractDto_addition = TquotationContractDto & {
+  worksheet?: TworksheetDto_addition[] | undefined;
+};
 
 export type {
   Tparams,
@@ -1023,7 +1031,7 @@ export const useGetContract_id = (
   };
 
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TquotationContractDto>();
+  const [res, setRes] = useState<TquotationContractDto_addition>();
 
   const update = async () => {
     if (!id) {
@@ -1032,7 +1040,23 @@ export const useGetContract_id = (
 
     try {
       setIsFetching(true);
-      const newRes = await apiGetContract_Id(id, params);
+      const newRes: TquotationContractDto_addition = await apiGetContract_Id(id, params);
+
+      if (newRes) {
+        const worksheetArr = newRes.worksheet ?? [];
+
+        for (const ws of worksheetArr) {
+          if (ws.isAbandoned) {
+            continue;
+          }
+
+          const latestRecord = ws.latestRecord;
+          const reviewArr = await apiGetReviewById(latestRecord.id);
+          latestRecord.addition = {
+            reviewArr,
+          };
+        }
+      }
 
       if (newRes) {
         setRes(newRes);

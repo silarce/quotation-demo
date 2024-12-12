@@ -93,6 +93,7 @@ type TworksheetRecordDto_addition = TworksheetRecordDto & {
 };
 
 type TworksheetDto_addition = TworksheetDto & {
+  latestRecord: TworksheetRecordDto_addition;
   records: TworksheetRecordDto_addition[];
 };
 
@@ -169,7 +170,7 @@ export type {
   TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
 
-export type { TinvouceCheckResult };
+export type { TinvouceCheckResult, TworksheetDto_addition };
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
