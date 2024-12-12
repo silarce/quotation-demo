@@ -290,7 +290,10 @@ export default function IncomeBillDetails({
 
             // incomeBillDate
 
-            raw: { isForeign, incomeBillDate },
+            raw: {
+              //  isForeign,
+              incomeBillDate,
+            },
           } = incomeBill;
 
           const year = moment(incomeBillDate).year();
