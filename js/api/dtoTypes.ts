@@ -4138,6 +4138,9 @@ export type TaccountsReceivableDto = {
 
   currency: Tcurrency;
   exchangeRate: string | null;
+
+  //其他手續費總合計
+  totalOtherFee: string;
 };
 
 export type TupdateAccountReceivableDto = Partial<
