@@ -346,3 +346,15 @@ export {
   apiGetReview,
 };
 export type { TreviewFlow, TgetReviewById, TaddReview, TgetReview };
+
+// const foo = (a: string, b: string, c: string) => {
+//   return 'foo';
+// };
+
+// type Tparams_foo = Parameters<typeof foo>;
+
+// const callFoo = (...params: Tparams_foo) => {
+//   return foo(...params);
+// };
+
+// callFoo('a', 'b', 'c');

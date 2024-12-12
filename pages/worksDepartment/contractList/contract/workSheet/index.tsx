@@ -82,7 +82,7 @@ import {
 
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
-import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
+// import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 // hook
 import {
@@ -121,6 +121,8 @@ import { useWorksheet } from 'components/page/worksDepartment/worksheet/productF
 import { useShallow } from 'zustand/react/shallow';
 import WorksheetForm from './WorksheetForm';
 
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+
 // ====================================================================
 
 type Tquery = {
@@ -145,37 +147,6 @@ type Tquery = {
 
 // ====================================================================
 
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-
 export default function Worksheet({
   isAdmin,
   userErpFeature,
@@ -185,6 +156,8 @@ export default function Worksheet({
   userErpFeature: TerpFeatureDto[] | undefined;
   userInfo: TuserDto;
 }) {
+  const { req_reviewBack, req_backThanAdd } = useGlobal_review();
+
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
   // ----------------------------------------------------------------
@@ -364,7 +337,7 @@ export default function Worksheet({
       setIsLoading(true);
       await apiDeleteWorksheet(worksheetId);
 
-      await apiGetReviewBack(latestRecord.id, {
+      await req_reviewBack(latestRecord.id, {
         showSuccess: false,
       });
 
@@ -403,7 +376,7 @@ export default function Worksheet({
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
 
         if (document_status === '審核中' || document_status === '駁回') {
-          await apiGetReviewBack(activeRecordData!.id, { showSuccess: false });
+          await req_reviewBack(activeRecordData!.id, { showSuccess: false });
         }
 
         await refreshData();
@@ -424,7 +397,7 @@ export default function Worksheet({
       return;
     }
 
-    const body: Parameters<typeof apiAddReview>[0] = {
+    const body: Parameters<typeof req_backThanAdd>[0] = {
       review_id: review_id,
       document_id: '',
       document_uuid: activeRecordId,
@@ -435,8 +408,9 @@ export default function Worksheet({
     };
 
     try {
-      await apiGetReviewBack(activeRecordId, { showSuccess: false, returnReject: true });
-      await apiAddReview(body);
+      await req_backThanAdd(body);
+      // await apiGetReviewBack(activeRecordId, { showSuccess: false, returnReject: true });
+      // await apiAddReview(body);
     } catch (error) {}
 
     await refreshData();
