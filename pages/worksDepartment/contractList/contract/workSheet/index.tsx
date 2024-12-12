@@ -641,17 +641,19 @@ export default function Worksheet({
             setDisabled(true);
             setIsLastestRecord(false);
           },
-          onDeleteClick: () => {
-            myAlert.confirm({
-              title: '確定刪除工作表?',
+          onDeleteClick: !isAllowEdit
+            ? undefined
+            : () => {
+                myAlert.confirm({
+                  title: '確定刪除工作表?',
 
-              props: {
-                onOk: async () => {
-                  await reqAbandonWorkSheet(worksheet.id);
-                },
+                  props: {
+                    onOk: async () => {
+                      await reqAbandonWorkSheet(worksheet.id);
+                    },
+                  },
+                });
               },
-            });
-          },
         };
 
         return intro;
@@ -666,30 +668,32 @@ export default function Worksheet({
         qty: prodQty,
         width: prodWidth,
         height: pridHeight,
-        onSeparateClick: () => {
-          setInputModalProps({
-            title: `可分配數量${itemsNoWorksheet.length}`,
-            onConfirm: async (str) => {
-              const qty = Number(str);
+        onSeparateClick: !isAllowEdit
+          ? undefined
+          : () => {
+              setInputModalProps({
+                title: `可分配數量${itemsNoWorksheet.length}`,
+                onConfirm: async (str) => {
+                  const qty = Number(str);
 
-              if (qty > itemsNoWorksheet.length) {
-                return myAlert.info({ title: '分配數量超過可分配數量' });
-              }
+                  if (qty > itemsNoWorksheet.length) {
+                    return myAlert.info({ title: '分配數量超過可分配數量' });
+                  }
 
-              const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
+                  const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
 
-              const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
+                  const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
 
-              const body: TcreateWorksheetDto = {
-                contractId,
-                contractProductItems,
-              };
+                  const body: TcreateWorksheetDto = {
+                    contractId,
+                    contractProductItems,
+                  };
 
-              await reqPostWorkSheet(body);
-              setInputModalProps(undefined);
+                  await reqPostWorkSheet(body);
+                  setInputModalProps(undefined);
+                },
+              });
             },
-          });
-        },
         worksheetIntroArr,
         isSpecialDoor: checkIsSpecialDoor(prod.doorModelName),
       });
