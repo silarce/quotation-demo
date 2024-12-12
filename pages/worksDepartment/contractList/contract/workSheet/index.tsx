@@ -17,6 +17,7 @@ import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
@@ -176,12 +177,13 @@ export default function Worksheet({
   const query = router.query as Tquery;
   const {
     contractId,
-
     //
     activeWorksheetId,
     activedProdId,
     activeRecordId,
   } = query;
+
+  const isAllowEdit = router.route === '/worksDepartment/contractList/contract/workSheet';
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -229,8 +231,6 @@ export default function Worksheet({
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
-
-  console.log(worksheetArr);
 
   // ________________________________________________________________________
   // ________________________________________________________________________
@@ -901,11 +901,15 @@ export default function Worksheet({
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader
-        returnBtn={disabled}
-        panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-      />
+      {isAllowEdit && (
+        <PageHeader
+          returnBtn={disabled}
+          panelList={panelList}
+          contractNumber={engineeringContact?.contractNumber ?? ''}
+        />
+      )}
+
+      {!isAllowEdit && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />}
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
