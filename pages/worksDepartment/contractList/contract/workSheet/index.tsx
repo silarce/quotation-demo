@@ -183,7 +183,7 @@ export default function Worksheet({
     activeRecordId,
   } = query;
 
-  const isAllowEdit = router.route === '/worksDepartment/contractList/contract/workSheet';
+  const isReadonly = router.route !== '/worksDepartment/contractList/contract/workSheet';
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -641,7 +641,7 @@ export default function Worksheet({
             setDisabled(true);
             setIsLastestRecord(false);
           },
-          onDeleteClick: !isAllowEdit
+          onDeleteClick: isReadonly
             ? undefined
             : () => {
                 myAlert.confirm({
@@ -668,7 +668,7 @@ export default function Worksheet({
         qty: prodQty,
         width: prodWidth,
         height: pridHeight,
-        onSeparateClick: !isAllowEdit
+        onSeparateClick: isReadonly
           ? undefined
           : () => {
               setInputModalProps({
@@ -905,7 +905,7 @@ export default function Worksheet({
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      {isAllowEdit && (
+      {!isReadonly && (
         <PageHeader
           returnBtn={disabled}
           panelList={panelList}
@@ -913,7 +913,7 @@ export default function Worksheet({
         />
       )}
 
-      {!isAllowEdit && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />}
+      {isReadonly && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />}
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
