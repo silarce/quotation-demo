@@ -22,7 +22,7 @@ type TworksheetIntro = {
   isActive?: boolean;
   reviewStatus: TstatusLabelProps;
   onClick: (e: React.MouseEvent) => void;
-  onDeleteClick: () => void;
+  onDeleteClick?: () => void;
 };
 
 type Tcontrol = {
@@ -31,7 +31,7 @@ type Tcontrol = {
   qty: string;
   width: string;
   height: string;
-  onSeparateClick: (e: React.MouseEvent) => void;
+  onSeparateClick?: (e: React.MouseEvent) => void;
   worksheetIntroArr: TworksheetIntro[];
 
   isSpecialDoor: boolean | undefined;
@@ -52,7 +52,8 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
             className={classNames(
               scss.btn,
               control.isSpecialDoor && 'invisible',
-              control.isSpecialDoor === undefined && 'invisible'
+              control.isSpecialDoor === undefined && 'invisible',
+              !control.onSeparateClick && 'invisible'
             )}
             onClick={control.onSeparateClick}
           >
@@ -65,6 +66,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
             <div className={scss.height}>
               <div>{control.height}</div>
             </div>
+
             <DoorIcon className={scss.doorIcon} />
           </div>
           <div>
@@ -104,7 +106,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
                     <span>{`淨高(h):${height}`}</span>
                   </div>
                   <span>{qty}樘</span>
-                  <IconDelete01 onClick={onDeleteClick} />
+                  {onDeleteClick && <IconDelete01 onClick={onDeleteClick} />}
                 </div>
 
                 <StatusLabel
@@ -116,23 +118,6 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           );
         })}
       </div>
-
-      {/* <div className={scss.list}>
-        {control.list.map((item, index) => {
-          const { isOriginal, itemName, qty, isActive, status, onClick, onDeleteClick } = item;
-
-          return (
-            <CellWithBar key={index} isActive={isActive}>
-              <div className={classNames(scss.row)} onClick={onClick}>
-                <span>{itemName}</span>
-                <span>{qty}樘</span>
-                <StatusLabel {...status} className={classNames(scss.statusLabel, status.className)} />
-                <IconDelete01 onClick={onDeleteClick} />
-              </div>
-            </CellWithBar>
-          );
-        })}
-      </div> */}
     </div>
   );
 }
