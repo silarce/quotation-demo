@@ -47,6 +47,7 @@ type Tstate_incomeBill = {
   // 票據到期日
   noteMaturityDate: string | null;
 
+  foreignCurrencyFee: string;
   fee: string;
   billSerialNumber: string;
   //
@@ -92,6 +93,19 @@ export default function IncomeBillDetails({
     setState_incomeBillArr((arr) => {
       const copy = [...arr];
       copy[index].fee = value;
+
+      return copy;
+    });
+  };
+
+  const editForeignCurrencyFee = (index: number, value: string) => {
+    // if (!isInteger(value) && value !== '') {
+    //   return;
+    // }
+
+    setState_incomeBillArr((arr) => {
+      const copy = [...arr];
+      copy[index].foreignCurrencyFee = value;
 
       return copy;
     });
@@ -199,7 +213,7 @@ export default function IncomeBillDetails({
       });
 
       const theReceivablePayment: number = isForeign ? Number(receivableCurrencyPayment || 0) : receivablePayment || 0;
-      const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
+      // const theFee = String(isForeign ? Number(foreignCurrencyFee || 0) : Number(fee || 0));
 
       const state: Tstate_incomeBill = {
         id,
@@ -212,7 +226,9 @@ export default function IncomeBillDetails({
         receivablePayment: theReceivablePayment,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        fee: theFee,
+        // fee: theFee,
+        foreignCurrencyFee: String(foreignCurrencyFee || 0),
+        fee: String(fee || 0),
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
@@ -276,6 +292,7 @@ export default function IncomeBillDetails({
             receivablePayment,
             noteNumber,
             noteMaturityDate,
+            foreignCurrencyFee,
             fee,
             billSerialNumber,
             state_deduction,
@@ -322,11 +339,30 @@ export default function IncomeBillDetails({
                 />
               </div>
 
+              <div className={scss.cell} style={configList['foreignCurrencyFee'].style}>
+                <InputSel
+                  showBaseline="auto"
+                  disabled={disabled}
+                  // prefix={receivableCurrency}
+                  inputProps={{
+                    props: {
+                      className: 'text-right',
+                      type: disabled ? 'text' : 'number',
+                      value: disabled ? Number(foreignCurrencyFee).toLocaleString() : foreignCurrencyFee,
+                      onChange: (e) => editForeignCurrencyFee(index_state, e.target.value),
+                      disabled: false,
+                      readOnly: disabled,
+                    },
+                  }}
+                />
+              </div>
+
               <div className={scss.cell} style={configList['fee'].style}>
                 <InputSel
                   showBaseline="auto"
                   disabled={disabled}
-                  prefix={receivableCurrency}
+                  // prefix={receivableCurrency}
+                  prefix={'TWD'}
                   inputProps={{
                     props: {
                       className: 'text-right',
@@ -469,7 +505,8 @@ type Tkey =
       | 'noteNumber' // 票據編號
       | 'noteMaturityDate' // 票據到期日
       //
-      | 'fee' // 匯費
+      | 'foreignCurrencyFee' // 國外匯費
+      | 'fee' // 國內匯費
       //
       | 'billSerialNumber' // 收入傳票序號
     >
@@ -501,6 +538,7 @@ const keyArr_thead: Tkey[] = [
   //
   'receiveDate',
   ...keyArr_half,
+  'foreignCurrencyFee',
   'fee',
   'billSerialNumber',
   'deductionTotal',
@@ -534,11 +572,14 @@ const configList: TconfigList = {
     label: '票據到期日',
     style: { width: '120px' },
   },
-  fee: {
-    // label: '匯費',
-    label: (isForeign) => {
-      return isForeign ? '外幣匯費' : '匯費';
+  foreignCurrencyFee: {
+    label: '外幣匯費',
+    style: {
+      width: '130px',
     },
+  },
+  fee: {
+    label: '國內匯費',
     style: {
       width: '130px',
     },

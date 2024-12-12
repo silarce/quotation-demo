@@ -390,6 +390,7 @@ export default function AccountReceivable({
 
       await apiPatchIncomeBill(state_incomeBill.id, {
         ...state_incomeBill.raw,
+        foreignCurrencyFee: state_incomeBill.foreignCurrencyFee || null,
         fee: Number(state_incomeBill.fee),
         incomeBillDeduction: accountsReceivableDeduction,
       });
