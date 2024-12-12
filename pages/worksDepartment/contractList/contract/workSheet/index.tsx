@@ -11,11 +11,13 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import moment from 'moment';
 
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
@@ -82,7 +84,7 @@ import {
 
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
-import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
+// import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 // hook
 import {
@@ -115,11 +117,14 @@ import type {
   TworksheetDto,
   TuserDto,
 } from 'js/api/dtoTypes';
+import type { TworksheetDto_addition } from 'js/api/api_engineering';
 
 // zustand // hook
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 import WorksheetForm from './WorksheetForm';
+
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 // ====================================================================
 
@@ -145,37 +150,6 @@ type Tquery = {
 
 // ====================================================================
 
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-// 這兩支 api 等於沒有了
-// @Patch('engineering/worksheet/worksheet-record/:id/submit')
-// @Patch('engineering/worksheet/worksheet-record/:id/review')
-
 export default function Worksheet({
   isAdmin,
   userErpFeature,
@@ -185,6 +159,8 @@ export default function Worksheet({
   userErpFeature: TerpFeatureDto[] | undefined;
   userInfo: TuserDto;
 }) {
+  const { req_reviewBack, req_backThanAdd } = useGlobal_review();
+
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
   // ----------------------------------------------------------------
@@ -201,12 +177,13 @@ export default function Worksheet({
   const query = router.query as Tquery;
   const {
     contractId,
-
     //
     activeWorksheetId,
     activedProdId,
     activeRecordId,
   } = query;
+
+  const isReadonly = router.route !== '/worksDepartment/contractList/contract/workSheet';
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -364,7 +341,7 @@ export default function Worksheet({
       setIsLoading(true);
       await apiDeleteWorksheet(worksheetId);
 
-      await apiGetReviewBack(latestRecord.id, {
+      await req_reviewBack(latestRecord.id, {
         showSuccess: false,
       });
 
@@ -403,7 +380,7 @@ export default function Worksheet({
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
 
         if (document_status === '審核中' || document_status === '駁回') {
-          await apiGetReviewBack(activeRecordData!.id, { showSuccess: false });
+          await req_reviewBack(activeRecordData!.id, { showSuccess: false });
         }
 
         await refreshData();
@@ -424,7 +401,7 @@ export default function Worksheet({
       return;
     }
 
-    const body: Parameters<typeof apiAddReview>[0] = {
+    const body: Parameters<typeof req_backThanAdd>[0] = {
       review_id: review_id,
       document_id: '',
       document_uuid: activeRecordId,
@@ -434,7 +411,12 @@ export default function Worksheet({
       query,
     };
 
-    await apiAddReview(body);
+    try {
+      await req_backThanAdd(body);
+      // await apiGetReviewBack(activeRecordId, { showSuccess: false, returnReject: true });
+      // await apiAddReview(body);
+    } catch (error) {}
+
     await refreshData();
 
     // if (!activeRecordId) {
@@ -558,7 +540,7 @@ export default function Worksheet({
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
 
-      const prodWorkSheetList: { [key: string]: TworksheetDto } = {};
+      const prodWorkSheetList: { [key: string]: TworksheetDto_addition } = {};
       const itemsNoWorksheet: TquotationProductItemDto[] = [];
 
       // ----------------------------------------------
@@ -580,13 +562,14 @@ export default function Worksheet({
         const {
           contractProductItems,
 
-          reviewSalesEmployee,
-          toReviewSales,
-          salesReviewAt,
+          // reviewSalesEmployee,
+          // toReviewSales,
+          // salesReviewAt,
 
-          reviewManagerEmployee,
-          toReviewManager,
-          managerReviewAt,
+          // reviewManagerEmployee,
+          // toReviewManager,
+          // managerReviewAt,
+          addition: { reviewArr } = {},
         } = latestRecord;
 
         const contractProductItem = contractProductItems?.[0];
@@ -594,17 +577,40 @@ export default function Worksheet({
         const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
         const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
 
-        let reviewStatus: TworksheetIntro['reviewStatus'] = {
-          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-          dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
-        };
+        // let reviewStatus: TworksheetIntro['reviewStatus'] = {
+        //   label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
+        //   dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
+        // };
 
-        if (toReviewManager) {
-          reviewStatus = {
-            label: `總經理 ${reviewManagerEmployee?.chName}`,
-            dotColor: managerReviewAt ? 'green' : 'red',
+        // if (toReviewManager) {
+        //   reviewStatus = {
+        //     label: `總經理 ${reviewManagerEmployee?.chName}`,
+        //     dotColor: managerReviewAt ? 'green' : 'red',
+        //   };
+        // }
+
+        const reviewStatus = (() => {
+          const reviewStatus: TworksheetIntro['reviewStatus'] = {
+            label: '未送審',
+            dotColor: 'gray',
           };
-        }
+
+          const review = reviewArr?.[0];
+
+          if (review) {
+            let currentStageIndex = Number(review.current_stage);
+            review.document_status === '核准' && (currentStageIndex = review.stages.length - 1);
+            const currentStage = review.stages[currentStageIndex];
+
+            const reviewAt_timeStamp = moment(currentStage.review_time).unix();
+            const isReviewed = reviewAt_timeStamp > 0;
+
+            reviewStatus.label = currentStage.review_person;
+            reviewStatus.dotColor = !isReviewed ? 'red' : 'green';
+          }
+
+          return reviewStatus;
+        })();
 
         const intro: TworksheetIntro = {
           worksheetId: worksheet.id,
@@ -635,17 +641,19 @@ export default function Worksheet({
             setDisabled(true);
             setIsLastestRecord(false);
           },
-          onDeleteClick: () => {
-            myAlert.confirm({
-              title: '確定刪除工作表?',
+          onDeleteClick: isReadonly
+            ? undefined
+            : () => {
+                myAlert.confirm({
+                  title: '確定刪除工作表?',
 
-              props: {
-                onOk: async () => {
-                  await reqAbandonWorkSheet(worksheet.id);
-                },
+                  props: {
+                    onOk: async () => {
+                      await reqAbandonWorkSheet(worksheet.id);
+                    },
+                  },
+                });
               },
-            });
-          },
         };
 
         return intro;
@@ -660,30 +668,32 @@ export default function Worksheet({
         qty: prodQty,
         width: prodWidth,
         height: pridHeight,
-        onSeparateClick: () => {
-          setInputModalProps({
-            title: `可分配數量${itemsNoWorksheet.length}`,
-            onConfirm: async (str) => {
-              const qty = Number(str);
+        onSeparateClick: isReadonly
+          ? undefined
+          : () => {
+              setInputModalProps({
+                title: `可分配數量${itemsNoWorksheet.length}`,
+                onConfirm: async (str) => {
+                  const qty = Number(str);
 
-              if (qty > itemsNoWorksheet.length) {
-                return myAlert.info({ title: '分配數量超過可分配數量' });
-              }
+                  if (qty > itemsNoWorksheet.length) {
+                    return myAlert.info({ title: '分配數量超過可分配數量' });
+                  }
 
-              const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
+                  const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
 
-              const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
+                  const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
 
-              const body: TcreateWorksheetDto = {
-                contractId,
-                contractProductItems,
-              };
+                  const body: TcreateWorksheetDto = {
+                    contractId,
+                    contractProductItems,
+                  };
 
-              await reqPostWorkSheet(body);
-              setInputModalProps(undefined);
+                  await reqPostWorkSheet(body);
+                  setInputModalProps(undefined);
+                },
+              });
             },
-          });
-        },
         worksheetIntroArr,
         isSpecialDoor: checkIsSpecialDoor(prod.doorModelName),
       });
@@ -702,13 +712,13 @@ export default function Worksheet({
     const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
-        reviewSalesEmployee,
-        toReviewSales,
-        salesReviewAt,
-        reviewManagerEmployee,
-        toReviewManager,
-        managerReviewAt,
-        agentEmployee,
+        // reviewSalesEmployee,
+        // toReviewSales,
+        // salesReviewAt,
+        // reviewManagerEmployee,
+        // toReviewManager,
+        // managerReviewAt,
+        agentEmployee, // 開立
         addition: { reviewArr } = {},
       } = record;
 
@@ -895,11 +905,15 @@ export default function Worksheet({
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader
-        returnBtn={disabled}
-        panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-      />
+      {!isReadonly && (
+        <PageHeader
+          returnBtn={disabled}
+          panelList={panelList}
+          contractNumber={engineeringContact?.contractNumber ?? ''}
+        />
+      )}
+
+      {isReadonly && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />}
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />

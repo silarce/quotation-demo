@@ -95,9 +95,11 @@ const apiGetReviewBack = (
   {
     showSuccess = true,
     showErr = true,
+    returnReject = false,
   }: {
     showSuccess?: boolean;
     showErr?: boolean;
+    returnReject?: boolean;
   } = {}
 ) => {
   const api = '/Review/GetReviewBack';
@@ -110,9 +112,15 @@ const apiGetReviewBack = (
     .post(api, body)
     .then(() => {
       showSuccess && myAlert.success({ title: '抽單完成' });
+
+      return 'success';
     })
     .catch((err) => {
       showErr && myAlert.err({ title: '抽單失敗', content: err.message });
+
+      if (returnReject) {
+        return Promise.reject(err);
+      }
     });
 };
 
@@ -338,3 +346,15 @@ export {
   apiGetReview,
 };
 export type { TreviewFlow, TgetReviewById, TaddReview, TgetReview };
+
+// const foo = (a: string, b: string, c: string) => {
+//   return 'foo';
+// };
+
+// type Tparams_foo = Parameters<typeof foo>;
+
+// const callFoo = (...params: Tparams_foo) => {
+//   return foo(...params);
+// };
+
+// callFoo('a', 'b', 'c');
