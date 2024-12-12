@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import moment from 'moment';
 
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
@@ -115,6 +116,7 @@ import type {
   TworksheetDto,
   TuserDto,
 } from 'js/api/dtoTypes';
+import type { TworksheetDto_addition } from 'js/api/api_engineering';
 
 // zustand // hook
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
@@ -227,6 +229,8 @@ export default function Worksheet({
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
+
+  console.log(worksheetArr);
 
   // ________________________________________________________________________
   // ________________________________________________________________________
@@ -536,7 +540,7 @@ export default function Worksheet({
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
 
-      const prodWorkSheetList: { [key: string]: TworksheetDto } = {};
+      const prodWorkSheetList: { [key: string]: TworksheetDto_addition } = {};
       const itemsNoWorksheet: TquotationProductItemDto[] = [];
 
       // ----------------------------------------------
@@ -558,13 +562,14 @@ export default function Worksheet({
         const {
           contractProductItems,
 
-          reviewSalesEmployee,
-          toReviewSales,
-          salesReviewAt,
+          // reviewSalesEmployee,
+          // toReviewSales,
+          // salesReviewAt,
 
-          reviewManagerEmployee,
-          toReviewManager,
-          managerReviewAt,
+          // reviewManagerEmployee,
+          // toReviewManager,
+          // managerReviewAt,
+          addition: { reviewArr } = {},
         } = latestRecord;
 
         const contractProductItem = contractProductItems?.[0];
@@ -572,17 +577,40 @@ export default function Worksheet({
         const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
         const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
 
-        let reviewStatus: TworksheetIntro['reviewStatus'] = {
-          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-          dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
-        };
+        // let reviewStatus: TworksheetIntro['reviewStatus'] = {
+        //   label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
+        //   dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
+        // };
 
-        if (toReviewManager) {
-          reviewStatus = {
-            label: `總經理 ${reviewManagerEmployee?.chName}`,
-            dotColor: managerReviewAt ? 'green' : 'red',
+        // if (toReviewManager) {
+        //   reviewStatus = {
+        //     label: `總經理 ${reviewManagerEmployee?.chName}`,
+        //     dotColor: managerReviewAt ? 'green' : 'red',
+        //   };
+        // }
+
+        const reviewStatus = (() => {
+          const reviewStatus: TworksheetIntro['reviewStatus'] = {
+            label: '未送審',
+            dotColor: 'gray',
           };
-        }
+
+          const review = reviewArr?.[0];
+
+          if (review) {
+            let currentStageIndex = Number(review.current_stage);
+            review.document_status === '核准' && (currentStageIndex = review.stages.length - 1);
+            const currentStage = review.stages[currentStageIndex];
+
+            const reviewAt_timeStamp = moment(currentStage.review_time).unix();
+            const isReviewed = reviewAt_timeStamp > 0;
+
+            reviewStatus.label = currentStage.review_person;
+            reviewStatus.dotColor = !isReviewed ? 'red' : 'green';
+          }
+
+          return reviewStatus;
+        })();
 
         const intro: TworksheetIntro = {
           worksheetId: worksheet.id,
@@ -680,13 +708,13 @@ export default function Worksheet({
     const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
-        reviewSalesEmployee,
-        toReviewSales,
-        salesReviewAt,
-        reviewManagerEmployee,
-        toReviewManager,
-        managerReviewAt,
-        agentEmployee,
+        // reviewSalesEmployee,
+        // toReviewSales,
+        // salesReviewAt,
+        // reviewManagerEmployee,
+        // toReviewManager,
+        // managerReviewAt,
+        agentEmployee, // 開立
         addition: { reviewArr } = {},
       } = record;
 
