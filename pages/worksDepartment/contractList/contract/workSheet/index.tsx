@@ -434,7 +434,11 @@ export default function Worksheet({
       query,
     };
 
-    await apiAddReview(body);
+    try {
+      await apiGetReviewBack(activeRecordId, { showSuccess: false, returnReject: true });
+      await apiAddReview(body);
+    } catch (error) {}
+
     await refreshData();
 
     // if (!activeRecordId) {
