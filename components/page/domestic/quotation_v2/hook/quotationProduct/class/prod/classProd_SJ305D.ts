@@ -74,6 +74,10 @@ class ClassProd_SJ305D extends ClassProd_prime implements Interface_ClassProd_pr
   readonly doorModel = 'SJ-305D';
 
   get options_surface() {
+    if (!this.materialName || !this.doorModelName) {
+      return undefined;
+    }
+
     let options = options_surface_onlyPaint;
 
     const isSST = checkIsSST(this.data.materialName);

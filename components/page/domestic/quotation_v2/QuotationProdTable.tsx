@@ -107,9 +107,10 @@ const QuotationRow_dnd_preMemo = (
     rerenderTrigger01?: any;
     rerenderTrigger02?: any;
     rerenderTrigger03?: any;
+    rerenderTrigger04?: any;
   }
 ) => {
-  const { rerenderTrigger01, rerenderTrigger02, rerenderTrigger03, ...rest } = params;
+  const { rerenderTrigger01, rerenderTrigger02, rerenderTrigger03, rerenderTrigger04, ...rest } = params;
 
   return <QuotationRow_dnd {...rest} />;
 };
@@ -121,7 +122,8 @@ const QuotationRow_dnd_memo = memo(QuotationRow_dnd_preMemo, (prev, next) => {
     prev.index === next.index &&
     prev.rerenderTrigger01 === next.rerenderTrigger01 &&
     prev.rerenderTrigger02 === next.rerenderTrigger02 &&
-    prev.rerenderTrigger03 === next.rerenderTrigger03
+    prev.rerenderTrigger03 === next.rerenderTrigger03 &&
+    prev.rerenderTrigger04 === next.rerenderTrigger04
 
     // 把rerenderTrigger設為陣列的方案發生問題
     // _.isEqual(prev.rerenderTrigger, next.rerenderTrigger)
@@ -337,6 +339,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
               rerenderTrigger01={classComponent.state}
               rerenderTrigger02={disabled}
               rerenderTrigger03={cellKeyArr_component}
+              rerenderTrigger04={classComponent.constructor}
               //
               key={componentKey}
               id={componentKey}

@@ -206,7 +206,12 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
     return this._options_material;
   }
+
   get options_surface() {
+    if (!this.materialName || !this.doorModelName) {
+      return undefined;
+    }
+
     if (!this._options_surface) {
       this._options_surface = createOptions_surface(this);
     }
@@ -387,10 +392,22 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     this.state.isFetching = false;
     this.render();
   }
+
+  // ---------------------------------------------------------------------------------
+  // MARK: 值
+
+  set materialName(value: string) {
+    this.data.materialName = value;
+
+    this.render();
+    // super.setData_simple('materialName', value);
+  }
 } // ClassProd_prime
 
 // MARK: END
 
+// ========================================================================
+// ========================================================================
 // ========================================================================
 
 // region API

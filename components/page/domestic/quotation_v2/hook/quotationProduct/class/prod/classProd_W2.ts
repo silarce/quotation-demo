@@ -38,6 +38,10 @@ class ClassProd_W2 extends ClassProd_prime implements Interface_ClassProd_prime 
   readonly doorModel = 'W2';
 
   get options_surface() {
+    if (!this.materialName || !this.doorModelName) {
+      return undefined;
+    }
+
     let options = options_surface_onlyPaint;
 
     const isSST = checkIsSST(this.data.materialName);

@@ -450,7 +450,9 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.materialName;
   }
   set materialName(value) {
-    this.setData_simple('materialName', value);
+    this.data.materialName = value;
+
+    this.render();
   }
 
   get materialSurface() {

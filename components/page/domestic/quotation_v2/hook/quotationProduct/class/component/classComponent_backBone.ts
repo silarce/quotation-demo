@@ -6,6 +6,10 @@ class ClassCompnent_backBone extends ClassCompnent_base<'backBone'> implements I
   readonly name = '背撐' as const;
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = '支';
+
+  get options_material() {
+    return undefined;
+  }
 }
 
 export { ClassCompnent_backBone };

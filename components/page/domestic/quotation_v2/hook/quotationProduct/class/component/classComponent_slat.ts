@@ -1,4 +1,8 @@
-import { ClassCompnent_base, Interface_ClassComponent_prime } from './classComponent_base';
+import {
+  ClassCompnent_base,
+  Interface_ClassComponent_prime,
+  TconstructorProps_componentBase,
+} from './classComponent_base';
 import { createNodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 const nodeConfig = (() => {
@@ -19,10 +23,53 @@ const nodeConfig = (() => {
 })();
 
 class ClassCompnent_slat extends ClassCompnent_base<'slat'> implements Interface_ClassComponent_prime {
+  //
+  static subspecies(subspecies: string) {
+    switch (subspecies) {
+      case 'W2':
+        return ClassCompnent_slat_W2;
+
+      default:
+        return ClassCompnent_slat;
+    }
+  }
+  //
   readonly key = 'slat' as const;
-  readonly name = '門片' as const;
+  protected _name = '捲門片';
   readonly nodeConfig = nodeConfig;
-  readonly unit = '㎡';
+  protected _unit = '㎡';
+
+  get name() {
+    return this._name;
+  }
+  get unit() {
+    return this._unit;
+  }
+
+  // ------------------------------------------------------------------------
+
+  get options_material() {
+    const options = this.classProd?.options_material;
+
+    if (options) {
+      const theOption = options.find((item) => {
+        return item.value === '黑鐵';
+      });
+
+      theOption && (theOption.label = '鐵材烤漆');
+    }
+
+    return options;
+  }
+}
+
+class ClassCompnent_slat_W2 extends ClassCompnent_slat {
+  protected _name = '門片';
+  protected _unit = 'M';
+
+  get options_material() {
+    return this.classProd?.options_material;
+  }
 }
 
 export { ClassCompnent_slat };

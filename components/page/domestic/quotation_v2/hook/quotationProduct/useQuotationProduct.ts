@@ -741,7 +741,7 @@ const createClassComponentDict_v2 = ({
 
   const slat =
     data_componentDict['slat'] &&
-    new ClassCompnent_slat({
+    new (ClassCompnent_slat.subspecies(activedClassProd.doorModel))({
       state_component: data_componentDict['slat'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -752,7 +752,7 @@ const createClassComponentDict_v2 = ({
 
   const bottomBar =
     data_componentDict['bottomBar'] &&
-    new ClassCompnent_bottomBar({
+    new (ClassCompnent_bottomBar.subspecies(activedClassProd.doorModel))({
       state_component: data_componentDict['bottomBar'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -763,7 +763,7 @@ const createClassComponentDict_v2 = ({
 
   const guideRail =
     data_componentDict['guideRail'] &&
-    new ClassCompnent_guideRail({
+    new (ClassCompnent_guideRail.subspecies(activedClassProd.doorModel))({
       state_component: data_componentDict['guideRail'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -817,7 +817,7 @@ const createClassComponentDict_v2 = ({
     });
   const headBox =
     data_componentDict['headBox'] &&
-    new ClassCompnent_headBox({
+    new (ClassCompnent_headBox.subspecies(activedClassProd.doorModel))({
       state_component: data_componentDict['headBox'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,

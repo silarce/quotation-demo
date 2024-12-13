@@ -52,18 +52,18 @@ interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
   readonly unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
 }
 
-// type TconstructorProps<T extends keyof Tdata_componentDict> = {
-//   state_component: TstateComponentData<T>;
-//   setState_component: TsetComponent<T>;
-// };
+type TconstructorProps_componentBase<T extends keyof Tdata_componentDict> = {
+  state_component: TstateComponentData<T>;
+  setState_component: TsetComponent<T>;
+};
 
 // ========================================================================
 // class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base<T> {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
   readonly state: TstateComponentData<T>;
-  private readonly setState: TsetComponent<T>;
+  protected readonly setState: TsetComponent<T>;
 
-  private classProd: Interface_ClassProd_prime | undefined;
+  protected classProd: Interface_ClassProd_prime | undefined;
   setClassProd(classProd: Interface_ClassProd_prime) {
     this.classProd = classProd;
   }
@@ -74,12 +74,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     //
     state_component,
     setState_component,
-  }: // activedClassProd,
-  {
-    state_component: TstateComponentData<T>;
-    setState_component: TsetComponent<T>;
-    // activedClassProd: Interface_ClassProd_prime;
-  }) {
+  }: TconstructorProps_componentBase<T>) {
     this.state = state_component;
     this.setState = setState_component;
     // this.classProd = activedClassProd;
@@ -151,9 +146,13 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
 
   get options_materialSurface() {
+    if (this.classProd?.doorModel === 'W2') {
+      return this.classProd?.options_material;
+    }
+
     return this.classProd?.options_surface;
   }
 } //  ClassCompnent_base
 
-export type { Interface_ClassComponent_base, Interface_ClassComponent_prime };
+export type { TconstructorProps_componentBase, Interface_ClassComponent_base, Interface_ClassComponent_prime };
 export { ClassCompnent_base };
