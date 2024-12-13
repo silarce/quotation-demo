@@ -16,6 +16,9 @@ import { Interface_ClassProd_prime } from '../prod/interface';
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 import type { Toption } from 'js/utils/options/options';
+import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
+
+import { checkIsSST, checkIsGalvanized } from '../library';
 
 // ========================================================================
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
@@ -146,11 +149,15 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
 
   get options_materialSurface() {
-    if (this.classProd?.doorModel === 'W2') {
-      return this.classProd?.options_material;
+    if (!this.material) {
+      return undefined;
     }
 
-    return this.classProd?.options_surface;
+    if (checkIsSST(this.material)) {
+      return optionsCreator_surface();
+    }
+
+    return optionsCreator_surface_onlyPaint();
   }
 } //  ClassCompnent_base
 
