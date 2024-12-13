@@ -62,23 +62,30 @@ interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
   readonly state: TstateComponentData<T>;
   private readonly setState: TsetComponent<T>;
-  private classProd: Interface_ClassProd_prime;
+
+  private classProd: Interface_ClassProd_prime | undefined;
+  setClassProd(classProd: Interface_ClassProd_prime) {
+    this.classProd = classProd;
+  }
+
   //
+  // -----------------------------------------------------------------------
   constructor({
     //
     state_component,
     setState_component,
-    activedClassProd,
-  }: {
+  }: // activedClassProd,
+  {
     state_component: TstateComponentData<T>;
     setState_component: TsetComponent<T>;
-    activedClassProd: Interface_ClassProd_prime;
+    // activedClassProd: Interface_ClassProd_prime;
   }) {
     this.state = state_component;
     this.setState = setState_component;
-    this.classProd = activedClassProd;
+    // this.classProd = activedClassProd;
   } // constructor close
 
+  // -----------------------------------------------------------------------
   get number() {
     return this.state.number;
   }
@@ -140,11 +147,11 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   // -----------------------------------------------------------------------
 
   get options_material() {
-    return this.classProd.options_material;
+    return this.classProd?.options_material;
   }
 
   get options_materialSurface() {
-    return this.classProd.options_surface;
+    return this.classProd?.options_surface;
   }
 } //  ClassCompnent_base
 

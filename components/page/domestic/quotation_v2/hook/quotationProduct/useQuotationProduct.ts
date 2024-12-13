@@ -476,14 +476,32 @@ const useQuotationProduct = ({
     });
   };
 
-  // const activedClassProd = useMemo(() => {
-  //   // if (!activedProd) {
-  //   //   return null;
-  //   // }
-  //   // console.log('fooo');
-  //   // const activedClassProd = createClassProd(activedProd);
-  //   // return activedClassProd;
-  // }, [activedProd]);
+  const { activedClassProd, activedClassComponentDict } = useMemo(() => {
+    if (!activedProd) {
+      return {};
+    }
+
+    const activedClassProd = createClassProd(activedProd);
+
+    const activedClassComponentDict = createActivedClassComponentDict(activedProd);
+    activedClassProd.setClassComponentDict(activedClassComponentDict);
+
+    if (activedClassProd.doorModel !== 'special') {
+      Object.values(activedClassComponentDict).forEach((classComponent) =>
+        classComponent.setClassProd(activedClassProd)
+      );
+    }
+
+    return {
+      activedClassProd,
+      activedClassComponentDict,
+    };
+  }, [
+    //
+    activedProd,
+    ...Object.values(activedProd?.data_componentDict ?? {}),
+    ...Object.values(activedProd?.data_accessoryDict ?? {}),
+  ]);
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -528,6 +546,8 @@ const useQuotationProduct = ({
     // classProdDict,
     // activedClassProd,
     activedProd,
+    activedClassProd,
+    activedClassComponentDict,
     //
     cellKeyArr,
     setCellKeyArr,
@@ -725,7 +745,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'slat',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const bottomBar =
@@ -736,7 +756,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'bottomBar',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const guideRail =
@@ -747,7 +767,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'guideRail',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const sidePlate =
@@ -758,7 +778,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'sidePlate',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const roller =
@@ -769,7 +789,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'roller',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const motor =
@@ -780,7 +800,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'motor',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const motorAccessories =
@@ -791,7 +811,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'motorAccessories',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
   const headBox =
     data_componentDict['headBox'] &&
@@ -801,7 +821,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'headBox',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
   const middlePillar =
     data_componentDict['middlePillar'] &&
@@ -811,7 +831,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'middlePillar',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
   const backBone =
     data_componentDict['backBone'] &&
@@ -821,7 +841,7 @@ const createClassComponentDict_v2 = ({
         pordKey: activeProdKey,
         componentKey: 'backBone',
       }),
-      activedClassProd,
+      // activedClassProd,
     });
 
   const classComponentDict: TclassComponentDict = {
@@ -836,6 +856,15 @@ const createClassComponentDict_v2 = ({
     middlePillar,
     backBone,
   };
+
+  // 清除classComponentDict中為undefined的項目
+  Object.keys(classComponentDict).forEach((key) => {
+    const theKey = key as keyof TclassComponentDict;
+
+    if (classComponentDict[theKey] === undefined) {
+      delete classComponentDict[theKey];
+    }
+  });
 
   return classComponentDict;
 };
@@ -865,7 +894,7 @@ const createAccessoryDict = ({
 
 // ================================================================================
 
-export type { TuseQuotationProductInstance, TstateProd };
+export type { TuseQuotationProductInstance, TstateProd, TclassComponentDict };
 export { useQuotationProduct };
 
 // import { DeepReadonly } from 'ts-essentials';

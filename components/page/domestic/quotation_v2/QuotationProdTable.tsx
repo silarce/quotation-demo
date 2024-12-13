@@ -158,6 +158,7 @@ const Table_prod = ({
     // lookup_classProd,
     // nodeConfig_prime,
     createClassProd,
+    activedClassProd,
   } = instance_useQuotationProductInstance;
 
   return (
@@ -231,6 +232,8 @@ const Table_prod = ({
                 prodKey={prodKey}
                 choseActiveProd={choseActiveProd}
                 createClassProd={createClassProd}
+                //
+                activedClassProd={activedClassProd}
               />
             );
           })}
@@ -244,6 +247,8 @@ const Table_prod = ({
 const Table_component = ({ instance_useQuotationProductInstance, disabled, className }: TtableProps) => {
   const {
     activedProd,
+    activedClassComponentDict,
+    //
     cellKeyArr_component,
     setCellKeyArr_component,
     componentKeyArr,
@@ -255,15 +260,16 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
-  const classComponentDict = (() => {
-    if (!activedProd) {
-      return undefined;
-    }
+  // const classComponentDict = (() => {
+  //   if (!activedProd) {
+  //     return undefined;
+  //   }
 
-    const classComponentDict = createActivedClassComponentDict(activedProd);
+  //   const classComponentDict = createActivedClassComponentDict(activedProd);
 
-    return classComponentDict;
-  })();
+  //   return classComponentDict;
+  // })();
+  const classComponentDict = activedClassComponentDict;
 
   useEffect(() => {
     setActiveIndex(undefined);
@@ -532,6 +538,7 @@ const QuotationRow_dealClass = ({
   cellKeyArr,
   choseActiveProd,
   createClassProd,
+  activedClassProd,
 }: {
   stateProd: TstateProd;
 
@@ -543,10 +550,12 @@ const QuotationRow_dealClass = ({
   cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
   choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
   createClassProd: TuseQuotationProductInstance['createClassProd'];
+  activedClassProd: TuseQuotationProductInstance['activedClassProd'];
 }) => {
   const [viewRef, inView] = useInView();
 
-  const classProd = createClassProd(stateProd);
+  // const classProd = activedClassProd || createClassProd(stateProd);
+  const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
 

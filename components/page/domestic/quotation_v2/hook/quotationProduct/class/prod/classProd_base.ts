@@ -28,6 +28,8 @@ import {
   TdoorModel,
 } from 'js/api/dtoTypes';
 
+import type { TclassComponentDict } from '../../useQuotationProduct';
+
 // api
 import {
   Thp,
@@ -215,6 +217,9 @@ class ClassProd_base implements Interface_ClassProd_base {
   static calcArea = calcArea;
   static reqGetProdCalcGeneralSpec = reqGetProdCalcGeneralSpec;
   static reqGetAvailableComponents = reqGetAvailableComponents;
+  // -----------------------------------------------------------------
+
+  // -----------------------------------------------------------------
 
   constructor({ stateProd, setStateProd, nodeConfig }: Tprops_constructor) {
     // cloneDeep對效能的負擔太大了
@@ -226,6 +231,16 @@ class ClassProd_base implements Interface_ClassProd_base {
   } // constructor
 
   // -----------------------------------------------------------------------
+
+  protected classComponentDict: TclassComponentDict = {};
+
+  setClassComponentDict(classComponentDict: TclassComponentDict) {
+    this.classComponentDict = classComponentDict;
+  }
+  clearClassComponentDict() {
+    this.classComponentDict = {};
+  }
+
   // -----------------------------------------------------------------------
   doorModel = 'SJ-302';
   protected _nodeConfig: TnodeConfig;
