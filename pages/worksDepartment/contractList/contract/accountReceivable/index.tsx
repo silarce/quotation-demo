@@ -608,6 +608,7 @@ export default function AccountReceivable({
           readonly={readonly}
           totalOtherFee={accountReceivable.totalOtherFee}
           isForeign={accountReceivable.currency !== 'TWD 新臺幣'}
+          accountReceivableCurrency={accountReceivable.currency}
         />
 
         {/* 扣款明細 */}
