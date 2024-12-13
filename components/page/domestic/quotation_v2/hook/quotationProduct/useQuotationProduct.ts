@@ -382,6 +382,7 @@ const useQuotationProduct = ({
     const setComponent: TsetComponent<T> = (newStateComponent) => {
       setState_prodDict((prev) => {
         const copy = { ...prev };
+        copy[pordKey] = { ...copy[pordKey] };
         const prod = copy[pordKey];
         const data_componentDict = prod.data_componentDict;
 
@@ -499,8 +500,9 @@ const useQuotationProduct = ({
   }, [
     //
     activedProd,
-    ...Object.values(activedProd?.data_componentDict ?? {}),
-    ...Object.values(activedProd?.data_accessoryDict ?? {}),
+    createClassProd,
+    // ...Object.values(activedProd?.data_componentDict ?? {}),
+    // ...Object.values(activedProd?.data_accessoryDict ?? {}),
   ]);
 
   // -----------------------------------------------------------------------
