@@ -50,25 +50,24 @@ type Tquery = {
 };
 
 export default function POrderDetail() {
+    const [pagename, setPagename] = useState<string>("採購單")
 
-    //路由參數
+    //#region ===========【路由參數】
     const router = useRouter();
     const {
         firstin,
-        need_date,
-        create_at,
-        create_by,
-        purchaserequisitionuuid,
-        purchaserequisitionid,
         item
     } = router.query;
 
     const parsedItem = item ? JSON.parse(item as string) : null;
+    //#endregion
 
-
-    //登入者資料
+    //#region ===========【登入者】
     const { userInfo } = useContext(AppContext);
     const { erpFeature } = useContext(AppContext);
+    //#endregion
+
+    //#region ===========【變數宣告】
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -78,6 +77,7 @@ export default function POrderDetail() {
     const [searchbardata, setSearchBarData] = useState<any[]>([]);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [prdata, setPrdata] = useState<any[]>([]);
+    const [customerdata, setCustomerdata] = useState<any[]>([]);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -95,15 +95,18 @@ export default function POrderDetail() {
 
     const [searchproduct, setSearchProduct] = useState<string>("");
 
+    // const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
+    // const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
+    // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
+    // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
+    const [idin, setidin] = useState<string>("");
+    const [uuidin, setuuidin] = useState<string>("");
+
     const [create_atin, setCreate_atin] = useState<string>("");
-    const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
-    const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
     const [create_byin, setCreate_byin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [need_datein, setNeed_datein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
-    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
-    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
@@ -113,6 +116,12 @@ export default function POrderDetail() {
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
 
     //編輯時保留原始資料
+    const [originalsuppliername, setOriginalsuppliername] = useState<string>("");
+    const [originalsupplierphone, setOriginalsupplierphone] = useState<string>("");
+    const [originalsuppliertaxid, setOriginalsuppliertaxid] = useState<string>("");
+    const [originalsupplieraddress, setOriginalsupplieraddress] = useState<string>("");
+    const [originalshippingaddress, setOriginalshippingaddress] = useState<string>("");
+    const [originalinvoice, setOriginalInvoice] = useState<string>("");
     const [originalcreate_at, setOriginalcreate_at] = useState<string>("");
     const [originalneed_date, setOriginalneed_date] = useState<string>("");
     const [originalnote, setOriginalnote] = useState<string>("");
@@ -155,15 +164,10 @@ export default function POrderDetail() {
     const [totalprice1, setTotalPrice1] = useState<string>("");
     const [taxprice1, setTaxPrice1] = useState<string>("");
     const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
+    //#endregion
 
-
-
-    //#region 上方功能列
-
-    //搜尋功能
-
-
-    //搜尋功能
+    //#region ===========【上方功能列】
+    //搜尋
     const doSearch = (valueArr: (string | Toption | null)[]) => {
         // const keywordWhpname = valueArr[0] as string;
         // const keywordMaterialnumber = valueArr[1] as string;
@@ -171,37 +175,51 @@ export default function POrderDetail() {
         // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
     };
 
-
-
-
-
-
-
-    //新增按鈕
+    //按鈕
     const panelList: TpanelList = [
 
     ];
     //#endregion
 
+    //#region ===========【監控畫面大小】
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-    //頁面進入
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+    //#endregion
+
+    //#region ===========【頁面進入】
+    //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
         console.log(userInfo);
         if (!hasFetchedData.current) {
             getProduct();
+            getCustomers();
             GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
 
     useEffect(() => {
-        NewGetPurchaseOrderDetailById(parsedItem?.purchaseorderuuid);
+        setuuidin(parsedItem?.purchaseorderuuid);
+        setidin(parsedItem?.purchaseorderid)
+        GetDetailById(parsedItem?.purchaseorderuuid);
         GetReviewById(parsedItem?.purchaseorderuuid);
         GetReviewHistory(parsedItem?.purchaseorderuuid);
-        setPurchaseorderuuidin(parsedItem?.purchaseorderuuid);
-        setPurchaseorderidin(parsedItem?.purchaseorderid);
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
@@ -215,13 +233,12 @@ export default function POrderDetail() {
         setInvoicein(parsedItem?.invoice);
 
     }, [item]);
+    //#endregion
 
+    //#region ===========【API】
 
-
-    // newapi
-
-    //取請購明細
-    const NewGetPurchaseOrderDetailById = async (id: any) => {
+    //以ID取單據
+    const GetDetailById = async (id: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
@@ -257,12 +274,22 @@ export default function POrderDetail() {
         }
     };
 
-    //更新請購單和請購單明細
-    const NewUpdatePurchaserequisitionDetail = async () => {
+    //更新單據
+    const Update = async () => {
         try {
+
+            const data = {
+                suppliername: suppliernamein,
+                supplieraddress: supplieraddressin,
+                supplierphone: supplierphonein,
+                suppliertaxid: suppliertaxidin,
+                invoice: invoicein,
+                shippingaddress: shippingaddressin
+            };
+            
             const conditionModel = {
-                purchaserequisitionid: purchaserequisitionidin,
-                purchaserequisitionuuid: purchaserequisitionuuidin,
+                purchaseorderuuid: uuidin,
+                data: data,
                 create_at: create_atin,
                 need_date: need_datein,
                 note: notein,
@@ -293,7 +320,7 @@ export default function POrderDetail() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                NewGetPurchaseOrderDetailById(purchaseorderuuidin);
+                GetDetailById(uuidin);
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
@@ -311,10 +338,10 @@ export default function POrderDetail() {
     };
 
     //作廢單據
-    const NewDeletePurchaseRequisition = async () => {
+    const Delete = async () => {
         try {
             const conditionModel = {
-                id: purchaserequisitionuuidin as string | undefined,
+                id: uuidin as string | undefined,
             };
 
 
@@ -326,7 +353,7 @@ export default function POrderDetail() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseRequisition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -357,9 +384,87 @@ export default function POrderDetail() {
         }
     };
 
+    //取物料
+    const getProduct = async () => {
+        try {
+            setIsLoading(true);
+
+            const conditionModel = {
+            };
 
 
-    //#region 審核
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData(data);
+            setModalData(data);
+            setSearchBarData(data);
+
+            console.log(erpFeature);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //取廠商
+    const getCustomers = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {};
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetCustomers?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+
+            // 提取唯一的縣市選項
+            const uniqueCounties = Array.from(new Set(responseData.map((item: any) => item.county))) as string[];
+            setCountyOptions(uniqueCounties);
+
+            // 設置客戶資料
+            setCustomerdata(responseData);
+
+            // 設置篩選後的資料
+            setFilteredData(responseData);
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+
+
+    //#endregion
+
+    //#region ===========【審核】
     const [review_flow, setReview_flow] = useState<string>("");
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
@@ -483,8 +588,8 @@ export default function POrderDetail() {
             // }
             // else {
             const review_query = {
-                purchaseorderuuid: purchaseorderuuidin,
-                purchaseorderid: purchaseorderidin,
+                purchaseorderuuid: uuidin,
+                purchaseorderid: idin,
                 create_at: create_atin,
                 create_by: create_byin,
                 status: '採購中',
@@ -494,9 +599,9 @@ export default function POrderDetail() {
             };
 
             const conditionModel = {
-                document_id: purchaseorderidin,
-                document_uuid: purchaseorderuuidin,
-                document_type: "採購單",
+                document_id: idin,
+                document_uuid: uuidin,
+                document_type: pagename,
                 review_id: review_flow,
                 query: review_query,
                 user_id: userInfo?.employee?.id.toString(),
@@ -525,7 +630,7 @@ export default function POrderDetail() {
             }
             const data = await response.json();
             setReviewflowdata([]);
-            GetReviewById(purchaseorderuuidin);
+            GetReviewById(uuidin);
 
 
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -533,7 +638,7 @@ export default function POrderDetail() {
             //改變單據狀態
             const conditionModel2 = {
                 type: type,
-                purchaseorderuuid: purchaseorderuuidin,
+                purchaseorderuuid: uuidin,
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -553,8 +658,8 @@ export default function POrderDetail() {
             }
             const data2 = await response2.json();
 
-            NewGetPurchaseOrderDetailById(purchaseorderuuidin);
-            GetReviewById(purchaseorderuuidin)
+            GetDetailById(uuidin);
+            GetReviewById(uuidin)
             setStatusin("審核中");
             setReviewbar(false);
 
@@ -575,7 +680,7 @@ export default function POrderDetail() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
+        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -586,7 +691,7 @@ export default function POrderDetail() {
                     try {
                         setIsLoading(true);
                         const conditionModel = {
-                            document_uuid: purchaserequisitionuuidin,
+                            document_uuid: uuidin,
                         };
 
                         var inputModel = {
@@ -613,7 +718,7 @@ export default function POrderDetail() {
                         setStatusin("詢價中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(purchaserequisitionuuidin);
+                        GetReviewHistory(uuidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -628,8 +733,6 @@ export default function POrderDetail() {
 
     const GetReviewHistory = async (id: any) => {
         try {
-            // setIsLoading(true);
-            // alert(purchaserequisitionidin);
             const conditionModel = {
                 document_uuid: id
             };
@@ -669,494 +772,50 @@ export default function POrderDetail() {
     }
     //#endregion
 
-
-
-
-
-
-    //#region api呼叫區
-    //取物料清單
-    const getProduct = async () => {
-        try {
-            //  console.log(userInfo);
-            setIsLoading(true);
-            const conditionModel = {
-                // keyword: "search" as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData(data);
-            setModalData(data);
-            setSearchBarData(data);
-
-            console.log(erpFeature);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
+    //#region ===========【單據功能區】
+    //編輯
+    const handleEdit = () => {
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginalnote(notein);
+        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+        setOriginalsuppliername(suppliernamein);
+        setOriginalsupplieraddress(supplieraddressin);
+        setOriginalsupplierphone(supplierphonein);
+        setOriginalsuppliertaxid(suppliertaxidin);
+        setOriginalshippingaddress(shippingaddressin);
+        setIsEditing(true) // 進入編輯模式
     };
 
-
-
-
-
-
-
-
-    //#endregion
-
-
-    //#region 口袋清單功能區
-    // 口袋清單編輯狀態控制，一次只能針對一列做修改
-    const handleEditStatus = (index: number) => {
-        setEditRowId(index);
-        setEditStatus(true);
-        setData2Restore(data2);
+    //取消編輯
+    const handleCancel = () => {
+        setCreate_atin(originalcreate_at);
+        setNeed_datein(originalneed_date);
+        setNotein(originalnote);
+        setData2([...originaldata2]);  // 確保還原為原始資料
+        setSuppliernamein(originalsuppliername);
+        setSupplieraddressin(originalsupplieraddress);
+        setSupplierphonein(originalsupplierphone);
+        setSuppliertaxidin(originalsuppliertaxid);
+        setShippingaddressin(originalshippingaddress);
+        setIsEditing(false);  // 結束編輯模式
     };
 
-    const handleSaveEdit = (index: number) => {
-        setEditStatus(false);
-        // // console.log(data2);
-    };
-
-    // 從口袋清單移除
-    const handleRemove = (index: number, item: any) => {
+    //作廢單據
+    const handleDelete = () => {
         myAlert.confirm({
-            title: '確定移除?',
+            title: '確定刪除嗎?',
             props: {
                 onOk: () => {
-                    const updatedData = data2.filter((_, i) => i !== index);
-                    setData2(updatedData);
+                    Delete();
                 }
             }
-        });
-        // RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
-    };
-
-
-    const handleStringChange = (index: number, key: string, value: string) => {
-        const updatedData2 = [...data2];  // 使用淺拷貝
-        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
-        setData2(updatedData2);  // 更新data2
-
-        if (key === 'productid' || key === 'name' || key === 'spec') {
-            const filters = {
-                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
-                name: updatedData2[index].name?.trim().toLowerCase() || "",
-                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
-            };
-
-            if (Object.values(filters).some(filter => filter !== "")) {
-                const filtered = data.filter(item =>
-                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
-                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
-                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
-                );
-
-                setFilteredData(filtered);
-                setShowSuggestions(true);
-            } else {
-                setShowSuggestions(false);
-            }
-        }
-    };
-
-    // 確保在進入編輯模式時，原始資料被正確保存
-    const enterEditMode = () => {
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setIsEditing(true); // 進入編輯模式
-    };
-
-    const cancelEditMode = () => {
-        setData2([...originaldata2]); // 確保還原為原始資料
-        setIsEditing(false); // 退出編輯模式
-    };
-
-
-
-
-
-    // 還原口袋清單
-    const handleRestore = () => {
-        setData2(data2restore);
+        })
     }
     //#endregion
 
-
-    useEffect(() => {
-        console.log(originaldata2);
-        console.log(data2);
-    }, [isEditing]);
-
-
-    //#region modal
-    const [productSearchmodalopen, setProductSearchmodalopen] = useState<boolean>(false);
-
-    const [test, setTest] = useState<string>("");
-
-    //帶入請購查詢畫面的資料
-    // const [quotereqname, setQuotereqname] = useState<string>("");
-    // const [quotereqspec, setQuotereqspec] = useState<string>("");
-    // const [quotereqquantity, setQuotereqquantity] = useState<string>("");
-    const [selectedOption, setSelectedOption] = useState('物料'); // 預設選項
-
-    //對應詢價單主檔的詢價單明細
-    const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
-    //確定廠商後更新請購單明細
-    const [refreshpurchaserequisitiondetail, setRefreshpurchaserequisitiondetail] = useState<any>();
-
-    //加入詢價廠商
-    const [prquotereqadddata, setPrquotereqadddata] = useState({
-        // id: "",id 自增長不用寫入
-        quoterequuid: "",
-        quotereqid: "",
-        unitprice: "",
-        totalprice: "",
-        suppliername: "",
-        deliverydate: moment(),
-        unit: "",
-        note: "",
-        awarded: false
-    });
-
-    //得標廠商id，update回quotereqdetail
-    const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
-    const [selectedsupplier, setSelectedsupplier] = useState<string>("");
-
-
-    //關閉詢價單modal
-    const productSearchModalClose = async () => {
-        setModalData([]);
-        setKeyword1("");
-        setKeyword2("");
-        setKeyword3("");
-        await new Promise(resolve => setTimeout(resolve, 50));
-        setProductSearchmodalopen(false);
-    }
-
-
-
-
-    interface DataItem {
-        id: string;
-        productid: string;
-        spec: string | null; // spec 可能為 null
-        name: string;
-        unit: string;
-    }
-
-
-    // const [handinputname, setHandinputname] = useState("");
-    // const [handinputspec, setHandinputspec] = useState("");
-    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const isSelectingRef = useRef(false);
-    // const data: DataItem[] = [
-    //     // 你的資料項目
-    // ];
-
-    useEffect(() => {
-        console.log("OK");
-        console.log(searchbardata);
-        console.log(handinputproductid);
-        console.log(handinputname);
-        console.log(handinputspec);
-
-        if (isSelectingRef.current) return;
-
-        let filtered = searchbardata;
-        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
-            if (handinputproductuuid) {
-                let filtered = searchbardata;
-                filtered = searchbardata.filter(item =>
-                    item.id.includes(handinputproductuuid)
-                );
-            }
-            if (handinputproductid) {
-                filtered = filtered.filter(item =>
-                    item.productid.includes(handinputproductid)
-                );
-            }
-
-            if (handinputname) {
-                filtered = filtered.filter(item =>
-                    item.name.includes(handinputname)
-                );
-            }
-
-            if (handinputspec) {
-                filtered = filtered.filter(item =>
-                    item.spec && item.spec.includes(handinputspec)
-                );
-            }
-
-            setFilteredData(filtered);
-            // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
-            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
-
-            console.log(showSuggestions);
-            console.log(filtered);
-        }
-        else {
-            setHandinputproductuuid('');
-            setFilteredData([]);
-            setShowSuggestions(false);
-        }
-
-        // }, [data2]);
-    }, [handinputproductid, handinputname, handinputspec]);
-
-    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        setHandinputproductid(e.target.value);
-    };
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // setFilteredData(data);
-        isSelectingRef.current = false;
-        setHandinputname(e.target.value);
-    };
-
-    const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        setHandinputspec(e.target.value);
-    };
-
-    // const handleSelect = (item: DataItem) => {
-    //     console.log(item);
-    //     console.log(data2);
-    //     isSelectingRef.current = true;
-    //     // setHandinputproductuuid(item.id);
-    //     // setHandinputproductid(item.productid);
-    //     // setHandinputname(item.name);
-    //     // setHandinputspec(item.spec || "");
-    //     // setHandinputunit(item.unit);
-    //     // handleStringChange(currentindex, "productuuid", item.id);
-    //     handleStringChange(currentindex, "productid", item.productid);
-    //     handleStringChange(currentindex, "name", item.name);
-    //     handleStringChange(currentindex, "spec", item.spec);
-    //     handleStringChange(currentindex, "unit", item.unit);
-
-
-    //     setShowSuggestions(false);
-    // };
-
-    // const handleSelect = (item: DataItem) => {
-    //     console.log(item);
-    //     console.log(data2);
-    //     isSelectingRef.current = true;
-
-    //     // 合併多個變更
-    //     const newData = [...data2];
-    //     newData[currentindex] = {
-    //         ...newData[currentindex],
-    //         productid: item.productid,
-    //         name: item.name,
-    //         spec: item.spec || "",
-    //         unit: item.unit,
-    //     };
-
-    //     setData2(newData); // 一次更新所有變更
-    //     setShowSuggestions(false); // 隱藏建議
-
-    //     setSearchBarData(data);
-    // };
-
-    const handleSelect = (selectedItem: any) => {
-        const updatedData2 = [...data2];
-        const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
-        updatedData2[index] = {
-            ...updatedData2[index],
-            productuuid: selectedItem.id,
-            productid: selectedItem.productid,
-            name: selectedItem.name,
-            spec: selectedItem.spec,
-            unit: selectedItem.unit,
-        };
-        setData2(updatedData2);
-
-        // 清除建議選單
-        setFilteredData([]);
-        setShowSuggestions(false);
-    };
-
-
-    const [dragging, setDragging] = useState(false);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-
-
-    const handleMouseUp = () => {
-        setDragging(false);
-    };
-
-
-    useEffect(() => {
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [dragging, offset, position]);
-
-    const handleMouseMove = (event: any) => {
-        if (dragging) {
-            setPosition({
-                x: event.clientX - offset.x,
-                y: event.clientY - offset.y,
-            });
-        }
-    };
-
-    const handleMouseDown = (event: any) => {
-        setDragging(true);
-        // 記錄下滑鼠的偏差
-        setOffset({
-            x: event.clientX - position.x,
-            y: event.clientY - position.y,
-        });
-    };
-
-
-
-    const handleClearHandKey = () => {
-        setHandinputproductuuid('');
-        setHandinputproductid('');
-        setHandinputname('');
-        setHandinputspec('');
-        setHandinputunit('');
-        setHandinputnote('');
-        setHandinputquantity('');
-        setShowSuggestions(false);
-    }
-
-    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-
-
-
-    useEffect(() => {
-        // 定義事件處理器
-        const handleResize = () => {
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        };
-
-        // 在元件掛載時設置事件監聽器
-        window.addEventListener('resize', handleResize);
-
-        // 在元件卸載時移除事件監聽器
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
-    const dropdownRef = useRef<HTMLUListElement | null>(null);
-
-    useEffect(() => {
-        // 按下 ESC 鍵關閉下拉選單
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
-                setFilteredData([]);
-                if (dropdownRef.current) {
-                    dropdownRef.current.style.display = 'none';
-                }
-            }
-        };
-
-        // 為整個 document 添加事件監聽器
-        document.addEventListener('keydown', handleKeyDown);
-
-        // 清理事件監聽器
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-
-    const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
-    const SearchModalClose = async () => {
-        setSearchmodalopen(false);
-    }
-
-    const filterData = () => {
-        const startDate = keywordstartdate;
-        const endDate = keywordenddate;
-        const requisitionId = keyword2.trim();
-        const status = keyword3.trim();
-
-        // 檢查是否所有條件都為空
-        if ((!startDate || !startDate.isValid()) &&
-            (!endDate || !endDate.isValid()) &&
-            !requisitionId &&
-            !status) {
-            setSearchdata(prdata);
-            return;
-        }
-
-        // 過濾資料
-        let filteredData = prdata.filter(item => {
-            const createAt = moment(item.create_at);
-            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
-                ? true
-                : createAt.isBetween(startDate, endDate, 'days', '[]');
-            return isDateInRange;
-        });
-
-        // 模糊查詢請購單號
-        if (requisitionId) {
-            filteredData = filteredData.filter(item =>
-                item.purchaserequisitionid.toString().includes(requisitionId)
-            );
-        }
-
-        // 模糊查詢單據狀態
-        if (status) {
-            filteredData = filteredData.filter(item =>
-                item.status.toString().includes(status)
-            );
-        }
-
-        setSearchdata(filteredData);
-    };
-
-    // 監聽條件變更
-    useEffect(() => {
-        filterData();
-    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
-
-
-
-    const clearFilterData = (e: any) => {
-        e.preventDefault();
-        setKeywordstartdate(null)
-        setKeywordenddate(null);
-        setKeyword2('');
-        setKeyword3('');
-        // setSearchdata(data);
-    }
-
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
-
+    //#region ===========【明細功能區】
+    // 新增明細
     const handleAddDetail = () => {
 
         const emptyDetail = {
@@ -1188,40 +847,54 @@ export default function POrderDetail() {
 
     };
 
-
-    const handleEdit = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setIsEditing(true) // 進入編輯模式
-    };
-
-    const handleCancel = () => {
-        setCreate_atin(originalcreate_at);
-        setNeed_datein(originalneed_date);
-        setNotein(originalnote);
-        setData2([...originaldata2]);  // 確保還原為原始資料
-        setIsEditing(false);  // 結束編輯模式
-    };
-
-    const handleDelete = () => {
+    // 從明細移除
+    const handleRemove = (index: number, item: any) => {
         myAlert.confirm({
-            title: '確定刪除嗎?',
+            title: '確定移除?',
             props: {
                 onOk: () => {
-                    NewDeletePurchaseRequisition();
+                    const updatedData = data2.filter((_, i) => i !== index);
+                    setData2(updatedData);
                 }
             }
-        })
-    }
+        });
+    };
 
+    //更新明細資料
+    const handleStringChange = (index: number, key: string, value: string) => {
+        const updatedData2 = [...data2];  // 使用淺拷貝
+        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
+        setData2(updatedData2);  // 更新data2
 
+        if (key === 'productid' || key === 'name' || key === 'spec') {
+            const filters = {
+                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
+                name: updatedData2[index].name?.trim().toLowerCase() || "",
+                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
+            };
 
+            if (Object.values(filters).some(filter => filter !== "")) {
+                const filtered = data.filter(item =>
+                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
+                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
+                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
+                );
 
+                setFilteredData(filtered);
+                setShowSuggestions(true);
+            } else {
+                setShowSuggestions(false);
+            }
+        }
+    };
 
-    // 資料異動處理
+    //focus選中的明細
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
 
+    // 明細異動處理
     useEffect(() => {
         console.log(data1);
 
@@ -1252,13 +925,130 @@ export default function POrderDetail() {
 
     }, [data2]);
 
+    //#endregion
+
+    //#region ===========【物料篩選】
+    interface DataItem {
+        id: string;
+        productid: string;
+        spec: string | null; // spec 可能為 null
+        name: string;
+        unit: string;
+    }
+
+    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const isSelectingRef = useRef(false);
+
+    useEffect(() => {
+
+        if (isSelectingRef.current) return;
+
+        let filtered = searchbardata;
+        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
+            if (handinputproductuuid) {
+                let filtered = searchbardata;
+                filtered = searchbardata.filter(item =>
+                    item.id.includes(handinputproductuuid)
+                );
+            }
+            if (handinputproductid) {
+                filtered = filtered.filter(item =>
+                    item.productid.includes(handinputproductid)
+                );
+            }
+
+            if (handinputname) {
+                filtered = filtered.filter(item =>
+                    item.name.includes(handinputname)
+                );
+            }
+
+            if (handinputspec) {
+                filtered = filtered.filter(item =>
+                    item.spec && item.spec.includes(handinputspec)
+                );
+            }
+
+            setFilteredData(filtered);
+            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+
+        }
+        else {
+            setHandinputproductuuid('');
+            setFilteredData([]);
+            setShowSuggestions(false);
+        }
+    }, [handinputproductid, handinputname, handinputspec]);
 
 
+    //點選物料
+    const handleSelect = (selectedItem: any) => {
+        const updatedData2 = [...data2];
+        const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
+        updatedData2[index] = {
+            ...updatedData2[index],
+            productuuid: selectedItem.id,
+            productid: selectedItem.productid,
+            name: selectedItem.name,
+            spec: selectedItem.spec,
+            unit: selectedItem.unit,
+        };
+        setData2(updatedData2);
+
+        // 清除建議選單
+        setFilteredData([]);
+        setShowSuggestions(false);
+    };
+
+    //點選物料後控制，使用ESC關閉等狀態監控
+    const dropdownRef = useRef<HTMLUListElement | null>(null);
+    useEffect(() => {
+        // 按下 ESC 鍵關閉下拉選單
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
+                setFilteredData([]);
+                if (dropdownRef.current) {
+                    dropdownRef.current.style.display = 'none';
+                }
+            }
+        };
+
+        // 為整個 document 添加事件監聽器
+        document.addEventListener('keydown', handleKeyDown);
+
+        // 清理事件監聽器
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+    //#endregion
+
+    //#region ===========【廠商篩選】
+    const [customerbar, setCustomerbar] = useState(false);
+    const [countyOptions, setCountyOptions] = useState<string[]>([]);
+    const [filteredData2, setFilteredData2] = useState<any[]>([]);
+    const [filters, setFilters] = useState({
+        county: '',
+        name: '',
+        contact: ''
+    });
+
+    // 根據篩選條件更新資料
+    useEffect(() => {
+        const filtered = customerdata.filter(item =>
+            (filters.county === '' || item.county === filters.county) &&
+            (filters.name === '' || item.name.includes(filters.name)) &&
+            (filters.contact === '' || item.contact.includes(filters.contact))
+        );
+        setFilteredData(filtered);
+    }, [filters]);
+
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag='採購單' panelList={panelList}
+            <PageHeader02 tag={pagename} panelList={panelList}
                 customeRight={[
                     <>
                         {/* 編輯按鈕 */}
@@ -1278,7 +1068,7 @@ export default function POrderDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         setReviewbar(true);
-                                        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
+                                        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
                                     }}
                                     title="審核流程"
                                 >
@@ -1314,7 +1104,7 @@ export default function POrderDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         myAlert.confirm({
-                                            title: '確定要返回採購單列表嗎?',
+                                            title: `確定要返回${pagename}列表嗎?`,
                                             content: <>
                                                 <h1>未儲存的資料將不會保留</h1>
                                             </>,
@@ -1337,7 +1127,7 @@ export default function POrderDetail() {
                                     className={scss.shortredsquarebtn}
                                     onClick={() => {
                                         setIsEditing(false); // 儲存後結束編輯模式
-                                        NewUpdatePurchaserequisitionDetail()
+                                        Update()
 
                                         // NewAddPurchaseRequisition(); // 實際儲存邏輯
                                     }}
@@ -1438,13 +1228,13 @@ export default function POrderDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="採購單號"
+                                            caption={`${pagename}號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: purchaseorderidin || ' ',
+                                                    value: idin || ' ',
                                                 },
                                             }}
                                         />
@@ -1643,9 +1433,48 @@ export default function POrderDetail() {
                                                 },
                                             }}
                                         />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin,
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <button
+                                            style={{
+                                                display: `${isEditing ? '' : 'none'}`,
+                                                width: '39px',
+                                                backgroundColor: '#f5f5f5',
+                                                border: '1px solid #c1c1c1',
+                                                // borderRadius: '5px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                            }}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                                                e.currentTarget.style.borderColor = '#a1a1a1';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                                e.currentTarget.style.borderColor = '#c1c1c1';
+                                            }}
+                                            onClick={() => {
+                                                setCustomerbar(true);
+                                            }}
+                                        >
+                                            ⋯
+                                        </button>
+
 
                                     </div>
-                                    <div></div>
                                 </div>
                             </div>
                             <div>
@@ -1661,17 +1490,28 @@ export default function POrderDetail() {
                                             },
                                         }}
                                     />
-                                    {/* <InputSel
+                                    <InputSel
                                         {...inputSelProps}
-                                        caption="合計"
+                                        caption="營業稅"
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                style: { color: 'red' },
-                                                value: status || ' ',
+                                                // style: { color: 'red' },
+                                                value: taxprice1 || ' ',
                                             },
                                         }}
-                                    /> */}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="應付金額"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                // style: { color: 'red' },
+                                                value: totalpayprice1 || ' ',
+                                            },
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -2124,48 +1964,6 @@ export default function POrderDetail() {
                 </div>
 
                 {/* 審核 */}
-                {/* <DragableModal
-                    handleText="審核流程"
-                    style={{ zIndex: '1001', width: '1000px' }}
-                    show={reviewbar}
-                    onCrossClick={() => { setReviewbar(false) }}
-                >
-                    <div style={{ padding: '0px 5px' }}>
-                        <span style={{ fontSize: '18px' }}>送審主旨</span>
-                        <input placeholder="主旨"
-                            style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
-                            value={documenttitle}
-                            onChange={(e) => { setDocumenttitle(e.target.value) }}
-                        />
-                        <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
-                            <Space direction="vertical">
-                                {reviewdata.map((_item: any) => (
-                                    <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
-                                        <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                                            <span style={{ width: '150px' }}>
-                                                {_item.name}
-                                            </span>
-                                            <span>
-                                                {_item.stages.map((_stage: any, index: number) => (
-                                                    <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
-                                                        {_stage.review_type}：{_stage.stage_user_name}
-                                                        {index < _item.stages.length - 1 && (
-                                                            <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </span>
-                                        </div>
-                                    </Radio>
-                                ))}
-                            </Space>
-                        </Radio.Group>
-                    </div>
-                    <button>
-                        送審
-                    </button>
-                </DragableModal> */}
-
                 <Modal
                     visible={reviewbar}
                     onCancel={() => {
@@ -2219,6 +2017,82 @@ export default function POrderDetail() {
                             </Radio.Group>
                         </div>
                     </div>
+                </Modal>
+
+                <Modal
+                    visible={customerbar}
+                    onCancel={() => setCustomerbar(false)}
+                    width="1010px"
+                    closable={false} // 移除右上角的叉叉
+                    style={{ top: 150 }}
+                    bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
+                    title={
+                        <>
+
+                            {/* 篩選區域 */}
+                            <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
+                                {/* 縣市篩選 */}
+                                <select
+                                    value={filters.county}
+                                    onChange={(e) => setFilters({ ...filters, county: e.target.value })}
+                                    style={{ padding: '5px', borderBottom: '1px solid #ccc' }}
+                                >
+                                    <option value="">全部縣市</option>
+                                    {countyOptions.map((county, index) => (
+                                        <option key={index} value={county}>{county}</option>
+                                    ))}
+                                </select>
+
+                                {/* 公司名稱篩選 */}
+                                <input
+                                    type="text"
+                                    placeholder="輸入公司名稱"
+                                    value={filters.name}
+                                    onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                                />
+
+                                {/* 聯絡人篩選 */}
+                                <input
+                                    type="text"
+                                    placeholder="輸入聯絡人名稱"
+                                    value={filters.contact}
+                                    onChange={(e) => setFilters({ ...filters, contact: e.target.value })}
+                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                                />
+                            </div>
+                        </>
+                    }
+                    footer={null}
+                >
+
+
+                    {/* 資料列表 */}
+                    <div className={scss.thead21}>
+                        <span>名稱</span>
+                        <span>地址</span>
+                        <span>統編</span>
+                        <span></span>
+                    </div>
+                    {filteredData && (
+                        filteredData.map((_item: any, index: number) => (
+                            <CellWithBar key={index} className={scss.panelHeader21}
+                                onClick={() => {
+                                    setSuppliernamein(_item.name);
+                                    setSupplieraddressin(_item.county + _item.district + _item.address);
+                                    setSupplierphonein(_item.phone);
+                                    setSuppliertaxidin(_item.tax_id);
+                                }}>
+                                <div className={scss.row01}>
+                                    <span>{_item.name}</span>
+                                    <span>{_item.county}{_item.district}{_item.address}</span>
+                                    <span>{_item.contact}</span>
+                                    <span>{_item.review_person}</span>
+                                    <span>{_item.review_memo}</span>
+                                </div>
+                            </CellWithBar>
+                        ))
+                    )}
                 </Modal>
             </div>
         </SubLayer >

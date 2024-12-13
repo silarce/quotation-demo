@@ -64,17 +64,20 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function POrderList() {
-    //登入者資料
-    const { userInfo } = useContext(AppContext);
+    const [pagename, setPagename] = useState<string>("採購單列表")
 
-    //路由參數
+    //#region ===========【路由參數】
     const router = useRouter();
     const {
-        viewtype, // 判斷審核的,
-        reviewflow
     } = router.query;
+    //#endregion
 
-    //變數宣告
+    //#region ===========【登入者】
+    const { userInfo } = useContext(AppContext);
+    const { erpFeature } = useContext(AppContext);
+    //#endregion
+
+    //#region ===========【變數宣告】
     //載入動畫
     const [isLoading, setIsLoading] = useState(false);
 
@@ -103,36 +106,35 @@ export default function POrderList() {
 
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    //#endregion
 
-
+    //#region ===========【上方功能列】
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         // setOpen(true);
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseRequisitionList`,
-        //             query: {
-        //                 type: 'AddPurchaseRequisition',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增採購單',
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/addPurchaseOrderList`,
+                    query: {
+                    },
+                });
+            },
+        },
     ];
+    //#endregion
 
-
-
-    //頁面進入
+    //#region ===========【頁面進入】
     useEffect(() => {
-        getPurchaseOrder();
+        Get();
     }, []);
 
+    //#endregion
 
-    //api
+    //#region ===========【API】
 
-    //取請購主檔
-    const getPurchaseOrder = async () => {
+    //取單據
+    const Get = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -167,12 +169,12 @@ export default function POrderList() {
         }
     };
 
-    //取請購明細
-    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
+    //以ID取單據
+    const GetDetailById = async (id: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaseorderuuid: purchaseorderuuid as string | undefined,
+                purchaseorderuuid: id as string | undefined,
             };
 
 
@@ -202,7 +204,9 @@ export default function POrderList() {
         }
     };
 
-    //#region 審核
+    //#endregion
+
+    //#region ===========【審核】
     const [review_flow, setReview_flow] = useState<string>("");
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
@@ -307,29 +311,20 @@ export default function POrderList() {
 
     //#endregion
 
-
-
-
-    //方法
-
-
-    // 點擊處理函數
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
-
+    //#region  ===========【單據功能區】
     const [details, setDetails] = useState<Record<number, any[]>>({});
 
     const handlePanelClick = async (id: number) => {
-        const detailData = await getPurchaseOrderDetail(id);
+        const detailData = await GetDetailById(id);
         setDetails((prevDetails) => ({
             ...prevDetails,
             [id]: detailData,
         }));
     };
 
+    //#endregion
 
-    //單據查詢過濾關鍵字
+    //#region ===========【單據篩選】
     const filterData = () => {
         const startDate = keywordstartdate;
         const endDate = keywordenddate;
@@ -375,11 +370,11 @@ export default function POrderList() {
     useEffect(() => {
         filterData();
     }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
-
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={'採購單列表'}
+            <PageHeader02 tag={pagename}
                 customeLeft={[
                     <div
                         style={{

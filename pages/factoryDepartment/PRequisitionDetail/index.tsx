@@ -51,24 +51,24 @@ type Tquery = {
 
 export default function PRequisitionDetail() {
 
-    //路由參數
+    const [pagename, setPagename] = useState<string>("請購單")
+
+    //#region ===========【路由參數】
     const router = useRouter();
     const {
         firstin,
-        need_date,
-        create_at,
-        create_by,
-        purchaserequisitionuuid,
-        purchaserequisitionid,
         item
     } = router.query;
 
     const parsedItem = item ? JSON.parse(item as string) : null;
+    //#endregion
 
-
-    //登入者資料
+    //#region ===========【登入者】
     const { userInfo } = useContext(AppContext);
     const { erpFeature } = useContext(AppContext);
+    //#endregion
+
+    //#region ===========【變數宣告】
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -95,14 +95,17 @@ export default function PRequisitionDetail() {
 
     const [searchproduct, setSearchProduct] = useState<string>("");
 
+    // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
+    // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
+    const [idin, setidin] = useState<string>("");
+    const [uuidin, setuuidin] = useState<string>("");
+
     const [create_atin, setCreate_atin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
     const [create_byin, setCreate_byin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [need_datein, setNeed_datein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
-    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
-    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
 
     //編輯時保留原始資料
@@ -149,14 +152,10 @@ export default function PRequisitionDetail() {
     const [taxprice1, setTaxPrice1] = useState<string>("");
     const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
 
+    //#endregion
 
-
-    //#region 上方功能列
-
-    //搜尋功能
-
-
-    //搜尋功能
+    //#region ===========【上方功能列】
+    //搜尋
     const doSearch = (valueArr: (string | Toption | null)[]) => {
         // const keywordWhpname = valueArr[0] as string;
         // const keywordMaterialnumber = valueArr[1] as string;
@@ -164,20 +163,33 @@ export default function PRequisitionDetail() {
         // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
     };
 
-
-
-
-
-
-
-    //新增按鈕
+    //按鈕
     const panelList: TpanelList = [
 
     ];
     //#endregion
 
+    //#region ===========【監控畫面大小】
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-    //頁面進入
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+    //#endregion
+
+    //#region ===========【頁面進入】
+    //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
     const hasFetchedData = useRef(false);
 
     useEffect(() => {
@@ -190,11 +202,11 @@ export default function PRequisitionDetail() {
     }, []);
 
     useEffect(() => {
-        NewGetPurchaseRequisitionDetailById(parsedItem?.purchaserequisitionuuid);
+        setuuidin(parsedItem?.purchaserequisitionuuid);
+        setidin(parsedItem?.purchaserequisitionid)
+        GetDetailById(parsedItem?.purchaserequisitionuuid);
         GetReviewById(parsedItem?.purchaserequisitionuuid);
         GetReviewHistory(parsedItem?.purchaserequisitionuuid);
-        setPurchaserequisitionuuidin(parsedItem?.purchaserequisitionuuid);
-        setPurchaserequisitionidin(parsedItem?.purchaserequisitionid);
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
@@ -202,17 +214,16 @@ export default function PRequisitionDetail() {
         setNotein(parsedItem?.note);
 
     }, [item]);
+    //#endregion
 
+    //#region ===========【API】
 
-
-    // newapi
-
-    //取請購明細
-    const NewGetPurchaseRequisitionDetailById = async (purchaserequisitionuuid: any) => {
+    //以ID取單據
+    const GetDetailById = async (id: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+                purchaserequisitionuuid: id as string | undefined,
             };
 
 
@@ -244,12 +255,12 @@ export default function PRequisitionDetail() {
         }
     };
 
-    //更新請購單和請購單明細
-    const NewUpdatePurchaserequisitionDetail = async () => {
+    //更新單據
+    const Update = async () => {
         try {
             const conditionModel = {
-                purchaserequisitionid: purchaserequisitionidin,
-                purchaserequisitionuuid: purchaserequisitionuuidin,
+                purchaserequisitionid: idin,
+                purchaserequisitionuuid: uuidin,
                 create_at: create_atin,
                 need_date: need_datein,
                 note: notein,
@@ -280,7 +291,7 @@ export default function PRequisitionDetail() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
+                GetDetailById(uuidin);
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
@@ -301,7 +312,7 @@ export default function PRequisitionDetail() {
     const NewDeletePurchaseRequisition = async () => {
         try {
             const conditionModel = {
-                id: purchaserequisitionuuidin as string | undefined,
+                id: uuidin as string | undefined,
             };
 
 
@@ -344,9 +355,44 @@ export default function PRequisitionDetail() {
         }
     };
 
+    //取物料
+    const getProduct = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+            };
 
 
-    //#region 審核
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData(data);
+            setModalData(data);
+            setSearchBarData(data);
+
+            console.log(erpFeature);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //#endregion
+
+    //#region ===========【審核】
     const [review_flow, setReview_flow] = useState<string>("");
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
@@ -470,8 +516,8 @@ export default function PRequisitionDetail() {
             // }
             // else {
             const review_query = {
-                purchaserequisitionuuid: purchaserequisitionuuidin,
-                purchaserequisitionid: purchaserequisitionidin,
+                purchaserequisitionuuid: uuidin,
+                purchaserequisitionid: idin,
                 create_at: create_atin,
                 create_by: create_byin,
                 status: '詢價中',
@@ -481,9 +527,9 @@ export default function PRequisitionDetail() {
             };
 
             const conditionModel = {
-                document_id: purchaserequisitionidin,
-                document_uuid: purchaserequisitionuuidin,
-                document_type: "請購單",
+                document_id: idin,
+                document_uuid: uuidin,
+                document_type: pagename,
                 review_id: review_flow,
                 query: review_query,
                 user_id: userInfo?.employee?.id.toString(),
@@ -512,7 +558,7 @@ export default function PRequisitionDetail() {
             }
             const data = await response.json();
             setReviewflowdata([]);
-            GetReviewById(purchaserequisitionuuidin);
+            GetReviewById(uuidin);
 
 
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -520,7 +566,7 @@ export default function PRequisitionDetail() {
             //改變單據狀態
             const conditionModel2 = {
                 type: type,
-                purchaserequisitionuuid: purchaserequisitionuuidin,
+                purchaserequisitionuuid: uuidin,
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -540,8 +586,8 @@ export default function PRequisitionDetail() {
             }
             const data2 = await response2.json();
 
-            NewGetPurchaseRequisitionDetailById(purchaserequisitionuuidin);
-            GetReviewById(purchaserequisitionuuidin)
+            GetDetailById(uuidin);
+            GetReviewById(uuidin)
             setStatusin("審核中");
             setReviewbar(false);
 
@@ -562,7 +608,7 @@ export default function PRequisitionDetail() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
+        setDocumenttitle(`【${pagename}】【${idin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -573,7 +619,7 @@ export default function PRequisitionDetail() {
                     try {
                         setIsLoading(true);
                         const conditionModel = {
-                            document_uuid: purchaserequisitionuuidin,
+                            document_uuid: uuidin,
                         };
 
                         var inputModel = {
@@ -600,7 +646,7 @@ export default function PRequisitionDetail() {
                         setStatusin("詢價中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(purchaserequisitionuuidin);
+                        GetReviewHistory(uuidin);
 
                     } catch (error: any) {
                         console.log(error.message);
@@ -656,73 +702,73 @@ export default function PRequisitionDetail() {
     }
     //#endregion
 
-
-
-
-
-
-    //#region api呼叫區
-    //取物料清單
-    const getProduct = async () => {
-        try {
-            //  console.log(userInfo);
-            setIsLoading(true);
-            const conditionModel = {
-                // keyword: "search" as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData(data);
-            setModalData(data);
-            setSearchBarData(data);
-
-            console.log(erpFeature);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
+    //#region ===========【單據功能區】
+    //編輯
+    const handleEdit = () => {
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginalnote(notein);
+        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+        setIsEditing(true) // 進入編輯模式
     };
 
+    //取消編輯
+    const handleCancel = () => {
+        setCreate_atin(originalcreate_at);
+        setNeed_datein(originalneed_date);
+        setNotein(originalnote);
+        setData2([...originaldata2]);  // 確保還原為原始資料
+        setIsEditing(false);  // 結束編輯模式
+    };
 
-
-
-
-
-
+    //作廢單據
+    const handleDelete = () => {
+        myAlert.confirm({
+            title: '確定刪除嗎?',
+            props: {
+                onOk: () => {
+                    NewDeletePurchaseRequisition();
+                }
+            }
+        })
+    }
 
     //#endregion
 
+    //#region ===========【明細功能區】
+    // 新增明細
+    const handleAddDetail = () => {
 
-    //#region 口袋清單功能區
-    // 口袋清單編輯狀態控制，一次只能針對一列做修改
-    const handleEditStatus = (index: number) => {
-        setEditRowId(index);
-        setEditStatus(true);
-        setData2Restore(data2);
+        const emptyDetail = {
+            purchaserequisitiondetailuuid: "",
+            productuuid: "",
+            productid: "",
+            quantity: 0,
+            totalprice: 0,
+            note: "",
+            purchaserequisitionid: "",
+            unitprice: 0,
+            purchaserequisitionuuid: "",
+            name: "",
+            spec: "",
+            unit: "",
+            suppliername: null,
+            deliverydate: null,
+            status: null,
+            quotereqdetailuuid: null,
+            suppliertaxid: null,
+            supplieraddress: null,
+            supplierphone: null,
+            suppliercontact: null,
+            supplierfax: null
+        };
+
+        // 將空資料新增進陣列
+        setData2((prevData) => [...prevData, emptyDetail]);
+
     };
 
-    const handleSaveEdit = (index: number) => {
-        setEditStatus(false);
-        // // console.log(data2);
-    };
-
-    // 從口袋清單移除
+    // 從明細移除
     const handleRemove = (index: number, item: any) => {
         myAlert.confirm({
             title: '確定移除?',
@@ -736,7 +782,7 @@ export default function PRequisitionDetail() {
         // RemovePurchaseRequisitionDetail(item.purchaserequisitiondetailuuid);
     };
 
-
+    //更新明細資料
     const handleStringChange = (index: number, key: string, value: string) => {
         const updatedData2 = [...data2];  // 使用淺拷貝
         updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
@@ -764,82 +810,47 @@ export default function PRequisitionDetail() {
         }
     };
 
-    // 確保在進入編輯模式時，原始資料被正確保存
-    const enterEditMode = () => {
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setIsEditing(true); // 進入編輯模式
+    //focus選中的明細
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
     };
 
-    const cancelEditMode = () => {
-        setData2([...originaldata2]); // 確保還原為原始資料
-        setIsEditing(false); // 退出編輯模式
-    };
+    // 明細異動處理
+    useEffect(() => {
+        console.log(data1);
+
+        // 每次 data2 更新時，重新計算總價和稅金
+        let totalprice = 0;
+        data2.forEach((element) => {
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
+        });
+
+        console.log(totalprice); // 應顯示正確的加總結果
+
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
+        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+    }, [data2]);
 
 
-
-
-
-    // 還原口袋清單
-    const handleRestore = () => {
-        setData2(data2restore);
-    }
     //#endregion
 
-
-    useEffect(() => {
-        console.log(originaldata2);
-        console.log(data2);
-    }, [isEditing]);
-
-
-    //#region modal
-    const [productSearchmodalopen, setProductSearchmodalopen] = useState<boolean>(false);
-
-    const [test, setTest] = useState<string>("");
-
-    //帶入請購查詢畫面的資料
-    // const [quotereqname, setQuotereqname] = useState<string>("");
-    // const [quotereqspec, setQuotereqspec] = useState<string>("");
-    // const [quotereqquantity, setQuotereqquantity] = useState<string>("");
-    const [selectedOption, setSelectedOption] = useState('物料'); // 預設選項
-
-    //對應詢價單主檔的詢價單明細
-    const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
-    //確定廠商後更新請購單明細
-    const [refreshpurchaserequisitiondetail, setRefreshpurchaserequisitiondetail] = useState<any>();
-
-    //加入詢價廠商
-    const [prquotereqadddata, setPrquotereqadddata] = useState({
-        // id: "",id 自增長不用寫入
-        quoterequuid: "",
-        quotereqid: "",
-        unitprice: "",
-        totalprice: "",
-        suppliername: "",
-        deliverydate: moment(),
-        unit: "",
-        note: "",
-        awarded: false
-    });
-
-    //得標廠商id，update回quotereqdetail
-    const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
-    const [selectedsupplier, setSelectedsupplier] = useState<string>("");
-
-
-    //關閉詢價單modal
-    const productSearchModalClose = async () => {
-        setModalData([]);
-        setKeyword1("");
-        setKeyword2("");
-        setKeyword3("");
-        await new Promise(resolve => setTimeout(resolve, 50));
-        setProductSearchmodalopen(false);
-    }
-
-
-
-
+    //#region ===========【物料篩選】
     interface DataItem {
         id: string;
         productid: string;
@@ -848,22 +859,11 @@ export default function PRequisitionDetail() {
         unit: string;
     }
 
-
-    // const [handinputname, setHandinputname] = useState("");
-    // const [handinputspec, setHandinputspec] = useState("");
     const [filteredData, setFilteredData] = useState<DataItem[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const isSelectingRef = useRef(false);
-    // const data: DataItem[] = [
-    //     // 你的資料項目
-    // ];
 
     useEffect(() => {
-        console.log("OK");
-        console.log(searchbardata);
-        console.log(handinputproductid);
-        console.log(handinputname);
-        console.log(handinputspec);
 
         if (isSelectingRef.current) return;
 
@@ -905,66 +905,9 @@ export default function PRequisitionDetail() {
             setFilteredData([]);
             setShowSuggestions(false);
         }
-
-        // }, [data2]);
     }, [handinputproductid, handinputname, handinputspec]);
 
-    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        setHandinputproductid(e.target.value);
-    };
-
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // setFilteredData(data);
-        isSelectingRef.current = false;
-        setHandinputname(e.target.value);
-    };
-
-    const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        setHandinputspec(e.target.value);
-    };
-
-    // const handleSelect = (item: DataItem) => {
-    //     console.log(item);
-    //     console.log(data2);
-    //     isSelectingRef.current = true;
-    //     // setHandinputproductuuid(item.id);
-    //     // setHandinputproductid(item.productid);
-    //     // setHandinputname(item.name);
-    //     // setHandinputspec(item.spec || "");
-    //     // setHandinputunit(item.unit);
-    //     // handleStringChange(currentindex, "productuuid", item.id);
-    //     handleStringChange(currentindex, "productid", item.productid);
-    //     handleStringChange(currentindex, "name", item.name);
-    //     handleStringChange(currentindex, "spec", item.spec);
-    //     handleStringChange(currentindex, "unit", item.unit);
-
-
-    //     setShowSuggestions(false);
-    // };
-
-    // const handleSelect = (item: DataItem) => {
-    //     console.log(item);
-    //     console.log(data2);
-    //     isSelectingRef.current = true;
-
-    //     // 合併多個變更
-    //     const newData = [...data2];
-    //     newData[currentindex] = {
-    //         ...newData[currentindex],
-    //         productid: item.productid,
-    //         name: item.name,
-    //         spec: item.spec || "",
-    //         unit: item.unit,
-    //     };
-
-    //     setData2(newData); // 一次更新所有變更
-    //     setShowSuggestions(false); // 隱藏建議
-
-    //     setSearchBarData(data);
-    // };
-
+    //點選物料
     const handleSelect = (selectedItem: any) => {
         const updatedData2 = [...data2];
         const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
@@ -983,80 +926,8 @@ export default function PRequisitionDetail() {
         setShowSuggestions(false);
     };
 
-
-    const [dragging, setDragging] = useState(false);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-
-
-    const handleMouseUp = () => {
-        setDragging(false);
-    };
-
-
-    useEffect(() => {
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [dragging, offset, position]);
-
-    const handleMouseMove = (event: any) => {
-        if (dragging) {
-            setPosition({
-                x: event.clientX - offset.x,
-                y: event.clientY - offset.y,
-            });
-        }
-    };
-
-    const handleMouseDown = (event: any) => {
-        setDragging(true);
-        // 記錄下滑鼠的偏差
-        setOffset({
-            x: event.clientX - position.x,
-            y: event.clientY - position.y,
-        });
-    };
-
-
-
-    const handleClearHandKey = () => {
-        setHandinputproductuuid('');
-        setHandinputproductid('');
-        setHandinputname('');
-        setHandinputspec('');
-        setHandinputunit('');
-        setHandinputnote('');
-        setHandinputquantity('');
-        setShowSuggestions(false);
-    }
-
-    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-
-
-
-    useEffect(() => {
-        // 定義事件處理器
-        const handleResize = () => {
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        };
-
-        // 在元件掛載時設置事件監聽器
-        window.addEventListener('resize', handleResize);
-
-        // 在元件卸載時移除事件監聽器
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
+    //點選物料後控制，使用ESC關閉等狀態監控
     const dropdownRef = useRef<HTMLUListElement | null>(null);
-
     useEffect(() => {
         // 按下 ESC 鍵關閉下拉選單
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -1076,176 +947,12 @@ export default function PRequisitionDetail() {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
-
-    const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
-    const SearchModalClose = async () => {
-        setSearchmodalopen(false);
-    }
-
-    const filterData = () => {
-        const startDate = keywordstartdate;
-        const endDate = keywordenddate;
-        const requisitionId = keyword2.trim();
-        const status = keyword3.trim();
-
-        // 檢查是否所有條件都為空
-        if ((!startDate || !startDate.isValid()) &&
-            (!endDate || !endDate.isValid()) &&
-            !requisitionId &&
-            !status) {
-            setSearchdata(prdata);
-            return;
-        }
-
-        // 過濾資料
-        let filteredData = prdata.filter(item => {
-            const createAt = moment(item.create_at);
-            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
-                ? true
-                : createAt.isBetween(startDate, endDate, 'days', '[]');
-            return isDateInRange;
-        });
-
-        // 模糊查詢請購單號
-        if (requisitionId) {
-            filteredData = filteredData.filter(item =>
-                item.purchaserequisitionid.toString().includes(requisitionId)
-            );
-        }
-
-        // 模糊查詢單據狀態
-        if (status) {
-            filteredData = filteredData.filter(item =>
-                item.status.toString().includes(status)
-            );
-        }
-
-        setSearchdata(filteredData);
-    };
-
-    // 監聽條件變更
-    useEffect(() => {
-        filterData();
-    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
-
-
-
-    const clearFilterData = (e: any) => {
-        e.preventDefault();
-        setKeywordstartdate(null)
-        setKeywordenddate(null);
-        setKeyword2('');
-        setKeyword3('');
-        // setSearchdata(data);
-    }
-
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
-
-    const handleAddDetail = () => {
-
-        const emptyDetail = {
-            purchaserequisitiondetailuuid: "",
-            productuuid: "",
-            productid: "",
-            quantity: 0,
-            totalprice: 0,
-            note: "",
-            purchaserequisitionid: "",
-            unitprice: 0,
-            purchaserequisitionuuid: "",
-            name: "",
-            spec: "",
-            unit: "",
-            suppliername: null,
-            deliverydate: null,
-            status: null,
-            quotereqdetailuuid: null,
-            suppliertaxid: null,
-            supplieraddress: null,
-            supplierphone: null,
-            suppliercontact: null,
-            supplierfax: null
-        };
-
-        // 將空資料新增進陣列
-        setData2((prevData) => [...prevData, emptyDetail]);
-
-    };
-
-
-    const handleEdit = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setIsEditing(true) // 進入編輯模式
-    };
-
-    const handleCancel = () => {
-        setCreate_atin(originalcreate_at);
-        setNeed_datein(originalneed_date);
-        setNotein(originalnote);
-        setData2([...originaldata2]);  // 確保還原為原始資料
-        setIsEditing(false);  // 結束編輯模式
-    };
-
-    const handleDelete = () => {
-        myAlert.confirm({
-            title: '確定刪除嗎?',
-            props: {
-                onOk: () => {
-                    NewDeletePurchaseRequisition();
-                }
-            }
-        })
-    }
-
-
-
-
-
-    // 資料異動處理
-
-    useEffect(() => {
-        console.log(data1);
-
-        // 每次 data2 更新時，重新計算總價和稅金
-        let totalprice = 0;
-        data2.forEach((element) => {
-            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
-            const price = typeof element.totalprice === 'string'
-                ? parseFloat(element.totalprice.replace(/,/g, ''))
-                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
-            console.log(price); // 顯示正確的數字格式
-            totalprice += price; // 將其加總
-        });
-
-        console.log(totalprice); // 應顯示正確的加總結果
-
-        // 四捨五入總價到小數點第二位
-        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
-        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
-        // 計算稅金，四捨五入到小數點第二位
-        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
-        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
-        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
-        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
-        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-
-    }, [data2]);
-
-
+    //#endregion
 
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag='請購單' panelList={panelList}
+            <PageHeader02 tag={pagename} panelList={panelList}
                 customeRight={[
                     <>
                         {/* 編輯按鈕 */}
@@ -1265,7 +972,7 @@ export default function PRequisitionDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         setReviewbar(true);
-                                        setDocumenttitle(`【請購單】【${purchaserequisitionidin}】_${userInfo?.employee?.chName.toString()}`)
+                                        setDocumenttitle(`【${pagename}】【${idin}】_${userInfo?.employee?.chName.toString()}`)
                                     }}
                                     title="審核流程"
                                 >
@@ -1301,7 +1008,7 @@ export default function PRequisitionDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         myAlert.confirm({
-                                            title: '確定要返回請購單列表嗎?',
+                                            title: `確定要返回${pagename}列表嗎?`,
                                             content: <>
                                                 <h1>未儲存的資料將不會保留</h1>
                                             </>,
@@ -1324,7 +1031,7 @@ export default function PRequisitionDetail() {
                                     className={scss.shortredsquarebtn}
                                     onClick={() => {
                                         setIsEditing(false); // 儲存後結束編輯模式
-                                        NewUpdatePurchaserequisitionDetail()
+                                        Update()
 
                                         // NewAddPurchaseRequisition(); // 實際儲存邏輯
                                     }}
@@ -1425,13 +1132,13 @@ export default function PRequisitionDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="請購單號"
+                                            caption={`${pagename}號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: purchaserequisitionidin || ' ',
+                                                    value: idin || ' ',
                                                 },
                                             }}
                                         />

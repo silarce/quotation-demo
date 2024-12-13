@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './addPurchaseRequisitionList.module.scss';
+import scss from './addPurchaseOrderList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -47,8 +47,8 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function AddPurchaseRequisitionList() {
-    const [pagename, setPagename] = useState<string>("新增請購單")
+export default function AddPurchaseOrderList() {
+    const [pagename, setPagename] = useState<string>("新增採購單")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -576,7 +576,7 @@ export default function AddPurchaseRequisitionList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="請購單號"
+                                            caption="採購單號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -688,40 +688,12 @@ export default function AddPurchaseRequisitionList() {
                                     <div></div>
                                 </div>
                                 <div className={scss.head_content2}>
-                                    <div>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="備註說明"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={false}
-                                            inputProps={{
-                                                props: {
-                                                    value: note,
-                                                    onChange: (e) => { setNote(e.target.value) }
-                                                },
-                                            }}
-                                        /> */}
-                                    </div>
+                                    <div></div>
                                     <div></div>
                                     <div></div>
                                 </div>
                             </div>
-                            <div>
-                                {/* <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="單據狀態"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { color: 'red' },
-                                                value: status || ' ',
-                                            },
-                                        }}
-                                    />
-                                </div> */}
-                            </div>
+                            <div></div>
                         </div>
                         <div
                             style={{ paddingBottom: '18px' }}

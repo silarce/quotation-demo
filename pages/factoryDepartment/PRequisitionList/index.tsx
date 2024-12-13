@@ -64,17 +64,20 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PRequisitionList() {
-    //登入者資料
-    const { userInfo } = useContext(AppContext);
+    const [pagename, setPagename] = useState<string>("請購單列表")
 
-    //路由參數
+    //#region ===========【路由參數】
     const router = useRouter();
     const {
-        viewtype, // 判斷審核的,
-        reviewflow
     } = router.query;
+    //#endregion
 
-    //變數宣告
+    //#region ===========【登入者】
+    const { userInfo } = useContext(AppContext);
+    const { erpFeature } = useContext(AppContext);
+    //#endregion
+
+    //#region ===========【變數宣告】
     //載入動畫
     const [isLoading, setIsLoading] = useState(false);
 
@@ -103,8 +106,9 @@ export default function PRequisitionList() {
 
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    //#endregion
 
-
+    //#region ===========【上方功能列】
     const panelList: TpanelList = [
         {
             type: 'addButton',
@@ -114,25 +118,24 @@ export default function PRequisitionList() {
                 router.push({
                     pathname: `/factoryDepartment/addPurchaseRequisitionList`,
                     query: {
-                        type: 'AddPurchaseRequisition',
                     },
                 });
             },
         },
     ];
+    //#endregion
 
-
-
-    //頁面進入
+    //#region ===========【頁面進入】
     useEffect(() => {
-        getPurchaseRequisition();
+        Get();
     }, []);
 
+    //#endregion
 
-    //api
+    //#region ===========【API】
 
-    //取請購主檔
-    const getPurchaseRequisition = async () => {
+    //取單據
+    const Get = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -157,7 +160,7 @@ export default function PRequisitionList() {
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
-            console.log(data);
+
             await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error: any) {
             // console.log(error.message);
@@ -167,12 +170,12 @@ export default function PRequisitionList() {
         }
     };
 
-    //取請購明細
-    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
+    //以ID取單據
+    const GetDetailById = async (id: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
+                purchaserequisitionuuid: id as string | undefined,
             };
 
 
@@ -201,7 +204,9 @@ export default function PRequisitionList() {
         }
     };
 
-    //#region 審核
+    //#endregion
+
+    //#region ===========【審核】
     const [review_flow, setReview_flow] = useState<string>("");
     const [reviewbar, setReviewbar] = useState<boolean>(false);
     const [reviewdata, setReviewdata] = useState<any[]>([]);
@@ -306,29 +311,20 @@ export default function PRequisitionList() {
 
     //#endregion
 
-
-
-
-    //方法
-
-
-    // 點擊處理函數
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
-
+    //#region  ===========【單據功能區】
+    //下拉單據明細
     const [details, setDetails] = useState<Record<number, any[]>>({});
-
     const handlePanelClick = async (id: number) => {
-        const detailData = await getPurchaseRequisitionDetail(id);
+        const detailData = await GetDetailById(id);
         setDetails((prevDetails) => ({
             ...prevDetails,
             [id]: detailData,
         }));
     };
 
+    //#endregion
 
-    //單據查詢過濾關鍵字
+    //#region ===========【單據篩選】
     const filterData = () => {
         const startDate = keywordstartdate;
         const endDate = keywordenddate;
@@ -375,10 +371,11 @@ export default function PRequisitionList() {
         filterData();
     }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
 
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={'請購單列表'}
+            <PageHeader02 tag={pagename}
                 customeLeft={[
                     <div
                         style={{
@@ -639,7 +636,7 @@ export default function PRequisitionList() {
                                                                 </div>
                                                             );
                                                         })
-                                                        
+
                                                     )}
 
                                                 </div>
