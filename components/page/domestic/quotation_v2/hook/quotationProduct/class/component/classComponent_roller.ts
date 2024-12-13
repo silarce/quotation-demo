@@ -6,12 +6,16 @@ import { optionsCreator_componentMaterial_02 } from 'js/utils/options/productOpt
 
 const nodeConfig = (() => {
   const nodeConfig_origin = createNodeConfig_component();
-  const { material } = nodeConfig_origin;
+  const { material, materialSurface } = nodeConfig_origin;
 
   const nodeConfig: typeof nodeConfig_origin = {
     ...nodeConfig_origin,
     material: {
       ...material,
+      createNode: null,
+    },
+    materialSurface: {
+      ...materialSurface,
       createNode: null,
     },
   };
@@ -33,6 +37,10 @@ class ClassCompnent_roller extends ClassCompnent_base<'roller'> implements Inter
 
     this.state.desc = `∮${diameter}`;
     this.render();
+  }
+
+  onProdChangeMaterial() {
+    // do nothing
   }
 
   // ------------------------------------------------------------------------

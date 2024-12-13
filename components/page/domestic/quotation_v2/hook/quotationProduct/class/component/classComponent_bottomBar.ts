@@ -3,6 +3,8 @@ import { createNodeConfig_component } from 'components/page/domestic/quotation_v
 
 import { optionsCreator_componentMaterial_01 } from 'js/utils/options/productOptions';
 
+import type { Toption } from 'js/utils/options/options';
+
 // ==========================================================================================================================
 const nodeConfig = (() => {
   const nodeConfig_origin = createNodeConfig_component();
@@ -62,6 +64,15 @@ class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
     options = options?.filter((option) => option.value !== '高耐鍍鋅鋼板');
 
     return options;
+  }
+
+  onProdChangeMaterial(prodMaterial: string) {
+    let v = prodMaterial;
+
+    if (v === '高耐鍍鋅鋼板') {
+      v = '鍍鋅鋼板';
+    } else {
+    }
   }
 }
 class ClassCompnent_bottomBar_w2 extends ClassCompnent_bottomBar {

@@ -46,6 +46,8 @@ interface Interface_ClassComponent_base {
 
   options_material: Toption[] | undefined;
   options_materialSurface: Toption[] | undefined;
+  readonly onProdChangeMaterial: (prodMaterial: string) => void;
+  //
 }
 
 interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
@@ -163,6 +165,24 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     }
 
     return optionsCreator_surface_onlyPaint();
+  }
+  // -----------------------------------------------------------------------
+
+  onProdChangeMaterial(prodMaterial: string) {
+    const options_material = this.options_material;
+    const value = options_material?.find((option) => option.value === prodMaterial)?.value;
+
+    if (value) {
+      this.state.material = value;
+    } else {
+      this.state.material = 'SST#304';
+
+      if (this.options_materialSurface) {
+        this.state.materialSurface = this.options_materialSurface[0].value;
+      }
+    }
+
+    this.render();
   }
 } //  ClassCompnent_base
 

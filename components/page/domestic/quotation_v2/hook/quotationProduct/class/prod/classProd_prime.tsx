@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { create } from 'lodash';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -396,11 +396,26 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   // ---------------------------------------------------------------------------------
   // MARK: 值
 
+  get materialName() {
+    return super.materialName;
+  }
+
   set materialName(value: string) {
-    this.data.materialName = value;
+    super.materialName = value;
+    Object.values(this.classComponentDict).forEach((classComponent) => {
+      classComponent.onProdChangeMaterial(this.data.materialName);
+    });
+
+    // 更新表面選項
+    this._options_surface = createOptions_surface(this);
+
+    const isSurfaceValid = this._options_surface.some((item) => item.value === this.data.materialSurface);
+
+    if (!isSurfaceValid) {
+      this.data.materialSurface = this._options_surface[0].value;
+    }
 
     this.render();
-    // super.setData_simple('materialName', value);
   }
 } // ClassProd_prime
 

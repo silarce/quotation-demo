@@ -42,6 +42,10 @@ class ClassCompnent_motorAccessories
     this.render();
   }
 
+  onProdChangeMaterial() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get options_material() {

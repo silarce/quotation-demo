@@ -47,6 +47,10 @@ class ClassCompnent_motor extends ClassCompnent_base<'motor'> implements Interfa
     this.render();
   }
 
+  onProdChangeMaterial() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get options_material() {

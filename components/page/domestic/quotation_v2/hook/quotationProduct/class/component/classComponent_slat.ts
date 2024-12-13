@@ -51,6 +51,10 @@ class ClassCompnent_slat extends ClassCompnent_base<'slat'> implements Interface
     this.render();
   }
 
+  onProdChangeMaterial() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get name() {
