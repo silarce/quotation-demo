@@ -9,6 +9,15 @@ class ClassCompnent_sidePlate extends ClassCompnent_base<'sidePlate'> implements
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = '組';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    this.state.desc = '';
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
+
   get options_material() {
     return optionsCreator_componentMaterial_02();
   }

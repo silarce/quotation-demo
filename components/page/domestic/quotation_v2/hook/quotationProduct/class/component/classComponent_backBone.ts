@@ -7,6 +7,13 @@ class ClassCompnent_backBone extends ClassCompnent_base<'backBone'> implements I
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = '支';
 
+  // ------------------------------------------------------------------------
+  renewDesc() {
+    this.state.desc = '背撐';
+    this.render();
+  }
+  // ------------------------------------------------------------------------
+
   get options_material() {
     return undefined;
   }

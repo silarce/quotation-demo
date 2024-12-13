@@ -38,6 +38,20 @@ class ClassCompnent_slat extends ClassCompnent_base<'slat'> implements Interface
   protected _name = '捲門片';
   readonly nodeConfig = nodeConfig;
   protected _unit = '㎡';
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    const { material } = this;
+    const name = this.state.rawData?.name ?? '';
+    let thickness: string | undefined | null = this.classProd?.thickness;
+    thickness = thickness && `${thickness}t`;
+    const desc = `${name} ${material} ${thickness}`;
+
+    this.state.desc = desc;
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
 
   get name() {
     return this._name;

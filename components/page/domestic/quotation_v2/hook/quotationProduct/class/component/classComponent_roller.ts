@@ -8,6 +8,17 @@ class ClassCompnent_roller extends ClassCompnent_base<'roller'> implements Inter
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = 'M';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    const diameter = this.state.rawData?.diameter ?? '';
+
+    this.state.desc = `∮${diameter}`;
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
+
   get options_material() {
     return optionsCreator_componentMaterial_02();
   }

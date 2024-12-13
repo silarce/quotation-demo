@@ -21,6 +21,17 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = 'M';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    const { material } = this;
+    const name = this.state.rawData?.name ?? '';
+
+    this.state.desc = `${name ?? ''} ${material ?? ''} `;
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
   }

@@ -53,6 +53,8 @@ interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
   readonly name: string;
   readonly nodeConfig: TnodeConfig_component;
   readonly unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
+
+  readonly renewDesc: () => void;
 }
 
 type TconstructorProps_componentBase<T extends keyof Tdata_componentDict> = {
@@ -65,6 +67,9 @@ type TconstructorProps_componentBase<T extends keyof Tdata_componentDict> = {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
   readonly state: TstateComponentData<T>;
   protected readonly setState: TsetComponent<T>;
+  protected readonly render = () => {
+    this.setState((state) => ({ ...state }));
+  };
 
   protected classProd: Interface_ClassProd_prime | undefined;
   setClassProd(classProd: Interface_ClassProd_prime) {

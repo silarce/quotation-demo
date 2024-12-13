@@ -7,6 +7,12 @@ class ClassCompnent_middlePillar extends ClassCompnent_base<'middlePillar'> impl
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = '支';
 
+  // ------------------------------------------------------------------------
+  renewDesc() {
+    this.state.desc = '中柱';
+    this.render();
+  }
+  // ------------------------------------------------------------------------
   get options_material() {
     return undefined;
   }

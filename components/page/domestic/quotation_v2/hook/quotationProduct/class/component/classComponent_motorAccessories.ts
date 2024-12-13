@@ -12,6 +12,16 @@ class ClassCompnent_motorAccessories
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = '組';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    // const { name, bearingType, chains } = this.state.rawData ?? {};
+    this.state.desc = '';
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
+
   get options_material() {
     return optionsCreator_componentMaterial_03();
   }

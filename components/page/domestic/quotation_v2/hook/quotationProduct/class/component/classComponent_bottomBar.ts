@@ -23,6 +23,15 @@ class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = 'M';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    this.state.desc = this.classProd?.bottomBarAngleIron ?? '';
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
+
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
   }

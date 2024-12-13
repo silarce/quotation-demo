@@ -67,6 +67,7 @@ interface Interface_ClassProd_base {
   // doorModel: string;
 
   readonly state: TstateProd;
+  readonly data: TstateProd['data_prod'];
   nodeConfig: TnodeConfig;
 
   isFetching: boolean;

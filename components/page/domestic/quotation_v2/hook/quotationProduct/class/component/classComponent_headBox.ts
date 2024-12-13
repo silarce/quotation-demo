@@ -20,6 +20,18 @@ class ClassCompnent_headBox extends ClassCompnent_base<'headBox'> implements Int
   readonly nodeConfig = createNodeConfig_component();
   readonly unit = 'M';
 
+  // ------------------------------------------------------------------------
+
+  renewDesc() {
+    const { name } = this.state.rawData ?? {};
+    const material = this.material;
+
+    this.state.desc = `${name} ${material}`;
+    this.render();
+  }
+
+  // ------------------------------------------------------------------------
+
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
   }
