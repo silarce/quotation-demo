@@ -459,7 +459,8 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.materialSurface;
   }
   set materialSurface(value) {
-    this.setData_simple('materialSurface', value);
+    this.data.materialSurface = value;
+    this.render();
   }
 
   get horsepower() {

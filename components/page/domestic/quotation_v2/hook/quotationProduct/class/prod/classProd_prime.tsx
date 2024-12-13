@@ -123,7 +123,6 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
       ...nodeConfig.materialName,
       createNode: ({ disabled }) => {
         const options = classProd.options_material;
-
         const v = classProd.materialName;
         const value = v ? { value: v, label: v } : null;
 
@@ -160,7 +159,7 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
               value,
               onChange: (option) => {
                 const value = option?.value || '';
-                classProd.data.materialSurface = value;
+                classProd.materialSurface = value;
               },
             },
           },
