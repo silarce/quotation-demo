@@ -3,13 +3,35 @@ import { createNodeConfig_component } from 'components/page/domestic/quotation_v
 
 import { optionsCreator_componentMaterial_03 } from 'js/utils/options/productOptions';
 
+// ==========================================================================================================================
+const nodeConfig = (() => {
+  const nodeConfig_origin = createNodeConfig_component();
+  const { materialSurface, material } = nodeConfig_origin;
+
+  const nodeConfig: typeof nodeConfig_origin = {
+    ...nodeConfig_origin,
+    materialSurface: {
+      ...materialSurface,
+      createNode: null,
+    },
+    material: {
+      ...material,
+      createNode: null,
+    },
+  };
+
+  return nodeConfig;
+})();
+
+// ==========================================================================================================================
+
 class ClassCompnent_motorAccessories
   extends ClassCompnent_base<'motorAccessories'>
   implements Interface_ClassComponent_prime
 {
   readonly key = 'motorAccessories' as const;
   readonly name = '馬達配件' as const;
-  readonly nodeConfig = createNodeConfig_component();
+  readonly nodeConfig = nodeConfig;
   readonly unit = '組';
 
   // ------------------------------------------------------------------------

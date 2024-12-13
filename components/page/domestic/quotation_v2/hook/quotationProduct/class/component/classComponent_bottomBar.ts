@@ -3,6 +3,23 @@ import { createNodeConfig_component } from 'components/page/domestic/quotation_v
 
 import { optionsCreator_componentMaterial_01 } from 'js/utils/options/productOptions';
 
+// ==========================================================================================================================
+const nodeConfig = (() => {
+  const nodeConfig_origin = createNodeConfig_component();
+  const { materialSurface } = nodeConfig_origin;
+
+  const nodeConfig: typeof nodeConfig_origin = {
+    ...nodeConfig_origin,
+    materialSurface: {
+      ...materialSurface,
+      createNode: null,
+    },
+  };
+
+  return nodeConfig;
+})();
+
+// ==========================================================================================================================
 class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements Interface_ClassComponent_prime {
   //
   static subspecies(subspecies: string) {
@@ -20,7 +37,7 @@ class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements
 
   readonly key = 'bottomBar' as const;
   readonly name = '底座' as const;
-  readonly nodeConfig = createNodeConfig_component();
+  readonly nodeConfig = nodeConfig;
   readonly unit = 'M';
 
   // ------------------------------------------------------------------------
