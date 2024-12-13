@@ -9,6 +9,8 @@ import { axi, domain } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
 import { AxiosError } from 'axios';
 
+import { apiGetReviewById } from './api_netCore/api_review';
+
 // type
 import type {
   Tparams,
@@ -34,6 +36,12 @@ import type {
   TbonusDto,
   TcopyQuotationDto,
 } from './dtoTypes';
+
+import type { TworksheetDto_addition } from 'js/api/api_engineering';
+
+type TquotationContractDto_addition = TquotationContractDto & {
+  worksheet?: TworksheetDto_addition[] | undefined;
+};
 
 export type {
   Tparams,
@@ -1013,10 +1021,13 @@ export const useGetContract_id = (
   option?: {
     customPopulate?: string[];
     preBuiltPopulate?: keyof typeof lookpu_contractPopulate;
+    addintion_latestRecordReview?: boolean;
   }
 ) => {
   const preBuiltPopulate = lookpu_contractPopulate[option?.preBuiltPopulate ?? 'basic'];
   const customPopulate = option?.customPopulate ?? [];
+
+  const { addintion_latestRecordReview = false } = option ?? {};
 
   let populate = [...preBuiltPopulate, ...customPopulate];
   populate = _.uniq(populate);
@@ -1026,7 +1037,7 @@ export const useGetContract_id = (
   };
 
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TquotationContractDto>();
+  const [res, setRes] = useState<TquotationContractDto_addition>();
 
   const update = async () => {
     if (!id) {
@@ -1035,7 +1046,23 @@ export const useGetContract_id = (
 
     try {
       setIsFetching(true);
-      const newRes = await apiGetContract_Id(id, params);
+      const newRes: TquotationContractDto_addition = await apiGetContract_Id(id, params);
+
+      if (addintion_latestRecordReview) {
+        const worksheetArr = newRes?.worksheet ?? [];
+
+        for (const ws of worksheetArr) {
+          if (ws.isAbandoned) {
+            continue;
+          }
+
+          const latestRecord = ws.latestRecord;
+          const reviewArr = await apiGetReviewById(latestRecord.id);
+          latestRecord.addition = {
+            reviewArr,
+          };
+        }
+      }
 
       if (newRes) {
         setRes(newRes);

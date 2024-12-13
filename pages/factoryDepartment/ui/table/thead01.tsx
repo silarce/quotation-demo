@@ -503,7 +503,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         <span>序</span>
         <span>名稱</span>
-        <span>審核流程</span>
+        <span>流程關卡→</span>
         {/* <span>單號</span>
         <span>人員</span> */}
         <span></span>
@@ -723,6 +723,30 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+
+
+  //#region 新請購單
+  else if (type === "PRequisition") {
+    return (
+      <div className={style.newthead1}>
+        <span>序</span>
+        <span>請購單號</span>
+        <span>狀態</span>
+        <span>請購日期</span>
+        <span>需用日期</span>
+        <span>申請人員</span>
+        <span>備註</span>
+        <span></span>
+        {/* <span>請購人員</span> */}
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+
+
+
+
   else {
     return null;
   }
