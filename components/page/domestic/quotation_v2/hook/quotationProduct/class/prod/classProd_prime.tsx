@@ -190,9 +190,6 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
     const nodeConfig = this.nodeConfig;
 
-    this._options_material = createOptions_material(this);
-    this._options_surface = createOptions_surface(this);
-
     this._nodeConfig = customizeNodeConfig({
       classProd: this,
       nodeConfig,
@@ -203,9 +200,17 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
   // region options
   get options_material() {
+    if (!this._options_material) {
+      this._options_material = createOptions_material(this);
+    }
+
     return this._options_material;
   }
   get options_surface() {
+    if (!this._options_surface) {
+      this._options_surface = createOptions_surface(this);
+    }
+
     return this._options_surface;
   }
 
