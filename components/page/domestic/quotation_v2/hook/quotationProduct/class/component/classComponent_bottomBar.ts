@@ -1,9 +1,11 @@
-import { ClassCompnent_base, Interface_ClassComponent_prime } from './classComponent_base';
+import {
+  ClassCompnent_base,
+  Interface_ClassComponent_prime,
+  Interface_ClassComponent_base,
+} from './classComponent_base';
 import { createNodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 import { optionsCreator_componentMaterial_01 } from 'js/utils/options/productOptions';
-
-import type { Toption } from 'js/utils/options/options';
 
 // ==========================================================================================================================
 const nodeConfig = (() => {
@@ -54,6 +56,10 @@ class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
   }
+
+  onProdChangeSurface() {
+    // do nothing
+  }
 }
 
 class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
@@ -75,6 +81,9 @@ class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
     }
   }
 }
+
+// region subspecies
+
 class ClassCompnent_bottomBar_w2 extends ClassCompnent_bottomBar {
   get options_material() {
     return this.classProd?.options_material;

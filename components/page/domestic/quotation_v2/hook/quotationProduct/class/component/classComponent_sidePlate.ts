@@ -39,10 +39,17 @@ class ClassCompnent_sidePlate extends ClassCompnent_base<'sidePlate'> implements
   }
 
   // ------------------------------------------------------------------------
+  onProdChangeSurface() {
+    // do nothing
+  }
+  // ------------------------------------------------------------------------
 
   get options_material() {
     return optionsCreator_componentMaterial_02();
   }
+  // ------------------------------------------------------------------------
+
+  // ------------------------------------------------------------------------
 }
 
 export { ClassCompnent_sidePlate };

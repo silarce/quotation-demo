@@ -401,6 +401,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
   set materialName(value: string) {
     super.materialName = value;
+
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
@@ -413,6 +414,21 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     if (!isSurfaceValid) {
       this.data.materialSurface = this._options_surface[0].value;
     }
+
+    this.render();
+  }
+
+  get materialSurface() {
+    return super.materialSurface;
+  }
+
+  set materialSurface(value) {
+    super.materialSurface = value;
+
+    Object.values(this.classComponentDict).forEach((classComponent) =>
+      // slat  headBox  guideRail // 只有這三個有作用
+      classComponent.onProdChangeSurface(this.data.materialSurface)
+    );
 
     this.render();
   }

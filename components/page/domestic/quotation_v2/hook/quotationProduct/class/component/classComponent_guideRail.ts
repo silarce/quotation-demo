@@ -35,8 +35,26 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
   }
+
+  // ------------------------------------------------------------------------
+
+  onProdChangeSurface(prodSurface: string | null) {
+    super.onProdChangeSurface(prodSurface);
+
+    const isSST = ClassCompnent_guideRail.utils.checkIsSST(this.state.material);
+
+    if (isSST && prodSurface === '無烤漆') {
+      prodSurface = '2B';
+      this.state.materialSurface = prodSurface;
+      this.render();
+    }
+  }
 }
 
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// region subspecies
 class ClassCompnent_guideRail_w2 extends ClassCompnent_guideRail {
   get options_material() {
     return this.classProd?.options_material;

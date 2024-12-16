@@ -46,6 +46,10 @@ class ClassCompnent_motorAccessories
     // do nothing
   }
 
+  onProdChangeSurface() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get options_material() {

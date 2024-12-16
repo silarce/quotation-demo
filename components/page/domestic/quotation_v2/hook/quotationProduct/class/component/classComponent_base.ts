@@ -47,6 +47,7 @@ interface Interface_ClassComponent_base {
   options_material: Toption[] | undefined;
   options_materialSurface: Toption[] | undefined;
   readonly onProdChangeMaterial: (prodMaterial: string) => void;
+  readonly onProdChangeSurface: (prodSurface: string | null) => void;
   //
 }
 
@@ -65,8 +66,17 @@ type TconstructorProps_componentBase<T extends keyof Tdata_componentDict> = {
 };
 
 // ========================================================================
+
+const utils = {
+  checkIsSST,
+  checkIsGalvanized,
+};
+
+// ========================================================================
 // class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base<T> {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
+  static utils = utils;
+
   readonly state: TstateComponentData<T>;
   protected readonly setState: TsetComponent<T>;
   protected readonly render = () => {
@@ -182,6 +192,19 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       }
     }
 
+    this.render();
+  }
+
+  onProdChangeSurface(prodSurface: string | null) {
+    const options_materialSurface = this.options_materialSurface;
+
+    const isSurfaceExist = options_materialSurface?.some((option) => option.value === prodSurface);
+
+    if (!isSurfaceExist) {
+      return;
+    }
+
+    this.state.materialSurface = prodSurface;
     this.render();
   }
 } //  ClassCompnent_base

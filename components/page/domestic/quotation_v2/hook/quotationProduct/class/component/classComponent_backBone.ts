@@ -35,6 +35,10 @@ class ClassCompnent_backBone extends ClassCompnent_base<'backBone'> implements I
     this.render();
   }
   // ------------------------------------------------------------------------
+  onProdChangeSurface() {
+    // do nothing
+  }
+  // ------------------------------------------------------------------------
 
   get options_material() {
     return undefined;

@@ -51,6 +51,10 @@ class ClassCompnent_motor extends ClassCompnent_base<'motor'> implements Interfa
     // do nothing
   }
 
+  onProdChangeSurface() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get options_material() {

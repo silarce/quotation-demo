@@ -34,6 +34,10 @@ class ClassCompnent_middlePillar extends ClassCompnent_base<'middlePillar'> impl
     this.render();
   }
   // ------------------------------------------------------------------------
+  onProdChangeSurface() {
+    // do nothing
+  }
+  // ------------------------------------------------------------------------
   get options_material() {
     return undefined;
   }

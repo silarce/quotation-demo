@@ -43,6 +43,10 @@ class ClassCompnent_roller extends ClassCompnent_base<'roller'> implements Inter
     // do nothing
   }
 
+  onProdChangeSurface() {
+    // do nothing
+  }
+
   // ------------------------------------------------------------------------
 
   get options_material() {
