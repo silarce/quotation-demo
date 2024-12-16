@@ -12,6 +12,7 @@ import EditDefunctionBtn from './accountantDeductionEditor';
 import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import Tip from 'components/global/myAntd/popover/tip';
 
 // css
 import scss from './incomeBillDetails.module.scss';
@@ -70,6 +71,7 @@ export default function IncomeBillDetails({
   readonly,
   totalOtherFee,
   isForeign,
+  accountReceivableCurrency,
 }: {
   className?: string;
   incomeBillList: TincomeBillSerialDto[];
@@ -77,6 +79,7 @@ export default function IncomeBillDetails({
   readonly?: boolean;
   totalOtherFee: string;
   isForeign: boolean;
+  accountReceivableCurrency: Tcurrency;
 }) {
   // ---------------------------------------------------------------------------
 
@@ -397,7 +400,13 @@ export default function IncomeBillDetails({
           );
         })}
 
-        {showTotals && <Tfoot {...totals} totalOtherFee={totalOtherFee} />}
+        {showTotals && (
+          <Tfoot
+            {...totals}
+            totalOtherFee={totalOtherFee}
+            accountReceivableCurrency={cutCurrency(accountReceivableCurrency)}
+          />
+        )}
       </div>
 
       {/*  */}
@@ -442,6 +451,7 @@ const Tfoot = ({
   deductionTotal,
   currency,
   totalOtherFee,
+  accountReceivableCurrency,
 }: {
   className?: string;
   price: number;
@@ -449,6 +459,7 @@ const Tfoot = ({
   deductionTotal: number;
   currency: string;
   totalOtherFee: string;
+  accountReceivableCurrency: string;
 }) => {
   return (
     <Row className={classNames(scss.tfoot, className)}>
@@ -477,7 +488,12 @@ const Tfoot = ({
       <div className={classNames(scss.cell, scss.price)} style={configList['fee'].style}>
         <InputSel
           showBaseline="invisible"
-          prefix={'TWD'}
+          prefix={
+            <div className="flex items-center gap-1">
+              {accountReceivableCurrency}
+              <Tip content={'國內匯費總和換算為合約幣別'} className={'translate-y-[1px]'} />
+            </div>
+          }
           node={<div className="text-right">{Number(totalOtherFee).toLocaleString()}</div>}
         />
       </div>
@@ -587,7 +603,7 @@ const configList: TconfigList = {
   fee: {
     label: '國內匯費',
     style: {
-      width: '130px',
+      width: '150px',
     },
     dynaStyle: (isForeign) => {
       if (!isForeign) {
