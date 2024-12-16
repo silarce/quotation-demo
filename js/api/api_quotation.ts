@@ -1018,10 +1018,13 @@ export const useGetContract_id = (
   option?: {
     customPopulate?: string[];
     preBuiltPopulate?: keyof typeof lookpu_contractPopulate;
+    addintion_latestRecordReview?: boolean;
   }
 ) => {
   const preBuiltPopulate = lookpu_contractPopulate[option?.preBuiltPopulate ?? 'basic'];
   const customPopulate = option?.customPopulate ?? [];
+
+  const { addintion_latestRecordReview = false } = option ?? {};
 
   let populate = [...preBuiltPopulate, ...customPopulate];
   populate = _.uniq(populate);
@@ -1042,8 +1045,8 @@ export const useGetContract_id = (
       setIsFetching(true);
       const newRes: TquotationContractDto_addition = await apiGetContract_Id(id, params);
 
-      if (newRes) {
-        const worksheetArr = newRes.worksheet ?? [];
+      if (addintion_latestRecordReview) {
+        const worksheetArr = newRes?.worksheet ?? [];
 
         for (const ws of worksheetArr) {
           if (ws.isAbandoned) {
