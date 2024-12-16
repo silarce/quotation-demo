@@ -2796,14 +2796,14 @@ export type TgenerateDoorProductBomDto = {
   slat: TgenerateDoorProductBomDto_ComponentInfo;
   bottomBar: TgenerateDoorProductBomDto_ComponentInfo;
   guideRail: TgenerateDoorProductBomDto_ComponentInfo;
-  sidePlate: TgenerateDoorProductBomDto_ComponentInfo;
-  roller: TgenerateDoorProductBomDto_ComponentInfo;
-  motor: TgenerateDoorProductBomDto_ComponentInfo;
-  motorAccessories: TgenerateDoorProductBomDto_ComponentInfo;
-  headBox: TgenerateDoorProductBomDto_ComponentInfo;
+  sidePlate?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  roller?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  motor?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  motorAccessories?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  headBox?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
   //
-  middlePillar?: TgenerateDoorProductBomDto_ComponentInfo;
-  backBone?: TgenerateDoorProductBomDto_ComponentInfo;
+  middlePillar?: TgenerateDoorProductBomDto_ComponentInfo; // W2時必須有
+  backBone?: TgenerateDoorProductBomDto_ComponentInfo; // W2時必須有
 };
 
 export type TdoorBomDto_Component = {

@@ -31,6 +31,9 @@ const createComponentDict = ({
     roller,
     optionalRollers,
 
+    motor,
+    optionalMotors,
+
     motorAccessory,
     optionalMotorAccessories,
 
@@ -127,6 +130,22 @@ const createComponentDict = ({
       price: '',
       rawData: roller,
       optionalComponent: optionalRollers,
+    });
+
+  motor &&
+    (componentDict.motor = {
+      type: 'motor',
+      shouldInit: true,
+      number: undefined,
+      desc: '稍後建立desc產生器',
+      material: '稍後處理',
+      materialSurface: '稍後處理',
+      density: null,
+      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+      quantity: '',
+      price: '',
+      rawData: motor,
+      optionalComponent: optionalMotors,
     });
 
   motorAccessory &&
@@ -315,6 +334,9 @@ const filterComponent = (classProd: ClassProd_base, availableComponents: TdoorCo
 
     roller,
     optionalRollers,
+
+    motor,
+    optionalMotors,
 
     motorAccessory,
     optionalMotorAccessories,

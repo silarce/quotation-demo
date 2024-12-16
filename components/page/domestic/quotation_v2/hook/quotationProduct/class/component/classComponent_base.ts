@@ -76,7 +76,9 @@ const utils = {
 class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interface_ClassComponent_base {
   static utils = utils;
 
-  readonly state: TstateComponentData<T>;
+  key: T | undefined = undefined;
+
+  state: TstateComponentData<T>;
   protected readonly setState: TsetComponent<T>;
   protected readonly render = () => {
     this.setState((state) => ({ ...state }));
@@ -179,6 +181,35 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     return optionsCreator_surface_onlyPaint();
   }
   // -----------------------------------------------------------------------
+
+  // 這個方案的型別搞不定，因此不採用，不然應該是這樣處理比較好
+  // reset(data_component: TstateComponentData<T>) {
+  //   this.state = {
+  //     ...data_component,
+  //     material: this.state.material,
+  //     materialSurface: this.state.materialSurface,
+  //   };
+  // }
+
+  replaceState({
+    remainMaterial = true,
+    remainMaterialSurface = true,
+  }: {
+    remainMaterial?: boolean;
+    remainMaterialSurface?: boolean;
+  } = {}) {
+    const prod_data_component = this.key && this.classProd?.state.data_componentDict[this.key];
+
+    if (!prod_data_component) {
+      throw new Error('replaceState方法，prod_data_component is undefined');
+    }
+
+    const state = { ...prod_data_component };
+    remainMaterial && (state.material = this.state.material);
+    remainMaterialSurface && (state.materialSurface = this.state.materialSurface);
+
+    this.state = state;
+  }
 
   init = () => {
     this.state.shouldInit = false;

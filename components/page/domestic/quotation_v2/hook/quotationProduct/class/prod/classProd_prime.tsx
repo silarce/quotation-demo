@@ -356,7 +356,17 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       availableComponents,
     });
 
-    this.state.data_componentDict = componentDict;
+    Object.values(this.classComponentDict).forEach((classComponent) => {
+      const data_component = componentDict[classComponent.key];
+
+      if (data_component) {
+        classComponent.replaceState();
+      }
+    });
+
+    Object.values(this.classComponentDict).forEach((classComponent) => {
+      classComponent.init();
+    });
   } // handleAvailableComponentsUpdated
 
   // region reqChain
@@ -383,6 +393,10 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
       // 更新材料配件
       this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
+
+      // Object.values(this.classComponentDict).forEach((classComponent) => classComponent.init());
+
+      await ClassProd_prime.reqGetBom(this);
 
       // 接著要取得BOM資料
     } catch (error) {

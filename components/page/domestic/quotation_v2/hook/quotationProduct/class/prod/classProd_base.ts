@@ -26,6 +26,11 @@ import {
 
   //
   TdoorModel,
+  //
+  TgenerateDoorProductBomDto_DoorSpec,
+  TgenerateDoorProductBomDto_ComponentInfo,
+  //
+  TmaterialSurface,
 } from 'js/api/dtoTypes';
 
 import type { TclassComponentDict } from '../../useQuotationProduct';
@@ -44,8 +49,10 @@ import {
   apiGetProdAvailableComponents,
   //
   TgetBoxDParams,
-  apiGetboxD,
   TgetBoxDParams_strict,
+  //
+  TgenerateDoorProductBomDto,
+  apiPostProdGenerateDoorProductBom,
 } from 'js/api/api_product';
 import { createAssetUrl } from 'js/api/api_product';
 
@@ -207,6 +214,61 @@ const reqGetAvailableComponents = async (classProd: ClassProd_base) => {
     });
 };
 
+const reqGetBom = async (classProd: ClassProd_base) => {
+  const componentDict = classProd.state.data_componentDict;
+
+  const infoDict_partial: Partial<Omit<TgenerateDoorProductBomDto, 'doorSpec'>> = {};
+
+  const componentInfoDict = Object.entries(componentDict).reduce((acc, [key, component]) => {
+    const { rawData, material, materialSurface, isPainted, type } = component;
+    const guideRailThickness = classProd.data.guideRailThickness; // 門軌厚度
+
+    acc[type] = {
+      id: rawData!.id,
+      material,
+      materialSurface: (materialSurface as TmaterialSurface) || undefined,
+      isPainted,
+      thickness: guideRailThickness,
+    };
+
+    return acc;
+  }, infoDict_partial) as Omit<TgenerateDoorProductBomDto, 'doorSpec'>;
+
+  const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
+    modelName: classProd.doorModelName as TdoorModel,
+    weight: classProd.data.weight ? Number(classProd.data.weight) : -1,
+    height: classProd.height_mm,
+    B: classProd.boxB_mm,
+    D: classProd.boxD_mm,
+    slatLength: classProd.data.slatLength || -1,
+    guideRailLength: classProd.data.guideRailLength || -1,
+    rollerLength: classProd.data.bearingHousingTotalLength ? Number(classProd.data.bearingHousingTotalLength) : -1,
+    headBoxLength: classProd.data.headBoxLength || -1,
+    isAntiTyphoon: !!classProd.isAntiTyphoon,
+    rollerDiameter: classProd.data.diameter ? Number(classProd.data.diameter) : 0,
+    bearingType: classProd.data.bearingName ?? '',
+    gearNumber: classProd.data.gearNumber ?? '',
+    chains: classProd.data.sprocketWheelChains ? Number(classProd.data.sprocketWheelChains) : -1,
+    fullWidth: classProd.fullWidth_mm,
+    bottomBarAngleIron: classProd.bottomBarAngleIron ?? '',
+    bottomBarPlate: classProd.bottomBarPlate ?? '',
+  };
+
+  const body: TgenerateDoorProductBomDto = {
+    doorSpec,
+    ...componentInfoDict,
+  };
+
+  // TgenerateDoorProductBomDto_DoorSpec
+  // TgenerateDoorProductBomDto_ComponentInfo
+
+  // TgenerateDoorProductBomDto
+
+  // const body:TgenerateDoorProductBomDto =
+
+  await apiPostProdGenerateDoorProductBom(body);
+};
+
 // ================================================================================
 // MARK: ClassProd_base
 //
@@ -217,6 +279,7 @@ class ClassProd_base implements Interface_ClassProd_base {
   static calcArea = calcArea;
   static reqGetProdCalcGeneralSpec = reqGetProdCalcGeneralSpec;
   static reqGetAvailableComponents = reqGetAvailableComponents;
+  static reqGetBom = reqGetBom;
   // -----------------------------------------------------------------
 
   // -----------------------------------------------------------------
