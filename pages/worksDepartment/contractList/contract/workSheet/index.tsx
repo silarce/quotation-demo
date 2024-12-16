@@ -228,6 +228,7 @@ export default function Worksheet({
       // 'worksheet.records.contractProductItems.components',
       // 'worksheet.records.contractProductItems.accessories',
     ],
+    addintion_latestRecordReview: true,
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
