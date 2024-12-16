@@ -7,12 +7,14 @@ import {
   TaddReview,
   TgetReviewById as TgetReviewById,
   useGetReviewById,
-  apiAddReview,
-  apiGetReviewBack,
+  // apiAddReview,
+  // apiGetReviewBack,
 } from 'js/api/api_netCore/api_review';
 
 import icon_review from 'public/image/icon/review.svg';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 // ======================================================================
 
@@ -59,6 +61,12 @@ const useReviewFlow = ({
   const query = router.query as { id?: string | undefined };
   const document_uuid = uuid || query.id;
 
+  const {
+    //  req_addReview,
+    req_reviewBack,
+    req_backThanAdd,
+  } = useGlobal_review();
+
   const [isFetching, setIsFetching] = useState(false);
 
   const { raw, update, isFetching: isFetching_get, isFirstLoaded } = useGetReviewById(document_uuid, { autoUpdate });
@@ -82,11 +90,17 @@ const useReviewFlow = ({
 
     setIsFetching(true);
 
-    return await apiAddReview(body)
+    return await req_backThanAdd(body)
       .then(async () => {
         await update();
       })
       .finally(() => setIsFetching(false));
+
+    // return await apiAddReview(body)
+    //   .then(async () => {
+    //     await update();
+    //   })
+    //   .finally(() => setIsFetching(false));
   };
 
   // 抽單
@@ -99,7 +113,7 @@ const useReviewFlow = ({
 
     setIsFetching(true);
 
-    return await apiGetReviewBack(document_uuid)
+    return await req_reviewBack(document_uuid)
       .then(async () => {
         await update();
       })
