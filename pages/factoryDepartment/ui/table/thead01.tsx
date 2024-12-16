@@ -725,6 +725,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   //#endregion
 
 
+
+
+
+  //新
   //#region 新請購單
   else if (type === "PRequisition") {
     return (
@@ -743,8 +747,37 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-
-
+  //#region 審核紀錄
+  else if (type === "ReviewHistory2") {
+    return (
+      <div className={style.newthead2}>
+        <span>序</span>
+        <span>審核日期</span>
+        <span>審核狀態</span>
+        <span>審核關卡</span>
+        <span>審核人員</span>
+        <span>審核意見</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 採購單
+  else if (type === "POrder") {
+    return (
+      <div className={style.newthead3}>
+        <span>序</span>
+        <span>採購單號</span>
+        <span>狀態</span>
+        <span>採購日期</span>
+        <span>需用日期</span>
+        <span>申請人員</span>
+        <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
 
 
   else {
