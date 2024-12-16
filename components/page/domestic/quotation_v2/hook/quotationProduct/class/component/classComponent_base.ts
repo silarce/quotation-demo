@@ -46,8 +46,9 @@ interface Interface_ClassComponent_base {
 
   options_material: Toption[] | undefined;
   options_materialSurface: Toption[] | undefined;
-  readonly onProdChangeMaterial: (prodMaterial: string) => void;
-  readonly onProdChangeSurface: (prodSurface: string | null) => void;
+  readonly onProdChangeMaterial: (prodMaterial: string | null | undefined) => void;
+  readonly onProdChangeSurface: (prodSurface: string | null | undefined) => void;
+  readonly renewDesc: () => void;
   //
 }
 
@@ -56,8 +57,6 @@ interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
   readonly name: string;
   readonly nodeConfig: TnodeConfig_component;
   readonly unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
-
-  readonly renewDesc: () => void;
 }
 
 type TconstructorProps_componentBase<T extends keyof Tdata_componentDict> = {
@@ -97,6 +96,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }: TconstructorProps_componentBase<T>) {
     this.state = state_component;
     this.setState = setState_component;
+
+    this.state.shouldInit && this.init();
+
     // this.classProd = activedClassProd;
   } // constructor close
 
@@ -178,7 +180,22 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
   // -----------------------------------------------------------------------
 
-  onProdChangeMaterial(prodMaterial: string) {
+  init = () => {
+    this.state.shouldInit = false;
+    const material = this.classProd?.data.materialName;
+    const materialSurface = this.classProd?.data.materialSurface;
+
+    this.onProdChangeMaterial(material);
+    this.onProdChangeSurface(materialSurface);
+    this.renewDesc();
+  };
+
+  renewDesc() {
+    // 將會在各個子類別中實作
+  }
+
+  // 在各個子類別中可能有各自的實作
+  onProdChangeMaterial(prodMaterial: string | null | undefined) {
     const options_material = this.options_material;
     const value = options_material?.find((option) => option.value === prodMaterial)?.value;
 
@@ -195,7 +212,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.render();
   }
 
-  onProdChangeSurface(prodSurface: string | null) {
+  // 在各個子類別中可能有各自的實作
+  onProdChangeSurface(prodSurface: string | null | undefined) {
     const options_materialSurface = this.options_materialSurface;
 
     const isSurfaceExist = options_materialSurface?.some((option) => option.value === prodSurface);
@@ -204,7 +222,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       return;
     }
 
-    this.state.materialSurface = prodSurface;
+    this.state.materialSurface = prodSurface ?? '';
     this.render();
   }
 } //  ClassCompnent_base

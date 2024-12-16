@@ -52,6 +52,7 @@ const createComponentDict = ({
   slat &&
     (componentDict.slat = {
       type: 'slat',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -67,6 +68,7 @@ const createComponentDict = ({
   bottomBar &&
     (componentDict.bottomBar = {
       type: 'bottomBar',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -82,6 +84,7 @@ const createComponentDict = ({
   guideRail &&
     (componentDict.guideRail = {
       type: 'guideRail',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -97,6 +100,7 @@ const createComponentDict = ({
   sidePlate &&
     (componentDict.sidePlate = {
       type: 'sidePlate',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -112,6 +116,7 @@ const createComponentDict = ({
   roller &&
     (componentDict.roller = {
       type: 'roller',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -127,6 +132,7 @@ const createComponentDict = ({
   motorAccessory &&
     (componentDict.motorAccessories = {
       type: 'motorAccessories',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -142,6 +148,7 @@ const createComponentDict = ({
   headBox &&
     (componentDict.headBox = {
       type: 'headBox',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -157,6 +164,7 @@ const createComponentDict = ({
   backBone &&
     (componentDict.backBone = {
       type: 'backBone',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',
@@ -172,6 +180,7 @@ const createComponentDict = ({
   middlePillar &&
     (componentDict.middlePillar = {
       type: 'middlePillar',
+      shouldInit: true,
       number: undefined,
       desc: '稍後建立desc產生器',
       material: '稍後處理',

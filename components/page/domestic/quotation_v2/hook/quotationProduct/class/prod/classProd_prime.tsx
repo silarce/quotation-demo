@@ -257,7 +257,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   //-------------------------------------------------------------------------------
 
   // MARK:handle_afterUpdateGeneralSpec
-  protected afterUpdateGeneralSpec(generalSpecs: TdoorGeneralSpecsDto) {
+  protected afterUpdateGeneralSpec_sideEffect(generalSpecs: TdoorGeneralSpecsDto) {
     // const generalSpecs = this.state.generalSpecs;
 
     // if (!generalSpecs) {
@@ -350,31 +350,41 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     return this;
   }
 
-  protected handleAvailableComponentsUpdated(availableComponents: TdoorComponentListDto) {
-    const {} = createComponentDict({
+  protected afterAvailableComponentsUpdated_sideEffect(availableComponents: TdoorComponentListDto) {
+    const { componentDict, changedMotorVendor } = createComponentDict({
       classProd: this,
       availableComponents,
     });
 
-    return {};
+    this.state.data_componentDict = componentDict;
   } // handleAvailableComponentsUpdated
 
   // region reqChain
   protected async reqChain_01() {
     try {
       const generalSpec = await ClassProd_prime.reqGetProdCalcGeneralSpec(this);
+      // 取得generalSpec
       this.state.generalSpecs = generalSpec;
-      this.afterUpdateGeneralSpec(generalSpec);
+      // 送入generalSpec更新state
+      this.afterUpdateGeneralSpec_sideEffect(generalSpec);
 
+      // 取得boxD並更新state
       const boxD = await reqGetBoxD(this);
       this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
 
+      // 取得slatCount並更新state
       const slatCount = await reqGetSlatCount(this);
       this.data.slatCount = slatCount === null ? null : `${slatCount}`;
 
+      // 取得可用材料配件
       const availableComponents = await ClassProd_prime.reqGetAvailableComponents(this);
+      // 更新可用材料配件
       this.state.availableComponents = availableComponents;
-      this.handleAvailableComponentsUpdated(availableComponents);
+
+      // 更新材料配件
+      this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
+
+      // 接著要取得BOM資料
     } catch (error) {
       this.clearGeneralSpec();
       this.clearComponent();

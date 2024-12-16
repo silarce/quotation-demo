@@ -38,7 +38,7 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
 
   // ------------------------------------------------------------------------
 
-  onProdChangeSurface(prodSurface: string | null) {
+  onProdChangeSurface(prodSurface: string | null | undefined) {
     super.onProdChangeSurface(prodSurface);
 
     const isSST = ClassCompnent_guideRail.utils.checkIsSST(this.state.material);

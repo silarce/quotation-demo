@@ -238,6 +238,7 @@ type TcomponentRawDataDict = {
 interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   type: T;
   //
+  shouldInit?: boolean; // 是否初始化
   // 輸出
   number: string | undefined; // 代號 來自於 door/generate-door-product-bom
   desc: string; // 說明
