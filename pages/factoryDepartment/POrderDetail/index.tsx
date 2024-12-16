@@ -44,6 +44,10 @@ import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
 import icon_review from 'public/image/icon/review.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_export from 'public/image/icon/fc_export.svg';
+import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-align';
+import { title } from 'process';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -111,6 +115,10 @@ export default function POrderDetail() {
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
+    const [supplieridin, setSupplieridin] = useState<string>("");
+    const [supplieruuidin, setSupplieruuidin] = useState<string>("");
+    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
@@ -280,14 +288,18 @@ export default function POrderDetail() {
 
             const data = {
                 suppliername: suppliernamein,
-                supplieraddress: supplieraddressin,
                 supplierphone: supplierphonein,
                 suppliertaxid: suppliertaxidin,
-                invoice: invoicein,
-                shippingaddress: shippingaddressin
+                supplieraddress: supplieraddressin,
+                supplierid: supplieridin,
+                shippingaddress: shippingaddressin,
+                suppliercontact: suppliercontactin,
+                supplierfax: supplierfaxin,
+                supplieruuid: supplieruuidin,
             };
-            
+
             const conditionModel = {
+                purchaseorderid: idin,
                 purchaseorderuuid: uuidin,
                 data: data,
                 create_at: create_atin,
@@ -303,7 +315,7 @@ export default function POrderDetail() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdatePurchaserequisitionDetail`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdatePurchaseorderDetail`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -364,7 +376,7 @@ export default function POrderDetail() {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
                 router.push({
-                    pathname: `/factoryDepartment/PRequisitionList`,
+                    pathname: `/factoryDepartment/POrderList`,
                 });
             } else {
                 // 失敗，顯示錯誤提示
@@ -450,7 +462,7 @@ export default function POrderDetail() {
             setCustomerdata(responseData);
 
             // 設置篩選後的資料
-            setFilteredData(responseData);
+            setFilteredData2(responseData);
 
         } catch (error: any) {
             setError(error.message);
@@ -459,6 +471,172 @@ export default function POrderDetail() {
         }
     };
 
+    //取得IP
+    const Print = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+            if (!response.ok) {
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+            }
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
+
+        } catch (error: any) {
+            setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //列印單據
+    const sentToPrint = async (ip: any) => {
+        myAlert.confirm({
+            title: '確定要列印單據嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        const conditionModel = {
+                            id: idin,
+                            type: "purchaseorder",
+                            clientip: ip,
+                            data: []
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        console.log(JSON.stringify(inputModel));
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const data = await response.text();
+                        console.log(data);
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+
+
+
+                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: data
+                        });
+
+                        if (!response2.ok) {
+                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
+                        }
+
+                        const data2 = await response2.text();
+                        console.log("Received from print4:", data2);
+
+
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        // setIsLoading(false);
+                    }
+                }
+            }
+        });
+
+
+    };
+
+    //匯出單據
+    const Excel = async (id: any, type2: any, quoid: any) => {
+        try {
+
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+                type: 'purchaseorder',
+                type2: type2,
+                quoterequuid: quoid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
 
@@ -812,6 +990,17 @@ export default function POrderDetail() {
             }
         })
     }
+
+    //列印單據
+    const handlePrint = () => {
+        Print();
+    }
+
+    //匯出單據
+    const handleExport = () => {
+        Excel(idin, "po", "")
+    }
+
     //#endregion
 
     //#region ===========【明細功能區】
@@ -1041,7 +1230,7 @@ export default function POrderDetail() {
             (filters.name === '' || item.name.includes(filters.name)) &&
             (filters.contact === '' || item.contact.includes(filters.contact))
         );
-        setFilteredData(filtered);
+        setFilteredData2(filtered);
     }, [filters]);
 
     //#endregion
@@ -1164,9 +1353,38 @@ export default function POrderDetail() {
                 customeLeft={
                     [
                         <>
-                            <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
-                                {statusin}
-                            </span>
+                            {/* 編輯按鈕 */}
+                            {/* {statusin === "採購中" && !isEditing && ( */}
+
+                            <>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handlePrint();
+                                    }}
+                                    title="列印單據"
+                                    style={{ margin: '0px 10px' }}
+                                >
+                                    <span style={{ paddingRight: '5px' }}>
+                                        <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    </span>
+                                    列印
+                                </button>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handleExport();
+                                    }}
+                                    title="匯出單據"
+                                    style={{ margin: '0px 10px' }}
+                                >
+                                    <span style={{ paddingRight: '5px' }}>
+                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    </span>
+                                    Excel
+                                </button>
+                            </>
+                            {/* )} */}
                         </>
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -1454,9 +1672,10 @@ export default function POrderDetail() {
                                                 width: '39px',
                                                 backgroundColor: '#f5f5f5',
                                                 border: '1px solid #c1c1c1',
-                                                // borderRadius: '5px',
+                                                borderRadius: '3px',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.3s ease',
+                                                fontWeight:'bolder'
                                             }}
                                             onMouseOver={(e) => {
                                                 e.currentTarget.style.backgroundColor = '#e0e0e0';
@@ -1485,7 +1704,7 @@ export default function POrderDetail() {
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                // style: { color: 'red' },
+                                                style: { textAlign: 'right' },
                                                 value: totalprice1 || ' ',
                                             },
                                         }}
@@ -1496,7 +1715,7 @@ export default function POrderDetail() {
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                // style: { color: 'red' },
+                                                style: { textAlign: 'right' },
                                                 value: taxprice1 || ' ',
                                             },
                                         }}
@@ -1507,7 +1726,7 @@ export default function POrderDetail() {
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                // style: { color: 'red' },
+                                                style: { textAlign: 'right' },
                                                 value: totalpayprice1 || ' ',
                                             },
                                         }}
@@ -1548,7 +1767,7 @@ export default function POrderDetail() {
                         </div>
                         <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
 
-                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
                                 {/* <Thead01 type={'AddPR_ReqList'} /> */}
                                 <div className={scss.thead20}>
                                     <span>
@@ -1753,12 +1972,13 @@ export default function POrderDetail() {
                                             maxHeight: '300px',
                                             overflowY: 'auto',
                                             marginTop: '0px',
+                                            position: 'sticky',  /* 設置為sticky */
+                                            bottom: '0',  /* 固定在底部 */
                                             left: '20px',
-                                            position: 'absolute',
                                             width: '1000px',
                                             backgroundColor: 'white',
                                             zIndex: 1004,
-                                            display: `${showSuggestions ? '' : 'none'}`
+                                            display: `${showSuggestions ? '' : 'none'}`  /* 根據showSuggestions控制顯示 */
                                         }}>
                                         {filteredData.map(item => (
                                             <li
@@ -1985,7 +2205,18 @@ export default function POrderDetail() {
                     }
                     footer={
                         <button className={scss.shortredsquarebtn}
-                            onClick={() => { sentToReview("審核") }}>
+                            onClick={() => {
+                                if (data2.length === 0) {
+                                    myAlert.warning({ title: '尚未加入採購項目' })
+                                    return;
+                                } else if (review_flow === '') {
+                                    myAlert.warning({ title: '請選擇審核流程' })
+                                    return;
+                                }
+                                else {
+                                    sentToReview("審核")
+                                }
+                            }}>
                             送審
                         </button>
                     }
@@ -2074,14 +2305,19 @@ export default function POrderDetail() {
                         <span>統編</span>
                         <span></span>
                     </div>
-                    {filteredData && (
-                        filteredData.map((_item: any, index: number) => (
+                    {filteredData2 && (
+                        filteredData2.map((_item: any, index: number) => (
                             <CellWithBar key={index} className={scss.panelHeader21}
                                 onClick={() => {
                                     setSuppliernamein(_item.name);
                                     setSupplieraddressin(_item.county + _item.district + _item.address);
                                     setSupplierphonein(_item.phone);
                                     setSuppliertaxidin(_item.tax_id);
+                                    setSupplieridin(_item.customer_number);
+                                    setSupplierfaxin(_item.fax);
+                                    setSuppliercontactin(_item.contact);
+                                    setSupplieruuidin(_item.id);
+                                    setCustomerbar(false);
                                 }}>
                                 <div className={scss.row01}>
                                     <span>{_item.name}</span>

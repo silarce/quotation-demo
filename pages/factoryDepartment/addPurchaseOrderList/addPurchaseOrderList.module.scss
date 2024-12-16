@@ -321,7 +321,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 450px
+    grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 150px 150px 450px // gap: 5px;
     // gap: 5px;
   }
 }
@@ -686,7 +686,7 @@ div.panelHeader15 {
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 450px 65px;
+  grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 150px 150px 450px 65px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;
@@ -822,3 +822,66 @@ div.panelHeader15 {
   }
 }
 
+
+//#region 廠商
+.thead21 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 415px 415px 100px 30px;
+  // gap: 5px;
+  height: 40px;
+  padding: 0px 20px;
+  background-color: $bgc01;
+
+  >* {
+      margin: auto;
+      margin-left: 0;
+
+      &:nth-last-of-type(1) {
+          margin-left: auto;
+      }
+  }
+
+  >span {
+      font-weight: 400;
+      font-size: 18px;
+      // color: #979797;
+      color: #14256a;
+  }
+}
+
+div.panelHeader21 {
+  // padding-left: 20px;
+  padding: 10px 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+      span {
+          font-weight: 400;
+          font-size: 18px;
+      }
+
+      .clientName,
+      .country {
+          color: $colorMain;
+      }
+  }
+
+  .row01 {
+      display: grid;
+      grid-template-columns:415px 415px 100px 30px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+  
+    .selectedRow {
+      background-color: #ecf1ff;
+      /* 當前選擇項目的背景顏色 */
+    }
+}
+
+//#endregion

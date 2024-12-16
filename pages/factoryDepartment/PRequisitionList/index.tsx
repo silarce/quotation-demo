@@ -400,7 +400,7 @@ export default function PRequisitionList() {
                                     fontSize: '18px',
                                     borderBottom: '1px solid #14256a',
                                     color: '#14256a',
-                                    width: '200px',
+                                    width: '100px',
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
@@ -654,8 +654,9 @@ export default function PRequisitionList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th>數量</th>
-                                                        <th>單價</th>
+                                                        <th style={{ width: '150px' }}>數量</th>
+                                                        <th style={{ width: '80px' }}>單位</th>
+                                                        <th style={{ width: '150px' }}>單價</th>
                                                         <th>金額</th>
                                                         <th></th>
                                                     </tr>
@@ -667,8 +668,9 @@ export default function PRequisitionList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td>{detail.quantity?.toLocaleString()}</td>
-                                                            <td>{detail.unitprice?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                                            <td style={{ width: '80px' }}>{detail.unit}</td>
+                                                            <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>
                                                         </tr>
                                                     ))}

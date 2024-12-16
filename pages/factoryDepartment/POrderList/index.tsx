@@ -95,6 +95,7 @@ export default function POrderList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -330,12 +331,14 @@ export default function POrderList() {
         const endDate = keywordenddate;
         const id = keyword2.trim();
         const status = keyword3.trim();
+        const supplier = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
             !id &&
-            !status) {
+            !status &&
+            !supplier) {
             setSearchdata(data);
             return;
         }
@@ -363,13 +366,19 @@ export default function POrderList() {
             );
         }
 
+        if (supplier) {
+            filteredData = filteredData.filter(item =>
+                item.suppliername.toString().includes(supplier)
+            );
+        }
+
         setSearchdata(filteredData);
     };
 
     // 監聽條件變更
     useEffect(() => {
         filterData();
-    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
     //#endregion
 
     return (
@@ -399,7 +408,7 @@ export default function POrderList() {
                                     fontSize: '18px',
                                     borderBottom: '1px solid #14256a',
                                     color: '#14256a',
-                                    width: '200px',
+                                    width: '100px',
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
@@ -453,10 +462,27 @@ export default function POrderList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入單號',
-                                        style: { width: "300px" },
+                                        style: { width: "200px" },
                                         value: keyword2,
                                         onChange: (e) => {
                                             setKeyword2(e.target.value)
+                                        }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <InputSel
+                                // caption="單號"
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                inputProps={{
+                                    props: {
+                                        placeholder: '請輸入廠商名稱',
+                                        style: { width: "300px" },
+                                        value: keyword4,
+                                        onChange: (e) => {
+                                            setKeyword4(e.target.value)
                                         }
                                     },
                                 }}
@@ -511,7 +537,7 @@ export default function POrderList() {
                                                     <span>
                                                         {_item.create_by}
                                                     </span>
-                                                    <span>{_item.note}</span>
+                                                    <span>{_item.suppliername}</span>
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({
@@ -647,8 +673,9 @@ export default function POrderList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th>數量</th>
-                                                        <th>單價</th>
+                                                        <th style={{ width: '150px' }}>數量</th>
+                                                        <th style={{ width: '80px' }}>單位</th>
+                                                        <th style={{ width: '150px' }}>單價</th>
                                                         <th>金額</th>
                                                         <th></th>
                                                     </tr>
@@ -660,8 +687,9 @@ export default function POrderList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td>{detail.quantity?.toLocaleString()}</td>
-                                                            <td>{detail.unitprice?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                                            <td style={{ width: '80px' }}>{detail.unit}</td>
+                                                            <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>
                                                         </tr>
                                                     ))}

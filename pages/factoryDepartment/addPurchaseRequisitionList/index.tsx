@@ -80,7 +80,8 @@ export default function AddPurchaseRequisitionList() {
     const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-
+    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -771,114 +772,156 @@ export default function AddPurchaseRequisitionList() {
                                     <span>規格</span>
                                     <span>數量</span>
                                     <span>單位</span>
+                                    <span>單價</span>
+                                    <span>總價</span>
                                     <span>備註(用途說明)</span>
                                     <span></span>
                                     <span></span>
                                 </div>
-                                {data2.map((_item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader20}>
-                                        <div className={scss.row01}>
-                                            <span>
-                                                <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
-                                                    {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                    <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                            <span>{index + 1}</span>
-                                            <span>
-                                                <input
-                                                    ref={productidRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    value={_item.productid !== undefined ? _item.productid : ''}
-                                                    // readOnly
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "productid", e.target.value);
-                                                        setCurrentIndex(index);
-                                                        // setHandinputproductid(e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={nameRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    value={_item.name !== undefined ? _item.name : ''}
-                                                    // readOnly
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "name", e.target.value);
-                                                        setCurrentIndex(index);
-                                                        // setHandinputname(e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={specRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    value={_item.spec !== undefined ? _item.spec : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    // readOnly
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "spec", e.target.value);
-                                                        setCurrentIndex(index);
-                                                        // setHandinputspec(e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={quantityRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    // maxLength={5}
-                                                    value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    // readOnly
-                                                    onChange={(e) => {
-                                                        // handleNumberChange(index, "quantity", e.target.value);
-                                                        handleStringChange(index, "quantity", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={unitRefs.current[index]}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    value={_item.unit !== undefined ? _item.unit : ''}
-                                                    // readOnly
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "unit", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
-                                            <span>
-                                                <input
-                                                    ref={noteRefs.current[index]}
-                                                    // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                    style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                    type="text"
-                                                    value={_item.note !== undefined ? _item.note : ''}
-                                                    // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                    // readOnly
-                                                    onChange={(e) => {
-                                                        handleStringChange(index, "note", e.target.value);
-                                                    }}
-                                                />
-                                            </span>
+                                {data2 && (
+                                    data2.map((_item, index) => {
+                                        const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                                        _item.totalprice = Totalprice
+                                        return (
+                                            <CellWithBar key={index} className={scss.panelHeader20}>
+                                                <div className={scss.row01}>
+                                                    <span>
+                                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                            {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                        </button>
+                                                    </span>
+                                                    <span>{index + 1}</span>
+                                                    <span>
+                                                        <input
+                                                            ref={productidRefs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            value={_item.productid !== undefined ? _item.productid : ''}
+                                                            // readOnly
+                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "productid", e.target.value);
+                                                                setCurrentIndex(index);
+                                                                // setHandinputproductid(e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={nameRefs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            value={_item.name !== undefined ? _item.name : ''}
+                                                            // readOnly
+                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "name", e.target.value);
+                                                                setCurrentIndex(index);
+                                                                // setHandinputname(e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={specRefs.current[index]}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            value={_item.spec !== undefined ? _item.spec : ''}
+                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                            // readOnly
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "spec", e.target.value);
+                                                                setCurrentIndex(index);
+                                                                // setHandinputspec(e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={quantityRefs.current[index]}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            // maxLength={5}
+                                                            value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                            // readOnly
+                                                            onChange={(e) => {
+                                                                // handleNumberChange(index, "quantity", e.target.value);
+                                                                handleStringChange(index, "quantity", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={unitRefs.current[index]}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            value={_item.unit !== undefined ? _item.unit : ''}
+                                                            // readOnly
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "unit", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={unitpriceRefs.current[index]}
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                borderBottom: "1px solid black",
+                                                                width: '95%',
+                                                            }}
+                                                            type={'number'}
+                                                            value={_item.unitprice !== undefined ? _item.unitprice : ''}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "unitprice", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={totalpriceRefs.current[index]}
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                // borderBottom: isEditing ? "1px solid black" : "",
+                                                                width: '95%',
+                                                            }}
+                                                            type={'text'}
+                                                            // value={Number(_item.quantity)}
+                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                            value={_item.totalprice.toLocaleString()}
+                                                            // readOnly={!isEditing}
+                                                            readOnly
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={noteRefs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                            style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            type="text"
+                                                            value={_item.note !== undefined ? _item.note : ''}
+                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                            // readOnly
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "note", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
 
 
-                                        </div>
-                                    </CellWithBar>
+                                                </div>
+                                            </CellWithBar>
+                                        );
 
-                                ))}
+                                    })
+                                )}
 
                             </div>
                             <span style={{ paddingLeft: '22px', position: 'relative' }}>

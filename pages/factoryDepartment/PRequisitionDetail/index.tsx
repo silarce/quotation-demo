@@ -1297,7 +1297,7 @@ export default function PRequisitionDetail() {
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                // style: { color: 'red' },
+                                                style: { textAlign: 'right' },
                                                 value: totalprice1 || ' ',
                                             },
                                         }}
@@ -1349,7 +1349,7 @@ export default function PRequisitionDetail() {
                         </div>
                         <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
 
-                            <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
                                 {/* <Thead01 type={'AddPR_ReqList'} /> */}
                                 <div className={scss.thead20}>
                                     <span>
@@ -1554,12 +1554,13 @@ export default function PRequisitionDetail() {
                                             maxHeight: '300px',
                                             overflowY: 'auto',
                                             marginTop: '0px',
+                                            position: 'sticky',  /* 設置為sticky */
+                                            bottom: '0',  /* 固定在底部 */
                                             left: '20px',
-                                            position: 'absolute',
                                             width: '1000px',
                                             backgroundColor: 'white',
                                             zIndex: 1004,
-                                            display: `${showSuggestions ? '' : 'none'}`
+                                            display: `${showSuggestions ? '' : 'none'}`  /* 根據showSuggestions控制顯示 */
                                         }}>
                                         {filteredData.map(item => (
                                             <li
@@ -1828,7 +1829,18 @@ export default function PRequisitionDetail() {
                     }
                     footer={
                         <button className={scss.shortredsquarebtn}
-                            onClick={() => { sentToReview("審核") }}>
+                            onClick={() => { 
+                                if (data2.length === 0) {
+                                    myAlert.warning({ title: '尚未加入請購項目' })
+                                    return;
+                                } else if (review_flow === '') {
+                                    myAlert.warning({ title: '請選擇審核流程' })
+                                    return;
+                                }
+                                else {
+                                    sentToReview("審核")
+                                }
+                                }}>
                             送審
                         </button>
                     }
