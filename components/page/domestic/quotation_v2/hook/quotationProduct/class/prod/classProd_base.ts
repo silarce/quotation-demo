@@ -219,9 +219,15 @@ const reqGetBom = async (classProd: ClassProd_base) => {
 
   const infoDict_partial: Partial<Omit<TgenerateDoorProductBomDto, 'doorSpec'>> = {};
 
-  const componentInfoDict = Object.entries(componentDict).reduce((acc, [key, component]) => {
-    const { rawData, material, materialSurface, isPainted, type } = component;
-    const guideRailThickness = classProd.data.guideRailThickness; // 門軌厚度
+  const componentInfoDict = Object.entries(componentDict).reduce((acc, [_key, component]) => {
+    const key = _key as keyof TclassComponentDict;
+    const { rawData, material, isPainted, type } = component;
+    let materialSurface = component.materialSurface;
+    const guideRailThickness = key === 'guideRail' ? classProd.data.guideRailThickness : undefined; // 門軌厚度
+
+    if (materialSurface === '烤漆' || materialSurface === '氟碳') {
+      materialSurface = '2B';
+    }
 
     acc[type] = {
       id: rawData!.id,
@@ -259,14 +265,13 @@ const reqGetBom = async (classProd: ClassProd_base) => {
     ...componentInfoDict,
   };
 
-  // TgenerateDoorProductBomDto_DoorSpec
-  // TgenerateDoorProductBomDto_ComponentInfo
+  const res = await apiPostProdGenerateDoorProductBom(body).catch(() => {
+    myAlert.err({ title: '取得BOM失敗' });
 
-  // TgenerateDoorProductBomDto
+    return null;
+  });
 
-  // const body:TgenerateDoorProductBomDto =
-
-  await apiPostProdGenerateDoorProductBom(body);
+  return res;
 };
 
 // ================================================================================

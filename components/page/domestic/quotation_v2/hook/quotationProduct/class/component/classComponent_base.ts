@@ -81,7 +81,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   state: TstateComponentData<T>;
   protected readonly setState: TsetComponent<T>;
   protected readonly render = () => {
-    this.setState((state) => ({ ...state }));
+    this.setState((prev) => ({ ...prev, ...this.state })); // 這樣可以
+    // this.setState((prev) => ({ ...this.state })); // 這樣不行 // 莫名其妙
   };
 
   protected classProd: Interface_ClassProd_prime | undefined;
@@ -209,6 +210,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     remainMaterialSurface && (state.materialSurface = this.state.materialSurface);
 
     this.state = state;
+    this.render();
   }
 
   init = () => {
@@ -219,6 +221,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.onProdChangeMaterial(material);
     this.onProdChangeSurface(materialSurface);
     this.renewDesc();
+
+    this.render();
   };
 
   renewDesc() {
@@ -254,6 +258,30 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     }
 
     this.state.materialSurface = prodSurface ?? '';
+    this.render();
+  }
+
+  onBomUpdate() {
+    const generateDoorProductBom = this.classProd?.state.generateDoorProductBom;
+
+    const key = this.key as keyof NonNullable<typeof generateDoorProductBom>;
+
+    const componentBom = generateDoorProductBom?.[key];
+
+    if (!componentBom) {
+      this.state.componentId = undefined;
+      this.state.bom = undefined;
+
+      return;
+    }
+
+    const { id, number, bom, unitPrice, quantity } = componentBom;
+
+    this.state.componentId = id;
+    this.state.bom = bom;
+    this.state.number = number;
+    this.state.quantity = `${quantity}`;
+    this.state.price = `${unitPrice}`;
     this.render();
   }
 } //  ClassCompnent_base

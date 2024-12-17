@@ -542,6 +542,8 @@ const useQuotationProduct = ({
     }
   }, [activeProdKey]);
 
+  console.log(activedProd);
+
   // -----------------------------------------------------------------------------
   // MARK: RETURN
   return {

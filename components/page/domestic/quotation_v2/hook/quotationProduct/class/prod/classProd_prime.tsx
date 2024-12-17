@@ -107,6 +107,7 @@ import {
 import { checkIsSST, checkIsGalvanized } from '../library';
 
 import { ClassProd_base } from './classProd_base';
+import { th } from 'date-fns/locale';
 
 // ========================================================================
 
@@ -394,9 +395,12 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       // 更新材料配件
       this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
 
-      // Object.values(this.classComponentDict).forEach((classComponent) => classComponent.init());
+      const bom = await ClassProd_prime.reqGetBom(this);
+      this.state.generateDoorProductBom = bom;
 
-      await ClassProd_prime.reqGetBom(this);
+      Object.values(this.classComponentDict).forEach((classComponent) => classComponent.onBomUpdate());
+
+      this.render();
 
       // 接著要取得BOM資料
     } catch (error) {

@@ -2823,6 +2823,9 @@ export type TdoorProductBomDto = {
   motor: TdoorBomDto_Component;
   motorAccessories: TdoorBomDto_Component;
   headBox: TdoorBomDto_Component;
+  //
+  backBone?: TdoorBomDto_Component;
+  middlePillar?: TdoorBomDto_Component;
 };
 
 export type TdoorAccessoryDto = {

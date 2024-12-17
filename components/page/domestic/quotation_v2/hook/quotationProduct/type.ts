@@ -28,6 +28,8 @@ import {
   //
   Tcurrency,
   TdoorModel,
+  TdoorProductBomDto,
+  TdoorBomDto_Component,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
@@ -250,6 +252,8 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   price: `${number}` | ''; // 牌價
 
   //
+  bom?: TdoorBomDto_Component['bom']; // 總而言之是從
+  componentId?: string;
   rawData: TcomponentRawDataDict[T] | null; // 來自於availableComponent的資料
   //
   optionalComponent?: TcomponentRawDataDict[T][] | null; // 來自於availableComponent的資料
@@ -317,7 +321,7 @@ interface TstateProd {
 
   generalSpecs: TdoorGeneralSpecsDto | undefined | null; // undefined視為未曾初始化
   availableComponents: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
-  // generateDoorProductBom: TgenerateDoorProductBomDto | undefined | null;
+  generateDoorProductBom?: TdoorProductBomDto | undefined | null;
   //
   isFetching?: boolean;
 }
