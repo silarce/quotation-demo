@@ -99,11 +99,15 @@ const useAttachment = ({
       const url = file.url;
       const isBlob = url.startsWith('blob:');
       await axi
-        .get<File>(url, {
+        .get(url, {
           baseURL: isBlob ? '' : undefined,
+          responseType: 'blob',
         })
         .then(({ data }) => {
-          arr.push(data);
+          const fileName = file.name;
+          const fileType = data.type || 'application/octet-stream';
+          const fileObj = new File([data], fileName, { type: fileType });
+          arr.push(fileObj);
         })
         .catch((err) => Promise.reject(err));
     }

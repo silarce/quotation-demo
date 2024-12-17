@@ -542,10 +542,10 @@ const useQuotationProduct = ({
       return stateProd;
     });
 
-    const body = stateArr.map((stateProd) => formatProdStateToBody(stateProd));
+    const quotationProductArr = stateArr.map((stateProd) => formatProdStateToBody(stateProd));
 
     return {
-      body,
+      quotationProductArr,
       isAllDoorModalValid,
       invalidComponentArr,
       totalQty: totalQty_decimal.toNumber(),
