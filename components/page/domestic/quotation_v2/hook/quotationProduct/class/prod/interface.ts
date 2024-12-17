@@ -260,6 +260,8 @@ interface Interface_ClassProd_base {
 
   changeDoorModel: (props: { name: string; doorModel: TdoorModelInfoDto | null }) => Interface_ClassProd_base;
 
+  isComponentValid: boolean;
+
   // onFullWidthChange?: () => Promise<Interface_ClassProd_base> | undefined;
 
   // -----------------------------------------------------------------------

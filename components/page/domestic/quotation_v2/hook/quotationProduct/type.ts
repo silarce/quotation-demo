@@ -129,25 +129,25 @@ interface TstateProdData {
 
   // W 這些要做成component
   // 配電箱牌價
-  // distributionBoxPrice: `${number}` | '';
+  distributionBoxPrice: `${number}` | '';
   // 配電箱單價
-  // distributionBoxUnitPrice: `${number}` | '';
+  distributionBoxUnitPrice: `${number}` | '';
   // 配電箱數量
-  // distributionBoxQuantity: `${number}` | '';
+  distributionBoxQuantity: `${number}` | '';
   // 配電箱牌價複價
-  // distributionBoxDualPrice: `${number}` | '';
+  distributionBoxDualPrice: `${number}` | '';
   // 配電箱複價
-  // distributionBoxTotalPrice: `${number}` | '';
+  distributionBoxTotalPrice: `${number}` | '';
   // 安裝費牌價
-  // installationFeePrice: `${number}` | '';
+  installationFeePrice: `${number}` | '';
   // 安裝費牌價複價
-  // installationFeeDualPrice: `${number}` | '';
+  installationFeeDualPrice: `${number}` | '';
   // 安裝費數量
-  // installationFeeQuantity: `${number}` | '';
+  installationFeeQuantity: `${number}` | '';
   // 安裝費單價
-  // installationFeeUnitPrice: `${number}` | '';
+  installationFeeUnitPrice: `${number}` | '';
   // 安裝費複價
-  // installationFeeTotalPrice: `${number}` | '';
+  installationFeeTotalPrice: `${number}` | '';
   // W 這些要做成component
 
   //
@@ -199,7 +199,7 @@ interface TstateProdData {
   totalPrice: `${number}` | '';
 
   // 排序
-  // order: number;
+  order?: number;
 
   // 來源產品Id
   attachedToProductId?: string | null;

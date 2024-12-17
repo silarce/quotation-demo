@@ -280,6 +280,40 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   // ----------------------------------------------------------------------
+
+  // region REQUEST
+
+  const reqPatchQuotation = async ({ editNote }: { editNote: string }) => {
+    const { calcProduct } = instance_quotationProduct;
+
+    // if (!userId) {
+    //   return myAlert.warning({ title: '沒有使用者ID' });
+    // }
+
+    // if (status === 'Pending') {
+    //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
+    // }
+
+    console.log('calcProduct', calcProduct());
+
+    setIsFeching(true);
+  };
+
+  // ----------------------------------------------------------------------
+
+  // region METHOD
+
+  const handleUpload = () => {
+    const { destroy } = myAlert.input({
+      title: '報價單註解',
+      onConfirm: (editNote) => {
+        reqPatchQuotation({ editNote });
+        destroy();
+      },
+    });
+  };
+
+  // ----------------------------------------------------------------------
   // region PROPS
 
   const props_profileForm = createProps_profileForm({
@@ -336,6 +370,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onCancel: () => {
         setDisabled(true);
       },
+      onUpload: handleUpload,
     },
   });
 
@@ -424,6 +459,7 @@ const usePanel = ({
   };
   props_panelList_02: {
     onCancel: () => void;
+    onUpload: () => void;
   };
 }): TpanelList => {
   const panelList_01: TpanelList = [
@@ -434,6 +470,11 @@ const usePanel = ({
     },
   ];
   const panelList_02: TpanelList = [
+    {
+      type: 'redButton',
+      label: '上傳',
+      onClick: props_panelList_02.onUpload,
+    },
     {
       type: 'myButton',
       label: '取消',

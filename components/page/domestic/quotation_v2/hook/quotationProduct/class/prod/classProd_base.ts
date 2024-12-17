@@ -832,6 +832,40 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this;
   }
 
+  get isComponentValid() {
+    return true;
+
+    // 目前isComponentValid只會為true，未來要再製作
+    // 除了檢查材料配件是否齊全，還要檢查RAW跟BOM有沒有資料
+
+    // 參考
+    // get isComponentOk() {
+    //   const componentBodyArr = this.comBodyArr;
+    //   let isComponentBreak = false;
+
+    //   if (this.isSpecialProd) {
+    //     isComponentBreak = false;
+    //     // WARNING W2判斷
+    //   } else if (this.isW2 && componentBodyArr.length !== 5) {
+    //     isComponentBreak = true;
+    //   } else if (!this.isW2 && componentBodyArr.length !== 8) {
+    //     isComponentBreak = true;
+    //   }
+
+    //   componentBodyArr.forEach((com) => {
+    //     if (!com.componentId) {
+    //       isComponentBreak = true;
+    //     }
+    //   });
+
+    //   // if (isComponentBreak) {
+    //   //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
+    //   // }
+
+    //   return !isComponentBreak;
+    // }
+  }
+
   // endregion HANDLER
 
   // -----------------------------------------------------------------------------------

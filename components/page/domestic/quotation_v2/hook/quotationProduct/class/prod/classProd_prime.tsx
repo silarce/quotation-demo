@@ -401,8 +401,6 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       Object.values(this.classComponentDict).forEach((classComponent) => classComponent.onBomUpdate());
 
       this.render();
-
-      // 接著要取得BOM資料
     } catch (error) {
       this.clearGeneralSpec();
       this.clearComponent();
@@ -460,6 +458,8 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
     this.render();
   }
+
+  // ---------------------------------------------------------------------------------
 } // ClassProd_prime
 
 // MARK: END

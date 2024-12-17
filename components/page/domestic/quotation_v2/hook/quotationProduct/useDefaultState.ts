@@ -139,16 +139,16 @@ const createDateProd = (raw: TquotationProductDto) => {
     bottomBarPlate: raw.bottomBarPlate,
 
     // W 這些要做成component
-    // distributionBoxPrice: `${raw.distributionBoxPrice || 0}`,
-    // distributionBoxUnitPrice: `${raw.distributionBoxUnitPrice || 0}`,
-    // distributionBoxQuantity: `${raw.distributionBoxQuantity || 0}`,
-    // distributionBoxDualPrice: `${raw.distributionBoxDualPrice || 0}`,
-    // distributionBoxTotalPrice: `${raw.distributionBoxTotalPrice || 0}`,
-    // installationFeePrice: `${raw.installationFeePrice || 0}`,
-    // installationFeeDualPrice: `${raw.installationFeeDualPrice || 0}` as `${number}`,
-    // installationFeeQuantity: `${raw.installationFeeQuantity || 0}` as `${number}`,
-    // installationFeeUnitPrice: `${raw.installationFeeUnitPrice || 0}`,
-    // installationFeeTotalPrice: `${raw.installationFeeTotalPrice || 0}` as `${number}`,
+    distributionBoxPrice: `${raw.distributionBoxPrice || 0}`,
+    distributionBoxUnitPrice: `${raw.distributionBoxUnitPrice || 0}`,
+    distributionBoxQuantity: `${raw.distributionBoxQuantity || 0}`,
+    distributionBoxDualPrice: `${raw.distributionBoxDualPrice || 0}`,
+    distributionBoxTotalPrice: `${raw.distributionBoxTotalPrice || 0}`,
+    installationFeePrice: `${raw.installationFeePrice || 0}`,
+    installationFeeDualPrice: `${raw.installationFeeDualPrice || 0}` as `${number}`,
+    installationFeeQuantity: `${raw.installationFeeQuantity || 0}` as `${number}`,
+    installationFeeUnitPrice: `${raw.installationFeeUnitPrice || 0}`,
+    installationFeeTotalPrice: `${raw.installationFeeTotalPrice || 0}` as `${number}`,
     // W 這些要做成component
 
     gapA: (raw.gapA || '') as `${number}` | '',
