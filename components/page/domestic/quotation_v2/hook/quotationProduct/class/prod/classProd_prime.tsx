@@ -353,15 +353,24 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       availableComponents,
     });
 
-    this.state.data_componentDict = componentDict;
+    Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
+      const key = _key as keyof typeof this.state.data_componentDict;
 
-    Object.values(this.classComponentDict).forEach((classComponent) => {
-      const data_component = componentDict[classComponent.key];
-
-      if (data_component) {
-        classComponent.replaceState();
-      }
+      // 將每個component的值替換掉，而不改變參照
+      Object.assign(component, {
+        ...componentDict[key],
+        material: component.material,
+        materialSurface: component.materialSurface,
+      });
     });
+
+    // Object.values(this.classComponentDict).forEach((classComponent) => {
+    //   const data_component = componentDict[classComponent.key];
+
+    //   if (data_component) {
+    //     classComponent.replaceState();
+    //   }
+    // });
 
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.init();

@@ -192,28 +192,28 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   //   };
   // }
 
-  replaceState({
-    remainMaterial = true,
-    remainMaterialSurface = true,
-  }: {
-    remainMaterial?: boolean;
-    remainMaterialSurface?: boolean;
-  } = {}) {
-    const prod_data_component = this.key && this.classProd?.state.data_componentDict[this.key];
+  // replaceState({
+  //   remainMaterial = true,
+  //   remainMaterialSurface = true,
+  // }: {
+  //   remainMaterial?: boolean;
+  //   remainMaterialSurface?: boolean;
+  // } = {}) {
+  //   const prod_data_component = this.key && this.classProd?.state.data_componentDict[this.key];
 
-    if (!prod_data_component) {
-      throw new Error('replaceState方法，prod_data_component is undefined');
-    }
+  //   if (!prod_data_component) {
+  //     throw new Error('replaceState方法，prod_data_component is undefined');
+  //   }
 
-    const state = prod_data_component;
+  //   const state = prod_data_component;
 
-    remainMaterial && (state.material = this.state.material);
-    remainMaterialSurface && (state.materialSurface = this.state.materialSurface);
+  //   remainMaterial && (state.material = this.state.material);
+  //   remainMaterialSurface && (state.materialSurface = this.state.materialSurface);
 
-    this.state = state;
+  //   this.state = state;
 
-    this.render();
-  }
+  //   this.render();
+  // }
 
   init = () => {
     this.state.shouldInit = false;
