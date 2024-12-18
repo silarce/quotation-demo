@@ -205,11 +205,13 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       throw new Error('replaceState方法，prod_data_component is undefined');
     }
 
-    const state = { ...prod_data_component };
+    const state = prod_data_component;
+
     remainMaterial && (state.material = this.state.material);
     remainMaterialSurface && (state.materialSurface = this.state.materialSurface);
 
     this.state = state;
+
     this.render();
   }
 
