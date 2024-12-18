@@ -212,6 +212,10 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       return undefined;
     }
 
+    if (this.materialName === '鋁合金') {
+      return undefined;
+    }
+
     if (!this._options_surface) {
       this._options_surface = createOptions_surface(this);
     }
@@ -259,40 +263,6 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
   // MARK:handle_afterUpdateGeneralSpec
   protected afterUpdateGeneralSpec_sideEffect(generalSpecs: TdoorGeneralSpecsDto) {
-    // const generalSpecs = this.state.generalSpecs;
-
-    // if (!generalSpecs) {
-    //   throw new Error('in afterUpdateGeneralSpec, generalSpecs is undefined or null');
-    // }
-
-    // if (!generalSpecs) {
-    //   this.data.gapA = '';
-    //   this.data.gapC = '';
-    //   this.data.gearNumber = null;
-    //   this.data.weight = null;
-    //   this.data.thickness = '';
-    //   this.data.sprocketWheelModel = null;
-    //   this.data.sprocketWheelTeethNumber = null;
-    //   this.data.sprocketWheelChains = null;
-    //   this.data.bearingInnerDiameter = null;
-    //   this.data.diameter = null;
-    //   this.data.bearingHousingTotalLength = null;
-    //   this.data.slatLength = null;
-    //   this.data.guideRailLength = null;
-    //   this.data.headBoxLength = null;
-    //   this.data.bearingHousingSize = null;
-    //   this.data.bearingName = null;
-
-    //   this.data.motorPhase = null;
-    //   this.data.motorVendor = null;
-    //   this.data.motorVoltage = null;
-    //   this.data.horsepower = '';
-    //   this.data.boxB = '';
-    //   this.data.boxD = '';
-
-    //   return this;
-    // }
-
     generalSpecs.bearingInnerDiameter === 'N/A' && (generalSpecs.bearingInnerDiameter = '');
     generalSpecs.bearingName === 'N/A' && (generalSpecs.bearingName = '');
     generalSpecs.gearNumber === 'N/A' && (generalSpecs.gearNumber = '');
@@ -470,58 +440,6 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
 // region API
 
-// const reqGetProdCalcGeneralSpec = async (classProd: ClassProd_base) => {
-//   if (!classProd.isValid_doorModelName) {
-//     return Promise.reject(null);
-//   }
-
-//   // '1/4' | '1/3' | '1/2' | '3/4' | '1' | '1 1/2' | '2' | '3' | '5';
-//   const hp = classProd.horsepower.replaceAll('HP', '') as Thp;
-
-//   const body: TpcgsPrams = {
-//     // classProd.doorModelName的實際型別為string而非TpcgsPrams['modelName']
-//     // 預期可能會422，但已在catch處理
-//     // modelName: classProd.doorModelName as TpcgsPrams['modelName'],
-//     modelName: classProd.doorModelName as TpcgsPrams['modelName'],
-//     height: classProd.height_mm,
-//     //
-//     fullWidth: classProd.fullWidth_mm,
-//     WG: undefined, // 不使用WG，統一使用fullWidth
-//     //
-//     isAntiTyphoon: !!classProd.isAntiTyphoon,
-//     hp: hp || undefined,
-//   };
-
-//   return await apiGetProdCalcGeneralSpec(body)
-//     .then((res) => res)
-//     .catch(() => {
-//       myAlert.err({ title: '取得產品規格失敗' });
-
-//       return Promise.reject(null);
-//     });
-// };
-
-// const reqGetAvailableComponents = async (classProd: ClassProd_base) => {
-//   if (!classProd.isValid_doorModelName) {
-//     return Promise.reject(null);
-//   }
-
-//   const body: TpacParams = {
-//     modelName: classProd.doorModelName as TdoorModel,
-//     weight: Number(classProd.data.weight || 0),
-//     isAntiTyphoon: !!classProd.data.isAntiTyphoon,
-//     rollerDiameter: Number(classProd.data.diameter || 0),
-//   };
-
-//   return await apiGetProdAvailableComponents(body)
-//     .then((res) => res)
-//     .catch(() => {
-//       myAlert.err({ title: '取得材料配件失敗' });
-
-//       return Promise.reject(null);
-//     });
-// };
-
 const reqGetBoxD = async (classProd: ClassProd_base) => {
   if (!classProd.isValid_doorModelName) {
     return Promise.reject(null);
@@ -544,16 +462,6 @@ const reqGetBoxD = async (classProd: ClassProd_base) => {
     });
 };
 
-// const reqGetSlatCount = async (body: TpcdsPrams) => {
-//   return await apiGetProdCalcDetailSpec(body)
-//     .then((res) => res.slatCount)
-//     .catch(() => {
-//       myAlert.err({ title: '取得門片數量失敗' });
-
-//       return null;
-//     });
-// };
-
 const reqGetSlatCount = async (classProd: ClassProd_base) => {
   if (!classProd.isValid_doorModelName) {
     return Promise.reject(null);
@@ -573,16 +481,6 @@ const reqGetSlatCount = async (classProd: ClassProd_base) => {
       return Promise.reject(null);
     });
 };
-
-// const reqGetAvailableComponents = async (body: TpacParams) => {
-//   return await apiGetProdAvailableComponents(body)
-//     .then((res) => res)
-//     .catch(() => {
-//       myAlert.err({ title: '取得材料配件失敗' });
-
-//       return null;
-//     });
-// };
 
 // ========================================================================
 

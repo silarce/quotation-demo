@@ -520,6 +520,10 @@ class ClassProd_base implements Interface_ClassProd_base {
   set materialName(value) {
     this.data.materialName = value;
 
+    if (this.data.materialName === '鋁合金') {
+      this.materialSurface = null;
+    }
+
     this.render();
   }
 
