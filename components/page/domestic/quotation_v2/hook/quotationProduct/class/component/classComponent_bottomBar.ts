@@ -77,8 +77,9 @@ class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
 
     if (v === '高耐鍍鋅鋼板') {
       v = '鍍鋅鋼板';
-    } else {
     }
+
+    super.onProdChangeMaterial(v);
   }
 }
 
