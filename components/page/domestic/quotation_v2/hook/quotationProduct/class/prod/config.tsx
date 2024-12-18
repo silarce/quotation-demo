@@ -260,7 +260,8 @@ const nodeConfig_origin: TnodeConfig = {
             classProd.fullWidth = e.target.value as `${number}` | '';
           },
           onBlur() {
-            classProd.afterFullWidthChange?.();
+            classProd.runAfterChange?.();
+            // classProd.afterFullWidthChange?.();
           },
         },
       };

@@ -421,18 +421,51 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   }
 
   // ---------------------------------------------------------------------------------
-  async afterFullWidthChange() {
+
+  addAfterChange(funcName: 'reqChain_01') {
+    if (!this.state.afterChangeQueue) {
+      this.state.afterChangeQueue = [];
+    }
+
+    this.state.afterChangeQueue.push(funcName);
+    this.render();
+  }
+
+  async runAfterChange() {
+    let afterChangeQueue = this.state.afterChangeQueue;
+
+    if (!afterChangeQueue) {
+      return;
+    }
+
+    afterChangeQueue = _.uniq(afterChangeQueue);
+
     this.state.isFetching = true;
     this.render();
 
-    await this.reqChain_01();
+    for (const _funcName of afterChangeQueue) {
+      const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
 
+      await this[funcName]();
+    }
+
+    this.state.afterChangeQueue = undefined;
     this.state.isFetching = false;
     this.render();
   }
 
   // ---------------------------------------------------------------------------------
   // MARK: 值
+
+  get fullWidth() {
+    return super.fullWidth;
+  }
+  set fullWidth(value: `${number}` | '') {
+    super.fullWidth = value;
+
+    this.addAfterChange('reqChain_01');
+    this.render();
+  }
 
   get materialName() {
     return super.materialName;

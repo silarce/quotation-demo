@@ -420,10 +420,6 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    // if (!checkIsFloat3(value)) {
-    //   return;
-    // }
-
     this.data.fullWidth = value;
     this.data.area = ClassProd_base.calcArea(this);
 

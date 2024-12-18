@@ -274,7 +274,7 @@ interface Interface_ClassProd_base2 extends Interface_ClassProd_base {
   // options_material?: Toption[] | undefined;
   // options_surface?: Toption[] | undefined;
   // afterFullWidthChange?: () => Promise<Interface_ClassProd_prime>;
-  afterFullWidthChange?: () => Promise<void>;
+  runAfterChange?: () => Promise<void>;
 }
 
 interface Interface_ClassProd_prime extends Interface_ClassProd_base2 {
@@ -284,7 +284,7 @@ interface Interface_ClassProd_prime extends Interface_ClassProd_base2 {
   options_surface: Toption[] | undefined;
   // options_material: NonNullable<Interface_ClassProd_base2['options_material']>;
   //
-  afterFullWidthChange: NonNullable<Interface_ClassProd_base2['afterFullWidthChange']>;
+  runAfterChange: NonNullable<Interface_ClassProd_base2['runAfterChange']>;
 }
 
 // MARK:Interface_ClassProd_special

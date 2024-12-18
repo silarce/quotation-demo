@@ -325,6 +325,7 @@ interface TstateProd {
   generateDoorProductBom?: TdoorProductBomDto | undefined | null;
   //
   isFetching?: boolean;
+  afterChangeQueue?: string[];
 }
 
 interface TstateProdDict {
