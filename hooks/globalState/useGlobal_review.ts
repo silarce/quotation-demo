@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import type { WritableDraft } from 'immer/src/types/types-external';
 
 import {
   //
@@ -9,6 +8,8 @@ import {
   apiAddReview,
   apiGetReviewBack,
 } from 'js/api/api_netCore/api_review';
+
+import { setting } from 'pages/factoryDepartment/wareHouseList/index';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -19,6 +20,7 @@ interface Tglobal_review {
   reviewArr: TgetReview[] | undefined | null;
   reviewQty: number;
   update: (newGetReview?: TgetReview[] | null) => Promise<void>;
+  update_2: (props?: { customeSetting?: typeof setting }) => Promise<void>;
   editUserId: (userId: string | undefined) => void;
 
   req_addReview: (...params: Parameters<typeof apiAddReview>) => ReturnType<typeof apiAddReview>;
@@ -68,6 +70,53 @@ const useGlobal_review = create<Tglobal_review>()(
         });
     };
 
+    const update_2 = async ({ customeSetting }: { customeSetting?: typeof setting } = {}) => {
+      const theSetting = customeSetting || setting;
+
+      try {
+        const conditionModel = {
+          user_id: get().userId,
+        };
+
+        const inputModel = {
+          TypeName: 'ERP',
+          ServiceName: 'ReviewService',
+          FunctionName: 'no',
+          FilterConditions: JSON.stringify(conditionModel),
+        };
+
+        console.log(JSON.stringify(inputModel));
+
+        const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+        const response = await fetch(`${theSetting.apipath}/Review/GetReview?${queryParams}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+
+        // setData(data);
+        // setSearchdata(data);
+        console.log(data);
+
+        update(data || null);
+
+        // 檢查 data 是否有內容
+        if (data.length > 0) {
+          // setCurrentreview_id(data[0].id);
+          // setReviewtype(data[0].document_type)
+          // GetReviewStatus(data[0]); // 只有當 data 有內容時才執行
+        } else {
+          console.log('沒有撈到資料');
+        }
+      } catch (error: any) {
+        // setError("GetReview:" + error.message);
+        console.log(error.message);
+      }
+    };
+
     const editUserId: Tglobal_review['editUserId'] = (userId) => {
       set((state) => {
         state.userId = userId;
@@ -113,6 +162,7 @@ const useGlobal_review = create<Tglobal_review>()(
       reviewArr: undefined,
       reviewQty: 0,
       update,
+      update_2,
       editUserId,
 
       req_addReview: addReview,
