@@ -993,9 +993,9 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     }
   );
 
-  const components: TcreateQuotationProductComponentDto[] = components_pre.filter((item) => {
-    item !== 'invalid' && item !== undefined;
-  }) as TcreateQuotationProductComponentDto[];
+  const components: TcreateQuotationProductComponentDto[] = components_pre.filter(
+    (item) => item !== 'invalid' && item !== undefined
+  ) as TcreateQuotationProductComponentDto[];
 
   const accessoryArr = accessoryKeyArr.map((key) => data_accessoryDict[key]);
   const accessories: TcreateQuotationProductAccessoryDto[] = accessoryArr.map((acce) => {
