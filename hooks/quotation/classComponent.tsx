@@ -252,6 +252,10 @@ class Class_component {
       return undefined;
     }
 
+    if (this.material === '鋁合金') {
+      return undefined;
+    }
+
     if (checkIsSST(this.material ?? '')) {
       return optionsCreator_surface();
     }

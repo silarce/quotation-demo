@@ -2408,6 +2408,10 @@ class Class_product {
 
   // 表面
   get options_surface() {
+    if (this.material === '鋁合金') {
+      return undefined;
+    }
+
     if (this.isSpecialProd) {
       return [{ value: '', label: '請直接輸入' }];
     }

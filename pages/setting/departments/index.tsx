@@ -37,6 +37,7 @@ import style from './departments.module.scss';
 // ===========================================================
 const params: Tparams_jobs = {
   populate: ['jobs'],
+  pageSize: 9999,
   // order: "DESC",
   sort: 'createdAt',
   /*  建立ClassJobArr時會將job取出依grade放進陣列相應位置
