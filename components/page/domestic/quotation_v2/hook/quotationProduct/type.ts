@@ -258,7 +258,7 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   //
   optionalComponent?: TcomponentRawDataDict[T][] | null; // 來自於availableComponent的資料
 
-  // 這幾個寫在class裡面
+  // 這幾個寫在class裡面,考慮要不要在class的建構函式把這些資料寫進state
   // name: string; // 名稱
   // unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
   // dualPrice: number; // 牌價複價 // 虛值

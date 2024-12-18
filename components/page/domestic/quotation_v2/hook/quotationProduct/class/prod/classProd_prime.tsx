@@ -36,6 +36,7 @@ import {
 
   //
   TdoorModel,
+  TdoorComponentType,
 } from 'js/api/dtoTypes';
 
 // api
@@ -79,8 +80,6 @@ import {
   Interface_ClassProd_special,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
 
-import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
-
 import { createComponentDict } from '../createComponentDict';
 
 import {
@@ -107,7 +106,8 @@ import {
 import { checkIsSST, checkIsGalvanized } from '../library';
 
 import { ClassProd_base } from './classProd_base';
-import { th } from 'date-fns/locale';
+
+import { createEmptyComponentDict } from '../../emptyState';
 
 // ========================================================================
 
@@ -253,6 +253,32 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     return this;
   }
 
+  //-------------------------------------------------------------------------------
+
+  // region com control
+
+  replaceToEmptyComponent({ returnOnly }: { returnOnly?: boolean } = {}) {
+    const emptyComponentDict = createEmptyComponentDict();
+
+    if (returnOnly) {
+      return emptyComponentDict;
+    }
+
+    const { backBone, middlePillar, ...rest } = emptyComponentDict;
+
+    this.state.data_componentDict = rest;
+    this.state.componentKeyArr = Object.keys(rest) as TdoorComponentType[];
+
+    this.render();
+
+    return emptyComponentDict;
+  }
+
+  resetComponentKeyArr() {
+    this.state.componentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
+    this.render();
+  }
+
   protected clearComponent() {
     this.state.availableComponents = null;
     this.state.data_componentDict = {};
@@ -327,6 +353,8 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       availableComponents,
     });
 
+    this.state.data_componentDict = componentDict;
+
     Object.values(this.classComponentDict).forEach((classComponent) => {
       const data_component = componentDict[classComponent.key];
 
@@ -338,6 +366,8 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.init();
     });
+
+    this.render();
   } // handleAvailableComponentsUpdated
 
   // region reqChain
@@ -372,6 +402,10 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
       this.render();
     } catch (error) {
+      // alert(error);
+      // throw error;
+      alert('取得資料失敗');
+      console.log(error);
       this.clearGeneralSpec();
       this.clearComponent();
     }
@@ -434,6 +468,9 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
 // MARK: END
 
+// ========================================================================
+// ========================================================================
+// ========================================================================
 // ========================================================================
 // ========================================================================
 // ========================================================================

@@ -481,13 +481,23 @@ const useQuotationProduct = ({
   };
 
   const { activedClassProd, activedClassComponentDict } = useMemo(() => {
+    // let activedProd = activedProd;
+
     if (!activedProd) {
       return {};
     }
 
     const activedClassProd = createClassProd(activedProd);
+    const stateProd = activedClassProd.state; // 同activedProd 為同一個參照
 
-    const activedClassComponentDict = createActivedClassComponentDict(activedProd);
+    const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;
+
+    if (!isComponentExist && activedClassProd.doorModel !== 'special') {
+      activedClassProd.replaceToEmptyComponent();
+      activedClassProd.resetComponentKeyArr();
+    }
+
+    const activedClassComponentDict = createActivedClassComponentDict(stateProd);
     activedClassProd.setClassComponentDict(activedClassComponentDict);
 
     if (activedClassProd.doorModel !== 'special') {

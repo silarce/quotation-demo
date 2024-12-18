@@ -53,6 +53,25 @@ class ClassProd_W2 extends ClassProd_prime implements Interface_ClassProd_prime 
 
     return options;
   }
+
+  // ------------------------------------------------------------------------
+
+  replaceToEmptyComponent() {
+    const emptyComponentDict = super.replaceToEmptyComponent({ returnOnly: true });
+
+    const { backBone, middlePillar, bottomBar, guideRail, slat } = emptyComponentDict;
+
+    this.state.data_componentDict = {
+      slat,
+      bottomBar,
+      guideRail,
+
+      backBone,
+      middlePillar,
+    };
+
+    return emptyComponentDict;
+  }
 }
 
 export { ClassProd_W2 };
