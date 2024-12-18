@@ -70,7 +70,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
   const nodeConfig_component: TnodeConfig_component = {
     name: {
       label: '名稱',
-      style: { width: 80 },
+      style: { width: 140 },
       createNode({ disabled, classComponent }) {
         return classComponent.name;
       },

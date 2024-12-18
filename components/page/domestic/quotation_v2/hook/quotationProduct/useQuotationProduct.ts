@@ -72,6 +72,8 @@ import {
   ClassCompnent_backBone,
 } from './class/component';
 
+import { Class_distributionBox, Class_installationFee } from './class/pseudoComponent';
+
 import {
   TnodeConfig_component,
   TcellKey_component,
@@ -480,7 +482,11 @@ const useQuotationProduct = ({
     });
   };
 
-  const { activedClassProd, activedClassComponentDict } = useMemo(() => {
+  const {
+    activedClassProd,
+    activedClassComponentDict,
+    activedPseudoComponentDict: activedClassPseudoComponentDict,
+  } = useMemo(() => {
     // let activedProd = activedProd;
 
     if (!activedProd) {
@@ -506,9 +512,21 @@ const useQuotationProduct = ({
       );
     }
 
+    const activedPseudoComponentDict = {
+      distributionBox: new Class_distributionBox({
+        stateProd: stateProd,
+        setStateProd: createSetProd(stateProd.key),
+      }),
+      installationFee: new Class_installationFee({
+        stateProd: stateProd,
+        setStateProd: createSetProd(stateProd.key),
+      }),
+    };
+
     return {
       activedClassProd,
       activedClassComponentDict,
+      activedPseudoComponentDict,
     };
   }, [
     //
@@ -607,6 +625,7 @@ const useQuotationProduct = ({
     activedProd,
     activedClassProd,
     activedClassComponentDict,
+    activedClassPseudoComponentDict,
     //
     cellKeyArr,
     setCellKeyArr,

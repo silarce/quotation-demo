@@ -138,6 +138,7 @@ interface TstateProdData {
   distributionBoxDualPrice: `${number}` | '';
   // 配電箱複價
   distributionBoxTotalPrice: `${number}` | '';
+
   // 安裝費牌價
   installationFeePrice: `${number}` | '';
   // 安裝費牌價複價

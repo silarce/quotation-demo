@@ -250,6 +250,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
   const {
     activedProd,
     activedClassComponentDict,
+    activedClassPseudoComponentDict,
     //
     cellKeyArr_component,
     setCellKeyArr_component,
@@ -260,7 +261,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
     createActivedClassComponentDict,
   } = instance_useQuotationProductInstance;
 
-  const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
+  const [activeIndex, setActiveIndex] = useState<number | string | undefined>(undefined);
 
   // const classComponentDict = (() => {
   //   if (!activedProd) {
@@ -355,6 +356,62 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
               // onDragStart={(e) => {
               //   choseActiveProd(undefined);
               // }}
+            >
+              {cellKeyArr_component.map((cellKey, cIndex) => {
+                const { style, className, createNode } = classComponent.nodeConfig[cellKey];
+
+                const node = createNode?.({
+                  disabled,
+                  classComponent: classComponent,
+                });
+
+                return (
+                  <Cell key={cellKey} className={classNames(className)} style={style}>
+                    {node}
+                  </Cell>
+                );
+              })}
+            </QuotationRow_dnd_memo>
+          );
+        })}
+        {/*  */}
+        {Object.entries(activedClassPseudoComponentDict ?? {}).map(([key, classComponent], index) => {
+          if (!classComponent) {
+            return null;
+          }
+
+          const nodeConfig_name = classComponent.nodeConfig['name'];
+
+          const left = (
+            <>
+              <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
+                {nodeConfig_name.createNode?.({
+                  disabled,
+                  classComponent: classComponent,
+                })}
+              </Cell>
+            </>
+          );
+
+          return (
+            <QuotationRow_dnd_memo
+              //
+              rerenderTrigger01={classComponent.state}
+              rerenderTrigger02={disabled}
+              rerenderTrigger03={null}
+              rerenderTrigger04={null}
+              //
+              key={classComponent.key}
+              id={classComponent.key}
+              index={index}
+              isActive={activeIndex === key}
+              //
+              dragHandleInvisible={true}
+              left={left}
+              //
+              onClick={() => {
+                setActiveIndex(key);
+              }}
             >
               {cellKeyArr_component.map((cellKey, cIndex) => {
                 const { style, className, createNode } = classComponent.nodeConfig[cellKey];
