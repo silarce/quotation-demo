@@ -150,7 +150,7 @@ const emptyBackBone: TstateComponentData<'backBone'> = {
   rawData: null,
 };
 
-const createEmptyComponentDict = () => {
+const createEmptyComponentStateDict = () => {
   const emptyComponentDict: Tdata_componentDict = {
     slat: { ...emptySlat },
     bottomBar: { ...emptyBottomBar },
@@ -167,4 +167,4 @@ const createEmptyComponentDict = () => {
   return emptyComponentDict;
 };
 
-export { createEmptyComponentDict };
+export { createEmptyComponentStateDict };
