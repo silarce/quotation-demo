@@ -307,6 +307,41 @@ const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
 };
 
 // =======================================================================
+
+// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+declare global {
+  interface ObjectConstructor {
+    clearAndAssign<T extends Record<string, any>>(target: T, source: T): void;
+  }
+}
+
+// 清空target物件並將source物件的內容填入，target與source的型別必須相同
+// 不會改變 target 物件的參考
+// 注意，填入不是深拷貝
+Object.clearAndAssign = function <T extends Record<string, any>>(target: T, source: T): void {
+  // 清空 target 物件的屬性
+  Object.keys(target).forEach((key) => delete target[key]);
+  // 將 source 的屬性複製到 target 物件
+  Object.assign(target, source);
+};
+
+// 測試
+// type Tfoo = {
+//   a: string;
+//   b?: string;
+// };
+// const foo: Tfoo = { a: 'a', b: 'b' };
+// const bar: Tfoo = { a: 'A' };
+// const foo2 = foo;
+// console.log(foo);
+// Object.clearAndAssign(foo, bar);
+// console.log(foo);
+// console.log(foo === foo2);
+
+// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+
+// =======================================================================
+
 export type { NextPageWithLayout, TappContext, TmyPageProps };
 // export default MyApp;
 export default MyApp;
