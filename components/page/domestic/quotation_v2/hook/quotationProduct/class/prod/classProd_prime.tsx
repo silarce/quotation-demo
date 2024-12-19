@@ -326,6 +326,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       hp,
       box: { default: defaultVendor, 大同, 東元 } = {},
     } = generalSpecs.motors[generalSpecs.defaultMotorIndex];
+
     this.data.horsepower = hp === 'N/A' ? '' : hp;
 
     if (東元) {
@@ -433,6 +434,8 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     } catch (error) {
       // alert(error);
       // throw error;
+      // TODO: 重構報價單 處理reqChain_01的catch
+
       alert('取得資料失敗');
       console.log(error);
       this.clearGeneralSpec();
@@ -477,11 +480,33 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   // ---------------------------------------------------------------------------------
   // MARK: 值
 
+  get quoteType() {
+    return super.quoteType;
+  }
+
+  set quoteType(v: string) {
+    super.quoteType = v;
+
+    this.render();
+  }
+
+  get doorModelName() {
+    return super.doorModelName;
+  }
+  set doorModelName(value: string) {
+    super.doorModelName = value;
+    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
+
+    this.addAfterChange('reqChain_01');
+    this.render();
+  }
+
   get fullWidth() {
     return super.fullWidth;
   }
   set fullWidth(value: `${number}` | '') {
     super.fullWidth = value;
+    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
     this.addAfterChange('reqChain_01');
     this.render();
@@ -492,8 +517,23 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   }
   set height(value: `${number}` | '') {
     super.height = value;
+    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
     this.addAfterChange('reqChain_01');
+    this.render();
+  }
+
+  get horsepower() {
+    return super.horsepower;
+  }
+
+  set horsepower(value: string) {
+    if (this.data.horsepower === value) {
+      return;
+    }
+
+    this.data.horsepower = value;
+
     this.render();
   }
 
