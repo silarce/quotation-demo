@@ -182,7 +182,7 @@ const customizeNodeConfig = ({ classProd, nodeConfig }: { classProd: ClassProd_p
 
 //MARK:ClassProd_prime
 class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prime {
-  doorModel: TdoorModel = 'SJ-302';
+  doorModel: TdoorModel = 'SJ-302'; // 先隨便選一個
 
   _options_material: Toption[] | undefined;
   _options_surface: Toption[] | undefined;
@@ -255,6 +255,23 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     return this;
   }
 
+  renewSurface() {
+    Object.values(this.classComponentDict).forEach((classComponent) => {
+      classComponent.onProdChangeMaterial(this.data.materialName);
+    });
+
+    // 更新表面選項
+    this._options_surface = createOptions_surface(this);
+
+    const isSurfaceValid = this._options_surface.some((item) => item.value === this.data.materialSurface);
+
+    if (!isSurfaceValid) {
+      this.data.materialSurface = this._options_surface[0].value;
+    }
+
+    this.render();
+  }
+
   //-------------------------------------------------------------------------------
 
   // region com control
@@ -289,7 +306,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
   //-------------------------------------------------------------------------------
 
-  // MARK:handle_afterUpdateGeneralSpec
+  // MARK:afterUpdateGeneralSpec_sideEffect
   protected afterUpdateGeneralSpec_sideEffect(generalSpecs: TdoorGeneralSpecsDto) {
     generalSpecs.bearingInnerDiameter === 'N/A' && (generalSpecs.bearingInnerDiameter = '');
     generalSpecs.bearingName === 'N/A' && (generalSpecs.bearingName = '');
@@ -350,6 +367,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     return this;
   }
 
+  // MARK:afterAvailableComponentsUpdated_sideEffect
   protected afterAvailableComponentsUpdated_sideEffect(availableComponents: TdoorComponentListDto) {
     const { componentDict, changedMotorVendor } = createComponentDict({
       classProd: this,
@@ -525,6 +543,30 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     }
 
     super.doorModelName = value;
+    const doorModelName = this.data.doorModelName;
+
+    const is304InMaterialOptions = this.options_material?.some((item) => item.value === 'SST#304');
+
+    if (doorModelName === 'SJ-305D') {
+      const theOption = this.options_material?.find((option) => {
+        if (option.value.includes('內SST') && option.value.includes('外SST')) {
+          return true;
+        }
+      });
+      this.data.materialName = theOption?.value || '';
+    } else if (is304InMaterialOptions) {
+      this.data.materialName = 'SST#304';
+    } else {
+      this.data.materialName = this.options_material?.[0]?.value ?? '';
+    }
+
+    this.renewSurface();
+
+    this.render();
+
+    // const material = this.options_material?.find((option) => option.value === this.materialName);
+    // this.materialName = material ? material.value : '';
+
     // this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
     // this.addAfterChange('reqChain_01');
@@ -574,18 +616,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   set materialName(value: string) {
     super.materialName = value;
 
-    Object.values(this.classComponentDict).forEach((classComponent) => {
-      classComponent.onProdChangeMaterial(this.data.materialName);
-    });
-
-    // 更新表面選項
-    this._options_surface = createOptions_surface(this);
-
-    const isSurfaceValid = this._options_surface.some((item) => item.value === this.data.materialSurface);
-
-    if (!isSurfaceValid) {
-      this.data.materialSurface = this._options_surface[0].value;
-    }
+    this.renewSurface();
 
     this.render();
   }
@@ -670,7 +701,9 @@ const createOptions_material = (classProd: ClassProd_prime) => {
     return undefined;
   }
 
+  // 選項來源為doorModel.slatMaterials
   const slatMaterialsArr = doorModel.slatMaterials;
+
   const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
   const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
 
