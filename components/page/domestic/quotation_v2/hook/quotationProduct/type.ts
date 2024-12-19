@@ -310,6 +310,7 @@ interface Tdata_accessoryDict {
 // MARK: TstateProd
 interface TstateProd {
   readonly key: string;
+
   data_prod: TstateProdData;
 
   data_componentDict: Tdata_componentDict;

@@ -238,9 +238,11 @@ const nodeConfig_origin: TnodeConfig = {
     },
   },
 
+  // lookup_quoteType_doorModelName
   doorModelName: {
     label: '門型',
     style: { width: 300 },
+
     createNode() {
       return null;
     },
@@ -953,20 +955,21 @@ const createNodeConfig_prime = ({
   const nodeConfig_prime: TnodeConfig = _.cloneDeep(nodeConfig_origin);
 
   nodeConfig_prime.doorModelName.createNode = ({ classProd, disabled }) => {
-    const options_doorModel = doorModelDict
-      ? Object.values(doorModelDict).map((doorModel) => {
-          return {
-            label: doorModel.name,
-            value: doorModel.name,
-          };
-        })
-      : undefined;
+    const optionsDict = lookup_quoteType_doorModelName[classProd.quoteType || 'undefined'];
+    const options = optionsDict ? Object.values(optionsDict) : undefined;
+    options && options && options.filter((option) => !!option);
+
+    let value: Toption | null = null;
+
+    if (classProd.doorModelName) {
+      value = (optionsDict && optionsDict[classProd.doorModelName]) || null;
+    }
 
     const selectProps: TinputSelProps['selectProps'] = {
       props: {
         isSearchable: true,
-        options: options_doorModel,
-        value: classProd.doorModelName ? { value: classProd.doorModelName, label: classProd.doorModelName } : null,
+        options: options as Toption[],
+        value: value,
         onChange: (option) => {
           const doorModelName = option?.value || '';
           classProd.doorModelName = doorModelName;
@@ -983,8 +986,6 @@ const createNodeConfig_prime = ({
 
   return nodeConfig_prime;
 };
-
-// ===============================================================================
 
 // ===============================================================================
 export type {

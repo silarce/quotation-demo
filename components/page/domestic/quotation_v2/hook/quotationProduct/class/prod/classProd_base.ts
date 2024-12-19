@@ -105,6 +105,8 @@ import {
 
 import { checkIsSST, checkIsGalvanized } from '../library';
 
+import { createEmptyStateProd } from '../../emptyProdState';
+
 // ================================================================================
 
 type TdoorModelNameLookup = {
@@ -405,7 +407,20 @@ class ClassProd_base implements Interface_ClassProd_base {
     return this.data.quoteType;
   }
   set quoteType(value) {
-    this.setData_simple('quoteType', value);
+    if (this.data.quoteType === value) {
+      return;
+    }
+
+    const newState = createEmptyStateProd(this.state.key);
+
+    newState.data_prod.itemName = this.itemName;
+    newState.data_prod.discount = this.discount;
+    Object.clearAndAssign(this.state, newState);
+
+    this.data = this.state.data_prod;
+    this.data.quoteType = value;
+
+    this.render();
   }
 
   get doorModelName() {

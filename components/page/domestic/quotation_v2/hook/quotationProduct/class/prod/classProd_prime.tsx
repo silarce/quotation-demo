@@ -105,11 +105,11 @@ import {
 
 import { checkIsSST, checkIsGalvanized } from '../library';
 
-import { ClassProd_base } from './classProd_base';
+import { ClassProd_base, Tprops_constructor } from './classProd_base';
 
 import { createEmptyComponentStateDict } from '../../emptyComponentState';
 
-import { createEmptyStateProd } from '../../emptyProdState';
+// import { createEmptyStateProd } from '../../emptyProdState';
 
 // ========================================================================
 
@@ -187,7 +187,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   _options_material: Toption[] | undefined;
   _options_surface: Toption[] | undefined;
 
-  constructor(props: ConstructorParameters<typeof ClassProd_base>[0]) {
+  constructor(props: Tprops_constructor) {
     super(props);
 
     const nodeConfig = this.nodeConfig;
@@ -495,25 +495,26 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   // ---------------------------------------------------------------------------------
   // MARK: 值
 
-  get quoteType() {
-    return super.quoteType;
-  }
+  // get quoteType() {
+  //   return super.quoteType;
+  // }
 
-  set quoteType(v: string) {
-    if (this.data.quoteType === v) {
-      return;
-    }
+  // set quoteType(v: string) {
+  //   if (this.data.quoteType === v) {
+  //     return;
+  //   }
 
-    super.quoteType = v;
+  //   const newState = createEmptyStateProd(this.state.key);
 
-    const newState = createEmptyStateProd(this.state.key);
-    newState.data_prod.itemName = this.itemName;
-    newState.data_prod.discount = this.discount;
+  //   newState.data_prod.itemName = this.itemName;
+  //   newState.data_prod.discount = this.discount;
 
-    Object.clearAndAssign(this.state, newState);
+  //   Object.clearAndAssign(this.state, newState);
 
-    this.render();
-  }
+  //   super.quoteType = v;
+
+  //   this.render();
+  // }
 
   get doorModelName() {
     return super.doorModelName;
@@ -705,5 +706,5 @@ const createOptions_surface = (classProd: ClassProd_prime) => {
 };
 
 // ========================================================================
-export type { Interface_ClassProd_prime };
+export type { Interface_ClassProd_prime, Tprops_constructor };
 export { ClassProd_prime };
