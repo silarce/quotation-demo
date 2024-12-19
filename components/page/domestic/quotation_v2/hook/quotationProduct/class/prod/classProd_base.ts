@@ -441,7 +441,7 @@ class ClassProd_base implements Interface_ClassProd_base {
 
   // W要額外處理
   get W() {
-    const WG_mm = new Decimal(this.data.WG).mul(1000).toNumber();
+    const WG_mm = new Decimal(this.data.WG || 0).mul(1000).toNumber();
     const G = this.data.guideRailG || 0;
 
     const W_num = calcW({
@@ -469,7 +469,7 @@ class ClassProd_base implements Interface_ClassProd_base {
     this.setData_simple('height', value);
   }
   get height_mm() {
-    return new Decimal(this.data.height).mul(1000).toNumber();
+    return new Decimal(this.data.height || 0).mul(1000).toNumber();
   }
 
   get boxB() {

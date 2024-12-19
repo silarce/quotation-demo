@@ -107,7 +107,9 @@ import { checkIsSST, checkIsGalvanized } from '../library';
 
 import { ClassProd_base } from './classProd_base';
 
-import { createEmptyComponentDict } from '../../emptyState';
+import { createEmptyComponentStateDict } from '../../emptyComponentState';
+
+import { createEmptyStateProd } from '../../emptyProdState';
 
 // ========================================================================
 
@@ -258,7 +260,7 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   // region com control
 
   replaceToEmptyComponent({ returnOnly }: { returnOnly?: boolean } = {}) {
-    const emptyComponentDict = createEmptyComponentDict();
+    const emptyComponentDict = createEmptyComponentStateDict();
 
     if (returnOnly) {
       return emptyComponentDict;
@@ -436,10 +438,12 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       // throw error;
       // TODO: 重構報價單 處理reqChain_01的catch
 
-      alert('取得資料失敗');
+      myAlert.err({ title: '取得資料失敗' });
       console.log(error);
       this.clearGeneralSpec();
       this.clearComponent();
+
+      return Promise.reject(null);
     }
   }
 
@@ -451,6 +455,10 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     }
 
     this.state.afterChangeQueue.push(funcName);
+    this.render();
+  }
+  clearAfterChange() {
+    this.state.afterChangeQueue = undefined;
     this.render();
   }
 
@@ -466,10 +474,17 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     this.state.isFetching = true;
     this.render();
 
-    for (const _funcName of afterChangeQueue) {
-      const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
+    let thisFuncName = '';
 
-      await this[funcName]();
+    try {
+      for (const _funcName of afterChangeQueue) {
+        thisFuncName = _funcName;
+        const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
+
+        await this[funcName]();
+      }
+    } catch (error) {
+      console.log(`${thisFuncName} failed`, error);
     }
 
     this.state.afterChangeQueue = undefined;
@@ -485,7 +500,17 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   }
 
   set quoteType(v: string) {
+    if (this.data.quoteType === v) {
+      return;
+    }
+
     super.quoteType = v;
+
+    const newState = createEmptyStateProd(this.state.key);
+    newState.data_prod.itemName = this.itemName;
+    newState.data_prod.discount = this.discount;
+
+    Object.clearAndAssign(this.state, newState);
 
     this.render();
   }
@@ -494,10 +519,14 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
     return super.doorModelName;
   }
   set doorModelName(value: string) {
-    super.doorModelName = value;
-    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
+    if (this.data.doorModelName === value) {
+      return;
+    }
 
-    this.addAfterChange('reqChain_01');
+    super.doorModelName = value;
+    // this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
+
+    // this.addAfterChange('reqChain_01');
     this.render();
   }
 
