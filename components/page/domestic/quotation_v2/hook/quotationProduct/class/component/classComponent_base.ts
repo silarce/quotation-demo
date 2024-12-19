@@ -11,7 +11,7 @@ import {
   TsetComponent,
 } from '../../type';
 
-import { Interface_ClassProd_prime } from '../prod/interface';
+// import { Interface_ClassProd_prime } from '../prod/interface';
 
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
@@ -19,6 +19,8 @@ import type { Toption } from 'js/utils/options/options';
 import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
 
 import { checkIsSST, checkIsGalvanized } from '../library';
+
+import { ClassProd_interfact } from '../prod/classProd_remake';
 
 // ========================================================================
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
@@ -85,8 +87,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     // this.setState((prev) => ({ ...this.state })); // 這樣不行 // 莫名其妙
   };
 
-  protected classProd: Interface_ClassProd_prime | undefined;
-  setClassProd(classProd: Interface_ClassProd_prime) {
+  protected classProd: ClassProd_interfact | undefined;
+  setClassProd(classProd: ClassProd_interfact) {
     this.classProd = classProd;
   }
 

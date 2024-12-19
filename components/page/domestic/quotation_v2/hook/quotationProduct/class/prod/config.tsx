@@ -18,11 +18,13 @@ import {
 import {
   lookup_classProd,
   // Interface_ClassProd_base,
-  Interface_ClassProd_base2,
-  Interface_ClassProd_prime,
+  // Interface_ClassProd_base2,
+  // Interface_ClassProd_prime,
   Interface_ClassProd_special,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from '../component/classComponent_base';
+
+import { ClassProd_interfact } from './classProd_remake';
 
 import {
   optionsCreator_doorModel,
@@ -60,13 +62,13 @@ interface TconfigItem_prod {
   className?: string;
   createNode: (params: {
     //
-    classProd: Interface_ClassProd_base2;
+    classProd: ClassProd_interfact;
     disabled: boolean;
   }) => React.ReactNode;
 }
 
 type TcellKey = keyof Pick<
-  Interface_ClassProd_prime,
+  ClassProd_interfact,
   | 'itemName' // 項目名
   | 'discount' // 折數
   | 'quoteType' // 報價別
@@ -963,6 +965,13 @@ const createNodeConfig_prime = ({
 
     if (classProd.doorModelName) {
       value = (optionsDict && optionsDict[classProd.doorModelName]) || null;
+
+      if (!value) {
+        value = {
+          value: classProd.doorModelName,
+          label: classProd.doorModelName,
+        };
+      }
     }
 
     const selectProps: TinputSelProps['selectProps'] = {
@@ -972,11 +981,15 @@ const createNodeConfig_prime = ({
         value: value,
         onChange: (option) => {
           const doorModelName = option?.value || '';
-          classProd.doorModelName = doorModelName;
+          const doorModel = doorModelDict?.[doorModelName] || null;
+
           classProd.changeDoorModel({
-            name: doorModelName,
-            doorModel: doorModelDict?.[doorModelName] || null,
+            doorModel: doorModel,
           });
+
+          if (!doorModel) {
+            classProd.doorModelName = doorModelName;
+          }
         },
       },
     };

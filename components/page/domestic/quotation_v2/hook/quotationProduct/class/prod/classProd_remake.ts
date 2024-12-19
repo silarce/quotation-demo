@@ -223,7 +223,7 @@ class ClassProd_1 {
   } // constructor
   // ---------------------------------------------------------------------------
 
-  protected setClassComponentDict(classComponentDict: TclassComponentDict) {
+  setClassComponentDict(classComponentDict: TclassComponentDict) {
     Object.clearAndAssign(this.classComponentDict, classComponentDict);
   }
   protected clearClassComponentDict() {

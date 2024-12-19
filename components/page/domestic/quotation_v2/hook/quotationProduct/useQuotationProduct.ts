@@ -36,7 +36,8 @@ import type {
   TsetAccessory,
 } from './type';
 
-import { lookup_classProd } from './class/prod/lookup_classProd';
+// import { lookup_classProd } from './class/prod/lookup_classProd';
+import { ClassProd_interfact } from './class/prod/classProd_remake';
 import {
   Interface_ClassProd_base,
   Interface_ClassProd_base2,
@@ -435,12 +436,18 @@ const useQuotationProduct = ({
 
   const createClassProd = useCallback(
     (stateProd: TstateProd) => {
-      const { doorModelName } = stateProd.data_prod;
-      const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
+      // const { doorModelName } = stateProd.data_prod;
+      // const prodName = (doorModelName in lookup_classProd ? doorModelName : 'special') as keyof typeof lookup_classProd;
 
-      const TheClass = lookup_classProd[prodName];
+      // const TheClass = lookup_classProd[prodName];
 
-      const classProd = new TheClass({
+      // const classProd = new TheClass({
+      //   stateProd: stateProd,
+      //   setStateProd: createSetProd(stateProd.key),
+      //   nodeConfig: nodeConfig_prime,
+      // });
+
+      const classProd = new ClassProd_interfact({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
         nodeConfig: nodeConfig_prime,
@@ -472,7 +479,7 @@ const useQuotationProduct = ({
 
     const activedClassProd = createClassProd(activedProd);
 
-    if (activedClassProd.doorModel === 'special') {
+    if (!activedClassProd.isValid_doorModel) {
       return {};
     }
 
@@ -498,7 +505,7 @@ const useQuotationProduct = ({
 
     const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;
 
-    if (!isComponentExist && activedClassProd.doorModel !== 'special') {
+    if (!isComponentExist && activedClassProd.doorModelName !== 'special') {
       activedClassProd.replaceToEmptyComponent();
       activedClassProd.resetComponentKeyArr();
     }
@@ -506,7 +513,7 @@ const useQuotationProduct = ({
     const activedClassComponentDict = createActivedClassComponentDict(stateProd);
     activedClassProd.setClassComponentDict(activedClassComponentDict);
 
-    if (activedClassProd.doorModel !== 'special') {
+    if (activedClassProd.doorModelName !== 'special') {
       Object.values(activedClassComponentDict).forEach((classComponent) =>
         classComponent.setClassProd(activedClassProd)
       );
@@ -811,7 +818,8 @@ const createClassComponentDict_v2 = ({
   activedClassProd,
   createSetComponent,
 }: {
-  activedClassProd: Interface_ClassProd_prime;
+  // activedClassProd: Interface_ClassProd_prime;
+  activedClassProd: ClassProd_interfact;
   createSetComponent: TcreateSetComponent;
 }) => {
   const data_componentDict = activedClassProd.state.data_componentDict;
@@ -819,7 +827,7 @@ const createClassComponentDict_v2 = ({
 
   const slat =
     data_componentDict['slat'] &&
-    new (ClassCompnent_slat.subspecies(activedClassProd.doorModel))({
+    new (ClassCompnent_slat.subspecies(activedClassProd.doorModelName))({
       state_component: data_componentDict['slat'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -830,7 +838,7 @@ const createClassComponentDict_v2 = ({
 
   const bottomBar =
     data_componentDict['bottomBar'] &&
-    new (ClassCompnent_bottomBar.subspecies(activedClassProd.doorModel))({
+    new (ClassCompnent_bottomBar.subspecies(activedClassProd.doorModelName))({
       state_component: data_componentDict['bottomBar'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -841,7 +849,7 @@ const createClassComponentDict_v2 = ({
 
   const guideRail =
     data_componentDict['guideRail'] &&
-    new (ClassCompnent_guideRail.subspecies(activedClassProd.doorModel))({
+    new (ClassCompnent_guideRail.subspecies(activedClassProd.doorModelName))({
       state_component: data_componentDict['guideRail'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
@@ -895,7 +903,7 @@ const createClassComponentDict_v2 = ({
     });
   const headBox =
     data_componentDict['headBox'] &&
-    new (ClassCompnent_headBox.subspecies(activedClassProd.doorModel))({
+    new (ClassCompnent_headBox.subspecies(activedClassProd.doorModelName))({
       state_component: data_componentDict['headBox'],
       setState_component: createSetComponent({
         pordKey: activeProdKey,
