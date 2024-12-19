@@ -127,8 +127,8 @@ const doorModelNameLookup: TdoorModelNameLookup = {
   'SJ-305D': 'SJ-305D',
   'SJ-303A': 'SJ-303A',
   'SJ-303AS': 'SJ-303AS',
-  'SJ-120A': 'SJ-120A',
-  'SJ-303S': 'SJ-303S',
+  // 'SJ-120A': 'SJ-120A',
+  // 'SJ-303S': 'SJ-303S',
   W2: 'W2',
 };
 

@@ -172,8 +172,8 @@ const lookup_options_boxB: Tlookup_options_boxB = {
   'SJ-305D': optionsCreator_boxB_SJ305D(),
   'SJ-303A': optionsCreator_boxB_SJ303A(),
   'SJ-303AS': optionsCreator_boxB_SJ303A(),
-  'SJ-120A': undefined,
-  'SJ-303S': undefined,
+  // 'SJ-120A': undefined,
+  // 'SJ-303S': undefined,
   W2: undefined,
 };
 

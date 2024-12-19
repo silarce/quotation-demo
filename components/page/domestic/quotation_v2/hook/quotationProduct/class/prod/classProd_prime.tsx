@@ -369,48 +369,23 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
   // MARK:afterAvailableComponentsUpdated_sideEffect
   protected afterAvailableComponentsUpdated_sideEffect(availableComponents: TdoorComponentListDto) {
-    const { componentDict, changedMotorVendor } = createComponentDict({
-      classProd: this,
-      availableComponents,
-    });
-
-    // console.log(componentDict.motor?.rawData?.id);
-    // console.log(componentDict.motor);
-
-    Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
-      const key = _key as keyof typeof this.state.data_componentDict;
-
-      // if (!componentDict[key]) {
-      //   this.state.data_componentDict[key] = undefined;
-      // } else {
-      //   Object.assign(component, {
-      //     ...componentDict[key],
-      //     material: component.material,
-      //     materialSurface: component.materialSurface,
-      //   });
-      // }
-
-      // 將每個component的值替換掉，而不改變參照
-      Object.assign(component, {
-        ...componentDict[key],
-        material: component.material,
-        materialSurface: component.materialSurface,
-      });
-    });
-
-    // Object.values(this.classComponentDict).forEach((classComponent) => {
-    //   const data_component = componentDict[classComponent.key];
-
-    //   if (data_component) {
-    //     classComponent.replaceState();
-    //   }
+    // const { componentDict, changedMotorVendor } = createComponentDict({
+    //   classProd: this,
+    //   availableComponents,
     // });
-
-    Object.values(this.classComponentDict).forEach((classComponent) => {
-      classComponent.init();
-    });
-
-    this.render();
+    // Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
+    //   const key = _key as keyof typeof this.state.data_componentDict;
+    //   // 將每個component的值替換掉，而不改變參照
+    //   Object.assign(component, {
+    //     ...componentDict[key],
+    //     material: component.material,
+    //     materialSurface: component.materialSurface,
+    //   });
+    // });
+    // Object.values(this.classComponentDict).forEach((classComponent) => {
+    //   classComponent.init();
+    // });
+    // this.render();
   } // handleAvailableComponentsUpdated
 
   // region reqChain

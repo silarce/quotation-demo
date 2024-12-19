@@ -5,6 +5,8 @@ import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quo
 import { ClassProd_base } from './prod/classProd_base';
 import type { Tdata_componentDict } from '../type';
 
+import { ClassProd_component } from './prod/classProd_remake';
+
 // ========================================================================
 
 // MARK:createComponentDict
@@ -12,7 +14,7 @@ const createComponentDict = ({
   classProd,
   availableComponents,
 }: {
-  classProd: ClassProd_base;
+  classProd: ClassProd_component;
   availableComponents: TdoorComponentListDto;
 }) => {
   const {
@@ -218,7 +220,7 @@ const createComponentDict = ({
 // ========================================================================
 
 // MARK: filterComponent
-const filterComponent = (classProd: ClassProd_base, availableComponents: TdoorComponentListDto) => {
+const filterComponent = (classProd: ClassProd_component, availableComponents: TdoorComponentListDto) => {
   const {
     filter_slat,
     filter_bottomBar,
