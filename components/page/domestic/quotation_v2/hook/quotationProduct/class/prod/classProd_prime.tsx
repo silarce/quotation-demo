@@ -353,8 +353,21 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
       availableComponents,
     });
 
+    // console.log(componentDict.motor?.rawData?.id);
+    // console.log(componentDict.motor);
+
     Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
       const key = _key as keyof typeof this.state.data_componentDict;
+
+      // if (!componentDict[key]) {
+      //   this.state.data_componentDict[key] = undefined;
+      // } else {
+      //   Object.assign(component, {
+      //     ...componentDict[key],
+      //     material: component.material,
+      //     materialSurface: component.materialSurface,
+      //   });
+      // }
 
       // 將每個component的值替換掉，而不改變參照
       Object.assign(component, {
@@ -398,7 +411,14 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
 
       // 取得可用材料配件
       const availableComponents = await ClassProd_prime.reqGetAvailableComponents(this);
+
       // 更新可用材料配件
+      // this.state.availableComponents = availableComponents;
+      // if (this.state.availableComponents) {
+      //   Object.assign(this.state.availableComponents, availableComponents);
+      // } else {
+      //   this.state.availableComponents = availableComponents;
+      // }
       this.state.availableComponents = availableComponents;
 
       // 更新材料配件
@@ -462,6 +482,16 @@ class ClassProd_prime extends ClassProd_base implements Interface_ClassProd_prim
   }
   set fullWidth(value: `${number}` | '') {
     super.fullWidth = value;
+
+    this.addAfterChange('reqChain_01');
+    this.render();
+  }
+
+  get height() {
+    return super.height;
+  }
+  set height(value: `${number}` | '') {
+    super.height = value;
 
     this.addAfterChange('reqChain_01');
     this.render();

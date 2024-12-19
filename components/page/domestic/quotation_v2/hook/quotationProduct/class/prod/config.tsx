@@ -261,7 +261,6 @@ const nodeConfig_origin: TnodeConfig = {
           },
           onBlur() {
             classProd.runAfterChange?.();
-            // classProd.afterFullWidthChange?.();
           },
         },
       };
@@ -322,6 +321,9 @@ const nodeConfig_origin: TnodeConfig = {
           value: classProd.height,
           onChange: (e) => {
             classProd.height = e.target.value as `${number}` | '';
+          },
+          onBlur() {
+            classProd.runAfterChange?.();
           },
         },
       };
