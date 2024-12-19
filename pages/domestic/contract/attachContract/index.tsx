@@ -866,7 +866,14 @@ const reqModify = async ({
     const divProdArr = (() => {
       const arr = Object.values(productList).map((item, index) => {
         if (item.isAttachDiv) {
-          if (item && !item.isComponentOk) {
+          if (
+            item &&
+            !item.isComponentOk &&
+            // 以前W2被視為特殊門處理，以前的特殊門W2無法通過isComponentOk
+            // 因此在這邊給W2做例外判斷
+            item.doorType !== 'W2'
+            //
+          ) {
             breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
           }
 
