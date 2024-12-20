@@ -124,6 +124,8 @@ import {
   reqGetSlatCount,
 } from './apiClient';
 
+import { Class_accessory } from '../accessory/classAccessory';
+
 // ================================================================================
 
 interface Tprops_constructor {
@@ -214,12 +216,23 @@ class ClassProd {
     return this.state.data_prod;
   }
 
-  readonly classComponentDict: TclassComponentDict = {};
-
   readonly nodeConfig: TnodeConfig;
 
-  // _options_material: Toption[] | undefined;
-  // _options_surface: Toption[] | undefined;
+  readonly classComponentDict: TclassComponentDict = {};
+  registerClassComponentDict(classComponentDict: TclassComponentDict) {
+    Object.clearAndAssign(this.classComponentDict, classComponentDict);
+  }
+  protected clearClassComponentDict() {
+    Object.clearAndAssign(this.classComponentDict, {});
+  }
+
+  readonly classAcceoooryDict: Record<string, Class_accessory> = {};
+  registerClassAccessoryDict(classAccessoryDict: Record<string, Class_accessory>) {
+    Object.clearAndAssign(this.classAcceoooryDict, classAccessoryDict);
+  }
+  protected clearClassAccessoryDict() {
+    Object.clearAndAssign(this.classAcceoooryDict, {});
+  }
 
   // 是否為特殊門
   get isSpecial() {
@@ -236,13 +249,6 @@ class ClassProd {
     this.nodeConfig = customizeNodeConfig({ nodeConfig });
   } // constructor
   // ---------------------------------------------------------------------------
-
-  setClassComponentDict(classComponentDict: TclassComponentDict) {
-    Object.clearAndAssign(this.classComponentDict, classComponentDict);
-  }
-  protected clearClassComponentDict() {
-    Object.clearAndAssign(this.classComponentDict, {});
-  }
 
   async init() {
     this.state.isFetching = true;

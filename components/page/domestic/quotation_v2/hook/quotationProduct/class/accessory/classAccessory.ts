@@ -12,6 +12,8 @@ import {
 
 import { TnodeConfig_accessory, createNodeConfig_accessory } from './config';
 
+import { ClassProd } from '../prod/classProd_remake';
+
 // ==========================================================================
 
 const nodeConfig = createNodeConfig_accessory();
@@ -39,17 +41,27 @@ class Class_accessory implements Interface_ClassAccessory {
   readonly state: TstateAccessoryData;
   private readonly setState: TsetAccessory;
   readonly nodeConfig = nodeConfig;
+  render() {
+    this.setState({ ...this.state });
+  }
+
+  protected classProd: ClassProd | undefined;
+
   constructor({
     state_accessory,
     setState_accessory,
+    classProd,
   }: {
     state_accessory: TstateAccessoryData;
     setState_accessory: TsetAccessory;
+    classProd: ClassProd;
   }) {
     this.state = state_accessory;
     this.setState = setState_accessory;
+    this.classProd = classProd;
   } // constructor
 
+  // -----------------------------------------------------------------------
   get name() {
     return this.state.name;
   }
@@ -62,7 +74,8 @@ class Class_accessory implements Interface_ClassAccessory {
     return this.state.quantity;
   }
   set quantity(value) {
-    this.setState((prev) => ({ ...prev, quantity: value }));
+    this.state.quantity = value;
+    this.render();
   }
 
   //牌價
@@ -70,7 +83,8 @@ class Class_accessory implements Interface_ClassAccessory {
     return this.state.price;
   }
   set price(value) {
-    this.setState((prev) => ({ ...prev, price: value }));
+    this.state.price = value;
+    this.render();
   }
 
   //牌價複價

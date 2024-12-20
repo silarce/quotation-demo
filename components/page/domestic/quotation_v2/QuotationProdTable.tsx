@@ -439,6 +439,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 const Table_accessory = ({ instance_useQuotationProductInstance, disabled, className }: TtableProps) => {
   const {
     activedProd,
+    activedClassAccessoryDict,
 
     // activedClassAccessoryDict,
     cellKeyArr_accessory,
@@ -452,7 +453,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
-  const classAccessoryDict = createActivedClassAccessoryDict(activedProd);
+  // const classAccessoryDict = createActivedClassAccessoryDict(activedProd);
 
   useEffect(() => {
     setActiveIndex(undefined);
@@ -494,12 +495,11 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         }}
       >
         {accessoryKeyArr?.map((acceKey, index) => {
-          if (!classAccessoryDict) {
+          if (!activedClassAccessoryDict) {
             return null;
           }
 
-          // 沒出錯的話，這是一定會有的
-          const classAccessory = classAccessoryDict[acceKey];
+          const classAccessory = activedClassAccessoryDict[acceKey];
 
           const nodeConfig_name = classAccessory.nodeConfig['name'];
 

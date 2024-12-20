@@ -388,7 +388,7 @@ const useQuotationProduct = ({
     const setComponent: TsetComponent<T> = (newStateComponent) => {
       setState_prodDict((prev) => {
         const copy = { ...prev };
-        copy[pordKey] = { ...copy[pordKey] };
+        copy[pordKey] = { ...copy[pordKey] }; // 就是更新activedProd
         const prod = copy[pordKey];
         const data_componentDict = prod.data_componentDict;
 
@@ -411,6 +411,8 @@ const useQuotationProduct = ({
     const setAccessory: TsetAccessory = (newStateAcce) => {
       setState_prodDict((prev) => {
         const copy = { ...prev };
+        copy[prodKey] = { ...copy[prodKey] }; // 就是更新activedProd
+
         const accessoriesDict = copy[prodKey].data_accessoryDict;
         const acce = accessoriesDict[accessoryKey];
         const newStateValue = typeof newStateAcce === 'function' ? newStateAcce(acce) : newStateAcce;
@@ -423,13 +425,16 @@ const useQuotationProduct = ({
     return setAccessory;
   };
 
-  const createActivedClassAccessoryDict = (activedProd: TstateProd | undefined) => {
-    if (!activedProd) {
+  const createActivedClassAccessoryDict = (
+    // activedProd: TstateProd | undefined
+    activedClassProd: ClassProd | undefined
+  ) => {
+    if (!activedClassProd) {
       return {};
     }
 
     return createAccessoryDict({
-      activedProd,
+      activedClassProd,
       createSetAccessory,
     });
   };
@@ -490,9 +495,11 @@ const useQuotationProduct = ({
   };
 
   const {
+    //
     activedClassProd,
     activedClassComponentDict,
-    activedPseudoComponentDict: activedClassPseudoComponentDict,
+    activedClassPseudoComponentDict,
+    activedClassAccessoryDict,
   } = useMemo(() => {
     // let activedProd = activedProd;
 
@@ -511,7 +518,7 @@ const useQuotationProduct = ({
     }
 
     const activedClassComponentDict = createActivedClassComponentDict(stateProd);
-    activedClassProd.setClassComponentDict(activedClassComponentDict);
+    activedClassProd.registerClassComponentDict(activedClassComponentDict);
 
     if (activedClassProd.doorModelName !== 'special') {
       Object.values(activedClassComponentDict).forEach((classComponent) =>
@@ -530,10 +537,18 @@ const useQuotationProduct = ({
       }),
     };
 
+    const activedClassAccessoryDict = createAccessoryDict({
+      activedClassProd,
+      createSetAccessory,
+    });
+
+    activedClassProd.registerClassAccessoryDict(activedClassAccessoryDict);
+
     return {
       activedClassProd,
       activedClassComponentDict,
-      activedPseudoComponentDict,
+      activedClassPseudoComponentDict: activedPseudoComponentDict,
+      activedClassAccessoryDict,
     };
   }, [
     //
@@ -633,6 +648,7 @@ const useQuotationProduct = ({
     activedClassProd,
     activedClassComponentDict,
     activedClassPseudoComponentDict,
+    activedClassAccessoryDict,
     //
     cellKeyArr,
     setCellKeyArr,
@@ -958,22 +974,23 @@ const createClassComponentDict_v2 = ({
 };
 
 const createAccessoryDict = ({
-  activedProd,
+  activedClassProd,
   createSetAccessory,
 }: {
-  activedProd: TstateProd;
+  activedClassProd: ClassProd;
   createSetAccessory: TcreateSetAccessory;
 }) => {
-  const data_accessoryDict = activedProd.data_accessoryDict;
+  const data_accessoryDict = activedClassProd.state.data_accessoryDict;
 
   const classAccessoryDict: TclassAccessoryDict = {};
   Object.entries(data_accessoryDict).forEach(([key, acce]) => {
     classAccessoryDict[key] = new Class_accessory({
       state_accessory: acce,
       setState_accessory: createSetAccessory({
-        prodKey: activedProd.key,
+        prodKey: activedClassProd.key,
         accessoryKey: key,
       }),
+      classProd: activedClassProd,
     });
   });
 
