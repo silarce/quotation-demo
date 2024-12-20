@@ -510,12 +510,12 @@ const useQuotationProduct = ({
     const activedClassProd = createClassProd(activedProd);
     const stateProd = activedClassProd.state; // 同activedProd 為同一個參照
 
-    const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;
+    // const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;
 
-    if (!isComponentExist && activedClassProd.doorModelName !== 'special') {
-      activedClassProd.replaceToEmptyComponent();
-      activedClassProd.resetComponentKeyArr();
-    }
+    // if (!isComponentExist && activedClassProd.doorModelName !== 'special') {
+    //   activedClassProd.replaceToEmptyComponent();
+    //   activedClassProd.resetComponentKeyArr();
+    // }
 
     const activedClassComponentDict = createActivedClassComponentDict(stateProd);
     activedClassProd.registerClassComponentDict(activedClassComponentDict);

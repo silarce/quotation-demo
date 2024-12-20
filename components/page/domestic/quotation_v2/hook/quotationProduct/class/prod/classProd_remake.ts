@@ -126,6 +126,8 @@ import {
 
 import { Class_accessory } from '../accessory/classAccessory';
 
+import type { Tdata_componentDict } from '../../type';
+
 // ================================================================================
 
 interface Tprops_constructor {
@@ -330,7 +332,7 @@ class ClassProd {
     this.data.doorModelName = doorModel?.name ?? '';
 
     if (!this.state.doorModel) {
-      return this;
+      return;
     }
 
     const {
@@ -358,6 +360,13 @@ class ClassProd {
     }
 
     this.renewSurface();
+
+    // -------------------------------------------------------------------------
+
+    // Object.clearAndAssign(this.state.data_componentDict, {});
+    this.replaceToEmptyComponent();
+
+    Object.clearAndAssign(this.state.data_accessoryDict, {});
 
     // this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
@@ -511,21 +520,54 @@ class ClassProd {
     this.render();
   } // handleAvailableComponentsUpdated
 
-  replaceToEmptyComponent({ returnOnly }: { returnOnly?: boolean } = {}) {
+  protected replaceToEmptyComponent() {
     const emptyComponentDict = createEmptyComponentStateDict();
 
-    if (returnOnly) {
-      return emptyComponentDict;
+    const {
+      //
+      slat,
+      bottomBar,
+      guideRail,
+      sidePlate,
+      roller,
+      motor,
+      motorAccessories,
+      headBox,
+      middlePillar,
+      backBone,
+    } = emptyComponentDict;
+
+    const componentDict: Tdata_componentDict = {
+      slat,
+      bottomBar,
+      guideRail,
+      sidePlate,
+      roller,
+      motor,
+      motorAccessories,
+      headBox,
+    };
+    const componentDict_W2: Tdata_componentDict = {
+      slat,
+      bottomBar,
+      guideRail,
+      backBone,
+      middlePillar,
+    };
+
+    let newComponentDict = componentDict;
+
+    if (this.data.doorModelName === 'W2') {
+      newComponentDict = componentDict_W2;
     }
 
-    const { backBone, middlePillar, ...rest } = emptyComponentDict;
+    Object.clearAndAssign(this.state.data_componentDict, newComponentDict);
 
-    this.state.data_componentDict = rest;
-    this.state.componentKeyArr = Object.keys(rest) as TdoorComponentType[];
+    const newComponentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
+    this.state.componentKeyArr.length = 0;
+    this.state.componentKeyArr.push(...newComponentKeyArr);
 
     this.render();
-
-    return emptyComponentDict;
   }
 
   resetComponentKeyArr() {
