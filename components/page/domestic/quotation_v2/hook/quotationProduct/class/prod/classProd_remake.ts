@@ -114,6 +114,8 @@ import { Toption } from 'js/utils/options/options';
 
 import { createEmptyComponentStateDict } from '../../emptyComponentState';
 
+import { handle__options_surface } from './handleProd/handle__options_surface';
+
 // ================================================================================
 
 interface Tprops_constructor {
@@ -123,9 +125,6 @@ interface Tprops_constructor {
 }
 
 // ================================================================================
-
-const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
-const options_surface = optionsCreator_surface();
 
 const doorModelNameLookup: {
   [key in TdoorModel]: key;
@@ -198,7 +197,10 @@ class ClassProd_1 {
   protected render() {
     this.setState({ ...this.state });
   }
-  data: TstateProd['data_prod'];
+  // data: TstateProd['data_prod'];
+  get data() {
+    return this.state.data_prod;
+  }
 
   readonly classComponentDict: TclassComponentDict = {};
 
@@ -217,7 +219,7 @@ class ClassProd_1 {
     // cloneDeep對效能的負擔太大了
     // this.state = _.cloneDeep(stateProd);
     this.state = stateProd;
-    this.data = this.state.data_prod;
+    // this.data = this.state.data_prod;
     this.setState = setStateProd;
     this.nodeConfig = customizeNodeConfig({ nodeConfig });
   } // constructor
@@ -266,12 +268,14 @@ class ClassProd_1 {
 
   protected renewSurface() {
     // 更新表面選項
-    this._options_surface = createOptions_surface(this);
+    // this._options_surface = createOptions_surface(this);
 
-    const isSurfaceValid = this._options_surface.some((item) => item.value === this.data.materialSurface);
+    // const options_surface = this.options_surface;
+
+    const isSurfaceValid = this.options_surface?.some((item) => item.value === this.data.materialSurface);
 
     if (!isSurfaceValid) {
-      this.data.materialSurface = this._options_surface[0].value;
+      this.data.materialSurface = this.options_surface?.[0].value ?? '';
     }
 
     this.render();
@@ -342,19 +346,24 @@ class ClassProd_1 {
   }
 
   get options_surface() {
-    if (!this.data.materialName || !this.doorModelName) {
+    if (
+      //
+      !this.data.materialName ||
+      !this.isValid_doorModel ||
+      this.data.materialName === '鋁合金'
+    ) {
       return undefined;
     }
 
-    if (this.data.materialName === '鋁合金') {
-      return undefined;
-    }
+    // handle__options_surface
 
-    if (!this._options_surface) {
-      this._options_surface = createOptions_surface(this);
-    }
+    // if (!this._options_surface) {
+    //   this._options_surface = createOptions_surface(this);
+    // }
 
-    return this._options_surface;
+    const options = handle__options_surface(this.doorModelName)(this);
+
+    return options;
   }
 
   get isComponentValid() {
@@ -755,7 +764,7 @@ class ClassProd_interfact extends ClassProd_api {
     newState.data_prod.discount = this.discount;
     Object.clearAndAssign(this.state, newState);
 
-    this.data = this.state.data_prod;
+    // this.data = this.state.data_prod;
     this.data.quoteType = value;
 
     this.render();
@@ -1335,35 +1344,17 @@ const createOptions_material = (classProd: ClassProd_1) => {
   return options;
 };
 
-const createOptions_surface = (classProd: ClassProd_1) => {
-  let options = options_surface_onlyPaint;
-
-  const isSST = checkIsSST(classProd.data.materialName);
-  const isGalvanized = checkIsGalvanized(classProd.data.materialName); // 是否鍍鋅
-
-  if (isSST) {
-    options = options_surface;
-  }
-
-  if (!isGalvanized) {
-    options = options.filter((item) => item.value !== '無烤漆');
-  }
-
-  return options;
-};
-
 // ================================================================================
 // ================================================================================
 // ================================================================================
 // ================================================================================
-// export { ClassProd_base };
 
-export { ClassProd_interfact, ClassProd_component };
+export { ClassProd_1, ClassProd_interfact, ClassProd_component };
 
-export type {
-  Interface_ClassProd_base,
-  Interface_ClassProd_base2,
-  Interface_ClassProd_prime,
-  Interface_ClassProd_special,
-  Tprops_constructor,
-};
+// export type {
+//   Interface_ClassProd_base,
+//   Interface_ClassProd_base2,
+//   Interface_ClassProd_prime,
+//   Interface_ClassProd_special,
+//   Tprops_constructor,
+// };
