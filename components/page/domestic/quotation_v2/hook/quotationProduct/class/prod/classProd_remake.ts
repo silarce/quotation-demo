@@ -218,8 +218,8 @@ class ClassProd {
 
   readonly nodeConfig: TnodeConfig;
 
-  _options_material: Toption[] | undefined;
-  _options_surface: Toption[] | undefined;
+  // _options_material: Toption[] | undefined;
+  // _options_surface: Toption[] | undefined;
 
   // 是否為特殊門
   get isSpecial() {
@@ -313,104 +313,9 @@ class ClassProd {
   //   return { ...this.state.data_componentDict };
   // }
 
-  get isValid_doorModel(): boolean {
-    const isValid = (this.state.doorModel?.name || 'undefined') in doorModelNameLookup;
-
-    return isValid;
-  }
-
-  get isInited() {
-    let isInit = true;
-
-    if (this.state.generalSpecs === undefined) {
-      isInit = false;
-    } else if (this.state.availableComponents === undefined) {
-      isInit = false;
-    }
-
-    return isInit;
-  }
   // get doorModelName() {
   //   return this.data.doorModelName;
   // }
-  get fullWidth_mm() {
-    return new Decimal(this.data.fullWidth || 0).mul(1000).toNumber();
-  }
-  get height_mm() {
-    return new Decimal(this.data.height || 0).mul(1000).toNumber();
-  }
-  get boxB_mm() {
-    return new Decimal(this.data.boxB || 0).mul(1000).toNumber();
-  }
-  get boxD_mm() {
-    return new Decimal(this.data.boxD).mul(1000).toNumber();
-  }
-  get isFetching() {
-    return !!this.state.isFetching;
-  }
-
-  get options_material() {
-    if (!this._options_material) {
-      this._options_material = createOptions_material(this);
-    }
-
-    return this._options_material;
-  }
-
-  get options_surface() {
-    if (
-      //
-      !this.data.materialName ||
-      !this.isValid_doorModel ||
-      this.data.materialName === '鋁合金'
-    ) {
-      return undefined;
-    }
-
-    // handle__options_surface
-
-    // if (!this._options_surface) {
-    //   this._options_surface = createOptions_surface(this);
-    // }
-
-    const options = handle__options_surface(this.doorModelName)(this);
-
-    return options;
-  }
-
-  get isComponentValid() {
-    return true;
-
-    // 目前isComponentValid只會為true，未來要再製作
-    // 除了檢查材料配件是否齊全，還要檢查RAW跟BOM有沒有資料
-
-    // 參考
-    // get isComponentOk() {
-    //   const componentBodyArr = this.comBodyArr;
-    //   let isComponentBreak = false;
-
-    //   if (this.isSpecialProd) {
-    //     isComponentBreak = false;
-    //     // WARNING W2判斷
-    //   } else if (this.isW2 && componentBodyArr.length !== 5) {
-    //     isComponentBreak = true;
-    //   } else if (!this.isW2 && componentBodyArr.length !== 8) {
-    //     isComponentBreak = true;
-    //   }
-
-    //   componentBodyArr.forEach((com) => {
-    //     if (!com.componentId) {
-    //       isComponentBreak = true;
-    //     }
-    //   });
-
-    //   // if (isComponentBreak) {
-    //   //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
-    //   // }
-
-    //   return !isComponentBreak;
-    // }
-  }
 
   // ---------------------------------------------------------------------------
 
@@ -621,6 +526,41 @@ class ClassProd {
     this.state.componentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
     this.render();
   }
+
+  get isComponentValid() {
+    return true;
+
+    // 目前isComponentValid只會為true，未來要再製作
+    // 除了檢查材料配件是否齊全，還要檢查RAW跟BOM有沒有資料
+
+    // 參考
+    // get isComponentOk() {
+    //   const componentBodyArr = this.comBodyArr;
+    //   let isComponentBreak = false;
+
+    //   if (this.isSpecialProd) {
+    //     isComponentBreak = false;
+    //     // WARNING W2判斷
+    //   } else if (this.isW2 && componentBodyArr.length !== 5) {
+    //     isComponentBreak = true;
+    //   } else if (!this.isW2 && componentBodyArr.length !== 8) {
+    //     isComponentBreak = true;
+    //   }
+
+    //   componentBodyArr.forEach((com) => {
+    //     if (!com.componentId) {
+    //       isComponentBreak = true;
+    //     }
+    //   });
+
+    //   // if (isComponentBreak) {
+    //   //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
+    //   // }
+
+    //   return !isComponentBreak;
+    // }
+  }
+
   // endregion COMPONENT
 
   // ==========================================================================
@@ -725,6 +665,80 @@ class ClassProd {
   // ==========================================================================
   // region interface
 
+  get isValid_doorModel(): boolean {
+    const isValid = (this.state.doorModel?.name || 'undefined') in doorModelNameLookup;
+
+    return isValid;
+  }
+
+  get isInited() {
+    let isInit = true;
+
+    if (this.state.generalSpecs === undefined) {
+      isInit = false;
+    } else if (this.state.availableComponents === undefined) {
+      isInit = false;
+    }
+
+    return isInit;
+  }
+
+  get isFetching() {
+    return !!this.state.isFetching;
+  }
+
+  // ----------------------------------------------------------------
+
+  get options_material() {
+    const doorModel = this.state.doorModel;
+
+    if (!doorModel) {
+      return undefined;
+    }
+
+    // 選項來源為doorModel.slatMaterials
+    const slatMaterialsArr = doorModel.slatMaterials;
+
+    const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+    const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
+
+    const options = orderedArr.map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+
+    // 把黑鐵的label改為鐵材烤漆
+    const blackIron = options.find((item) => item.value === '黑鐵');
+    blackIron && (blackIron.label = '鐵材烤漆');
+
+    return options;
+  }
+
+  get options_surface() {
+    if (
+      //
+      !this.data.materialName ||
+      !this.isValid_doorModel ||
+      this.data.materialName === '鋁合金'
+    ) {
+      return undefined;
+    }
+
+    // handle__options_surface
+
+    // if (!this._options_surface) {
+    //   this._options_surface = createOptions_surface(this);
+    // }
+
+    const options = handle__options_surface(this.doorModelName)(this);
+
+    return options;
+  }
+
+  // ----------------------------------------------------------------
+
   get key() {
     return this.state.key;
   }
@@ -799,6 +813,9 @@ class ClassProd {
     this.addAfterChange('reqChain_01');
     this.render();
   }
+  get fullWidth_mm() {
+    return new Decimal(this.data.fullWidth || 0).mul(1000).toNumber();
+  }
 
   // get WG() {
   //   return this.data.WG;
@@ -850,6 +867,9 @@ class ClassProd {
     this.addAfterChange('reqChain_01');
     this.render();
   }
+  get height_mm() {
+    return new Decimal(this.data.height || 0).mul(1000).toNumber();
+  }
 
   get boxB() {
     return this.data.boxB;
@@ -862,6 +882,9 @@ class ClassProd {
     this.data.boxB = value;
     this.render();
   }
+  get boxB_mm() {
+    return new Decimal(this.data.boxB || 0).mul(1000).toNumber();
+  }
 
   get boxD() {
     return this.data.boxD;
@@ -869,6 +892,9 @@ class ClassProd {
   set boxD(value) {
     this.data.boxD = value;
     this.render();
+  }
+  get boxD_mm() {
+    return new Decimal(this.data.boxD).mul(1000).toNumber();
   }
 
   get area() {
@@ -899,13 +925,12 @@ class ClassProd {
       return;
     }
 
-    if (this.data.materialName === '鋁合金') {
-      this.materialSurface = null;
-      this._options_material = undefined;
-      this.render();
+    // if (this.data.materialName === '鋁合金') {
+    //   this.materialSurface = null;
+    //   this.render();
 
-      return;
-    }
+    //   return;
+    // }
 
     this.renewSurface();
 
@@ -1154,44 +1179,9 @@ class ClassProd {
 // ================================================================================
 // ================================================================================
 
-const createOptions_material = (classProd: ClassProd) => {
-  const doorModel = classProd.state.doorModel;
-
-  if (!doorModel) {
-    return undefined;
-  }
-
-  // 選項來源為doorModel.slatMaterials
-  const slatMaterialsArr = doorModel.slatMaterials;
-
-  const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
-  const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
-
-  const options = orderedArr.map((item) => {
-    return {
-      value: item.name,
-      label: item.name,
-    };
-  });
-
-  // 把黑鐵的label改為鐵材烤漆
-  const blackIron = options.find((item) => item.value === '黑鐵');
-  blackIron && (blackIron.label = '鐵材烤漆');
-
-  return options;
-};
-
 // ================================================================================
 // ================================================================================
 // ================================================================================
 // ================================================================================
 
 export { ClassProd };
-
-// export type {
-//   Interface_ClassProd_base,
-//   Interface_ClassProd_base2,
-//   Interface_ClassProd_prime,
-//   Interface_ClassProd_special,
-//   Tprops_constructor,
-// };
