@@ -253,7 +253,7 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   price: `${number}` | ''; // 牌價
 
   //
-  bom?: TdoorBomDto_Component['bom']; // 總而言之是從
+  bom?: TdoorBomDto_Component['bom'];
   componentId?: string;
   rawData: TcomponentRawDataDict[T] | null; // 來自於availableComponent的資料
   //

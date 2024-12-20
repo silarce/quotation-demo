@@ -1031,10 +1031,10 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
         type: component.type,
         number,
         componentId,
-        rawData,
+        rawData: {}, // 必須要送隨便送一個物件
         bom: component.bom,
         material: component.material,
-        materialSurface: component.materialSurface,
+        materialSurface: component.materialSurface || undefined,
         isPainted: component.isPainted,
         price: Number(component.price || 0),
         quantity: component.quantity,

@@ -198,20 +198,23 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
       quantity,
       price,
       rawData,
+      componentId,
     } = item;
 
-    const data_component = {
+    const data_component: TstateComponentData<typeof type> = {
       type,
       number,
-      desc,
+      desc: desc || '',
       material,
-      materialSurface,
-      density,
+      materialSurface: materialSurface || '',
+      density: (density ? `${density}` : null) as `${number}` | null,
       isPainted,
-      quantity,
+      quantity: quantity as `${number}` | '',
       price: `${price}`,
-      rawData,
-    } as TstateComponentData<typeof type>;
+      rawData: rawData as TstateComponentData<typeof type>['rawData'],
+      componentId,
+      //
+    };
 
     switch (type) {
       case 'slat':
