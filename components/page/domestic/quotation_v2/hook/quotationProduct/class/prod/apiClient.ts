@@ -1,40 +1,11 @@
 import { ClassProd } from './classProd_remake';
 
-import Decimal from 'decimal.js';
-import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-// type
-import { TstateProd } from '../../type';
-import { TnodeConfig } from './config';
-import {
-  TdoorModelInfoDto,
-  //
-  TdoorGeneralSpecsDto,
-  //
-  TdoorComponentListDto,
-  TdoorSlatDto,
-  TdoorBottomBarDto,
-  TdoorGuideRailDto,
-  TdoorSidePlateDto,
-  TdoorRollerDto,
-  TdoorMotorDto,
-  TdoorMotorAccessoriesDto,
-  TdoorHeadBoxDto,
-  TdoorMiddlePillarDto,
-  TdoorBackBoneDto,
-
-  //
-  TdoorModel,
-  //
-  TgenerateDoorProductBomDto_DoorSpec,
-  TgenerateDoorProductBomDto_ComponentInfo,
-  //
-  TmaterialSurface,
-  TdoorComponentType,
-} from 'js/api/dtoTypes';
+import { TapiError, TdoorModel, TgenerateDoorProductBomDto_DoorSpec, TmaterialSurface } from 'js/api/dtoTypes';
 
 import type { TclassComponentDict } from '../../useQuotationProduct';
 
@@ -59,71 +30,21 @@ import {
   //
   apiGetboxD,
 } from 'js/api/api_product';
-import { createAssetUrl } from 'js/api/api_product';
 
-// utils
-import { checkIsFloat } from 'js/utils/checkValue';
-import {
-  calcProductArea,
-  calcProductVolume,
-  calcProductWG_withWAndG,
-  calcProductFullWidth,
-  calcW,
-  calcW_2,
-  // findBDoptions,
-  calcFullHeight,
-  calcAngleIronSize,
-  calcProductWG,
-} from 'js/utils/product/calc';
+// ===========================================================================
 
-import {
-  Interface_ClassProd_base,
-  Interface_ClassProd_base2,
-  Interface_ClassProd_prime,
-  Interface_ClassProd_special,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
-
-import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
-
-import { createComponentDict } from '../createComponentDict';
-
-import {
-  optionsCreator_surface,
-  optionsCreator_surface_onlyPaint,
-  optionsCreator_doorModel,
-  optionsCreator_bottomBarAngleIron,
-  optionsCreator_bottomBarPlate,
-  optionsCreator_bottomBarAngleIron_303A,
-  optionsCreator_bottomBarPlate_303A,
-  optionsCreator_bottomBarAngleIron_303AS,
-  optionsCreator_bottomBarPlate_303AS,
-  optionsCreator_boxB_SJ302,
-  optionsCreator_boxB_SJ303A,
-  optionsCreator_boxB_SJ312,
-  optionsCreator_boxB_SJ305D,
-  optionsCreator_horsePower,
-  optionsCreator_quoteType,
-  lookup_options_bottomBarAngleIronAndPlate,
-  optionsCreator_doorModelName,
-  lookup_quoteType_doorModelName,
-} from 'js/utils/options/productOptions';
-
-import { checkIsSST, checkIsGalvanized } from '../library';
-
-import { createEmptyStateProd } from '../../emptyProdState';
-
-import { Toption } from 'js/utils/options/options';
-
-import { createEmptyComponentStateDict } from '../../emptyComponentState';
-
-import { handle__options_surface } from './handleProd/handle__options_surface';
+type TresError = AxiosError<TapiError>;
+type TerrRes = { title: string; content?: string };
 
 // ===========================================================================
 
 // MARK:reqGetProdCalcGeneralSpec
 const reqGetProdCalcGeneralSpec = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
-    return Promise.reject(null);
+    return Promise.reject({
+      title: '取得產品規格失敗',
+      content: `無效的門型`,
+    });
   }
 
   const prodData = classProd.data;
@@ -147,17 +68,20 @@ const reqGetProdCalcGeneralSpec = async (classProd: ClassProd) => {
 
   return await apiGetProdCalcGeneralSpec(body)
     .then((res) => res)
-    .catch(() => {
-      myAlert.err({ title: '取得產品規格失敗' });
+    .catch((err: TresError) => {
+      console.log(err);
 
-      return Promise.reject(null);
+      return Promise.reject({
+        title: '取得產品規格失敗',
+        content: err.response?.data.message,
+      });
     });
 };
 
 // MARK:reqGetAvailableComponents
 const reqGetAvailableComponents = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
-    return Promise.reject(null);
+    return Promise.reject({ title: '取得可用材料配件失敗', content: '無效的門型' });
   }
 
   const prodData = classProd.data;
@@ -171,10 +95,8 @@ const reqGetAvailableComponents = async (classProd: ClassProd) => {
 
   return await apiGetProdAvailableComponents(body)
     .then((res) => res)
-    .catch(() => {
-      myAlert.err({ title: '取得材料配件失敗' });
-
-      return Promise.reject(null);
+    .catch((err: TresError) => {
+      return Promise.reject({ title: '取得可用材料配件失敗', content: err.response?.data.message });
     });
 };
 
@@ -188,7 +110,9 @@ const reqGetBom = async (classProd: ClassProd) => {
 
   const componentInfoDict = Object.entries(componentDict).reduce((acc, [_key, component]) => {
     const key = _key as keyof TclassComponentDict;
+
     const { rawData, material, isPainted, type } = component;
+
     let materialSurface = component.materialSurface;
     const guideRailThickness = key === 'guideRail' ? classProd.data.guideRailThickness : undefined; // 門軌厚度
 
@@ -232,19 +156,17 @@ const reqGetBom = async (classProd: ClassProd) => {
     ...componentInfoDict,
   };
 
-  const res = await apiPostProdGenerateDoorProductBom(body).catch(() => {
+  return await apiPostProdGenerateDoorProductBom(body).catch((err: TresError) => {
     myAlert.err({ title: '取得BOM失敗' });
 
-    return null;
+    return Promise.reject({ title: '取得BOM失敗', content: err.response?.data.message });
   });
-
-  return res;
 };
 
 // MARK:reqGetBoxD
 const reqGetBoxD = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
-    return Promise.reject(null);
+    return Promise.reject({ title: '取得boxD失敗', content: '無效的門型' });
   }
 
   const body: TgetBoxDParams_strict = {
@@ -257,17 +179,15 @@ const reqGetBoxD = async (classProd: ClassProd) => {
 
   return await apiGetboxD(body)
     .then((res) => res.sidePlateSizeD)
-    .catch(() => {
-      myAlert.err({ title: '取得boxD失敗' });
-
-      return Promise.reject(null);
+    .catch((err: TresError) => {
+      return Promise.reject({ title: '取得boxD失敗', content: err.response?.data.message });
     });
 };
 
 // MARK:reqGetSlatCount
 const reqGetSlatCount = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
-    return Promise.reject(null);
+    return Promise.reject({ title: '門片數量失敗', content: '無效的門型' });
   }
 
   const body: TpcdsPrams = {
@@ -278,10 +198,8 @@ const reqGetSlatCount = async (classProd: ClassProd) => {
 
   return await apiGetProdCalcDetailSpec(body)
     .then((res) => res.slatCount)
-    .catch(() => {
-      myAlert.err({ title: '取得門片數量失敗' });
-
-      return Promise.reject(null);
+    .catch((err: TresError) => {
+      return Promise.reject({ title: '取得門片數量失敗', content: err.response?.data.message });
     });
 };
 
@@ -289,3 +207,4 @@ const reqGetSlatCount = async (classProd: ClassProd) => {
 // ===========================================================================
 // ===========================================================================
 export { reqGetProdCalcGeneralSpec, reqGetAvailableComponents, reqGetBom, reqGetBoxD, reqGetSlatCount };
+export type { TerrRes };

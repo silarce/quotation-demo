@@ -117,6 +117,7 @@ import { createEmptyComponentStateDict } from '../../emptyComponentState';
 import { handle__options_surface } from './handleProd/handle__options_surface';
 
 import {
+  TerrRes,
   reqGetProdCalcGeneralSpec,
   reqGetAvailableComponents,
   reqGetBom,
@@ -246,6 +247,7 @@ class ClassProd {
     // cloneDeep對效能的負擔太大了
     // this.state = _.cloneDeep(stateProd);
     this.state = stateProd;
+
     // this.data = this.state.data_prod;
     this.setState = setStateProd;
     this.nodeConfig = customizeNodeConfig({ nodeConfig });
@@ -263,9 +265,19 @@ class ClassProd {
 
         const availableComponents = await reqGetAvailableComponents(this);
         this.state.availableComponents = availableComponents;
-      } catch {
+      } catch (error) {
+        const err = error as TerrRes;
+
+        if ('title' in err) {
+          myAlert.err({ title: err.title, content: err.content });
+        } else {
+          throw err;
+        }
+
         this.state.generalSpecs = null;
+        this.clearGeneralSpec();
         this.state.availableComponents = null;
+        this.replaceToEmptyComponent();
       }
     }
 
@@ -468,11 +480,11 @@ class ClassProd {
   // ==========================================================================
   // region COMPONENT
 
-  protected clearComponent() {
-    this.state.availableComponents = null;
-    this.state.data_componentDict = {};
-    this.state.componentKeyArr = [];
-  }
+  // protected clearComponent() {
+  //   this.state.availableComponents = null;
+  //   this.state.data_componentDict = {};
+  //   this.state.componentKeyArr = [];
+  // }
 
   // MARK:afterAvailableComponentsUpdated_sideEffect
   protected afterAvailableComponentsUpdated_sideEffect(availableComponents: TdoorComponentListDto) {
@@ -633,17 +645,18 @@ class ClassProd {
       // 取得可用材料配件
       const availableComponents = await reqGetAvailableComponents(this);
 
-      // 更新可用材料配件
-      // this.state.availableComponents = availableComponents;
-      // if (this.state.availableComponents) {
-      //   Object.assign(this.state.availableComponents, availableComponents);
-      // } else {
-      //   this.state.availableComponents = availableComponents;
-      // }
       this.state.availableComponents = availableComponents;
 
       // 更新材料配件
       this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
+
+      const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
+
+      if (invalidComponentArr) {
+        const message = invalidComponentArr.join(', ');
+
+        throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
+      }
 
       const bom = await reqGetBom(this);
       this.state.generateDoorProductBom = bom;
@@ -652,16 +665,21 @@ class ClassProd {
 
       this.render();
     } catch (error) {
-      // alert(error);
-      // throw error;
-      // TODO: 重構報價單 處理reqChain_01的catch
+      const err = error as { title?: string; content?: string };
 
-      myAlert.err({ title: '取得資料失敗' });
-      console.log(error);
-      this.clearGeneralSpec();
-      this.clearComponent();
+      if (err && 'title' in err) {
+        myAlert.err({ title: err?.title, content: err?.content });
 
-      return Promise.reject(null);
+        this.clearGeneralSpec();
+        this.replaceToEmptyComponent();
+        this.state.availableComponents = null;
+
+        return Promise.reject(null);
+      } else {
+        myAlert.err({ title: '預期外的錯誤' });
+
+        throw error;
+      }
     }
   }
 
@@ -682,30 +700,33 @@ class ClassProd {
   async runAfterChange() {
     let afterChangeQueue = this.state.afterChangeQueue;
 
-    if (!afterChangeQueue) {
+    if (!afterChangeQueue || afterChangeQueue.length === 0) {
       return;
     }
 
     afterChangeQueue = _.uniq(afterChangeQueue);
 
     this.state.isFetching = true;
+
     this.render();
 
     let thisFuncName = '';
 
-    try {
-      for (const _funcName of afterChangeQueue) {
-        thisFuncName = _funcName;
-        const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
+    for (const _funcName of afterChangeQueue) {
+      thisFuncName = _funcName;
+      const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
 
+      try {
         await this[funcName]();
+      } catch (error) {
+        console.log(`${thisFuncName} failed`, error);
+        break;
       }
-    } catch (error) {
-      console.log(`${thisFuncName} failed`, error);
     }
 
     this.state.afterChangeQueue = undefined;
     this.state.isFetching = false;
+
     this.render();
   }
   // endregion API
@@ -1226,6 +1247,18 @@ class ClassProd {
 // ================================================================================
 // ================================================================================
 // ================================================================================
+
+const checkComponentRawData = (componentDict: Tdata_componentDict) => {
+  const arr: string[] = [];
+
+  Object.entries(componentDict).forEach(([key, com]) => {
+    if (!com.rawData) {
+      arr.push(key);
+    }
+  });
+
+  return arr.length === 0 ? null : arr;
+};
 
 // ================================================================================
 // ================================================================================
