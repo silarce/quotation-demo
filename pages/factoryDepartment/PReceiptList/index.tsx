@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './POrderList.module.scss';
+import scss from './PReceiptList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -63,8 +63,8 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
-export default function POrderList() {
-    const [pagename, setPagename] = useState<string>("採購單列表")
+export default function PReceiptList() {
+    const [pagename, setPagename] = useState<string>("進貨單列表")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -111,17 +111,17 @@ export default function POrderList() {
 
     //#region ===========【上方功能列】
     const panelList: TpanelList = [
-        {
-            type: 'addButton',
-            label: '新增採購單',
-            onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrderList`,
-                    query: {
-                    },
-                });
-            },
-        },
+        // {
+        //     type: 'addButton',
+        //     label: '新增採購單',
+        //     onClick: () => {
+        //         router.push({
+        //             pathname: `/factoryDepartment/addPurchaseOrderList`,
+        //             query: {
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -139,7 +139,7 @@ export default function POrderList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "詢價中",
+                type: "進貨中",
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -152,7 +152,7 @@ export default function POrderList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderWithReviews?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdReceiptWithReviews?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -175,7 +175,7 @@ export default function POrderList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaseorderuuid: id as string | undefined,
+                prodreceiptuuid: id as string | undefined,
             };
 
 
@@ -187,12 +187,13 @@ export default function POrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdReceiptDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const responsedata = await response.json();
             // setData1(data);
+            console.log(data);
             return responsedata
 
             console.log()
@@ -317,6 +318,7 @@ export default function POrderList() {
 
     const handlePanelClick = async (id: number) => {
         const detailData = await GetDetailById(id);
+        console.log(detailData);
         setDetails((prevDetails) => ({
             ...prevDetails,
             [id]: detailData,
@@ -355,7 +357,7 @@ export default function POrderList() {
         // 模糊查詢請購單號
         if (id) {
             filteredData = filteredData.filter(item =>
-                item.purchaseorderid.toString().includes(id)
+                item.prodreceiptid.toString().includes(id)
             );
         }
 
@@ -509,7 +511,7 @@ export default function POrderList() {
                                     className={scss.customCollapse}
                                     onChange={(key) => {
                                         if (key.includes("1")) {
-                                            handlePanelClick(_item.purchaseorderuuid);
+                                            handlePanelClick(_item.prodreceiptuuid);
                                         }
                                     }}
                                 >
@@ -522,10 +524,10 @@ export default function POrderList() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row01} 
-                                                ${_item.purchaseorderuuid === selectedItemId ? scss.selectedRow : ''}`}
+                                                ${_item.prodreceiptuuid === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span style={{ fontSize: '18px' }}>{_item.purchaseorderid}</span>
+                                                    <span style={{ fontSize: '18px' }}>{_item.prodreceiptid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>
@@ -542,7 +544,7 @@ export default function POrderList() {
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({
-                                                                pathname: `/factoryDepartment/POrderDetail`,
+                                                                pathname: `/factoryDepartment/PReceiptDetail`,
                                                                 query: {
                                                                     item: JSON.stringify(_item),
                                                                 },
@@ -674,7 +676,7 @@ export default function POrderList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th style={{ width: '150px' }}>已進</th>
+                                                        <th style={{ width: '150px' }}>已入</th>
                                                         <th style={{ width: '150px' }}>數量</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
@@ -683,7 +685,7 @@ export default function POrderList() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {details[_item.purchaseorderuuid]?.map((detail: any, detailIndex: number) => (
+                                                    {details[_item.prodreceiptuuid]?.map((detail: any, detailIndex: number) => (
                                                         <tr key={detailIndex}>
                                                             <td style={{ width: '50px' }}>{detailIndex + 1}</td>
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>

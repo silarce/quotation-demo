@@ -318,8 +318,8 @@ export default function AddPurchaseRequisitionList() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                setidin(result.purchaserequisitionid);
-                setuuidin(result.purchaserequisitionuuid);
+                setidin(result.id);
+                setuuidin(result.uuid);
                 setStatus("詢價中");
                 router.push({
                     pathname: `/factoryDepartment/PRequisitionList`,
@@ -340,6 +340,12 @@ export default function AddPurchaseRequisitionList() {
         }
     };
 
+    //#endregion
+
+    //#region ===========【單據功能區】
+    const handleAdd = () => {
+        Add();
+    }
     //#endregion
 
     //#region ===========【明細功能區】
@@ -377,7 +383,7 @@ export default function AddPurchaseRequisitionList() {
     };
 
     // 從明細移除
-    const handleRemove = (index: number, item: any) => {
+    const handleRemoveDetail = (index: number, item: any) => {
         myAlert.confirm({
             title: '確定移除?',
             props: {
@@ -552,7 +558,7 @@ export default function AddPurchaseRequisitionList() {
                                 display: `${status === "" ? '' : 'none'}`
                             }}
                             onClick={() => {
-                                Add();
+                                handleAdd();
                             }}
                         >
                             儲存
@@ -772,8 +778,8 @@ export default function AddPurchaseRequisitionList() {
                                     <span>規格</span>
                                     <span>數量</span>
                                     <span>單位</span>
-                                    <span>單價</span>
-                                    <span>總價</span>
+                                    {/* <span>單價</span>
+                                    <span>總價</span> */}
                                     <span>備註(用途說明)</span>
                                     <span></span>
                                     <span></span>
@@ -786,7 +792,7 @@ export default function AddPurchaseRequisitionList() {
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -866,7 +872,7 @@ export default function AddPurchaseRequisitionList() {
                                                             }}
                                                         />
                                                     </span>
-                                                    <span>
+                                                    {/* <span>
                                                         <input
                                                             ref={unitpriceRefs.current[index]}
                                                             style={{
@@ -896,10 +902,10 @@ export default function AddPurchaseRequisitionList() {
                                                             // readOnly={!isEditing}
                                                             readOnly
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "totalprice", e.target.value);
                                                             }}
                                                         />
-                                                    </span>
+                                                    </span> */}
                                                     <span>
                                                         <input
                                                             ref={noteRefs.current[index]}
@@ -942,7 +948,7 @@ export default function AddPurchaseRequisitionList() {
                                             overflowY: 'auto',
                                             marginTop: '0px',
                                             left: '20px',
-                                            position: 'absolute',
+                                            position: 'sticky',
                                             width: '1000px',
                                             backgroundColor: 'white',
                                             zIndex: 1004,
