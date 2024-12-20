@@ -37,7 +37,7 @@ import type {
 } from './type';
 
 // import { lookup_classProd } from './class/prod/lookup_classProd';
-import { ClassProd_interfact } from './class/prod/classProd_remake';
+import { ClassProd } from './class/prod/classProd_remake';
 import {
   Interface_ClassProd_base,
   Interface_ClassProd_base2,
@@ -447,7 +447,7 @@ const useQuotationProduct = ({
       //   nodeConfig: nodeConfig_prime,
       // });
 
-      const classProd = new ClassProd_interfact({
+      const classProd = new ClassProd({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
         nodeConfig: nodeConfig_prime,
@@ -819,7 +819,7 @@ const createClassComponentDict_v2 = ({
   createSetComponent,
 }: {
   // activedClassProd: Interface_ClassProd_prime;
-  activedClassProd: ClassProd_interfact;
+  activedClassProd: ClassProd;
   createSetComponent: TcreateSetComponent;
 }) => {
   const data_componentDict = activedClassProd.state.data_componentDict;

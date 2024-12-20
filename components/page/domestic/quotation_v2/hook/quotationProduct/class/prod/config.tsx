@@ -24,7 +24,7 @@ import {
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
 import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from '../component/classComponent_base';
 
-import { ClassProd_interfact } from './classProd_remake';
+import { ClassProd } from './classProd_remake';
 
 import {
   optionsCreator_doorModel,
@@ -62,13 +62,13 @@ interface TconfigItem_prod {
   className?: string;
   createNode: (params: {
     //
-    classProd: ClassProd_interfact;
+    classProd: ClassProd;
     disabled: boolean;
   }) => React.ReactNode;
 }
 
 type TcellKey = keyof Pick<
-  ClassProd_interfact,
+  ClassProd,
   | 'itemName' // 項目名
   | 'discount' // 折數
   | 'quoteType' // 報價別

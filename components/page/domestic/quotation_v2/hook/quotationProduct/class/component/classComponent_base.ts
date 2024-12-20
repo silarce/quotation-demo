@@ -20,7 +20,7 @@ import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/uti
 
 import { checkIsSST, checkIsGalvanized } from '../library';
 
-import { ClassProd_interfact } from '../prod/classProd_remake';
+import { ClassProd } from '../prod/classProd_remake';
 
 // ========================================================================
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
@@ -87,8 +87,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     // this.setState((prev) => ({ ...this.state })); // 這樣不行 // 莫名其妙
   };
 
-  protected classProd: ClassProd_interfact | undefined;
-  setClassProd(classProd: ClassProd_interfact) {
+  protected classProd: ClassProd | undefined;
+  setClassProd(classProd: ClassProd) {
     this.classProd = classProd;
   }
 

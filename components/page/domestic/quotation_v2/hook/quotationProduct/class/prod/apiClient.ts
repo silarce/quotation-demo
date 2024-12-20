@@ -1,4 +1,4 @@
-import { ClassProd_1 } from './classProd_remake';
+import { ClassProd } from './classProd_remake';
 
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -121,7 +121,7 @@ import { handle__options_surface } from './handleProd/handle__options_surface';
 // ===========================================================================
 
 // MARK:reqGetProdCalcGeneralSpec
-const reqGetProdCalcGeneralSpec = async (classProd: ClassProd_1) => {
+const reqGetProdCalcGeneralSpec = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
     return Promise.reject(null);
   }
@@ -155,7 +155,7 @@ const reqGetProdCalcGeneralSpec = async (classProd: ClassProd_1) => {
 };
 
 // MARK:reqGetAvailableComponents
-const reqGetAvailableComponents = async (classProd: ClassProd_1) => {
+const reqGetAvailableComponents = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
     return Promise.reject(null);
   }
@@ -179,7 +179,7 @@ const reqGetAvailableComponents = async (classProd: ClassProd_1) => {
 };
 
 // MARK:reqGetBom
-const reqGetBom = async (classProd: ClassProd_1) => {
+const reqGetBom = async (classProd: ClassProd) => {
   const prodData = classProd.data;
 
   const componentDict = classProd.state.data_componentDict;
@@ -242,7 +242,7 @@ const reqGetBom = async (classProd: ClassProd_1) => {
 };
 
 // MARK:reqGetBoxD
-const reqGetBoxD = async (classProd: ClassProd_1) => {
+const reqGetBoxD = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
     return Promise.reject(null);
   }
@@ -265,7 +265,7 @@ const reqGetBoxD = async (classProd: ClassProd_1) => {
 };
 
 // MARK:reqGetSlatCount
-const reqGetSlatCount = async (classProd: ClassProd_1) => {
+const reqGetSlatCount = async (classProd: ClassProd) => {
   if (!classProd.isValid_doorModel) {
     return Promise.reject(null);
   }

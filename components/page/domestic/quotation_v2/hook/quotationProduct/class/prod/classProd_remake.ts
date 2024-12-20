@@ -198,8 +198,12 @@ const customizeNodeConfig = ({ nodeConfig }: { nodeConfig: TnodeConfig }) => {
 // ================================================================================
 // ================================================================================
 
-// MARK:ClassProd_1
-class ClassProd_1 {
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+
+class ClassProd {
   readonly state: TstateProd;
   protected readonly setState: React.Dispatch<React.SetStateAction<TstateProd>>;
   protected render() {
@@ -263,7 +267,7 @@ class ClassProd_1 {
 
   // ---------------------------------------------------------------------------
 
-  calcArea(classProd: ClassProd_1) {
+  calcArea(classProd: ClassProd) {
     const fullWidth = classProd.fullWidth_mm;
     const height = classProd.height_mm;
     const boxb = classProd.boxB_mm;
@@ -326,9 +330,9 @@ class ClassProd_1 {
 
     return isInit;
   }
-  get doorModelName() {
-    return this.data.doorModelName;
-  }
+  // get doorModelName() {
+  //   return this.data.doorModelName;
+  // }
   get fullWidth_mm() {
     return new Decimal(this.data.fullWidth || 0).mul(1000).toNumber();
   }
@@ -450,15 +454,8 @@ class ClassProd_1 {
 
     this.render();
   }
-}
-
-// ================================================================================
-// MARK:ClassProd_spec
-//
-//
-//
-//
-class ClassProd_spec extends ClassProd_1 {
+  // ==========================================================================
+  // region SPEC
   protected clearGeneralSpec() {
     this.data.gapA = '';
     this.data.gapC = '';
@@ -547,13 +544,10 @@ class ClassProd_spec extends ClassProd_1 {
 
     return this;
   }
-}
+  // endregion SPEC
+  // ==========================================================================
+  // region COMPONENT
 
-// ================================================================================
-// ================================================================================
-
-// MARK:ClassProd_component
-class ClassProd_component extends ClassProd_spec {
   protected clearComponent() {
     this.state.availableComponents = null;
     this.state.data_componentDict = {};
@@ -627,11 +621,11 @@ class ClassProd_component extends ClassProd_spec {
     this.state.componentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
     this.render();
   }
-}
+  // endregion COMPONENT
 
-// MARK:ClassProd_api
-class ClassProd_api extends ClassProd_component {
-  // -----------------------------------------------------------------------------
+  // ==========================================================================
+  // region API
+
   protected async reqChain_01() {
     try {
       const generalSpec = await reqGetProdCalcGeneralSpec(this);
@@ -726,10 +720,11 @@ class ClassProd_api extends ClassProd_component {
     this.state.isFetching = false;
     this.render();
   }
-}
-// ================================================================================
-// MARK:ClassProd_interfact
-class ClassProd_interfact extends ClassProd_api {
+  // endregion API
+
+  // ==========================================================================
+  // region interface
+
   get key() {
     return this.state.key;
   }
@@ -1152,15 +1147,14 @@ class ClassProd_interfact extends ClassProd_api {
     this.render();
   }
 }
+// MARK: END
 
 // ================================================================================
 // ================================================================================
 // ================================================================================
 // ================================================================================
 
-// ================================================================================
-
-const createOptions_material = (classProd: ClassProd_1) => {
+const createOptions_material = (classProd: ClassProd) => {
   const doorModel = classProd.state.doorModel;
 
   if (!doorModel) {
@@ -1192,7 +1186,7 @@ const createOptions_material = (classProd: ClassProd_1) => {
 // ================================================================================
 // ================================================================================
 
-export { ClassProd_1, ClassProd_interfact, ClassProd_component };
+export { ClassProd };
 
 // export type {
 //   Interface_ClassProd_base,

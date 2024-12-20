@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { ClassProd_1 } from '../classProd_remake';
+import { ClassProd } from '../classProd_remake';
 
 import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
 import {
@@ -8,7 +8,7 @@ import {
   checkIsGalvanized,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/library';
 
-const createOptions_surface = (classProd: ClassProd_1) => {
+const createOptions_surface = (classProd: ClassProd) => {
   let options = optionsCreator_surface_onlyPaint();
 
   const isSST = checkIsSST(classProd.data.materialName);
@@ -25,7 +25,7 @@ const createOptions_surface = (classProd: ClassProd_1) => {
   return options;
 };
 
-const createOptions_surface_SJ305D = (classProd: ClassProd_1) => {
+const createOptions_surface_SJ305D = (classProd: ClassProd) => {
   let options = optionsCreator_surface_onlyPaint();
 
   const isSST = checkIsSST(classProd.data.materialName);
