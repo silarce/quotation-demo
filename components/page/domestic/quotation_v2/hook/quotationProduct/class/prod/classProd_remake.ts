@@ -692,7 +692,7 @@ class ClassProd {
       classComponent.init();
     });
 
-    this.render();
+    // this.render();
   } // handleAvailableComponentsUpdated
 
   protected replaceToEmptyComponent() {
@@ -742,12 +742,12 @@ class ClassProd {
     this.state.componentKeyArr.length = 0;
     this.state.componentKeyArr.push(...newComponentKeyArr);
 
-    this.render();
+    // this.render();
   }
 
   resetComponentKeyArr() {
     this.state.componentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
-    this.render();
+    // this.render();
   }
 
   get isComponentValid() {
@@ -804,62 +804,17 @@ class ClassProd {
     return pass;
   }
 
+  // MARK:reqChain_01
   protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
     try {
-      const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp }).catch((err) => {
-        this.clearGeneralSpec();
-
-        throw err;
-      });
-      // 取得generalSpec
-      this.state.generalSpecs = generalSpec;
-
-      // 送入generalSpec更新state
-      this.afterUpdateGeneralSpec_sideEffect(this.state.generalSpecs);
-      this.renewPhase();
-      this.renewDistributionBoxPrice();
-
-      // 取得boxD並更新state
-      const boxD = await reqGetBoxD(this);
-      this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
-
-      // 取得slatCount並更新state
-      const slatCount = await reqGetSlatCount(this);
-      this.data.slatCount = slatCount === null ? null : `${slatCount}`;
-
-      // 取得可用材料配件
-      const availableComponents = await reqGetAvailableComponents(this);
-      this.state.availableComponents = availableComponents;
-
-      this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
-
-      // 更新材料配件
-      this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
-      const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
-
-      if (invalidComponentArr) {
-        const message = invalidComponentArr.join(', ');
-        this.replaceToEmptyComponent();
-        this.state.availableComponents = null;
-
-        throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
-      }
-
-      const bom = await reqGetBom(this);
-      this.state.generateDoorProductBom = bom;
-
-      Object.values(this.classComponentDict).forEach((classComponent) => classComponent.onBomUpdate());
-
-      this.render();
+      await this.updateProductSpec({ withHp });
+      await this.updateAvailableComponents();
+      await this.updateBom();
     } catch (error) {
       const err = error as { title?: string; content?: string };
 
       if (err && 'title' in err) {
         myAlert.err({ title: err?.title, content: err?.content });
-
-        // this.clearGeneralSpec();
-        // this.replaceToEmptyComponent();
-        // this.state.availableComponents = null;
 
         return Promise.reject(null);
       } else {
@@ -870,8 +825,68 @@ class ClassProd {
     }
   }
 
+  // MARK:reqChain_01_withHp
   reqChain_01_withHp() {
     return this.reqChain_01({ withHp: true });
+  }
+
+  // MARK:updateProductSpec
+  async updateProductSpec({ withHp }: { withHp?: boolean } = {}) {
+    const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp }).catch((err) => {
+      this.clearGeneralSpec();
+
+      throw err;
+    });
+    // 取得generalSpec
+    this.state.generalSpecs = generalSpec;
+
+    // 送入generalSpec更新state
+    this.afterUpdateGeneralSpec_sideEffect(this.state.generalSpecs);
+    this.renewPhase();
+    this.renewDistributionBoxPrice();
+
+    // 取得boxD並更新state
+    const boxD = await reqGetBoxD(this);
+    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
+
+    // 取得slatCount並更新state
+    const slatCount = await reqGetSlatCount(this);
+    this.data.slatCount = slatCount === null ? null : `${slatCount}`;
+  }
+
+  // MARK:updateAvailableComponents
+  async updateAvailableComponents() {
+    // 取得可用材料配件
+    const availableComponents = await reqGetAvailableComponents(this).catch((err) => {
+      this.replaceToEmptyComponent();
+      this.state.availableComponents = null;
+
+      throw err;
+    });
+
+    this.state.availableComponents = availableComponents;
+
+    this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
+
+    // 更新材料配件
+    this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
+    const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
+
+    if (invalidComponentArr) {
+      const message = invalidComponentArr.join(', ');
+      this.replaceToEmptyComponent();
+      this.state.availableComponents = null;
+
+      throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
+    }
+  }
+
+  // MARK:updateBom
+  async updateBom() {
+    const bom = await reqGetBom(this);
+    this.state.generateDoorProductBom = bom;
+
+    Object.values(this.classComponentDict).forEach((classComponent) => classComponent.onBomUpdate());
   }
 
   // ---------------------------------------------------------------------------
