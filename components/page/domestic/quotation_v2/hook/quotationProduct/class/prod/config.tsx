@@ -368,18 +368,19 @@ const nodeConfig_origin: TnodeConfig = {
       width: 80,
     },
     createNode({ disabled, classProd }) {
-      const selectProps: TinputSelProps['selectProps'] = {
+      disabled = classProd.isSpecial ? disabled : true;
+
+      const inputProps: TinputSelProps['inputProps'] = {
         props: {
-          options: undefined,
-          value: classProd.boxD ? { value: classProd.boxD, label: classProd.boxD } : null,
-          onChange: (option) => {
-            const value = (option?.value || '') as `${number}` | '';
-            classProd.boxD = value;
+          type: 'number',
+          value: classProd.boxD ?? '',
+          onChange: (e) => {
+            classProd.boxD = e.target.value as `${number}` | '';
           },
         },
       };
 
-      return <InputSel_prod_memo_select disabled={disabled} selectProps={selectProps} />;
+      return <InputSel_prod disabled={disabled} inputProps={inputProps} />;
     },
   },
 

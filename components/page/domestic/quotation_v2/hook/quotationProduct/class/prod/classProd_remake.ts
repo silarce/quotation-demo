@@ -210,6 +210,7 @@ const customizeNodeConfig = ({ nodeConfig }: { nodeConfig: TnodeConfig }) => {
 // ================================================================================
 // ================================================================================
 
+// MARK:ClassProd
 class ClassProd {
   readonly state: TstateProd;
   protected readonly setState: React.Dispatch<React.SetStateAction<TstateProd>>;
@@ -935,7 +936,7 @@ class ClassProd {
   // ==========================================================================
   // ==========================================================================
   // ==========================================================================
-  // region interface
+  // region INTERFACE
 
   get isValid_doorModel(): boolean {
     const isValid = (this.state.doorModel?.name || 'undefined') in doorModelNameLookup;
@@ -960,6 +961,10 @@ class ClassProd {
   }
 
   // ----------------------------------------------------------------
+
+  // region options
+
+  // 未來若要電相或馬達廠商的選項，從availableComponents過濾出來
 
   get options_material() {
     const doorModel = this.state.doorModel;
@@ -1012,6 +1017,10 @@ class ClassProd {
   get options_horsepower() {
     if (this.isSpecial) {
       return optionsCreator_horsePower();
+    }
+
+    if (this.doorModelName === 'W2') {
+      return undefined;
     }
 
     const motorArr = this.state.availableComponents?.motors;
