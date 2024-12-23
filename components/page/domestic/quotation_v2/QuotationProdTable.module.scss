@@ -1,6 +1,6 @@
 .prodTableWrapper {
   position: relative;
-  z-index: 3;
+  z-index: 4;
 }
 .prodTable {
   // position: relative;
@@ -12,10 +12,12 @@
 }
 
 .componentTable {
+  position: relative;
   width: 100%;
   height: 350px;
   overflow: auto;
   border: solid 1px theme("colors.border");
+  z-index: 3;
 }
 .accessoryTable {
   width: 100%;
