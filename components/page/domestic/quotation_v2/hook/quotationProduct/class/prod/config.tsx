@@ -414,40 +414,12 @@ const nodeConfig_origin: TnodeConfig = {
       const v = classProd.horsepower;
       const value = v ? { value: v, label: v } : null;
 
-      const motorArr = classProd.state.availableComponents?.motors;
-
-      let options: Toption[] | undefined = undefined;
-
-      if (motorArr) {
-        let hpArr = motorArr.map((motor) => motor.horsePower);
-        hpArr = _.uniq(hpArr);
-
-        const theIndex = hpArr.indexOf('1.5HP');
-
-        if (theIndex > -1) {
-          hpArr[theIndex] = '1 1/2HP';
-        }
-
-        // optionsCreator_horsePower是已經排序好的options
-        // 這樣處理省下排序的麻煩
-        options = optionsCreator_horsePower();
-        options = options.filter((hp) => {
-          return hpArr.includes(hp.value);
-        });
-
-        // 如果hp中含有options中沒有的值，就加進options
-        hpArr.forEach((hp) => {
-          if (!options?.find((option) => option.value === hp)) {
-            options?.push({ value: hp, label: hp });
-          }
-        });
-      }
-
       const inputSeleProps: TinputSelProps = {
         disabled,
         selectProps: {
           props: {
-            options,
+            isSearchable: classProd.isSpecial,
+            options: classProd.options_horsepower,
             value,
             onChange: (option) => {
               const value = option?.value || '';
@@ -650,8 +622,8 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
-            // options的label要加上單位't';
-            options: [],
+            isSearchable: classProd.isSpecial,
+            options: classProd.options_guideRailThickness,
             value,
             onChange: (option) => {
               const value = option?.value || '';
@@ -678,8 +650,8 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
-            // options的label要加上單位't';
-            options: [],
+            isSearchable: classProd.isSpecial,
+            options: classProd.options_headBoxThickness,
             value,
             onChange: (option) => {
               const value = option?.value || '';

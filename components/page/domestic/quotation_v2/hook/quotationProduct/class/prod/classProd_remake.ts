@@ -446,6 +446,7 @@ class ClassProd {
     this.render();
   }
 
+  // 更新電相
   protected renewPhase() {
     const hp = this.data.horsepower as keyof typeof lookup_hpToGapAGapC;
     const hpValue = lookup_hpToGapAGapC[hp].HPValue;
@@ -455,6 +456,7 @@ class ClassProd {
     this.data.motorPhase = phase;
   }
 
+  // 更新配電箱牌價
   protected renewDistributionBoxPrice() {
     const hp = this.data.horsepower as keyof typeof lookup_hpToGapAGapC;
     const hpValue = lookup_hpToGapAGapC[hp].distributionBoxPrice;
@@ -828,6 +830,8 @@ class ClassProd {
       const availableComponents = await reqGetAvailableComponents(this);
       this.state.availableComponents = availableComponents;
 
+      this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
+
       // 更新材料配件
       this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
       const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
@@ -1001,6 +1005,106 @@ class ClassProd {
     // }
 
     const options = handle__options_surface(this.doorModelName)(this);
+
+    return options;
+  }
+
+  get options_horsepower() {
+    if (this.isSpecial) {
+      return optionsCreator_horsePower();
+    }
+
+    const motorArr = this.state.availableComponents?.motors;
+
+    if (!motorArr) {
+      return undefined;
+    }
+
+    let options: Toption[] = motorArr.map((motor) => {
+      let { horsePower } = motor;
+
+      if (horsePower === '1.5HP') {
+        horsePower = '1 1/2HP';
+      }
+
+      return {
+        value: horsePower,
+        label: horsePower,
+      };
+    });
+
+    options = _.uniqBy(options, (option) => option.value);
+
+    options = _.sortBy(options, (option) => {
+      const hp = option.value as keyof typeof lookup_hpToGapAGapC;
+      const hpValue = lookup_hpToGapAGapC[hp].HPValue;
+
+      return hpValue;
+    });
+
+    return options;
+  }
+
+  // 這個基本上只有在更新材料配件時會用到
+  get options_motorVoltage() {
+    const motorArr = this.state.availableComponents?.motors;
+
+    if (!motorArr) {
+      return undefined;
+    }
+
+    let options: Toption[] = motorArr.map((motor) => {
+      const { voltage } = motor;
+
+      return {
+        value: String(voltage ?? ''),
+        label: voltage === 220 ? '220V' : voltage === 380 ? '380V' : `${voltage ?? ''}`,
+      };
+    });
+
+    options = _.uniqBy(options, (option) => option.value);
+
+    return options;
+  }
+
+  get options_headBoxThickness() {
+    const headBoxes = this.state.availableComponents?.headBoxes;
+
+    if (!headBoxes) {
+      return undefined;
+    }
+
+    let options: Toption[] = headBoxes.map((headBox) => {
+      const { thickness } = headBox;
+
+      return {
+        value: thickness,
+        label: `${thickness} t`,
+      };
+    });
+
+    options = _.uniqBy(options, (option) => option.value);
+
+    return options;
+  }
+
+  get options_guideRailThickness() {
+    const guideRails = this.state.availableComponents?.guideRails;
+
+    if (!guideRails) {
+      return undefined;
+    }
+
+    let options: Toption[] = guideRails.map((guideRail) => {
+      const { thickness } = guideRail;
+
+      return {
+        value: thickness ?? '',
+        label: `${thickness} t`,
+      };
+    });
+
+    options = _.uniqBy(options, (option) => option.value);
 
     return options;
   }
@@ -1255,6 +1359,12 @@ class ClassProd {
     }
 
     this.data.horsepower = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
 
     this.renewPhase();
     this.renewDistributionBoxPrice();
