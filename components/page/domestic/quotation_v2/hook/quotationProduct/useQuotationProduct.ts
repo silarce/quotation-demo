@@ -609,6 +609,7 @@ const useQuotationProduct = ({
     if (disabled) {
       setState_prodDict(defaultState_copy.stateProdDict);
       setProdKeyArr(defaultState_copy.prodKeyArr);
+      setActiveProdKey(undefined);
     }
   }, [defaultState_copy, disabled]);
 
