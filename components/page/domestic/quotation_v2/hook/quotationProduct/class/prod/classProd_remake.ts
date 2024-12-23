@@ -358,44 +358,62 @@ class ClassProd {
     Object.clearAndAssign(this.state, newState);
   }
 
-  clearState_keepsome() {
-    const newState = createEmptyStateProd(this.state.key);
+  clearState_some() {
+    // const newState = createEmptyStateProd(this.state.key);
 
     const data_prod = this.state.data_prod;
 
-    newState.afterChangeQueue = this.state.afterChangeQueue;
-    newState.isFetching = this.state.isFetching;
+    data_prod.boxB = '';
+    data_prod.boxD = '';
+    data_prod.area = null;
+    data_prod.volume = null;
+    data_prod.horsepower = '';
+    data_prod.motorVendor = null;
+    data_prod.motorVoltage = null;
+    data_prod.motorPhase = null;
+    data_prod.slatCount = null;
 
-    newState.doorModel = this.state.doorModel;
-    newState.data_prod.doorModelName = data_prod.doorModelName;
-
-    newState.data_componentDict = this.state.data_componentDict;
+    this.clearGeneralSpec();
     this.replaceToEmptyComponent();
-    newState.componentKeyArr = this.state.componentKeyArr;
 
-    newState.data_accessoryDict = this.state.data_accessoryDict;
-    newState.accessoryKeyArr = this.state.accessoryKeyArr;
+    this.render();
 
-    newState.data_prod.itemName = data_prod.itemName;
-    newState.data_prod.discount = data_prod.discount;
-    newState.data_prod.quoteType = data_prod.quoteType;
+    // const data_prod = this.state.data_prod;
 
-    newState.data_prod.fullWidth = data_prod.fullWidth;
-    newState.data_prod.height = data_prod.height;
-    newState.data_prod.WG = data_prod.WG;
+    // newState.afterChangeQueue = this.state.afterChangeQueue;
+    // newState.isFetching = this.state.isFetching;
 
-    newState.data_prod.materialName = data_prod.materialName;
-    newState.data_prod.materialSurface = data_prod.materialSurface;
+    // newState.doorModel = this.state.doorModel;
+    // newState.data_prod.doorModelName = data_prod.doorModelName;
 
-    newState.data_prod.isAntiTyphoon = data_prod.isAntiTyphoon;
-    newState.data_prod.bounceDoorWidth = data_prod.bounceDoorWidth;
-    newState.data_prod.closingType = data_prod.closingType;
-    newState.data_prod.notes = data_prod.notes;
-    newState.data_prod.isIntegratedHeadBox = data_prod.isIntegratedHeadBox;
-    newState.data_prod.isULGuideRail = data_prod.isULGuideRail;
-    newState.data_prod.hasSilencingStrip = data_prod.hasSilencingStrip;
+    // newState.data_componentDict = this.state.data_componentDict;
+    // this.replaceToEmptyComponent();
+    // newState.componentKeyArr = this.state.componentKeyArr;
 
-    Object.clearAndAssign(this.state, newState);
+    // newState.data_accessoryDict = this.state.data_accessoryDict;
+    // newState.accessoryKeyArr = this.state.accessoryKeyArr;
+
+    // newState.data_prod.itemName = data_prod.itemName;
+    // newState.data_prod.discount = data_prod.discount;
+    // newState.data_prod.quoteType = data_prod.quoteType;
+
+    // newState.data_prod.fullWidth = data_prod.fullWidth;
+    // newState.data_prod.height = data_prod.height;
+    // newState.data_prod.WG = data_prod.WG;
+
+    // newState.data_prod.materialName = data_prod.materialName;
+    // newState.data_prod.materialSurface = data_prod.materialSurface;
+    // newState.data_prod.guideRail = data_prod.guideRail;
+
+    // newState.data_prod.isAntiTyphoon = data_prod.isAntiTyphoon;
+    // newState.data_prod.bounceDoorWidth = data_prod.bounceDoorWidth;
+    // newState.data_prod.closingType = data_prod.closingType;
+    // newState.data_prod.notes = data_prod.notes;
+    // newState.data_prod.isIntegratedHeadBox = data_prod.isIntegratedHeadBox;
+    // newState.data_prod.isULGuideRail = data_prod.isULGuideRail;
+    // newState.data_prod.hasSilencingStrip = data_prod.hasSilencingStrip;
+
+    // Object.clearAndAssign(this.state, newState);
   }
 
   // ---------------------------------------------------------------------------
@@ -1026,7 +1044,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState_keepsome();
+    this.clearState_some();
 
     this.data.area = this.calcArea(this);
 
@@ -1084,7 +1102,7 @@ class ClassProd {
 
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
-    this.clearState_keepsome();
+    this.clearState_some();
     this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01_withHp');
 
     this.render();
@@ -1102,7 +1120,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState_keepsome();
+    this.clearState_some();
 
     this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01');
     this.render();
