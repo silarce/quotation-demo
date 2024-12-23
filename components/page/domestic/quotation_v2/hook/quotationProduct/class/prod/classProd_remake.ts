@@ -966,6 +966,17 @@ class ClassProd {
 
   // 未來若要電相或馬達廠商的選項，從availableComponents過濾出來
 
+  get options_bottomBarAngleIron() {
+    const doorModelName = this.data.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+    return lookup_options_bottomBarAngleIronAndPlate[doorModelName]?.angleIron();
+  }
+  get options_bottomBarPlate() {
+    const doorModelName = this.data.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+    return lookup_options_bottomBarAngleIronAndPlate[doorModelName]?.plate();
+  }
+
   get options_material() {
     const doorModel = this.state.doorModel;
 
@@ -1306,7 +1317,7 @@ class ClassProd {
   }
 
   get thickness() {
-    return `999` as `${number}`;
+    return this.data.thickness;
   }
 
   get materialName() {
@@ -1493,9 +1504,10 @@ class ClassProd {
   get isAntiTyphoon() {
     return this.data.isAntiTyphoon;
   }
-  // set isAntiTyphoon(value) {
-  //   this.setData_simple('isAntiTyphoon', value);
-  // }
+  set isAntiTyphoon(value) {
+    this.data.isAntiTyphoon = value;
+    this.render();
+  }
 
   get bounceDoorWidth() {
     return this.data.bounceDoorWidth;

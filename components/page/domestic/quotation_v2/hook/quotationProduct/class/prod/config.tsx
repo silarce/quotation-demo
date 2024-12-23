@@ -500,10 +500,10 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.isAntiTyphoon}
-          // onChange={(e) => {
-          //   classProd.isAntiTyphoon = e.target.checked;
-          // }}
-          disabled={true}
+          onChange={(e) => {
+            classProd.isAntiTyphoon = e.target.checked;
+          }}
+          disabled={disabled}
         />
       );
     },
@@ -519,10 +519,10 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.hasSilencingStrip}
-          // onChange={(e) => {
-          //   classProd.hasSilencingStrip = e.target.checked;
-          // }}
-          disabled={true}
+          onChange={(e) => {
+            classProd.hasSilencingStrip = e.target.checked;
+          }}
+          disabled={disabled}
         />
       );
     },
@@ -533,7 +533,7 @@ const nodeConfig_origin: TnodeConfig = {
     style: {
       width: 100,
     },
-    createNode({ disabled, classProd }) {
+    createNode({ classProd }) {
       return classProd.thickness + ' t';
     },
   },
@@ -546,7 +546,9 @@ const nodeConfig_origin: TnodeConfig = {
     createNode({ disabled, classProd }) {
       const v = classProd.materialName;
 
-      const inputSelProps: TinputSelProps = {
+      const value = v ? { value: v, label: v } : null;
+
+      const inputSelProps_input: TinputSelProps = {
         disabled: false,
         inputProps: {
           props: {
@@ -559,7 +561,22 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod {...inputSelProps} />;
+      const inputSelProps_select: TinputSelProps = {
+        disabled: false,
+        selectProps: {
+          props: {
+            value,
+            options: classProd.options_material,
+            onChange: (option) => {
+              classProd.materialName = option?.value ?? '';
+            },
+          },
+        },
+      };
+
+      const inputSelProps = classProd.isSpecial ? inputSelProps_input : inputSelProps_select;
+
+      return <InputSel_prod disabled={disabled} {...inputSelProps} />;
     },
   },
 
@@ -572,11 +589,21 @@ const nodeConfig_origin: TnodeConfig = {
       const v = classProd.materialSurface;
       const value = v ? { value: v, label: v } : null;
 
-      const inputSelProps: TinputSelProps = {
-        disabled,
+      const inputSelProps_input: TinputSelProps = {
+        inputProps: {
+          props: {
+            value: v ?? '',
+            onChange: (e) => {
+              classProd.materialSurface = e.target.value;
+            },
+          },
+        },
+      };
+
+      const inputSelProps_select: TinputSelProps = {
         selectProps: {
           props: {
-            options: [],
+            options: classProd.options_surface,
             value,
             onChange: (option) => {
               const value = option?.value || '';
@@ -586,7 +613,9 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      const inpuSelProps = classProd.isSpecial ? inputSelProps_input : inputSelProps_select;
+
+      return <InputSel_prod_memo_select disabled={disabled} {...inpuSelProps} />;
     },
   },
 
@@ -679,7 +708,7 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
-            options: [],
+            options: optionsCreator_closingType(),
             value,
             onChange: (option) => {
               const value = option?.value || '';
@@ -879,7 +908,7 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
-            options: [],
+            options: classProd.options_bottomBarAngleIron,
             value,
             onChange: (option) => {
               const value = option?.value || '';
@@ -906,7 +935,7 @@ const nodeConfig_origin: TnodeConfig = {
         disabled,
         selectProps: {
           props: {
-            options: [],
+            options: classProd.options_bottomBarPlate,
             value,
             onChange: (option) => {
               const value = option?.value || '';
