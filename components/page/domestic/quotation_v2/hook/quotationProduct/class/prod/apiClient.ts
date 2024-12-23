@@ -72,9 +72,17 @@ const reqGetProdCalcGeneralSpec = async ({ classProd, withHp = false }: { classP
     .catch((err: TresError) => {
       console.log(err);
 
+      let message = err.response?.data.message as any;
+
+      if (typeof message === 'string') {
+        message = message;
+      } else if (typeof message === 'object') {
+        message = JSON.stringify(message);
+      }
+
       return Promise.reject({
         title: '取得產品規格失敗',
-        content: err.response?.data.message,
+        content: message,
       });
     });
 };
@@ -97,7 +105,15 @@ const reqGetAvailableComponents = async (classProd: ClassProd) => {
   return await apiGetProdAvailableComponents(body)
     .then((res) => res)
     .catch((err: TresError) => {
-      return Promise.reject({ title: '取得可用材料配件失敗', content: err.response?.data.message });
+      let message = err.response?.data.message as any;
+
+      if (typeof message === 'string') {
+        message = message;
+      } else if (typeof message === 'object') {
+        message = JSON.stringify(message);
+      }
+
+      return Promise.reject({ title: '取得可用材料配件失敗', content: message });
     });
 };
 
@@ -158,9 +174,15 @@ const reqGetBom = async (classProd: ClassProd) => {
   };
 
   return await apiPostProdGenerateDoorProductBom(body).catch((err: TresError) => {
-    myAlert.err({ title: '取得BOM失敗' });
+    let message = err.response?.data.message as any;
 
-    return Promise.reject({ title: '取得BOM失敗', content: err.response?.data.message });
+    if (typeof message === 'string') {
+      message = message;
+    } else if (typeof message === 'object') {
+      message = JSON.stringify(message);
+    }
+
+    return Promise.reject({ title: '取得BOM失敗', content: message });
   });
 };
 
@@ -181,7 +203,15 @@ const reqGetBoxD = async (classProd: ClassProd) => {
   return await apiGetboxD(body)
     .then((res) => res.sidePlateSizeD)
     .catch((err: TresError) => {
-      return Promise.reject({ title: '取得boxD失敗', content: err.response?.data.message });
+      let message = err.response?.data.message as any;
+
+      if (typeof message === 'string') {
+        message = message;
+      } else if (typeof message === 'object') {
+        message = JSON.stringify(message);
+      }
+
+      return Promise.reject({ title: '取得boxD失敗', content: message });
     });
 };
 
@@ -200,7 +230,15 @@ const reqGetSlatCount = async (classProd: ClassProd) => {
   return await apiGetProdCalcDetailSpec(body)
     .then((res) => res.slatCount)
     .catch((err: TresError) => {
-      return Promise.reject({ title: '取得門片數量失敗', content: err.response?.data.message });
+      let message = err.response?.data.message as any;
+
+      if (typeof message === 'string') {
+        message = message;
+      } else if (typeof message === 'object') {
+        message = JSON.stringify(message);
+      }
+
+      return Promise.reject({ title: '取得門片數量失敗', content: message });
     });
 };
 
