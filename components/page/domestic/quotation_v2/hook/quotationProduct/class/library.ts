@@ -22,4 +22,19 @@ const checkIsGalvanized = (material: string) => {
   return isGalvanized;
 };
 
-export { checkIsSST, checkIsGalvanized };
+/** 去除小數點後三位的值，無條件捨去  */
+const fixedToFloat3 = (v: number | `${number}`) => {
+  // const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
+
+  let v_str = `${v}`;
+
+  // eslint-disable-next-line prefer-const
+  let [a, b] = v_str.split('.');
+  b = b?.slice(0, 3) || '';
+  v_str = b ? `${a}.${b}` : a;
+
+  return Number(v_str);
+};
+
+// ========================================================================
+export { checkIsSST, checkIsGalvanized, fixedToFloat3 };

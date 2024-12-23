@@ -286,6 +286,9 @@ const nodeConfig_origin: TnodeConfig = {
           onChange: (e) => {
             classProd.W = e.target.value as `${number}` | '';
           },
+          onBlur() {
+            classProd.runAfterChange();
+          },
         },
       };
 

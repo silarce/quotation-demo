@@ -39,7 +39,7 @@ type TerrRes = { title: string; content?: string };
 // ===========================================================================
 
 // MARK:reqGetProdCalcGeneralSpec
-const reqGetProdCalcGeneralSpec = async (classProd: ClassProd) => {
+const reqGetProdCalcGeneralSpec = async ({ classProd, withHp = false }: { classProd: ClassProd; withHp?: boolean }) => {
   if (!classProd.isValid_doorModel) {
     return Promise.reject({
       title: '取得產品規格失敗',
@@ -63,7 +63,8 @@ const reqGetProdCalcGeneralSpec = async (classProd: ClassProd) => {
     WG: undefined, // 不使用WG，統一使用fullWidth
     //
     isAntiTyphoon: !!prodData.isAntiTyphoon,
-    hp: hp || undefined,
+    // hp:  hp || undefined,
+    hp: withHp ? hp : undefined,
   };
 
   return await apiGetProdCalcGeneralSpec(body)

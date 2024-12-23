@@ -106,7 +106,7 @@ import {
   lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
-import { checkIsSST, checkIsGalvanized } from '../library';
+import { checkIsSST, checkIsGalvanized, fixedToFloat3 } from '../library';
 
 import { createEmptyStateProd } from '../../emptyProdState';
 
@@ -260,7 +260,7 @@ class ClassProd {
 
     if (this.isValid_doorModel) {
       try {
-        const generalSpec = await reqGetProdCalcGeneralSpec(this);
+        const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this });
         this.state.generalSpecs = generalSpec;
 
         const availableComponents = await reqGetAvailableComponents(this);
@@ -626,9 +626,9 @@ class ClassProd {
   // ==========================================================================
   // region API
 
-  protected async reqChain_01() {
+  protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
     try {
-      const generalSpec = await reqGetProdCalcGeneralSpec(this);
+      const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp });
       // 取得generalSpec
       this.state.generalSpecs = generalSpec;
       // 送入generalSpec更新state
@@ -683,8 +683,12 @@ class ClassProd {
     }
   }
 
+  reqChain_01_withHp() {
+    return this.reqChain_01({ withHp: true });
+  }
+
   // ---------------------------------------------------------------------------
-  addAfterChange(funcName: 'reqChain_01') {
+  addAfterChange(funcName: 'reqChain_01' | 'reqChain_01_withHp') {
     if (!this.state.afterChangeQueue) {
       this.state.afterChangeQueue = [];
     }
@@ -877,7 +881,6 @@ class ClassProd {
     }
 
     this.data.area = this.calcArea(this);
-    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
     this.addAfterChange('reqChain_01');
     this.render();
@@ -901,22 +904,39 @@ class ClassProd {
     const WG_mm = new Decimal(this.data.WG || 0).mul(1000).toNumber();
     const G = this.data.guideRailG || 0;
 
-    const W_num = calcW({
+    const W_mm = calcW({
       WG: WG_mm,
       G,
     });
 
-    return new Decimal(W_num).div(1000).toString() as `${number}` | '';
+    return new Decimal(W_mm).div(1000).toString() as `${number}` | '';
   }
   set W(v) {
-    const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
+    // const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
+    const v_num = fixedToFloat3(v || 0);
+    const v_mm = new Decimal(v_num).mul(1000).toNumber();
+
+    // console.log(v_num);
+    // console.log(this.data.guideRailG);
 
     const WG_mm = calcProductWG_withWAndG({
-      W: v_num,
+      W: v_mm,
       G: this.data.guideRailG || 0,
     });
 
-    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}` | '';
+    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+
+    const fullWidth = calcProductFullWidth({
+      WG: new Decimal(this.data.WG).mul(1000).toNumber(),
+      gapA: Number(this.data.gapA ?? 0),
+      gapC: Number(this.data.gapC ?? 0),
+    });
+
+    this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
+
+    this.addAfterChange('reqChain_01_withHp');
+
+    this.render();
   }
 
   get height() {
@@ -930,8 +950,6 @@ class ClassProd {
 
       return;
     }
-
-    this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
 
     this.addAfterChange('reqChain_01');
     this.render();
