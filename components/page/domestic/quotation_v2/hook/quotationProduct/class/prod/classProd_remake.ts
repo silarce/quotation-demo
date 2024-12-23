@@ -688,6 +688,9 @@ class ClassProd {
   }
 
   // ---------------------------------------------------------------------------
+
+  // 不可以直接把方法放進陣列中等待執行
+  // 加入方法後類跟狀態都會更新，實際要呼叫時，方法範疇裡的類跟狀態都是舊的
   addAfterChange(funcName: 'reqChain_01' | 'reqChain_01_withHp') {
     if (!this.state.afterChangeQueue) {
       this.state.afterChangeQueue = [];
@@ -702,13 +705,18 @@ class ClassProd {
   }
 
   async runAfterChange() {
-    let afterChangeQueue = this.state.afterChangeQueue;
+    const afterChangeQueue = this.state.afterChangeQueue;
 
     if (!afterChangeQueue || afterChangeQueue.length === 0) {
       return;
     }
 
-    afterChangeQueue = _.uniq(afterChangeQueue);
+    const qniqQuestion = _.uniq(afterChangeQueue);
+
+    if (qniqQuestion.length !== afterChangeQueue.length) {
+      myAlert.warning({ title: '開發者提示', content: 'afterChangeQueue有重複的方法，預期不應重複' });
+      console.log('afterChangeQueue有重複的方法', afterChangeQueue);
+    }
 
     this.state.isFetching = true;
 
