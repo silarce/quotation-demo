@@ -285,6 +285,46 @@ class ClassProd {
     this.render();
   }
 
+  clearState({
+    //
+    keepItemName = true,
+    keepDiscount = true,
+    keeyQuoteType,
+    keepIsAntiTyphoon,
+    keepBounceDoorWidth,
+    keepClosingType,
+    keepNotes,
+    keepIsIntegratedHeadBox,
+    keepIsULGuideRail,
+    keepHasSilencingStrip,
+  }: {
+    keepItemName?: boolean;
+    keepDiscount?: boolean;
+    keeyQuoteType?: boolean;
+    keepIsAntiTyphoon?: boolean;
+    keepBounceDoorWidth?: boolean;
+    keepClosingType?: boolean;
+    keepNotes?: boolean;
+    keepIsIntegratedHeadBox?: boolean;
+    keepIsULGuideRail?: boolean;
+    keepHasSilencingStrip?: boolean;
+  } = {}) {
+    const newState = createEmptyStateProd(this.state.key);
+
+    keepItemName && (newState.data_prod.itemName = this.itemName);
+    keepDiscount && (newState.data_prod.discount = this.discount);
+    keeyQuoteType && (newState.data_prod.quoteType = this.quoteType);
+    keepIsAntiTyphoon && (newState.data_prod.isAntiTyphoon = this.isAntiTyphoon);
+    keepBounceDoorWidth && (newState.data_prod.bounceDoorWidth = this.bounceDoorWidth);
+    keepClosingType && (newState.data_prod.closingType = this.closingType);
+    keepNotes && (newState.data_prod.notes = this.notes);
+    keepIsIntegratedHeadBox && (newState.data_prod.isIntegratedHeadBox = this.isIntegratedHeadBox);
+    keepIsULGuideRail && (newState.data_prod.isULGuideRail = this.isULGuideRail);
+    keepHasSilencingStrip && (newState.data_prod.hasSilencingStrip = this.hasSilencingStrip);
+
+    Object.clearAndAssign(this.state, newState);
+  }
+
   // ---------------------------------------------------------------------------
 
   calcArea(classProd: ClassProd) {
