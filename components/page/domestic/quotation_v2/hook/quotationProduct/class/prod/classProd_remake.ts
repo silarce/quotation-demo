@@ -286,41 +286,114 @@ class ClassProd {
   }
 
   clearState({
-    //
-    keepItemName = true,
-    keepDiscount = true,
-    keeyQuoteType,
-    keepIsAntiTyphoon,
-    keepBounceDoorWidth,
-    keepClosingType,
-    keepNotes,
-    keepIsIntegratedHeadBox,
-    keepIsULGuideRail,
-    keepHasSilencingStrip,
-  }: {
+    keepItemName,
+    keepDiscount,
+    keepQuoteType,
+  }: // keepIsAntiTyphoon,
+  // keepBounceDoorWidth,
+  // keepClosingType,
+  // keepNotes,
+  // keepIsIntegratedHeadBox,
+  // keepIsULGuideRail,
+  // keepHasSilencingStrip,
+
+  // keepFullWidth,
+  // keepHeight,
+  // keepWG,
+
+  // keepMaterialName,
+  // keepMaterialSurface,
+
+  // keepDoorModel,
+  {
     keepItemName?: boolean;
     keepDiscount?: boolean;
-    keeyQuoteType?: boolean;
-    keepIsAntiTyphoon?: boolean;
-    keepBounceDoorWidth?: boolean;
-    keepClosingType?: boolean;
-    keepNotes?: boolean;
-    keepIsIntegratedHeadBox?: boolean;
-    keepIsULGuideRail?: boolean;
-    keepHasSilencingStrip?: boolean;
+    keepQuoteType?: boolean;
+
+    // keepIsAntiTyphoon?: boolean;
+    // keepBounceDoorWidth?: boolean;
+    // keepClosingType?: boolean;
+    // keepNotes?: boolean;
+    // keepIsIntegratedHeadBox?: boolean;
+    // keepIsULGuideRail?: boolean;
+    // keepHasSilencingStrip?: boolean;
+
+    // keepFullWidth?: boolean;
+    // keepHeight?: boolean;
+    // keepWG?: boolean;
+
+    // keepMaterialName?: boolean;
+    // keepMaterialSurface?: boolean;
+
+    // keepDoorModel?: boolean;
   } = {}) {
     const newState = createEmptyStateProd(this.state.key);
 
-    keepItemName && (newState.data_prod.itemName = this.itemName);
-    keepDiscount && (newState.data_prod.discount = this.discount);
-    keeyQuoteType && (newState.data_prod.quoteType = this.quoteType);
-    keepIsAntiTyphoon && (newState.data_prod.isAntiTyphoon = this.isAntiTyphoon);
-    keepBounceDoorWidth && (newState.data_prod.bounceDoorWidth = this.bounceDoorWidth);
-    keepClosingType && (newState.data_prod.closingType = this.closingType);
-    keepNotes && (newState.data_prod.notes = this.notes);
-    keepIsIntegratedHeadBox && (newState.data_prod.isIntegratedHeadBox = this.isIntegratedHeadBox);
-    keepIsULGuideRail && (newState.data_prod.isULGuideRail = this.isULGuideRail);
-    keepHasSilencingStrip && (newState.data_prod.hasSilencingStrip = this.hasSilencingStrip);
+    const data_prod = this.state.data_prod;
+
+    keepItemName && (newState.data_prod.itemName = data_prod.itemName);
+    keepDiscount && (newState.data_prod.discount = data_prod.discount);
+    keepQuoteType && (newState.data_prod.quoteType = data_prod.quoteType);
+
+    // keepIsAntiTyphoon && (newState.data_prod.isAntiTyphoon = this.data.isAntiTyphoon);
+    // keepBounceDoorWidth && (newState.data_prod.bounceDoorWidth = this.data.bounceDoorWidth);
+    // keepClosingType && (newState.data_prod.closingType = this.data.closingType);
+    // keepNotes && (newState.data_prod.notes = this.data.notes);
+    // keepIsIntegratedHeadBox && (newState.data_prod.isIntegratedHeadBox = this.data.isIntegratedHeadBox);
+    // keepIsULGuideRail && (newState.data_prod.isULGuideRail = this.data.isULGuideRail);
+    // keepHasSilencingStrip && (newState.data_prod.hasSilencingStrip = this.data.hasSilencingStrip);
+
+    // keepFullWidth && (newState.data_prod.fullWidth = this.data.fullWidth);
+    // keepHeight && (newState.data_prod.height = this.data.height);
+    // keepWG && (newState.data_prod.WG = this.data.WG);
+
+    // keepMaterialName && (newState.data_prod.materialName = this.data.materialName);
+    // keepMaterialSurface && (newState.data_prod.materialSurface = this.data.materialSurface);
+
+    // if (keepDoorModel) {
+    //   newState.data_prod.doorModelName = this.data.doorModelName;
+    //   newState.doorModel = this.state.doorModel;
+    // }
+
+    Object.clearAndAssign(this.state, newState);
+  }
+
+  clearState_keepsome() {
+    const newState = createEmptyStateProd(this.state.key);
+
+    const data_prod = this.state.data_prod;
+
+    newState.afterChangeQueue = this.state.afterChangeQueue;
+    newState.isFetching = this.state.isFetching;
+
+    newState.doorModel = this.state.doorModel;
+    newState.data_prod.doorModelName = data_prod.doorModelName;
+
+    newState.data_componentDict = this.state.data_componentDict;
+    this.replaceToEmptyComponent();
+    newState.componentKeyArr = this.state.componentKeyArr;
+
+    newState.data_accessoryDict = this.state.data_accessoryDict;
+    newState.accessoryKeyArr = this.state.accessoryKeyArr;
+
+    newState.data_prod.itemName = data_prod.itemName;
+    newState.data_prod.discount = data_prod.discount;
+    newState.data_prod.quoteType = data_prod.quoteType;
+
+    newState.data_prod.fullWidth = data_prod.fullWidth;
+    newState.data_prod.height = data_prod.height;
+    newState.data_prod.WG = data_prod.WG;
+
+    newState.data_prod.materialName = data_prod.materialName;
+    newState.data_prod.materialSurface = data_prod.materialSurface;
+
+    newState.data_prod.isAntiTyphoon = data_prod.isAntiTyphoon;
+    newState.data_prod.bounceDoorWidth = data_prod.bounceDoorWidth;
+    newState.data_prod.closingType = data_prod.closingType;
+    newState.data_prod.notes = data_prod.notes;
+    newState.data_prod.isIntegratedHeadBox = data_prod.isIntegratedHeadBox;
+    newState.data_prod.isULGuideRail = data_prod.isULGuideRail;
+    newState.data_prod.hasSilencingStrip = data_prod.hasSilencingStrip;
 
     Object.clearAndAssign(this.state, newState);
   }
@@ -380,6 +453,12 @@ class ClassProd {
   // ---------------------------------------------------------------------------
 
   changeDoorModel({ doorModel }: { doorModel: TdoorModelInfoDto | null }) {
+    this.clearState({
+      keepItemName: true,
+      keepDiscount: true,
+      keepQuoteType: true,
+    });
+
     this.state.doorModel = doorModel;
     this.data.doorModelName = doorModel?.name ?? '';
 
@@ -413,19 +492,15 @@ class ClassProd {
 
     this.renewSurface();
 
-    // -------------------------------------------------------------------------
-
-    // Object.clearAndAssign(this.state.data_componentDict, {});
     this.replaceToEmptyComponent();
-
-    Object.clearAndAssign(this.state.data_accessoryDict, {});
-
-    // this.data.horsepower = ''; // 相關 reqGetProdCalcGeneralSpec
-
-    // this.addAfterChange('reqChain_01');
 
     this.render();
   }
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
   // ==========================================================================
   // region SPEC
   protected clearGeneralSpec() {
@@ -517,6 +592,11 @@ class ClassProd {
     return this;
   }
   // endregion SPEC
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
   // ==========================================================================
   // region COMPONENT
 
@@ -664,7 +744,22 @@ class ClassProd {
   // endregion COMPONENT
 
   // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
   // region API
+
+  checkShouldCallReqChain01() {
+    let pass = true;
+
+    !this.isValid_doorModel && (pass = false);
+    this.fullWidth === '' && (pass = false);
+    this.height === '' && (pass = false);
+
+    return pass;
+  }
 
   protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
     try {
@@ -784,6 +879,11 @@ class ClassProd {
   // endregion API
 
   // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
   // region interface
 
   get isValid_doorModel(): boolean {
@@ -896,13 +996,11 @@ class ClassProd {
       return;
     }
 
-    const newState = createEmptyStateProd(this.state.key);
+    this.clearState({
+      keepItemName: true,
+      keepDiscount: true,
+    });
 
-    newState.data_prod.itemName = this.itemName;
-    newState.data_prod.discount = this.discount;
-    Object.clearAndAssign(this.state, newState);
-
-    // this.data = this.state.data_prod;
     this.data.quoteType = value;
 
     this.render();
@@ -928,9 +1026,11 @@ class ClassProd {
       return;
     }
 
+    this.clearState_keepsome();
+
     this.data.area = this.calcArea(this);
 
-    this.addAfterChange('reqChain_01');
+    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01');
     this.render();
   }
   get fullWidth_mm() {
@@ -960,12 +1060,8 @@ class ClassProd {
     return new Decimal(W_mm).div(1000).toString() as `${number}` | '';
   }
   set W(v) {
-    // const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
     const v_num = fixedToFloat3(v || 0);
     const v_mm = new Decimal(v_num).mul(1000).toNumber();
-
-    // console.log(v_num);
-    // console.log(this.data.guideRailG);
 
     const WG_mm = calcProductWG_withWAndG({
       W: v_mm,
@@ -973,6 +1069,12 @@ class ClassProd {
     });
 
     this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
 
     const fullWidth = calcProductFullWidth({
       WG: new Decimal(this.data.WG).mul(1000).toNumber(),
@@ -982,7 +1084,8 @@ class ClassProd {
 
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
-    this.addAfterChange('reqChain_01_withHp');
+    this.clearState_keepsome();
+    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01_withHp');
 
     this.render();
   }
@@ -999,7 +1102,9 @@ class ClassProd {
       return;
     }
 
-    this.addAfterChange('reqChain_01');
+    this.clearState_keepsome();
+
+    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01');
     this.render();
   }
   get height_mm() {
@@ -1186,9 +1291,10 @@ class ClassProd {
   get hasSilencingStrip() {
     return this.data.hasSilencingStrip;
   }
-  // set hasSilencingStrip(value) {
-  //   this.setData_simple('hasSilencingStrip', value);
-  // }
+  set hasSilencingStrip(value) {
+    this.data.hasSilencingStrip = value;
+    this.render();
+  }
 
   get isULGuideRail() {
     return this.data.isULGuideRail;
