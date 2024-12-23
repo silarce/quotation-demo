@@ -129,6 +129,8 @@ import { Class_accessory } from '../accessory/classAccessory';
 
 import type { Tdata_componentDict } from '../../type';
 
+import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
+
 // ================================================================================
 
 interface Tprops_constructor {
@@ -444,6 +446,27 @@ class ClassProd {
     this.render();
   }
 
+  protected renewPhase() {
+    const hp = this.data.horsepower as keyof typeof lookup_hpToGapAGapC;
+    const hpValue = lookup_hpToGapAGapC[hp].HPValue;
+
+    const phase = hpValue >= 1.5 ? 3 : 1;
+
+    this.data.motorPhase = phase;
+  }
+
+  protected renewDistributionBoxPrice() {
+    const hp = this.data.horsepower as keyof typeof lookup_hpToGapAGapC;
+    const hpValue = lookup_hpToGapAGapC[hp].distributionBoxPrice;
+
+    if (hpValue !== undefined) {
+      this.data.distributionBoxPrice = `${hpValue}`;
+    } else {
+      myAlert.warning({ title: `${hp} 配電箱牌價未知` });
+      this.data.distributionBoxPrice = '';
+    }
+  }
+
   // ---------------------------------------------------------------------------
 
   // get prodData(): typeof this.data {
@@ -470,6 +493,7 @@ class ClassProd {
 
   // ---------------------------------------------------------------------------
 
+  // MARK: changeDoorModel
   changeDoorModel({ doorModel }: { doorModel: TdoorModelInfoDto | null }) {
     this.clearState({
       keepItemName: true,
@@ -606,8 +630,6 @@ class ClassProd {
     }
 
     this.data.area = this.calcArea(this);
-
-    return this;
   }
   // endregion SPEC
   // ==========================================================================
@@ -781,11 +803,18 @@ class ClassProd {
 
   protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
     try {
-      const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp });
+      const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp }).catch((err) => {
+        this.clearGeneralSpec();
+
+        throw err;
+      });
       // 取得generalSpec
       this.state.generalSpecs = generalSpec;
+
       // 送入generalSpec更新state
-      this.afterUpdateGeneralSpec_sideEffect(generalSpec);
+      this.afterUpdateGeneralSpec_sideEffect(this.state.generalSpecs);
+      this.renewPhase();
+      this.renewDistributionBoxPrice();
 
       // 取得boxD並更新state
       const boxD = await reqGetBoxD(this);
@@ -797,16 +826,16 @@ class ClassProd {
 
       // 取得可用材料配件
       const availableComponents = await reqGetAvailableComponents(this);
-
       this.state.availableComponents = availableComponents;
 
       // 更新材料配件
       this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
-
       const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
 
       if (invalidComponentArr) {
         const message = invalidComponentArr.join(', ');
+        this.replaceToEmptyComponent();
+        this.state.availableComponents = null;
 
         throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
       }
@@ -823,9 +852,9 @@ class ClassProd {
       if (err && 'title' in err) {
         myAlert.err({ title: err?.title, content: err?.content });
 
-        this.clearGeneralSpec();
-        this.replaceToEmptyComponent();
-        this.state.availableComponents = null;
+        // this.clearGeneralSpec();
+        // this.replaceToEmptyComponent();
+        // this.state.availableComponents = null;
 
         return Promise.reject(null);
       } else {
@@ -1226,6 +1255,10 @@ class ClassProd {
     }
 
     this.data.horsepower = value;
+
+    this.renewPhase();
+    this.renewDistributionBoxPrice();
+
     this.render();
   }
 

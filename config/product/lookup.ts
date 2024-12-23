@@ -90,6 +90,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 30,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1/3HP': {
     HPValue: 0.3,
@@ -97,6 +98,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 40,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1/2HP': {
     HPValue: 0.5,
@@ -104,6 +106,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 50,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '3/4HP': {
     HPValue: 0.75,
@@ -111,6 +114,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 60,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1HP': {
     HPValue: 1,
@@ -118,6 +122,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 70,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1 1/2HP': {
     HPValue: 1.5,
@@ -125,6 +130,15 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 70,
     gapC: 20,
+    distributionBoxPrice: 5940,
+  },
+  '1.5HP': {
+    HPValue: 1.5,
+    outputTooth: 9,
+    reelGear: 60,
+    gapA: 70,
+    gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '2HP': {
     HPValue: 2,
@@ -132,6 +146,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 120,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '3HP': {
     HPValue: 3,
@@ -139,6 +154,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 150,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '5HP': {
     HPValue: 5,
@@ -146,6 +162,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 170,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '50Nm': {
     HPValue: 50,
@@ -153,6 +170,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 40,
     gapC: 10,
+    distributionBoxPrice: undefined, // 價格不知道，
   },
 };
 
