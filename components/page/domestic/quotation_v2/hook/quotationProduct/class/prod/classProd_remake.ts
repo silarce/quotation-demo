@@ -830,6 +830,43 @@ class ClassProd {
     return this.reqChain_01({ withHp: true });
   }
 
+  async reqChain_02() {
+    try {
+      await this.updateAvailableComponents();
+      await this.updateBom();
+    } catch (error) {
+      const err = error as { title?: string; content?: string };
+
+      if (err && 'title' in err) {
+        myAlert.err({ title: err?.title, content: err?.content });
+
+        return Promise.reject(null);
+      } else {
+        myAlert.err({ title: '預期外的錯誤' });
+
+        throw error;
+      }
+    }
+  }
+
+  async reqChain_03() {
+    try {
+      await this.updateBom();
+    } catch (error) {
+      const err = error as { title?: string; content?: string };
+
+      if (err && 'title' in err) {
+        myAlert.err({ title: err?.title, content: err?.content });
+
+        return Promise.reject(null);
+      } else {
+        myAlert.err({ title: '預期外的錯誤' });
+
+        throw error;
+      }
+    }
+  }
+
   // MARK:updateProductSpec
   async updateProductSpec({ withHp }: { withHp?: boolean } = {}) {
     const generalSpec = await reqGetProdCalcGeneralSpec({ classProd: this, withHp }).catch((err) => {
