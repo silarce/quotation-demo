@@ -988,6 +988,8 @@ const createNodeConfig_prime = ({
         isSearchable: true,
         options: options as Toption[],
         value: value,
+        // menuPortalTarget: document.getElementById('fooo'),
+        // menuIsOpen: true,
         onChange: (option) => {
           const doorModelName = option?.value || '';
           const doorModel = doorModelDict?.[doorModelName] || null;

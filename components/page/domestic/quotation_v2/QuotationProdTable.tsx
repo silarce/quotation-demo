@@ -188,60 +188,68 @@ const Table_prod = ({
           編輯欄位排序
         </SquareBtn> */}
       </div>
+      {/*  */}
       <div className={classNames(scss.prodTable, className)}>
-        <QuotationRow_dndThead
-          className={scss.rowThead}
-          disabled={disabled}
-          keyArr={cellKeyArr}
-          onDragEnd={({ move }) => {
-            setCellKeyArr(move(cellKeyArr));
-          }}
-          configDict={nodeConfig_origin}
-          dragHandleInvisible={true}
-          left={
-            <>
-              <Cell_delete className={'invisible'} onClick={() => {}} />
-              <Cell_copy className={'invisible'} onClick={() => {}} />
-              <Cell_indexNumber />
-              <Cell
-                className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
-                style={nodeConfig_origin['itemName'].style}
-              >
-                {nodeConfig_origin['itemName'].label}
-              </Cell>
-            </>
-          }
-        />
-        <Table_dnd
-          items={prodKeyArr}
-          onDragEnd={({ move }) => {
-            setProdKeyArr(move(prodKeyArr));
-          }}
-        >
-          {prodKeyArr.map((prodKey, index) => {
-            const stateProd = state_prodDict[prodKey];
-            const isActive = activedProd === stateProd;
+        <div className={scss.table}>
+          <QuotationRow_dndThead
+            className={scss.rowThead}
+            disabled={disabled}
+            keyArr={cellKeyArr}
+            onDragEnd={({ move }) => {
+              setCellKeyArr(move(cellKeyArr));
+            }}
+            configDict={nodeConfig_origin}
+            dragHandleInvisible={true}
+            left={
+              <>
+                <Cell_delete className={'invisible'} onClick={() => {}} />
+                <Cell_copy className={'invisible'} onClick={() => {}} />
+                <Cell_indexNumber />
+                <Cell
+                  className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
+                  style={nodeConfig_origin['itemName'].style}
+                >
+                  {nodeConfig_origin['itemName'].label}
+                </Cell>
+              </>
+            }
+          />
+          <Table_dnd
+            items={prodKeyArr}
+            onDragEnd={({ move }) => {
+              setProdKeyArr(move(prodKeyArr));
+            }}
+          >
+            {prodKeyArr.map((prodKey, index) => {
+              const stateProd = state_prodDict[prodKey];
+              const isActive = activedProd === stateProd;
 
-            return (
-              <QuotationRow_dealClass_memo
-                key={prodKey}
-                stateProd={stateProd}
-                disabled={disabled}
-                isActive={isActive}
-                cellKeyArr={cellKeyArr}
-                index={index}
-                //
-                rerenderTrigger01={stateProd.renderCount}
-                //
-                prodKey={prodKey}
-                choseActiveProd={choseActiveProd}
-                createClassProd={createClassProd}
-                //
-                activedClassProd={activedClassProd}
-              />
-            );
-          })}
-        </Table_dnd>
+              return (
+                <QuotationRow_dealClass_memo
+                  key={prodKey}
+                  stateProd={stateProd}
+                  disabled={disabled}
+                  isActive={isActive}
+                  cellKeyArr={cellKeyArr}
+                  index={index}
+                  //
+                  rerenderTrigger01={stateProd.renderCount}
+                  //
+                  prodKey={prodKey}
+                  choseActiveProd={choseActiveProd}
+                  createClassProd={createClassProd}
+                  //
+                  activedClassProd={activedClassProd}
+                />
+              );
+            })}
+          </Table_dnd>
+        </div>
+        <div className={scss.bottom}>
+          <SquareBtn sharp="mini" onClick={() => {}} className={scss.btn}>
+            新增主產品
+          </SquareBtn>
+        </div>
       </div>
     </div>
   );
@@ -463,91 +471,98 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
   return (
     <div className={classNames(scss.accessoryTable, className)}>
-      <QuotationRow_dndThead
-        className={scss.rowThead}
-        disabled={disabled}
-        keyArr={cellKeyArr_accessory}
-        onDragEnd={({ move }) => {
-          setCellKeyArr_accessory(move(cellKeyArr_accessory));
-        }}
-        configDict={nodeConfig_accessory_origin}
-        dragHandleInvisible={true}
-        left={
-          <>
-            <Cell_delete className={'invisible'} onClick={() => {}} />
-            <Cell_indexNumber className="invisible" />
-            <Cell
-              className={classNames('text-xl text-main', nodeConfig_accessory_origin['name'].className)}
-              style={nodeConfig_accessory_origin['name'].style}
-            >
-              {nodeConfig_accessory_origin['name'].label}
-            </Cell>
-          </>
-        }
-      />
-
-      <Table_dnd
-        items={accessoryKeyArr ?? []}
-        onDragEnd={({ move }) => {
-          if (!accessoryKeyArr) {
-            return;
-          }
-
-          setAccessoryKeyArr(move(accessoryKeyArr));
-        }}
-      >
-        {accessoryKeyArr?.map((acceKey, index) => {
-          if (!activedClassAccessoryDict) {
-            return null;
-          }
-
-          const classAccessory = activedClassAccessoryDict[acceKey];
-
-          const nodeConfig_name = classAccessory.nodeConfig['name'];
-
-          const left = (
+      <div className={scss.table}>
+        <QuotationRow_dndThead
+          className={scss.rowThead}
+          disabled={disabled}
+          keyArr={cellKeyArr_accessory}
+          onDragEnd={({ move }) => {
+            setCellKeyArr_accessory(move(cellKeyArr_accessory));
+          }}
+          configDict={nodeConfig_accessory_origin}
+          dragHandleInvisible={true}
+          left={
             <>
-              <Cell_delete onClick={() => {}} />
-              <Cell_indexNumber>{index + 1}</Cell_indexNumber>
-              <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
-                {nodeConfig_name.createNode({
-                  disabled,
-                  classAcce: classAccessory,
-                })}
+              <Cell_delete className={'invisible'} onClick={() => {}} />
+              <Cell_indexNumber className="invisible" />
+              <Cell
+                className={classNames('text-xl text-main', nodeConfig_accessory_origin['name'].className)}
+                style={nodeConfig_accessory_origin['name'].style}
+              >
+                {nodeConfig_accessory_origin['name'].label}
               </Cell>
             </>
-          );
+          }
+        />
 
-          return (
-            <QuotationRow_dnd_memo
-              rerenderTrigger01={classAccessory.state}
-              rerenderTrigger02={disabled}
-              rerenderTrigger03={cellKeyArr_accessory}
-              key={acceKey}
-              id={acceKey}
-              index={index}
-              isActive={activeIndex === index}
-              left={left}
-              onClick={() => setActiveIndex(index)}
-            >
-              {cellKeyArr_accessory.map((cellKey) => {
-                const { style, className, createNode } = classAccessory.nodeConfig[cellKey];
+        <Table_dnd
+          items={accessoryKeyArr ?? []}
+          onDragEnd={({ move }) => {
+            if (!accessoryKeyArr) {
+              return;
+            }
 
-                const node = createNode({
-                  disabled,
-                  classAcce: classAccessory,
-                });
+            setAccessoryKeyArr(move(accessoryKeyArr));
+          }}
+        >
+          {accessoryKeyArr?.map((acceKey, index) => {
+            if (!activedClassAccessoryDict) {
+              return null;
+            }
 
-                return (
-                  <Cell key={cellKey} className={classNames(className)} style={style}>
-                    {node}
-                  </Cell>
-                );
-              })}
-            </QuotationRow_dnd_memo>
-          );
-        })}
-      </Table_dnd>
+            const classAccessory = activedClassAccessoryDict[acceKey];
+
+            const nodeConfig_name = classAccessory.nodeConfig['name'];
+
+            const left = (
+              <>
+                <Cell_delete onClick={() => {}} />
+                <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+                <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
+                  {nodeConfig_name.createNode({
+                    disabled,
+                    classAcce: classAccessory,
+                  })}
+                </Cell>
+              </>
+            );
+
+            return (
+              <QuotationRow_dnd_memo
+                rerenderTrigger01={classAccessory.state}
+                rerenderTrigger02={disabled}
+                rerenderTrigger03={cellKeyArr_accessory}
+                key={acceKey}
+                id={acceKey}
+                index={index}
+                isActive={activeIndex === index}
+                left={left}
+                onClick={() => setActiveIndex(index)}
+              >
+                {cellKeyArr_accessory.map((cellKey) => {
+                  const { style, className, createNode } = classAccessory.nodeConfig[cellKey];
+
+                  const node = createNode({
+                    disabled,
+                    classAcce: classAccessory,
+                  });
+
+                  return (
+                    <Cell key={cellKey} className={classNames(className)} style={style}>
+                      {node}
+                    </Cell>
+                  );
+                })}
+              </QuotationRow_dnd_memo>
+            );
+          })}
+        </Table_dnd>
+      </div>
+      <div className={scss.bottom}>
+        <SquareBtn sharp="mini" onClick={() => {}} className={scss.btn}>
+          新增選配
+        </SquareBtn>
+      </div>
     </div>
   );
 };
