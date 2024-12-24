@@ -855,6 +855,11 @@ class ClassProd {
 
     // 送入generalSpec更新state
     this.afterUpdateGeneralSpec_sideEffect(this.state.generalSpecs);
+
+    if (this.doorModelName === 'W2') {
+      return;
+    }
+
     this.renewPhase();
     this.renewDistributionBoxPrice();
 
@@ -879,25 +884,17 @@ class ClassProd {
 
     this.state.availableComponents = availableComponents;
 
-    this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
-    const headBoxThickness = (this.options_headBoxThickness?.[0].value || '') as `${number}`;
-    this.data.headBoxThickness = headBoxThickness || null;
-
     if (!this.data.guideRailThickness) {
       this.data.guideRailThickness = (this.options_guideRailThickness?.[0].value || '') as `${number}` | '';
     }
 
-    // // 更新材料配件
-    // this.afterAvailableComponentsUpdated_sideEffect(this.state.availableComponents);
-    // const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
+    if (this.doorModelName === 'W2') {
+      return;
+    }
 
-    // if (invalidComponentArr) {
-    //   const message = invalidComponentArr.join(', ');
-    //   this.replaceToEmptyComponent();
-    //   this.state.availableComponents = null;
-
-    //   throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
-    // }
+    this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
+    const headBoxThickness = (this.options_headBoxThickness?.[0].value || '') as `${number}`;
+    this.data.headBoxThickness = headBoxThickness || null;
   }
 
   async updateComponent() {
@@ -1437,7 +1434,7 @@ class ClassProd {
     this.render();
   }
   get boxD_mm() {
-    return new Decimal(this.data.boxD).mul(1000).toNumber();
+    return new Decimal(this.data.boxD || 0).mul(1000).toNumber();
   }
 
   get area() {

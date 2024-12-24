@@ -147,6 +147,16 @@ class ClassCompnent_slat_W2 extends ClassCompnent_slat {
   get options_material() {
     return this.classProd?.options_material;
   }
+
+  get options_materialSurface() {
+    return undefined;
+  }
+
+  onProdChangeMaterial(prodMaterial: string | null | undefined) {
+    // super.onProdChangeMaterial(prodMaterial);
+    this.state.material = prodMaterial ?? '';
+    this.render();
+  }
 }
 
 class ClassCompnent_slat_sj305D extends ClassCompnent_slat {

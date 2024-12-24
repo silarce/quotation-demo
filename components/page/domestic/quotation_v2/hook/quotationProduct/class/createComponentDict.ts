@@ -230,7 +230,8 @@ const filterComponent = (classProd: ClassProd, availableComponents: TdoorCompone
 
   const { bottomBar, optionalBottomBars } = filter_bottomBar(availableComponents.bottomBars, {
     isAntiTyphoon: !!classProd.data.isAntiTyphoon,
-    isWaterProof: classProd.data.bottomBar === '止水型',
+    // isWaterProof: classProd.data.bottomBar === '止水型',
+    isWaterProof: classProd.doorModelName === 'W2' ? true : classProd.data.bottomBar === '止水型',
     hasAluminumBarrier: classProd.data.bottomBar === '鋁障感型',
   });
 

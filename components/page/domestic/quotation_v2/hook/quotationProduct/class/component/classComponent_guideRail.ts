@@ -59,6 +59,10 @@ class ClassCompnent_guideRail_w2 extends ClassCompnent_guideRail {
   get options_material() {
     return this.classProd?.options_material;
   }
+
+  get options_materialSurface() {
+    return undefined;
+  }
 }
 
 export { ClassCompnent_guideRail };
