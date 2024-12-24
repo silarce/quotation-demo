@@ -149,6 +149,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
   set isPainted(value) {
     this.state.isPainted = value;
+
+    this.classProd?.reqChain_04();
+
     this.render();
   }
 
