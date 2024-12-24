@@ -60,7 +60,21 @@ class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements
   onProdChangeSurface() {
     // do nothing
   }
+
+  // ------------------------------------------------------------------------
+
+  set material(v: string) {
+    super.material = v;
+
+    this.classProd?.changeBottomBarAngleIronAndBottomBarPlate(v);
+    this.classProd?.reqChain_04();
+    this.render();
+  }
 }
+
+// ================================================================================
+// ================================================================================
+// ================================================================================
 
 class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
   //

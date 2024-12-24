@@ -854,7 +854,7 @@ class ClassProd {
     }
   }
 
-  protected async reqChain_04({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
+  async reqChain_04({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
     if (updateIsFetching) {
       this.state.isFetching = true;
       this.render();
@@ -1679,6 +1679,36 @@ class ClassProd {
   }
   set bottomBarAngleIron(value) {
     this.data.bottomBarAngleIron = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    // 使底座板與底座角鐵的材質一樣
+    const angleIronMaterial = this.options_bottomBarAngleIron.find((item) => item.value === value)?.material as
+      | string
+      | undefined;
+    const plateInfo = this.options_bottomBarPlate.find((item) => item.value === this.bottomBarPlate);
+    const plateMaterial = plateInfo?.material;
+
+    if (angleIronMaterial !== plateMaterial) {
+      const newPlate = this.options_bottomBarPlate.find((item) => item.material === angleIronMaterial);
+
+      if (!newPlate) {
+        myAlert.err({ title: '找不到對應的底座版' });
+      }
+
+      this.data.bottomBarPlate = newPlate?.value ?? '';
+    }
+
+    if (this.classComponentDict.bottomBar) {
+      this.classComponentDict.bottomBar.material = angleIronMaterial ?? '';
+    }
+
+    this.reqChain_04();
+
     this.render();
   }
 
@@ -1687,6 +1717,52 @@ class ClassProd {
   }
   set bottomBarPlate(value) {
     this.data.bottomBarPlate = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    // 使底座板與底座角鐵的材質一樣
+    const plateMaterial = this.options_bottomBarPlate.find((item) => item.value === value)?.material as
+      | string
+      | undefined;
+    const angleIronInfo = this.options_bottomBarAngleIron.find((item) => item.material === this.bottomBarAngleIron);
+    const angleIronMaterial = angleIronInfo?.material;
+
+    if (plateMaterial !== angleIronMaterial) {
+      const newAngleIron = this.options_bottomBarAngleIron.find((item) => item.material === plateMaterial);
+
+      if (!newAngleIron) {
+        myAlert.err({ title: '找不到對應的底座角鐵' });
+      }
+
+      this.data.bottomBarAngleIron = newAngleIron?.value ?? '';
+    }
+
+    if (this.classComponentDict.bottomBar) {
+      this.classComponentDict.bottomBar.material = plateMaterial ?? '';
+    }
+
+    this.reqChain_04();
+
+    this.render();
+  }
+
+  // 給classComponent_bottomBar用的
+  changeBottomBarAngleIronAndBottomBarPlate(
+    v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
+  ) {
+    const dict_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
+    const dict_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
+
+    const bottomBarAngleIron = dict_bottomBarAngleIron[v]?.value ?? '';
+    const bottomBarPlate = dict_bottomBarPlate[v]?.value ?? '';
+
+    this.data.bottomBarAngleIron = bottomBarAngleIron;
+    this.data.bottomBarPlate = bottomBarPlate;
+
     this.render();
   }
 
