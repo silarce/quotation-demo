@@ -74,13 +74,6 @@ import {
   calcProductWG,
 } from 'js/utils/product/calc';
 
-import {
-  Interface_ClassProd_base,
-  Interface_ClassProd_base2,
-  Interface_ClassProd_prime,
-  Interface_ClassProd_special,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
-
 import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
 
 import { createComponentDict } from '../createComponentDict';
@@ -830,6 +823,7 @@ class ClassProd {
     return this.reqChain_01({ withHp: true });
   }
 
+  // MARK:reqChain_02
   async reqChain_02() {
     try {
       await this.updateAvailableComponents();
@@ -849,6 +843,7 @@ class ClassProd {
     }
   }
 
+  // MARK:reqChain_03
   async reqChain_03() {
     try {
       await this.updateBom();
@@ -930,13 +925,16 @@ class ClassProd {
 
   // 不可以直接把方法放進陣列中等待執行
   // 加入方法後類跟狀態都會更新，實際要呼叫時，方法範疇裡的類跟狀態都是舊的
-  addAfterChange(funcName: 'reqChain_01' | 'reqChain_01_withHp') {
+  addAfterChange(
+    funcName: 'reqChain_01' | 'reqChain_01_withHp' | 'reqChain_02' | 'reqChain_03',
+    { render = true }: { render?: boolean } = {}
+  ) {
     if (!this.state.afterChangeQueue) {
       this.state.afterChangeQueue = [];
     }
 
     this.state.afterChangeQueue.push(funcName);
-    this.render();
+    render && this.render();
   }
   clearAfterChange() {
     this.state.afterChangeQueue = undefined;
@@ -1473,6 +1471,13 @@ class ClassProd {
   }
   set guideRail(value) {
     this.data.guideRail = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
     const guideRail = this.data.guideRail;
 
     const guideRails = this.state.doorModel?.guideRails ?? [];
@@ -1487,13 +1492,33 @@ class ClassProd {
       data.isAntiTyphoon = guideRailInfo.withHook;
       data.guideRailsOpening = guideRailInfo.opening;
       data.guideRailG = guideRailInfo.width;
+
+      if (!data.guideRailThickness) {
+        data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
+      }
     } else {
       data.guideRailThickness = '';
       data.hasSilencingStrip = null;
       data.isAntiTyphoon = null;
       data.guideRailsOpening = null;
       data.guideRailG = null;
+
+      if (this.doorModelName !== 'W2') {
+        myAlert.warning({ title: '沒有對應的門軌資料' });
+      }
     }
+
+    const WG_mm = calcProductWG({
+      fullWidth: this.fullWidth_mm,
+      gapA: data.gapA || 0,
+      gapC: data.gapC || 0,
+    });
+    const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    data.WG = WG;
+
+    // this.addAfterChange('reqChain_02', { render: false });
+    // this.reqChain_02();
+    // this.runAfterChange();
 
     this.render();
   }
@@ -1524,10 +1549,11 @@ class ClassProd {
   get hasSilencingStrip() {
     return this.data.hasSilencingStrip;
   }
-  set hasSilencingStrip(value) {
-    this.data.hasSilencingStrip = value;
-    this.render();
-  }
+  // 消音條在編輯guideRail時一併設置
+  // set hasSilencingStrip(value) {
+  //   this.data.hasSilencingStrip = value;
+  //   this.render();
+  // }
 
   get isULGuideRail() {
     return this.data.isULGuideRail;
@@ -1556,10 +1582,11 @@ class ClassProd {
   get isAntiTyphoon() {
     return this.data.isAntiTyphoon;
   }
-  set isAntiTyphoon(value) {
-    this.data.isAntiTyphoon = value;
-    this.render();
-  }
+  // 防颱在編輯guideRail時一併設置
+  // set isAntiTyphoon(value) {
+  //   this.data.isAntiTyphoon = value;
+  //   this.render();
+  // }
 
   get bounceDoorWidth() {
     return this.data.bounceDoorWidth;

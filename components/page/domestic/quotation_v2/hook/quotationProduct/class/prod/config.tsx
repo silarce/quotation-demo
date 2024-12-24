@@ -481,6 +481,7 @@ const nodeConfig_origin: TnodeConfig = {
             onChange: (option) => {
               const value = option?.value || '';
               classProd.guideRail = value;
+              // classProd.runAfterChange();
             },
           },
         },
@@ -500,10 +501,13 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.isAntiTyphoon}
-          onChange={(e) => {
-            classProd.isAntiTyphoon = e.target.checked;
-          }}
-          disabled={disabled}
+          // onChange={(e) => {
+          //   classProd.isAntiTyphoon = e.target.checked;
+          //   setTimeout(() => {
+          //     classProd.runAfterChange();
+          //   }, 0);
+          // }}
+          disabled={true}
         />
       );
     },
@@ -519,10 +523,10 @@ const nodeConfig_origin: TnodeConfig = {
       return (
         <Checkbox
           checked={!!classProd.hasSilencingStrip}
-          onChange={(e) => {
-            classProd.hasSilencingStrip = e.target.checked;
-          }}
-          disabled={disabled}
+          // onChange={(e) => {
+          //   classProd.hasSilencingStrip = e.target.checked;
+          // }}
+          disabled={true}
         />
       );
     },
