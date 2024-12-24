@@ -211,6 +211,8 @@ class ClassProd {
   protected render() {
     // this.setState({ ...this.state });
     this.state.renderCount = this.state.renderCount ? this.state.renderCount + 1 : 1;
+
+    console.log(this.state.renderCount);
     this.setState(this.state);
   }
   // data: TstateProd['data_prod'];
@@ -329,6 +331,8 @@ class ClassProd {
     const newState = createEmptyStateProd(this.state.key);
 
     const data_prod = this.state.data_prod;
+
+    newState.renderCount = this.state.renderCount;
 
     keepItemName && (newState.data_prod.itemName = data_prod.itemName);
     keepDiscount && (newState.data_prod.discount = data_prod.discount);
