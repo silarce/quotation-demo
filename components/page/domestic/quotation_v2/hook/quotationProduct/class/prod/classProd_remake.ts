@@ -1324,7 +1324,11 @@ class ClassProd {
       return;
     }
 
-    this.reqChain_03();
+    this.state.isFetching = true;
+    this.reqChain_03().then(() => {
+      this.state.isFetching = false;
+      this.render();
+    });
 
     this.render();
   }
@@ -1384,7 +1388,11 @@ class ClassProd {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
 
-    this.reqChain_04();
+    this.state.isFetching = true;
+    this.reqChain_04().then(() => {
+      this.state.isFetching = false;
+      this.render();
+    });
 
     this.render();
   }
@@ -1426,7 +1434,11 @@ class ClassProd {
     this.renewPhase();
     this.renewDistributionBoxPrice();
 
-    this.reqChain_03();
+    this.state.isFetching = true;
+    this.reqChain_03().then(() => {
+      this.state.isFetching = false;
+      this.render();
+    });
 
     this.render();
   }
@@ -1506,12 +1518,16 @@ class ClassProd {
     const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
     data.WG = WG;
 
+    this.state.isFetching = true;
     this.reqChain_02({
       onUpdateAvailableComponentsSuccess: () => {
         if (!data.guideRailThickness) {
           data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
         }
       },
+    }).then(() => {
+      this.state.isFetching = false;
+      this.render();
     });
 
     this.render();
