@@ -466,77 +466,40 @@ class ClassProd {
     }
   }
 
-  // ---------------------------------------------------------------------------
+  afterEditGuideRailInfo() {
+    const guideRail = this.data.guideRail;
+    const guideRails = this.state.doorModel?.guideRails ?? [];
+    const guideRailInfo = guideRails.find((item) => item.imgSrc === guideRail);
 
-  // get prodData(): typeof this.data {
-  //   // 配合deepClone
-  //   // const deepFreeze = (obj: any) => {
-  //   //   Object.keys(obj).forEach((key) => {
-  //   //     if (typeof obj[key] === 'object' && obj[key] !== null) {
-  //   //       deepFreeze(obj[key]);
-  //   //     }
-  //   //   });
-  //   //   return Object.freeze(obj);
-  //   // };
-
-  //   return { ...this.data };
-  // }
-
-  // get componentDict() {
-  //   return { ...this.state.data_componentDict };
-  // }
-
-  // get doorModelName() {
-  //   return this.data.doorModelName;
-  // }
-
-  // ---------------------------------------------------------------------------
-
-  // MARK: changeDoorModel
-  changeDoorModel({ doorModel }: { doorModel: TdoorModelInfoDto | null }) {
-    this.clearState({
-      keepItemName: true,
-      keepDiscount: true,
-      keepQuoteType: true,
-    });
-
-    this.state.doorModel = doorModel;
-    this.data.doorModelName = doorModel?.name ?? '';
-
-    if (!this.state.doorModel) {
-      return;
-    }
-
-    const {
-      thickness,
-      // density,
-      // guideRails,
-      // slatMaterials,
-    } = this.state.doorModel;
-
-    this.data.thickness = thickness.replaceAll('t', '') as `${number}`;
-
-    const is304InMaterialOptions = this.options_material?.some((item) => item.value === 'SST#304');
-
-    if (this.data.doorModelName === 'SJ-305D') {
-      const theOption = this.options_material?.find((option) => {
-        if (option.value.includes('內SST') && option.value.includes('外SST')) {
-          return true;
-        }
-      });
-      this.data.materialName = theOption?.value || '';
-    } else if (is304InMaterialOptions) {
-      this.data.materialName = 'SST#304';
+    if (guideRailInfo) {
+      this.data.guideRailThickness = guideRailInfo.thickness.replaceAll('t', '') as `${number}`;
+      this.data.hasSilencingStrip = guideRailInfo.hasSilencingStrip;
+      this.data.isAntiTyphoon = guideRailInfo.withHook;
+      this.data.guideRailsOpening = guideRailInfo.opening;
+      this.data.guideRailG = guideRailInfo.width;
     } else {
-      this.data.materialName = this.options_material?.[0]?.value ?? '';
+      this.data.guideRailThickness = '';
+      this.data.hasSilencingStrip = null;
+      this.data.isAntiTyphoon = null;
+      this.data.guideRailsOpening = null;
+      this.data.guideRailG = null;
+
+      if (this.doorModelName !== 'W2') {
+        myAlert.warning({ title: '沒有對應的門軌資料' });
+      }
     }
 
-    this.renewSurface();
-
-    this.replaceToEmptyComponent();
-
-    this.render();
+    const WG_mm = calcProductWG({
+      fullWidth: this.fullWidth_mm,
+      gapA: this.data.gapA || 0,
+      gapC: this.data.gapC || 0,
+    });
+    const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    this.data.WG = WG;
   }
+
+  // ---------------------------------------------------------------------------
+
   // ==========================================================================
   // ==========================================================================
   // ==========================================================================
@@ -907,6 +870,8 @@ class ClassProd {
     this.state.availableComponents = availableComponents;
 
     this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
+    const headBoxThickness = (this.options_headBoxThickness?.[0].value || '') as `${number}`;
+    this.data.headBoxThickness = headBoxThickness || null;
 
     // // 更新材料配件
     // this.afterAvailableComponentsUpdated_sideEffect(this.state.availableComponents);
@@ -1207,6 +1172,8 @@ class ClassProd {
 
   // ----------------------------------------------------------------
 
+  // region get set edit
+
   get key() {
     return this.state.key;
   }
@@ -1258,6 +1225,65 @@ class ClassProd {
   }
   set doorModelName(value) {
     this.data.doorModelName = value;
+    this.render();
+  }
+  // MARK: changeDoorModel
+  changeDoorModel({ doorModel }: { doorModel: TdoorModelInfoDto | null }) {
+    this.clearState({
+      keepItemName: true,
+      keepDiscount: true,
+      keepQuoteType: true,
+    });
+
+    this.state.doorModel = doorModel;
+    this.data.doorModelName = doorModel?.name ?? '';
+
+    if (!this.state.doorModel) {
+      return;
+    }
+
+    const {
+      thickness,
+      // density,
+      // guideRails,
+      // slatMaterials,
+    } = this.state.doorModel;
+
+    // 門軌
+
+    const guideRails = this.state.doorModel?.guideRails ?? [];
+    const guideRailInfo = guideRails[0];
+    this.data.guideRail = guideRailInfo?.imgSrc ?? '';
+    this.afterEditGuideRailInfo();
+
+    // 門片厚度
+    this.data.thickness = thickness.replaceAll('t', '') as `${number}`;
+
+    // 材質
+    const is304InMaterialOptions = this.options_material?.some((item) => item.value === 'SST#304');
+
+    if (this.data.doorModelName === 'SJ-305D') {
+      const theOption = this.options_material?.find((option) => {
+        if (option.value.includes('內SST') && option.value.includes('外SST')) {
+          return true;
+        }
+      });
+      this.data.materialName = theOption?.value || '';
+    } else if (is304InMaterialOptions) {
+      this.data.materialName = 'SST#304';
+    } else {
+      this.data.materialName = this.options_material?.[0]?.value ?? '';
+    }
+
+    // 底座版與底座角鐵
+    this.changeBottomBarAngleIronAndBottomBarPlate(this.materialName);
+
+    // 表面
+    this.renewSurface();
+
+    // 材料配件
+    this.replaceToEmptyComponent();
+
     this.render();
   }
 
@@ -1516,49 +1542,12 @@ class ClassProd {
       return;
     }
 
-    const guideRail = this.data.guideRail;
-
-    const guideRails = this.state.doorModel?.guideRails ?? [];
-
-    const guideRailInfo = guideRails.find((item) => item.imgSrc === guideRail);
-
-    const data = this.data;
-
-    if (guideRailInfo) {
-      data.guideRailThickness = guideRailInfo.thickness.replaceAll('t', '') as `${number}`;
-      data.hasSilencingStrip = guideRailInfo.hasSilencingStrip;
-      data.isAntiTyphoon = guideRailInfo.withHook;
-      data.guideRailsOpening = guideRailInfo.opening;
-      data.guideRailG = guideRailInfo.width;
-
-      // 這時option還沒更新
-      // if (!data.guideRailThickness) {
-      //   data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
-      // }
-    } else {
-      data.guideRailThickness = '';
-      data.hasSilencingStrip = null;
-      data.isAntiTyphoon = null;
-      data.guideRailsOpening = null;
-      data.guideRailG = null;
-
-      if (this.doorModelName !== 'W2') {
-        myAlert.warning({ title: '沒有對應的門軌資料' });
-      }
-    }
-
-    const WG_mm = calcProductWG({
-      fullWidth: this.fullWidth_mm,
-      gapA: data.gapA || 0,
-      gapC: data.gapC || 0,
-    });
-    const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
-    data.WG = WG;
+    this.afterEditGuideRailInfo();
 
     this.reqChain_02({
       onUpdateAvailableComponentsSuccess: () => {
-        if (!data.guideRailThickness) {
-          data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
+        if (!this.data.guideRailThickness) {
+          this.data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
         }
       },
     });
