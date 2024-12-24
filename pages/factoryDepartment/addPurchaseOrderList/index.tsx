@@ -86,6 +86,8 @@ export default function AddPurchaseOrderList() {
     const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -143,6 +145,12 @@ export default function AddPurchaseOrderList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     // const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+
+
+    // 計算總價
+    const [totalprice1, setTotalPrice1] = useState<string>("");
+    const [taxprice1, setTaxPrice1] = useState<string>("");
+    const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
     //#endregion
 
     //#region ===========【上方功能列】
@@ -533,6 +541,38 @@ export default function AddPurchaseOrderList() {
         setSelectedItemId(itemId);
     };
 
+    // 明細異動處理
+    useEffect(() => {
+        console.log(data1);
+
+        // 每次 data2 更新時，重新計算總價和稅金
+        let totalprice = 0;
+        data2.forEach((element) => {
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
+        });
+
+        console.log(totalprice); // 應顯示正確的加總結果
+
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
+        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+    }, [data2]);
+
+
     //#endregion
 
     //#region ===========【物料篩選】
@@ -686,7 +726,9 @@ export default function AddPurchaseOrderList() {
                                 display: `${status === "" ? '' : 'none'}`
                             }}
                             onClick={() => {
+                                // console.log(data2);
                                 handleAdd();
+
                             }}
                         >
                             儲存
@@ -708,7 +750,10 @@ export default function AddPurchaseOrderList() {
                                     setPrbar(!prbar);
                                 }}
                             >
-                                從請購單帶入
+                                <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
+                                ☰
+                                </span>
+                                請購項目
                             </button>
                         </>
                     ]} />
@@ -943,7 +988,44 @@ export default function AddPurchaseOrderList() {
                                     </div>
                                 </div>
                             </div>
-                            <div></div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="小計"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: totalprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="營業稅"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: taxprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="應付金額"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: totalpayprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+
+                            </div>
                         </div>
                         {prbar && (
                             <>
@@ -964,6 +1046,30 @@ export default function AddPurchaseOrderList() {
                                         請購項目
                                     </span>
                                 </div>
+                                <div className={scss.head_content1}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="請購數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                type: "number",
+                                                value: data3.length,
+                                            },
+                                        }}
+                                    />
+                                                                        <InputSel
+                                        {...inputSelProps}
+                                        caption="請購數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                type: "number",
+                                                value: data3.length,
+                                            },
+                                        }}
+                                    />
+                                </div>
                                 <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
 
                                     <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
@@ -972,15 +1078,17 @@ export default function AddPurchaseOrderList() {
 
                                             </span>
                                             <span>序</span>
+                                            <span>請購單號</span>
                                             <span>料號</span>
                                             <span>品名</span>
                                             <span>規格</span>
                                             <span>數量</span>
+                                            <span>已採購</span>
+                                            <span>剩餘</span>
                                             <span>單位</span>
                                             <span>單價</span>
                                             <span>總價</span>
                                             <span>備註(用途說明)</span>
-                                            <span></span>
                                             <span></span>
                                         </div>
                                         {data3 && (
@@ -991,10 +1099,14 @@ export default function AddPurchaseOrderList() {
                                                 // 檢查是否已存在於 data2 中
                                                 const isChecked = data2.some(item => item.id === _item.id);
                                                 const handleCheckboxChange = (checked: any) => {
-
+                                                    console.log(data3);
+                                                    console.log(data2);
                                                     if (checked) {
+                                                        // 複製 _item 並將剩餘數量取代原本的數量
+                                                        const updatedItem = { ..._item, quantity: _item.remaining_quantity };
+                                                
                                                         // 加入到 data2
-                                                        setData2(prevData2 => [...prevData2, _item]);
+                                                        setData2(prevData2 => [...prevData2, updatedItem]);
                                                     } else {
                                                         // 從 data2 中移除
                                                         setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
@@ -1012,14 +1124,14 @@ export default function AddPurchaseOrderList() {
                                                                     checked={isChecked}
                                                                     onChange={(e) => handleCheckboxChange(e.target.checked)}
                                                                     style={{
-                                                                        transform:'scale(1.5)',
-                                                                        margin:'5px',
+                                                                        transform: 'scale(1.5)',
+                                                                        margin: '5px',
                                                                         cursor: 'pointer'
                                                                     }}
                                                                 />
 
                                                             </span>
-                                                            <span>{index + 1}</span>                                                            
+                                                            <span>{index + 1}</span>
                                                             <span>{_item.purchaserequisitionid}</span>
                                                             <span>
                                                                 <input
@@ -1057,6 +1169,32 @@ export default function AddPurchaseOrderList() {
                                                                     }}
                                                                     type={'text'}
                                                                     value={_item.quantity}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={po_quantityRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                        color:'#ea1833'
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.po_quantity}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                           
+                                                            <span>
+                                                                <input
+                                                                    ref={remaining_quantityRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.remaining_quantity}
                                                                     readOnly
                                                                 />
                                                             </span>
@@ -1114,7 +1252,10 @@ export default function AddPurchaseOrderList() {
                             </>
                         )}
                         <div
-                            style={{ paddingBottom: '18px' }}
+                            style={{
+                                paddingTop: `${prbar ? '18px' : '0px'}`,
+                                paddingBottom: '18px'
+                            }}
                         >
                             <span
                                 style={{

@@ -696,6 +696,7 @@ export default function PRequisitionList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
+                                                        <th style={{ width: '150px' }}>已轉</th>
                                                         <th style={{ width: '150px' }}>數量</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
@@ -710,6 +711,7 @@ export default function PRequisitionList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
+                                                            <td style={{ width: '150px' }}>{detail.po_quantity ?? '0'}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>

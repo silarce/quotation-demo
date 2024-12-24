@@ -2130,98 +2130,99 @@ export default function PReceiptDetail() {
                                 審核流程
                             </span>
                         </div>
-                        <div className={scss.body_foot2}>
-                            <div>
-                                {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
-                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                        尚未送審
-                                    </div>
-                                ) : (
-                                    reviewflowdata.map((item, index) => (
-                                        <div
-                                            key={index}
-                                            style={{
-                                                display: 'flex',
-                                                justifyContent: 'space-evenly', // 水平均分
-                                                alignItems: 'center', // 垂直置中
-                                                gap: '10px',
-                                            }}
-                                        >
-                                            {item.stages.map((stage: any, stageIndex: any) => (
+                        {/* <div className={scss.body_foot2}> */}
+                        <div>
+                            {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
+                                <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                    尚未送審
+                                </div>
+                            ) : (
+                                reviewflowdata.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-evenly', // 水平均分
+                                            alignItems: 'center', // 垂直置中
+                                            gap: '10px',
+                                        }}
+                                    >
+                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                            <div
+                                                key={stageIndex}
+                                                style={{
+                                                    flex: 1, // 平均分配空間
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'left', // 子項目置中
+                                                    textAlign: 'center', // 文字置中
+                                                    margin: '0 10px',
+                                                }}
+                                            >
+                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
+                                                    {stage.review_title}
+                                                </span>
                                                 <div
-                                                    key={stageIndex}
                                                     style={{
-                                                        flex: 1, // 平均分配空間
-                                                        display: 'flex',
-                                                        flexDirection: 'column',
-                                                        alignItems: 'left', // 子項目置中
-                                                        textAlign: 'center', // 文字置中
-                                                        margin: '0 10px',
+                                                        fontSize: '18px',
+                                                        display: 'flex', // 使名字和圖示並排
+                                                        alignItems: 'center', // 讓它們垂直對齊
+                                                        textAlign: 'left', // 讓文字靠左對齊
                                                     }}
                                                 >
-                                                    <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
-                                                        {stage.review_title}
-                                                    </span>
-                                                    <div
-                                                        style={{
-                                                            fontSize: '18px',
-                                                            display: 'flex', // 使名字和圖示並排
-                                                            alignItems: 'center', // 讓它們垂直對齊
-                                                            textAlign: 'left', // 讓文字靠左對齊
-                                                        }}
-                                                    >
-                                                        <span>{stage.review_person}</span>
-                                                        {stage.review_time !== "0001-01-01T00:00:00" && (
-                                                            <span style={{ paddingLeft: '5px' }}>
-                                                                <img
-                                                                    src={icon_review.src}
-                                                                    alt="review_status"
-                                                                    style={{
-                                                                        width: '25px',
-                                                                        height: '25px',
-                                                                    }}
-                                                                />
-                                                            </span>
-                                                        )}
-                                                    </div>
+                                                    <span>{stage.review_person}</span>
+                                                    {stage.review_time !== "0001-01-01T00:00:00" && (
+                                                        <span style={{ paddingLeft: '5px' }}>
+                                                            <img
+                                                                src={icon_review.src}
+                                                                alt="review_status"
+                                                                style={{
+                                                                    width: '25px',
+                                                                    height: '25px',
+                                                                }}
+                                                            />
+                                                        </span>
+                                                    )}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    ))
-                                )}
-
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
-                                {reviewflowdata2.length > 0 ? (
-                                    reviewflowdata2.map((item, index) => (
-                                        <div key={index} style={{
-                                            flex: 1, // 平均分配空間
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'left', // 子項目置中
-                                            textAlign: 'center', // 文字置中
-                                            margin: '0 10px',
-                                        }}>
-                                            <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
-                                                {item.stage_user_title}
-                                            </span>
-                                            <div style={{
-                                                fontSize: '18px',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                textAlign: 'left',
-                                            }}>
-                                                <span>{item.stage_user_name}</span>
-                                                {/* 如果有需要顯示圖示，在此處添加 */}
                                             </div>
-                                        </div>
-                                    ))
-                                ) : (
+                                        ))}
+                                    </div>
+                                ))
+                            )}
 
-                                    <></>
-                                )}
-                            </div>
                         </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                            {reviewflowdata2.length > 0 ? (
+                                reviewflowdata2.map((item, index) => (
+                                    <div key={index} style={{
+                                        flex: 1, // 平均分配空間
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'left', // 子項目置中
+                                        textAlign: 'center', // 文字置中
+                                        margin: '0 10px',
+                                    }}>
+                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                                            {item.stage_user_title}
+                                        </span>
+                                        <div style={{
+                                            fontSize: '18px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            textAlign: 'left',
+                                        }}>
+                                            <span>{item.stage_user_name}</span>
+                                            {/* 如果有需要顯示圖示，在此處添加 */}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+
+                                <></>
+                            )}
+                        </div>
+                        {/* </div> */}
+                        
                         <div
                             style={{
                                 paddingTop: '18px',
@@ -2241,42 +2242,50 @@ export default function PReceiptDetail() {
                                 審核紀錄
                             </span>
                         </div>
-                        <div className={scss.head_content1}>
-
-                            <InputSel
-                                {...inputSelProps}
-                                caption="審核次數"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        type: "number",
-                                        // style: { color: 'red' },
-                                        value: reviewhistroydata.length,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                            <div className={scss.body_content1} >
-                                <div style={{ overflowX: 'auto' }}>
-                                    <Thead01 type={'ReviewHistory2'} />
-                                    {reviewhistroydata && (
-                                        reviewhistroydata.map((_item: any, index: number) => (
-                                            <CellWithBar key={index} className={scss.panelHeader18} >
-                                                <div className={scss.row01}>
-                                                    <span>{index + 1}</span>
-                                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                    <span>{_item.document_status}</span>
-                                                    <span>{_item.current_stage}</span>
-                                                    <span>{_item.review_person}</span>
-                                                    <span>{_item.review_memo}</span>
-                                                </div>
-                                            </CellWithBar>
-                                        ))
-                                    )}
-                                </div>
+                        {reviewhistroydata.length === 0 ? (
+                            <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                尚無紀錄
                             </div>
-                        </div>
+                        ) : (
+                            <>
+                                <div className={scss.head_content1}>
+
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="審核次數"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                type: "number",
+                                                // style: { color: 'red' },
+                                                value: reviewhistroydata.length,
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                    <div className={scss.body_content1} >
+                                        <div style={{ overflowX: 'auto' }}>
+                                            <Thead01 type={'ReviewHistory2'} />
+                                            {reviewhistroydata && (
+                                                reviewhistroydata.map((_item: any, index: number) => (
+                                                    <CellWithBar key={index} className={scss.panelHeader18} >
+                                                        <div className={scss.row01}>
+                                                            <span>{index + 1}</span>
+                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                            <span>{_item.document_status}</span>
+                                                            <span>{_item.current_stage}</span>
+                                                            <span>{_item.review_person}</span>
+                                                            <span>{_item.review_memo}</span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
