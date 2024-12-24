@@ -380,6 +380,7 @@ export type {
   //
   TstateAccessoryData,
   TsetAccessory,
+  Tdata_accessoryDict,
   //
   //
   //

@@ -580,6 +580,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
           doorNModelName={activedClassProd?.doorModelName ?? ''}
           onConfirm={(v) => {
             console.log(v);
+            activedClassProd?.addAccessory(Object.values(v));
             setShowSelector(false);
           }}
         />
@@ -588,6 +589,11 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
   );
 };
 
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
+// ===================================================================
 // ===================================================================
 
 const Cell_indexNumber = (props: Tprops_cell) => {

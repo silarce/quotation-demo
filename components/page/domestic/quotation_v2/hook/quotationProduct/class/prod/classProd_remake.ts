@@ -32,6 +32,8 @@ import {
   //
   TmaterialSurface,
   TdoorComponentType,
+  //
+  TdoorAccessoryDto,
 } from 'js/api/dtoTypes';
 
 import type { TclassComponentDict } from '../../useQuotationProduct';
@@ -120,10 +122,11 @@ import {
 
 import { Class_accessory } from '../accessory/classAccessory';
 
-import type { Tdata_componentDict } from '../../type';
+import type { Tdata_componentDict, TstateAccessoryData, Tdata_accessoryDict } from '../../type';
 
 import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
 import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndThead/theadItem';
+import { Tstate_accountant } from 'components/wholePage/collection';
 
 // ================================================================================
 
@@ -724,6 +727,68 @@ class ClassProd {
   }
 
   // endregion COMPONENT
+
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+  // ==========================================================================
+
+  // region ACCESSORY
+
+  addAccessory(rawAccessoryArr: TdoorAccessoryDto[]) {
+    const dict: Tdata_accessoryDict = {};
+
+    rawAccessoryArr.forEach((acce) => {
+      const { id, name, unit: _unit, referenceSpec, cost, price } = acce;
+
+      let unit = _unit;
+
+      if (!unit) {
+        if (referenceSpec === 'fullWidth') {
+          unit = 'M';
+        } else if (referenceSpec === 'area') {
+          unit = '㎡';
+        } else {
+          unit = '組';
+        }
+      }
+
+      const state_accessory: TstateAccessoryData = {
+        codeName: id, //選配的id，也就是TdoorAccessoryDto.id
+        name: name, //名稱
+        unit, // 單位
+        quantity: '999', // 數量
+        unitPrice: '999', // 單價
+        totalPrice: '999', // 複價
+        originalPrice: price ?? undefined,
+        price: `${price || 0}`, // 牌價
+        dualPrice: '999', // 牌價複價
+        order: -1,
+        referenceSpec: referenceSpec,
+      };
+
+      dict[id] = state_accessory;
+    });
+
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+    // 沒有反應
+
+    Object.assign(this.state.data_accessoryDict, dict);
+    this.render();
+  }
 
   // ==========================================================================
   // ==========================================================================
