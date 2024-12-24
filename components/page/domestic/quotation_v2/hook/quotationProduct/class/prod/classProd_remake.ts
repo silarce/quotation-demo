@@ -123,6 +123,7 @@ import { Class_accessory } from '../accessory/classAccessory';
 import type { Tdata_componentDict } from '../../type';
 
 import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
+import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndThead/theadItem';
 
 // ================================================================================
 
@@ -777,7 +778,20 @@ class ClassProd {
   }
 
   // MARK:reqChain
-  protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
+  protected async reqChain_01({
+    //
+    withHp,
+    updateIsFetching = true,
+  }: {
+    //
+    withHp?: boolean;
+    updateIsFetching?: boolean;
+  } = {}) {
+    if (updateIsFetching) {
+      this.state.isFetching = true;
+      this.render();
+    }
+
     try {
       await this.updateProductSpec({ withHp });
       await this.updateAvailableComponents();
@@ -785,41 +799,74 @@ class ClassProd {
       await this.updateBom();
     } catch (error) {
       dealErr(error);
+    } finally {
+      this.state.isFetching = true;
+      this.render();
     }
   }
 
-  protected async reqChain_01_withHp() {
-    return await this.reqChain_01({ withHp: true });
+  protected async reqChain_01_withHp({
+    updateIsFetching,
+  }: {
+    updateIsFetching?: boolean;
+  } = {}) {
+    return await this.reqChain_01({ withHp: true, updateIsFetching });
   }
 
   protected async reqChain_02({
+    updateIsFetching = true,
     onUpdateAvailableComponentsSuccess,
   }: {
+    updateIsFetching?: boolean;
     onUpdateAvailableComponentsSuccess?: () => void;
   } = {}) {
+    if (updateIsFetching) {
+      this.state.isFetching = true;
+      this.render();
+    }
+
     try {
       await this.updateAvailableComponents().then(onUpdateAvailableComponentsSuccess);
       await this.updateComponent();
       await this.updateBom();
     } catch (error) {
       dealErr(error);
+    } finally {
+      this.state.isFetching = false;
+      this.render();
     }
   }
 
-  protected async reqChain_03() {
+  protected async reqChain_03({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
+    if (updateIsFetching) {
+      this.state.isFetching = true;
+      this.render();
+    }
+
     try {
       await this.updateComponent();
       await this.updateBom();
     } catch (error) {
       dealErr(error);
+    } finally {
+      this.state.isFetching = false;
+      this.render();
     }
   }
 
-  protected async reqChain_04() {
+  protected async reqChain_04({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
+    if (updateIsFetching) {
+      this.state.isFetching = true;
+      this.render();
+    }
+
     try {
       await this.updateBom();
     } catch (error) {
       dealErr(error);
+    } finally {
+      this.state.isFetching = false;
+      this.render();
     }
   }
 
@@ -945,7 +992,7 @@ class ClassProd {
       const funcName = _funcName as Parameters<ClassProd['addAfterChange']>[0];
 
       try {
-        await this[funcName]();
+        await this[funcName]({ updateIsFetching: false });
       } catch (error) {
         console.log(`${thisFuncName} failed`, error);
         break;
@@ -1324,11 +1371,7 @@ class ClassProd {
       return;
     }
 
-    this.state.isFetching = true;
-    this.reqChain_03().then(() => {
-      this.state.isFetching = false;
-      this.render();
-    });
+    this.reqChain_03();
 
     this.render();
   }
@@ -1388,11 +1431,7 @@ class ClassProd {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
 
-    this.state.isFetching = true;
-    this.reqChain_04().then(() => {
-      this.state.isFetching = false;
-      this.render();
-    });
+    this.reqChain_04();
 
     this.render();
   }
@@ -1434,11 +1473,7 @@ class ClassProd {
     this.renewPhase();
     this.renewDistributionBoxPrice();
 
-    this.state.isFetching = true;
-    this.reqChain_03().then(() => {
-      this.state.isFetching = false;
-      this.render();
-    });
+    this.reqChain_03();
 
     this.render();
   }
@@ -1518,16 +1553,12 @@ class ClassProd {
     const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
     data.WG = WG;
 
-    this.state.isFetching = true;
     this.reqChain_02({
       onUpdateAvailableComponentsSuccess: () => {
         if (!data.guideRailThickness) {
           data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
         }
       },
-    }).then(() => {
-      this.state.isFetching = false;
-      this.render();
     });
 
     this.render();
