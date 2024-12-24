@@ -240,6 +240,7 @@ type TcomponentRawDataDict = {
 
 interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   type: T;
+  renderCount?: number;
   //
   shouldInit?: boolean; // 是否初始化
   // 輸出

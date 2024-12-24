@@ -339,7 +339,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
           return (
             <QuotationRow_dnd_memo
               //
-              rerenderTrigger01={classComponent.state}
+              rerenderTrigger01={classComponent.state.renderCount}
               rerenderTrigger02={disabled}
               rerenderTrigger03={cellKeyArr_component}
               rerenderTrigger04={classComponent.constructor}

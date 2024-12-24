@@ -83,8 +83,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   state: TstateComponentData<T>;
   protected readonly setState: TsetComponent<T>;
   protected readonly render = () => {
-    this.setState((prev) => ({ ...prev, ...this.state })); // 這樣可以
-    // this.setState((prev) => ({ ...this.state })); // 這樣不行 // 莫名其妙
+    this.state.renderCount = (this.state.renderCount ?? 0) + 1;
+    this.setState(this.state as Tdata_componentDict[T]);
   };
 
   protected classProd: ClassProd | undefined;
@@ -120,14 +120,16 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     return this.state.material;
   }
   set material(value) {
-    this.setState((prev) => ({ ...prev, material: value }));
+    this.state.material = value;
+    this.render();
   }
 
   get materialSurface() {
     return this.state.materialSurface;
   }
   set materialSurface(value) {
-    this.setState((prev) => ({ ...prev, materialSurface: value }));
+    this.state.materialSurface = value;
+    this.render();
   }
 
   get density() {
@@ -138,21 +140,24 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     return this.state.isPainted;
   }
   set isPainted(value) {
-    this.setState((prev) => ({ ...prev, isPainted: value }));
+    this.state.isPainted = value;
+    this.render();
   }
 
   get quantity() {
     return this.state.quantity;
   }
   set quantity(value) {
-    this.setState((prev) => ({ ...prev, quantity: value }));
+    this.state.quantity = value;
+    this.render();
   }
 
   get price() {
     return this.state.price;
   }
   set price(value) {
-    this.setState((prev) => ({ ...prev, price: value }));
+    this.state.price = value;
+    this.render();
   }
 
   get dualPrice() {
