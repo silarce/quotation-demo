@@ -34,20 +34,6 @@ import { TuseQuotationProductInstance, TstateProd } from './hook/quotationProduc
 import { SearchModal_prodAccessories } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodAccessories';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
-const foo = () => {
-  const { unmount } = DragableModal.create({
-    children: (
-      <SearchModal_prodAccessories
-        doorNModelName={'SJ-302'}
-        onConfirm={(v) => {
-          console.log(v);
-          unmount();
-        }}
-      />
-    ),
-  });
-};
-
 // ===================================================================
 
 interface Tprops {
@@ -262,7 +248,7 @@ const Table_prod = ({
             })}
           </Table_dnd>
         </div>
-        <div className={scss.bottom}>
+        <div className={classNames(scss.bottom, disabled && 'invisible')}>
           <SquareBtn sharp="mini" onClick={() => {}} className={scss.btn}>
             新增主產品
           </SquareBtn>
@@ -465,9 +451,10 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 // MARK:Table_accessory
 const Table_accessory = ({ instance_useQuotationProductInstance, disabled, className }: TtableProps) => {
   const {
-    activedProd,
+    // activedProd,
+    activedClassProd,
     activedClassAccessoryDict,
-
+    // showAccessorySelector,
     // activedClassAccessoryDict,
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
@@ -480,11 +467,18 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
+  const [showSelector, setShowSelector] = useState(false);
+
   // const classAccessoryDict = createActivedClassAccessoryDict(activedProd);
 
   useEffect(() => {
     setActiveIndex(undefined);
-  }, [activedProd]);
+    setShowSelector(false);
+  }, [activedClassProd]);
+
+  useEffect(() => {
+    setShowSelector(false);
+  }, [disabled]);
 
   return (
     <div className={classNames(scss.accessoryTable, className)}>
@@ -575,11 +569,21 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
           })}
         </Table_dnd>
       </div>
-      <div className={scss.bottom}>
-        <SquareBtn sharp="mini" onClick={foo} className={scss.btn}>
+      <div className={classNames(scss.bottom, disabled && 'invisible')}>
+        <SquareBtn sharp="mini" onClick={() => setShowSelector(true)} className={scss.btn}>
           新增選配
         </SquareBtn>
       </div>
+
+      <DragableModal show={showSelector} onCrossClick={() => setShowSelector(false)}>
+        <SearchModal_prodAccessories
+          doorNModelName={activedClassProd?.doorModelName ?? ''}
+          onConfirm={(v) => {
+            console.log(v);
+            setShowSelector(false);
+          }}
+        />
+      </DragableModal>
     </div>
   );
 };

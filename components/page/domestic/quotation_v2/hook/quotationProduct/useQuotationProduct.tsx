@@ -38,12 +38,12 @@ import type {
 
 // import { lookup_classProd } from './class/prod/lookup_classProd';
 import { ClassProd } from './class/prod/classProd_remake';
-import {
-  Interface_ClassProd_base,
-  Interface_ClassProd_base2,
-  Interface_ClassProd_prime,
-  Interface_ClassProd_special,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
+// import {
+//   Interface_ClassProd_base,
+//   Interface_ClassProd_base2,
+//   Interface_ClassProd_prime,
+//   Interface_ClassProd_special,
+// } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
 
 import {
   TconfigItem,
@@ -94,6 +94,9 @@ import {
 // hook
 import { useDefaultState } from './useDefaultState';
 import { useQuotationTotalPrice } from './useQuotationPrice';
+
+// import { SearchModal_prodAccessories } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodAccessories';
+// import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 // ================================================================================
 
@@ -252,6 +255,9 @@ const useQuotationProduct = ({
   // -----------------------------------------------------------------------
 
   // region COOKED
+  //
+  //
+  //
 
   // class用來管理資料狀態
   // MARK:classProdDict
@@ -602,6 +608,30 @@ const useQuotationProduct = ({
     };
   };
 
+  // const { showAccessorySelector, closeAccessorySelector } = useMemo(() => {
+  //   const { unmount, update } = DragableModal.create();
+
+  //   const showAccessorySelector = () => {
+  //     update({
+  //       children: (
+  //         <SearchModal_prodAccessories
+  //           doorNModelName={activedClassProd?.doorModelName ?? ''}
+  //           onConfirm={(v) => {
+  //             console.log(v);
+  //             unmount();
+  //           }}
+  //         />
+  //       ),
+  //     });
+  //   };
+
+  //   const closeAccessorySelector = () => {
+  //     unmount();
+  //   };
+
+  //   return { showAccessorySelector, closeAccessorySelector };
+  // }, [activedClassProd]);
+
   // -----------------------------------------------------------------------
   // region useEffect
 
@@ -670,6 +700,7 @@ const useQuotationProduct = ({
     setCellKeyArr_accessory,
     accessoryKeyArr,
     setAccessoryKeyArr,
+    // showAccessorySelector,
     //
     nodeConfig_origin,
     nodeConfig_component_origin,
@@ -698,6 +729,7 @@ const useQuotationProduct = ({
     createClassProd,
     //
     calcProduct: calcProductBody,
+    //
   };
 };
 
