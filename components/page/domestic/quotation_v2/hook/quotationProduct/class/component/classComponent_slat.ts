@@ -26,6 +26,9 @@ class ClassCompnent_slat extends ClassCompnent_base<'slat'> implements Interface
   //
   static subspecies(subspecies: string) {
     switch (subspecies) {
+      case 'SJ-305D':
+        return ClassCompnent_slat_sj305D;
+
       case 'W2':
         return ClassCompnent_slat_W2;
 
@@ -89,6 +92,18 @@ class ClassCompnent_slat_W2 extends ClassCompnent_slat {
 
   get options_material() {
     return this.classProd?.options_material;
+  }
+}
+
+class ClassCompnent_slat_sj305D extends ClassCompnent_slat {
+  get options_material() {
+    return this.classProd?.options_material;
+  }
+
+  onProdChangeMaterial(prodMaterial: string | null | undefined) {
+    // super.onProdChangeMaterial(prodMaterial);
+    this.state.material = prodMaterial ?? '';
+    this.render();
   }
 }
 

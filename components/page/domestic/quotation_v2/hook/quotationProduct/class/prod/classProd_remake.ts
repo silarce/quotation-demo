@@ -212,10 +212,9 @@ class ClassProd {
     // this.setState({ ...this.state });
     this.state.renderCount = this.state.renderCount ? this.state.renderCount + 1 : 1;
 
-    console.log(this.state.renderCount);
     this.setState(this.state);
   }
-  // data: TstateProd['data_prod'];
+
   get data() {
     return this.state.data_prod;
   }
@@ -761,6 +760,13 @@ class ClassProd {
 
     try {
       await this.updateProductSpec({ withHp });
+
+      this.classComponentDict;
+      Object.values(this.classComponentDict).forEach((classComponentDict) => {
+        classComponentDict.onProdChangeMaterial(this.data.materialName);
+        classComponentDict.onProdChangeSurface(this.data.materialSurface);
+      });
+
       await this.updateAvailableComponents();
       await this.updateComponent();
       await this.updateBom();
@@ -876,6 +882,10 @@ class ClassProd {
     this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
     const headBoxThickness = (this.options_headBoxThickness?.[0].value || '') as `${number}`;
     this.data.headBoxThickness = headBoxThickness || null;
+
+    if (!this.data.guideRailThickness) {
+      this.data.guideRailThickness = (this.options_guideRailThickness?.[0].value || '') as `${number}` | '';
+    }
 
     // // 更新材料配件
     // this.afterAvailableComponentsUpdated_sideEffect(this.state.availableComponents);
@@ -1288,6 +1298,16 @@ class ClassProd {
     // 材料配件
     this.replaceToEmptyComponent();
 
+    // if (this.doorModelName === 'SJ-305D' && this.state.data_componentDict.slat) {
+    //   this.state.data_componentDict.slat.material = this.data.materialName;
+    // }
+
+    // this.classComponentDict
+    // Object.values(this.classComponentDict).forEach((classComponentDict) => {
+    //   classComponentDict.onProdChangeMaterial(this.data.materialName);
+    //   classComponentDict.onProdChangeSurface(this.data.materialSurface);
+    // });
+
     this.render();
   }
 
@@ -1456,6 +1476,7 @@ class ClassProd {
     // }
 
     this.renewSurface();
+    this.changeBottomBarAngleIronAndBottomBarPlate(value);
 
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.onProdChangeMaterial(this.data.materialName);
@@ -1743,15 +1764,25 @@ class ClassProd {
     this.render();
   }
 
-  // 給classComponent_bottomBar用的
+  // 以材質更新底座板與底座角鐵
   changeBottomBarAngleIronAndBottomBarPlate(
     v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
   ) {
-    const dict_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
-    const dict_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
+    const func = (v: string) => {
+      const dict_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
+      const dict_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
 
-    const bottomBarAngleIron = dict_bottomBarAngleIron[v]?.value ?? '';
-    const bottomBarPlate = dict_bottomBarPlate[v]?.value ?? '';
+      const bottomBarAngleIron = dict_bottomBarAngleIron[v]?.value ?? '';
+      const bottomBarPlate = dict_bottomBarPlate[v]?.value ?? '';
+
+      return [bottomBarAngleIron, bottomBarPlate];
+    };
+
+    let [bottomBarAngleIron, bottomBarPlate] = func(v);
+
+    if (!bottomBarAngleIron || !bottomBarPlate) {
+      [bottomBarAngleIron, bottomBarPlate] = func('SST#304');
+    }
 
     this.data.bottomBarAngleIron = bottomBarAngleIron;
     this.data.bottomBarPlate = bottomBarPlate;
