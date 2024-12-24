@@ -122,6 +122,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   set material(value) {
     this.state.material = value;
     this.renewDesc();
+
+    this.classProd?.reqChain_04();
+
     this.render();
   }
 
@@ -131,6 +134,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   set materialSurface(value) {
     this.state.materialSurface = value;
     this.renewDesc();
+
+    this.classProd?.reqChain_04();
+
     this.render();
   }
 

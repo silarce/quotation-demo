@@ -63,8 +63,13 @@ class ClassCompnent_bottomBar extends ClassCompnent_base<'bottomBar'> implements
 
   // ------------------------------------------------------------------------
 
+  get material() {
+    return super.material;
+  }
+
   set material(v: string) {
-    super.material = v;
+    this.state.material = v;
+    this.renewDesc();
 
     this.classProd?.changeBottomBarAngleIronAndBottomBarPlate(v);
     this.classProd?.reqChain_04();
