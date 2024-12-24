@@ -54,165 +54,155 @@ const createComponentDict = ({
 
   const componentDict: Tdata_componentDict = {};
 
-  slat &&
-    (componentDict.slat = {
-      type: 'slat',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: (`${classProd.state.doorModel?.density ?? ''}` || null) as `${number}` | null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: slat,
-      optionalComponent: optionalSlats,
-    });
+  componentDict.slat = {
+    type: 'slat',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: (`${classProd.state.doorModel?.density ?? ''}` || null) as `${number}` | null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: slat,
+    optionalComponent: optionalSlats,
+  };
 
-  bottomBar &&
-    (componentDict.bottomBar = {
-      type: 'bottomBar',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: bottomBar,
-      optionalComponent: optionalBottomBars,
-    });
+  componentDict.bottomBar = {
+    type: 'bottomBar',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: bottomBar,
+    optionalComponent: optionalBottomBars,
+  };
 
-  guideRail &&
-    (componentDict.guideRail = {
-      type: 'guideRail',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: guideRail,
-      optionalComponent: optionalGuideRails,
-    });
+  componentDict.guideRail = {
+    type: 'guideRail',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: guideRail,
+    optionalComponent: optionalGuideRails,
+  };
 
-  sidePlate &&
-    (componentDict.sidePlate = {
-      type: 'sidePlate',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: sidePlate,
-      optionalComponent: optionalSidePlates,
-    });
+  componentDict.sidePlate = {
+    type: 'sidePlate',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: sidePlate,
+    optionalComponent: optionalSidePlates,
+  };
 
-  roller &&
-    (componentDict.roller = {
-      type: 'roller',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: roller,
-      optionalComponent: optionalRollers,
-    });
+  componentDict.roller = {
+    type: 'roller',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: roller,
+    optionalComponent: optionalRollers,
+  };
 
-  motor &&
-    (componentDict.motor = {
-      type: 'motor',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: motor,
-      optionalComponent: optionalMotors,
-    });
+  componentDict.motor = {
+    type: 'motor',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: motor,
+    optionalComponent: optionalMotors,
+  };
 
-  motorAccessory &&
-    (componentDict.motorAccessories = {
-      type: 'motorAccessories',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: motorAccessory,
-      optionalComponent: optionalMotorAccessories,
-    });
+  componentDict.motorAccessories = {
+    type: 'motorAccessories',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: motorAccessory,
+    optionalComponent: optionalMotorAccessories,
+  };
 
-  headBox &&
-    (componentDict.headBox = {
-      type: 'headBox',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: headBox,
-      optionalComponent: optionalHeadBoxes,
-    });
+  componentDict.headBox = {
+    type: 'headBox',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: headBox,
+    optionalComponent: optionalHeadBoxes,
+  };
 
-  backBone &&
-    (componentDict.backBone = {
-      type: 'backBone',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: backBone,
-      optionalComponent: optionalBackBones,
-    });
+  componentDict.backBone = {
+    type: 'backBone',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: backBone,
+    optionalComponent: optionalBackBones,
+  };
 
-  middlePillar &&
-    (componentDict.middlePillar = {
-      type: 'middlePillar',
-      shouldInit: true,
-      number: undefined,
-      desc: '',
-      material: '',
-      materialSurface: '',
-      density: null,
-      isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
-      quantity: '',
-      price: '',
-      rawData: middlePillar,
-      optionalComponent: optionalMiddlePillars,
-    });
+  componentDict.middlePillar = {
+    type: 'middlePillar',
+    shouldInit: true,
+    number: undefined,
+    desc: '',
+    material: '',
+    materialSurface: '',
+    density: null,
+    isPainted: false, // 是否應該根據表面判斷是否預設烤漆?
+    quantity: '',
+    price: '',
+    rawData: middlePillar,
+    optionalComponent: optionalMiddlePillars,
+  };
 
   return { componentDict, changedMotorVendor };
 }; // createComponentDict

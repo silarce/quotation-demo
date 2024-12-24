@@ -651,21 +651,8 @@ class ClassProd {
       availableComponents,
     });
 
-    // console.log(componentDict.motor?.rawData?.id);
-    // console.log(componentDict.motor);
-
     Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
       const key = _key as keyof typeof this.state.data_componentDict;
-
-      // if (!componentDict[key]) {
-      //   this.state.data_componentDict[key] = undefined;
-      // } else {
-      //   Object.assign(component, {
-      //     ...componentDict[key],
-      //     material: component.material,
-      //     materialSurface: component.materialSurface,
-      //   });
-      // }
 
       // 將每個component的值替換掉，而不改變參照
       Object.assign(component, {
@@ -675,19 +662,9 @@ class ClassProd {
       });
     });
 
-    // Object.values(this.classComponentDict).forEach((classComponent) => {
-    //   const data_component = componentDict[classComponent.key];
-
-    //   if (data_component) {
-    //     classComponent.replaceState();
-    //   }
-    // });
-
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.init();
     });
-
-    // this.render();
   } // handleAvailableComponentsUpdated
 
   protected replaceToEmptyComponent() {
@@ -799,68 +776,50 @@ class ClassProd {
     return pass;
   }
 
-  // MARK:reqChain_01
+  // MARK:reqChain
   protected async reqChain_01({ withHp }: { withHp?: boolean } = {}) {
     try {
       await this.updateProductSpec({ withHp });
       await this.updateAvailableComponents();
+      await this.updateComponent();
       await this.updateBom();
     } catch (error) {
-      const err = error as { title?: string; content?: string };
-
-      if (err && 'title' in err) {
-        myAlert.err({ title: err?.title, content: err?.content });
-
-        return Promise.reject(null);
-      } else {
-        myAlert.err({ title: '預期外的錯誤' });
-
-        throw error;
-      }
+      dealErr(error);
     }
   }
 
-  // MARK:reqChain_01_withHp
   protected async reqChain_01_withHp() {
     return await this.reqChain_01({ withHp: true });
   }
 
-  // MARK:reqChain_02
-  protected async reqChain_02() {
+  protected async reqChain_02({
+    onUpdateAvailableComponentsSuccess,
+  }: {
+    onUpdateAvailableComponentsSuccess?: () => void;
+  } = {}) {
     try {
-      await this.updateAvailableComponents();
+      await this.updateAvailableComponents().then(onUpdateAvailableComponentsSuccess);
+      await this.updateComponent();
       await this.updateBom();
     } catch (error) {
-      const err = error as { title?: string; content?: string };
-
-      if (err && 'title' in err) {
-        myAlert.err({ title: err?.title, content: err?.content });
-
-        return Promise.reject(null);
-      } else {
-        myAlert.err({ title: '預期外的錯誤' });
-
-        throw error;
-      }
+      dealErr(error);
     }
   }
 
-  // MARK:reqChain_03
   protected async reqChain_03() {
+    try {
+      await this.updateComponent();
+      await this.updateBom();
+    } catch (error) {
+      dealErr(error);
+    }
+  }
+
+  protected async reqChain_04() {
     try {
       await this.updateBom();
     } catch (error) {
-      const err = error as { title?: string; content?: string };
-
-      if (err && 'title' in err) {
-        myAlert.err({ title: err?.title, content: err?.content });
-
-        return Promise.reject(null);
-      } else {
-        myAlert.err({ title: '預期外的錯誤' });
-
-        throw error;
-      }
+      dealErr(error);
     }
   }
 
@@ -902,8 +861,26 @@ class ClassProd {
 
     this.data.motorVoltage = Number(this.options_motorVoltage?.[0].value) || null;
 
+    // // 更新材料配件
+    // this.afterAvailableComponentsUpdated_sideEffect(this.state.availableComponents);
+    // const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
+
+    // if (invalidComponentArr) {
+    //   const message = invalidComponentArr.join(', ');
+    //   this.replaceToEmptyComponent();
+    //   this.state.availableComponents = null;
+
+    //   throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
+    // }
+  }
+
+  async updateComponent() {
+    if (!this.state.availableComponents) {
+      throw { title: 'updateComponent失敗', content: '未取得availableComponents' };
+    }
+
     // 更新材料配件
-    this.afterAvailableComponentsUpdated_sideEffect(availableComponents);
+    this.afterAvailableComponentsUpdated_sideEffect(this.state.availableComponents);
     const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
 
     if (invalidComponentArr) {
@@ -911,7 +888,7 @@ class ClassProd {
       this.replaceToEmptyComponent();
       this.state.availableComponents = null;
 
-      throw { title: '取得資料失敗，以下材料配件不匹配', content: message };
+      throw { title: '更新材料配件失敗，以下材料配件不匹配', content: message };
     }
   }
 
@@ -1495,9 +1472,10 @@ class ClassProd {
       data.guideRailsOpening = guideRailInfo.opening;
       data.guideRailG = guideRailInfo.width;
 
-      if (!data.guideRailThickness) {
-        data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
-      }
+      // 這時option還沒更新
+      // if (!data.guideRailThickness) {
+      //   data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
+      // }
     } else {
       data.guideRailThickness = '';
       data.hasSilencingStrip = null;
@@ -1518,9 +1496,13 @@ class ClassProd {
     const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
     data.WG = WG;
 
-    // this.addAfterChange('reqChain_02', { render: false });
-    // this.reqChain_02();
-    // this.runAfterChange();
+    this.reqChain_02({
+      onUpdateAvailableComponentsSuccess: () => {
+        if (!data.guideRailThickness) {
+          data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
+        }
+      },
+    });
 
     this.render();
   }
@@ -1693,6 +1675,20 @@ const checkComponentRawData = (componentDict: Tdata_componentDict) => {
   });
 
   return arr.length === 0 ? null : arr;
+};
+
+const dealErr = (error: unknown) => {
+  const err = error as { title?: string; content?: string };
+
+  if (err && 'title' in err) {
+    myAlert.err({ title: err?.title, content: err?.content });
+
+    return Promise.reject(null);
+  } else {
+    myAlert.err({ title: '預期外的錯誤' });
+
+    throw error;
+  }
 };
 
 // ================================================================================
