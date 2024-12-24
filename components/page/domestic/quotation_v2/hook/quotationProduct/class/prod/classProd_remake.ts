@@ -733,7 +733,7 @@ class ClassProd {
   // ==========================================================================
   // region API
 
-  checkShouldCallReqChain01() {
+  get isAllowReqChain() {
     let pass = true;
 
     !this.isValid_doorModel && (pass = false);
@@ -1327,7 +1327,7 @@ class ClassProd {
 
     this.data.area = this.calcArea(this);
 
-    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01');
+    this.isAllowReqChain && this.addAfterChange('reqChain_01');
     this.render();
   }
   get fullWidth_mm() {
@@ -1382,7 +1382,7 @@ class ClassProd {
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
     this.clearState_some();
-    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01_withHp');
+    this.isAllowReqChain && this.addAfterChange('reqChain_01_withHp');
 
     this.render();
   }
@@ -1401,7 +1401,7 @@ class ClassProd {
 
     this.clearState_some();
 
-    this.checkShouldCallReqChain01() && this.addAfterChange('reqChain_01');
+    this.isAllowReqChain && this.addAfterChange('reqChain_01');
     this.render();
   }
   get height_mm() {
@@ -1421,7 +1421,7 @@ class ClassProd {
       return;
     }
 
-    this.reqChain_03();
+    this.isAllowReqChain && this.reqChain_03();
 
     this.render();
   }
@@ -1482,7 +1482,7 @@ class ClassProd {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
 
-    this.reqChain_04();
+    this.isAllowReqChain && this.reqChain_04();
 
     this.render();
   }
@@ -1502,7 +1502,7 @@ class ClassProd {
       classComponent.onProdChangeSurface(this.data.materialSurface)
     );
 
-    this.reqChain_04();
+    this.isAllowReqChain && this.reqChain_04();
 
     this.render();
   }
@@ -1526,7 +1526,7 @@ class ClassProd {
     this.renewPhase();
     this.renewDistributionBoxPrice();
 
-    this.reqChain_03();
+    this.isAllowReqChain && this.reqChain_03();
 
     this.render();
   }
@@ -1569,13 +1569,14 @@ class ClassProd {
 
     this.afterEditGuideRailInfo();
 
-    this.reqChain_02({
-      onUpdateAvailableComponentsSuccess: () => {
-        if (!this.data.guideRailThickness) {
-          this.data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
-        }
-      },
-    });
+    this.isAllowReqChain &&
+      this.reqChain_02({
+        onUpdateAvailableComponentsSuccess: () => {
+          if (!this.data.guideRailThickness) {
+            this.data.guideRailThickness = (this.options_guideRailThickness?.[0]?.value ?? '') as `${number}` | '';
+          }
+        },
+      });
 
     this.render();
   }
@@ -1602,7 +1603,7 @@ class ClassProd {
       return;
     }
 
-    this.reqChain_03();
+    this.isAllowReqChain && this.reqChain_03();
 
     this.render();
   }
@@ -1644,7 +1645,7 @@ class ClassProd {
       return;
     }
 
-    this.reqChain_03();
+    this.isAllowReqChain && this.reqChain_03();
 
     this.render();
   }
@@ -1721,7 +1722,7 @@ class ClassProd {
       this.classComponentDict.bottomBar.material = angleIronMaterial ?? '';
     }
 
-    this.reqChain_04();
+    this.isAllowReqChain && this.reqChain_04();
 
     this.render();
   }
@@ -1759,7 +1760,7 @@ class ClassProd {
       this.classComponentDict.bottomBar.material = plateMaterial ?? '';
     }
 
-    this.reqChain_04();
+    this.isAllowReqChain && this.reqChain_04();
 
     this.render();
   }

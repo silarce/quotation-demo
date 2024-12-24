@@ -128,7 +128,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.state.material = value;
     this.renewDesc();
 
-    this.classProd?.reqChain_04();
+    this.classProd?.isAllowReqChain && this.classProd?.reqChain_04();
 
     this.render();
   }
@@ -140,7 +140,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.state.materialSurface = value;
     this.renewDesc();
 
-    this.classProd?.reqChain_04();
+    this.classProd?.isAllowReqChain && this.classProd?.reqChain_04();
 
     this.render();
   }
@@ -155,7 +155,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   set isPainted(value) {
     this.state.isPainted = value;
 
-    this.classProd?.reqChain_04();
+    this.classProd?.isAllowReqChain && this.classProd?.reqChain_04();
 
     this.render();
   }
