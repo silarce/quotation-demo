@@ -31,3 +31,4 @@ const InputSel_prod = (props: TinputSelProps) => {
 const InputSel_prod_memo_select = InputSel_prod;
 
 export { InputSel_prod, InputSel_prod_memo_select };
+export type { TinputSelProps };

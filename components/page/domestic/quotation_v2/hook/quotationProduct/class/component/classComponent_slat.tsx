@@ -5,12 +5,49 @@ import {
 } from './classComponent_base';
 import { createNodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
+import {
+  TinputSelProps,
+  InputSel_prod,
+  InputSel_prod_memo_select,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
+import { Toption } from 'js/utils/options/options';
+
 const nodeConfig = (() => {
   const nodeConfig_origin = createNodeConfig_component();
-  const { density } = nodeConfig_origin;
+  const { desc, density } = nodeConfig_origin;
 
   const nodeConfig: typeof nodeConfig_origin = {
     ...nodeConfig_origin,
+    desc: {
+      ...desc,
+      createNode({ classComponent, disabled }) {
+        const v = classComponent.desc;
+        const value = { value: v, label: v };
+
+        const slatArr = classComponent.availableComponents?.slats;
+
+        let options: Toption[] | undefined = undefined;
+
+        !!slatArr && (options = slatArr.map((item) => ({ value: item.name, label: item.name })));
+
+        const inputSelProps: TinputSelProps = {
+          disabled,
+          selectProps: {
+            props: {
+              placeholder: '',
+              // options: classComponent.options_material,
+              options,
+              value,
+              onChange(newValue) {
+                classComponent.changeRaw?.(newValue?.value ?? '');
+              },
+            },
+          },
+        };
+
+        return <InputSel_prod_memo_select {...inputSelProps} />;
+      },
+    },
     density: {
       ...density,
       createNode: ({ classComponent }) => {
@@ -103,6 +140,31 @@ class ClassCompnent_slat_sj305D extends ClassCompnent_slat {
   onProdChangeMaterial(prodMaterial: string | null | undefined) {
     // super.onProdChangeMaterial(prodMaterial);
     this.state.material = prodMaterial ?? '';
+    this.render();
+  }
+
+  renewDesc() {
+    const name = this.state.rawData?.name ?? '';
+    const desc = `${name}`;
+
+    this.state.desc = desc;
+    this.render();
+  }
+  // ------------------------------------------------------------------------
+
+  // get desc() {
+  //   return super.desc;
+  // }
+
+  changeRaw(name: string) {
+    const availableComponents_slats = this.availableComponents?.slats;
+
+    const raw = availableComponents_slats?.find((item) => item.name === name);
+
+    this.state.rawData = raw ?? null;
+
+    this.renewDesc();
+
     this.render();
   }
 }

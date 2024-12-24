@@ -11,6 +11,8 @@ import {
   TsetComponent,
 } from '../../type';
 
+import type { TdoorComponentListDto } from 'js/api/dtoTypes';
+
 // import { Interface_ClassProd_prime } from '../prod/interface';
 
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
@@ -51,6 +53,9 @@ interface Interface_ClassComponent_base {
   readonly onProdChangeMaterial: (prodMaterial: string | null | undefined) => void;
   readonly onProdChangeSurface: (prodSurface: string | null | undefined) => void;
   readonly renewDesc: () => void;
+
+  availableComponents?: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
+  changeRaw?: (v: string) => void;
   //
 }
 
@@ -199,6 +204,11 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
 
     return optionsCreator_surface_onlyPaint();
   }
+
+  get availableComponents() {
+    return this.classProd?.state.availableComponents;
+  }
+
   // -----------------------------------------------------------------------
 
   // 這個方案的型別搞不定，因此不採用，不然應該是這樣處理比較好
