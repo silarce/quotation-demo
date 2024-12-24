@@ -1315,11 +1315,17 @@ class ClassProd {
     return this.data.boxB;
   }
   set boxB(value) {
-    // if (checkIsFloat3(value)) {
-    //   return;
-    // }
-
+    value = `${fixedToFloat3(value || 0)}`;
     this.data.boxB = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    this.reqChain_03();
+
     this.render();
   }
   get boxB_mm() {
@@ -1378,6 +1384,8 @@ class ClassProd {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
 
+    this.reqChain_04();
+
     this.render();
   }
 
@@ -1417,6 +1425,8 @@ class ClassProd {
 
     this.renewPhase();
     this.renewDistributionBoxPrice();
+
+    this.reqChain_03();
 
     this.render();
   }
