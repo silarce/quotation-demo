@@ -1451,6 +1451,8 @@ class ClassProd {
       classComponent.onProdChangeSurface(this.data.materialSurface)
     );
 
+    this.reqChain_04();
+
     this.render();
   }
 
@@ -1577,13 +1579,17 @@ class ClassProd {
   }
   set guideRailThickness(value) {
     // 門軌厚度的選項是從availableComponents中取得的
-    // 門軌厚度的選項是從availableComponents中取得的
-    // 門軌厚度的選項是從availableComponents中取得的
-    // 門軌厚度的選項是從availableComponents中取得的
-    // 門軌厚度的選項是從availableComponents中取得的
-    // 門軌厚度的選項是從availableComponents中取得的
 
     this.data.guideRailThickness = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    this.reqChain_03();
+
     this.render();
   }
 
@@ -1617,6 +1623,15 @@ class ClassProd {
   }
   set headBoxThickness(value) {
     this.data.headBoxThickness = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    this.reqChain_03();
+
     this.render();
   }
 

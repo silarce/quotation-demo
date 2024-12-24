@@ -142,15 +142,19 @@ const filter_motor = (
   motors: TdoorComponentListDto['motors'],
   params: {
     horsePower: string; // 馬力數
-    gearNumber: string; // 鍊齒輪番號
-    motorVendor: string; // 馬達廠商
+    // gearNumber: string; // 鍊齒輪番號
+    // motorVendor: string; // 馬達廠商
     phase: number; // 相數
-    voltage: number; // 電壓(V)
+    // voltage: number; // 電壓(V)
     weight: number; // 荷重(kg) 用weight來比
-    hasSupportStand: boolean; // 有腳 // 馬達支撐架
+    // hasSupportStand: boolean; // 有腳 // 馬達支撐架
   }
 ) => {
-  const { gearNumber, motorVendor, phase, voltage, weight, hasSupportStand } = params;
+  const {
+    phase,
+    weight,
+    //  gearNumber, motorVendor, voltage, hasSupportStand
+  } = params;
   let horsePower = params.horsePower;
 
   const optionalArr = motors.filter((motor) => {

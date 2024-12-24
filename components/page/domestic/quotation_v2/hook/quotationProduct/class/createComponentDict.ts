@@ -262,12 +262,12 @@ const filterComponent = (classProd: ClassProd, availableComponents: TdoorCompone
   let changedMotorVendor = null;
   let { motor, optionalMotors } = filter_motor(availableComponents.motors, {
     horsePower: classProd.data.horsepower,
-    gearNumber: classProd.data.gearNumber || 'null',
-    motorVendor: motorVendor || 'null',
+    // gearNumber: classProd.data.gearNumber || 'null',
+    // motorVendor: motorVendor || 'null',
     phase: Number(classProd.data.motorPhase ?? NaN),
-    voltage: Number(classProd.data.motorVoltage ?? NaN),
+    // voltage: Number(classProd.data.motorVoltage ?? NaN),
     weight: Number(classProd.data.weight ?? NaN),
-    hasSupportStand: !!classProd.data.hasMotorSupportStand,
+    // hasSupportStand: !!classProd.data.hasMotorSupportStand,
   });
 
   // 現在使用者不能選擇馬達廠商，因此在這裡自動轉換
@@ -280,12 +280,12 @@ const filterComponent = (classProd: ClassProd, availableComponents: TdoorCompone
 
     const result = filter_motor(availableComponents.motors, {
       horsePower: classProd.data.horsepower,
-      gearNumber: classProd.data.gearNumber || 'null',
-      motorVendor: motorVendor || 'null',
+      // gearNumber: classProd.data.gearNumber || 'null',
+      // motorVendor: motorVendor || 'null',
       phase: Number(classProd.data.motorPhase ?? NaN),
-      voltage: Number(classProd.data.motorVoltage ?? NaN),
+      // voltage: Number(classProd.data.motorVoltage ?? NaN),
       weight: Number(classProd.data.weight ?? NaN),
-      hasSupportStand: !!classProd.data.hasMotorSupportStand,
+      // hasSupportStand: !!classProd.data.hasMotorSupportStand,
     });
 
     if (result) {
@@ -348,3 +348,50 @@ const filterComponent = (classProd: ClassProd, availableComponents: TdoorCompone
 };
 
 export { createComponentDict };
+
+// 過濾參數一覽
+// slat
+// isAntiTyphoon: !!classProd.data.isAntiTyphoon,
+
+// bottomBar;
+// isAntiTyphoon: !!classProd.data.isAntiTyphoon,
+// isWaterProof: classProd.data.bottomBar === '止水型',
+// hasAluminumBarrier: classProd.data.bottomBar === '鋁障感型',
+
+// guideRail;
+// thickness: Number(classProd.data.guideRailThickness),
+// isAntiTyphoon: !!classProd.data.isAntiTyphoon,
+// hasSilencingStrip: !!classProd.data.hasSilencingStrip,
+// imageName: classProd.data.guideRail || 'null',
+// isUL: !!classProd.data.isULGuideRail,
+
+// sidePlate;
+// bearingType: classProd.data.bearingName || 'null',
+// gearNumber: classProd.data.gearNumber,
+// isIntegrated: !!classProd.data.isIntegratedHeadBox,
+// motorVendor: classProd.data.motorVendor || 'null',
+// sizeB: classProd.boxB_mm,
+// weight: Number(classProd.data.weight ?? NaN),
+
+// roller;
+// diameter: classProd.data.diameter ?? '-1',
+
+// motor;
+// horsePower: classProd.data.horsepower,
+// phase: Number(classProd.data.motorPhase ?? NaN),
+// weight: Number(classProd.data.weight ?? NaN),
+
+// motorAccessory
+// chains: Number(classProd.data.sprocketWheelChains ?? NaN),
+// bearingType: classProd.data.bearingName ?? 'null',
+// gearNumber: classProd.data.gearNumber ?? 'null',
+
+// headBox
+// thickness: Number(classProd.data.headBoxThickness ?? NaN),
+// isIntegrated: !!classProd.data.isIntegratedHeadBox,
+
+// backBone
+// 沒有
+
+// middlePillar
+// 沒有
