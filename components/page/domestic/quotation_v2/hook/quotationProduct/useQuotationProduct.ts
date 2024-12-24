@@ -583,7 +583,7 @@ const useQuotationProduct = ({
       }
 
       const { doorModelName, quantity } = stateProd.data_prod;
-      totalQty_decimal.add(quantity);
+      totalQty_decimal.add(quantity || 0);
 
       !doorModelName && (isAllDoorModalValid = false);
 
