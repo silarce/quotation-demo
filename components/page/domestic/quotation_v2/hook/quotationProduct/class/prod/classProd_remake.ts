@@ -208,7 +208,9 @@ class ClassProd {
   readonly state: TstateProd;
   protected readonly setState: React.Dispatch<React.SetStateAction<TstateProd>>;
   protected render() {
-    this.setState({ ...this.state });
+    // this.setState({ ...this.state });
+    this.state.renderCount = this.state.renderCount ? this.state.renderCount + 1 : 1;
+    this.setState(this.state);
   }
   // data: TstateProd['data_prod'];
   get data() {
@@ -819,12 +821,12 @@ class ClassProd {
   }
 
   // MARK:reqChain_01_withHp
-  reqChain_01_withHp() {
-    return this.reqChain_01({ withHp: true });
+  protected async reqChain_01_withHp() {
+    return await this.reqChain_01({ withHp: true });
   }
 
   // MARK:reqChain_02
-  async reqChain_02() {
+  protected async reqChain_02() {
     try {
       await this.updateAvailableComponents();
       await this.updateBom();
@@ -844,7 +846,7 @@ class ClassProd {
   }
 
   // MARK:reqChain_03
-  async reqChain_03() {
+  protected async reqChain_03() {
     try {
       await this.updateBom();
     } catch (error) {
@@ -963,7 +965,7 @@ class ClassProd {
 
     for (const _funcName of afterChangeQueue) {
       thisFuncName = _funcName;
-      const funcName = _funcName as Parameters<typeof this.addAfterChange>[0];
+      const funcName = _funcName as Parameters<ClassProd['addAfterChange']>[0];
 
       try {
         await this[funcName]();

@@ -231,6 +231,8 @@ const Table_prod = ({
                 cellKeyArr={cellKeyArr}
                 index={index}
                 //
+                rerenderTrigger01={stateProd.renderCount}
+                //
                 prodKey={prodKey}
                 choseActiveProd={choseActiveProd}
                 createClassProd={createClassProd}
@@ -611,6 +613,7 @@ const QuotationRow_dealClass = ({
   choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
   createClassProd: TuseQuotationProductInstance['createClassProd'];
   activedClassProd: TuseQuotationProductInstance['activedClassProd'];
+  rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
 }) => {
   const [viewRef, inView] = useInView();
 
@@ -683,7 +686,8 @@ const QuotationRow_dealClass = ({
 
 const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
   return (
-    prev.stateProd === next.stateProd &&
+    prev.rerenderTrigger01 === next.rerenderTrigger01 &&
+    // prev.stateProd === next.stateProd &&
     prev.disabled === next.disabled &&
     prev.isActive === next.isActive &&
     prev.cellKeyArr === next.cellKeyArr &&
