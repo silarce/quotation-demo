@@ -31,6 +31,23 @@ import scss from './QuotationProdTable.module.scss';
 
 import { TuseQuotationProductInstance, TstateProd } from './hook/quotationProduct/useQuotationProduct';
 
+import { SearchModal_prodAccessories } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodAccessories';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+
+const foo = () => {
+  const { unmount } = DragableModal.create({
+    children: (
+      <SearchModal_prodAccessories
+        doorNModelName={'SJ-302'}
+        onConfirm={(v) => {
+          console.log(v);
+          unmount();
+        }}
+      />
+    ),
+  });
+};
+
 // ===================================================================
 
 interface Tprops {
@@ -559,7 +576,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         </Table_dnd>
       </div>
       <div className={scss.bottom}>
-        <SquareBtn sharp="mini" onClick={() => {}} className={scss.btn}>
+        <SquareBtn sharp="mini" onClick={foo} className={scss.btn}>
           新增選配
         </SquareBtn>
       </div>

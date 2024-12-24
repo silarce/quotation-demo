@@ -265,6 +265,30 @@ export const apiGetProdAccessories = (params: { modelName: string }) => {
     .catch((err) => Promise.reject(err));
 };
 
+export const useGetProdAccessories = (modelName: string) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TdoorAccessoryDto[]>();
+
+  const update = async () => {
+    try {
+      setIsFetching(true);
+      const res = await apiGetProdAccessories({ modelName });
+      setRes(res);
+    } catch (error) {
+      setRes(undefined);
+      myAlert.err({ title: '取得選配列表失敗' });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
+
 type TgetBoxDParams = {
   modelName: string;
   rollerDiameter: number;
