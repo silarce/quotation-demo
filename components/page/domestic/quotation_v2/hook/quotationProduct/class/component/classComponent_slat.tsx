@@ -14,6 +14,23 @@ import { Toption } from 'js/utils/options/options';
 
 const nodeConfig = (() => {
   const nodeConfig_origin = createNodeConfig_component();
+  const { density } = nodeConfig_origin;
+
+  const nodeConfig: typeof nodeConfig_origin = {
+    ...nodeConfig_origin,
+    density: {
+      ...density,
+      createNode: ({ classComponent }) => {
+        return classComponent.density;
+      },
+    },
+  };
+
+  return nodeConfig;
+})();
+
+const nodeConfig_sj305D = (() => {
+  const nodeConfig_origin = createNodeConfig_component();
   const { desc, density } = nodeConfig_origin;
 
   const nodeConfig: typeof nodeConfig_origin = {
@@ -133,6 +150,8 @@ class ClassCompnent_slat_W2 extends ClassCompnent_slat {
 }
 
 class ClassCompnent_slat_sj305D extends ClassCompnent_slat {
+  readonly nodeConfig = nodeConfig_sj305D;
+
   get options_material() {
     return this.classProd?.options_material;
   }
