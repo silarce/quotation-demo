@@ -23,6 +23,9 @@ import scss from './login.module.scss';
 
 import { AppContext } from 'pages/_app';
 
+const devAccount: { name: string; account: string; password: string }[] | undefined =
+  process.env.NEXT_PUBLIC_NAV_DEV_DEVACCOUNT && JSON.parse(process.env.NEXT_PUBLIC_NAV_DEV_DEVACCOUNT);
+
 const Login: NextPageWithLayout<{
   onLogin: (postBody: { account: string; password: string }) => void;
 }> = ({ onLogin }) => {
@@ -42,6 +45,21 @@ const Login: NextPageWithLayout<{
       const acc = account.trim();
       const pw = password.trim();
       await onLogin({ account: acc, password: pw });
+    } catch {
+      myAlert.err({ title: '帳號或密碼錯誤' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reqLog_dev = async (account: string, password: string) => {
+    if (isLoading) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await onLogin({ account, password });
     } catch {
       myAlert.err({ title: '帳號或密碼錯誤' });
     } finally {
@@ -112,6 +130,20 @@ const Login: NextPageWithLayout<{
 
       {/* 右下角背景的一條線 */}
       <div className={scss.bgLine} />
+      {/*  */}
+      {devAccount && (
+        <div className={scss.accountList}>
+          {devAccount?.map((item, index) => {
+            const { name, account, password } = item;
+
+            return (
+              <div key={index} onClick={() => reqLog_dev(account, password)}>
+                {name}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
