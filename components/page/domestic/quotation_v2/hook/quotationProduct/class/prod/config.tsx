@@ -453,6 +453,22 @@ const nodeConfig_origin: TnodeConfig = {
     },
     createNode({ disabled, classProd }) {
       const v = classProd.guideRail;
+
+      if (classProd.isSpecial) {
+        const inpuSelProps: TinputSelProps = {
+          inputProps: {
+            props: {
+              value: v ?? '',
+              onChange: (e) => {
+                classProd.guideRail = e.target.value;
+              },
+            },
+          },
+        };
+
+        return <InputSel_prod disabled={disabled} {...inpuSelProps} />;
+      }
+
       const value = v
         ? {
             value: v,
