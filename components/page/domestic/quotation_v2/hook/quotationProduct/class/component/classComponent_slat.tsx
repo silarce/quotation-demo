@@ -198,6 +198,8 @@ class ClassCompnent_slat_sj305D extends ClassCompnent_slat {
 
     this.renewDesc();
 
+    this.classProd?.reqChain_04();
+
     this.render();
   }
 }
