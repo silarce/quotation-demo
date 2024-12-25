@@ -280,7 +280,7 @@ class ClassProd {
         this.state.generalSpecs = null;
         this.clearGeneralSpec();
         this.state.availableComponents = null;
-        this.replaceToEmptyComponent();
+        this.replaceComponentToEmpty();
       }
     }
 
@@ -379,7 +379,7 @@ class ClassProd {
     data_prod.slatCount = null;
 
     this.clearGeneralSpec();
-    this.replaceToEmptyComponent();
+    this.replaceComponentToEmpty();
 
     this.render();
 
@@ -624,6 +624,14 @@ class ClassProd {
     Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
       const key = _key as keyof typeof this.state.data_componentDict;
 
+      if (
+        component.rawData?.id &&
+        componentDict?.[key]?.rawData?.id &&
+        component.rawData.id === componentDict[key].rawData.id
+      ) {
+        return;
+      }
+
       // 將每個component的值替換掉，而不改變參照
       Object.assign(component, {
         ...componentDict[key],
@@ -637,7 +645,7 @@ class ClassProd {
     });
   } // handleAvailableComponentsUpdated
 
-  protected replaceToEmptyComponent() {
+  protected replaceComponentToEmpty() {
     const emptyComponentDict = createEmptyComponentStateDict();
 
     const {
@@ -686,6 +694,17 @@ class ClassProd {
 
     // this.render();
   }
+
+  // params:  Tdata_componentDict
+  replaceTargetComponentToEmpty(...params: (keyof Tdata_componentDict)[]) {
+    const emptyComponentDict = createEmptyComponentStateDict();
+
+    const targetEmptyComponentDict = _.pick(emptyComponentDict, params);
+
+    Object.assign(this.state.data_componentDict, targetEmptyComponentDict);
+  }
+
+  // replaceTargetComponentToEmpty("slat","bottomBar","guideRail","sidePlate","roller","motor","motorAccessories","headBox","middlePillar","backBone")
 
   resetComponentKeyArr() {
     this.state.componentKeyArr = Object.keys(this.state.data_componentDict) as TdoorComponentType[];
@@ -931,7 +950,7 @@ class ClassProd {
   async updateAvailableComponents() {
     // 取得可用材料配件
     const availableComponents = await reqGetAvailableComponents(this).catch((err) => {
-      this.replaceToEmptyComponent();
+      this.replaceComponentToEmpty();
       this.state.availableComponents = null;
 
       throw err;
@@ -962,11 +981,12 @@ class ClassProd {
     const invalidComponentArr = checkComponentRawData(this.state.data_componentDict);
 
     if (invalidComponentArr) {
-      const message = invalidComponentArr.join(', ');
-      this.replaceToEmptyComponent();
-      this.state.availableComponents = null;
+      const content = invalidComponentArr.join(', ');
 
-      throw { title: '更新材料配件失敗，以下材料配件不匹配', content: message };
+      // this.replaceComponentToEmpty();
+      this.replaceTargetComponentToEmpty(...invalidComponentArr);
+
+      throw { title: '更新材料配件失敗，以下材料配件不匹配', content: content };
     }
   }
 
@@ -1348,7 +1368,7 @@ class ClassProd {
     this.renewSurface();
 
     // 材料配件
-    this.replaceToEmptyComponent();
+    this.replaceComponentToEmpty();
 
     // if (this.doorModelName === 'SJ-305D' && this.state.data_componentDict.slat) {
     //   this.state.data_componentDict.slat.material = this.data.materialName;
@@ -1908,11 +1928,11 @@ class ClassProd {
 // ================================================================================
 
 const checkComponentRawData = (componentDict: Tdata_componentDict) => {
-  const arr: string[] = [];
+  const arr: (keyof Tdata_componentDict)[] = [];
 
   Object.entries(componentDict).forEach(([key, com]) => {
     if (!com.rawData) {
-      arr.push(key);
+      arr.push(key as keyof Tdata_componentDict);
     }
   });
 
