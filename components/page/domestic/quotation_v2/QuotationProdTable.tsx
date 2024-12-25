@@ -579,9 +579,11 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         <SearchModal_prodAccessories
           doorNModelName={activedClassProd?.doorModelName ?? ''}
           onConfirm={(v) => {
-            console.log(v);
             activedClassProd?.addAccessory(Object.values(v));
             setShowSelector(false);
+          }}
+          checkForbbiden={({ dto }) => {
+            return accessoryKeyArr?.some((key) => key === dto.id);
           }}
         />
       </DragableModal>
