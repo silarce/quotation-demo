@@ -45,8 +45,9 @@ import {
   useQuotation_id_attachments,
   TquotationContentDto,
   TquotationContractDto,
+  apiSubmitContracting,
 } from 'js/api/api_quotation';
-import { TuserDto, TcustomerDto } from 'js/api/dtoTypes';
+import { TuserDto, TcustomerDto, TcreateQuotationVerifyFormDto } from 'js/api/dtoTypes';
 
 // hook
 import { Class_product } from 'hooks/quotation/useProduct';
@@ -107,8 +108,8 @@ export default function AttachContract({
   // region useData
 
   const {
+    //
     data: data_contract,
-
     update: update_contract,
   } = useGetContract_id_forAttach(contractId);
 
@@ -244,6 +245,8 @@ export default function AttachContract({
       averageDiscount: avgDiscount_withQty,
       //
       foreignTotal,
+      //
+      verifyForm: data_contract?.content.verifyForm,
     });
   };
 
@@ -766,6 +769,8 @@ const reqModify = async ({
   averageDiscount,
   //
   foreignTotal,
+  //
+  verifyForm,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -793,6 +798,8 @@ const reqModify = async ({
   averageDiscount: string;
   //
   foreignTotal: `${number}`;
+  //
+  verifyForm: TcreateQuotationVerifyFormDto | undefined;
 }) => {
   try {
     setIsLading(true);
@@ -866,7 +873,14 @@ const reqModify = async ({
     const divProdArr = (() => {
       const arr = Object.values(productList).map((item, index) => {
         if (item.isAttachDiv) {
-          if (item && !item.isComponentOk) {
+          if (
+            item &&
+            !item.isComponentOk &&
+            // 以前W2被視為特殊門處理，以前的特殊門W2無法通過isComponentOk
+            // 因此在這邊給W2做例外判斷
+            item.doorType !== 'W2'
+            //
+          ) {
             breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
           }
 
@@ -1011,6 +1025,8 @@ const reqModify = async ({
 
     try {
       const res = await apiQuotationModify(contractId, body);
+      const contentId = res.latestContent.id;
+      verifyForm && (await apiSubmitContracting({ contentId, body: verifyForm }));
       setIsLading(false);
       // router.back();
       router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);

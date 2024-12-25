@@ -149,8 +149,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }, []);
 
   useEffect(() => {
-    globalState_review.editUserId(userInfo?.employee?.id);
-    globalState_review.update();
+    if (userInfo) {
+      globalState_review.editUserId(userInfo?.employee?.id);
+      // globalState_review.update();
+      globalState_review.update_2();
+    }
   }, [userInfo]);
 
   // -----------------------------------------------------------------------

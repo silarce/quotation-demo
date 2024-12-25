@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './PRequisitionList.module.scss';
+import scss from './QReqList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -63,8 +63,8 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
-export default function PRequisitionList() {
-    const [pagename, setPagename] = useState<string>("請購單列表")
+export default function QReqList() {
+    const [pagename, setPagename] = useState<string>("詢價單列表")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -113,11 +113,10 @@ export default function PRequisitionList() {
     const panelList: TpanelList = [
         {
             type: 'addButton',
-            label: '新增請購單',
+            label: '新增詢價單',
             onClick: () => {
-                // setOpen(true);
                 router.push({
-                    pathname: `/factoryDepartment/addPurchaseRequisitionList`,
+                    pathname: `/factoryDepartment/addPurchaseOrderList`,
                     query: {
                     },
                 });
@@ -140,8 +139,6 @@ export default function PRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "編輯中",
-                username: userInfo?.employee?.id.toString()
             };
 
             var inputModel = {
@@ -153,7 +150,7 @@ export default function PRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionWithReviews?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetQuotereq?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -161,7 +158,7 @@ export default function PRequisitionList() {
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
-
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error: any) {
             // console.log(error.message);
@@ -176,7 +173,7 @@ export default function PRequisitionList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: id as string | undefined,
+                quoterequuid: id as string | undefined,
             };
 
 
@@ -188,12 +185,14 @@ export default function PRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetQuotereqDetailForList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const responsedata = await response.json();
             // setData1(data);
+            console.log(responsedata);
+
             return responsedata
 
 
@@ -313,8 +312,8 @@ export default function PRequisitionList() {
     //#endregion
 
     //#region  ===========【單據功能區】
-    //下拉單據明細
     const [details, setDetails] = useState<Record<number, any[]>>({});
+
     const handlePanelClick = async (id: number) => {
         const detailData = await GetDetailById(id);
         setDetails((prevDetails) => ({
@@ -331,14 +330,14 @@ export default function PRequisitionList() {
         const endDate = keywordenddate;
         const id = keyword2.trim();
         const status = keyword3.trim();
-        const note = keyword4.trim();
+        const supplier = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
             !id &&
             !status &&
-            !note) {
+            !supplier) {
             setSearchdata(data);
             return;
         }
@@ -355,7 +354,7 @@ export default function PRequisitionList() {
         // 模糊查詢請購單號
         if (id) {
             filteredData = filteredData.filter(item =>
-                item.purchaserequisitionid.toString().includes(id)
+                item.purchaseorderid.toString().includes(id)
             );
         }
 
@@ -366,12 +365,11 @@ export default function PRequisitionList() {
             );
         }
 
-        if (note) {
+        if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.note.toString().includes(note)
+                item.suppliername.toString().includes(supplier)
             );
         }
-
 
         setSearchdata(filteredData);
     };
@@ -380,7 +378,6 @@ export default function PRequisitionList() {
     useEffect(() => {
         filterData();
     }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
-
     //#endregion
 
     return (
@@ -414,9 +411,7 @@ export default function PRequisitionList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="編輯中">編輯中</option>
-                                <option value="審核中">審核中</option>
-                                <option value="已核准">已核准</option>
+                                <option value="未結案">未結案</option>
                                 <option value="已結案">已結案</option>
                             </select>
 
@@ -475,7 +470,8 @@ export default function PRequisitionList() {
                             />
                         </div>
                         <div>
-                            {/* <InputSel
+                            <InputSel
+                                // caption="單號"
                                 disabled={false}
                                 captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                 inputProps={{
@@ -488,24 +484,9 @@ export default function PRequisitionList() {
                                         }
                                     },
                                 }}
-                            /> */}
-                            <InputSel
-                                disabled={false}
-                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                inputProps={{
-                                    props: {
-                                        placeholder: '請輸入備註',
-                                        style: { width: "300px" },
-                                        value: keyword4,
-                                        onChange: (e) => {
-                                            setKeyword4(e.target.value)
-                                        }
-                                    },
-                                }}
                             />
                         </div>
                     </div>
-
                 ]}
                 customeRight={[
 
@@ -513,7 +494,7 @@ export default function PRequisitionList() {
 
                 panelList={panelList} />
             <div>
-                <Thead01 type={'PRequisition'} />
+                <Thead01 type={'QReq'} />
                 <div>
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                     {searchdata && (
@@ -525,7 +506,7 @@ export default function PRequisitionList() {
                                     className={scss.customCollapse}
                                     onChange={(key) => {
                                         if (key.includes("1")) {
-                                            handlePanelClick(_item.purchaserequisitionuuid);
+                                            handlePanelClick(_item.id);
                                         }
                                     }}
                                 >
@@ -538,10 +519,10 @@ export default function PRequisitionList() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row01} 
-                                                ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                                ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span style={{ fontSize: '18px' }}>{_item.purchaserequisitionid}</span>
+                                                    <span style={{ fontSize: '18px' }}>{_item.quotereqid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>
@@ -549,23 +530,16 @@ export default function PRequisitionList() {
                                                         {getTaiwanDateStr(_item.create_at)}
                                                     </span>
                                                     <span>
-                                                        {getTaiwanDateStr(_item.need_date)}
-                                                    </span>
-                                                    <span>
                                                         {_item.create_by}
                                                     </span>
-                                                    <span>{_item.note}</span>
+                                                    <span>
+                                                        {/* {_item.suppliername} */}
+                                                    </span>
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({
-                                                                pathname: `/factoryDepartment/PRequisitionDetail`,
+                                                                pathname: `/factoryDepartment/QReqDetail`,
                                                                 query: {
-                                                                    // purchaserequisitionuuid: _item.purchaserequisitionuuid,
-                                                                    // purchaserequisitionid: _item.purchaserequisitionid,
-                                                                    // create_at: _item.create_at,
-                                                                    // need_date: _item.need_date,
-                                                                    // create_by: _item.create_by,
-                                                                    // status: _item.status
                                                                     item: JSON.stringify(_item),
                                                                 },
                                                             });
@@ -581,114 +555,19 @@ export default function PRequisitionList() {
                                                         gap: '20px',
                                                         padding: '10px 20px',
                                                         cursor: 'pointer',
+                                                        fontSize: '16px',
                                                     }} // 水平排列
                                                 >
-                                                    {_item.stages.length === 0 ? (
-                                                        <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
-                                                    ) : (
-                                                        _item.stages.map((item: any, index: number) => {
-                                                            // 判斷圈圈顏色
-                                                            let circleColor = 'gray'; // 預設為灰色
-                                                            let textColor = 'gray'; // 預設文字顏色為灰色
-
-                                                            if (item.review_order === 1 || item.review_status === '核准') {
-                                                                circleColor = 'green';
-                                                                textColor = 'black'; // 綠色的時候文字變為黑色
-
-                                                                // 如果是核准且存在下一關，設定下一關為簽核中
-                                                                if (
-                                                                    index < _item.stages.length - 1 && // 確保不是最後一關
-                                                                    _item.stages[index + 1].review_status === '' // 下一關的狀態是空
-                                                                ) {
-                                                                    _item.stages[index + 1].review_status = '簽核中';
-                                                                }
-                                                            } else if (
-                                                                item.review_status === '簽核中' &&
-                                                                index > 0 &&
-                                                                _item.stages[index - 1].review_order + 1 === item.review_order
-                                                            ) {
-                                                                circleColor = 'red';
-                                                                textColor = 'black'; // 紅色的時候文字變為黑色
-                                                            }
-
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                    style={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '10px',
-                                                                    }}
-                                                                >
-                                                                    {/* 灰色框框 */}
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            backgroundColor: "#f5f5f5",
-                                                                            borderRadius: '15px',
-                                                                            padding: '5px 10px',
-                                                                            gap: '10px',
-                                                                        }}
-                                                                    >
-                                                                        {/* 左邊的圈圈 */}
-                                                                        <div
-                                                                            style={{
-                                                                                width: '10px',
-                                                                                height: '10px',
-                                                                                borderRadius: '50%',
-                                                                                backgroundColor: circleColor,
-                                                                            }}
-                                                                        ></div>
-                                                                        {/* 名稱 */}
-                                                                        <span style={{ color: textColor }}>
-                                                                            {item.review_status}&nbsp;
-                                                                            {item.review_person_name}
-                                                                        </span>
-                                                                    </div>
-
-                                                                    {/* 右邊的箭頭，最後一筆不顯示 */}
-                                                                    {index < _item.stages.length - 1 && (
-                                                                        <div style={{ fontSize: '20px', color: 'black' }}>
-                                                                            <svg
-                                                                                width="32"
-                                                                                height="11"
-                                                                                viewBox="0 0 32 11"
-                                                                                fill="none"
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                            >
-                                                                                <line
-                                                                                    x1="0.5"
-                                                                                    y1="5.5"
-                                                                                    x2="30.5"
-                                                                                    y2="5.5"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></line>
-                                                                                <path
-                                                                                    d="M27 2L31 5.5L27 9"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></path>
-                                                                            </svg>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })
-
-                                                    )}
-
+                                                    <span style={{ fontWeight: 'bold' }}>廠商1:</span> <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername || '無'}</span>
+                                                    <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商2:</span>  <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername2 || '無'}</span>
+                                                    <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商3:</span> <span style={{ color: '#5b5a5ad6' }}> {_item.suppliername3 || '無'}</span>
                                                 </div>
-
 
                                             </>
 
                                         )}
                                     >
-                                        <div>
+                                        <div style={{ overflowX: 'auto' }}>
                                             <table className={scss.detailTable}>
                                                 <thead>
                                                     <tr>
@@ -696,31 +575,30 @@ export default function PRequisitionList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th style={{ width: '150px' }}>已轉</th>
                                                         <th style={{ width: '150px' }}>數量</th>
                                                         <th style={{ width: '80px' }}>單位</th>
-                                                        <th style={{ width: '150px' }}>單價</th>
-                                                        <th>金額</th>
+                                                        <th style={{ width: '400px' }}>成交廠商</th>
+                                                        <th style={{ width: '150px' }}>成交單價</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {details[_item.purchaserequisitionuuid]?.map((detail: any, detailIndex: number) => (
+                                                    {details[_item.id]?.map((detail: any, detailIndex: number) => (
                                                         <tr key={detailIndex}>
-                                                            <td style={{ width: '50px' }}>{detailIndex + 1}</td>
-                                                            <td style={{ width: '100px' }}>{detail.productid}</td>
-                                                            <td style={{ width: '300px' }}>{detail.name}</td>
-                                                            <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td style={{ width: '150px' }}>{detail.po_quantity ?? '0'}</td>
-                                                            <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                                                            <td style={{ width: '80px' }}>{detail.unit}</td>
-                                                            <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
-                                                            <td>{detail.totalprice?.toLocaleString()}</td>
+                                                            <td>{detailIndex + 1}</td>
+                                                            <td>{detail.detail_productid}</td>
+                                                            <td>{detail.detail_name}</td>
+                                                            <td>{detail.detail_spec}</td>
+                                                            <td>{detail.detail_quantity?.toLocaleString()}</td>
+                                                            <td>{detail.detail_unit}</td>
+                                                            <td>{detail.supplier1_name}</td>
+                                                            <td>{detail.supplier1_unitprice?.toLocaleString()}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
                                         </div>
+
                                     </Panel>
                                 </Collapse>
                             </CellWithBar>

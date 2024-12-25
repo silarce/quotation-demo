@@ -959,6 +959,7 @@ export default function AddPurchaseRequisition() {
         handleRowClick(item.pickinglistid);
         setData2([]);
         setPickinglistid(item.pickinglistid);
+        setPickinglistuuid(item.id);
         setStatus(item.status);
         setNote(item.note);
         setCreate_atin(item.create_at);
@@ -1557,7 +1558,7 @@ export default function AddPurchaseRequisition() {
 
             getWhpositionDetailByProductId(nowproductid);
             setNowpickingqty((parseInt(nowpickingqty) + 1).toString());
-            getPickingListDetailById(pickinglistid);
+            getPickingListDetailById(pickinglistuuid);
             setWhpquantity((parseInt(whpquantity) - inboxquantity).toString());
             setInboxquantity(0);
 
@@ -1597,7 +1598,7 @@ export default function AddPurchaseRequisition() {
             // setData(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             getPickingList();
-            getPickingListDetailById(pickinglistid);
+            getPickingListDetailById(pickinglistuuid);
             await new Promise(resolve => setTimeout(resolve, 500));
 
 

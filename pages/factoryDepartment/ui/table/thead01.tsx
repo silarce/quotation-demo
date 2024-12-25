@@ -714,8 +714,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead43}>
         <span>序</span>
-        <span>入庫單號</span>
-        <span>入庫日期</span>
+        <span>單號</span>
+        <span>日期</span>
         <span>單據狀態</span>
         <span>單據備註</span>
         <span></span>
@@ -725,14 +725,18 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   //#endregion
 
 
+
+
+
+  //新
   //#region 新請購單
   else if (type === "PRequisition") {
     return (
       <div className={style.newthead1}>
         <span>序</span>
-        <span>請購單號</span>
+        <span>單號</span>
         <span>狀態</span>
-        <span>請購日期</span>
+        <span>建立日期</span>
         <span>需用日期</span>
         <span>申請人員</span>
         <span>備註</span>
@@ -743,8 +747,55 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+  //#region 審核紀錄
+  else if (type === "ReviewHistory2") {
+    return (
+      <div className={style.newthead2}>
+        <span>序</span>
+        <span>日期</span>
+        <span>狀態</span>
+        <span>關卡</span>
+        <span>人員</span>
+        <span>意見</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 採購單
+  else if (type === "POrder") {
+    return (
+      <div className={style.newthead3}>
+        <span>序</span>
+        <span>單號</span>
+        <span>狀態</span>
+        <span>建立日期</span>
+        <span>需用日期</span>
+        <span>申請人員</span>
+        <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
 
-
+    //#region 詢價單
+    else if (type === "QReq") {
+      return (
+        <div className={style.newthead4}>
+          <span>序</span>
+          <span>單號</span>
+          <span>狀態</span>
+          <span>建立日期</span>
+          <span>申請人員</span>
+          <span>
+            {/* 廠商名稱 */}
+          </span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
 
 
   else {
