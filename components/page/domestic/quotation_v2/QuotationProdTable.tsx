@@ -570,8 +570,15 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         </Table_dnd>
       </div>
       <div className={classNames(scss.bottom, disabled && 'invisible')}>
-        <SquareBtn sharp="mini" onClick={() => setShowSelector(true)} className={scss.btn}>
-          新增選配
+        <SquareBtn
+          sharp="mini"
+          className={scss.btn}
+          //
+          onClick={() => {
+            activedClassProd && !activedClassProd.isSpecial && setShowSelector(true);
+          }}
+        >
+          {activedClassProd?.isSpecial ? '特殊門無選配' : '新增選配'}
         </SquareBtn>
       </div>
 
