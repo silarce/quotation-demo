@@ -1173,7 +1173,7 @@ export const useGetContract_id_noItems_2 = (id: string | undefined, customParams
 
 export const useGetContract_id_forAttach = (id: string | undefined) => {
   const params: Tparams = {
-    populate: [...lookpu_contractPopulate.forAttach],
+    populate: [...lookpu_contractPopulate.forAttach, 'content.verifyForm'],
   };
 
   const [res, setRes] = useState<TquotationContractDto>();
@@ -1411,7 +1411,7 @@ export const apiQuotationReview = ({
     .catch((err) => Promise.reject(err));
 };
 
-/**送審 合約審核表 */
+/**更新 合約審核表 */
 export function apiSubmitContracting({ contentId, body }: { contentId: string; body: TcreateQuotationVerifyFormDto }) {
   const api = `/quotation/${contentId}/submit-contracting`;
 

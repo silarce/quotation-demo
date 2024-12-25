@@ -99,16 +99,6 @@ export default function SidePathAccountingDepartment() {
                     erpFeature: [accountingDepartment],
                     list: [
                         {
-                            label: '結算薪資作業',
-                            path: path + '/salarySettlement',
-                            erpFeature: [accountingDepartment],
-                        },
-                        {
-                            label: '薪資帳簿',
-                            path: path + '/payrollLedger',
-                            erpFeature: [accountingDepartment],
-                        },
-                        {
                             label: '薪資維護',
                             path: path + '/salaryMaintenance',
                             erpFeature: [accountingDepartment],
@@ -119,13 +109,28 @@ export default function SidePathAccountingDepartment() {
                             erpFeature: [accountingDepartment],
                         },
                         {
+                            label: '年終獎金維護',
+                            path: path + '/yearEndBonusMaintenance',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '結算薪資作業',
+                            path: path + '/salarySettlement',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
                             label: '獎金發放作業',
                             path: path + '/bonusPayout',
                             erpFeature: [accountingDepartment],
                         },
                         {
-                            label: '年終獎金維護',
-                            path: path + '/yearEndBonusMaintenance',
+                            label: '薪資帳簿',
+                            path: path + '/payrollLedger',
+                            erpFeature: [accountingDepartment],
+                        },
+                        {
+                            label: '獎金帳簿',
+                            path: path + '/bonusLedger',
                             erpFeature: [accountingDepartment],
                         },
                     ],

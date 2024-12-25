@@ -1829,7 +1829,7 @@ export default function ProductList() {
                                     </button>
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div>
+                                    <div style={{display:'none'}}>
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
@@ -1903,7 +1903,10 @@ export default function ProductList() {
                                             inputProps={{
                                                 props: {
                                                     value: addproductid,
-                                                    onChange: (e) => handleProductidChange(e),
+                                                    onChange: (e) => { 
+                                                        // handleProductidChange(e)
+                                                        setAddProductid(e.target.value)
+                                                     },
                                                 },
                                             }}
                                         />
