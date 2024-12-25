@@ -1081,11 +1081,14 @@ const comCellConfig: TcellConfig = {
 // ============================================================================================
 
 const creDesc_slats = (classCom: Class_component) => {
-  const { isAntiTyphoon, material, surface, thickness, name } = classCom;
+  const { isAntiTyphoon, material, surface, thickness, name, options_material } = classCom;
   const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
 
+  let label = options_material.find((item) => item.value === material)?.label;
+  label = (label || material) ?? '';
+
   // return `${desc_isAntiTyphoon} `;
-  return `${name ?? ''} ${material ?? ''} ${thickness ?? ''}`;
+  return `${name ?? ''} ${label} ${thickness ?? ''}`;
 };
 
 const creDesc_bottomBars = (classCom: Class_component) => {

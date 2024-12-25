@@ -3204,6 +3204,13 @@ class Class_product {
       this.surface = this.options_surface?.[0].value ?? '';
     }
 
+    // label為鐵材烤漆，value為黑鐵
+    if (this.doorType === 'SJ-302' && v === '黑鐵') {
+      this.comList?.headBox && (this.comList.headBox.material = '鍍鋅鋼板');
+      this.comList?.guideRail && (this.comList.guideRail.material = '鍍鋅鋼板');
+      this.comList?.bottomBar && (this.comList.bottomBar.material = '鍍鋅鋼板');
+    }
+
     this.reRender();
   }
   //

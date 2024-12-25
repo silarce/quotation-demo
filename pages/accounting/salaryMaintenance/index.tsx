@@ -62,6 +62,8 @@ export default function salaryMaintenance() {
     const [leavedata, setLeavedata] = useState<any[]>([]);
     const [originalleavedata, setOriginalLeavedata] = useState<any[]>([]);
     const [originaldata, setOriginalData] = useState<any[]>([]);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [departmentOptions, setDepartmentOptions] = useState<string[]>([]);
 
     //普通變數
     const [currentemp, setCurrentEmp] = useState<string>("");
@@ -99,6 +101,10 @@ export default function salaryMaintenance() {
     const [editbtn, seteditbtn] = useState<boolean>(false);
     const [addbar, setaddbar] = useState<boolean>(false);
     const [editall, seteditall] = useState<boolean>(false);
+
+    //關鍵字搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
 
     //#endregion
 
@@ -233,6 +239,19 @@ export default function salaryMaintenance() {
 
             console.log(responsedata); // 檢查排序後的資料
             setData(responsedata);
+            setSearchdata(responsedata)
+
+
+            const departments = Array.from(
+                new Set(
+                    responsedata
+                        .map((item: any) => item.department) // 取出 department
+                        .filter((dept: string) => dept) // 過濾掉 falsy 值
+                )
+            ) as string[]; // 斷言為 string[]
+            setDepartmentOptions(departments);
+
+
 
         } catch (error: any) {
             console.log(error.message);
@@ -861,6 +880,55 @@ export default function salaryMaintenance() {
         setSelectedItemId(itemId);
     };
 
+
+    //#region ===========【人員篩選】
+    const filterData = () => {
+        const name = keyword1.trim();
+        const department = keyword2.trim();
+        // const supplier = keyword4.trim();
+
+        // 檢查是否所有條件都為空
+        if (!name && !department) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        // let filteredData = data.filter(item => {
+        //     const createAt = moment(item.create_at);
+        //     const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+        //         ? true
+        //         : createAt.isBetween(startDate, endDate, 'days', '[]');
+        //     return isDateInRange;
+        // });
+
+        let filteredData = data;
+
+        if (name) {
+            filteredData = filteredData.filter(item =>
+                item.ch_name.toString().includes(name)
+            );
+        }
+
+        if (department) {
+            filteredData = filteredData.filter(item =>
+                item.department.toString().includes(department)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keyword1, keyword2]);
+    //#endregion
+
+
+
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             {/* <PageHeader02 tag={'BOM維護'} panelList={panelList} /> */}
@@ -868,6 +936,41 @@ export default function salaryMaintenance() {
                 customeRight={
                     [
                         <span>
+                            <select
+                                value={keyword2 || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                    setKeyword2(e.target.value);
+                                    e.target.blur(); // 讓 select 失去焦點
+                                }}
+                                disabled={false} // 根據需求設置是否禁用
+                                style={{
+                                    fontSize: '18px', // 字體大小調整
+                                    borderBottom: '1px solid #c1c1c1',
+                                    color: 'black',
+                                    width: '200px',
+                                    height: '30px', // 明確設定高度，與 input 對齊
+                                    lineHeight: 'normal', // 保持文字垂直居中
+                                    padding: '0px 5px', // 與 input 的 padding 一致
+                                    verticalAlign: 'middle', // 確保 select 與 input 垂直對齊
+                                    borderRight:'1px solid #c1c1c1'
+                                }}
+                            >
+                                <option value="">部門</option>
+                                {departmentOptions.map((dept, index) => (
+                                    <option key={index} value={dept}>
+                                        {dept}
+                                    </option>
+                                ))}
+                            </select>
+
+
+                            <input
+                                type="text"
+                                placeholder='請輸入姓名'
+                                value={keyword1}
+                                style={{ padding: '4px 5px', width: '350px', fontSize: '18px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                onChange={(e) => setKeyword1(e.target.value)}
+                            />
                             <span style={{ display: `${data.length <= 0 ? '' : 'none'}` }}>
                                 {/* <button className={scss.longsquarebtn}
                                     onClick={() => {
@@ -876,6 +979,8 @@ export default function salaryMaintenance() {
                                     title="產生薪資">
                                     產生薪資
                                 </button> */}
+
+
                             </span>
                             <span style={{ display: `${status === "審核中" ? 'none' : ''}` }}>
                                 <span style={{ display: `${(data.length > 0 && editall === false) ? '' : 'none'}`, padding: '0px 10px' }}>
@@ -976,8 +1081,8 @@ export default function salaryMaintenance() {
 
                         </div>
                         <span>
-                            {data && (
-                                data.map((_item: any, index: number) => {
+                            {searchdata && (
+                                searchdata.map((_item: any, index: number) => {
                                     // 計算總薪資
                                     const taxTotal = parseFloat(_item.salary || 0) + parseFloat(_item.supplement || 0) + parseFloat(_item.allowance || 0) + parseFloat(_item.perfect_attendance_bonus || 0) - parseFloat(_item.leave_day_pay || 0);
                                     const earning_total = taxTotal + parseFloat(_item.overtime_pay || 0)

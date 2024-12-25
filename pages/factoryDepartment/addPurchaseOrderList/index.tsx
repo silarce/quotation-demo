@@ -29,7 +29,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
-import { Modal } from 'antd';
+import { Collapse, Modal } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
@@ -42,6 +42,7 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import { Panel } from 'components/global/myAntd/collapse';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -66,12 +67,14 @@ export default function AddPurchaseOrderList() {
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
+    const [data3, setData3] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [modaldata, setModalData] = useState<any[]>([]);
     const [searchbardata, setSearchBarData] = useState<any[]>([]);
     const [searchdata, setSearchdata] = useState<any[]>([]);
     const [prdata, setPrdata] = useState<any[]>([]);
     const [customerdata, setCustomerdata] = useState<any[]>([]);
+    const [prbardata, setPrbarData] = useState<any[]>([]);
 
     const [error, setError] = useState<string | null>(null);
 
@@ -83,6 +86,8 @@ export default function AddPurchaseOrderList() {
     const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -140,6 +145,12 @@ export default function AddPurchaseOrderList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     // const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+
+
+    // 計算總價
+    const [totalprice1, setTotalPrice1] = useState<string>("");
+    const [taxprice1, setTaxPrice1] = useState<string>("");
+    const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
     //#endregion
 
     //#region ===========【上方功能列】
@@ -243,6 +254,7 @@ export default function AddPurchaseOrderList() {
             setCreate_byin(userInfo?.employee?.chName.toString() || '');
             setNeed_datein(moment().format('YYYY-MM-DD') || '');
             setShippingaddressin("台中市霧峰區峰北路666號");
+            getPRequisition();
             hasFetchedData.current = true;
         }
     }, []);
@@ -340,9 +352,9 @@ export default function AddPurchaseOrderList() {
             if (result.success) {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
-                setidin(result.purchaseorderid);
-                setuuidin(result.purchaseorderuuid);
-                setStatusin("採購中");
+                setidin(result.id);
+                setuuidin(result.uuid);
+                setStatusin("編輯中");
                 router.push({
                     pathname: `/factoryDepartment/POrderList`,
                     query: {
@@ -401,7 +413,46 @@ export default function AddPurchaseOrderList() {
         }
     };
 
+    //取請購(轉採購用)
+    const getPRequisition = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+            };
 
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPRequisitionForAddPOrder?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+
+            setData3(responsedata);
+            setPrbarData(responsedata);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    //#endregion
+
+    //#region ===========【單據功能區】
+    const handleAdd = () => {
+        Add();
+    }
     //#endregion
 
     //#region ===========【明細功能區】
@@ -439,7 +490,7 @@ export default function AddPurchaseOrderList() {
     };
 
     // 從明細移除
-    const handleRemove = (index: number, item: any) => {
+    const handleRemoveDetail = (index: number, item: any) => {
         myAlert.confirm({
             title: '確定移除?',
             props: {
@@ -489,6 +540,38 @@ export default function AddPurchaseOrderList() {
     const handleRowClick = (itemId: string) => {
         setSelectedItemId(itemId);
     };
+
+    // 明細異動處理
+    useEffect(() => {
+        console.log(data1);
+
+        // 每次 data2 更新時，重新計算總價和稅金
+        let totalprice = 0;
+        data2.forEach((element) => {
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
+        });
+
+        console.log(totalprice); // 應顯示正確的加總結果
+
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
+        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+    }, [data2]);
+
 
     //#endregion
 
@@ -616,6 +699,13 @@ export default function AddPurchaseOrderList() {
     //#endregion
 
 
+    //#region  ===========【請購帶入功能區】
+    const [prbar, setPrbar] = useState(false);
+
+
+
+    //#endregion
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
@@ -636,7 +726,9 @@ export default function AddPurchaseOrderList() {
                                 display: `${status === "" ? '' : 'none'}`
                             }}
                             onClick={() => {
-                                Add();
+                                // console.log(data2);
+                                handleAdd();
+
                             }}
                         >
                             儲存
@@ -650,6 +742,19 @@ export default function AddPurchaseOrderList() {
                             <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
                                 {status}
                             </span>
+                            <button
+                                className={scss.shortsquarebtn}
+                                style={{
+                                }}
+                                onClick={() => {
+                                    setPrbar(!prbar);
+                                }}
+                            >
+                                <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
+                                ☰
+                                </span>
+                                請購項目
+                            </button>
                         </>
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -862,7 +967,7 @@ export default function AddPurchaseOrderList() {
                                                 borderRadius: '3px',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.3s ease',
-                                                fontWeight:'bolder'
+                                                fontWeight: 'bolder'
                                             }}
                                             onMouseOver={(e) => {
                                                 e.currentTarget.style.backgroundColor = '#e0e0e0';
@@ -883,10 +988,274 @@ export default function AddPurchaseOrderList() {
                                     </div>
                                 </div>
                             </div>
-                            <div></div>
+                            <div>
+                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="小計"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: totalprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="營業稅"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: taxprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="應付金額"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                style: { textAlign: 'right' },
+                                                value: totalpayprice1 || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+
+                            </div>
                         </div>
+                        {prbar && (
+                            <>
+
+                                <div
+                                    style={{ paddingBottom: '18px' }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
+                                        }}
+                                    >
+                                        請購項目
+                                    </span>
+                                </div>
+                                <div className={scss.head_content1}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="請購數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                type: "number",
+                                                value: data3.length,
+                                            },
+                                        }}
+                                    />
+                                                                        <InputSel
+                                        {...inputSelProps}
+                                        caption="請購數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                type: "number",
+                                                value: data3.length,
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+
+                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                        <div className={scss.thead22}>
+                                            <span>
+
+                                            </span>
+                                            <span>序</span>
+                                            <span>請購單號</span>
+                                            <span>料號</span>
+                                            <span>品名</span>
+                                            <span>規格</span>
+                                            <span>數量</span>
+                                            <span>已採購</span>
+                                            <span>剩餘</span>
+                                            <span>單位</span>
+                                            <span>單價</span>
+                                            <span>總價</span>
+                                            <span>備註(用途說明)</span>
+                                            <span></span>
+                                        </div>
+                                        {data3 && (
+                                            data3.map((_item, index) => {
+                                                const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                                                _item.totalprice = Totalprice;
+
+                                                // 檢查是否已存在於 data2 中
+                                                const isChecked = data2.some(item => item.id === _item.id);
+                                                const handleCheckboxChange = (checked: any) => {
+                                                    console.log(data3);
+                                                    console.log(data2);
+                                                    if (checked) {
+                                                        // 複製 _item 並將剩餘數量取代原本的數量
+                                                        const updatedItem = { ..._item, quantity: _item.remaining_quantity };
+                                                
+                                                        // 加入到 data2
+                                                        setData2(prevData2 => [...prevData2, updatedItem]);
+                                                    } else {
+                                                        // 從 data2 中移除
+                                                        setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
+                                                    }
+                                                };
+                                                return (
+                                                    <CellWithBar key={index} className={scss.panelHeader22}>
+                                                        <div className={scss.row01}>
+                                                            <span>
+                                                                {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                        </button> */}
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={isChecked}
+                                                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                                                    style={{
+                                                                        transform: 'scale(1.5)',
+                                                                        margin: '5px',
+                                                                        cursor: 'pointer'
+                                                                    }}
+                                                                />
+
+                                                            </span>
+                                                            <span>{index + 1}</span>
+                                                            <span>{_item.purchaserequisitionid}</span>
+                                                            <span>
+                                                                <input
+                                                                    ref={productidRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                    type="text"
+                                                                    value={_item.productid !== undefined ? _item.productid : ''}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={nameRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                    type="text"
+                                                                    value={_item.name !== undefined ? _item.name : ''}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={specRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                    type="text"
+                                                                    value={_item.spec !== undefined ? _item.spec : ''}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={quantityRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.quantity}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={po_quantityRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                        color:'#ea1833'
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.po_quantity}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                           
+                                                            <span>
+                                                                <input
+                                                                    ref={remaining_quantityRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.remaining_quantity}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={unitRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                    type="text"
+                                                                    value={_item.unit !== undefined ? _item.unit : ''}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={unitpriceRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.unitprice}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={totalpriceRefs.current[index]}
+                                                                    style={{
+                                                                        backgroundColor: 'transparent',
+                                                                        width: '95%',
+                                                                    }}
+                                                                    type={'text'}
+                                                                    value={_item.totalprice}
+                                                                    readOnly
+
+                                                                />
+                                                            </span>
+                                                            <span>
+                                                                <input
+                                                                    ref={noteRefs.current[index]}
+                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                    type="text"
+                                                                    value={_item.note !== undefined ? _item.note : ''}
+                                                                    readOnly
+                                                                />
+                                                            </span>
+                                                        </div>
+                                                    </CellWithBar>
+                                                );
+
+                                            })
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
                         <div
-                            style={{ paddingBottom: '18px' }}
+                            style={{
+                                paddingTop: `${prbar ? '18px' : '0px'}`,
+                                paddingBottom: '18px'
+                            }}
                         >
                             <span
                                 style={{
@@ -900,9 +1269,6 @@ export default function AddPurchaseOrderList() {
                             >
                                 採購項目
                             </span>
-                            {/* {handinputproductid}/{handinputname}/{handinputspec}<br/>
-                            數量{searchbardata.length}
-                            數量{filteredData.length} */}
                         </div>
                         <div className={scss.head_content1}>
 
@@ -947,7 +1313,7 @@ export default function AddPurchaseOrderList() {
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index, _item) }}>
+                                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -1103,7 +1469,8 @@ export default function AddPurchaseOrderList() {
                                             overflowY: 'auto',
                                             marginTop: '0px',
                                             left: '20px',
-                                            position: 'absolute',
+                                            // position: 'relative',
+                                            position: 'sticky',
                                             width: '1000px',
                                             backgroundColor: 'white',
                                             zIndex: 1004,
@@ -1143,8 +1510,11 @@ export default function AddPurchaseOrderList() {
                             <div>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
+
                 <Modal
                     visible={customerbar}
                     onCancel={() => setCustomerbar(false)}
