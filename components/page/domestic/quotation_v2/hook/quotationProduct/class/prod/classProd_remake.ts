@@ -1258,7 +1258,7 @@ class ClassProd {
 
   // ----------------------------------------------------------------
 
-  // region get set edit
+  // region GET SET EDIT
 
   get key() {
     return this.state.key;
@@ -1268,6 +1268,7 @@ class ClassProd {
     return this.data.id;
   }
 
+  // MARK:itemName
   get itemName() {
     return this.data.itemName;
   }
@@ -1276,6 +1277,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:discount
   get discount() {
     return this.data.discount;
   }
@@ -1288,6 +1290,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:quoteType
   get quoteType() {
     return this.data.quoteType;
   }
@@ -1306,6 +1309,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:doorModelName
   get doorModelName() {
     return this.data.doorModelName;
   }
@@ -1383,6 +1387,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:fullWidth
   get fullWidth() {
     return this.data.fullWidth;
   }
@@ -1416,6 +1421,7 @@ class ClassProd {
   //   return new Decimal(this.data.WG).mul(1000).toNumber();
   // }
 
+  // MARK:W
   // W要額外處理
   get W() {
     const WG_mm = new Decimal(this.data.WG || 0).mul(1000).toNumber();
@@ -1459,6 +1465,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:height
   get height() {
     return this.data.height;
   }
@@ -1480,6 +1487,7 @@ class ClassProd {
     return new Decimal(this.data.height || 0).mul(1000).toNumber();
   }
 
+  // MARK:boxB
   get boxB() {
     return this.data.boxB;
   }
@@ -1501,6 +1509,7 @@ class ClassProd {
     return new Decimal(this.data.boxB || 0).mul(1000).toNumber();
   }
 
+  // MARK:boxD
   get boxD() {
     return this.data.boxD;
   }
@@ -1512,18 +1521,22 @@ class ClassProd {
     return new Decimal(this.data.boxD || 0).mul(1000).toNumber();
   }
 
+  // MARK:area
   get area() {
     return this.data.area ?? '';
   }
 
+  // MARK:volume
   get volume() {
     return this.data.volume ?? '';
   }
 
+  // MARK:thickness
   get thickness() {
     return this.data.thickness;
   }
 
+  // MARK:materialName
   get materialName() {
     return this.data.materialName;
   }
@@ -1558,7 +1571,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:materialSurface
   get materialSurface() {
     return this.data.materialSurface;
   }
@@ -1578,7 +1591,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:horsepower
   get horsepower() {
     return this.data.horsepower;
   }
@@ -1602,7 +1615,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:motorVendor
   get motorVendor() {
     return this.data.motorVendor;
   }
@@ -1610,7 +1623,7 @@ class ClassProd {
     this.data.motorVendor = value;
     this.render();
   }
-
+  // MARK:motorVoltage
   get motorVoltage() {
     return this.data.motorVoltage;
   }
@@ -1618,7 +1631,7 @@ class ClassProd {
     this.data.motorVoltage = value;
     this.render();
   }
-
+  // MARK:motorPhase
   get motorPhase() {
     return this.data.motorPhase;
   }
@@ -1626,7 +1639,7 @@ class ClassProd {
     this.data.motorPhase = value;
     this.render();
   }
-
+  // MARK:guideRail
   get guideRail() {
     return this.data.guideRail;
   }
@@ -1652,7 +1665,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:guideRailImg
   get guideRailImg() {
     if (!this.data.guideRail) {
       return undefined;
@@ -1660,7 +1673,7 @@ class ClassProd {
 
     return createAssetUrl(this.data.guideRail);
   }
-
+  // MARK:guideRailThickness
   get guideRailThickness() {
     return this.data.guideRailThickness;
   }
@@ -1679,7 +1692,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:hasSilencingStrip
   get hasSilencingStrip() {
     return this.data.hasSilencingStrip;
   }
@@ -1688,7 +1701,7 @@ class ClassProd {
   //   this.data.hasSilencingStrip = value;
   //   this.render();
   // }
-
+  // MARK:isUlGuideRail
   get isULGuideRail() {
     return this.data.isULGuideRail;
   }
@@ -1705,7 +1718,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:isIntegratedHeadBox
   get isIntegratedHeadBox() {
     return this.data.isIntegratedHeadBox;
   }
@@ -1721,7 +1734,7 @@ class ClassProd {
     this.reqChain_03();
     this.render();
   }
-
+  // MARK:headBoxThickness
   get headBoxThickness() {
     return this.data.headBoxThickness;
   }
@@ -1738,7 +1751,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:isAntiTyphoon
   get isAntiTyphoon() {
     return this.data.isAntiTyphoon;
   }
@@ -1748,6 +1761,7 @@ class ClassProd {
   //   this.render();
   // }
 
+  // MARK:bounceDoorWidth
   get bounceDoorWidth() {
     return this.data.bounceDoorWidth;
   }
@@ -1760,7 +1774,7 @@ class ClassProd {
     this.data.bounceDoor = !!value;
     this.render();
   }
-
+  // MARK:closingType
   get closingType() {
     return this.data.closingType;
   }
@@ -1769,7 +1783,7 @@ class ClassProd {
     this.data.closingType = value;
     this.render();
   }
-
+  // MARK:notes
   get notes() {
     return this.data.notes;
   }
@@ -1777,7 +1791,7 @@ class ClassProd {
     this.data.notes = value;
     this.render();
   }
-
+  // MARK:bottomBarAngleIron
   get bottomBarAngleIron() {
     return this.data.bottomBarAngleIron;
   }
@@ -1815,7 +1829,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:bottomBarPlate
   get bottomBarPlate() {
     return this.data.bottomBarPlate;
   }
@@ -1854,6 +1868,7 @@ class ClassProd {
     this.render();
   }
 
+  // MARK:changeBottomBarAngleIronAndBottomBarPlate
   // 以材質更新底座板與底座角鐵
   changeBottomBarAngleIronAndBottomBarPlate(
     v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
@@ -1879,7 +1894,7 @@ class ClassProd {
 
     this.render();
   }
-
+  // MARK:quantity
   get quantity() {
     return this.data.quantity;
   }
@@ -1887,7 +1902,7 @@ class ClassProd {
     this.data.quantity = value;
     this.render();
   }
-
+  // MARK:unitPrice
   get unitPrice() {
     return this.data.unitPrice;
   }
@@ -1895,7 +1910,7 @@ class ClassProd {
     this.data.unitPrice = value;
     this.render();
   }
-
+  // MARK:totalPrice
   get totalPrice() {
     return this.data.totalPrice;
   }
@@ -1903,7 +1918,7 @@ class ClassProd {
     this.data.totalPrice = value;
     this.render();
   }
-
+  // MARK:price
   get price() {
     return this.data.price;
   }
@@ -1911,7 +1926,7 @@ class ClassProd {
     this.data.price = value;
     this.render();
   }
-
+  // MARK:dualPrice
   get dualPrice() {
     return this.data.dualPrice;
   }
