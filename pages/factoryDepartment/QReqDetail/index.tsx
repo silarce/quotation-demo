@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './POrderDetail.module.scss';
+import scss from './QReqDetail.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -53,13 +53,15 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function POrderDetail() {
+export default function QReqDetail() {
     //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("採購單")
-    const [statusarea, setStatusarea] = useState<boolean>(true)
+    const [pagename, setPagename] = useState<string>("詢價單")
+    const [statusarea, setStatusarea] = useState<boolean>(false)
     const [excelopen, setExcelopen] = useState<boolean>(true)
-    const [printopen, setPrintopen] = useState<boolean>(true)
+    const [printopen, setPrintopen] = useState<boolean>(false)
+
     //#endregion
+
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -102,6 +104,15 @@ export default function POrderDetail() {
     const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const suppliername1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitprice1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const awarded1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const suppliername2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitprice2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const awarded2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const suppliername3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitprice3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const awarded3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -128,8 +139,28 @@ export default function POrderDetail() {
     const [supplieruuidin, setSupplieruuidin] = useState<string>("");
     const [suppliercontactin, setSuppliercontactin] = useState<string>("");
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
+    const [suppliername2in, setSuppliername2in] = useState<string>("");
+    const [supplierphone2in, setSupplierphone2in] = useState<string>("");
+    const [suppliertaxid2in, setSuppliertaxid2in] = useState<string>("");
+    const [supplieraddress2in, setSupplieraddress2in] = useState<string>("");
+    const [supplierfax2in, setSupplierfax2in] = useState<string>("");
+    const [supplierid2in, setSupplierid2in] = useState<string>("");
+    const [supplieruuid2in, setSupplieruuid2in] = useState<string>("");
+    const [suppliercontact2in, setSuppliercontact2in] = useState<string>("");
+    const [shippingaddress2in, setShippingaddress2in] = useState<string>("");
+    const [suppliername3in, setSuppliername3in] = useState<string>("");
+    const [supplierphone3in, setSupplierphone3in] = useState<string>("");
+    const [suppliertaxid3in, setSuppliertaxid3in] = useState<string>("");
+    const [supplieraddress3in, setSupplieraddress3in] = useState<string>("");
+    const [supplierfax3in, setSupplierfax3in] = useState<string>("");
+    const [supplierid3in, setSupplierid3in] = useState<string>("");
+    const [supplieruuid3in, setSupplieruuid3in] = useState<string>("");
+    const [suppliercontact3in, setSuppliercontact3in] = useState<string>("");
+    const [shippingaddress3in, setShippingaddress3in] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
+    const [currentsupplier, setCurrentSupplier] = useState(1);
+
 
     //編輯時保留原始資料
     const [originalsuppliername, setOriginalsuppliername] = useState<string>("");
@@ -142,6 +173,16 @@ export default function POrderDetail() {
     const [originalneed_date, setOriginalneed_date] = useState<string>("");
     const [originalnote, setOriginalnote] = useState<string>("");
     const [originaldata2, setOriginaldata2] = useState<any[]>([]);
+    const [originalsuppliername2, setOriginalsuppliername2] = useState<string>("");
+    const [originalsupplierphone2, setOriginalsupplierphone2] = useState<string>("");
+    const [originalsuppliertaxid2, setOriginalsuppliertaxid2] = useState<string>("");
+    const [originalsupplieraddress2, setOriginalsupplieraddress2] = useState<string>("");
+    const [originalshippingaddress2, setOriginalshippingaddress2] = useState<string>("");
+    const [originalsuppliername3, setOriginalsuppliername3] = useState<string>("");
+    const [originalsupplierphone3, setOriginalsupplierphone3] = useState<string>("");
+    const [originalsuppliertaxid3, setOriginalsuppliertaxid3] = useState<string>("");
+    const [originalsupplieraddress3, setOriginalsupplieraddress3] = useState<string>("");
+    const [originalshippingaddress3, setOriginalshippingaddress3] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -244,24 +285,44 @@ export default function POrderDetail() {
     }, []);
 
     useEffect(() => {
-        setuuidin(parsedItem?.purchaseorderuuid);
-        setidin(parsedItem?.purchaseorderid)
-        GetDetailById(parsedItem?.purchaseorderuuid);
-        GetReviewById(parsedItem?.purchaseorderuuid);
-        GetReviewHistory(parsedItem?.purchaseorderuuid);
-        GetTransById(parsedItem?.purchaseorderid);
-        getPRequisition();
+        console.log(parsedItem);
+        setuuidin(parsedItem?.id);
+        setidin(parsedItem?.quotereqid)
+        GetDetailById(parsedItem?.id);
+        // GetReviewById(parsedItem?.quoterequuid);
+        // GetReviewHistory(parsedItem?.quoterequuid);
+        // GetTransById(parsedItem?.purchaseorderid);
+        // getPRequisition();
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
         setStatusin(parsedItem?.status);
         setNotein(parsedItem?.note);
+        setInvoicein(parsedItem?.invoice);
+        setSupplieridin(parsedItem?.supplierid);
         setSuppliernamein(parsedItem?.suppliername);
         setSupplieraddressin(parsedItem?.supplieraddress);
         setSupplierphonein(parsedItem?.supplierphone);
         setSuppliertaxidin(parsedItem?.suppliertaxid);
         setShippingaddressin(parsedItem?.shippingaddress);
-        setInvoicein(parsedItem?.invoice);
+        setSupplierfaxin(parsedItem?.supplierfax);
+        setSuppliercontactin(parsedItem?.suppliercontact);
+        setSupplierid2in(parsedItem?.supplierid2);
+        setSuppliername2in(parsedItem?.suppliername2);
+        setSupplieraddress2in(parsedItem?.supplieraddress2);
+        setSupplierphone2in(parsedItem?.supplierphone2);
+        setSuppliertaxid2in(parsedItem?.suppliertaxid2);
+        setShippingaddress2in(parsedItem?.shippingaddress2);
+        setSupplierfax2in(parsedItem?.supplierfax2);
+        setSuppliercontact2in(parsedItem?.suppliercontact2);
+        setSupplierid3in(parsedItem?.supplierid3);
+        setSuppliername3in(parsedItem?.suppliername3);
+        setSupplieraddress3in(parsedItem?.supplieraddress3);
+        setSupplierphone3in(parsedItem?.supplierphone3);
+        setSuppliertaxid3in(parsedItem?.suppliertaxid3);
+        setShippingaddress3in(parsedItem?.shippingaddress3);
+        setSupplierfax3in(parsedItem?.supplierfax3);
+        setSuppliercontact3in(parsedItem?.suppliercontact3);
 
     }, [item]);
     //#endregion
@@ -273,7 +334,7 @@ export default function POrderDetail() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaseorderuuid: id as string | undefined,
+                quoterequuid: id as string | undefined,
             };
 
 
@@ -285,7 +346,7 @@ export default function POrderDetail() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetQuotereqDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -322,14 +383,34 @@ export default function POrderDetail() {
             };
 
             const conditionModel = {
-                purchaseorderid: idin,
-                purchaseorderuuid: uuidin,
-                data: data,
+                quotereqid: idin,
+                quoterequuid: uuidin,
                 create_at: create_atin,
                 need_date: need_datein,
                 note: notein,
+                supplierid: supplieridin,
+                suppliername: suppliernamein,
+                supplierphone: supplierphonein,
+                suppliertaxid: suppliertaxidin,
+                supplieraddress: supplieraddressin,
+                suppliercontact: suppliercontactin,
+                supplierfax: supplierfaxin,
+                shippingaddress: shippingaddressin,
+                supplierid2: supplierid2in,
+                suppliername2: suppliername2in,
+                supplierphone2: supplierphone2in,
+                suppliertaxid2: suppliertaxid2in,
+                supplieraddress2: supplieraddress2in,
+                suppliercontact2: suppliercontact2in,
+                supplierfax2: supplierfax2in,
+                supplierid3: supplierid3in,
+                suppliername3: suppliername3in,
+                supplierphone3: supplierphone3in,
+                suppliertaxid3: suppliertaxid3in,
+                supplieraddress3: supplieraddress3in,
+                suppliercontact3: suppliercontact3in,
+                supplierfax3: supplierfax3in,
                 data2: data2,
-                originaldata2: originaldata2
             };
 
             var inputModel = {
@@ -339,7 +420,7 @@ export default function POrderDetail() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdatePurchaseorderDetail`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdateAddQuotereq`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -357,7 +438,7 @@ export default function POrderDetail() {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
                 GetDetailById(uuidin);
-                getPRequisition();
+                // getPRequisition();
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
@@ -625,7 +706,7 @@ export default function POrderDetail() {
             setIsLoading(true);
             const conditionModel = {
                 id: id,
-                type: 'purchaseorder',
+                type: 'quotereq',
                 type2: type2,
                 quoterequuid: quoid
             };
@@ -658,7 +739,7 @@ export default function POrderDetail() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_比價單_${id}.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -1233,6 +1314,16 @@ export default function POrderDetail() {
         setOriginalsupplierphone(supplierphonein);
         setOriginalsuppliertaxid(suppliertaxidin);
         setOriginalshippingaddress(shippingaddressin);
+        setOriginalsuppliername2(suppliername2in);
+        setOriginalsupplieraddress2(supplieraddress2in);
+        setOriginalsupplierphone2(supplierphone2in);
+        setOriginalsuppliertaxid2(suppliertaxid2in);
+        setOriginalshippingaddress2(shippingaddress2in);
+        setOriginalsuppliername3(suppliername3in);
+        setOriginalsupplieraddress3(supplieraddress3in);
+        setOriginalsupplierphone3(supplierphone3in);
+        setOriginalsuppliertaxid3(suppliertaxid3in);
+        setOriginalshippingaddress3(shippingaddress3in);
         setIsEditing(true) // 進入編輯模式
     };
 
@@ -1247,6 +1338,16 @@ export default function POrderDetail() {
         setSupplierphonein(originalsupplierphone);
         setSuppliertaxidin(originalsuppliertaxid);
         setShippingaddressin(originalshippingaddress);
+        setSuppliername2in(originalsuppliername2);
+        setSupplieraddress2in(originalsupplieraddress2);
+        setSupplierphone2in(originalsupplierphone2);
+        setSuppliertaxid2in(originalsuppliertaxid2);
+        setShippingaddress2in(originalshippingaddress2);
+        setSuppliername3in(originalsuppliername3);
+        setSupplieraddress3in(originalsupplieraddress3);
+        setSupplierphone3in(originalsupplierphone3);
+        setSuppliertaxid3in(originalsuppliertaxid3);
+        setShippingaddress3in(originalshippingaddress3);
         setIsEditing(false);  // 結束編輯模式
 
 
@@ -1311,7 +1412,7 @@ export default function POrderDetail() {
 
     //匯出單據
     const handleExport = () => {
-        Excel(idin, "po", "")
+        Excel(idin, "", "")
     }
 
 
@@ -1322,27 +1423,21 @@ export default function POrderDetail() {
     const handleAddDetail = () => {
 
         const emptyDetail = {
-            purchaserequisitiondetailuuid: "",
-            productuuid: "",
-            productid: "",
-            quantity: 0,
-            totalprice: 0,
-            note: "",
-            purchaserequisitionid: "",
-            unitprice: 0,
-            purchaserequisitionuuid: "",
-            name: "",
-            spec: "",
-            unit: "",
-            suppliername: null,
-            deliverydate: null,
-            status: null,
-            quotereqdetailuuid: null,
-            suppliertaxid: null,
-            supplieraddress: null,
-            supplierphone: null,
-            suppliercontact: null,
-            supplierfax: null
+            detail_name: "",
+            detail_note: "",
+            detail_productid: "",
+            detail_quantity: "",
+            detail_spec: "",
+            detail_unit: "",
+            supplier1_name: suppliernamein,
+            supplier1_unitprice: "",
+            supplier1_awarded: "",
+            supplier2_name: suppliername2in,
+            supplier2_unitprice: "",
+            supplier2_awarded: "",
+            supplier3_name: suppliername3in,
+            supplier3_unitprice: "",
+            supplier3_awarded: "",
         };
 
         // 將空資料新增進陣列
@@ -1369,11 +1464,11 @@ export default function POrderDetail() {
         updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
         setData2(updatedData2);  // 更新data2
 
-        if (key === 'productid' || key === 'name' || key === 'spec') {
+        if (key === 'detail_productid' || key === 'detail_name' || key === 'detail_spec') {
             const filters = {
-                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
-                name: updatedData2[index].name?.trim().toLowerCase() || "",
-                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
+                productid: updatedData2[index].detail_productid?.trim().toLowerCase() || "",
+                name: updatedData2[index].detail_name?.trim().toLowerCase() || "",
+                spec: updatedData2[index].detail_spec?.trim().toLowerCase() || ""
             };
 
             if (Object.values(filters).some(filter => filter !== "")) {
@@ -1399,7 +1494,7 @@ export default function POrderDetail() {
 
     // 明細異動處理
     useEffect(() => {
-        console.log(data1);
+        // console.log(data1);
 
         // 每次 data2 更新時，重新計算總價和稅金
         let totalprice = 0;
@@ -1491,11 +1586,11 @@ export default function POrderDetail() {
         const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
         updatedData2[index] = {
             ...updatedData2[index],
-            productuuid: selectedItem.id,
-            productid: selectedItem.productid,
-            name: selectedItem.name,
-            spec: selectedItem.spec,
-            unit: selectedItem.unit,
+            detail_productuuid: selectedItem.id,
+            detail_productid: selectedItem.productid,
+            detail_name: selectedItem.name,
+            detail_spec: selectedItem.spec,
+            detail_unit: selectedItem.unit,
         };
         setData2(updatedData2);
 
@@ -1643,7 +1738,7 @@ export default function POrderDetail() {
                         )}
 
                         {/* 編輯按鈕 */}
-                        {statusin === "編輯中" && !isEditing && (
+                        {statusin === "未結案" && !isEditing && (
 
                             <>
 
@@ -1713,13 +1808,14 @@ export default function POrderDetail() {
                             </>
                         )}
                         {/* 儲存按鈕 */}
-                        {statusin === "編輯中" && isEditing && (
+                        {statusin === "未結案" && isEditing && (
                             <>
                                 <button
                                     className={scss.shortredsquarebtn}
                                     onClick={() => {
+
                                         setIsEditing(false); // 儲存後結束編輯模式
-                                        setPrbar(false);
+                                        // setPrbar(false);
                                         Update()
 
                                         // NewAddPurchaseRequisition(); // 實際儲存邏輯
@@ -1978,7 +2074,7 @@ export default function POrderDetail() {
                                                 },
                                             }}
                                         /> */}
-                                        <InputSel
+                                        {/* <InputSel
                                             caption="需用日期"
                                             className="global_tip_must"
                                             disabled={!isEditing}
@@ -1990,11 +2086,11 @@ export default function POrderDetail() {
                                                     onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
                                                 },
                                             }}
-                                        />
+                                        /> */}
 
                                     </div>
                                     <div>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="發票號碼"
                                             captionStyle={{ fontSize: '18px' }}
@@ -2006,14 +2102,14 @@ export default function POrderDetail() {
                                                     onChange: (e) => { setInvoicein(e.target.value) }
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商名稱"
+                                            caption="廠商1名稱"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
@@ -2026,7 +2122,7 @@ export default function POrderDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商地址"
+                                            caption="廠商1地址"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
@@ -2039,35 +2135,7 @@ export default function POrderDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="收貨地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: shippingaddressin,
-                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="備註說明"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: notein,
-                                                    onChange: (e) => { setNotein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商電話"
+                                            caption="廠商1電話"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
@@ -2080,7 +2148,7 @@ export default function POrderDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商1統編"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
@@ -2091,8 +2159,6 @@ export default function POrderDetail() {
                                                 },
                                             }}
                                         />
-                                    </div>
-                                    <div>
                                         <button
                                             style={{
                                                 display: `${isEditing ? '' : 'none'}`,
@@ -2113,6 +2179,193 @@ export default function POrderDetail() {
                                                 e.currentTarget.style.borderColor = '#c1c1c1';
                                             }}
                                             onClick={() => {
+                                                setCurrentSupplier(1);
+                                                setCustomerbar(true);
+                                            }}
+                                        >
+                                            ⋯
+                                        </button>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="收貨地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: shippingaddressin,
+                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
+                                                },
+                                            }}
+                                        /> */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="備註說明"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: notein,
+                                                    onChange: (e) => { setNotein(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商2名稱"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliername2in,
+                                                    onChange: (e) => { setSuppliername2in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商2地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplieraddress2in,
+                                                    onChange: (e) => { setSupplieraddress2in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商2電話"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplierphone2in,
+                                                    onChange: (e) => { setSupplierphone2in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商2統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxid2in,
+                                                    onChange: (e) => { setSuppliertaxid2in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <button
+                                            style={{
+                                                display: `${isEditing ? '' : 'none'}`,
+                                                width: '39px',
+                                                backgroundColor: '#f5f5f5',
+                                                border: '1px solid #c1c1c1',
+                                                borderRadius: '3px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                fontWeight: 'bolder'
+                                            }}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                                                e.currentTarget.style.borderColor = '#a1a1a1';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                                e.currentTarget.style.borderColor = '#c1c1c1';
+                                            }}
+                                            onClick={() => {
+                                                setCurrentSupplier(2);
+                                                setCustomerbar(true);
+                                            }}
+                                        >
+                                            ⋯
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商3名稱"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliername3in,
+                                                    onChange: (e) => { setSuppliername3in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商3地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplieraddress3in,
+                                                    onChange: (e) => { setSupplieraddress3in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商3電話"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: supplierphone3in,
+                                                    onChange: (e) => { setSupplierphone3in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商3統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxid3in,
+                                                    onChange: (e) => { setSuppliertaxid3in(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <button
+                                            style={{
+                                                display: `${isEditing ? '' : 'none'}`,
+                                                width: '39px',
+                                                backgroundColor: '#f5f5f5',
+                                                border: '1px solid #c1c1c1',
+                                                borderRadius: '3px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                fontWeight: 'bolder'
+                                            }}
+                                            onMouseOver={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                                                e.currentTarget.style.borderColor = '#a1a1a1';
+                                            }}
+                                            onMouseOut={(e) => {
+                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                                e.currentTarget.style.borderColor = '#c1c1c1';
+                                            }}
+                                            onClick={() => {
+                                                setCurrentSupplier(3);
                                                 setCustomerbar(true);
                                             }}
                                         >
@@ -2125,7 +2378,6 @@ export default function POrderDetail() {
                             </div>
                             <div>
                                 {statusarea && (
-
                                     <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                         <InputSel
                                             {...inputSelProps}
@@ -2164,219 +2416,6 @@ export default function POrderDetail() {
                                 )}
                             </div>
                         </div>
-                        {prbar && (
-                            <>
-
-                                <div
-                                    style={{ paddingBottom: '18px' }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        請購項目
-                                    </span>
-                                </div>
-                                <div className={scss.head_content1}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購數量"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                value: data3.length,
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-
-                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                        <div className={scss.thead22}>
-                                            <span>
-
-                                            </span>
-                                            <span>序</span>
-                                            <span>請購單號</span>
-                                            <span>料號</span>
-                                            <span>品名</span>
-                                            <span>規格</span>
-                                            <span>數量</span>
-                                            <span>已採購</span>
-                                            <span>剩餘</span>
-                                            <span>單位</span>
-                                            <span>單價</span>
-                                            <span>總價</span>
-                                            <span>備註(用途說明)</span>
-                                            <span></span>
-                                        </div>
-                                        {data4 && (
-                                            data4.map((_item, index) => {
-                                                const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                                _item.totalprice = Totalprice;
-
-                                                // 檢查是否已存在於 data2 中
-                                                const isChecked = data2.some(item => item.id === _item.id);
-                                                const handleCheckboxChange = (checked: any) => {
-                                                    console.log(data3);
-                                                    console.log(data2);
-                                                    if (checked) {
-                                                        // 複製 _item 並將剩餘數量取代原本的數量
-                                                        const updatedItem = { ..._item, quantity: _item.remaining_quantity };
-
-                                                        // 加入到 data2
-                                                        setData2(prevData2 => [...prevData2, updatedItem]);
-                                                    } else {
-                                                        // 從 data2 中移除
-                                                        setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
-                                                    }
-                                                };
-                                                return (
-                                                    <CellWithBar key={index} className={scss.panelHeader22}>
-                                                        <div className={scss.row01}>
-                                                            <span>
-                                                                {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
-                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                        </button> */}
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={isChecked}
-                                                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
-                                                                    style={{
-                                                                        transform: 'scale(1.5)',
-                                                                        margin: '5px',
-                                                                        cursor: 'pointer'
-                                                                    }}
-                                                                />
-
-                                                            </span>
-                                                            <span>{index + 1}</span>
-                                                            <span>{_item.purchaserequisitionid}</span>
-                                                            <span>
-                                                                <input
-                                                                    ref={productidRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.productid !== undefined ? _item.productid : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={nameRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.name !== undefined ? _item.name : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={specRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.spec !== undefined ? _item.spec : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={po_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                        color: '#ea1833'
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.po_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-
-                                                            <span>
-                                                                <input
-                                                                    ref={remaining_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.remaining_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.unit !== undefined ? _item.unit : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.unitprice}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={totalpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.totalprice}
-                                                                    readOnly
-
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={noteRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.note !== undefined ? _item.note : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                );
-
-                                            })
-                                        )}
-                                    </div>
-                                </div>
-                            </>
-                        )}
                         <div
                             style={{
                                 paddingTop: `${prbar ? '18px' : '0px'}`,
@@ -2393,7 +2432,7 @@ export default function POrderDetail() {
                                     fontSize: '18px'
                                 }}
                             >
-                                採購項目
+                                詢價項目
                             </span>
                         </div>
                         <div className={scss.head_content1}>
@@ -2423,29 +2462,33 @@ export default function POrderDetail() {
                                     <span>料號</span>
                                     <span>品名</span>
                                     <span>規格</span>
-                                    <span>已進</span>
-                                    <span>剩餘</span>
                                     <span>數量</span>
                                     <span>單位</span>
-                                    <span>單價</span>
-                                    <span>總價</span>
+                                    <span>廠商1</span>
+                                    <span>單價1</span>
+                                    <span>成交否1</span>
+                                    <span>廠商2</span>
+                                    <span>單價2</span>
+                                    <span>成交否2</span>
+                                    <span>廠商3</span>
+                                    <span>單價3</span>
+                                    <span>成交否3</span>
                                     <span>備註(用途說明)</span>
-                                    <span></span>
                                     <span></span>
                                 </div>
                                 {data2 && (
                                     data2.map((_item, index) => {
-                                        const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                        _item.totalprice = Totalprice
-                                        if (_item.wantinquantity === 0) {
-                                            const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
-                                            _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
-                                        }
+                                        // const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                                        // _item.totalprice = Totalprice
+                                        // if (_item.wantinquantity === 0) {
+                                        //     const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
+                                        //     _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
+                                        // }
                                         return (
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                        <button style={{ display: (statusin === "未結案" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -2458,12 +2501,12 @@ export default function POrderDetail() {
                                                             // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
                                                             style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                             type="text"
-                                                            value={_item.productid !== undefined ? _item.productid : ''}
+                                                            value={_item.detail_productid !== undefined ? _item.detail_productid : ''}
                                                             // readOnly
                                                             // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "productid", e.target.value);
+                                                                handleStringChange(index, "detail_productid", e.target.value);
                                                                 setCurrentIndex(index);
                                                                 // setHandinputproductid(e.target.value);
                                                             }}
@@ -2476,12 +2519,12 @@ export default function POrderDetail() {
                                                             // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
                                                             style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                             type="text"
-                                                            value={_item.name !== undefined ? _item.name : ''}
+                                                            value={_item.detail_name !== undefined ? _item.detail_name : ''}
                                                             // readOnly
                                                             // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "name", e.target.value);
+                                                                handleStringChange(index, "detail_name", e.target.value);
                                                                 setCurrentIndex(index);
                                                                 // setHandinputname(e.target.value);
                                                             }}
@@ -2493,35 +2536,14 @@ export default function POrderDetail() {
                                                             // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
                                                             style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                             type="text"
-                                                            value={_item.spec !== undefined ? _item.spec : ''}
+                                                            value={_item.detail_spec !== undefined ? _item.detail_spec : ''}
                                                             // readOnly
                                                             // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "spec", e.target.value);
+                                                                handleStringChange(index, "detail_spec", e.target.value);
                                                                 setCurrentIndex(index);
                                                                 // setHandinputspec(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>{_item.alreadyinquantity}</span>
-                                                    <span>
-                                                        <input
-                                                            ref={wantinquantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isTrans ? "1px solid black" : "",
-                                                                width: '95%',
-                                                                color: `${isTrans ? '#ea1833' : '#14256a'}`
-                                                            }}
-                                                            type={isTrans ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isTrans ? _item.wantinquantity : Number(_item.wantinquantity).toLocaleString()}
-                                                            readOnly={!isTrans}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "wantinquantity", e.target.value); {/* 處理變更 */ }
-                                                                setCurrentIndex(index);
                                                             }}
                                                         />
                                                     </span>
@@ -2536,10 +2558,10 @@ export default function POrderDetail() {
                                                             type={isEditing ? 'number' : 'text'}
                                                             // value={Number(_item.quantity)}
                                                             // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()}
+                                                            value={isEditing ? _item.detail_quantity : Number(_item.detail_quantity).toLocaleString()}
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "detail_quantity", e.target.value); {/* 處理變更 */ }
                                                             }}
                                                         />
                                                     </span>
@@ -2549,35 +2571,57 @@ export default function POrderDetail() {
                                                             // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
                                                             style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                             type="text"
-                                                            value={_item.unit !== undefined ? _item.unit : ''}
+                                                            value={_item.detail_unit !== undefined ? _item.detail_unit : ''}
                                                             // readOnly
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "unit", e.target.value);
+                                                                handleStringChange(index, "detail_unit", e.target.value);
                                                             }}
                                                         />
                                                     </span>
                                                     <span>
                                                         <input
-                                                            ref={unitpriceRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
+                                                            ref={suppliername1Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={(_item.supplier1_name !== undefined && _item.supplier1_name !== '') ? _item.supplier1_name : suppliernamein}
+                                                            readOnly
+                                                        // readOnly={!isEditing}
+                                                        // onChange={(e) => {
+                                                        //     handleStringChange(index, "detail_unit", e.target.value);
+                                                        // }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={unitprice1Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={_item.supplier1_unitprice !== undefined ? _item.supplier1_unitprice : ''}
+                                                            // readOnly
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                // handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "supplier1_unitprice", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={awarded1Refs.current[index]}
+                                                            type="checkbox"
+                                                            checked={_item.supplier1_awarded || false}  // 如果是 `true`，勾選；否則不勾選
+                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
+                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
+                                                            onChange={(e) => {
                                                                 const newData = [...data2];
-                                                                const newUnitprice = e.target.value;
+                                                                const newAwardedValue = e.target.checked;
                                                                 newData[index] = {
                                                                     ...newData[index],
-                                                                    unitprice: isEditing ? newUnitprice : parseFloat(newUnitprice.replace(/,/g, ''))
-
+                                                                    supplier1_awarded: newAwardedValue,  // 更新 supplier1_awarded
+                                                                    supplier2_awarded: false,  // 取消其他兩個勾選
+                                                                    supplier3_awarded: false,
                                                                 };
                                                                 setData2(newData);
                                                             }}
@@ -2585,20 +2629,97 @@ export default function POrderDetail() {
                                                     </span>
                                                     <span>
                                                         <input
-                                                            ref={totalpriceRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                // borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.totalprice : Number(_item.totalprice).toLocaleString()}
-                                                            // readOnly={!isEditing}
+                                                            ref={suppliername2Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={(_item.supplier2_name !== undefined && _item.supplier2_name !== '') ? _item.supplier2_name : suppliername2in}
                                                             readOnly
+                                                        // readOnly={!isEditing}
+                                                        // onChange={(e) => {
+                                                        //     handleStringChange(index, "detail_unit", e.target.value);
+                                                        // }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={unitprice2Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={_item.supplier2_unitprice !== undefined ? _item.supplier2_unitprice : ''}
+                                                            // readOnly
+                                                            readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "supplier2_unitprice", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={awarded2Refs.current[index]}
+                                                            type="checkbox"
+                                                            checked={_item.supplier2_awarded || false}  // 如果是 `true`，勾選；否則不勾選
+                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
+                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
+                                                            onChange={(e) => {
+                                                                const newData = [...data2];
+                                                                const newAwardedValue = e.target.checked;
+                                                                newData[index] = {
+                                                                    ...newData[index],
+                                                                    supplier1_awarded: false,  // 取消其他兩個勾選
+                                                                    supplier2_awarded: newAwardedValue,  // 更新 supplier2_awarded
+                                                                    supplier3_awarded: false,
+                                                                };
+                                                                setData2(newData);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={suppliername3Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={(_item.supplier3_name !== undefined && _item.supplier3_name !== '') ? _item.supplier3_name : suppliername3in}
+                                                            readOnly
+                                                        // readOnly={!isEditing}
+                                                        // onChange={(e) => {
+                                                        //     handleStringChange(index, "detail_unit", e.target.value);
+                                                        // }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={unitprice3Refs.current[index]}
+                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
+                                                            type="text"
+                                                            value={_item.supplier3_unitprice !== undefined ? _item.supplier3_unitprice : ''}
+                                                            // readOnly
+                                                            readOnly={!isEditing}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "supplier3_unitprice", e.target.value);
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>
+                                                        <input
+                                                            ref={awarded3Refs.current[index]}
+                                                            type="checkbox"
+                                                            checked={_item.supplier3_awarded || false}  // 如果是 `true`，勾選；否則不勾選
+                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
+                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
+                                                            onChange={(e) => {
+                                                                const newData = [...data2];
+                                                                const newAwardedValue = e.target.checked;
+                                                                newData[index] = {
+                                                                    ...newData[index],
+                                                                    supplier1_awarded: false,  // 取消其他兩個勾選
+                                                                    supplier2_awarded: false,
+                                                                    supplier3_awarded: newAwardedValue,  // 更新 supplier3_awarded
+                                                                };
+                                                                setData2(newData);
                                                             }}
                                                         />
                                                     </span>
@@ -2609,12 +2730,12 @@ export default function POrderDetail() {
                                                             // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
                                                             style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
                                                             type="text"
-                                                            value={_item.note !== undefined ? _item.note : ''}
+                                                            value={_item.detail_note !== undefined ? _item.detail_note : ''}
                                                             // readOnly
                                                             // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "note", e.target.value);
+                                                                handleStringChange(index, "detail_note", e.target.value);
                                                             }}
                                                         />
                                                     </span>
@@ -2627,7 +2748,7 @@ export default function POrderDetail() {
                                     })
                                 )}
                             </div>
-                            {statusin === "編輯中" && isEditing && (
+                            {statusin === "未結案" && isEditing && (
                                 <span style={{ paddingLeft: '22px', position: 'relative' }}>
                                     <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
                                         <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
@@ -3078,14 +3199,35 @@ export default function POrderDetail() {
                         filteredData2.map((_item: any, index: number) => (
                             <CellWithBar key={index} className={scss.panelHeader21}
                                 onClick={() => {
-                                    setSuppliernamein(_item.name);
-                                    setSupplieraddressin(_item.county + _item.district + _item.address);
-                                    setSupplierphonein(_item.phone);
-                                    setSuppliertaxidin(_item.tax_id);
-                                    setSupplieridin(_item.customer_number);
-                                    setSupplierfaxin(_item.fax);
-                                    setSuppliercontactin(_item.contact);
-                                    setSupplieruuidin(_item.id);
+                                    if (currentsupplier === 1) {
+                                        setSuppliernamein(_item.name);
+                                        setSupplieraddressin(_item.county + _item.district + _item.address);
+                                        setSupplierphonein(_item.phone);
+                                        setSuppliertaxidin(_item.tax_id);
+                                        setSupplieridin(_item.customer_number);
+                                        setSupplierfaxin(_item.fax);
+                                        setSuppliercontactin(_item.contact);
+                                        setSupplieruuidin(_item.id);
+                                    } else if (currentsupplier === 2) {
+                                        setSuppliername2in(_item.name);
+                                        setSupplieraddress2in(_item.county + _item.district + _item.address);
+                                        setSupplierphone2in(_item.phone);
+                                        setSuppliertaxid2in(_item.tax_id);
+                                        setSupplierid2in(_item.customer_number);
+                                        setSupplierfax2in(_item.fax);
+                                        setSuppliercontact2in(_item.contact);
+                                        setSupplieruuid2in(_item.id);
+                                    } else if (currentsupplier === 3) {
+                                        setSuppliername3in(_item.name);
+                                        setSupplieraddress3in(_item.county + _item.district + _item.address);
+                                        setSupplierphone3in(_item.phone);
+                                        setSuppliertaxid3in(_item.tax_id);
+                                        setSupplierid3in(_item.customer_number);
+                                        setSupplierfax3in(_item.fax);
+                                        setSuppliercontact3in(_item.contact);
+                                        setSupplieruuid3in(_item.id);
+                                    }
+
                                     setCustomerbar(false);
                                 }}>
                                 <div className={scss.row01}>
