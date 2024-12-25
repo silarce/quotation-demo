@@ -1299,12 +1299,19 @@ class ClassProd {
       return;
     }
 
+    this.data.quoteType = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
     this.clearState({
       keepItemName: true,
       keepDiscount: true,
+      keepQuoteType: true,
     });
-
-    this.data.quoteType = value;
 
     this.render();
   }
@@ -1319,6 +1326,10 @@ class ClassProd {
   }
   // MARK: changeDoorModel
   changeDoorModel({ doorModel }: { doorModel: TdoorModelInfoDto | null }) {
+    if (this.state.doorModel === doorModel) {
+      return;
+    }
+
     this.clearState({
       keepItemName: true,
       keepDiscount: true,
@@ -1553,13 +1564,6 @@ class ClassProd {
       return;
     }
 
-    // if (this.data.materialName === '鋁合金') {
-    //   this.materialSurface = null;
-    //   this.render();
-
-    //   return;
-    // }
-
     this.renewSurface();
     this.changeBottomBarAngleIronAndBottomBarPlate(value);
 
@@ -1581,6 +1585,12 @@ class ClassProd {
     }
 
     this.data.materialSurface = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
 
     Object.values(this.classComponentDict).forEach((classComponent) =>
       // slat  headBox  guideRail // 只有這三個有作用

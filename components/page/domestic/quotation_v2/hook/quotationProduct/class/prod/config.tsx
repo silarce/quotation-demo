@@ -358,7 +358,19 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select disabled={disabled} selectProps={selectProps} />;
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          type: 'number',
+          value: classProd.boxB ?? '',
+          onChange: (e) => {
+            classProd.boxB = e.target.value as `${number}` | '';
+          },
+        },
+      };
+
+      const inputSelProps = classProd.isSpecial ? { inputProps } : { selectProps };
+
+      return <InputSel_prod_memo_select disabled={disabled} {...inputSelProps} />;
     },
   },
 
@@ -498,18 +510,11 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
-      return (
-        <Checkbox
-          checked={!!classProd.isAntiTyphoon}
-          // onChange={(e) => {
-          //   classProd.isAntiTyphoon = e.target.checked;
-          //   setTimeout(() => {
-          //     classProd.runAfterChange();
-          //   }, 0);
-          // }}
-          disabled={true}
-        />
-      );
+      if (classProd.isSpecial) {
+        return null;
+      }
+
+      return <Checkbox checked={!!classProd.isAntiTyphoon} disabled={true} />;
     },
   },
 
@@ -520,15 +525,11 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
-      return (
-        <Checkbox
-          checked={!!classProd.hasSilencingStrip}
-          // onChange={(e) => {
-          //   classProd.hasSilencingStrip = e.target.checked;
-          // }}
-          disabled={true}
-        />
-      );
+      if (classProd.isSpecial) {
+        return null;
+      }
+
+      return <Checkbox checked={!!classProd.hasSilencingStrip} disabled={true} />;
     },
   },
 
@@ -538,6 +539,10 @@ const nodeConfig_origin: TnodeConfig = {
       width: 100,
     },
     createNode({ classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       return classProd.thickness + ' t';
     },
   },
@@ -553,7 +558,6 @@ const nodeConfig_origin: TnodeConfig = {
       const value = v ? { value: v, label: v } : null;
 
       const inputSelProps_input: TinputSelProps = {
-        disabled: false,
         inputProps: {
           props: {
             value: v,
@@ -566,7 +570,6 @@ const nodeConfig_origin: TnodeConfig = {
       };
 
       const inputSelProps_select: TinputSelProps = {
-        disabled: false,
         selectProps: {
           props: {
             value,
@@ -649,6 +652,10 @@ const nodeConfig_origin: TnodeConfig = {
       width: 90,
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       const v = classProd.guideRailThickness;
       const value = v ? { value: v, label: v } : null;
 
@@ -677,6 +684,10 @@ const nodeConfig_origin: TnodeConfig = {
       width: 90,
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       const v = classProd.headBoxThickness;
       const value = v ? { value: v, label: v } : null;
 
@@ -733,6 +744,10 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       return (
         <Checkbox
           checked={!!classProd.isIntegratedHeadBox}
@@ -752,6 +767,10 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'center',
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       return (
         <Checkbox
           checked={!!classProd.isULGuideRail}
@@ -905,6 +924,10 @@ const nodeConfig_origin: TnodeConfig = {
       width: 210,
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       const v = classProd.bottomBarAngleIron;
       const value = v ? { value: v, label: v } : null;
 
@@ -932,6 +955,10 @@ const nodeConfig_origin: TnodeConfig = {
       width: 210,
     },
     createNode({ disabled, classProd }) {
+      if (classProd.isSpecial) {
+        return null;
+      }
+
       const v = classProd.bottomBarPlate;
       const value = v ? { value: v, label: v } : null;
 
@@ -994,11 +1021,18 @@ const createNodeConfig_prime = ({
           const doorModelName = option?.value || '';
           const doorModel = doorModelDict?.[doorModelName] || null;
 
-          classProd.changeDoorModel({
-            doorModel: doorModel,
-          });
+          // classProd
 
-          if (!doorModel) {
+          if ((!classProd.isSpecial && doorModel) || (classProd.isSpecial && doorModel)) {
+            classProd.changeDoorModel({
+              doorModel: doorModel,
+            });
+          } else if (!classProd.isSpecial && !doorModel) {
+            classProd.changeDoorModel({
+              doorModel: null,
+            });
+            classProd.doorModelName = doorModelName;
+          } else {
             classProd.doorModelName = doorModelName;
           }
         },
