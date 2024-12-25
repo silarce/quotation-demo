@@ -1674,6 +1674,15 @@ class ClassProd {
   }
   set isULGuideRail(value) {
     this.data.isULGuideRail = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    this.reqChain_03();
+
     this.render();
   }
 
@@ -1682,6 +1691,14 @@ class ClassProd {
   }
   set isIntegratedHeadBox(value) {
     this.data.isIntegratedHeadBox = value;
+
+    if (this.isSpecial) {
+      this.render();
+
+      return;
+    }
+
+    this.reqChain_03();
     this.render();
   }
 
