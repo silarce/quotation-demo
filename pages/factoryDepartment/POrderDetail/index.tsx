@@ -54,8 +54,12 @@ type Tquery = {
 };
 
 export default function POrderDetail() {
+    //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("採購單")
-
+    const [statusarea, setStatusarea] = useState<boolean>(true)
+    const [excelopen, setExcelopen] = useState<boolean>(true)
+    const [printopen, setPrintopen] = useState<boolean>(true)
+    //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -1757,33 +1761,37 @@ export default function POrderDetail() {
                             {/* {statusin === "編輯中" && !isEditing && ( */}
 
                             <>
+                                {printopen && (
+                                    <button
+                                        className={scss.shortsquarebtn}
+                                        onClick={() => {
+                                            handlePrint();
+                                        }}
+                                        title="列印單據"
+                                        style={{ margin: '0px 10px' }}
+                                    >
+                                        <span style={{ paddingRight: '5px' }}>
+                                            <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                        </span>
+                                        列印
+                                    </button>
+                                )}
+                                {excelopen && (
 
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handlePrint();
-                                    }}
-                                    title="列印單據"
-                                    style={{ margin: '0px 10px' }}
-                                >
-                                    <span style={{ paddingRight: '5px' }}>
-                                        <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    </span>
-                                    列印
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleExport();
-                                    }}
-                                    title="匯出單據"
-                                    style={{ margin: '0px 10px' }}
-                                >
-                                    <span style={{ paddingRight: '5px' }}>
-                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                    </span>
-                                    Excel
-                                </button>
+                                    <button
+                                        className={scss.shortsquarebtn}
+                                        onClick={() => {
+                                            handleExport();
+                                        }}
+                                        title="匯出單據"
+                                        style={{ margin: '0px 10px' }}
+                                    >
+                                        <span style={{ paddingRight: '5px' }}>
+                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                        </span>
+                                        Excel
+                                    </button>
+                                )}
                                 {statusin === "編輯中" && isEditing && (
 
                                     <>
@@ -1877,7 +1885,7 @@ export default function POrderDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="申請人員"
+                                            caption="建立人員"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -1888,7 +1896,7 @@ export default function POrderDetail() {
                                             }}
                                         />
                                         <InputSel
-                                            caption="採購日期"
+                                            caption="建立日期"
                                             className="global_tip_must"
                                             disabled={!isEditing}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
@@ -2116,41 +2124,44 @@ export default function POrderDetail() {
                                 </div>
                             </div>
                             <div>
-                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="小計"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { textAlign: 'right' },
-                                                value: totalprice1 || ' ',
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="營業稅"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { textAlign: 'right' },
-                                                value: taxprice1 || ' ',
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="應付金額"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { textAlign: 'right' },
-                                                value: totalpayprice1 || ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
+                                {statusarea && (
+
+                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="小計"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { textAlign: 'right' },
+                                                    value: totalprice1 || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="營業稅"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { textAlign: 'right' },
+                                                    value: taxprice1 || ' ',
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="應付金額"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { textAlign: 'right' },
+                                                    value: totalpayprice1 || ' ',
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                         {prbar && (
@@ -2219,7 +2230,7 @@ export default function POrderDetail() {
                                                     if (checked) {
                                                         // 複製 _item 並將剩餘數量取代原本的數量
                                                         const updatedItem = { ..._item, quantity: _item.remaining_quantity };
-                                                
+
                                                         // 加入到 data2
                                                         setData2(prevData2 => [...prevData2, updatedItem]);
                                                     } else {
@@ -2833,8 +2844,8 @@ export default function POrderDetail() {
                                     <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
                                         <div className={scss.thead19}>
                                             <span>序</span>
-                                            <span>進貨單號</span>
-                                            <span>進貨日期</span>
+                                            <span>單號</span>
+                                            <span>日期</span>
                                             <span>狀態</span>
                                             <span>備註</span>
                                             <span></span>

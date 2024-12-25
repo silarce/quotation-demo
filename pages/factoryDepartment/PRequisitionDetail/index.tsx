@@ -44,6 +44,8 @@ import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
 import icon_review from 'public/image/icon/review.svg';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_export from 'public/image/icon/fc_export.svg';
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 //引用審核global做更新
@@ -52,9 +54,12 @@ type Tquery = {
 };
 
 export default function PRequisitionDetail() {
-
+    //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("請購單")
-
+    const [statusarea, setStatusarea] = useState<boolean>(true)
+    const [excelopen, setExcelopen] = useState<boolean>(false)
+    const [printopen, setPrintopen] = useState<boolean>(true)
+    //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -248,7 +253,7 @@ export default function PRequisitionDetail() {
             // setData1(data);
 
             console.log(responsedata);
-            alert(responsedata.length);
+            // alert(responsedata.length);
             setData2(responsedata);
             // return responsedata
 
@@ -460,6 +465,172 @@ export default function PRequisitionDetail() {
         }
     };
 
+    //取得IP
+    const Print = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+            if (!response.ok) {
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
+            }
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
+
+        } catch (error: any) {
+            setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //列印單據
+    const sentToPrint = async (ip: any) => {
+        myAlert.confirm({
+            title: '確定要列印單據嗎?',
+            content: <>
+            </>,
+            props: {
+                onOk: async () => {
+                    try {
+                        const conditionModel = {
+                            id: idin,
+                            type: "purchaserequisition",
+                            clientip: ip,
+                            data: []
+                        };
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+                        console.log(JSON.stringify(inputModel));
+
+                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch data');
+                        }
+                        const data = await response.text();
+                        console.log(data);
+
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+
+
+
+                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: data
+                        });
+
+                        if (!response2.ok) {
+                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
+                        }
+
+                        const data2 = await response2.text();
+                        console.log("Received from print4:", data2);
+
+
+
+                    } catch (error: any) {
+                        // setError(error.message);
+                        console.log(error.message);
+                    }
+                    finally {
+                        // setIsLoading(false);
+                    }
+                }
+            }
+        });
+
+
+    };
+
+    //匯出單據
+    const Excel = async (id: any, type2: any, quoid: any) => {
+        try {
+
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+                type: 'purchaserequisition',
+                type2: type2,
+                quoterequuid: quoid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     //#endregion
@@ -821,6 +992,15 @@ export default function PRequisitionDetail() {
 
     }
 
+    //列印單據
+    const handlePrint = () => {
+        Print();
+    }
+
+    //匯出單據
+    const handleExport = () => {
+        Excel(idin, "", "")
+    }
 
     //#endregion
 
@@ -1050,7 +1230,7 @@ export default function PRequisitionDetail() {
                                     className={scss.shortredsquarebtn}
                                     style={{ display: `${statusin === '已核准' ? '' : 'none'}` }}
                                     title="單據結案"
-                                    onClick={() => { handleGetReviewBack() }}>
+                                    onClick={() => { alert("結案") }}>
                                     結案
                                 </button>
 
@@ -1181,6 +1361,37 @@ export default function PRequisitionDetail() {
                             {/* <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
                                 {statusin}
                             </span> */}
+                            {printopen && (
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handlePrint();
+                                    }}
+                                    title="列印單據"
+                                    style={{ margin: '0px 10px' }}
+                                >
+                                    <span style={{ paddingRight: '5px' }}>
+                                        <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    </span>
+                                    列印
+                                </button>
+                            )}
+                            {excelopen && (
+
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handleExport();
+                                    }}
+                                    title="匯出單據"
+                                    style={{ margin: '0px 10px' }}
+                                >
+                                    <span style={{ paddingRight: '5px' }}>
+                                        <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                    </span>
+                                    Excel
+                                </button>
+                            )}
                         </>
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -1254,7 +1465,7 @@ export default function PRequisitionDetail() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="申請人員"
+                                            caption="建立人員"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -1278,7 +1489,7 @@ export default function PRequisitionDetail() {
 
                                         /> */}
                                         <InputSel
-                                            caption="請購日期"
+                                            caption="建立日期"
                                             className="global_tip_must"
                                             disabled={!isEditing}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
@@ -1400,19 +1611,20 @@ export default function PRequisitionDetail() {
                                 </div>
                             </div>
                             <div>
-                                <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="小計"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                style: { textAlign: 'right' },
-                                                value: totalprice1 || ' ',
-                                            },
-                                        }}
-                                    />
-                                    {/* <InputSel
+                                {statusarea && (
+                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="小計"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { textAlign: 'right' },
+                                                    value: totalprice1 || ' ',
+                                                },
+                                            }}
+                                        />
+                                        {/* <InputSel
                                         {...inputSelProps}
                                         caption="合計"
                                         disabled={true}
@@ -1420,10 +1632,11 @@ export default function PRequisitionDetail() {
                                             props: {
                                                 style: { color: 'red' },
                                                 value: status || ' ',
-                                            },
-                                        }}
-                                    /> */}
-                                </div>
+                                                },
+                                                }}
+                                                /> */}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div
