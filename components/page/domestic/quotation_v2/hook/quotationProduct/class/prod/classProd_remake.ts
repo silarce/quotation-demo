@@ -627,7 +627,7 @@ class ClassProd {
       if (
         component.rawData?.id &&
         componentDict?.[key]?.rawData?.id &&
-        component.rawData.id === componentDict[key].rawData.id
+        component.rawData.id === componentDict[key]?.rawData?.id
       ) {
         return;
       }

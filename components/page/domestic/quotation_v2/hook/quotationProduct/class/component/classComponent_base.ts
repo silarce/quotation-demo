@@ -57,7 +57,7 @@ interface Interface_ClassComponent_base {
   availableComponents?: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
   changeRaw?: (v: string) => void;
   //
-  isRawDataExist: boolean;
+  isRawDataExist?: boolean;
 }
 
 interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
