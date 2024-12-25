@@ -1137,7 +1137,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 馬力
     horsepower: data_prod.horsepower,
     // 馬達廠商
-    motorVendor: data_prod.motorVendor,
+    motorVendor: data_prod.motorVendor || null,
     // 電壓
     motorVoltage: data_prod.motorVoltage,
     // 馬達支撐架
@@ -1147,7 +1147,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 馬達鎖盒
     motorLockBox: data_prod.motorLockBox,
     // 門軌厚度
-    guideRailThickness: data_prod.guideRailThickness,
+    guideRailThickness: data_prod.guideRailThickness || null,
     // 捲軸規格  // 棄用
     rollerSpec: null, // 無凸 | 雙凸
     // 門軌消音條
@@ -1236,8 +1236,8 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     bearingHousingSize: data_prod.bearingHousingSize,
     // 軸承
     bearingName: data_prod.bearingName,
-    gapA: data_prod.gapA,
-    gapC: data_prod.gapC,
+    gapA: data_prod.gapA || null,
+    gapC: data_prod.gapC || null,
     gearNumber: data_prod.gearNumber,
     weight: data_prod.weight,
     // guideRailG為門軌的width
@@ -1251,6 +1251,8 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     accessories: accessories,
     // 來源產品
     attachedToProductId: data_prod.attachedToProductId,
+    //
+    //
     //
   };
 

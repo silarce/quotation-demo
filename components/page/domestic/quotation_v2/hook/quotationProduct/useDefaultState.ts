@@ -199,6 +199,7 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
       price,
       rawData,
       componentId,
+      bom,
     } = item;
 
     const data_component: TstateComponentData<typeof type> = {
@@ -212,6 +213,7 @@ const createData_componentDict = (componentsArr: TquotationProductComponentDto[]
       quantity: quantity as `${number}` | '',
       price: `${price}`,
       rawData: rawData as TstateComponentData<typeof type>['rawData'],
+      bom,
       componentId,
       //
     };
