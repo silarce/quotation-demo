@@ -99,7 +99,10 @@ const createNodeConfig_component = (): TnodeConfig_component => {
       style: { width: 90 },
       createNode({ disabled, classComponent }) {
         const v = classComponent.material;
-        const value = v ? { value: v, label: v } : null;
+        const options_material = classComponent.options_material;
+
+        // const value = v ? { value: v, label: v } : null;
+        const value = options_material?.find((item) => item.value === v) || null;
 
         const inputSelProps: TinputSelProps = {
           disabled,

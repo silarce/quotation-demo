@@ -570,8 +570,10 @@ const nodeConfig_origin: TnodeConfig = {
     },
     createNode({ disabled, classProd }) {
       const v = classProd.materialName;
+      const options_material = classProd.options_material;
 
-      const value = v ? { value: v, label: v } : null;
+      // const value = v ? { value: v, label: v } : null;
+      const value = options_material?.find((option) => option.value === v) || null;
 
       const inputSelProps_input: TinputSelProps = {
         inputProps: {
