@@ -772,21 +772,11 @@ class ClassProd {
       dict[id] = state_accessory;
     });
 
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-    // 沒有反應
-
     Object.assign(this.state.data_accessoryDict, dict);
+    const keys = Object.keys(dict);
+
+    this.state.accessoryKeyArr.push(...keys);
+
     this.render();
   }
 
