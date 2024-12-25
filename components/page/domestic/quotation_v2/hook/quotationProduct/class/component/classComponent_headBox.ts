@@ -42,10 +42,12 @@ class ClassCompnent_headBox extends ClassCompnent_base<'headBox'> implements Int
   // ------------------------------------------------------------------------
 
   renewDesc() {
-    const { name } = this.state.rawData ?? {};
-    const material = this.material;
+    const { material, options_material } = this;
+    const label = options_material?.find((item) => item.value === material)?.label || material;
 
-    this.state.desc = `${name} ${material}`;
+    const { name } = this.state.rawData ?? {};
+
+    this.state.desc = `${name} ${label}`;
     this.render();
   }
 

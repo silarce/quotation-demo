@@ -102,11 +102,13 @@ class ClassCompnent_slat extends ClassCompnent_base<'slat'> implements Interface
   // ------------------------------------------------------------------------
 
   renewDesc() {
-    const { material } = this;
+    const { material, options_material } = this;
     const name = this.state.rawData?.name ?? '';
     let thickness: string | undefined | null = this.classProd?.thickness;
     thickness = thickness && `${thickness}t`;
-    const desc = `${name} ${material} ${thickness}`;
+
+    const label = options_material?.find((item) => item.value === material)?.label || material;
+    const desc = `${name} ${label} ${thickness}`;
 
     this.state.desc = desc;
     this.render();

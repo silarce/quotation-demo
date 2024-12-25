@@ -24,10 +24,13 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
   // ------------------------------------------------------------------------
 
   renewDesc() {
-    const { material } = this;
+    const { material, options_material } = this;
+
+    const label = options_material?.find((item) => item.value === material)?.label || material;
+
     const name = this.state.rawData?.name ?? '';
 
-    this.state.desc = `${name ?? ''} ${material ?? ''} `;
+    this.state.desc = `${name} ${label} `;
     this.render();
   }
 
