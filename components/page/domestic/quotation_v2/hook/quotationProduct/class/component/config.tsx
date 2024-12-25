@@ -86,6 +86,10 @@ const createNodeConfig_component = (): TnodeConfig_component => {
       label: '說明',
       style: { width: 200 },
       createNode({ disabled, classComponent }) {
+        if (!classComponent.isRawDataExist) {
+          return <span className="text-danger">{classComponent.desc}</span>;
+        }
+
         return classComponent.desc;
       },
     },

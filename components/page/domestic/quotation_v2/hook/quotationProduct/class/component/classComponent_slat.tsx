@@ -38,6 +38,10 @@ const nodeConfig_sj305D = (() => {
     desc: {
       ...desc,
       createNode({ classComponent, disabled }) {
+        if (!classComponent.isRawDataExist) {
+          return <span className="text-danger">{classComponent.desc}</span>;
+        }
+
         const v = classComponent.desc;
         const value = { value: v, label: v };
 

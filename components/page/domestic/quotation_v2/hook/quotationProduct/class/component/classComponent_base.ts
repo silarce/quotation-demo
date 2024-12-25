@@ -57,6 +57,7 @@ interface Interface_ClassComponent_base {
   availableComponents?: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
   changeRaw?: (v: string) => void;
   //
+  isRawDataExist: boolean;
 }
 
 interface Interface_ClassComponent_prime extends Interface_ClassComponent_base {
@@ -113,11 +114,20 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   } // constructor close
 
   // -----------------------------------------------------------------------
+
+  get isRawDataExist() {
+    return !!this.state.rawData;
+  }
+
   get number() {
     return this.state.number;
   }
 
   get desc() {
+    if (!this.state.rawData) {
+      return '無資料';
+    }
+
     return this.state.desc;
   }
 
