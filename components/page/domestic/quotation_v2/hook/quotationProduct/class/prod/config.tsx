@@ -477,15 +477,16 @@ const nodeConfig_origin: TnodeConfig = {
           }
         : null;
 
-      const { guideRails = [] } = classProd.state.doorModel ?? {};
+      // let { guideRails = [] } = classProd.state.doorModel ?? {};
+      // guideRails = _.sortBy(guideRails, 'imgSrc');
 
-      const options = guideRails.map(({ imgSrc }) => {
-        return {
-          value: imgSrc,
-          label: imgSrc,
-          icon: createAssetUrl(imgSrc),
-        };
-      });
+      // const options = guideRails.map(({ imgSrc }) => {
+      //   return {
+      //     value: imgSrc,
+      //     label: imgSrc,
+      //     icon: createAssetUrl(imgSrc),
+      //   };
+      // });
 
       const inputSelProps: TinputSelProps = {
         disabled,
@@ -504,7 +505,7 @@ const nodeConfig_origin: TnodeConfig = {
             },
           },
           props: {
-            options: options,
+            options: classProd.options_guideRail,
             value,
             onChange: (option) => {
               const value = option?.value || '';

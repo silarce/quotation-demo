@@ -59,6 +59,7 @@ import {
   //
   apiGetboxD,
 } from 'js/api/api_product';
+
 import { createAssetUrl } from 'js/api/api_product';
 
 // utils
@@ -1256,6 +1257,21 @@ class ClassProd {
     return options;
   }
 
+  get options_guideRail() {
+    let { guideRails = [] } = this.state.doorModel ?? {};
+    guideRails = _.sortBy(guideRails, 'imgSrc');
+
+    const options = guideRails.map(({ imgSrc }) => {
+      return {
+        value: imgSrc,
+        label: imgSrc,
+        icon: createAssetUrl(imgSrc),
+      };
+    });
+
+    return options;
+  }
+
   // ----------------------------------------------------------------
 
   // region GET SET EDIT
@@ -1352,9 +1368,10 @@ class ClassProd {
 
     // 門軌
 
-    const guideRails = this.state.doorModel?.guideRails ?? [];
-    const guideRailInfo = guideRails[0];
-    this.data.guideRail = guideRailInfo?.imgSrc ?? '';
+    // const guideRails = this.state.doorModel?.guideRails ?? [];
+    // const guideRailInfo = guideRails[0];
+    this.data.guideRail = this.options_guideRail?.[0]?.value ?? '';
+
     this.afterEditGuideRailInfo();
 
     // 門片厚度
