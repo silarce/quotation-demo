@@ -17,22 +17,19 @@ const useQuotationOther = ({
   const [state, setState] = useState<TstateOther[]>(defaultState);
 
   const createSetOther = (index: number) => {
-    function setOther<K extends keyof TstateOther>({
+    function setOther<K extends Exclude<keyof TstateOther, 'totalPrice'>>({
       key,
       value,
     }: {
-      key: Exclude<K, 'totalPrice'>;
+      key: K;
       value: TstateOther[K];
     }) {
       setState((prev) => {
         const copy = [...prev];
 
-        let target = copy[index];
+        const target = copy[index];
 
-        target = {
-          ...target,
-          [key]: value,
-        };
+        target[key] = value;
 
         if (key === 'quantity' || key === 'unitPrice') {
           const quantity = new Decimal(target.quantity || 0);
@@ -40,6 +37,8 @@ const useQuotationOther = ({
 
           target.totalPrice = quantity.mul(unitPrice).toNumber().toString() as `${number}`;
         }
+
+        copy[index] = { ...target };
 
         return copy;
       });
