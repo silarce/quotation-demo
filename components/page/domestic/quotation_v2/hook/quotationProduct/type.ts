@@ -366,6 +366,27 @@ interface TstateTotalPrice {
 type Tstate_quotaionDiscount = `${number}` | ''; // 總折數 // 這個折數會作用在每個主產品上
 
 // ===========================================================================
+
+interface TstateOther {
+  // 項目
+  item: string;
+  // 內容
+  description: string;
+  // 數量
+  quantity: `${number}` | ''; // DTO型別 string | null 注意不可以為''
+  // 單位
+  unit: string | null;
+  // 單價
+  unitPrice: `${number}` | ''; // DTO型別 number 注意不可以為''
+  // 複價
+  totalPrice: `${number}` | ''; // DTO型別 string | null 注意不可以為''
+  // 備註
+  notes: string;
+  // 尺寸規格
+  spec: string | null;
+}
+
+// ===========================================================================
 export type {
   TstateProd,
   TsetProd,
@@ -386,4 +407,8 @@ export type {
   //
   TstateTotalPrice,
   Tstate_quotaionDiscount,
+  //
+  //
+  //
+  TstateOther,
 };
