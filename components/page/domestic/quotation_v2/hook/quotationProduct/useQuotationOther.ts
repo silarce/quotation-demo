@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Decimal from 'decimal.js';
 
-import type { TquotationContentOtherDto } from 'js/api/dtoTypes';
+import type { TquotationContentOtherDto, TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 
 import type { TstateOther } from './type';
 
@@ -55,6 +55,7 @@ const useQuotationOther = ({
   return {
     state_otherArr: state,
     createSetOther,
+    formatToBody_other: () => formatToBody_other(state),
   };
 };
 
@@ -96,6 +97,34 @@ const useDefaultState = ({ raw_contentOtherArr }: { raw_contentOtherArr: Tquotat
 };
 
 // ===========================================================================
+
+// item: aa,
+// description: aa,
+// unit: aa,
+// unitPrice: aa,
+// notes: aa,
+// spec: aa,
+// quantity: aa,
+// totalPrice: aa,
+
+const formatToBody_other = (state_otherArr: TstateOther[]) => {
+  const body: TcreateQuotationContentOtherDto[] = state_otherArr.map((other) => {
+    const bodyItem: TcreateQuotationContentOtherDto = {
+      item: other.item,
+      description: other.description,
+      unit: other.unit || null,
+      unitPrice: Number(other.unitPrice || 0),
+      notes: other.notes,
+      spec: other.spec || null,
+      quantity: other.quantity || '0',
+      totalPrice: other.totalPrice || '0',
+    };
+
+    return bodyItem;
+  });
+
+  return body;
+};
 
 // ===========================================================================
 export { useQuotationOther };

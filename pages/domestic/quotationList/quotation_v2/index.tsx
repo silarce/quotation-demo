@@ -224,7 +224,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
-  // region state management
+  // region STATE MANAGEMENT
 
   const instance_quotationProduct = useQuotationProduct({
     raw_quotationContent: content,
@@ -325,6 +325,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       },
     } = instance_quotationProduct;
 
+    const { formatToBody_other } = instance_useQuotationOther;
+
     // if (status === 'Pending') {
     //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
     // }
@@ -402,7 +404,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       foreignTotal,
       currency,
       products: quotationProductArr,
-      others: [],
+      others: formatToBody_other(),
       isLost,
       designUnitId: designUnit?.id || null,
     };

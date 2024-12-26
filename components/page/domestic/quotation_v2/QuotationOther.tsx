@@ -58,7 +58,7 @@ export default function QuotationOther({
   // MARK: RENDER
   return (
     <div>
-      <div className={classNames(scss.title, 'p-[10px]')}>其他</div>
+      <div className={classNames(scss.title, 'p-[10px]')}>其他設定</div>
       <div className={classNames(scss.otherTable, className)}>
         <div className={scss.table}>
           <QuotationRow_thead
