@@ -128,27 +128,27 @@ interface TstateProdData {
   bottomBarPlate: string | null;
 
   // W 這些要做成component
-  // 配電箱牌價
-  distributionBoxPrice: `${number}` | '';
-  // 配電箱單價
-  distributionBoxUnitPrice: `${number}` | '';
   // 配電箱數量
   distributionBoxQuantity: `${number}` | '';
+  // 配電箱牌價
+  distributionBoxPrice: `${number}` | '';
   // 配電箱牌價複價
   distributionBoxDualPrice: `${number}` | '';
+  // 配電箱單價
+  distributionBoxUnitPrice: `${number}` | ''; // 受折數影響
   // 配電箱複價
-  distributionBoxTotalPrice: `${number}` | '';
+  distributionBoxTotalPrice: `${number}` | ''; // 單價乘數量
 
+  // 安裝費數量
+  installationFeeQuantity: `${number}` | '';
   // 安裝費牌價
   installationFeePrice: `${number}` | '';
   // 安裝費牌價複價
   installationFeeDualPrice: `${number}` | '';
-  // 安裝費數量
-  installationFeeQuantity: `${number}` | '';
   // 安裝費單價
-  installationFeeUnitPrice: `${number}` | '';
+  installationFeeUnitPrice: `${number}` | ''; // 受折數影響
   // 安裝費複價
-  installationFeeTotalPrice: `${number}` | '';
+  installationFeeTotalPrice: `${number}` | ''; // 單價乘數量
   // W 這些要做成component
 
   //
@@ -195,9 +195,9 @@ interface TstateProdData {
   // 牌價複價
   dualPrice: `${number}` | '';
   // 單價
-  unitPrice: `${number}` | '';
+  unitPrice: `${number}` | ''; // 受折數影響
   // 複價
-  totalPrice: `${number}` | '';
+  totalPrice: `${number}` | ''; // 單價乘數量
 
   // 排序
   order?: number;
@@ -263,6 +263,9 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   // 這幾個寫在class裡面,考慮要不要在class的建構函式把這些資料寫進state
   // name: string; // 名稱
   // unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
+
+  // 以下三個，都沒有在後端紀錄，必須在前端即時計算
+  // 生氣氣 不爽爽
   // dualPrice: number; // 牌價複價 // 虛值
   // unitPrice: `${number}` | ''; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
   // totalPrice: number; // 複價 = 單價 * 數量 // 虛值
@@ -293,13 +296,13 @@ interface TstateAccessoryData {
   name: string; //名稱
   unit: string; // 單位
   quantity: `${number}` | ''; // 數量
-  unitPrice: `${number}` | ''; // 單價
-  totalPrice: `${number}` | ''; // 複價
   originalPrice?: number | undefined;
   price: `${number}` | ''; // 牌價
   dualPrice: `${number}` | ''; // 牌價複價
-  order: number;
+  unitPrice: `${number}` | ''; // 單價  受折數影響
+  totalPrice: `${number}` | ''; // 複價  單價乘數量
   referenceSpec: string | null;
+  order: number;
 }
 
 interface Tdata_accessoryDict {

@@ -1930,22 +1930,6 @@ class ClassProd {
     this.data.quantity = value;
     this.render();
   }
-  // MARK:unitPrice
-  get unitPrice() {
-    return this.data.unitPrice;
-  }
-  set unitPrice(value) {
-    this.data.unitPrice = value;
-    this.render();
-  }
-  // MARK:totalPrice
-  get totalPrice() {
-    return this.data.totalPrice;
-  }
-  set totalPrice(value) {
-    this.data.totalPrice = value;
-    this.render();
-  }
   // MARK:price
   get price() {
     return this.data.price;
@@ -1960,6 +1944,22 @@ class ClassProd {
   }
   set dualPrice(value) {
     this.data.dualPrice = value;
+    this.render();
+  }
+  // MARK:unitPrice
+  get unitPrice() {
+    return this.data.unitPrice;
+  }
+  set unitPrice(value) {
+    this.data.unitPrice = value;
+    this.render();
+  }
+  // MARK:totalPrice
+  get totalPrice() {
+    return this.data.totalPrice;
+  }
+  set totalPrice(value) {
+    this.data.totalPrice = value;
     this.render();
   }
 }
