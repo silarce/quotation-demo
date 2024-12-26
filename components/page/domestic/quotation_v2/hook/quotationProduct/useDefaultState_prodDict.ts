@@ -18,7 +18,7 @@ interface TdefaultState {
 
 // ===========================================================================
 // MARK:useDefaultState
-const useDefaultState = ({
+const useDefaultState_prodDict = ({
   raw_productArr,
   doorModelDict,
 }: {
@@ -303,4 +303,4 @@ const createData_accessoryDict = (accessoriesArr: TquotationProductAccessoryDto[
 };
 
 // ========================================================================
-export { useDefaultState };
+export { useDefaultState_prodDict };

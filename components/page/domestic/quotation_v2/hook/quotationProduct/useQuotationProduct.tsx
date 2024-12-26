@@ -89,7 +89,7 @@ import {
 } from './class/accessory/config';
 
 // hook
-import { useDefaultState } from './useDefaultState';
+import { useDefaultState_prodDict as useDefaultState_prodDict } from './useDefaultState_prodDict';
 import { useQuotationTotalPrice } from './useQuotationPrice';
 
 // method
@@ -167,8 +167,8 @@ const useQuotationProduct = ({
   // region STATE
 
   const {
-    state_quotationDiscount,
-    setState_quotationDiscount,
+    // state_quotationDiscount,
+    // setState_quotationDiscount,
     //
 
     state_totalPrice,
@@ -181,14 +181,14 @@ const useQuotationProduct = ({
     disabled,
   });
 
-  const defaultState = useDefaultState({
+  const defaultState_prodDict = useDefaultState_prodDict({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
   });
   // 深拷貝，避免在編輯狀態內的物件時影響原始的defaultState
   const defaultState_copy = useMemo(() => {
-    return _.cloneDeep(defaultState);
-  }, [defaultState, disabled]);
+    return _.cloneDeep(defaultState_prodDict);
+  }, [defaultState_prodDict, disabled]);
 
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
@@ -199,6 +199,10 @@ const useQuotationProduct = ({
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
+
+  const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(
+    (raw_quotationContent?.discount ?? '') as `${number}` | ''
+  );
 
   const nodeConfig_prime = useMemo(() => {
     return createNodeConfig_prime({

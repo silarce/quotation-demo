@@ -101,6 +101,7 @@ export type { Tprops_quotationPayInfo };
 
 // ========================================================================
 
+// MARK: START
 export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
   const {
     disabled,
@@ -129,6 +130,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
     //
   } = form;
 
+  // MARK: RENDER
   return (
     <div className={classNames(scss.container, scss.legacy)}>
       <div className={scss.payBox}>
