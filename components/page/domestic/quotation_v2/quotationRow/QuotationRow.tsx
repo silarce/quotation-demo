@@ -161,6 +161,12 @@ const QuotationRow = forwardRef(QuotationRow_pre);
 
 // =====================================================================
 
+const QuotationRow_thead = (_props: Omit<Tprops_quotationRow, 'dragHandle' | 'dragHandleInvisible'>) => {
+  const { className, ...props } = _props;
+
+  return <QuotationRow {...props} className={classNames(scss.row_dndThead, className)} />;
+};
+
 function QuotationRow_dndThead({
   disabled,
   keyArr,
@@ -337,6 +343,7 @@ const Table_dnd = ({
 export {
   //
   QuotationRow,
+  QuotationRow_thead,
   QuotationRow_dndThead,
   QuotationRow_dnd,
   Table_dnd,

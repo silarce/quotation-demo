@@ -128,6 +128,9 @@ import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domes
 import { useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
 
+import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
+import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
+
 // css
 import scss from './index.module.scss';
 
@@ -221,6 +224,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
+  // region state management
+
   const instance_quotationProduct = useQuotationProduct({
     raw_quotationContent: content,
     // raw_productArr: content?.products,
@@ -277,6 +282,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { state: state_payInfo, kit: kit_payInfo } = usePayInfo({
     disabled,
     raw: content,
+  });
+
+  const instance_useQuotationOther = useQuotationOther({
+    disabled,
+    raw_contentOtherArr: content?.others,
   });
 
   // ----------------------------------------------------------------------
@@ -527,6 +537,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         <br />
         <div className={'px-[50px]'}>
           <QuotationProdTable disabled={disabled} instance_useQuotationProductInstance={instance_quotationProduct} />
+          <QuotationOther disabled={disabled} instance_useQuotationOther={instance_useQuotationOther} />
         </div>
 
         {/* prod */}

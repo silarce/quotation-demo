@@ -5,6 +5,13 @@ import type { TquotationContentOtherDto } from 'js/api/dtoTypes';
 
 import type { TstateOther } from './type';
 
+// ===========================================================================
+
+type TsetOther = <K extends keyof TstateOther>(key: K, value: TstateOther[K]) => void;
+type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
+
+// ===========================================================================
+
 const useQuotationOther = ({
   disabled,
   raw_contentOtherArr,
@@ -17,13 +24,7 @@ const useQuotationOther = ({
   const [state, setState] = useState<TstateOther[]>(defaultState);
 
   const createSetOther = (index: number) => {
-    function setOther<K extends Exclude<keyof TstateOther, 'totalPrice'>>({
-      key,
-      value,
-    }: {
-      key: K;
-      value: TstateOther[K];
-    }) {
+    const setOther: TsetOther = (key, value) => {
       setState((prev) => {
         const copy = [...prev];
 
@@ -42,7 +43,7 @@ const useQuotationOther = ({
 
         return copy;
       });
-    }
+    };
 
     return setOther;
   };
@@ -94,4 +95,8 @@ const useDefaultState = ({ raw_contentOtherArr }: { raw_contentOtherArr: Tquotat
   return defaultState;
 };
 
+// ===========================================================================
+
+// ===========================================================================
 export { useQuotationOther };
+export type { TstateOther, Tinstance_useQuotationOther, TsetOther };
