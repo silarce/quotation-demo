@@ -7,6 +7,8 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
   //
   static subspecies(subspecies: string) {
     switch (subspecies) {
+      case 'SJ-302':
+        return ClassCompnent_guideRail_sj302;
       case 'W2':
         return ClassCompnent_guideRail_w2;
 
@@ -58,6 +60,17 @@ class ClassCompnent_guideRail extends ClassCompnent_base<'guideRail'> implements
 // ================================================================================
 // ================================================================================
 // region subspecies
+class ClassCompnent_guideRail_sj302 extends ClassCompnent_guideRail {
+  onProdChangeMaterial(prodMaterial: string) {
+    let v = prodMaterial;
+
+    if (v === '黑鐵') {
+      v = '鍍鋅鋼板';
+    }
+
+    super.onProdChangeMaterial(v);
+  }
+}
 class ClassCompnent_guideRail_w2 extends ClassCompnent_guideRail {
   get options_material() {
     return this.classProd?.options_material;

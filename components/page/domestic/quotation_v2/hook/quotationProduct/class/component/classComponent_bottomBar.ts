@@ -98,6 +98,10 @@ class ClassCompnent_bottomBar_sj302 extends ClassCompnent_bottomBar {
       v = '鍍鋅鋼板';
     }
 
+    if (v === '黑鐵') {
+      v = '鍍鋅鋼板';
+    }
+
     super.onProdChangeMaterial(v);
   }
 }

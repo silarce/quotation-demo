@@ -1582,11 +1582,12 @@ class ClassProd {
     }
 
     this.renewSurface();
-    this.changeBottomBarAngleIronAndBottomBarPlate(value);
 
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
+
+    this.changeBottomBarAngleIronAndBottomBarPlate(this.state.data_componentDict.bottomBar?.material ?? 'undefined');
 
     this.isAllowReqChain && this.reqChain_04();
 

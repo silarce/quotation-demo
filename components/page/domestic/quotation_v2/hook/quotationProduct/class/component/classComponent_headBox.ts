@@ -25,6 +25,8 @@ class ClassCompnent_headBox extends ClassCompnent_base<'headBox'> implements Int
   //
   static subspecies(subspecies: string) {
     switch (subspecies) {
+      case 'SJ-302':
+        return ClassCompnent_headBox_sj302;
       case 'W2':
         return ClassCompnent_headBox_w2;
 
@@ -55,6 +57,18 @@ class ClassCompnent_headBox extends ClassCompnent_base<'headBox'> implements Int
 
   get options_material(): Interface_ClassComponent_prime['options_material'] {
     return optionsCreator_componentMaterial_01();
+  }
+}
+
+class ClassCompnent_headBox_sj302 extends ClassCompnent_headBox {
+  onProdChangeMaterial(prodMaterial: string) {
+    let v = prodMaterial;
+
+    if (v === '黑鐵') {
+      v = '鍍鋅鋼板';
+    }
+
+    super.onProdChangeMaterial(v);
   }
 }
 
