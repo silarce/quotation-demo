@@ -1722,29 +1722,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
 
-    // if (status === 'TempPending') {
-    //   if (latestContent?.toSalesAt) {
-    //     dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
-    //   }
+    if (status === 'TempPending') {
+      // if (latestContent?.toSalesAt) {
+      //   dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+      // }
 
-    //   if (latestContent?.toSupervisorAt) {
-    //     dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
-    //   }
-    // }
+      // if (latestContent?.toSupervisorAt) {
+      //   dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+      // }
+      dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+    }
 
-    // if (status === 'Pending') {
-    //   // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+    if (status === 'Pending') {
+      // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
 
-    //   // dynaSelectorPropsList[0].isSkip = true;
+      // dynaSelectorPropsList[0].isSkip = true;
 
-    //   if (latestContent?.toSalesAt) {
-    //     dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
-    //   }
+      if (latestContent?.toSalesAt) {
+        dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+      }
 
-    //   if (latestContent?.toSupervisorAt) {
-    //     dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
-    //   }
-    // }
+      if (latestContent?.toSupervisorAt) {
+        dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+      }
+    }
 
     return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1984,7 +1985,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
               myAlert.confirm({
                 title: '送審後合約審核表將被鎖定',
                 content: '建議先確認合約審核表是否正確',
-                props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+                // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+                props: {
+                  width: 450,
+                  onOk: () => {
+                    if (!latestContent.toSupervisorAt) {
+                      setShowEmployeSelector(true);
+                    } else {
+                      reqPatchReviewer_pending();
+                    }
+
+                    //
+                  },
+                  okText: '確定送審',
+                  cancelText: '取消',
+                },
               });
 
               return;
