@@ -1657,24 +1657,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ____________________________________________________________________
 
   const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
+    const latestContent = quotationData?.latestContent;
+
     const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
       {
         label: '總經理',
-        value: quotationData?.latestContent.reviewManagerEmployee?.chName,
+        value: latestContent?.reviewManagerEmployee?.chName,
         style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.managerReviewedAt,
+        isReviewed: !!latestContent?.managerReviewedAt,
       },
       {
         label: '應收帳款',
-        value: quotationData?.latestContent.reviewCashierEmployee?.chName,
+        value: latestContent?.reviewCashierEmployee?.chName,
         style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.cashierReviewedAt,
+        isReviewed: !!latestContent?.cashierReviewedAt,
       },
       {
         label: '應收帳款',
-        value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
+        value: latestContent?.reviewWorkDirectorEmployee?.chName,
         style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.workDirectorReviewedAt,
+        isReviewed: !!latestContent?.workDirectorReviewedAt,
       },
       // {
       //   label: '業務經理',
@@ -1684,15 +1686,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // },
       {
         label: '業務主管',
-        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
+        value: latestContent?.reviewSupervisorEmployee?.chName,
         style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.supervisorReviewedAt,
+        isReviewed: !!latestContent?.supervisorReviewedAt,
       },
       {
         label: '業務',
-        value: quotationData?.latestContent.reviewSalesEmployee?.chName,
+        value: latestContent?.reviewSalesEmployee?.chName,
         style: { width: '180px' },
-        isReviewed: !!quotationData?.latestContent.salesReviewedAt,
+        isReviewed: !!latestContent?.salesReviewedAt,
       },
       {
         label: '經辦',
@@ -1714,21 +1716,35 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
-      quotationData?.latestContent.reviewSalesEmployee ? [quotationData.latestContent.reviewSalesEmployee] : undefined,
-      quotationData?.latestContent.reviewSupervisorEmployee
-        ? [quotationData.latestContent.reviewSupervisorEmployee]
-        : undefined,
+      latestContent?.reviewSalesEmployee ? [latestContent.reviewSalesEmployee] : undefined,
+      latestContent?.reviewSupervisorEmployee ? [latestContent.reviewSupervisorEmployee] : undefined,
     ];
 
     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
 
-    if (status === 'TempPending' && dynaSelectorPropsList[1]) {
-      dynaSelectorPropsList[1].isSkip = true;
-    }
+    // if (status === 'TempPending') {
+    //   if (latestContent?.toSalesAt) {
+    //     dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+    //   }
 
-    if (status === 'Pending' && dynaSelectorPropsList[0]) {
-      dynaSelectorPropsList[0].isSkip = true;
-    }
+    //   if (latestContent?.toSupervisorAt) {
+    //     dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+    //   }
+    // }
+
+    // if (status === 'Pending') {
+    //   // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+
+    //   // dynaSelectorPropsList[0].isSkip = true;
+
+    //   if (latestContent?.toSalesAt) {
+    //     dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+    //   }
+
+    //   if (latestContent?.toSupervisorAt) {
+    //     dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+    //   }
+    // }
 
     return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
     // eslint-disable-next-line react-hooks/exhaustive-deps
