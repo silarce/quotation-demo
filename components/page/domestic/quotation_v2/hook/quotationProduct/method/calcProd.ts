@@ -1,20 +1,22 @@
 import Decimal from 'decimal.js';
 
-import type { TstateProd, TstateProdDict } from '../type';
+import type { TstateProd, TstateProdDict, TstateComponentData } from '../type';
 
 const calcProdTotalPrice = ({
   stateProd,
   quotationDiscount,
 }: {
   stateProd: TstateProd;
-  quotationDiscount: `${number}` | number | '';
+  quotationDiscount: `${number}` | number | ''; // 必須是已經除過100的數字，也就是0.52這類
 }) => {
   const { data_prod, data_componentDict, data_accessoryDict } = stateProd;
 
   const { quantity } = data_prod;
 
-  const prodDiscount = new Decimal(data_prod.discount || 0).div(100).toNumber();
-  const discount = new Decimal(quotationDiscount).mul(prodDiscount).toNumber();
+  const priceDiscount_percent = calcPriceDiscount_percent({
+    prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
+    quotationDiscount: quotationDiscount || 0,
+  });
 
   let dualPriceTotal_acce_decimal = new Decimal(0);
   let totalPriceTotal_acce_decimal = new Decimal(0);
@@ -35,9 +37,16 @@ const calcProdTotalPrice = ({
 
   Object.values(data_componentDict).forEach((component) => {
     const { quantity, price } = component;
-    const dualPrice = new Decimal(price || 0).mul(quantity).toString();
-    const unitPrice = new Decimal(price || 0).mul(discount).toString();
-    const totalPrice = new Decimal(unitPrice).mul(quantity || 0).toString();
+
+    const {
+      dualPrice,
+      //  unitPrice,
+      totalPrice,
+    } = calcAllPrice({
+      price: price || 0,
+      quantity: quantity || 0,
+      priceDiscount_percent,
+    });
 
     dualPriceTotal_com_decimal = dualPriceTotal_com_decimal.add(dualPrice);
     totalPriceTotal_com_decimal = totalPriceTotal_com_decimal.add(totalPrice);
@@ -77,13 +86,11 @@ const calcProdTotalPrice = ({
 // 注意，有副作用，會直接修改prodDict的內容
 const calcAndRenewAllProdPrice_sideEffect = ({
   prodDict,
-  quotationDiscount: _quotationDiscount,
+  quotationDiscount,
 }: {
   prodDict: TstateProdDict;
   quotationDiscount: `${number}` | '';
 }) => {
-  const quotationDiscount = new Decimal(_quotationDiscount || 0).div(100).toNumber();
-
   Object.values(prodDict).forEach((stateProd) => {
     stateProd.renderCount = (stateProd.renderCount ?? 0) + 1;
 
@@ -95,8 +102,10 @@ const calcAndRenewAllProdPrice_sideEffect = ({
 
     const { distributionBoxQuantity, distributionBoxPrice, installationFeeQuantity, installationFeePrice } = data_prod;
 
-    const prodDiscount = new Decimal(data_prod.discount || 0).div(100).toNumber();
-    const discount = new Decimal(quotationDiscount).mul(prodDiscount).toNumber();
+    const priceDiscount_percent = calcPriceDiscount_percent({
+      prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
+      quotationDiscount: quotationDiscount || 0,
+    });
 
     // ___________________________________________________________________
     // ___________________________________________________________________
@@ -105,7 +114,7 @@ const calcAndRenewAllProdPrice_sideEffect = ({
       const copy = { ...acce };
       const { quantity, price } = copy;
 
-      const unitPrice = new Decimal(price || 0).mul(discount).toDecimalPlaces().toString();
+      const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces().toString();
       const totalPrice = new Decimal(unitPrice).mul(quantity || 0).toString();
 
       copy.unitPrice = unitPrice as `${number}`;
@@ -117,12 +126,16 @@ const calcAndRenewAllProdPrice_sideEffect = ({
     // ___________________________________________________________________
     // ___________________________________________________________________
 
-    const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0).mul(discount).toString() as `${number}`;
+    const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0)
+      .mul(priceDiscount_percent)
+      .toString() as `${number}`;
     const distributionBoxTotalPrice = new Decimal(distributionBoxUnitPrice)
       .mul(distributionBoxQuantity || 0)
       .toString() as `${number}`;
 
-    const installationFeeUnitPrice = new Decimal(installationFeePrice || 0).mul(discount).toString() as `${number}`;
+    const installationFeeUnitPrice = new Decimal(installationFeePrice || 0)
+      .mul(priceDiscount_percent)
+      .toString() as `${number}`;
     const installationFeeTotalPrice = new Decimal(installationFeeUnitPrice)
       .mul(installationFeeQuantity || 0)
       .toString() as `${number}`;
@@ -153,5 +166,39 @@ const calcAndRenewAllProdPrice_sideEffect = ({
   return prodDict;
 };
 
+const calcAllPrice = ({
+  price,
+  quantity,
+  priceDiscount_percent,
+}: {
+  price: number | `${number}`;
+  quantity: number | `${number}`;
+  priceDiscount_percent: number | `${number}`; // 浮點數
+}) => {
+  const dualPrice = new Decimal(price || 0).mul(quantity).toNumber();
+  const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toNumber();
+  const totalPrice = new Decimal(unitPrice).mul(quantity || 0).toNumber();
+
+  return {
+    price,
+    dualPrice,
+    unitPrice,
+    totalPrice,
+  };
+};
+
+const calcPriceDiscount_percent = ({
+  prodDiscount,
+  quotationDiscount,
+}: {
+  prodDiscount: `${number}` | '' | number;
+  quotationDiscount: `${number}` | '' | number;
+}) => {
+  const prodDiscount_percent = new Decimal(prodDiscount || 0).div(100).toNumber();
+  const quotationDiscount_percent = new Decimal(quotationDiscount || 0).div(100).toNumber();
+
+  return new Decimal(prodDiscount_percent).mul(quotationDiscount_percent).toDecimalPlaces(3).toNumber();
+};
+
 // ========================================================================
-export { calcProdTotalPrice, calcAndRenewAllProdPrice_sideEffect };
+export { calcProdTotalPrice, calcAndRenewAllProdPrice_sideEffect, calcAllPrice, calcPriceDiscount_percent };
