@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 import {
   TstateProd,
   TsetProd,
@@ -23,6 +25,8 @@ import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/uti
 import { checkIsSST, checkIsGalvanized } from '../library';
 
 import { ClassProd } from '../prod/classProd_remake';
+
+import { calcAllPrice } from '../../method/calcProd';
 
 // ========================================================================
 // interface Interface_ClassComponent_base<T extends keyof TcomponentRawDataDict> {
@@ -94,9 +98,16 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   };
 
   protected classProd: ClassProd | undefined;
+
   setClassProd(classProd: ClassProd) {
     this.classProd = classProd;
+
+    this.renewComponentAllPrice();
   }
+
+  _dualPrice = 0;
+  _unitPrice = 0;
+  _totalPrice = 0;
 
   //
   // -----------------------------------------------------------------------
@@ -187,11 +198,23 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
 
   get dualPrice() {
-    return 9999;
+    const dualPrice = new Decimal(this.state.price || 0).mul(this.state.quantity || 0).toNumber();
+
+    return dualPrice;
   }
 
   get unitPrice() {
-    return 9999;
+    const price = this.state.price;
+    const quantity = this.state.quantity;
+    const priceDiscount = this.classProd?.priceDiscount_percent ?? 100;
+
+    const unitPrice = new Decimal(price || 0)
+      .mul(priceDiscount)
+      .div(100)
+      .mul(quantity || 0)
+      .toNumber();
+
+    return unitPrice;
   }
 
   get totalPrice() {
@@ -264,6 +287,18 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
 
     this.render();
   };
+
+  renewComponentAllPrice() {
+    const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      price: this.state.price || 0,
+      quantity: this.state.quantity || 0,
+      priceDiscount_percent: this.classProd?.priceDiscount_percent || 0,
+    });
+
+    this._dualPrice = dualPrice;
+    this._unitPrice = unitPrice;
+    this._totalPrice = totalPrice;
+  }
 
   renewDesc() {
     // 將會在各個子類別中實作

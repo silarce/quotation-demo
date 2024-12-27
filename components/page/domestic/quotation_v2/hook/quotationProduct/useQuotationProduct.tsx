@@ -28,19 +28,12 @@ import type {
   // TcomponentRawDataDict,
   Tdata_componentDict,
   TsetComponent,
-  //s
+  //
   TstateAccessoryData,
   TsetAccessory,
 } from './type';
 
-// import { lookup_classProd } from './class/prod/lookup_classProd';
 import { ClassProd } from './class/prod/classProd_remake';
-// import {
-//   Interface_ClassProd_base,
-//   Interface_ClassProd_base2,
-//   Interface_ClassProd_prime,
-//   Interface_ClassProd_special,
-// } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/interface';
 
 import {
   TconfigItem,
@@ -98,7 +91,7 @@ import { createClassComponentDict } from './method/createClassComponentDict';
 import { createAccessoryDict } from './method/createAccessoryDict';
 import {
   //
-  calcProdTotalPrice,
+  // calcProdTotalPrice,
   // w注意 calcAndRenewAllProdPrice_sideEffect有副作用
   calcAndRenewAllProdPrice_sideEffect,
   //
@@ -369,11 +362,17 @@ const useQuotationProduct = ({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
         nodeConfig: nodeConfig_prime,
+        quotationDiscount: state_quotationDiscount || 0,
       });
 
       return classProd;
     },
-    [nodeConfig_prime]
+    [
+      nodeConfig_prime,
+      // 編輯總折數state_quotationDiscount時會呼叫calcAndRenewAllProdPrice_sideEffect
+      // 本來就會使所有prod更新，所以暫時不用在這裡考慮效能的問題
+      state_quotationDiscount,
+    ]
   );
 
   const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
@@ -407,6 +406,7 @@ const useQuotationProduct = ({
     }
 
     const activedClassProd = createClassProd(activedProd);
+
     const stateProd = activedClassProd.state; // 同activedProd 為同一個參照
 
     // const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;

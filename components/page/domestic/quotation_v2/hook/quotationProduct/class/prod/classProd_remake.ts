@@ -128,6 +128,7 @@ import type { Tdata_componentDict, TstateAccessoryData, Tdata_accessoryDict } fr
 import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
 import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndThead/theadItem';
 import { Tstate_accountant } from 'components/wholePage/collection';
+import { calcPriceDiscount_percent } from '../../method/calcProd';
 
 // ================================================================================
 
@@ -135,6 +136,7 @@ interface Tprops_constructor {
   stateProd: TstateProd;
   setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
   nodeConfig: TnodeConfig;
+  quotationDiscount: number | `${number}`;
 }
 
 // ================================================================================
@@ -245,12 +247,23 @@ class ClassProd {
   get isSpecial() {
     return !this.isValid_doorModel;
   }
+
+  readonly quotationDiscount: number | `${number}`;
+
+  get priceDiscount_percent() {
+    const priceDiscount_percent = calcPriceDiscount_percent({
+      prodDiscount: (this.data.discount || 0) as `${number}` | number,
+      quotationDiscount: this.quotationDiscount,
+    });
+
+    return priceDiscount_percent;
+  }
+
   // ---------------------------------------------------------------------------
   // MARK:constructor
-  constructor({ stateProd, setStateProd, nodeConfig }: Tprops_constructor) {
-    // cloneDeep對效能的負擔太大了
-    // this.state = _.cloneDeep(stateProd);
+  constructor({ stateProd, setStateProd, nodeConfig, quotationDiscount }: Tprops_constructor) {
     this.state = stateProd;
+    this.quotationDiscount = quotationDiscount;
 
     // this.data = this.state.data_prod;
     this.setState = setStateProd;
