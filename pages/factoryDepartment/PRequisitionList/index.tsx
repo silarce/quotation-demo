@@ -95,6 +95,7 @@ export default function PRequisitionList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -139,7 +140,7 @@ export default function PRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "詢價中",
+                type: "編輯中",
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -330,12 +331,14 @@ export default function PRequisitionList() {
         const endDate = keywordenddate;
         const id = keyword2.trim();
         const status = keyword3.trim();
+        const note = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
             !id &&
-            !status) {
+            !status &&
+            !note) {
             setSearchdata(data);
             return;
         }
@@ -363,13 +366,20 @@ export default function PRequisitionList() {
             );
         }
 
+        if (note) {
+            filteredData = filteredData.filter(item =>
+                item.note.toString().includes(note)
+            );
+        }
+
+
         setSearchdata(filteredData);
     };
 
     // 監聽條件變更
     useEffect(() => {
         filterData();
-    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
 
     //#endregion
 
@@ -382,7 +392,7 @@ export default function PRequisitionList() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
-                            gap: '20px', // 元素之間的間距
+                            gap: '5px', // 元素之間的間距
                             flexWrap: 'wrap', // 如果空間不足，讓元素換行
                             paddingLeft: '10px'
                         }}
@@ -404,11 +414,12 @@ export default function PRequisitionList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="詢價中">詢價中</option>
+                                <option value="編輯中">編輯中</option>
                                 <option value="審核中">審核中</option>
                                 <option value="已核准">已核准</option>
                                 <option value="已結案">已結案</option>
                             </select>
+
                         </div>
 
                         {/* 第二個選項 */}
@@ -454,7 +465,7 @@ export default function PRequisitionList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入單號',
-                                        style: { width: "300px" },
+                                        style: { width: "250px" },
                                         value: keyword2,
                                         onChange: (e) => {
                                             setKeyword2(e.target.value)
@@ -463,7 +474,38 @@ export default function PRequisitionList() {
                                 }}
                             />
                         </div>
+                        <div>
+                            {/* <InputSel
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                inputProps={{
+                                    props: {
+                                        placeholder: '請輸入廠商名稱',
+                                        style: { width: "300px" },
+                                        value: keyword4,
+                                        onChange: (e) => {
+                                            setKeyword4(e.target.value)
+                                        }
+                                    },
+                                }}
+                            /> */}
+                            <InputSel
+                                disabled={false}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                inputProps={{
+                                    props: {
+                                        placeholder: '請輸入備註',
+                                        style: { width: "300px" },
+                                        value: keyword4,
+                                        onChange: (e) => {
+                                            setKeyword4(e.target.value)
+                                        }
+                                    },
+                                }}
+                            />
+                        </div>
                     </div>
+
                 ]}
                 customeRight={[
 
@@ -654,6 +696,7 @@ export default function PRequisitionList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
+                                                        <th style={{ width: '150px' }}>已轉</th>
                                                         <th style={{ width: '150px' }}>數量</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
@@ -668,6 +711,7 @@ export default function PRequisitionList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
+                                                            <td style={{ width: '150px' }}>{detail.po_quantity ?? '0'}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>

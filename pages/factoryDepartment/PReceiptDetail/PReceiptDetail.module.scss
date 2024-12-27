@@ -274,10 +274,10 @@
 
 
 // grid
-//進貨明細
+//物料明細
 div.panelHeader19 {
-    // padding-left: 15px;
-    padding: 10px 20px;
+
+    padding-left: 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,
@@ -294,10 +294,9 @@ div.panelHeader19 {
     }
 
     .row01 {
-        
         display: grid;
-        grid-template-columns: 30px 150px 150px 150px 415px 65px;
-        cursor: pointer;
+        grid-template-columns: 145px 300px 300px 40px 30px;
+        gap: 5px;
     }
 }
 
@@ -322,7 +321,7 @@ div.panelHeader20 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px // gap: 5px;
+        grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 50px 150px 150px 450px // gap: 5px;
     }
 }
 
@@ -686,7 +685,7 @@ div.panelHeader15 {
     top: 0;
     z-index: 1000; // 確保元素位於其他內容的上層
     display: grid;
-    grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px 65px;
+    grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 50px 150px 150px 450px 65px;
     // gap: 5px;
     height: 40px;
     padding: 0px 20px;
@@ -843,7 +842,7 @@ div.panelHeader18 {
     .row02 {
         span {
             font-weight: 400;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .clientName,
@@ -924,96 +923,3 @@ div.panelHeader21 {
 }
 
 //#endregion
-
-
-//#region 進貨紀錄
-.thead19 {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0;
-    z-index: 1000; // 確保元素位於其他內容的上層
-    display: grid;
-    grid-template-columns: 30px 150px 150px 150px 415px 65px;
-    // gap: 5px;
-    height: 40px;
-    padding: 0px 20px;
-    background-color: $bgc01;
-
-    >* {
-        margin: auto;
-        margin-left: 0;
-
-        &:nth-last-of-type(1) {
-            margin-left: auto;
-        }
-    }
-
-    >span {
-        font-weight: 400;
-        font-size: 18px;
-        // color: #979797;
-        color: #14256a;
-    }
-}
-
-//#endregion
-
-
-
-//#region 物料明細(請購帶入)
-.thead22 {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0;
-    z-index: 1000; // 確保元素位於其他內容的上層
-    display: grid;
-    grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px 65px;
-    // gap: 5px;
-    height: 40px;
-    padding: 0px 20px;
-    background-color: $bgc01;
-  
-    >* {
-      margin: auto;
-      margin-left: 0;
-  
-      &:nth-last-of-type(1) {
-        margin-left: auto;
-      }
-    }
-  
-    >span {
-      font-weight: 400;
-      font-size: 18px;
-      // color: #979797;
-      color:#14256a;
-    }
-  }
-  
-  //#endregion
-  
-  //物料明細(請購帶入)
-  div.panelHeader22 {
-    // padding-left: 15px;
-    padding: 10px 20px;
-    border-bottom: solid 1px $colorBorder01;
-  
-    .row01,
-    .row02 {
-      span {
-        font-weight: 400;
-        font-size: 16px;
-      }
-  
-      .clientName,
-      .country {
-        color: $colorMain;
-      }
-    }
-  
-    .row01 {
-      display: grid;
-      grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px
-      // gap: 5px;
-    }
-  }
