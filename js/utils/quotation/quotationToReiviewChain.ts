@@ -91,7 +91,7 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
   const processChain =
     status === 'Budget' || status === 'Bidding' || status === 'Contracting'
       ? [process_agent, process_sales, process_supervisor, process_manager]
-      : [process_agent, process_sales, process_workDirector, process_cashier, process_manager];
+      : [process_agent, process_sales, process_supervisor, process_workDirector, process_cashier, process_manager];
 
   return processChain;
 };
