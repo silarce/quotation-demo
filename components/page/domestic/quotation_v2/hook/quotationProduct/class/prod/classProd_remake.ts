@@ -769,6 +769,7 @@ class ClassProd {
       dealErr(error);
     } finally {
       this.state.isFetching = true;
+      this.renewProdAllPrice_updateQuotationTotalPrice();
       this.render();
     }
   }
@@ -801,6 +802,7 @@ class ClassProd {
       dealErr(error);
     } finally {
       this.state.isFetching = false;
+      this.renewProdAllPrice_updateQuotationTotalPrice();
       this.render();
     }
   }
@@ -818,6 +820,7 @@ class ClassProd {
       dealErr(error);
     } finally {
       this.state.isFetching = false;
+      this.renewProdAllPrice_updateQuotationTotalPrice();
       this.render();
     }
   }
@@ -834,6 +837,7 @@ class ClassProd {
       dealErr(error);
     } finally {
       this.state.isFetching = false;
+      this.renewProdAllPrice_updateQuotationTotalPrice();
       this.render();
     }
   }
@@ -904,7 +908,6 @@ class ClassProd {
     if (invalidComponentArr) {
       const content = invalidComponentArr.join(', ');
 
-      // this.replaceComponentToEmpty();
       this.replaceTargetComponentToEmpty(...invalidComponentArr);
 
       throw { title: '更新材料配件失敗，以下材料配件不匹配', content: content };

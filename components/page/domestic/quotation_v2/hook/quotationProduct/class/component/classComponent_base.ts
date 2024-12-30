@@ -357,6 +357,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.state.number = number;
     this.state.quantity = `${quantity}`;
     this.state.price = `${unitPrice}`;
+
+    this.renewComponentAllPrice();
+
     this.render();
   }
 } //  ClassCompnent_base
