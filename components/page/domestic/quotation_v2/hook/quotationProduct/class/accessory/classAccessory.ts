@@ -101,6 +101,8 @@ class Class_accessory implements Interface_ClassAccessory {
   set quantity(value) {
     this.state.quantity = value;
     this.renewAcceAllPrice();
+    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
     this.render();
   }
 
@@ -111,6 +113,8 @@ class Class_accessory implements Interface_ClassAccessory {
   set price(value) {
     this.state.price = value;
     this.renewAcceAllPrice();
+    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
     this.render();
   }
 

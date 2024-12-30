@@ -428,6 +428,12 @@ class ClassProd {
     this.data.WG = WG;
   }
 
+  // MARK:renewProdAllPrice
+  renewProdAllPrice_updateQuotationTotalPrice() {
+    this.renewProdAllPrice();
+    this.updateQuotationTotalPrice();
+  }
+
   renewProdAllPrice() {
     const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
       stateProd: this.state,
@@ -439,6 +445,8 @@ class ClassProd {
     this.data.unitPrice = unitPrice;
     this.data.totalPrice = totalPrice;
   }
+
+  updateQuotationTotalPrice() {}
 
   // ---------------------------------------------------------------------------
 
@@ -705,6 +713,7 @@ class ClassProd {
     const keys = Object.keys(dict);
 
     this.state.accessoryKeyArr.push(...keys);
+    this.renewProdAllPrice_updateQuotationTotalPrice();
 
     this.render();
   }
@@ -1227,8 +1236,7 @@ class ClassProd {
       acce.renewAcceAllPrice();
     });
 
-    this.renewProdAllPrice();
-    // console.log(this.priceDiscount_percent);
+    this.renewProdAllPrice_updateQuotationTotalPrice();
 
     this.render();
   }
