@@ -2,6 +2,7 @@ import Decimal from 'decimal.js';
 
 import type { TstateProd, TstateProdDict, TstateComponentData } from '../type';
 
+// MARK:calcProdTotalPrice
 const calcProdTotalPrice = ({
   stateProd,
   quotationDiscount,
@@ -83,6 +84,7 @@ const calcProdTotalPrice = ({
   };
 };
 
+// MARK:calcAndRenewAllProdPrice_sideEffect
 // 注意，有副作用，會直接修改prodDict的內容
 const calcAndRenewAllProdPrice_sideEffect = ({
   prodDict,
@@ -115,13 +117,17 @@ const calcAndRenewAllProdPrice_sideEffect = ({
         return;
       }
 
-      const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      const {
+        //  dualPrice,
+        unitPrice,
+        totalPrice,
+      } = calcAllPrice({
         price: com.price || 0,
         quantity: com.quantity || 0,
         priceDiscount_percent,
       });
 
-      theComponent.dualPrice = dualPrice;
+      // theComponent.dualPrice = dualPrice;
       theComponent.unitPrice = unitPrice;
       theComponent.totalPrice = totalPrice;
       theComponent.renderCount = (theComponent.renderCount ?? 0) + 1;
@@ -134,11 +140,19 @@ const calcAndRenewAllProdPrice_sideEffect = ({
       const copy = { ...acce };
       const { quantity, price } = copy;
 
-      const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces().toString();
-      const totalPrice = new Decimal(unitPrice).mul(quantity || 0).toString();
+      const {
+        // dualPrice,
+        unitPrice,
+        totalPrice,
+      } = calcAllPrice({
+        price: price || 0,
+        quantity: quantity || 0,
+        priceDiscount_percent,
+      });
 
-      copy.unitPrice = unitPrice as `${number}`;
-      copy.totalPrice = totalPrice as `${number}`;
+      // copy.dualPrice = `${dualPrice}` as `${number}`;
+      copy.unitPrice = `${unitPrice}` as `${number}`;
+      copy.totalPrice = `${totalPrice}` as `${number}`;
 
       data_accessoryDict[key] = copy;
     });
@@ -146,19 +160,11 @@ const calcAndRenewAllProdPrice_sideEffect = ({
     // ___________________________________________________________________
     // ___________________________________________________________________
 
-    const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0)
-      .mul(priceDiscount_percent)
-      .toString() as `${number}`;
-    const distributionBoxTotalPrice = new Decimal(distributionBoxUnitPrice)
-      .mul(distributionBoxQuantity || 0)
-      .toString() as `${number}`;
-
-    const installationFeeUnitPrice = new Decimal(installationFeePrice || 0)
-      .mul(priceDiscount_percent)
-      .toString() as `${number}`;
-    const installationFeeTotalPrice = new Decimal(installationFeeUnitPrice)
-      .mul(installationFeeQuantity || 0)
-      .toString() as `${number}`;
+    const { distributionBoxUnitPrice, distributionBoxTotalPrice, installationFeeUnitPrice, installationFeeTotalPrice } =
+      calcProdDistributionBoxAndInstallationFee({
+        stateProd,
+        priceDiscount_percent,
+      });
 
     data_prod.distributionBoxUnitPrice = distributionBoxUnitPrice;
     data_prod.distributionBoxTotalPrice = distributionBoxTotalPrice;
@@ -186,6 +192,7 @@ const calcAndRenewAllProdPrice_sideEffect = ({
   return prodDict;
 };
 
+// MARK:calcAllPrice
 const calcAllPrice = ({
   price,
   quantity,
@@ -196,8 +203,11 @@ const calcAllPrice = ({
   priceDiscount_percent: number | `${number}`; // 浮點數
 }) => {
   const dualPrice = new Decimal(price || 0).mul(quantity).toNumber();
-  const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toNumber();
-  const totalPrice = new Decimal(unitPrice).mul(quantity || 0).toNumber();
+  const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces(0).toNumber();
+  const totalPrice = new Decimal(unitPrice)
+    .mul(quantity || 0)
+    .toDecimalPlaces(0)
+    .toNumber();
 
   return {
     price,
@@ -207,6 +217,7 @@ const calcAllPrice = ({
   };
 };
 
+// MARK:calcPriceDiscount_percent
 const calcPriceDiscount_percent = ({
   prodDiscount,
   quotationDiscount,
@@ -220,5 +231,45 @@ const calcPriceDiscount_percent = ({
   return new Decimal(prodDiscount_percent).mul(quotationDiscount_percent).toDecimalPlaces(3).toNumber();
 };
 
+// MARK:calcProdDistributionBoxAndInstallationFee
+const calcProdDistributionBoxAndInstallationFee = ({
+  stateProd,
+  priceDiscount_percent,
+}: {
+  stateProd: TstateProd;
+  priceDiscount_percent: number | `${number}`;
+}) => {
+  const {
+    data_prod: { distributionBoxPrice, distributionBoxQuantity, installationFeePrice, installationFeeQuantity },
+  } = stateProd;
+
+  const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0)
+    .mul(priceDiscount_percent)
+    .toString() as `${number}`;
+  const distributionBoxTotalPrice = new Decimal(distributionBoxUnitPrice)
+    .mul(distributionBoxQuantity || 0)
+    .toString() as `${number}`;
+
+  const installationFeeUnitPrice = new Decimal(installationFeePrice || 0)
+    .mul(priceDiscount_percent)
+    .toString() as `${number}`;
+  const installationFeeTotalPrice = new Decimal(installationFeeUnitPrice)
+    .mul(installationFeeQuantity || 0)
+    .toString() as `${number}`;
+
+  return {
+    distributionBoxUnitPrice,
+    distributionBoxTotalPrice,
+    installationFeeUnitPrice,
+    installationFeeTotalPrice,
+  };
+};
+
 // ========================================================================
-export { calcProdTotalPrice, calcAndRenewAllProdPrice_sideEffect, calcAllPrice, calcPriceDiscount_percent };
+export {
+  calcProdTotalPrice,
+  calcAndRenewAllProdPrice_sideEffect,
+  calcAllPrice,
+  calcPriceDiscount_percent,
+  calcProdDistributionBoxAndInstallationFee,
+};
