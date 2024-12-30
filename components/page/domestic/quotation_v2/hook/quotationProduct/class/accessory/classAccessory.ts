@@ -72,6 +72,7 @@ class Class_accessory implements Interface_ClassAccessory {
 
   // -----------------------------------------------------------------------
 
+  // MARK: renewAcceAllPrice
   renewAcceAllPrice() {
     const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
       price: this.price || 0,
@@ -99,6 +100,7 @@ class Class_accessory implements Interface_ClassAccessory {
   }
   set quantity(value) {
     this.state.quantity = value;
+    this.renewAcceAllPrice();
     this.render();
   }
 
@@ -108,6 +110,7 @@ class Class_accessory implements Interface_ClassAccessory {
   }
   set price(value) {
     this.state.price = value;
+    this.renewAcceAllPrice();
     this.render();
   }
 
