@@ -872,20 +872,22 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
-      const { value, type } = inputLocaleStringSwitcher(classProd.dualPrice, disabled);
+      // const { value, type } = inputLocaleStringSwitcher(classProd.dualPrice, disabled);
 
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-right',
-          type: type,
-          value: value,
-          onChange: (e) => {
-            classProd.dualPrice = e.target.value as `${number}` | '';
-          },
-        },
-      };
+      // const inputProps: TinputSelProps['inputProps'] = {
+      //   props: {
+      //     className: 'text-right',
+      //     type: type,
+      //     value: value,
+      //     onChange: (e) => {
+      //       classProd.dualPrice = e.target.value as `${number}` | '';
+      //     },
+      //   },
+      // };
 
-      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+      // return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+
+      return <InputSel_prod node={Number(classProd.dualPrice).toLocaleString()} disabled={true} />;
     },
   },
 
@@ -896,20 +898,22 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
-      const { value, type } = inputLocaleStringSwitcher(classProd.unitPrice, disabled);
+      // const { value, type } = inputLocaleStringSwitcher(classProd.unitPrice, disabled);
 
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-right',
-          type: type,
-          value: value,
-          onChange: (e) => {
-            classProd.unitPrice = e.target.value as `${number}` | '';
-          },
-        },
-      };
+      // const inputProps: TinputSelProps['inputProps'] = {
+      //   props: {
+      //     className: 'text-right',
+      //     type: type,
+      //     value: value,
+      //     onChange: (e) => {
+      //       classProd.unitPrice = e.target.value as `${number}` | '';
+      //     },
+      //   },
+      // };
 
-      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+      // return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+
+      return <InputSel_prod node={Number(classProd.unitPrice).toLocaleString()} disabled={true} />;
     },
   },
 
@@ -920,20 +924,22 @@ const nodeConfig_origin: TnodeConfig = {
       textAlign: 'right',
     },
     createNode({ disabled, classProd }) {
-      const { value, type } = inputLocaleStringSwitcher(classProd.totalPrice, disabled);
+      // const { value, type } = inputLocaleStringSwitcher(classProd.totalPrice, disabled);
 
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          className: 'text-right',
-          type: type,
-          value: value,
-          onChange: (e) => {
-            classProd.totalPrice = e.target.value as `${number}` | '';
-          },
-        },
-      };
+      // const inputProps: TinputSelProps['inputProps'] = {
+      //   props: {
+      //     className: 'text-right',
+      //     type: type,
+      //     value: value,
+      //     onChange: (e) => {
+      //       classProd.totalPrice = e.target.value as `${number}` | '';
+      //     },
+      //   },
+      // };
 
-      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+      // return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+
+      return <InputSel_prod node={Number(classProd.totalPrice).toLocaleString()} disabled={true} />;
     },
   },
 
