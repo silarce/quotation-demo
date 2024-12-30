@@ -102,12 +102,15 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   setClassProd(classProd: ClassProd) {
     this.classProd = classProd;
 
-    this.renewComponentAllPrice();
+    if (
+      this.state.dualPrice === undefined ||
+      this.state.unitPrice === undefined ||
+      this.state.totalPrice === undefined
+    ) {
+      this.renewComponentAllPrice();
+      this.render();
+    }
   }
-
-  _dualPrice = 0;
-  _unitPrice = 0;
-  _totalPrice = 0;
 
   //
   // -----------------------------------------------------------------------
@@ -120,8 +123,6 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.setState = setState_component;
 
     this.state.shouldInit && this.init();
-
-    // this.classProd = activedClassProd;
   } // constructor close
 
   // -----------------------------------------------------------------------
@@ -198,27 +199,15 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
 
   get dualPrice() {
-    const dualPrice = new Decimal(this.state.price || 0).mul(this.state.quantity || 0).toNumber();
-
-    return dualPrice;
+    return this.state.dualPrice ?? 0;
   }
 
   get unitPrice() {
-    const price = this.state.price;
-    const quantity = this.state.quantity;
-    const priceDiscount = this.classProd?.priceDiscount_percent ?? 100;
-
-    const unitPrice = new Decimal(price || 0)
-      .mul(priceDiscount)
-      .div(100)
-      .mul(quantity || 0)
-      .toNumber();
-
-    return unitPrice;
+    return this.state.unitPrice ?? 0;
   }
 
   get totalPrice() {
-    return 9999;
+    return this.state.totalPrice ?? 0;
   }
   // -----------------------------------------------------------------------
 
@@ -295,9 +284,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       priceDiscount_percent: this.classProd?.priceDiscount_percent || 0,
     });
 
-    this._dualPrice = dualPrice;
-    this._unitPrice = unitPrice;
-    this._totalPrice = totalPrice;
+    this.state.dualPrice = dualPrice;
+    this.state.unitPrice = unitPrice;
+    this.state.totalPrice = totalPrice;
   }
 
   renewDesc() {
