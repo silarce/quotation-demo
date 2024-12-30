@@ -94,17 +94,37 @@ const calcAndRenewAllProdPrice_sideEffect = ({
   Object.values(prodDict).forEach((stateProd) => {
     stateProd.renderCount = (stateProd.renderCount ?? 0) + 1;
 
-    const {
-      data_prod,
-
-      data_accessoryDict,
-    } = stateProd;
+    const { data_prod, data_componentDict, data_accessoryDict } = stateProd;
 
     const { distributionBoxQuantity, distributionBoxPrice, installationFeeQuantity, installationFeePrice } = data_prod;
 
     const priceDiscount_percent = calcPriceDiscount_percent({
       prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
       quotationDiscount: quotationDiscount || 0,
+    });
+
+    // ___________________________________________________________________
+    // ___________________________________________________________________
+
+    Object.entries(data_componentDict).forEach(([_key, com]) => {
+      const key = _key as keyof typeof data_componentDict;
+
+      const theComponent = data_componentDict[key];
+
+      if (!theComponent) {
+        return;
+      }
+
+      const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+        price: com.price || 0,
+        quantity: com.quantity || 0,
+        priceDiscount_percent,
+      });
+
+      theComponent.dualPrice = dualPrice;
+      theComponent.unitPrice = unitPrice;
+      theComponent.totalPrice = totalPrice;
+      theComponent.renderCount = (theComponent.renderCount ?? 0) + 1;
     });
 
     // ___________________________________________________________________
