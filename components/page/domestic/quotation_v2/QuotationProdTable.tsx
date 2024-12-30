@@ -407,7 +407,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
             return (
               <QuotationRow_dnd_memo
                 //
-                rerenderTrigger01={classComponent.state}
+                rerenderTrigger01={classComponent.state.renderCount}
                 rerenderTrigger02={disabled}
                 rerenderTrigger03={null}
                 rerenderTrigger04={null}
