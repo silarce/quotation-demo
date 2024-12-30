@@ -432,6 +432,8 @@ class ClassProd {
   renewProdAllPrice_updateQuotationTotalPrice() {
     this.renewProdAllPrice();
     this.updateQuotationTotalPrice();
+
+    this.render();
   }
 
   renewProdAllPrice() {
