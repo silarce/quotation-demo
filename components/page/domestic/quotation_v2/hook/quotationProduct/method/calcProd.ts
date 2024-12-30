@@ -80,8 +80,8 @@ const calcProdTotalPrice = ({
 
   // dual
   const price = new Decimal(0) // 沒有折扣過的價格
-    .add(data_prod.distributionBoxDualPrice)
-    .add(data_prod.installationFeeDualPrice)
+    .add(data_prod.distributionBoxDualPrice || 0)
+    .add(data_prod.installationFeeDualPrice || 0)
     .add(dualPriceTotal_acce_decimal)
     .add(dualPriceTotal_com_decimal)
     .toNumber();
@@ -90,8 +90,8 @@ const calcProdTotalPrice = ({
 
   // total
   const unitPrice = new Decimal(0)
-    .add(data_prod.distributionBoxTotalPrice)
-    .add(data_prod.installationFeeTotalPrice)
+    .add(data_prod.distributionBoxTotalPrice || 0)
+    .add(data_prod.installationFeeTotalPrice || 0)
     .add(totalPriceTotal_acce_decimal)
     .add(totalPriceTotal_com_decimal)
     .toNumber();

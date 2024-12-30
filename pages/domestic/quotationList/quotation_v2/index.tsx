@@ -478,9 +478,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   }) {
     const quotationPriceTotal = new Decimal(prodPriceAllTotal).add(otherPriceAllTotal).toNumber();
 
-    console.log('prodPriceAllTotal', prodPriceAllTotal);
-    console.log('otherPriceAllTotal', otherPriceAllTotal);
-
     setQuotationPriceTotal(quotationPriceTotal);
   }
 

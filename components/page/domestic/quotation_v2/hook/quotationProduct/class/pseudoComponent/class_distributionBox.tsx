@@ -174,15 +174,7 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
   }
 
   renewAllPrice() {
-    const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
-      price: this.data.distributionBoxPrice || 0,
-      quantity: this.data.distributionBoxQuantity || 0,
-      priceDiscount_percent: this.classProd.priceDiscount_percent,
-    });
-
-    this.data.distributionBoxDualPrice = `${dualPrice}`;
-    this.data.distributionBoxUnitPrice = `${unitPrice}`;
-    this.data.distributionBoxTotalPrice = `${totalPrice}`;
+    this.classProd.renewDistributionBoxAllPrice();
   }
 }
 

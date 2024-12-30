@@ -128,7 +128,7 @@ import type { Tdata_componentDict, TstateAccessoryData, Tdata_accessoryDict } fr
 import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
 import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndThead/theadItem';
 import { Tstate_accountant } from 'components/wholePage/collection';
-import { calcPriceDiscount_percent } from '../../method/calcProd';
+import { calcAllPrice, calcPriceDiscount_percent } from '../../method/calcProd';
 
 import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee } from '../../method/calcProd';
 
@@ -311,13 +311,15 @@ class ClassProd {
   }
 
   clearState({
-    keepItemName,
-    keepDiscount,
-    keepQuoteType,
+    keepItemName = true,
+    keepDiscount = true,
+    keepQuoteType = true,
+    keepDistributionBoxQuantity = true,
   }: {
     keepItemName?: boolean;
     keepDiscount?: boolean;
     keepQuoteType?: boolean;
+    keepDistributionBoxQuantity?: boolean;
   } = {}) {
     const newState = createEmptyStateProd(this.state.key);
 
@@ -328,6 +330,7 @@ class ClassProd {
     keepItemName && (newState.data_prod.itemName = data_prod.itemName);
     keepDiscount && (newState.data_prod.discount = data_prod.discount);
     keepQuoteType && (newState.data_prod.quoteType = data_prod.quoteType);
+    keepDistributionBoxQuantity && (newState.data_prod.distributionBoxQuantity = data_prod.distributionBoxQuantity);
 
     Object.clearAndAssign(this.state, newState);
   }
@@ -461,23 +464,22 @@ class ClassProd {
     this.data.totalPrice = totalPrice;
   }
 
-  // renewProdAllPrice_noComAndAcce() {
-  //   const { quantity, price } = this.data;
-  //   const priceDiscount_percent = this.priceDiscount_percent;
+  renewDistributionBoxAllPrice() {
+    const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      price: this.data.distributionBoxPrice || 0,
+      quantity: this.data.distributionBoxQuantity || 0,
+      priceDiscount_percent: this.priceDiscount_percent,
+    });
 
-  //   const dualPrice = new Decimal(price || 0).mul(quantity || 0).toNumber();
-  //   const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces(0).toNumber();
-  //   const totalPrice = new Decimal(unitPrice)
-  //     .mul(quantity || 0)
-  //     .toDecimalPlaces(0)
-  //     .toNumber();
-
-  //   this.data.dualPrice = `${dualPrice}`;
-  //   this.data.unitPrice = `${unitPrice}`;
-  //   this.data.totalPrice = `${totalPrice}`;
-  // }
-
-  updateQuotationTotalPrice() {}
+    this.data.distributionBoxDualPrice = `${dualPrice}`;
+    this.data.distributionBoxUnitPrice = `${unitPrice}`;
+    this.data.distributionBoxTotalPrice = `${totalPrice}`;
+  }
+  renewDistributionBoxAllPrice_byHorsepower() {
+    const distributionBoxPrice = lookup_distributionBoxPrice[this.data.horsepower] || '0';
+    this.data.distributionBoxPrice = `${distributionBoxPrice}`;
+    this.renewDistributionBoxAllPrice();
+  }
 
   // ---------------------------------------------------------------------------
 
@@ -571,6 +573,8 @@ class ClassProd {
       this.data.motorVendor = null;
       this.data.boxB = '';
     }
+
+    this.renewDistributionBoxAllPrice_byHorsepower();
 
     this.data.area = this.calcArea(this);
   }
@@ -1336,17 +1340,10 @@ class ClassProd {
       return;
     }
 
-    const {
-      thickness,
-      // density,
-      // guideRails,
-      // slatMaterials,
-    } = this.state.doorModel;
+    const { thickness } = this.state.doorModel;
 
     // 門軌
 
-    // const guideRails = this.state.doorModel?.guideRails ?? [];
-    // const guideRailInfo = guideRails[0];
     this.data.guideRail = this.options_guideRail?.[0]?.value ?? '';
 
     this.afterEditGuideRailInfo();
@@ -1379,15 +1376,11 @@ class ClassProd {
     // 材料配件
     this.replaceComponentToEmpty();
 
-    // if (this.doorModelName === 'SJ-305D' && this.state.data_componentDict.slat) {
-    //   this.state.data_componentDict.slat.material = this.data.materialName;
-    // }
+    // lookup_distributionBoxPrice
+    // const distributionBoxPrice = lookup_distributionBoxPrice[this.data.horsepower];
 
-    // this.classComponentDict
-    // Object.values(this.classComponentDict).forEach((classComponentDict) => {
-    //   classComponentDict.onProdChangeMaterial(this.data.materialName);
-    //   classComponentDict.onProdChangeSurface(this.data.materialSurface);
-    // });
+    // this.data.distributionBoxPrice = `${distributionBoxPrice || ''}`;
+    // this.data.distributionBoxQuantity = '1';
 
     this.render();
   }
@@ -1612,6 +1605,8 @@ class ClassProd {
 
       return;
     }
+
+    this.renewDistributionBoxAllPrice_byHorsepower();
 
     this.renewPhase();
     this.renewDistributionBoxPrice();
