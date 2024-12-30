@@ -130,6 +130,8 @@ import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndTh
 import { Tstate_accountant } from 'components/wholePage/collection';
 import { calcPriceDiscount_percent } from '../../method/calcProd';
 
+import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee } from '../../method/calcProd';
+
 // ================================================================================
 
 interface Tprops_constructor {
@@ -306,43 +308,10 @@ class ClassProd {
     keepItemName,
     keepDiscount,
     keepQuoteType,
-  }: // keepIsAntiTyphoon,
-  // keepBounceDoorWidth,
-  // keepClosingType,
-  // keepNotes,
-  // keepIsIntegratedHeadBox,
-  // keepIsULGuideRail,
-  // keepHasSilencingStrip,
-
-  // keepFullWidth,
-  // keepHeight,
-  // keepWG,
-
-  // keepMaterialName,
-  // keepMaterialSurface,
-
-  // keepDoorModel,
-  {
+  }: {
     keepItemName?: boolean;
     keepDiscount?: boolean;
     keepQuoteType?: boolean;
-
-    // keepIsAntiTyphoon?: boolean;
-    // keepBounceDoorWidth?: boolean;
-    // keepClosingType?: boolean;
-    // keepNotes?: boolean;
-    // keepIsIntegratedHeadBox?: boolean;
-    // keepIsULGuideRail?: boolean;
-    // keepHasSilencingStrip?: boolean;
-
-    // keepFullWidth?: boolean;
-    // keepHeight?: boolean;
-    // keepWG?: boolean;
-
-    // keepMaterialName?: boolean;
-    // keepMaterialSurface?: boolean;
-
-    // keepDoorModel?: boolean;
   } = {}) {
     const newState = createEmptyStateProd(this.state.key);
 
@@ -354,32 +323,10 @@ class ClassProd {
     keepDiscount && (newState.data_prod.discount = data_prod.discount);
     keepQuoteType && (newState.data_prod.quoteType = data_prod.quoteType);
 
-    // keepIsAntiTyphoon && (newState.data_prod.isAntiTyphoon = this.data.isAntiTyphoon);
-    // keepBounceDoorWidth && (newState.data_prod.bounceDoorWidth = this.data.bounceDoorWidth);
-    // keepClosingType && (newState.data_prod.closingType = this.data.closingType);
-    // keepNotes && (newState.data_prod.notes = this.data.notes);
-    // keepIsIntegratedHeadBox && (newState.data_prod.isIntegratedHeadBox = this.data.isIntegratedHeadBox);
-    // keepIsULGuideRail && (newState.data_prod.isULGuideRail = this.data.isULGuideRail);
-    // keepHasSilencingStrip && (newState.data_prod.hasSilencingStrip = this.data.hasSilencingStrip);
-
-    // keepFullWidth && (newState.data_prod.fullWidth = this.data.fullWidth);
-    // keepHeight && (newState.data_prod.height = this.data.height);
-    // keepWG && (newState.data_prod.WG = this.data.WG);
-
-    // keepMaterialName && (newState.data_prod.materialName = this.data.materialName);
-    // keepMaterialSurface && (newState.data_prod.materialSurface = this.data.materialSurface);
-
-    // if (keepDoorModel) {
-    //   newState.data_prod.doorModelName = this.data.doorModelName;
-    //   newState.doorModel = this.state.doorModel;
-    // }
-
     Object.clearAndAssign(this.state, newState);
   }
 
   clearState_some() {
-    // const newState = createEmptyStateProd(this.state.key);
-
     const data_prod = this.state.data_prod;
 
     data_prod.boxB = '';
@@ -396,43 +343,6 @@ class ClassProd {
     this.replaceComponentToEmpty();
 
     this.render();
-
-    // const data_prod = this.state.data_prod;
-
-    // newState.afterChangeQueue = this.state.afterChangeQueue;
-    // newState.isFetching = this.state.isFetching;
-
-    // newState.doorModel = this.state.doorModel;
-    // newState.data_prod.doorModelName = data_prod.doorModelName;
-
-    // newState.data_componentDict = this.state.data_componentDict;
-    // this.replaceToEmptyComponent();
-    // newState.componentKeyArr = this.state.componentKeyArr;
-
-    // newState.data_accessoryDict = this.state.data_accessoryDict;
-    // newState.accessoryKeyArr = this.state.accessoryKeyArr;
-
-    // newState.data_prod.itemName = data_prod.itemName;
-    // newState.data_prod.discount = data_prod.discount;
-    // newState.data_prod.quoteType = data_prod.quoteType;
-
-    // newState.data_prod.fullWidth = data_prod.fullWidth;
-    // newState.data_prod.height = data_prod.height;
-    // newState.data_prod.WG = data_prod.WG;
-
-    // newState.data_prod.materialName = data_prod.materialName;
-    // newState.data_prod.materialSurface = data_prod.materialSurface;
-    // newState.data_prod.guideRail = data_prod.guideRail;
-
-    // newState.data_prod.isAntiTyphoon = data_prod.isAntiTyphoon;
-    // newState.data_prod.bounceDoorWidth = data_prod.bounceDoorWidth;
-    // newState.data_prod.closingType = data_prod.closingType;
-    // newState.data_prod.notes = data_prod.notes;
-    // newState.data_prod.isIntegratedHeadBox = data_prod.isIntegratedHeadBox;
-    // newState.data_prod.isULGuideRail = data_prod.isULGuideRail;
-    // newState.data_prod.hasSilencingStrip = data_prod.hasSilencingStrip;
-
-    // Object.clearAndAssign(this.state, newState);
   }
 
   // ---------------------------------------------------------------------------
@@ -516,6 +426,18 @@ class ClassProd {
     });
     const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
     this.data.WG = WG;
+  }
+
+  renewProdAllPrice() {
+    const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
+      stateProd: this.state,
+      quotationDiscount: this.quotationDiscount,
+    });
+
+    this.data.price = price;
+    this.data.dualPrice = dualPrice;
+    this.data.unitPrice = unitPrice;
+    this.data.totalPrice = totalPrice;
   }
 
   // ---------------------------------------------------------------------------
@@ -774,35 +696,9 @@ class ClassProd {
     const dict: Tdata_accessoryDict = {};
 
     rawAccessoryArr.forEach((acce) => {
-      const { id, name, unit: _unit, referenceSpec, cost, price } = acce;
-
-      let unit = _unit;
-
-      if (!unit) {
-        if (referenceSpec === 'fullWidth') {
-          unit = 'M';
-        } else if (referenceSpec === 'area') {
-          unit = '㎡';
-        } else {
-          unit = '組';
-        }
-      }
-
-      const state_accessory: TstateAccessoryData = {
-        codeName: id, //選配的id，也就是TdoorAccessoryDto.id
-        name: name, //名稱
-        unit, // 單位
-        quantity: '999', // 數量
-        unitPrice: '999', // 單價
-        totalPrice: '999', // 複價
-        originalPrice: price ?? undefined,
-        price: `${price || 0}`, // 牌價
-        dualPrice: '999', // 牌價複價
-        order: -1,
-        referenceSpec: referenceSpec,
-      };
-
-      dict[id] = state_accessory;
+      const newAcce = Class_accessory.createAcce({ classProd: this, doorAccesssory: acce });
+      // codeName實為acce.id
+      dict[newAcce.codeName] = newAcce;
     });
 
     Object.assign(this.state.data_accessoryDict, dict);
@@ -1311,12 +1207,29 @@ class ClassProd {
     return this.data.discount;
   }
   set discount(value) {
-    // if (checkIsFloat3(value)) {
-    //   return;
-    // }
-    value = `${fixedToFloat3(value as `${number}`)}`;
-
+    value = `${fixedToFloat3(value || 0)}`;
     this.data.discount = value;
+
+    const { distributionBoxUnitPrice, distributionBoxTotalPrice, installationFeeUnitPrice, installationFeeTotalPrice } =
+      calcProdDistributionBoxAndInstallationFee({
+        stateProd: this.state,
+        priceDiscount_percent: this.priceDiscount_percent,
+      });
+
+    this.data.distributionBoxUnitPrice = distributionBoxUnitPrice;
+    this.data.distributionBoxTotalPrice = distributionBoxTotalPrice;
+    this.data.installationFeeUnitPrice = installationFeeUnitPrice;
+    this.data.installationFeeTotalPrice = installationFeeTotalPrice;
+
+    Object.values(this.classComponentDict).forEach((com) => com.renewComponentAllPrice());
+
+    Object.values(this.classAcceoooryDict).forEach((acce) => {
+      acce.renewAcceAllPrice();
+    });
+
+    this.renewProdAllPrice();
+    // console.log(this.priceDiscount_percent);
+
     this.render();
   }
 

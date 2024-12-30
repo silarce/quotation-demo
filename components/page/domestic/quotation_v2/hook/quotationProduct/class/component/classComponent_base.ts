@@ -287,6 +287,7 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
     this.state.dualPrice = dualPrice;
     this.state.unitPrice = unitPrice;
     this.state.totalPrice = totalPrice;
+    this.render();
   }
 
   renewDesc() {
