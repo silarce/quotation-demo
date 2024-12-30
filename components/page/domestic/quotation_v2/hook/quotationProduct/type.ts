@@ -41,7 +41,7 @@ interface TstateProdData {
   // 項目名
   itemName: string;
   // 折數
-  discount: string;
+  discount: `${number}` | '';
   // 報價別
   quoteType: string;
   //

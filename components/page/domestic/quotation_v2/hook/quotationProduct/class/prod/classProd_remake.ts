@@ -39,26 +39,26 @@ import {
 import type { TclassComponentDict } from '../../useQuotationProduct';
 
 // api
-import {
-  Thp,
-  //
-  TpcgsPrams,
-  apiGetProdCalcGeneralSpec,
-  //
-  TpcdsPrams,
-  apiGetProdCalcDetailSpec,
-  //
-  TpacParams,
-  apiGetProdAvailableComponents,
-  //
-  TgetBoxDParams,
-  TgetBoxDParams_strict,
-  //
-  TgenerateDoorProductBomDto,
-  apiPostProdGenerateDoorProductBom,
-  //
-  apiGetboxD,
-} from 'js/api/api_product';
+// import {
+//   Thp,
+//   //
+//   TpcgsPrams,
+//   apiGetProdCalcGeneralSpec,
+//   //
+//   TpcdsPrams,
+//   apiGetProdCalcDetailSpec,
+//   //
+//   TpacParams,
+//   apiGetProdAvailableComponents,
+//   //
+//   TgetBoxDParams,
+//   TgetBoxDParams_strict,
+//   //
+//   TgenerateDoorProductBomDto,
+//   apiPostProdGenerateDoorProductBom,
+//   //
+//   apiGetboxD,
+// } from 'js/api/api_product';
 
 import { createAssetUrl } from 'js/api/api_product';
 
@@ -77,7 +77,7 @@ import {
   calcProductWG,
 } from 'js/utils/product/calc';
 
-import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
+// import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
 
 import { createComponentDict } from '../createComponentDict';
 
@@ -1314,6 +1314,7 @@ class ClassProd {
     // if (checkIsFloat3(value)) {
     //   return;
     // }
+    value = `${fixedToFloat3(value as `${number}`)}`;
 
     this.data.discount = value;
     this.render();

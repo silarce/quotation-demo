@@ -93,7 +93,7 @@ const createDateProd = (raw: TquotationProductDto) => {
   const data_prod: TstateProdData & { id: string } = {
     id: raw.id,
     itemName: raw.itemName,
-    discount: raw.discount,
+    discount: raw.discount as `${number}`,
     quoteType: raw.quoteType,
     doorModelName: raw.doorModelName,
     fullWidth: new Decimal(raw.fullWidth).div(1000).toString() as `${number}` | '',

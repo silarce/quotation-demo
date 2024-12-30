@@ -210,7 +210,7 @@ const nodeConfig_origin: TnodeConfig = {
           type: 'number',
           value: classProd.discount,
           onChange: (e) => {
-            classProd.discount = e.target.value;
+            classProd.discount = e.target.value as `${number}` | '';
           },
         },
       };
