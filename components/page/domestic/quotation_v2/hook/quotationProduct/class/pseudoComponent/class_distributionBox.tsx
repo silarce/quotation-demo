@@ -24,11 +24,15 @@ import type { Interface_ClassComponent_base, Interface_ClassComponent_prime } fr
 
 import { createNodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
+import { ClassProd } from '../prod/classProd_remake';
+import { calcAllPrice } from '../../method/calcProd';
+
 // ========================================================================
 
 interface Tprops_constructor {
   stateProd: TstateProd;
   setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
+  classProd: ClassProd;
 }
 
 // ========================================================================
@@ -81,10 +85,13 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
     this.setState({ ...this.state });
   }
 
-  constructor({ stateProd, setStateProd }: Tprops_constructor) {
+  classProd;
+
+  constructor({ stateProd, setStateProd, classProd }: Tprops_constructor) {
     this.state = stateProd;
     this.data = this.state.data_prod;
     this.setState = setStateProd;
+    this.classProd = classProd;
   } // constructor
 
   get number() {
@@ -116,6 +123,10 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
   }
   set quantity(value) {
     this.data.distributionBoxQuantity = value;
+    this.renewAllPrice();
+
+    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
     this.render();
   }
 
@@ -124,6 +135,10 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
   }
   set price(v) {
     this.data.distributionBoxPrice = v;
+    this.renewAllPrice();
+
+    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
     this.render();
   }
 
@@ -156,6 +171,18 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
   }
   renewDesc() {
     // do nothing
+  }
+
+  renewAllPrice() {
+    const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      price: this.data.distributionBoxPrice || 0,
+      quantity: this.data.distributionBoxQuantity || 0,
+      priceDiscount_percent: this.classProd.priceDiscount_percent,
+    });
+
+    this.data.distributionBoxDualPrice = `${dualPrice}`;
+    this.data.distributionBoxUnitPrice = `${unitPrice}`;
+    this.data.distributionBoxTotalPrice = `${totalPrice}`;
   }
 }
 

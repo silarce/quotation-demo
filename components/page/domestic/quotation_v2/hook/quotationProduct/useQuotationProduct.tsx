@@ -441,10 +441,12 @@ const useQuotationProduct = ({
       distributionBox: new Class_distributionBox({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
+        classProd: activedClassProd,
       }),
       installationFee: new Class_installationFee({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
+        classProd: activedClassProd,
       }),
     };
 
