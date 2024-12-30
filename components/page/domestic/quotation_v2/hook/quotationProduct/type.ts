@@ -315,6 +315,8 @@ interface Tdata_accessoryDict {
 interface TstateProd {
   readonly key: string;
   renderCount?: number;
+  // isCustomPrice在calcProdTotalPrice中使用，在set price設為true 在reqChain中設為false
+  isCustomPrice?: boolean;
 
   data_prod: TstateProdData;
 

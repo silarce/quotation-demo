@@ -374,6 +374,7 @@ const useQuotationProduct = ({
         setStateProd: createSetProd(stateProd.key),
         nodeConfig: nodeConfig_prime,
         quotationDiscount: state_quotationDiscount || 0,
+        onPordTotalChange: onProdAllTotalChange,
       });
 
       return classProd;

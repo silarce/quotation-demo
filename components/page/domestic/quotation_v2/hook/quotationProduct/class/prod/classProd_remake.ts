@@ -139,6 +139,8 @@ interface Tprops_constructor {
   setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
   nodeConfig: TnodeConfig;
   quotationDiscount: number | `${number}`;
+  // onPordTotalChange: (total: number, oldTotal: number) => void;
+  onPordTotalChange: () => void;
 }
 
 // ================================================================================
@@ -261,15 +263,19 @@ class ClassProd {
     return priceDiscount_percent;
   }
 
+  onPordTotalChange;
+
   // ---------------------------------------------------------------------------
   // MARK:constructor
-  constructor({ stateProd, setStateProd, nodeConfig, quotationDiscount }: Tprops_constructor) {
+  constructor({ stateProd, setStateProd, nodeConfig, quotationDiscount, onPordTotalChange }: Tprops_constructor) {
     this.state = stateProd;
     this.quotationDiscount = quotationDiscount;
 
     // this.data = this.state.data_prod;
     this.setState = setStateProd;
     this.nodeConfig = customizeNodeConfig({ nodeConfig });
+
+    this.onPordTotalChange = onPordTotalChange;
   } // constructor
   // ---------------------------------------------------------------------------
 
@@ -431,10 +437,17 @@ class ClassProd {
   // MARK:renewProdAllPrice
   renewProdAllPrice_updateQuotationTotalPrice() {
     this.renewProdAllPrice();
-    this.updateQuotationTotalPrice();
+    // this.updateQuotationTotalPrice();
+    this.onPordTotalChange();
 
     this.render();
   }
+  // renewProdAllPrice_updateQuotationTotalPrice_noComAndAcce() {
+  //   this.renewProdAllPrice_noComAndAcce();
+  //   this.updateQuotationTotalPrice();
+
+  //   this.render();
+  // }
 
   renewProdAllPrice() {
     const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
@@ -447,6 +460,22 @@ class ClassProd {
     this.data.unitPrice = unitPrice;
     this.data.totalPrice = totalPrice;
   }
+
+  // renewProdAllPrice_noComAndAcce() {
+  //   const { quantity, price } = this.data;
+  //   const priceDiscount_percent = this.priceDiscount_percent;
+
+  //   const dualPrice = new Decimal(price || 0).mul(quantity || 0).toNumber();
+  //   const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces(0).toNumber();
+  //   const totalPrice = new Decimal(unitPrice)
+  //     .mul(quantity || 0)
+  //     .toDecimalPlaces(0)
+  //     .toNumber();
+
+  //   this.data.dualPrice = `${dualPrice}`;
+  //   this.data.unitPrice = `${unitPrice}`;
+  //   this.data.totalPrice = `${totalPrice}`;
+  // }
 
   updateQuotationTotalPrice() {}
 
@@ -748,6 +777,8 @@ class ClassProd {
     withHp?: boolean;
     updateIsFetching?: boolean;
   } = {}) {
+    this.state.isCustomPrice = false;
+
     if (updateIsFetching) {
       this.state.isFetching = true;
       this.render();
@@ -789,6 +820,8 @@ class ClassProd {
     updateIsFetching?: boolean;
     onUpdateAvailableComponentsSuccess?: () => void;
   } = {}) {
+    this.state.isCustomPrice = false;
+
     if (updateIsFetching) {
       this.state.isFetching = true;
       this.render();
@@ -808,6 +841,8 @@ class ClassProd {
   }
 
   protected async reqChain_03({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
+    this.state.isCustomPrice = false;
+
     if (updateIsFetching) {
       this.state.isFetching = true;
       this.render();
@@ -826,6 +861,8 @@ class ClassProd {
   }
 
   async reqChain_04({ updateIsFetching = true }: { updateIsFetching?: boolean } = {}) {
+    this.state.isCustomPrice = false;
+
     if (updateIsFetching) {
       this.state.isFetching = true;
       this.render();
@@ -1868,6 +1905,7 @@ class ClassProd {
   }
   set quantity(value) {
     this.data.quantity = value;
+    this.renewProdAllPrice_updateQuotationTotalPrice();
     this.render();
   }
   // MARK:price
@@ -1876,6 +1914,8 @@ class ClassProd {
   }
   set price(value) {
     this.data.price = value;
+    this.state.isCustomPrice = true;
+    this.renewProdAllPrice_updateQuotationTotalPrice();
     this.render();
   }
   // MARK:dualPrice

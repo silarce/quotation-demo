@@ -10,14 +10,36 @@ const calcProdTotalPrice = ({
   stateProd: TstateProd;
   quotationDiscount: `${number}` | number | ''; // 必須是已經除過100的數字，也就是0.52這類
 }) => {
-  const { data_prod, data_componentDict, data_accessoryDict } = stateProd;
-
-  const { quantity } = data_prod;
+  const { isCustomPrice, data_prod, data_componentDict, data_accessoryDict } = stateProd;
 
   const priceDiscount_percent = calcPriceDiscount_percent({
     prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
     quotationDiscount: quotationDiscount || 0,
   });
+
+  // ___________________________________________________________________
+  // ___________________________________________________________________
+  if (isCustomPrice) {
+    const { quantity, price } = data_prod;
+
+    const dualPrice = new Decimal(price || 0).mul(quantity || 0).toNumber();
+    const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces(0).toNumber();
+    const totalPrice = new Decimal(unitPrice)
+      .mul(quantity || 0)
+      .toDecimalPlaces(0)
+      .toNumber();
+
+    return {
+      price: `${price}` as `${number}`,
+      dualPrice: `${dualPrice}` as `${number}`,
+      unitPrice: `${unitPrice}` as `${number}`,
+      totalPrice: `${totalPrice}` as `${number}`,
+    };
+  }
+  // ___________________________________________________________________
+  // ___________________________________________________________________
+
+  const { quantity } = data_prod;
 
   let dualPriceTotal_acce_decimal = new Decimal(0);
   let totalPriceTotal_acce_decimal = new Decimal(0);
