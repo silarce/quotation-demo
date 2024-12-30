@@ -64,7 +64,7 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function QReqList() {
-    const [pagename, setPagename] = useState<string>("詢價單列表")
+    const [pagename, setPagename] = useState<string>("詢價")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -113,10 +113,10 @@ export default function QReqList() {
     const panelList: TpanelList = [
         {
             type: 'addButton',
-            label: '新增詢價單',
+            label: `新增${pagename}單`,
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrderList`,
+                    pathname: `/factoryDepartment/addQReqList`,
                     query: {
                     },
                 });
@@ -354,7 +354,7 @@ export default function QReqList() {
         // 模糊查詢請購單號
         if (id) {
             filteredData = filteredData.filter(item =>
-                item.purchaseorderid.toString().includes(id)
+                item.quotereqid.toString().includes(id)
             );
         }
 
@@ -367,9 +367,12 @@ export default function QReqList() {
 
         if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.suppliername.toString().includes(supplier)
+                item.suppliername.toString().includes(supplier) ||
+                item.suppliername2.toString().includes(supplier) ||
+                item.suppliername3.toString().includes(supplier)
             );
         }
+        
 
         setSearchdata(filteredData);
     };
@@ -382,7 +385,7 @@ export default function QReqList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename}
+            <PageHeader02 tag={pagename+"單列表"}
                 customeLeft={[
                     <div
                         style={{
@@ -411,7 +414,7 @@ export default function QReqList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="未結案">未結案</option>
+                                <option value="編輯中">編輯中</option>
                                 <option value="已結案">已結案</option>
                             </select>
 
@@ -591,10 +594,23 @@ export default function QReqList() {
                                                             <td>{detail.detail_spec}</td>
                                                             <td>{detail.detail_quantity?.toLocaleString()}</td>
                                                             <td>{detail.detail_unit}</td>
-                                                            <td>{detail.supplier1_name}</td>
-                                                            <td>{detail.supplier1_unitprice?.toLocaleString()}</td>
+
+                                                            {/* 根據 supplier1, supplier2, supplier3 來顯示不同的供應商欄位 */}
+                                                            <td>
+                                                                {detail.supplier1_name ? detail.supplier1_name :
+                                                                    detail.supplier2_name ? detail.supplier2_name :
+                                                                        detail.supplier3_name}
+                                                            </td>
+
+                                                            <td>
+                                                                {detail.supplier1_unitprice ? detail.supplier1_unitprice?.toLocaleString() :
+                                                                    detail.supplier2_unitprice ? detail.supplier2_unitprice?.toLocaleString() :
+                                                                        detail.supplier3_unitprice ? detail.supplier3_unitprice?.toLocaleString() :
+                                                                            ''}
+                                                            </td>
                                                         </tr>
                                                     ))}
+
                                                 </tbody>
                                             </table>
                                         </div>

@@ -48,6 +48,7 @@ import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-align';
 import { title } from 'process';
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -55,7 +56,7 @@ type Tquery = {
 
 export default function POrderDetail() {
     //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("採購單")
+    const [pagename, setPagename] = useState<string>("採購")
     const [statusarea, setStatusarea] = useState<boolean>(true)
     const [excelopen, setExcelopen] = useState<boolean>(true)
     const [printopen, setPrintopen] = useState<boolean>(true)
@@ -64,7 +65,8 @@ export default function POrderDetail() {
     const router = useRouter();
     const {
         firstin,
-        item
+        item,
+        viewtype
     } = router.query;
 
     const parsedItem = item ? JSON.parse(item as string) : null;
@@ -76,6 +78,9 @@ export default function POrderDetail() {
     //#endregion
 
     //#region ===========【變數宣告】
+
+    const { update_2 } = useGlobal_review();
+
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -147,6 +152,10 @@ export default function POrderDetail() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+    const [keyword5, setKeyword5] = useState<string>("");
+    const [keyword6, setKeyword6] = useState<string>("");
+    const [keyword7, setKeyword7] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -678,7 +687,7 @@ export default function POrderDetail() {
     //複製單據(同新增單據)
     const Add = async () => {
         if (data2.length === 0) {
-            myAlert.warning({ title: "採購項目不可為空" })
+            myAlert.warning({ title: `${pagename}項目不可為空` })
             return;
         }
         // return;
@@ -1037,20 +1046,21 @@ export default function POrderDetail() {
             // }
             // else {
             const review_query = {
-                purchaseorderuuid: uuidin,
-                purchaseorderid: idin,
-                create_at: create_atin,
-                create_by: create_byin,
-                status: '編輯中',
-                need_date: need_datein,
-                note: notein,
-                firstin: 1,
+                // purchaseorderuuid: uuidin,
+                // purchaseorderid: idin,
+                // create_at: create_atin,
+                // create_by: create_byin,
+                // status: '編輯中',
+                // need_date: need_datein,
+                // note: notein,
+                // firstin: 1,
+                item: JSON.stringify(parsedItem)
             };
 
             const conditionModel = {
                 document_id: idin,
                 document_uuid: uuidin,
-                document_type: pagename,
+                document_type: pagename + "單",
                 review_id: review_flow,
                 query: review_query,
                 user_id: userInfo?.employee?.id.toString(),
@@ -1080,7 +1090,7 @@ export default function POrderDetail() {
             const data = await response.json();
             setReviewflowdata([]);
             GetReviewById(uuidin);
-
+            update_2();
 
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -1168,7 +1178,7 @@ export default function POrderDetail() {
                         setReview_flow("");
                         setValue(null);
                         GetReviewHistory(uuidin);
-
+                        update_2();
                     } catch (error: any) {
                         console.log(error.message);
                     }
@@ -1251,6 +1261,7 @@ export default function POrderDetail() {
 
 
         setIsTrans(false);  //結束進貨模式
+        setPrbar(false);
     };
 
     //作廢單據
@@ -1556,198 +1567,221 @@ export default function POrderDetail() {
 
     //#endregion
 
+    //#region ===========【請購單篩選】
+
+    const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
+
+    // 當 keyword5, keyword6, keyword7 變化時進行篩選
+    useEffect(() => {
+        const filteredData = data4.filter((item) => {
+            const matchesKeyword5 = keyword5 ? item.purchaserequisitionid?.includes(keyword5) : true;
+            const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
+            const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+
+            return matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+        });
+
+        setFilteredData3(filteredData);
+    }, [keyword5, keyword6, keyword7, data4]); // 監聽依賴項目
+
+    //#endregion
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename + "：" + statusin} panelList={panelList}
+            <PageHeader02 tag={pagename + "單" + "：" + statusin} panelList={panelList}
                 customeRight={[
                     <>
-                        {(!isEditing && !isTrans) && (
-                            <button
-                                className={scss.shortsquarebtn}
-                                onClick={() => {
-                                    handleCopy();
-                                }}
-                                title="複製"
-                            >
-                                複製
-                            </button>
-                        )}
-                        {(statusin === "已核准" && !isTrans) && (
+                        {viewtype !== "review" && (
                             <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定結案嗎?',
-                                            props: {
-                                                onOk: () => {
-                                                    handleClose();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    title="單據結案"
-                                >
-                                    結案
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEditTrans();
-                                    }}
-                                    title="進貨"
-                                >
-                                    進貨
-                                </button>
+                                {(!isEditing && !isTrans) && (
+                                    <button
+                                        className={scss.shortsquarebtn}
+                                        onClick={() => {
+                                            handleCopy();
+                                        }}
+                                        title="複製"
+                                    >
+                                        複製
+                                    </button>
+                                )}
+                                {(statusin === "已核准" && !isTrans) && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定結案嗎?',
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleClose();
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                            title="單據結案"
+                                        >
+                                            結案
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleEditTrans();
+                                            }}
+                                            title="進貨"
+                                        >
+                                            進貨
+                                        </button>
+                                    </>
+                                )}
+                                {statusin === "已核准" && isTrans && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定新增嗎?',
+                                                    content: <>
+                                                        <h1>請確認進貨數量</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleAddTrans()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            新增進貨
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定要取消嗎?',
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleCancel()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            取消
+                                        </button>
+                                    </>
+                                )}
+
+                                {/* 編輯按鈕 */}
+                                {statusin === "編輯中" && !isEditing && (
+
+                                    <>
+
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                handleDelete();
+                                            }}
+                                            title="刪除單據"
+                                        >
+                                            刪除
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                setReviewbar(true);
+                                                setDocumenttitle(`【採購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
+                                            }}
+                                            title="審核流程"
+                                        >
+                                            審核流程
+                                        </button>
+
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleEdit()
+                                            }}
+                                        >
+                                            編輯
+                                        </button>
+                                    </>
+                                )}
+
+                                {statusin === "審核中" && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
+                                            title="單據抽回"
+                                            onClick={() => { handleGetReviewBack() }}>
+                                            抽單
+                                        </button>
+
+                                    </>
+                                )}
+                                {(!isEditing && !isTrans) && (
+                                    <>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: `確定要返回${pagename}單列表嗎?`,
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            router.back();
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            返回
+                                        </button >
+                                    </>
+                                )}
+                                {/* 儲存按鈕 */}
+                                {statusin === "編輯中" && isEditing && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                setIsEditing(false); // 儲存後結束編輯模式
+                                                setPrbar(false);
+                                                Update()
+
+                                                // NewAddPurchaseRequisition(); // 實際儲存邏輯
+                                            }}
+                                        >
+                                            儲存
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定要取消嗎?',
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleCancel()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            取消
+                                        </button>
+
+                                    </>
+
+                                )}
                             </>
-                        )}
-                        {statusin === "已核准" && isTrans && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定新增嗎?',
-                                            content: <>
-                                                <h1>請確認進貨數量</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleAddTrans()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    新增進貨
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-                            </>
-                        )}
-
-                        {/* 編輯按鈕 */}
-                        {statusin === "編輯中" && !isEditing && (
-
-                            <>
-
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        handleDelete();
-                                    }}
-                                    title="刪除單據"
-                                >
-                                    刪除
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        setReviewbar(true);
-                                        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
-                                    }}
-                                    title="審核流程"
-                                >
-                                    審核流程
-                                </button>
-
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEdit()
-                                    }}
-                                >
-                                    編輯
-                                </button>
-                            </>
-                        )}
-
-                        {statusin === "審核中" && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
-                                    title="單據抽回"
-                                    onClick={() => { handleGetReviewBack() }}>
-                                    抽單
-                                </button>
-
-                            </>
-                        )}
-                        {(!isEditing && !isTrans) && (
-                            <>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: `確定要返回${pagename}列表嗎?`,
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    router.back();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    返回
-                                </button >
-                            </>
-                        )}
-                        {/* 儲存按鈕 */}
-                        {statusin === "編輯中" && isEditing && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        setIsEditing(false); // 儲存後結束編輯模式
-                                        setPrbar(false);
-                                        Update()
-
-                                        // NewAddPurchaseRequisition(); // 實際儲存邏輯
-                                    }}
-                                >
-                                    儲存
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-
-                            </>
-
                         )}
                     </>
 
@@ -1759,59 +1793,62 @@ export default function POrderDetail() {
                         <>
                             {/* 編輯按鈕 */}
                             {/* {statusin === "編輯中" && !isEditing && ( */}
-
-                            <>
-                                {printopen && (
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handlePrint();
-                                        }}
-                                        title="列印單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        列印
-                                    </button>
-                                )}
-                                {excelopen && (
-
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handleExport();
-                                        }}
-                                        title="匯出單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        Excel
-                                    </button>
-                                )}
-                                {statusin === "編輯中" && isEditing && (
-
-                                    <>
+                            {viewtype !== "review" && (
+                                <>
+                                    {printopen && (
                                         <button
                                             className={scss.shortsquarebtn}
-                                            style={{
-                                            }}
                                             onClick={() => {
-                                                setPrbar(!prbar);
+                                                handlePrint();
                                             }}
+                                            title="列印單據"
+                                            style={{ margin: '0px 10px' }}
                                         >
-                                            <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
-                                                ☰
+                                            <span style={{ paddingRight: '5px' }}>
+                                                <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                             </span>
-                                            請購項目
+                                            列印
                                         </button>
-                                    </>
-                                )}
-                            </>
-                            {/* )} */}
+                                    )}
+                                    {excelopen && (
+
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleExport();
+                                            }}
+                                            title="匯出單據"
+                                            style={{ margin: '0px 10px' }}
+                                        >
+                                            <span style={{ paddingRight: '5px' }}>
+                                                <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                            </span>
+                                            Excel
+                                        </button>
+                                    )}
+                                    {statusin === "編輯中" && isEditing && (
+
+                                        <>
+                                            <span style={{ fontSize: '18px', padding: '0px 10px' }}>
+
+                                                <button
+                                                    className={scss.shortsquarebtn}
+                                                    style={{
+                                                    }}
+                                                    onClick={() => {
+                                                        setPrbar(!prbar);
+                                                    }}
+                                                >
+                                                    <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
+                                                        ☰
+                                                    </span>
+                                                    請購項目
+                                                </button>
+                                            </span>
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </>
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -1869,11 +1906,11 @@ export default function POrderDetail() {
                         </div> */}
                         <div className={scss.head_body}>
                             <div>
-                                <div className={scss.head_content1}>
+                                <div className={scss.head_content0}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption={`${pagename}號`}
+                                            caption={`${pagename}單號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -2195,6 +2232,43 @@ export default function POrderDetail() {
                                             },
                                         }}
                                     />
+                                    {/* 搜尋欄位：依單號 */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                type: "text",
+                                                value: keyword5,
+                                                placeholder: "輸入單號",
+                                                onChange: (e) => setKeyword5(e.target.value),
+                                            },
+                                        }}
+                                    />
+                                    {/* 搜尋欄位：依品項規格 */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                type: "text",
+                                                value: keyword6,
+                                                placeholder: "輸入品名",
+                                                onChange: (e) => setKeyword6(e.target.value),
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                type: "text",
+                                                value: keyword7,
+                                                placeholder: "輸入規格",
+                                                onChange: (e) => setKeyword7(e.target.value),
+                                            },
+                                        }}
+                                    />
                                 </div>
                                 <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
 
@@ -2217,8 +2291,8 @@ export default function POrderDetail() {
                                             <span>備註(用途說明)</span>
                                             <span></span>
                                         </div>
-                                        {data4 && (
-                                            data4.map((_item, index) => {
+                                        {filteredData3 && (
+                                            filteredData3.map((_item, index) => {
                                                 const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
                                                 _item.totalprice = Totalprice;
 

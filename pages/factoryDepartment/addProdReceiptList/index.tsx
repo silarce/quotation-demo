@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
-import scss from './addPurchaseOrderList.module.scss';
+import scss from './addProdReceiptList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -48,8 +48,8 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function AddPurchaseOrderList() {
-    const [pagename, setPagename] = useState<string>("採購單")
+export default function AddProdReceiptList() {
+    const [pagename, setPagename] = useState<string>("進貨單")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -116,6 +116,7 @@ export default function AddPurchaseOrderList() {
     const [shippingaddressin, setShippingaddressin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState('請選擇類別');
+    const [purchaseorderid, setPurchaseorderid] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -259,7 +260,7 @@ export default function AddPurchaseOrderList() {
             setCreate_byin(userInfo?.employee?.chName.toString() || '');
             setNeed_datein(moment().format('YYYY-MM-DD') || '');
             setShippingaddressin("台中市霧峰區峰北路666號");
-            getPRequisition();
+            getPorder();
             hasFetchedData.current = true;
         }
     }, []);
@@ -311,7 +312,7 @@ export default function AddPurchaseOrderList() {
     //新增單據
     const Add = async () => {
         if (data2.length === 0) {
-            myAlert.warning({ title: "採購項目不可為空" })
+            myAlert.warning({ title: "進貨項目不可為空" })
             return;
         }
         // return;
@@ -322,16 +323,9 @@ export default function AddPurchaseOrderList() {
                 need_date: moment(need_datein).format('YYYY-MM-DD'),
                 create_by: userInfo?.employee?.id.toString(),
                 note: notein,
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                supplierid: supplieridin,
-                shippingaddress: shippingaddressin,
-                suppliercontact: suppliercontactin,
-                supplierfax: supplierfaxin,
-                supplieruuid: supplieruuidin,
-                data2: data2
+                data2: data2,
+                username: userInfo?.employee?.id.toString(),
+                purchaseorderid: purchaseorderid
             };
 
             var inputModel = {
@@ -341,7 +335,7 @@ export default function AddPurchaseOrderList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewAddPurchaseOrder`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/NewAddProdReceipt`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -359,9 +353,9 @@ export default function AddPurchaseOrderList() {
                 myAlert.success({ title: result.message });
                 setidin(result.id);
                 setuuidin(result.uuid);
-                setStatusin("編輯中");
+                setStatusin("進貨中");
                 router.push({
-                    pathname: `/factoryDepartment/POrderList`,
+                    pathname: `/factoryDepartment/PReceiptList`,
                     query: {
                     },
                 });
@@ -419,7 +413,7 @@ export default function AddPurchaseOrderList() {
     };
 
     //取請購(轉採購用)
-    const getPRequisition = async () => {
+    const getPorder = async () => {
         try {
             setIsLoading(true);
             const conditionModel = {
@@ -434,7 +428,7 @@ export default function AddPurchaseOrderList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPRequisitionForAddPOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPOrderForAddPReceipt?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -704,21 +698,20 @@ export default function AddPurchaseOrderList() {
     //#endregion
 
 
-    //#region  ===========【請購帶入功能區】
+    //#region  ===========【採購帶入功能區】
     const [prbar, setPrbar] = useState(false);
 
 
 
     //#endregion
-   
-    //#region ===========【請購單篩選】
+    //#region ===========【採購單篩選】
 
     const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
 
     // 當 keyword5, keyword6, keyword7 變化時進行篩選
     useEffect(() => {
         const filteredData = data4.filter((item) => {
-            const matchesKeyword5 = keyword5 ? item.purchaserequisitionid?.includes(keyword5) : true;
+            const matchesKeyword5 = keyword5 ? item.purchaseorderid?.includes(keyword5) : true;
             const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
             const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
 
@@ -750,7 +743,9 @@ export default function AddPurchaseOrderList() {
                                 display: `${status === "" ? '' : 'none'}`
                             }}
                             onClick={() => {
-                                // console.log(data2);
+
+                                console.log(data2);
+                                // return;
                                 handleAdd();
 
                             }}
@@ -763,7 +758,7 @@ export default function AddPurchaseOrderList() {
                 customeLeft={
                     [
                         <>
-                            <span style={{ fontSize: '18px', paddingLeft: '10px' }}>
+                            <span style={{ fontSize: '18px', padding: '10px' }}>
                                 {status}
                             </span>
                             <button
@@ -777,7 +772,7 @@ export default function AddPurchaseOrderList() {
                                 <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
                                     ☰
                                 </span>
-                                請購項目
+                                採購項目
                             </button>
                         </>
                     ]} />
@@ -1067,7 +1062,7 @@ export default function AddPurchaseOrderList() {
                                             fontSize: '18px'
                                         }}
                                     >
-                                        請購項目
+                                        採購項目
                                     </span>
                                 </div>
                                 <div className={scss.head_content1}>
@@ -1128,13 +1123,14 @@ export default function AddPurchaseOrderList() {
 
                                             </span>
                                             <span>序</span>
-                                            <span>請購單號</span>
+                                            <span>採購單號</span>
+                                            <span>廠商</span>
                                             <span>料號</span>
                                             <span>品名</span>
                                             <span>規格</span>
                                             <span>數量</span>
-                                            <span>已採購</span>
-                                            <span>剩餘</span>
+                                            <span>已進貨</span>
+                                            <span>剩餘數量</span>
                                             <span>單位</span>
                                             <span>單價</span>
                                             <span>總價</span>
@@ -1151,17 +1147,58 @@ export default function AddPurchaseOrderList() {
                                                 const handleCheckboxChange = (checked: any) => {
                                                     console.log(data3);
                                                     console.log(data2);
+
                                                     if (checked) {
+                                                        // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
+                                                        if (data2.length > 0 && suppliernamein !== _item.suppliername) {
+                                                            myAlert.warning({ title: "不同供應商品項" });
+                                                            return;
+                                                        }
+
                                                         // 複製 _item 並將剩餘數量取代原本的數量
                                                         const updatedItem = { ..._item, quantity: _item.remaining_quantity };
 
                                                         // 加入到 data2
                                                         setData2(prevData2 => [...prevData2, updatedItem]);
+
+                                                        // 加入到 purchaseorderid
+                                                        setPurchaseorderid(prevIds => {
+                                                            const ids = prevIds ? prevIds.split(",") : [];
+                                                            if (!ids.includes(_item.purchaseorderid)) {
+                                                                ids.push(_item.purchaseorderid);
+                                                            }
+                                                            return ids.join(",");
+                                                        });
+
+                                                        // 設定供應商相關資訊
+                                                        setSuppliernamein(_item.suppliername);
+                                                        setSupplieraddressin(_item.supplieraddress);
+                                                        setSuppliertaxidin(_item.suppliertaxid);
+                                                        setSupplierphonein(_item.supplierphone);
+                                                        setShippingaddressin(_item.shippingaddress);
                                                     } else {
                                                         // 從 data2 中移除
                                                         setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
+
+                                                        // 從 purchaseorderid 中移除
+                                                        setPurchaseorderid(prevIds => {
+                                                            const ids = prevIds ? prevIds.split(",") : [];
+                                                            const updatedIds = ids.filter(id => id !== _item.purchaseorderid);
+                                                            return updatedIds.join(",");
+                                                        });
+
+                                                        // 如果移除後 data2 為空，清除供應商相關資訊
+                                                        if (data2.length === 1) { // 因為移除前會有一筆資料
+                                                            setSuppliernamein('');
+                                                            setSupplieraddressin('');
+                                                            setSuppliertaxidin('');
+                                                            setSupplierphonein('');
+                                                            setShippingaddressin('');
+                                                        }
                                                     }
                                                 };
+
+
                                                 return (
                                                     <CellWithBar key={index} className={scss.panelHeader22}>
                                                         <div className={scss.row01}>
@@ -1182,7 +1219,8 @@ export default function AddPurchaseOrderList() {
 
                                                             </span>
                                                             <span>{index + 1}</span>
-                                                            <span>{_item.purchaserequisitionid}</span>
+                                                            <span>{_item.purchaseorderid}</span>
+                                                            <span>{_item.suppliername}</span>
                                                             <span>
                                                                 <input
                                                                     ref={productidRefs.current[index]}
@@ -1231,7 +1269,7 @@ export default function AddPurchaseOrderList() {
                                                                         color: '#ea1833'
                                                                     }}
                                                                     type={'text'}
-                                                                    value={_item.po_quantity}
+                                                                    value={_item.receipt_quantity}
                                                                     readOnly
                                                                 />
                                                             </span>
@@ -1317,7 +1355,7 @@ export default function AddPurchaseOrderList() {
                                     fontSize: '18px'
                                 }}
                             >
-                                採購項目
+                                進貨項目
                             </span>
                         </div>
                         <div className={scss.head_content1}>

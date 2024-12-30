@@ -64,7 +64,7 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PRequisitionList() {
-    const [pagename, setPagename] = useState<string>("請購單列表")
+    const [pagename, setPagename] = useState<string>("請購")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -113,7 +113,7 @@ export default function PRequisitionList() {
     const panelList: TpanelList = [
         {
             type: 'addButton',
-            label: '新增請購單',
+            label: `新增${pagename}單`,
             onClick: () => {
                 // setOpen(true);
                 router.push({
@@ -385,7 +385,7 @@ export default function PRequisitionList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename}
+            <PageHeader02 tag={pagename+"單列表"}
                 customeLeft={[
                     <div
                         style={{

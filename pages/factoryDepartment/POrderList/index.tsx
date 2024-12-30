@@ -64,7 +64,7 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function POrderList() {
-    const [pagename, setPagename] = useState<string>("採購單列表")
+    const [pagename, setPagename] = useState<string>("採購")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -113,7 +113,7 @@ export default function POrderList() {
     const panelList: TpanelList = [
         {
             type: 'addButton',
-            label: '新增採購單',
+            label: `新增${pagename}單`,
             onClick: () => {
                 router.push({
                     pathname: `/factoryDepartment/addPurchaseOrderList`,
@@ -187,7 +187,7 @@ export default function POrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseOrderDetailByIdForList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -383,7 +383,7 @@ export default function POrderList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename}
+            <PageHeader02 tag={pagename + "單列表"}
                 customeLeft={[
                     <div
                         style={{
@@ -417,7 +417,7 @@ export default function POrderList() {
                                 <option value="已核准">已核准</option>
                                 <option value="已結案">已結案</option>
                             </select>
-                            
+
                         </div>
 
                         {/* 第二個選項 */}

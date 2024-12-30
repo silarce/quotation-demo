@@ -64,7 +64,7 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PReceiptList() {
-    const [pagename, setPagename] = useState<string>("進貨單列表")
+    const [pagename, setPagename] = useState<string>("進貨")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -111,17 +111,17 @@ export default function PReceiptList() {
 
     //#region ===========【上方功能列】
     const panelList: TpanelList = [
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         router.push({
-        //             pathname: `/factoryDepartment/addPurchaseOrderList`,
-        //             query: {
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: `新增${pagename}單`,
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/addProdReceiptList`,
+                    query: {
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -385,7 +385,7 @@ export default function PReceiptList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename}
+            <PageHeader02 tag={pagename + "單列表"}
                 customeLeft={[
                     <div
                         style={{
@@ -414,12 +414,12 @@ export default function PReceiptList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="採購中">採購中</option>
-                                <option value="審核中">審核中</option>
-                                <option value="已核准">已核准</option>
+                                <option value="進貨中">進貨中</option>
+                                {/* <option value="審核中">審核中</option>
+                                <option value="已核准">已核准</option> */}
                                 <option value="已結案">已結案</option>
                             </select>
-                            
+
                         </div>
 
                         {/* 第二個選項 */}
