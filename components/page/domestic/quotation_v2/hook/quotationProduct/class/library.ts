@@ -22,7 +22,7 @@ const checkIsGalvanized = (material: string) => {
   return isGalvanized;
 };
 
-/** 去除小數點後三位的值，無條件捨去  */
+/** 去除小數點後超過三位的值，無條件捨去  */
 const fixedToFloat3 = (v: number | `${number}`) => {
   // const v_num = new Decimal(v || 0).toDecimalPlaces(3, Decimal.ROUND_DOWN).toNumber();
 

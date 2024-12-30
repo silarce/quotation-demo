@@ -219,22 +219,17 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           <div>
             <input
               onWheel={(e) => e.currentTarget.blur()}
-              type="text"
+              type={disabled ? 'text' : 'number'}
               className={classNames(
                 //
                 'bg-transparent',
                 disabled && scss.noBaseLine
               )}
               readOnly={disabled}
-              value={tuneTotal.value}
+              value={disabled ? Number(tuneTotal.value || 0).toLocaleString() : tuneTotal.value}
               onChange={(e) => {
                 const value = e.target.value;
-
-                if (!_.isNumber(value)) {
-                  return;
-                }
-
-                tuneTotal.onChange?.(e.target.value as `${number}` | '');
+                tuneTotal.onChange?.(value as `${number}` | '');
               }}
             />
           </div>

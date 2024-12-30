@@ -10,18 +10,22 @@ import type { TstateOther } from './type';
 type TsetOther = <K extends keyof TstateOther>(key: K, value: TstateOther[K]) => void;
 type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
 
+type Tstate = TstateOther[];
+
 // ===========================================================================
 
 const useQuotationOther = ({
   disabled,
   raw_contentOtherArr,
+  onOtherPriceAllTotalChange,
 }: {
   disabled: boolean;
   raw_contentOtherArr: TquotationContentOtherDto[] | undefined;
+  onOtherPriceAllTotalChange: (total: number) => void;
 }) => {
   const defaultState = useDefaultState({ raw_contentOtherArr });
 
-  const [state, setState] = useState<TstateOther[]>(defaultState);
+  const [state, setState] = useState<Tstate>(defaultState);
 
   const createSetOther = (index: number) => {
     const setOther: TsetOther = (key, value) => {
@@ -41,11 +45,25 @@ const useQuotationOther = ({
 
         copy[index] = { ...target };
 
+        if (key === 'quantity' || key === 'unitPrice') {
+          onOtherPriceAllTotalChange(calcAllOtherTotalPrice(copy));
+        }
+
         return copy;
       });
     };
 
     return setOther;
+  };
+
+  const calcAllOtherTotalPrice = (newState?: Tstate) => {
+    let allTotal_d = new Decimal(0);
+
+    (newState ?? state).forEach((other) => {
+      allTotal_d = allTotal_d.add(other.totalPrice);
+    });
+
+    return allTotal_d.toNumber();
   };
 
   useEffect(() => {
@@ -56,6 +74,7 @@ const useQuotationOther = ({
     state_otherArr: state,
     createSetOther,
     formatToBody_other: () => formatToBody_other(state),
+    calcAllOtherTotalPrice,
   };
 };
 

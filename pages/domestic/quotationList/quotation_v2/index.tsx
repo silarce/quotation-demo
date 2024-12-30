@@ -131,6 +131,8 @@ import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationP
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
 import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
 
+import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
+
 // css
 import scss from './index.module.scss';
 
@@ -226,21 +228,33 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region STATE MANAGEMENT
 
+  // instance_quotationTotalPrice
+  const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
+    useQuotationTotalPrice({
+      raw_quotationContent: content,
+      disabled,
+    });
+
   const instance_quotationProduct = useQuotationProduct({
     raw_quotationContent: content,
-    // raw_productArr: content?.products,
     disabled,
+    onProdAllTotalChange: (prodAllTotal) => {
+      handleSetQuotationPriceTotal({
+        prodPriceAllTotal: prodAllTotal,
+        otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
+      });
+    },
   });
 
   const {
     quotationDiscount: state_quotationDiscount, // 總折數
-    setQuotationDiscount: setState_quotationDiscount,
+    // setQuotationDiscount,
     //
-    state_totalPrice, // 完整狀態
+    // state_totalPrice, // 完整狀態
     // setProdPriceTotal,
-    setTuneTotal,
-    setCurrency,
-    setExchangeRate,
+    // setTuneTotal,
+    // setCurrency,
+    // setExchangeRate,
   } = instance_quotationProduct;
 
   const { state_profile, setState_profile } = useProfile({
@@ -287,6 +301,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const instance_useQuotationOther = useQuotationOther({
     disabled,
     raw_contentOtherArr: content?.others,
+    onOtherPriceAllTotalChange(total) {
+      handleSetQuotationPriceTotal({
+        prodPriceAllTotal: instance_quotationProduct.calcProdAllTotal(),
+        otherPriceAllTotal: total,
+      });
+    },
   });
 
   // ----------------------------------------------------------------------
@@ -310,19 +330,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     }
 
     const {
-      calcProduct,
+      calcProductBody: calcProduct,
       quotationDiscount,
-      state_totalPrice: {
-        prodPriceTotal,
-        averageDiscount,
-        tuneTotal,
-        subTotal,
-        salesTax,
-        total,
-        currency,
-        exchangeRate,
-        foreignTotal,
-      },
+      // state_totalPrice: {
+      //   prodPriceTotal,
+      //   averageDiscount,
+      //   tuneTotal,
+      //   subTotal,
+      //   salesTax,
+      //   total,
+      //   currency,
+      //   exchangeRate,
+      //   foreignTotal,
+      // },
     } = instance_quotationProduct;
 
     const { formatToBody_other } = instance_useQuotationOther;
@@ -359,6 +379,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
       return;
     }
+
+    const { tuneTotal, subTotal, salesTax, total, exchangeRate, foreignTotal, currency } = state_quotationTotal;
 
     const body: TcreateQuotationContentDto = {
       quotationDate: new Date().toISOString(),
@@ -447,6 +469,21 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  function handleSetQuotationPriceTotal({
+    prodPriceAllTotal,
+    otherPriceAllTotal,
+  }: {
+    prodPriceAllTotal: number | `${number}`;
+    otherPriceAllTotal: number | `${number}`;
+  }) {
+    const quotationPriceTotal = new Decimal(prodPriceAllTotal).add(otherPriceAllTotal).toNumber();
+
+    console.log('prodPriceAllTotal', prodPriceAllTotal);
+    console.log('otherPriceAllTotal', otherPriceAllTotal);
+
+    setQuotationPriceTotal(quotationPriceTotal);
+  }
+
   // ----------------------------------------------------------------------
   // region PROPS
 
@@ -462,28 +499,28 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     discountRate: { value: state_quotationDiscount },
     tuneTotal: {
       // value: state_totalPrice.tuneTotal,
-      value: disabled ? Number(state_totalPrice.tuneTotal).toLocaleString() : state_totalPrice.tuneTotal,
+      value: disabled ? Number(state_quotationTotal.tuneTotal).toLocaleString() : state_quotationTotal.tuneTotal,
       onChange(value) {
         setTuneTotal(value);
       },
     },
     currency: {
-      value: state_totalPrice.currency,
+      value: state_quotationTotal.currency,
       onChange(value) {
         setCurrency(value);
       },
     },
     exchangeRate: {
-      value: state_totalPrice.exchangeRate,
+      value: state_quotationTotal.exchangeRate,
       onChange(value) {
         setExchangeRate(value);
       },
     },
-    avgDiscount_withQty: state_totalPrice.averageDiscount,
-    subTotal: Number(state_totalPrice.subTotal).toLocaleString(),
-    salesTax: Number(state_totalPrice.salesTax).toLocaleString(),
-    total: Number(state_totalPrice.total).toLocaleString(),
-    foreignTotal: Number(state_totalPrice.foreignTotal).toLocaleString(),
+    avgDiscount_withQty: state_quotationTotal.averageDiscount,
+    subTotal: Number(state_quotationTotal.subTotal).toLocaleString(),
+    salesTax: Number(state_quotationTotal.salesTax).toLocaleString(),
+    total: Number(state_quotationTotal.total).toLocaleString(),
+    foreignTotal: Number(state_quotationTotal.foreignTotal).toLocaleString(),
 
     // deliveryLocation: kit_payInfo.deliveryLocation,
     // deliveryDate: kit_payInfo.deliveryDate,

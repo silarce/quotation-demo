@@ -28,7 +28,7 @@ import type {
   //
   //
   //
-  TstateTotalPrice,
+  TstateTotalPrice as TstateQuotationTotal,
   Tstate_quotaionDiscount,
 } from './type';
 
@@ -47,17 +47,20 @@ const useQuotationTotalPrice = ({
 }) => {
   const defaultState = useDefaultState({ raw_quotationContent: raw_quotationContent });
 
-  const [state_quotationDiscount, setState_quotationDiscount] = useState<Tstate_quotaionDiscount>('100');
-  const [state_totalPrice, setState_totalPrice] = useState<TstateTotalPrice>(defaultState);
+  // const [state_quotationDiscount, setState_quotationDiscount] = useState<Tstate_quotaionDiscount>('100');
+  const [state_quotationTotal, setState_quotationTotal] = useState<TstateQuotationTotal>(defaultState);
 
   // ---------------------------------------------------------------------------
 
-  const setProdPriceTotal = (value: TstateTotalPrice['prodPriceTotal']) => {
-    setState_totalPrice((prev) => {
+  const setQuotationPriceTotal = (value: TstateQuotationTotal['prodPriceTotal']) => {
+    setState_quotationTotal((prev) => {
       let copy = { ...prev };
+
       copy.prodPriceTotal = value;
+
       const { tuneTotal, prodPriceTotal } = copy;
       const subTotal = new Decimal(prodPriceTotal).add(tuneTotal).toNumber();
+
       copy.subTotal = subTotal;
 
       const { salesTax, total, foreignTotal } = calcTotal(copy);
@@ -73,12 +76,12 @@ const useQuotationTotalPrice = ({
     });
   };
 
-  const setTuneTotal = (value: TstateTotalPrice['tuneTotal']) => {
-    if (!Number.isInteger(Number(value || 0))) {
-      return;
+  const setTuneTotal = (value: TstateQuotationTotal['tuneTotal']) => {
+    if (value) {
+      value = new Decimal(value).toDecimalPlaces(0, Decimal.ROUND_DOWN).toString() as `${number}`;
     }
 
-    setState_totalPrice((prev) => {
+    setState_quotationTotal((prev) => {
       let copy = { ...prev };
 
       copy.tuneTotal = value;
@@ -99,8 +102,8 @@ const useQuotationTotalPrice = ({
     });
   };
 
-  const setCurrency = (value: TstateTotalPrice['currency']) => {
-    setState_totalPrice((prev) => {
+  const setCurrency = (value: TstateQuotationTotal['currency']) => {
+    setState_quotationTotal((prev) => {
       return {
         ...prev,
         currency: value,
@@ -108,8 +111,8 @@ const useQuotationTotalPrice = ({
     });
   };
 
-  const setExchangeRate = (value: TstateTotalPrice['exchangeRate']) => {
-    setState_totalPrice((prev) => {
+  const setExchangeRate = (value: TstateQuotationTotal['exchangeRate']) => {
+    setState_quotationTotal((prev) => {
       const copy = { ...prev };
       copy.exchangeRate = value;
 
@@ -127,19 +130,17 @@ const useQuotationTotalPrice = ({
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    setState_totalPrice(defaultState);
+    setState_quotationTotal(defaultState);
   }, [defaultState, disabled]);
 
-  useEffect(() => {
-    setState_quotationDiscount((raw_quotationContent?.discount ?? '100') as `${number}` | '');
-  }, [raw_quotationContent?.discount, disabled]);
+  // useEffect(() => {
+  //   setState_quotationDiscount((raw_quotationContent?.discount ?? '100') as `${number}` | '');
+  // }, [raw_quotationContent?.discount, disabled]);
 
+  // MARK: RETURN
   return {
-    state_quotationDiscount,
-    setState_quotationDiscount,
-    //
-    state_totalPrice,
-    setProdPriceTotal,
+    state_quotationTotal,
+    setQuotationPriceTotal,
     setTuneTotal,
     setCurrency,
     setExchangeRate,
@@ -151,7 +152,7 @@ const useQuotationTotalPrice = ({
 // ===========================================================================
 
 const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: TquotationContentDto | undefined }) => {
-  const defaultState: TstateTotalPrice = useMemo(() => {
+  const defaultState: TstateQuotationTotal = useMemo(() => {
     // const { tuneTotal, subTotal } = raw ?? {};
 
     const tuneTotal = (raw?.tuneTotal ?? '0') as `${number}`;
@@ -159,7 +160,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
 
     const prodPriceTotal = new Decimal(subTotal).minus(tuneTotal).toNumber();
 
-    const defaultState: TstateTotalPrice = {
+    const defaultState: TstateQuotationTotal = {
       prodPriceTotal,
       //
       // quotationDiscount: (raw?.discount ?? '100') as `${number}` | '',
@@ -181,7 +182,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
 
 // ===========================================================================
 
-const calcTotal = (state: TstateTotalPrice) => {
+const calcTotal = (state: TstateQuotationTotal) => {
   const { subTotal, exchangeRate } = state;
 
   const salesTax = new Decimal(subTotal).mul(taxRate).toDecimalPlaces(0).toNumber();

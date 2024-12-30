@@ -83,7 +83,7 @@ import {
 
 // hook
 import { useDefaultState_prodDict as useDefaultState_prodDict } from './useDefaultState_prodDict';
-import { useQuotationTotalPrice } from './useQuotationPrice';
+// import { useQuotationTotalPrice } from './useQuotationPrice';
 
 // method
 import { formatProdStateToBody } from './method/formatProdStateToBody';
@@ -149,12 +149,12 @@ const nodeConfig_accessory_origin = createNodeConfig_accessory();
 // MARK:START
 const useQuotationProduct = ({
   raw_quotationContent,
-  // raw_productArr,
   disabled,
+  onProdAllTotalChange: _onProdAllTotalChange,
 }: {
   raw_quotationContent: TquotationContentDto | undefined;
-  // raw_productArr: undefined | TquotationProductDto[];
   disabled: boolean;
+  onProdAllTotalChange: (alltotal: number) => void;
 }) => {
   const raw_productArr = raw_quotationContent?.products;
 
@@ -166,20 +166,21 @@ const useQuotationProduct = ({
 
   // region STATE
 
-  const {
-    // state_quotationDiscount,
-    // setState_quotationDiscount,
-    //
+  // const {
+  //   // state_quotationDiscount,
+  //   // setState_quotationDiscount,
+  //   //
 
-    state_totalPrice,
-    setProdPriceTotal,
-    setTuneTotal,
-    setCurrency,
-    setExchangeRate,
-  } = useQuotationTotalPrice({
-    raw_quotationContent: raw_quotationContent,
-    disabled,
-  });
+  //   state_totalPrice,
+
+  //   setProdPriceTotal,
+  //   setTuneTotal,
+  //   setCurrency,
+  //   setExchangeRate,
+  // } = useQuotationTotalPrice({
+  //   raw_quotationContent: raw_quotationContent,
+  //   disabled,
+  // });
 
   const defaultState_prodDict = useDefaultState_prodDict({
     raw_productArr,
@@ -217,6 +218,10 @@ const useQuotationProduct = ({
   //
   //
   //
+
+  const onProdAllTotalChange = () => {
+    _onProdAllTotalChange(calcProdAllTotal());
+  };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
     setActiveProdKey(stateProd?.key);
@@ -264,6 +269,12 @@ const useQuotationProduct = ({
       prodDict: state_prodDict,
       quotationDiscount: value,
     });
+
+    onProdAllTotalChange();
+    // let total_d = new Decimal(0);
+    // Object.values(state_prodDict).forEach((prod) => {
+    //   total_d = total_d.add(prod.data_prod.totalPrice || 0);
+    // });
   };
 
   // -----------------------------------------------------------------------
@@ -455,6 +466,17 @@ const useQuotationProduct = ({
 
   // region METHOD
 
+  function calcProdAllTotal() {
+    let total_d = new Decimal(0);
+    // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
+    // 不會有物件狀態未更新而金額不對的問題
+    Object.values(state_prodDict).forEach((prod) => {
+      total_d = total_d.add(prod.data_prod.totalPrice || 0);
+    });
+
+    return total_d.toNumber();
+  }
+
   const calcProductBody = () => {
     const totalQty_decimal = new Decimal(0);
     let isAllDoorModalValid = true;
@@ -561,11 +583,11 @@ const useQuotationProduct = ({
     quotationDiscount: state_quotationDiscount, // 總折數
     setQuotationDiscount,
     //
-    state_totalPrice, // 完整狀態
+    // state_totalPrice, // 完整狀態
     // setProdPriceTotal,
-    setTuneTotal,
-    setCurrency,
-    setExchangeRate,
+    // setTuneTotal,
+    // setCurrency,
+    // setExchangeRate,
     //
     //
     //
@@ -578,7 +600,8 @@ const useQuotationProduct = ({
     createActivedClassAccessoryDict,
     createClassProd,
     //
-    calcProduct: calcProductBody,
+    calcProductBody,
+    calcProdAllTotal,
     //
   };
 };
