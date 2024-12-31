@@ -223,8 +223,8 @@ const useQuotationProduct = ({
   //
   //
 
-  const onProdAllTotalChange = () => {
-    _onProdAllTotalChange(calcProdAllTotal());
+  const onProdAllTotalChange = (state_prodDict?: TstateProdDict) => {
+    _onProdAllTotalChange(calcProdAllTotal(state_prodDict));
   };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
@@ -371,25 +371,36 @@ const useQuotationProduct = ({
     });
   };
 
-  const createClassProd = useCallback(
-    (stateProd: TstateProd) => {
-      const classProd = new ClassProd({
-        stateProd: stateProd,
-        setStateProd: createSetProd(stateProd.key),
-        nodeConfig: nodeConfig_prime,
-        quotationDiscount: state_quotationDiscount || 0,
-        onPordTotalChange: onProdAllTotalChange,
-      });
+  // const createClassProd = useCallback(
+  //   (stateProd: TstateProd) => {
+  //     const classProd = new ClassProd({
+  //       stateProd: stateProd,
+  //       setStateProd: createSetProd(stateProd.key),
+  //       nodeConfig: nodeConfig_prime,
+  //       quotationDiscount: state_quotationDiscount || 0,
+  //       onPordTotalChange: onProdAllTotalChange,
+  //     });
 
-      return classProd;
-    },
-    [
-      nodeConfig_prime,
-      // 編輯總折數state_quotationDiscount時會呼叫calcAndRenewAllProdPrice_sideEffect
-      // 本來就會使所有prod更新，所以暫時不用在這裡考慮效能的問題
-      state_quotationDiscount,
-    ]
-  );
+  //     return classProd;
+  //   },
+  //   [
+  //     nodeConfig_prime,
+  //     // 編輯總折數state_quotationDiscount時會呼叫calcAndRenewAllProdPrice_sideEffect
+  //     // 本來就會使所有prod更新，所以暫時不用在這裡考慮效能的問題
+  //     state_quotationDiscount,
+  //   ]
+  // );
+  const createClassProd = (stateProd: TstateProd) => {
+    const classProd = new ClassProd({
+      stateProd: stateProd,
+      setStateProd: createSetProd(stateProd.key),
+      nodeConfig: nodeConfig_prime,
+      quotationDiscount: state_quotationDiscount || 0,
+      onPordTotalChange: onProdAllTotalChange,
+    });
+
+    return classProd;
+  };
 
   const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
     if (!activedProd) {
@@ -493,11 +504,33 @@ const useQuotationProduct = ({
     });
   };
 
-  function calcProdAllTotal() {
+  const removeProd = (prodKey: string) => {
+    setProdKeyArr((prev) => {
+      const newProdKeyArr = prev.filter((key) => key !== prodKey);
+
+      return newProdKeyArr;
+    });
+
+    setState_prodDict((prev) => {
+      const { [prodKey]: removedProd, ...rest } = prev;
+
+      onProdAllTotalChange(rest);
+
+      return rest;
+    });
+
+    if (prodKey === activeProdKey) {
+      setActiveProdKey(undefined);
+    }
+  };
+
+  function calcProdAllTotal(newState_prodDict?: TstateProdDict) {
+    const prodDict = newState_prodDict ?? state_prodDict;
+
     let total_d = new Decimal(0);
     // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
     // 不會有物件狀態未更新而金額不對的問題
-    Object.values(state_prodDict).forEach((prod) => {
+    Object.values(prodDict).forEach((prod) => {
       total_d = total_d.add(prod.data_prod.totalPrice || 0);
     });
 
@@ -569,6 +602,10 @@ const useQuotationProduct = ({
     setState_quotationDiscount((raw_quotationContent?.discount ?? '') as `${number}` | '');
   }, [disabled, raw_quotationContent]);
 
+  // useEffect(() => {
+  //   onProdAllTotalChange();
+  // }, [Object.keys(state_prodDict).length]);
+
   // -----------------------------------------------------------------------------
   // MARK: RETURN
   return {
@@ -631,6 +668,7 @@ const useQuotationProduct = ({
     calcProdAllTotal,
     //
     addEmptyProd,
+    removeProd,
   };
 };
 

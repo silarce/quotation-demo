@@ -170,6 +170,7 @@ const Table_prod = ({
     activedClassProd,
     //
     addEmptyProd,
+    removeProd,
   } = instance_useQuotationProductInstance;
 
   return (
@@ -251,6 +252,7 @@ const Table_prod = ({
                   createClassProd={createClassProd}
                   //
                   activedClassProd={activedClassProd}
+                  removeProd={removeProd}
                 />
               );
             })}
@@ -657,6 +659,8 @@ const QuotationRow_dealClass = ({
   choseActiveProd,
   createClassProd,
   activedClassProd,
+  //
+  removeProd,
 }: {
   stateProd: TstateProd;
 
@@ -670,6 +674,7 @@ const QuotationRow_dealClass = ({
   createClassProd: TuseQuotationProductInstance['createClassProd'];
   activedClassProd: TuseQuotationProductInstance['activedClassProd'];
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
+  removeProd: (prodKey: string) => void;
 }) => {
   const [viewRef, inView] = useInView();
 
@@ -681,7 +686,7 @@ const QuotationRow_dealClass = ({
   const left = (
     <>
       <div ref={viewRef} className={scss.viewIndicator} />
-      <Cell_delete onClick={() => {}} />
+      <Cell_delete onClick={() => removeProd(classProd.key)} />
       <Cell_copy onClick={() => {}} />
       <Cell_indexNumber>{index + 1}</Cell_indexNumber>
       <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
@@ -747,7 +752,8 @@ const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) =>
     prev.disabled === next.disabled &&
     prev.isActive === next.isActive &&
     prev.cellKeyArr === next.cellKeyArr &&
-    prev.index === next.index &&
-    prev.createClassProd === next.createClassProd
+    prev.index === next.index
+    // &&
+    // prev.createClassProd === next.createClassProd
   );
 });
