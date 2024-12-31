@@ -113,6 +113,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // region REFACTOR IMPORT
 
+import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
+
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
 
@@ -544,6 +546,35 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
+  const history = useMemo(() => {
+    let content = quotationData?.contents ?? [];
+
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
+    }
+
+    return content.map((item, index, arr) => {
+      const { status, quotationDate, createdAt } = item;
+      const preStatus = arr[index - 1]?.status;
+
+      return {
+        state_from: quotationStatusLookup[preStatus] ?? '建立',
+        state_to: quotationStatusLookup[status] ?? '',
+        isoString: moment(createdAt).toISOString(),
+      };
+    });
+  }, [quotationData]);
+
+  const customeLeft: React.ReactNode[] = [
+    <VersionLabel
+      key="0"
+      version={content?.version}
+      subTotal={state_quotationTotal.subTotal}
+      salesTax={state_quotationTotal.salesTax}
+      total={state_quotationTotal.total}
+    />,
+  ];
+
   // ----------------------------------------------------------------------
   // region useEffect
   useEffect(() => {
@@ -562,7 +593,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       isLoading_all={isFetching_update || isFetching}
       // isLoading_subLayer={true}
     >
-      <PageHeader02 tag="報價單" panelList={panelList} />
+      <PageHeader02
+        // tag={`報價編號 ${content?.quotationNumber}`}
+        tag={quotationId ? `報價編號 ${content?.quotationNumber}` : '新增報價單'}
+        panelList={panelList}
+        customeLeft={customeLeft}
+      />
       <div>
         <QuotationProfile
           disabled={disabled}
@@ -618,45 +654,26 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 //
 //
 
-// ======================================================================
+// =============================================================================
 
-//
-// MARK: usePanel
-const usePanel = ({
-  disabled,
-  props_panelList_01,
-  props_panelList_02,
+const VersionLabel = ({
+  version,
+  subTotal,
+  salesTax,
+  total,
 }: {
-  disabled: boolean;
-  props_panelList_01: {
-    onEdit: () => void;
-  };
-  props_panelList_02: {
-    onCancel: () => void;
-    onUpload: () => void;
-  };
-}): TpanelList => {
-  const panelList_01: TpanelList = [
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: props_panelList_01.onEdit,
-    },
-  ];
-  const panelList_02: TpanelList = [
-    {
-      type: 'redButton',
-      label: '上傳',
-      onClick: props_panelList_02.onUpload,
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: props_panelList_02.onCancel,
-    },
-  ];
-
-  const panelList = disabled ? panelList_01 : panelList_02;
-
-  return panelList;
+  version: React.ReactNode;
+  subTotal: React.ReactNode;
+  salesTax: React.ReactNode;
+  total: React.ReactNode;
+}) => {
+  return (
+    <div className="ml-2 mb-1 mt-auto">
+      <div>版本 : {version}</div>
+      <div>
+        小計 : {subTotal}　 營業稅: {salesTax}　 總計 : {total}
+        {/*  */}
+      </div>
+    </div>
+  );
 };
