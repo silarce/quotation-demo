@@ -265,7 +265,6 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   // unit: string; // 單位 //要送到excel，不可以用ReactNode // 平方公尺可以用unicode處理 // ㎡或m²
 
   // 以下三個，都沒有在後端紀錄，必須在前端即時計算
-  // 生氣氣 不爽爽
   dualPrice?: number; // 牌價複價 // 虛值
   unitPrice?: number; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
   totalPrice?: number; // 複價 = 單價 * 數量 // 虛值

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { nanoid } from 'nanoid';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
@@ -511,10 +512,13 @@ const useQuotationProduct = ({
       return newProdKeyArr;
     });
 
+    // let newProdDict: TstateProdDict = {};
+
     setState_prodDict((prev) => {
       const { [prodKey]: removedProd, ...rest } = prev;
 
       onProdAllTotalChange(rest);
+      // newProdDict = rest;
 
       return rest;
     });
@@ -522,6 +526,46 @@ const useQuotationProduct = ({
     if (prodKey === activeProdKey) {
       setActiveProdKey(undefined);
     }
+
+    // onProdAllTotalChange(newProdDict);
+  };
+
+  const copyProd = (prodKey: string) => {
+    const copyedProd = state_prodDict[prodKey];
+
+    const data_prod = {
+      ...copyedProd.data_prod,
+      id: undefined,
+      attachedToProductId: undefined,
+      rootProductId: undefined,
+    };
+
+    const newProd: TstateProd = {
+      ...copyedProd,
+      data_prod,
+      key: 'new-' + nanoid(),
+      renderCount: undefined,
+      afterChangeQueue: undefined,
+    };
+
+    let newProdDict: TstateProdDict = {};
+
+    setState_prodDict((prev) => {
+      const copy = {
+        ...prev,
+        [newProd.key]: newProd,
+      };
+
+      newProdDict = copy;
+
+      return copy;
+    });
+
+    setProdKeyArr((prev) => {
+      return [...prev, newProd.key];
+    });
+
+    onProdAllTotalChange(newProdDict);
   };
 
   function calcProdAllTotal(newState_prodDict?: TstateProdDict) {
@@ -669,6 +713,7 @@ const useQuotationProduct = ({
     //
     addEmptyProd,
     removeProd,
+    copyProd,
   };
 };
 
