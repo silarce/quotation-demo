@@ -131,6 +131,7 @@ import { Tstate_accountant } from 'components/wholePage/collection';
 import { calcAllPrice, calcPriceDiscount_percent } from '../../method/calcProd';
 
 import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee } from '../../method/calcProd';
+import { TagsOutlined } from '@ant-design/icons';
 
 // ================================================================================
 
@@ -481,6 +482,39 @@ class ClassProd {
     this.renewDistributionBoxAllPrice();
   }
 
+  renewInstallationFee() {
+    this.data.installationFeeQuantity = this.data.area || '0';
+
+    let installationFeePrice = 0;
+
+    if (this.doorModelName === 'SJ-302') {
+      installationFeePrice = 1800;
+    }
+
+    if (this.doorModelName === 'SJ-303A' || this.doorModelName === 'SJ-303AS') {
+      if (Number(this.data.installationFeeQuantity) <= 10) {
+        installationFeePrice = 5400;
+      } else {
+        installationFeePrice = 3600;
+      }
+    }
+
+    installationFeePrice = 1800;
+    this.data.installationFeePrice = `${installationFeePrice}`;
+
+    const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      price: installationFeePrice,
+      quantity: Number(this.data.installationFeeQuantity),
+      priceDiscount_percent: this.priceDiscount_percent,
+    });
+
+    this.data.installationFeeDualPrice = `${dualPrice}`;
+    this.data.installationFeeUnitPrice = `${unitPrice}`;
+    this.data.installationFeeTotalPrice = `${totalPrice}`;
+  }
+
+  // 確認並測試renewInstallationFee
+
   // ---------------------------------------------------------------------------
 
   // ==========================================================================
@@ -577,6 +611,7 @@ class ClassProd {
     this.renewDistributionBoxAllPrice_byHorsepower();
 
     this.data.area = this.calcArea(this);
+    this.renewInstallationFee();
   }
   // endregion SPEC
   // ==========================================================================
@@ -1308,6 +1343,7 @@ class ClassProd {
       keepItemName: true,
       keepDiscount: true,
       keepQuoteType: true,
+      keepDistributionBoxQuantity: true,
     });
 
     this.render();
@@ -1331,6 +1367,7 @@ class ClassProd {
       keepItemName: true,
       keepDiscount: true,
       keepQuoteType: true,
+      keepDistributionBoxQuantity: true,
     });
 
     this.state.doorModel = doorModel;
@@ -1376,12 +1413,6 @@ class ClassProd {
     // 材料配件
     this.replaceComponentToEmpty();
 
-    // lookup_distributionBoxPrice
-    // const distributionBoxPrice = lookup_distributionBoxPrice[this.data.horsepower];
-
-    // this.data.distributionBoxPrice = `${distributionBoxPrice || ''}`;
-    // this.data.distributionBoxQuantity = '1';
-
     this.render();
   }
 
@@ -1399,8 +1430,6 @@ class ClassProd {
     }
 
     this.clearState_some();
-
-    this.data.area = this.calcArea(this);
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
     this.render();
@@ -1458,6 +1487,7 @@ class ClassProd {
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
     this.clearState_some();
+
     this.isAllowReqChain && this.addAfterChange('reqChain_01_withHp');
 
     this.render();
@@ -1477,6 +1507,8 @@ class ClassProd {
     }
 
     this.clearState_some();
+
+    this.renewInstallationFee();
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
     this.render();
@@ -1498,6 +1530,9 @@ class ClassProd {
 
       return;
     }
+
+    this.data.area = this.calcArea(this);
+    this.renewInstallationFee();
 
     this.isAllowReqChain && this.reqChain_03();
 
