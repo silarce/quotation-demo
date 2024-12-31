@@ -95,19 +95,14 @@ export default function QuotationOther({
 
               const left = (
                 <>
-                  <Cell_delete onClick={() => {}} />
+                  <Cell_delete className={classNames(disabled && 'invisible')} onClick={() => {}} />
                   <Cell_indexNumber>{index + 1}</Cell_indexNumber>
                   <Cell className={classNames()} style={config.item.style}>
-                    <InputSel_prod
-                      inputProps={{
-                        props: {
-                          value: state_other.item,
-                          onChange(e) {
-                            setOther('item', e.target.value);
-                          },
-                        },
-                      }}
-                    />
+                    {config.item.createNode({
+                      disabled,
+                      state_other,
+                      setOther,
+                    })}
                   </Cell>
                 </>
               );

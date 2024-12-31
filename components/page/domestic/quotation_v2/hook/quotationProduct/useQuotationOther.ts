@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 import type { TquotationContentOtherDto, TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 
@@ -25,7 +26,7 @@ const useQuotationOther = ({
 }) => {
   const defaultState = useDefaultState({ raw_contentOtherArr });
 
-  const [state, setState] = useState<Tstate>(defaultState);
+  const [state, setState] = useState<Tstate>([]);
 
   const createSetOther = (index: number) => {
     const setOther: TsetOther = (key, value) => {
@@ -67,7 +68,7 @@ const useQuotationOther = ({
   };
 
   useEffect(() => {
-    setState(defaultState);
+    setState(_.cloneDeep(defaultState));
   }, [defaultState, disabled]);
 
   return {
