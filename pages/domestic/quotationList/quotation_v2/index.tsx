@@ -141,7 +141,7 @@ import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/ho
 
 import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
 
-import { kit_req } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/kit_req';
+import { kit_req } from 'components/page/domestic/quotation_v2/method/kit_req';
 
 import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/versionLabel';
 
