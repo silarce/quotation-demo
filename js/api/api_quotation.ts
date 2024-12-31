@@ -2038,6 +2038,8 @@ export const useGetQuotation_id_3 = (
       ...params,
     };
 
+    setIsFetching(true);
+
     const quotation = await apiGetQuotation_id(id, theParams)
       .then(async (quotation) => {
         const prodIdArr = quotation.latestContent.products.map((prod) => prod.id);
@@ -2073,6 +2075,9 @@ export const useGetQuotation_id_3 = (
         });
 
         return null;
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
 
     setRaw(quotation);

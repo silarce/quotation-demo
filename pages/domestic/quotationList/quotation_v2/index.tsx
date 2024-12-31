@@ -174,12 +174,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const [disabled, setDisabled] = useState(true);
 
-  const [isFeching, setIsFeching] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   // ----------------------------------------------------------------------
 
   const {
-    isFetching,
+    isFetching: isFetching_update,
     //
     raw: quotationData,
     update: update_quotation,
@@ -433,6 +433,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
     let shouldUpdate = false;
 
+    setIsFetching(true);
+
     try {
       const updatedQuotation = await apiPatchQuotation(body, quotationId);
       const latestContentId = updatedQuotation.latestContent.id;
@@ -450,9 +452,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         await update_quotation();
         setDisabled(true);
       }
-    }
 
-    setIsFeching(true);
+      setIsFetching(false);
+    }
   };
 
   // ----------------------------------------------------------------------
@@ -556,7 +558,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: RENDER
   return (
-    <SubLayer>
+    <SubLayer
+      isLoading_all={isFetching_update || isFetching}
+      // isLoading_subLayer={true}
+    >
       <PageHeader02 tag="報價單" panelList={panelList} />
       <div>
         <QuotationProfile
