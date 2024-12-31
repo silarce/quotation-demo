@@ -137,7 +137,7 @@ import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/ho
 
 import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
 
-import { kit_req } from './kit_req';
+import { kit_req } from '../../../../components/page/domestic/quotation_v2/hook/quotationProduct/method/kit_req';
 
 // css
 import scss from './index.module.scss';
@@ -233,6 +233,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
 
   // region STATE MANAGEMENT
+
+  const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
   // instance_quotationTotalPrice
   const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
@@ -479,10 +481,21 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       // isLoading_subLayer={true}
     >
       <PageHeader02
-        // tag={`報價編號 ${content?.quotationNumber}`}
         tag={quotationId ? `報價編號 ${content?.quotationNumber}` : '新增報價單'}
         panelList={panelList}
         customeLeft={customeLeft}
+        customeRight={[
+          <QuotationStateSel
+            key="0"
+            quotationState={{ value: status, label: quotationStatusLookup[status] }}
+            setQuotationState={(option) => {
+              setStatus(option.value as TquotationContentDto['status']);
+            }}
+            history={history}
+            isNew={isNewQuotation}
+            disabled={disabled}
+          />,
+        ]}
       />
       <div>
         <QuotationProfile

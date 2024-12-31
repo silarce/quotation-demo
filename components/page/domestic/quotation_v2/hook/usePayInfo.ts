@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import moment, { Moment } from 'moment';
 
 interface Traw {
@@ -111,3 +111,4 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
 };
 
 export { usePayInfo };
+export type { Tstate as Tstate_payInfo };
