@@ -206,7 +206,8 @@ const Table_prod = ({
         <div className={scss.table}>
           <QuotationRow_dndThead
             className={scss.rowThead}
-            disabled={disabled}
+            // disabled={disabled}
+            disabled={true}
             keyArr={cellKeyArr}
             onDragEnd={({ move }) => {
               setCellKeyArr(move(cellKeyArr));
@@ -300,7 +301,8 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
       <div className={classNames(scss.componentTable, className)}>
         <QuotationRow_dndThead
           className={scss.rowThead}
-          disabled={disabled}
+          // disabled={disabled}
+          disabled={true}
           keyArr={cellKeyArr_component}
           onDragEnd={({ move }) => {
             setCellKeyArr_component(move(cellKeyArr_component));
@@ -494,7 +496,8 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
         <div className={scss.table}>
           <QuotationRow_dndThead
             className={scss.rowThead}
-            disabled={disabled}
+            // disabled={disabled}
+            disabled={true}
             keyArr={cellKeyArr_accessory}
             onDragEnd={({ move }) => {
               setCellKeyArr_accessory(move(cellKeyArr_accessory));

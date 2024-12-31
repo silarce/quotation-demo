@@ -178,10 +178,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
-  const [disabled, setDisabled] = useState(true);
-
-  const [isFetching, setIsFetching] = useState(false);
-
   // ----------------------------------------------------------------------
 
   const {
@@ -234,9 +230,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region STATE MANAGEMENT
 
+  const [disabled, setDisabled] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
-  // instance_quotationTotalPrice
   const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
     useQuotationTotalPrice({
       raw_quotationContent: content,
