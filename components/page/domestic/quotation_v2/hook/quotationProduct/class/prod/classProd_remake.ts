@@ -788,6 +788,15 @@ class ClassProd {
     this.render();
   }
 
+  removeAccessory(key: string) {
+    delete this.state.data_accessoryDict[key];
+    this.state.accessoryKeyArr = this.state.accessoryKeyArr.filter((item) => item !== key);
+
+    this.renewProdAllPrice_updateQuotationTotalPrice();
+
+    this.render();
+  }
+
   // ==========================================================================
   // ==========================================================================
   // ==========================================================================

@@ -536,7 +536,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
               const left = (
                 <>
-                  <Cell_delete onClick={() => {}} />
+                  <Cell_delete onClick={() => activedClassProd?.removeAccessory(acceKey)} />
                   <Cell_indexNumber>{index + 1}</Cell_indexNumber>
                   <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
                     {nodeConfig_name.createNode({
