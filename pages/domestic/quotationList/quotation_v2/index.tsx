@@ -113,7 +113,11 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // region REFACTOR IMPORT
 
+import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
+import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
 import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
+
+import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
 
 import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
@@ -236,11 +240,18 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const [isFetching, setIsFetching] = useState(false);
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
+  // const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
+  //   useQuotationTotalPrice({
+  //     raw_quotationContent: content,
+  //     disabled,
+  //   });
+  const instance_quotationPrice = useQuotationTotalPrice({
+    raw_quotationContent: content,
+    disabled,
+  });
+
   const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
-    useQuotationTotalPrice({
-      raw_quotationContent: content,
-      disabled,
-    });
+    instance_quotationPrice;
 
   const instance_quotationProduct = useQuotationProduct({
     raw_quotationContent: content,
@@ -381,41 +392,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     isSendToReview,
   });
 
-  const props_payInfo: Tprops_quotationPayInfo['form'] = {
-    haveTax: { value: true },
-    discountRate: { value: state_quotationDiscount },
-    tuneTotal: {
-      // value: state_totalPrice.tuneTotal,
-      value: disabled ? Number(state_quotationTotal.tuneTotal).toLocaleString() : state_quotationTotal.tuneTotal,
-      onChange(value) {
-        setTuneTotal(value);
-      },
-    },
-    currency: {
-      value: state_quotationTotal.currency,
-      onChange(value) {
-        setCurrency(value);
-      },
-    },
-    exchangeRate: {
-      value: state_quotationTotal.exchangeRate,
-      onChange(value) {
-        setExchangeRate(value);
-      },
-    },
-    avgDiscount_withQty: avgDiscount,
-    subTotal: Number(state_quotationTotal.subTotal).toLocaleString(),
-    salesTax: Number(state_quotationTotal.salesTax).toLocaleString(),
-    total: Number(state_quotationTotal.total).toLocaleString(),
-    foreignTotal: Number(state_quotationTotal.foreignTotal).toLocaleString(),
-
-    // deliveryLocation: kit_payInfo.deliveryLocation,
-    // deliveryDate: kit_payInfo.deliveryDate,
-    // paymentMethodArr: kit_payInfo.paymentMethodArr,
-    // addPaymentMethod: kit_payInfo.addPaymentMethod,
-
-    ...kit_payInfo,
-  };
+  const props_payInfo = createProps_payInfo({
+    instance_quotationPrice,
+    kit_payInfo,
+    state_quotationDiscount,
+    disabled,
+    avgDiscount,
+  });
 
   const panelList = usePanel({
     disabled,
@@ -432,24 +415,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const history = useMemo(() => {
-    let content = quotationData?.contents ?? [];
-
-    if (content) {
-      content = _.sortBy(content, (item) => item.createdAt);
-    }
-
-    return content.map((item, index, arr) => {
-      const { status, quotationDate, createdAt } = item;
-      const preStatus = arr[index - 1]?.status;
-
-      return {
-        state_from: quotationStatusLookup[preStatus] ?? '建立',
-        state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
-      };
-    });
-  }, [quotationData]);
+  const history = useHistory({
+    quotationData,
+  });
 
   const customeLeft: React.ReactNode[] = [
     <VersionLabel
