@@ -395,7 +395,7 @@ const createEmptydataProd = () => {
 
 const createEmptyStateProd = () => {
   const stateProd: TstateProd = {
-    key: nanoid(),
+    key: 'new-' + nanoid(),
     data_prod: createEmptydataProd(),
     data_componentDict: {},
     componentKeyArr: [],
