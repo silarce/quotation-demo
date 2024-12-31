@@ -316,11 +316,13 @@ class ClassProd {
     keepDiscount = true,
     keepQuoteType = true,
     keepDistributionBoxQuantity = true,
+    keepQuantity = true,
   }: {
     keepItemName?: boolean;
     keepDiscount?: boolean;
     keepQuoteType?: boolean;
     keepDistributionBoxQuantity?: boolean;
+    keepQuantity?: boolean;
   } = {}) {
     const newState = createEmptyStateProd(this.state.key);
 
@@ -332,6 +334,7 @@ class ClassProd {
     keepDiscount && (newState.data_prod.discount = data_prod.discount);
     keepQuoteType && (newState.data_prod.quoteType = data_prod.quoteType);
     keepDistributionBoxQuantity && (newState.data_prod.distributionBoxQuantity = data_prod.distributionBoxQuantity);
+    keepQuantity && (newState.data_prod.quantity = data_prod.quantity);
 
     Object.clearAndAssign(this.state, newState);
   }
@@ -1339,12 +1342,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState({
-      keepItemName: true,
-      keepDiscount: true,
-      keepQuoteType: true,
-      keepDistributionBoxQuantity: true,
-    });
+    this.clearState();
 
     this.render();
   }
@@ -1363,12 +1361,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState({
-      keepItemName: true,
-      keepDiscount: true,
-      keepQuoteType: true,
-      keepDistributionBoxQuantity: true,
-    });
+    this.clearState();
 
     this.state.doorModel = doorModel;
     this.data.doorModelName = doorModel?.name ?? '';
