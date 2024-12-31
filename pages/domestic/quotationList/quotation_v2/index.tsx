@@ -655,5 +655,3 @@ const usePanel = ({
 
   return panelList;
 };
-
-// console.log(performance.navigation);

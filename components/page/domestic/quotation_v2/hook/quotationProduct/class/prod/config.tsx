@@ -12,7 +12,7 @@ import InputSel, {
 } from 'components/global/gear/inputAndSel_v2/inputSel';
 import {
   InputSel_prod,
-  InputSel_prod_memo_select,
+  // InputSel_prod_memo_select,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
 import {
@@ -53,6 +53,14 @@ import { TdoorModel } from 'js/api/dtoTypes';
 
 // =======================================================================
 const options_quoteType = optionsCreator_quoteType();
+
+const InputSel_prod_select = (props: TinputSelProps) => {
+  const { selectProps } = props;
+
+  selectProps?.props && (selectProps.props.menuPortalTarget ??= document.getElementById('quotationProdTableWrapper'));
+
+  return <InputSel_prod {...props} />;
+};
 
 // =======================================================================
 
@@ -225,7 +233,10 @@ const nodeConfig_origin: TnodeConfig = {
     createNode({ disabled, classProd }) {
       const selectProps: TinputSelProps['selectProps'] = {
         props: {
-          menuPortalTarget: undefined,
+          // menuPortalTarget: undefined,
+          // menuPortalTarget: document.getElementById('quotationProdTableWrapper'),
+          // menuPortalTarget: document.getElementById('zxc'),
+          // menuIsOpen: true,
           isSearchable: true,
           options: options_quoteType,
           value: classProd.quoteType ? { value: classProd.quoteType, label: classProd.quoteType } : null,
@@ -236,7 +247,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select selectProps={selectProps} disabled={disabled} />;
+      return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
     },
   },
 
@@ -370,7 +381,7 @@ const nodeConfig_origin: TnodeConfig = {
 
       const inputSelProps = classProd.isSpecial ? { inputProps } : { selectProps };
 
-      return <InputSel_prod_memo_select disabled={disabled} {...inputSelProps} />;
+      return <InputSel_prod_select disabled={disabled} {...inputSelProps} />;
     },
   },
 
@@ -442,7 +453,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSeleProps} disabled={disabled} />;
+      return <InputSel_prod_select {...inputSeleProps} disabled={disabled} />;
     },
   },
 
@@ -516,7 +527,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} disabled={disabled} />;
+      return <InputSel_prod_select {...inputSelProps} disabled={disabled} />;
     },
   },
 
@@ -641,7 +652,7 @@ const nodeConfig_origin: TnodeConfig = {
 
       const inpuSelProps = classProd.isSpecial ? inputSelProps_input : inputSelProps_select;
 
-      return <InputSel_prod_memo_select disabled={disabled} {...inpuSelProps} />;
+      return <InputSel_prod_select disabled={disabled} {...inpuSelProps} />;
     },
   },
 
@@ -693,7 +704,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod_select {...inputSelProps} />;
     },
   },
 
@@ -725,7 +736,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod_select {...inputSelProps} />;
     },
   },
 
@@ -752,7 +763,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod_select {...inputSelProps} />;
     },
   },
 
@@ -970,7 +981,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod_select {...inputSelProps} />;
     },
   },
 
@@ -1001,7 +1012,7 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod_memo_select {...inputSelProps} />;
+      return <InputSel_prod_select {...inputSelProps} />;
     },
   },
 
@@ -1064,7 +1075,7 @@ const createNodeConfig_prime = ({
       },
     };
 
-    return <InputSel_prod_memo_select selectProps={selectProps} disabled={disabled} />;
+    return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
   };
 
   return nodeConfig_prime;

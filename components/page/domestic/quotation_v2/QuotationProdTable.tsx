@@ -63,7 +63,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   // MARK:RENDER
   return (
-    <div className={className}>
+    <div id="zxc" className={classNames(className)}>
       {/* 主產品 product */}
       <Table_prod instance_useQuotationProductInstance={instance_useQuotationProductInstance} disabled={disabled} />
       <br />
@@ -171,11 +171,10 @@ const Table_prod = ({
   } = instance_useQuotationProductInstance;
 
   return (
-    <div className={scss.prodTableWrapper}>
+    <div id="quotationProdTableWrapper" className={scss.prodTableWrapper}>
       <div className={scss.tablePanel}>
         <span className={scss.title}>主產品設定</span>
         <InputSel_prod
-          //
           caption="總折數 : "
           wrapperStyle={{ width: 130, gap: 5 }}
           disabled={disabled}
