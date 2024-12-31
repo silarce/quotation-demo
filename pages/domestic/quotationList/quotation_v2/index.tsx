@@ -136,6 +136,9 @@ import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther
 import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
 
 import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
+
+import { kit_req } from './kit_req';
+
 // css
 import scss from './index.module.scss';
 
@@ -322,145 +325,24 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
   //
-  // MARK:reqPatchQuotation
-  const reqPatchQuotation = async ({ editNote }: { editNote: string }) => {
-    if (!userId) {
-      return myAlert.warning({ title: '沒有使用者ID' });
-    }
 
-    if (!quotationId) {
-      myAlert.warning({ title: '沒有報價單ID' });
-
-      return;
-    }
-
-    const {
-      calcProductBody: calcProduct,
-      quotationDiscount,
-      // state_totalPrice: {
-      //   prodPriceTotal,
-      //   averageDiscount,
-      //   tuneTotal,
-      //   subTotal,
-      //   salesTax,
-      //   total,
-      //   currency,
-      //   exchangeRate,
-      //   foreignTotal,
-      // },
-    } = instance_quotationProduct;
-
-    const { formatToBody_other } = instance_useQuotationOther;
-
-    // if (status === 'Pending') {
-    //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
-    // }
-
-    const { quotationProductArr, isAllDoorModalValid, invalidComponentArr, totalQty } = calcProduct();
-    const {
-      projectName,
-      validityPeriod,
-      county,
-      district,
-      address,
-      contactPerson,
-      contactNumber,
-      faxNumber,
-      trackProgress,
-      projectProgress,
-      designatedBrand,
-      siteManager,
-      siteManagerNumber,
-      type,
-      isLost,
-      customer,
-      designUnit,
-    } = state_profile;
-
-    const { deliveryLocation, deliveryDate, paymentMethodArr } = state_payInfo;
-
-    if (!customer) {
-      myAlert.info({ title: '請選擇客戶' });
-
-      return;
-    }
-
-    const { tuneTotal, subTotal, salesTax, total, exchangeRate, foreignTotal, currency } = state_quotationTotal;
-
-    const body: TcreateQuotationContentDto = {
-      quotationDate: new Date().toISOString(),
-
-      validityPeriod,
-      customerId: customer?.id,
-      projectName,
-      county,
-      district,
-      address,
-      contactPerson,
-      contactNumber,
-      faxNumber,
-      designatedBrand,
-      siteManager,
-      siteManagerNumber,
-      // !
-      requiredDoorType: '門型彙總',
-      // !
-      type,
-      quantity: totalQty,
-      editNotes: editNote,
-      // !
-      status: 'Budget',
-      // !
-      agentId: userId,
-      annotations: annoArr.map((anno) => anno.value),
-      quotationRanges: quotationRangeArr.map((qr) => qr.value),
-      trackProgress,
-      projectProgress,
-      discount: quotationDiscount || '100',
-      // !
-      averageDiscount: '999',
-      // !
-      tuneTotal,
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate: deliveryDate && deliveryDate.toISOString(),
-      paymentMethods: paymentMethodArr,
-      exchangeRate,
-      foreignTotal,
-      currency,
-      products: quotationProductArr,
-      others: formatToBody_other(),
-      isLost,
-      designUnitId: designUnit?.id || null,
-    };
-
-    let shouldUpdate = false;
-
-    setIsFetching(true);
-
-    try {
-      const updatedQuotation = await apiPatchQuotation(body, quotationId);
-      const latestContentId = updatedQuotation.latestContent.id;
-      shouldUpdate = true;
-      const fileArr = await createFileArr();
-
-      for (const file of fileArr) {
-        const formData = new FormData();
-        formData.append('file', file);
-        await apiPostQuotation_id_attachments(latestContentId, formData);
-      }
-    } catch (error) {
-    } finally {
-      if (shouldUpdate) {
-        await update_quotation();
-        setDisabled(true);
-      }
-
-      setIsFetching(false);
-    }
-  };
+  const { reqPatchQuotation } = kit_req({
+    userId,
+    quotationId,
+    instance_quotationProduct,
+    instance_useQuotationOther,
+    state_profile,
+    state_payInfo,
+    annoArr: annoArr.map((anno) => anno.value),
+    quotationRangeArr: quotationRangeArr.map((qr) => qr.value),
+    setIsFetching,
+    createFileArr,
+    update_quotation: async () => {
+      await update_quotation();
+    },
+    setDisabled,
+    state_quotationTotal,
+  });
 
   // ----------------------------------------------------------------------
 
