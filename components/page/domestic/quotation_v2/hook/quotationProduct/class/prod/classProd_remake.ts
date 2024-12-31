@@ -610,6 +610,7 @@ class ClassProd {
     this.renewDistributionBoxAllPrice_byHorsepower();
 
     this.data.area = this.calcArea(this);
+    this.data.volume = calcProductVolume(Number(this.data.area));
     this.renewInstallationFee();
   }
   // endregion SPEC
