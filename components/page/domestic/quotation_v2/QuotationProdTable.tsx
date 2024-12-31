@@ -171,7 +171,10 @@ const Table_prod = ({
   } = instance_useQuotationProductInstance;
 
   return (
-    <div id="quotationProdTableWrapper" className={scss.prodTableWrapper}>
+    <div
+      id="quotationProdTableWrapper" // 作為下拉式選單的menuPortalTarget
+      className={scss.prodTableWrapper}
+    >
       <div className={scss.tablePanel}>
         <span className={scss.title}>主產品設定</span>
         <InputSel_prod
