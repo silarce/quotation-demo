@@ -43,7 +43,7 @@ type Tkey = keyof Tconfig;
 export default function QuotationOther({
   className,
   disabled,
-  instance_useQuotationOther: { state_otherArr, createSetOther },
+  instance_useQuotationOther: { state_otherArr, createSetOther, addOther, removeOther },
 }: {
   className?: string;
   disabled: boolean;
@@ -95,7 +95,7 @@ export default function QuotationOther({
 
               const left = (
                 <>
-                  <Cell_delete className={classNames(disabled && 'invisible')} onClick={() => {}} />
+                  <Cell_delete className={classNames(disabled && 'invisible')} onClick={() => removeOther(index)} />
                   <Cell_indexNumber>{index + 1}</Cell_indexNumber>
                   <Cell className={classNames()} style={config.item.style}>
                     {config.item.createNode({
@@ -140,9 +140,7 @@ export default function QuotationOther({
             sharp="mini"
             className={scss.btn}
             //
-            onClick={() => {
-              // activedClassProd && !activedClassProd.isSpecial && setShowSelector(true);
-            }}
+            onClick={addOther}
           >
             新增其他
           </SquareBtn>
@@ -151,7 +149,7 @@ export default function QuotationOther({
     </div>
   );
 }
-// MARK: EDN
+// MARK: END
 
 // ===========================================================
 

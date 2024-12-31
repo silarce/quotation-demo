@@ -67,6 +67,36 @@ const useQuotationOther = ({
     return allTotal_d.toNumber();
   };
 
+  const addOther = () => {
+    setState((prev) => {
+      const copy = [...prev];
+
+      copy.push({
+        item: '',
+        description: '',
+        quantity: '',
+        unit: null,
+        unitPrice: '',
+        totalPrice: '',
+        notes: '',
+        spec: null,
+      });
+
+      return copy;
+    });
+  };
+
+  const removeOther = (index: number) => {
+    setState((prev) => {
+      const copy = [...prev];
+      copy.splice(index, 1);
+
+      onOtherPriceAllTotalChange(calcAllOtherTotalPrice(copy));
+
+      return copy;
+    });
+  };
+
   useEffect(() => {
     setState(_.cloneDeep(defaultState));
   }, [defaultState, disabled]);
@@ -76,6 +106,8 @@ const useQuotationOther = ({
     createSetOther,
     formatToBody_other: () => formatToBody_other(state),
     calcAllOtherTotalPrice,
+    addOther,
+    removeOther,
   };
 };
 
@@ -117,15 +149,6 @@ const useDefaultState = ({ raw_contentOtherArr }: { raw_contentOtherArr: Tquotat
 };
 
 // ===========================================================================
-
-// item: aa,
-// description: aa,
-// unit: aa,
-// unitPrice: aa,
-// notes: aa,
-// spec: aa,
-// quantity: aa,
-// totalPrice: aa,
 
 const formatToBody_other = (state_otherArr: TstateOther[]) => {
   const body: TcreateQuotationContentOtherDto[] = state_otherArr.map((other) => {
