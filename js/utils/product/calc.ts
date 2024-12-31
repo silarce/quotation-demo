@@ -24,7 +24,7 @@ export const calcProductArea = ({
 
 /**計算主產品才數 */
 export const calcProductVolume = (area: number) => {
-  return Decimal.mul(area, 10.89).toFixed(2).toString();
+  return Decimal.mul(area, 10.89).toFixed(2).toString() as `${number}`;
 };
 
 // warning 注意，變更fullWidth就意味著gapA與gapC也會變更

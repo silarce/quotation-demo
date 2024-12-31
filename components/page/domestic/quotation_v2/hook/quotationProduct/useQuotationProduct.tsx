@@ -82,8 +82,7 @@ import {
 } from './class/accessory/config';
 
 // hook
-import { useDefaultState_prodDict as useDefaultState_prodDict } from './useDefaultState_prodDict';
-// import { useQuotationTotalPrice } from './useQuotationPrice';
+import { useDefaultState_prodDict, createEmptyStateProd } from './useDefaultState_prodDict';
 
 // method
 import { formatProdStateToBody } from './method/formatProdStateToBody';
@@ -478,6 +477,22 @@ const useQuotationProduct = ({
 
   // region METHOD
 
+  const addEmptyProd = () => {
+    const newProd = createEmptyStateProd();
+    const key = newProd.key;
+
+    setState_prodDict((prev) => {
+      return {
+        ...prev,
+        [key]: newProd,
+      };
+    });
+
+    setProdKeyArr((prev) => {
+      return [...prev, key];
+    });
+  };
+
   function calcProdAllTotal() {
     let total_d = new Decimal(0);
     // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
@@ -615,6 +630,7 @@ const useQuotationProduct = ({
     calcProductBody,
     calcProdAllTotal,
     //
+    addEmptyProd,
   };
 };
 

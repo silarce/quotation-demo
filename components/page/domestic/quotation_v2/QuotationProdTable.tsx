@@ -168,6 +168,8 @@ const Table_prod = ({
     // nodeConfig_prime,
     createClassProd,
     activedClassProd,
+    //
+    addEmptyProd,
   } = instance_useQuotationProductInstance;
 
   return (
@@ -255,7 +257,7 @@ const Table_prod = ({
           </Table_dnd>
         </div>
         <div className={classNames(scss.bottom, disabled && 'invisible')}>
-          <SquareBtn sharp="mini" onClick={() => {}} className={scss.btn}>
+          <SquareBtn sharp="mini" onClick={addEmptyProd} className={scss.btn}>
             新增主產品
           </SquareBtn>
         </div>

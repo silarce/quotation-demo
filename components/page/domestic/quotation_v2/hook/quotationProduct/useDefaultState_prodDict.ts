@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { nanoid } from 'nanoid';
 
 import type {
   TdoorModelInfoDto,
@@ -303,4 +304,112 @@ const createData_accessoryDict = (accessoriesArr: TquotationProductAccessoryDto[
 };
 
 // ========================================================================
-export { useDefaultState_prodDict };
+
+const createEmptydataProd = () => {
+  const data_prod: TstateProdData = {
+    id: null,
+    itemName: '',
+    discount: '100',
+    quoteType: '',
+    doorModelName: '',
+
+    fullWidth: '',
+    WG: '',
+    height: '',
+    boxB: '',
+    boxD: '',
+    area: null,
+    volume: null,
+
+    materialName: '',
+    materialSurface: null,
+    horsepower: '',
+    motorVendor: null,
+    motorVoltage: null,
+    motorPhase: null,
+
+    guideRail: null,
+    guideRailThickness: '',
+    hasSilencingStrip: null,
+    guideRailG: null,
+    isULGuideRail: null,
+
+    hasMotorSupportStand: null,
+    bottomBar: null,
+    motorLockBox: null,
+    isIntegratedHeadBox: null,
+    headBoxThickness: null,
+
+    isAntiTyphoon: null,
+    bounceDoor: null,
+    bounceDoorWidth: '',
+    closingType: null,
+    notes: '',
+
+    bottomBarAngleIron: null,
+    bottomBarPlate: null,
+
+    distributionBoxQuantity: '1',
+    distributionBoxPrice: '',
+    distributionBoxDualPrice: '',
+    distributionBoxUnitPrice: '',
+    distributionBoxTotalPrice: '',
+    installationFeeQuantity: '',
+    installationFeePrice: '',
+    installationFeeDualPrice: '',
+    installationFeeUnitPrice: '',
+    installationFeeTotalPrice: '',
+
+    slatCount: null,
+    guideRailsOpening: null,
+
+    gapA: '',
+    gapC: '',
+    gearNumber: null,
+    weight: null,
+    thickness: '',
+    sprocketWheelModel: null,
+    sprocketWheelTeethNumber: null,
+    sprocketWheelChains: null,
+    bearingInnerDiameter: null,
+    diameter: null,
+    bearingHousingTotalLength: null,
+    slatLength: null,
+    guideRailLength: null,
+    headBoxLength: null,
+    bearingHousingSize: null,
+    bearingName: null,
+
+    quantity: '1',
+    price: '',
+    dualPrice: '',
+    unitPrice: '',
+    totalPrice: '',
+    order: 9999,
+    // attachedToProductId: null,
+    // rootProductId: '',
+  };
+
+  return data_prod;
+};
+
+const createEmptyStateProd = () => {
+  const stateProd: TstateProd = {
+    key: nanoid(),
+    data_prod: createEmptydataProd(),
+    data_componentDict: {},
+    componentKeyArr: [],
+
+    data_accessoryDict: {},
+    accessoryKeyArr: [],
+
+    doorModel: null,
+    generalSpecs: null,
+    availableComponents: null,
+  };
+
+  return stateProd;
+};
+
+// ========================================================================
+export { useDefaultState_prodDict, createEmptyStateProd };
