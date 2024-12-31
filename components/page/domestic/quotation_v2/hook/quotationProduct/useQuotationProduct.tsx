@@ -91,6 +91,8 @@ import { useDefaultState_prodDict, createEmptyStateProd } from './useDefaultStat
 import { formatProdStateToBody } from './method/formatProdStateToBody';
 import { createClassComponentDict } from './method/createClassComponentDict';
 import { createAccessoryDict } from './method/createAccessoryDict';
+import { calcProductBody as _calcProductBody } from './method/calcProductBody';
+
 import {
   //
   // calcProdTotalPrice,
@@ -99,6 +101,9 @@ import {
   calcPriceDiscount_percent,
   //
 } from './method/calcProd';
+import { calcProdSummary } from './method/calcProdSummary';
+
+import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
 // ================================================================================
 
@@ -174,22 +179,6 @@ const useQuotationProduct = ({
 
   // region STATE
 
-  // const {
-  //   // state_quotationDiscount,
-  //   // setState_quotationDiscount,
-  //   //
-
-  //   state_totalPrice,
-
-  //   setProdPriceTotal,
-  //   setTuneTotal,
-  //   setCurrency,
-  //   setExchangeRate,
-  // } = useQuotationTotalPrice({
-  //   raw_quotationContent: raw_quotationContent,
-  //   disabled,
-  // });
-
   const defaultState_prodDict = useDefaultState_prodDict({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
@@ -224,6 +213,16 @@ const useQuotationProduct = ({
       doorModelDict,
     });
   }, [doorModelDict]);
+
+  const { avgDiscount, doorModelSummery } = useMemo(() => {
+    const { avgDiscount, doorModelSummery } = calcProdSummary({
+      state_prodDict: debounced_state_prodDict,
+      state_quotationDiscount: state_quotationDiscount || 0,
+    });
+
+    return { avgDiscount, doorModelSummery };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounced_state_prodDict]);
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
@@ -268,12 +267,6 @@ const useQuotationProduct = ({
     });
   };
 
-  // const setQuotationDiscount = (value: typeof state_quotationDiscount) => {
-  //   setState_quotationDiscount(value);
-  //   // 總折數改變後要重新計算主產品的金額
-  //   //
-  // };
-
   const setQuotationDiscount = (value: `${number}` | '') => {
     setState_quotationDiscount(value);
 
@@ -284,10 +277,6 @@ const useQuotationProduct = ({
     });
 
     onProdAllTotalChange();
-    // let total_d = new Decimal(0);
-    // Object.values(state_prodDict).forEach((prod) => {
-    //   total_d = total_d.add(prod.data_prod.totalPrice || 0);
-    // });
   };
 
   // -----------------------------------------------------------------------
@@ -296,137 +285,27 @@ const useQuotationProduct = ({
 
   const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
 
-  const componentKeyArr = activedProd?.componentKeyArr;
-  const accessoryKeyArr = activedProd?.accessoryKeyArr;
-
-  // MARK:createSetProd
-  const createSetProd = (key: string): TsetProd => {
-    const setProd: TsetProd = (newState) => {
-      setState_prodDict((prev) => {
-        const newStateValue = typeof newState === 'function' ? newState(prev[key]) : newState;
-
-        return {
-          ...prev,
-          [key]: {
-            ...prev[key],
-            ...newStateValue,
-          },
-        };
-      });
-    };
-
-    return setProd;
-  };
-
-  // MARK:createSetComponent
-  const createSetComponent: TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
-    pordKey,
-    componentKey,
-  }: {
-    pordKey: string;
-    componentKey: T;
-  }): TsetComponent<T> => {
-    const setComponent: TsetComponent<T> = (newStateComponent) => {
-      setState_prodDict((prev) => {
-        const copy = { ...prev };
-        copy[pordKey] = { ...copy[pordKey] }; // 就是更新activedProd
-        const prod = copy[pordKey];
-        const data_componentDict = prod.data_componentDict;
-
-        const newStateValue =
-          typeof newStateComponent === 'function'
-            ? newStateComponent(data_componentDict[componentKey])
-            : newStateComponent;
-
-        data_componentDict[componentKey] = newStateValue;
-
-        return copy;
-      });
-    };
-
-    return setComponent;
-  };
-
-  // MARK:createSetAccessory
-  const createSetAccessory: TcreateSetAccessory = ({ prodKey, accessoryKey }) => {
-    const setAccessory: TsetAccessory = (newStateAcce) => {
-      setState_prodDict((prev) => {
-        const copy = { ...prev };
-        copy[prodKey] = { ...copy[prodKey] }; // 就是更新activedProd
-
-        const accessoriesDict = copy[prodKey].data_accessoryDict;
-        const acce = accessoriesDict[accessoryKey];
-        const newStateValue = typeof newStateAcce === 'function' ? newStateAcce(acce) : newStateAcce;
-        accessoriesDict[accessoryKey] = newStateValue;
-
-        return copy;
-      });
-    };
-
-    return setAccessory;
-  };
-
-  const createActivedClassAccessoryDict = (
-    // activedProd: TstateProd | undefined
-    activedClassProd: ClassProd | undefined
-  ) => {
-    if (!activedClassProd) {
-      return {};
-    }
-
-    return createAccessoryDict({
-      activedClassProd,
-      createSetAccessory,
-    });
-  };
-
-  // const createClassProd = useCallback(
-  //   (stateProd: TstateProd) => {
-  //     const classProd = new ClassProd({
-  //       stateProd: stateProd,
-  //       setStateProd: createSetProd(stateProd.key),
-  //       nodeConfig: nodeConfig_prime,
-  //       quotationDiscount: state_quotationDiscount || 0,
-  //       onPordTotalChange: onProdAllTotalChange,
-  //     });
-
-  //     return classProd;
-  //   },
-  //   [
-  //     nodeConfig_prime,
-  //     // 編輯總折數state_quotationDiscount時會呼叫calcAndRenewAllProdPrice_sideEffect
-  //     // 本來就會使所有prod更新，所以暫時不用在這裡考慮效能的問題
-  //     state_quotationDiscount,
-  //   ]
-  // );
-  const createClassProd = (stateProd: TstateProd) => {
-    const classProd = new ClassProd({
-      stateProd: stateProd,
-      setStateProd: createSetProd(stateProd.key),
-      nodeConfig: nodeConfig_prime,
-      quotationDiscount: state_quotationDiscount || 0,
-      onPordTotalChange: onProdAllTotalChange,
-    });
-
-    return classProd;
-  };
-
-  const createActivedClassComponentDict = (activedProd: TstateProd | undefined) => {
-    if (!activedProd) {
-      return {};
-    }
-
-    const activedClassProd = createClassProd(activedProd);
-
-    if (!activedClassProd.isValid_doorModel) {
-      return {};
-    }
-
-    return createClassComponentDict({
-      activedClassProd,
-      createSetComponent,
-    });
-  };
+  const {
+    createSetProd,
+    // createSetComponent,
+    createSetAccessory,
+    createActivedClassAccessoryDict,
+    createClassProd,
+    createActivedClassComponentDict,
+    //
+    addEmptyProd,
+    removeProd,
+    copyProd,
+  } = kit_createClass({
+    setState_prodDict,
+    nodeConfig_prime,
+    state_quotationDiscount,
+    onProdAllTotalChange,
+    setProdKeyArr,
+    state_prodDict,
+    activeProdKey,
+    setActiveProdKey,
+  });
 
   const {
     //
@@ -434,147 +313,17 @@ const useQuotationProduct = ({
     activedClassComponentDict,
     activedClassPseudoComponentDict,
     activedClassAccessoryDict,
-  } = useMemo(() => {
-    // let activedProd = activedProd;
-
-    if (!activedProd) {
-      return {};
-    }
-
-    const activedClassProd = createClassProd(activedProd);
-
-    const stateProd = activedClassProd.state; // 同activedProd 為同一個參照
-
-    // const isComponentExist = !!Object.keys(stateProd.data_componentDict ?? {}).length;
-
-    // if (!isComponentExist && activedClassProd.doorModelName !== 'special') {
-    //   activedClassProd.replaceToEmptyComponent();
-    //   activedClassProd.resetComponentKeyArr();
-    // }
-
-    const activedClassComponentDict = createActivedClassComponentDict(stateProd);
-    activedClassProd.registerClassComponentDict(activedClassComponentDict);
-
-    if (activedClassProd.doorModelName !== 'special') {
-      Object.values(activedClassComponentDict).forEach((classComponent) =>
-        classComponent.setClassProd(activedClassProd)
-      );
-    }
-
-    const activedPseudoComponentDict: TclassPsuedoComponentDict = {
-      distributionBox: new Class_distributionBox({
-        stateProd: stateProd,
-        setStateProd: createSetProd(stateProd.key),
-        classProd: activedClassProd,
-      }),
-      installationFee: new Class_installationFee({
-        stateProd: stateProd,
-        setStateProd: createSetProd(stateProd.key),
-        classProd: activedClassProd,
-      }),
-    };
-
-    if (activedClassProd.doorModelName === 'W2') {
-      delete activedPseudoComponentDict.installationFee;
-    }
-
-    const activedClassAccessoryDict = createAccessoryDict({
-      activedClassProd,
-      createSetAccessory,
-    });
-
-    activedClassProd.registerClassAccessoryDict(activedClassAccessoryDict);
-
-    return {
-      activedClassProd,
-      activedClassComponentDict,
-      activedClassPseudoComponentDict: activedPseudoComponentDict,
-      activedClassAccessoryDict,
-    };
-  }, [activedProd, activedProd?.renderCount, createClassProd]);
+  } = useActivedClass({
+    activedProd,
+    createClassProd,
+    createActivedClassComponentDict,
+    createSetProd,
+    createSetAccessory,
+  });
 
   // -----------------------------------------------------------------------
 
   // region METHOD
-
-  const addEmptyProd = () => {
-    const newProd = createEmptyStateProd();
-    const key = newProd.key;
-
-    setState_prodDict((prev) => {
-      return {
-        ...prev,
-        [key]: newProd,
-      };
-    });
-
-    setProdKeyArr((prev) => {
-      return [...prev, key];
-    });
-  };
-
-  const removeProd = (prodKey: string) => {
-    setProdKeyArr((prev) => {
-      const newProdKeyArr = prev.filter((key) => key !== prodKey);
-
-      return newProdKeyArr;
-    });
-
-    // let newProdDict: TstateProdDict = {};
-
-    setState_prodDict((prev) => {
-      const { [prodKey]: removedProd, ...rest } = prev;
-
-      onProdAllTotalChange(rest);
-      // newProdDict = rest;
-
-      return rest;
-    });
-
-    if (prodKey === activeProdKey) {
-      setActiveProdKey(undefined);
-    }
-
-    // onProdAllTotalChange(newProdDict);
-  };
-
-  const copyProd = (prodKey: string) => {
-    const copyedProd = state_prodDict[prodKey];
-
-    const data_prod = {
-      ...copyedProd.data_prod,
-      id: undefined,
-      attachedToProductId: undefined,
-      rootProductId: undefined,
-    };
-
-    const newProd: TstateProd = {
-      ...copyedProd,
-      data_prod,
-      key: 'new-' + nanoid(),
-      renderCount: undefined,
-      afterChangeQueue: undefined,
-    };
-
-    let newProdDict: TstateProdDict = {};
-
-    setState_prodDict((prev) => {
-      const copy = {
-        ...prev,
-        [newProd.key]: newProd,
-      };
-
-      newProdDict = copy;
-
-      return copy;
-    });
-
-    setProdKeyArr((prev) => {
-      return [...prev, newProd.key];
-    });
-
-    onProdAllTotalChange(newProdDict);
-  };
 
   function calcProdAllTotal(newState_prodDict?: TstateProdDict) {
     const prodDict = newState_prodDict ?? state_prodDict;
@@ -590,43 +339,11 @@ const useQuotationProduct = ({
   }
 
   const calcProductBody = () => {
-    const totalQty_decimal = new Decimal(0);
-    let isAllDoorModalValid = true;
-    // let isAllComponentValid = true;
-    // let isAllComponentValid = true;
-    const invalidComponentArr: number[] = [];
-
-    const classProdArr = prodKeyArr.map((key) => {
-      return createClassProd(state_prodDict[key]);
+    return _calcProductBody({
+      prodKeyArr,
+      createClassProd,
+      state_prodDict,
     });
-
-    const stateArr = classProdArr.map((classProd, index) => {
-      const { state: stateProd, isComponentValid } = classProd;
-
-      // 目前isComponentValid只會為true，未來要再製作
-      if (!isComponentValid) {
-        const indexNumber = index + 1; // 給使用者看得流水號
-        invalidComponentArr.push(indexNumber);
-      }
-
-      const { doorModelName, quantity } = stateProd.data_prod;
-      totalQty_decimal.add(quantity || 0);
-
-      !doorModelName && (isAllDoorModalValid = false);
-
-      stateProd.data_prod.order = index;
-
-      return stateProd;
-    });
-
-    const quotationProductArr = stateArr.map((stateProd) => formatProdStateToBody(stateProd));
-
-    return {
-      quotationProductArr,
-      isAllDoorModalValid,
-      invalidComponentArr,
-      totalQty: totalQty_decimal.toNumber(),
-    };
   };
 
   // -----------------------------------------------------------------------
@@ -654,75 +371,6 @@ const useQuotationProduct = ({
     setState_quotationDiscount((raw_quotationContent?.discount ?? '') as `${number}` | '');
   }, [disabled, raw_quotationContent]);
 
-  const { avgDiscount, doorModelSummery } = useMemo(() => {
-    const state_prodDict = debounced_state_prodDict;
-
-    let prodQty_d = new Decimal(0);
-    let prodDiscountTotal_d = new Decimal(0);
-
-    type TdoorModelSummeryItem_d = {
-      doorModel: string;
-      quantity: Decimal;
-      discountTotal: Decimal;
-    };
-
-    type TdoorModelSummeryItem = {
-      doorModel: string;
-      quantity: number;
-      avgDiscount: number;
-    };
-
-    const doorModelSummery_d: Record<string, TdoorModelSummeryItem_d> = {};
-
-    Object.values(state_prodDict).forEach((state) => {
-      const { discount, quantity } = state.data_prod;
-      let { doorModelName } = state.data_prod;
-      doorModelName = doorModelName || '---';
-
-      const priceDiscount_percent = calcPriceDiscount_percent({
-        prodDiscount: discount || 0,
-        quotationDiscount: state_quotationDiscount || 0,
-      });
-
-      prodQty_d = prodQty_d.add(quantity || 0);
-      prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
-
-      doorModelSummery_d[doorModelName] ??= {
-        doorModel: doorModelName,
-        quantity: new Decimal(0),
-        discountTotal: new Decimal(0),
-      };
-
-      doorModelSummery_d[doorModelName].quantity = doorModelSummery_d[doorModelName].quantity.add(quantity || 0);
-      doorModelSummery_d[doorModelName].discountTotal =
-        doorModelSummery_d[doorModelName].discountTotal.add(priceDiscount_percent);
-    });
-
-    // page右下方的平均折數
-    const avgDiscount = prodDiscountTotal_d.div(prodQty_d).mul(100).toDecimalPlaces(3).toNumber();
-
-    // profile下的 門型彙總
-
-    const doorModelSummery = Object.entries(doorModelSummery_d).reduce((doorModelSummery, [key, item]) => {
-      const qty = item.quantity.toNumber();
-      const avgDiscount = item.discountTotal.div(item.quantity).mul(100).toDecimalPlaces(3).toNumber();
-
-      doorModelSummery[key] = {
-        doorModel: item.doorModel,
-        quantity: qty,
-        avgDiscount: avgDiscount,
-      };
-
-      return doorModelSummery;
-    }, {} as Record<string, TdoorModelSummeryItem>);
-
-    //
-    return { avgDiscount, doorModelSummery };
-  }, [
-    debounced_state_prodDict,
-    // debounced_state_quotationDiscount
-  ]);
-
   // -----------------------------------------------------------------------------
   // MARK: RETURN
   return {
@@ -745,13 +393,13 @@ const useQuotationProduct = ({
     // activedClassComponentDict,
     cellKeyArr_component,
     setCellKeyArr_component,
-    componentKeyArr,
+    componentKeyArr: activedProd?.componentKeyArr,
     setComponentKeyArr,
     //
     // activedClassAccessoryDict,
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
-    accessoryKeyArr,
+    accessoryKeyArr: activedProd?.accessoryKeyArr,
     setAccessoryKeyArr,
     // showAccessorySelector,
     //
@@ -798,6 +446,8 @@ const useQuotationProduct = ({
 
 // ================================================================================
 
+// ================================================================================
+
 export type {
   TuseQuotationProductInstance,
   TstateProd,
@@ -805,5 +455,9 @@ export type {
   TcreateSetComponent,
   TcreateSetAccessory,
   TclassAccessoryDict,
+  TstateProdDict,
+  TsetComponent,
+  TsetAccessory,
+  TclassPsuedoComponentDict,
 };
-export { useQuotationProduct };
+export { useQuotationProduct, ClassProd };

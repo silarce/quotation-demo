@@ -618,7 +618,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
           node={
             <DoorSummary
-              // list={Object.values(doorModelSummery).map((item) => [item.doorModel, item.quantity, item.avgDescount])}
               list={Object.values(doorModelSummery).map((item) => {
                 return {
                   doorModel: item.doorModel,
