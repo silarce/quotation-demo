@@ -248,6 +248,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
+  const { avgDiscount } = instance_quotationProduct;
+
   const {
     quotationDiscount: state_quotationDiscount, // 總折數
     // setQuotationDiscount,
@@ -517,7 +519,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         setExchangeRate(value);
       },
     },
-    avgDiscount_withQty: state_quotationTotal.averageDiscount,
+    avgDiscount_withQty: avgDiscount,
     subTotal: Number(state_quotationTotal.subTotal).toLocaleString(),
     salesTax: Number(state_quotationTotal.salesTax).toLocaleString(),
     total: Number(state_quotationTotal.total).toLocaleString(),

@@ -164,7 +164,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
       prodPriceTotal,
       //
       // quotationDiscount: (raw?.discount ?? '100') as `${number}` | '',
-      averageDiscount: Number(raw?.averageDiscount ?? '100'),
+      // averageDiscount: Number(raw?.averageDiscount ?? '100'),
       tuneTotal,
       subTotal,
       salesTax: Number(raw?.salesTax ?? '0'),

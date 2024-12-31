@@ -5,6 +5,8 @@ import { nanoid } from 'nanoid';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
+import { useDebounce } from 'hooks/useDebounce';
+
 import type {
   TquotationContentDto,
   // TquotationProductDto,
@@ -94,6 +96,7 @@ import {
   // calcProdTotalPrice,
   // w注意 calcAndRenewAllProdPrice_sideEffect有副作用
   calcAndRenewAllProdPrice_sideEffect,
+  calcPriceDiscount_percent,
   //
 } from './method/calcProd';
 
@@ -200,6 +203,10 @@ const useQuotationProduct = ({
   const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(
     (raw_quotationContent?.discount ?? '') as `${number}` | ''
   );
+  // const { debouncedState: debounced_state_quotationDiscount, isBouncing: isBouncing_quotationDiscount } = useDebounce(
+  //   state_quotationDiscount,
+  //   500
+  // );
 
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
@@ -210,6 +217,7 @@ const useQuotationProduct = ({
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
+  const { debouncedState: debounced_state_prodDict, isBouncing } = useDebounce(state_prodDict, 500);
 
   const nodeConfig_prime = useMemo(() => {
     return createNodeConfig_prime({
@@ -646,9 +654,31 @@ const useQuotationProduct = ({
     setState_quotationDiscount((raw_quotationContent?.discount ?? '') as `${number}` | '');
   }, [disabled, raw_quotationContent]);
 
-  // useEffect(() => {
-  //   onProdAllTotalChange();
-  // }, [Object.keys(state_prodDict).length]);
+  const { avgDiscount } = useMemo(() => {
+    const state_prodDict = debounced_state_prodDict;
+
+    let prodQty_d = new Decimal(0);
+    let prodDiscountTotal_d = new Decimal(0);
+
+    Object.values(state_prodDict).forEach((state) => {
+      const { discount, quantity } = state.data_prod;
+      const priceDiscount_percent = calcPriceDiscount_percent({
+        prodDiscount: discount || 0,
+        quotationDiscount: state_quotationDiscount || 0,
+      });
+
+      prodQty_d = prodQty_d.add(quantity || 0);
+      prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
+    });
+
+    // page右下方的平均折數
+    const avgDiscount = prodDiscountTotal_d.div(prodQty_d).toNumber();
+
+    return { avgDiscount };
+  }, [
+    debounced_state_prodDict,
+    // debounced_state_quotationDiscount
+  ]);
 
   // -----------------------------------------------------------------------------
   // MARK: RETURN
@@ -714,13 +744,13 @@ const useQuotationProduct = ({
     addEmptyProd,
     removeProd,
     copyProd,
+    //
+    avgDiscount,
   };
 };
 
 // MARK: END
 //
-
-// ================================================================================
 
 // ================================================================================
 
