@@ -1,0 +1,12 @@
+.li {
+  display: grid;
+  grid-template-columns: 120px 50px 140px;
+  gap: 10px;
+  > span {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  > .qty {
+    text-align: right;
+  }
+}

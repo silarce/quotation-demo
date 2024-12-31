@@ -654,14 +654,31 @@ const useQuotationProduct = ({
     setState_quotationDiscount((raw_quotationContent?.discount ?? '') as `${number}` | '');
   }, [disabled, raw_quotationContent]);
 
-  const { avgDiscount } = useMemo(() => {
+  const { avgDiscount, doorModelSummery } = useMemo(() => {
     const state_prodDict = debounced_state_prodDict;
 
     let prodQty_d = new Decimal(0);
     let prodDiscountTotal_d = new Decimal(0);
 
+    type TdoorModelSummeryItem_d = {
+      doorModel: string;
+      quantity: Decimal;
+      discountTotal: Decimal;
+    };
+
+    type TdoorModelSummeryItem = {
+      doorModel: string;
+      quantity: number;
+      avgDiscount: number;
+    };
+
+    const doorModelSummery_d: Record<string, TdoorModelSummeryItem_d> = {};
+
     Object.values(state_prodDict).forEach((state) => {
       const { discount, quantity } = state.data_prod;
+      let { doorModelName } = state.data_prod;
+      doorModelName = doorModelName || '---';
+
       const priceDiscount_percent = calcPriceDiscount_percent({
         prodDiscount: discount || 0,
         quotationDiscount: state_quotationDiscount || 0,
@@ -669,12 +686,38 @@ const useQuotationProduct = ({
 
       prodQty_d = prodQty_d.add(quantity || 0);
       prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
+
+      doorModelSummery_d[doorModelName] ??= {
+        doorModel: doorModelName,
+        quantity: new Decimal(0),
+        discountTotal: new Decimal(0),
+      };
+
+      doorModelSummery_d[doorModelName].quantity = doorModelSummery_d[doorModelName].quantity.add(quantity || 0);
+      doorModelSummery_d[doorModelName].discountTotal =
+        doorModelSummery_d[doorModelName].discountTotal.add(priceDiscount_percent);
     });
 
     // page右下方的平均折數
-    const avgDiscount = prodDiscountTotal_d.div(prodQty_d).toNumber();
+    const avgDiscount = prodDiscountTotal_d.div(prodQty_d).mul(100).toDecimalPlaces(3).toNumber();
 
-    return { avgDiscount };
+    // profile下的 門型彙總
+
+    const doorModelSummery = Object.entries(doorModelSummery_d).reduce((doorModelSummery, [key, item]) => {
+      const qty = item.quantity.toNumber();
+      const avgDiscount = item.discountTotal.div(item.quantity).mul(100).toDecimalPlaces(3).toNumber();
+
+      doorModelSummery[key] = {
+        doorModel: item.doorModel,
+        quantity: qty,
+        avgDiscount: avgDiscount,
+      };
+
+      return doorModelSummery;
+    }, {} as Record<string, TdoorModelSummeryItem>);
+
+    //
+    return { avgDiscount, doorModelSummery };
   }, [
     debounced_state_prodDict,
     // debounced_state_quotationDiscount
@@ -746,6 +789,7 @@ const useQuotationProduct = ({
     copyProd,
     //
     avgDiscount,
+    doorModelSummery,
   };
 };
 

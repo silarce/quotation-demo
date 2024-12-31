@@ -40,7 +40,7 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
-import DoorSummary from 'components/page/domestic/quotation/doorSummary';
+// import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -135,6 +135,7 @@ import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther
 
 import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
 
+import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
 // css
 import scss from './index.module.scss';
 
@@ -248,7 +249,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const { avgDiscount } = instance_quotationProduct;
+  const { avgDiscount, doorModelSummery } = instance_quotationProduct;
 
   const {
     quotationDiscount: state_quotationDiscount, // 總折數
@@ -607,6 +608,26 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           form={props_profileForm}
           quotationNumber={content?.quotationNumber ?? '---'}
           editNotes={content?.editNotes}
+        />
+
+        <InputSel
+          className={'ml-[50px]'}
+          caption={'門型彙總'}
+          showBaseline="invisible"
+          captionStyle={{ width: '120px' }}
+          wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+          node={
+            <DoorSummary
+              // list={Object.values(doorModelSummery).map((item) => [item.doorModel, item.quantity, item.avgDescount])}
+              list={Object.values(doorModelSummery).map((item) => {
+                return {
+                  doorModel: item.doorModel,
+                  quantity: item.quantity,
+                  avgDiscount: item.avgDiscount,
+                };
+              })}
+            />
+          }
         />
 
         {/* prod */}
