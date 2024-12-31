@@ -486,37 +486,33 @@ class ClassProd {
   }
 
   renewInstallationFee() {
-    this.data.installationFeeQuantity = this.data.area || '0';
-
-    let installationFeePrice = 0;
-
-    if (this.doorModelName === 'SJ-302') {
-      installationFeePrice = 1800;
-    }
+    let installationFeeQuantity = this.data.area || '0';
+    let installationFeePrice = 1800;
 
     if (this.doorModelName === 'SJ-303A' || this.doorModelName === 'SJ-303AS') {
-      if (Number(this.data.installationFeeQuantity) <= 10) {
+      if (Number(installationFeeQuantity) <= 10) {
         installationFeePrice = 5400;
       } else {
         installationFeePrice = 3600;
       }
+    } else if (this.doorModelName === 'W2') {
+      installationFeePrice = 0;
+      installationFeeQuantity = '0';
     }
 
-    installationFeePrice = 1800;
     this.data.installationFeePrice = `${installationFeePrice}`;
 
     const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
       price: installationFeePrice,
-      quantity: Number(this.data.installationFeeQuantity),
+      quantity: Number(installationFeeQuantity),
       priceDiscount_percent: this.priceDiscount_percent,
     });
 
+    this.data.installationFeeQuantity = `${installationFeeQuantity}`;
     this.data.installationFeeDualPrice = `${dualPrice}`;
     this.data.installationFeeUnitPrice = `${unitPrice}`;
     this.data.installationFeeTotalPrice = `${totalPrice}`;
   }
-
-  // 確認並測試renewInstallationFee
 
   // ---------------------------------------------------------------------------
 

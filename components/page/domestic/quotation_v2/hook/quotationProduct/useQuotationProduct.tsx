@@ -135,6 +135,11 @@ type TclassComponentDict = {
     : never;
 };
 
+type TclassPsuedoComponentDict = {
+  distributionBox: Class_distributionBox;
+  installationFee?: Class_installationFee;
+};
+
 interface TclassAccessoryDict {
   [key: string]: Class_accessory;
 }
@@ -437,7 +442,7 @@ const useQuotationProduct = ({
       );
     }
 
-    const activedPseudoComponentDict = {
+    const activedPseudoComponentDict: TclassPsuedoComponentDict = {
       distributionBox: new Class_distributionBox({
         stateProd: stateProd,
         setStateProd: createSetProd(stateProd.key),
@@ -449,6 +454,10 @@ const useQuotationProduct = ({
         classProd: activedClassProd,
       }),
     };
+
+    if (activedClassProd.doorModelName === 'W2') {
+      delete activedPseudoComponentDict.installationFee;
+    }
 
     const activedClassAccessoryDict = createAccessoryDict({
       activedClassProd,
