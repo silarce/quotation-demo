@@ -15,11 +15,12 @@ interface Traw {
 interface Tstate {
   deliveryLocation: string;
   deliveryDate: Moment | null;
-  paymentMethodArr: {
-    milestone: string;
-    // totalPaymentRatio: `${number}`;
-    totalPaymentRatio: string;
-  }[];
+  paymentMethodArr: TpaymentMethod[];
+}
+
+interface TpaymentMethod {
+  milestone: string;
+  totalPaymentRatio: `${number}` | '';
 }
 
 // ===========================================================================
@@ -45,12 +46,14 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
 
 const useDefaultState = (raw: Traw | undefined | null) => {
   const defaultState: Tstate = useMemo(() => {
-    const { deliveryLocation, deliveryDate, paymentMethods: paymentMethod } = raw ?? {};
+    const { deliveryLocation, deliveryDate, paymentMethods } = raw ?? {};
+
+    const paymentMethodArr = raw ? (_.cloneDeep(paymentMethods) as TpaymentMethod[]) : createDefaultPaymentMethod();
 
     return {
       deliveryLocation: deliveryLocation ?? '',
       deliveryDate: deliveryDate ? moment(deliveryDate) : null,
-      paymentMethodArr: _.cloneDeep(paymentMethod ?? []),
+      paymentMethodArr: paymentMethodArr,
     };
   }, [raw]);
 
@@ -89,9 +92,9 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
         },
         totalPaymentRatio: {
           value: method.totalPaymentRatio,
-          onChange: (v: string) => {
+          onChange: (v: `${number}` | '') => {
             const copy = { ...state };
-            copy.paymentMethodArr[index].totalPaymentRatio = v;
+            copy.paymentMethodArr[index].totalPaymentRatio = v as `${number}` | '';
             setState(copy);
           },
         },
@@ -110,5 +113,31 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
   return kit;
 };
 
+// ===========================================================================
+
+const createDefaultPaymentMethod = () => {
+  const paymentMethodArr: TpaymentMethod[] = [
+    {
+      milestone: '訂製同時付總金額',
+      totalPaymentRatio: '',
+    },
+    {
+      milestone: '門軌安裝完成付總金額',
+      totalPaymentRatio: '',
+    },
+    {
+      milestone: '門扇安裝完成付總金額',
+      totalPaymentRatio: '',
+    },
+    {
+      milestone: '驗收完成(保留款)付總金額',
+      totalPaymentRatio: '',
+    },
+  ];
+
+  return paymentMethodArr;
+};
+
+// ===========================================================================
 export { usePayInfo };
 export type { Tstate as Tstate_payInfo };

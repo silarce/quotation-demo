@@ -31,7 +31,7 @@ interface TpaymentMethod {
   };
   totalPaymentRatio: {
     value: string;
-    onChange?: (v: string) => void;
+    onChange?: (v: `${number}` | '') => void;
   };
   onDelete?: () => void;
 }
@@ -387,10 +387,10 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
                   disabled={disabled}
                   inputProps={{
                     props: {
+                      type: 'number',
                       placeholder: '請輸入比例',
                       value: totalPaymentRatio.value,
-                      onChange: (e) => totalPaymentRatio.onChange?.(e.target.value),
-                      type: 'number',
+                      onChange: (e) => totalPaymentRatio.onChange?.(e.target.value as `${number}` | ''),
                       onWheel: (e) => {
                         e.currentTarget.blur();
                       },
