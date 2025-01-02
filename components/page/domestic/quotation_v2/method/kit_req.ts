@@ -40,6 +40,9 @@ import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hoo
 
 type Tinstance_getQuotationId3 = ReturnType<typeof useGetQuotation_id_3>;
 
+type Tinstance_useQuotationProduct = ReturnType<typeof useQuotationProduct>;
+type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
+
 // ===========================================================================
 const kit_req = ({
   userId,
@@ -59,8 +62,8 @@ const kit_req = ({
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
-  instance_quotationProduct: ReturnType<typeof useQuotationProduct>;
-  instance_useQuotationOther: ReturnType<typeof useQuotationOther>;
+  instance_quotationProduct: Tinstance_useQuotationProduct;
+  instance_useQuotationOther: Tinstance_useQuotationOther;
   state_profile: Tstate_profile;
   state_payInfo: Tstate_payInfo;
   annoArr: string[];
@@ -75,6 +78,15 @@ const kit_req = ({
   const { reqPost, reqPatch, reqReview, reqUnlock, reqPatchReviewer, reqCopyQuotation, reqToPending } =
     instatnce_getQuotationId3;
 
+  // MARK: reqPostQuotation
+  const reqPostQuotation = async ({ editNote }: { editNote: string }) => {
+    if (!userId) {
+      return myAlert.warning({ title: '沒有使用者ID' });
+    }
+  };
+
+  // -----------------------------------------------------------------------
+
   // MARK:reqPatchQuotation
   const reqPatchQuotation = async ({ editNote }: { editNote: string }) => {
     if (!userId) {
@@ -87,131 +99,27 @@ const kit_req = ({
       return;
     }
 
-    const {
-      calcProductBody: calcProduct,
-      quotationDiscount,
-      // state_totalPrice: {
-      //   prodPriceTotal,
-      //   averageDiscount,
-      //   tuneTotal,
-      //   subTotal,
-      //   salesTax,
-      //   total,
-      //   currency,
-      //   exchangeRate,
-      //   foreignTotal,
-      // },
-    } = instance_quotationProduct;
-
-    const { formatToBody_other } = instance_useQuotationOther;
-
-    // if (status === 'Pending') {
-    //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
-    // }
-
-    const { quotationProductArr, isAllDoorModalValid, invalidComponentArr, totalQty } = calcProduct();
-    const {
-      projectName,
-      validityPeriod,
-      county,
-      district,
-      address,
-      contactPerson,
-      contactNumber,
-      faxNumber,
-      trackProgress,
-      projectProgress,
-      designatedBrand,
-      siteManager,
-      siteManagerNumber,
-      type,
-      isLost,
-      customer,
-      designUnit,
-    } = state_profile;
-
-    const { deliveryLocation, deliveryDate, paymentMethodArr } = state_payInfo;
-
-    if (!customer) {
+    if (!state_profile.customer) {
       myAlert.info({ title: '請選擇客戶' });
-
-      return;
     }
 
-    const {
-      //
-      tuneTotal,
-      subTotal,
-      salesTax,
-      total,
-      exchangeRate,
-      foreignTotal,
-      currency,
-    } = state_quotationTotal;
-
-    const body: TcreateQuotationContentDto = {
-      quotationDate: new Date().toISOString(),
-
-      validityPeriod,
-      customerId: customer?.id,
-      projectName,
-      county,
-      district,
-      address,
-      contactPerson,
-      contactNumber,
-      faxNumber,
-      designatedBrand,
-      siteManager,
-      siteManagerNumber,
-      // !
-      requiredDoorType: '門型彙總',
-      // !
-      type,
-      quantity: totalQty,
-      editNotes: editNote,
-      // !
-      status: 'Budget',
-      // !
-      agentId: userId,
-      // annotations: annoArr.map((anno) => anno.value),
-      // quotationRanges: quotationRangeArr.map((qr) => qr.value),
-      annotations: annoArr,
-      quotationRanges: quotationRangeArr,
-      trackProgress,
-      projectProgress,
-      discount: quotationDiscount || '100',
-      // !
-      averageDiscount: '999',
-      // !
-      tuneTotal,
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate: deliveryDate && deliveryDate.toISOString(),
-      paymentMethods: paymentMethodArr,
-      exchangeRate,
-      foreignTotal,
-      currency,
-      products: quotationProductArr,
-      others: formatToBody_other(),
-      isLost,
-      designUnitId: designUnit?.id || null,
-    };
+    const body = createBody({
+      instance_quotationProduct,
+      instance_useQuotationOther,
+      state_profile,
+      state_payInfo,
+      state_quotationTotal,
+      editNote,
+      userId,
+      annoArr,
+      quotationRangeArr,
+    });
 
     // const shouldUpdate = false;
 
     // setIsFetching(true);
 
-    const fileArr = await createFileArr();
-    const attachmentArr: FormData[] = [];
-
-    for (const file of fileArr) {
-      const formData = new FormData();
-      formData.append('file', file);
-      attachmentArr.push(formData);
-    }
+    const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
     const { isUpdated: updated } = (await reqPatch({ body, attachmentArr })) ?? {};
 
@@ -241,10 +149,156 @@ const kit_req = ({
     // }
   };
 
-  // -----------------------------------------------------------------------
   return {
     reqPatchQuotation,
   };
 };
+
+// ==========================================================================
+
+const createBody = ({
+  instance_quotationProduct,
+  instance_useQuotationOther,
+  state_profile,
+  state_payInfo,
+  state_quotationTotal,
+  editNote,
+  userId,
+  annoArr,
+  quotationRangeArr,
+}: {
+  instance_quotationProduct: Tinstance_useQuotationProduct;
+  instance_useQuotationOther: Tinstance_useQuotationOther;
+  state_profile: Tstate_profile;
+  state_payInfo: Tstate_payInfo;
+  state_quotationTotal: TstateTotalPrice;
+  editNote: string;
+  userId: string;
+  annoArr: string[];
+  quotationRangeArr: string[];
+}) => {
+  const {
+    calcProductBody: calcProduct,
+    quotationDiscount,
+    // state_totalPrice: {
+    //   prodPriceTotal,
+    //   averageDiscount,
+    //   tuneTotal,
+    //   subTotal,
+    //   salesTax,
+    //   total,
+    //   currency,
+    //   exchangeRate,
+    //   foreignTotal,
+    // },
+  } = instance_quotationProduct;
+
+  const { formatToBody_other } = instance_useQuotationOther;
+
+  // if (status === 'Pending') {
+  //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
+  // }
+
+  const { quotationProductArr, isAllDoorModalValid, invalidComponentArr, totalQty } = calcProduct();
+  const {
+    projectName,
+    validityPeriod,
+    county,
+    district,
+    address,
+    contactPerson,
+    contactNumber,
+    faxNumber,
+    trackProgress,
+    projectProgress,
+    designatedBrand,
+    siteManager,
+    siteManagerNumber,
+    type,
+    isLost,
+    customer,
+    designUnit,
+  } = state_profile;
+
+  const { deliveryLocation, deliveryDate, paymentMethodArr } = state_payInfo;
+
+  const {
+    //
+    tuneTotal,
+    subTotal,
+    salesTax,
+    total,
+    exchangeRate,
+    foreignTotal,
+    currency,
+  } = state_quotationTotal;
+
+  const body: TcreateQuotationContentDto = {
+    quotationDate: new Date().toISOString(),
+
+    validityPeriod,
+    customerId: customer!.id,
+    projectName,
+    county,
+    district,
+    address,
+    contactPerson,
+    contactNumber,
+    faxNumber,
+    designatedBrand,
+    siteManager,
+    siteManagerNumber,
+    // !
+    requiredDoorType: '門型彙總',
+    // !
+    type,
+    quantity: totalQty,
+    editNotes: editNote,
+    // !
+    status: 'Budget',
+    // !
+    agentId: userId,
+    // annotations: annoArr.map((anno) => anno.value),
+    // quotationRanges: quotationRangeArr.map((qr) => qr.value),
+    annotations: annoArr,
+    quotationRanges: quotationRangeArr,
+    trackProgress,
+    projectProgress,
+    discount: quotationDiscount || '100',
+    // !
+    averageDiscount: '999',
+    // !
+    tuneTotal,
+    subTotal,
+    salesTax,
+    total,
+    deliveryLocation,
+    deliveryDate: deliveryDate && deliveryDate.toISOString(),
+    paymentMethods: paymentMethodArr,
+    exchangeRate,
+    foreignTotal,
+    currency,
+    products: quotationProductArr,
+    others: formatToBody_other(),
+    isLost,
+    designUnitId: designUnit?.id || null,
+  };
+
+  return body;
+};
+
+const createAttachmentArr = (fileArr: File[]) => {
+  const attachmentArr: FormData[] = [];
+
+  for (const file of fileArr) {
+    const formData = new FormData();
+    formData.append('file', file);
+    attachmentArr.push(formData);
+  }
+
+  return attachmentArr;
+};
+
+// ==========================================================================
 
 export { kit_req };
