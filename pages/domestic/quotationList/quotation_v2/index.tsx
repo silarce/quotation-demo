@@ -27,6 +27,7 @@ import QuotationPdf, {
 import QuotationPdf_part, {
   TmainProduct,
   Tpart,
+  usePdfPart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import ContractReviewForm, {
@@ -467,6 +468,22 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
   // region PROPS
 
+  const {
+    visible: pdfModalVisible,
+    // setVisible: setPdfModalVisible,
+    showPdf,
+    showPdf_noDiscount,
+    hidePdf,
+    pdfData,
+  } = useModalQuotationPdf({
+    quotationContent: content,
+    emptySomeProperty: status === 'Bidding',
+  });
+
+  const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
+    quotationContent: content,
+  });
+
   const props_profileForm = createProps_profileForm({
     state_profile,
     setState_profile,
@@ -500,6 +517,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     cloneQuotation_relation: () => {
       handleClone(true);
     },
+    showPdf,
+    showPdf_noDiscount,
+    showPdf_part: () => setShow_pdfPart(true),
   });
 
   const history = useHistory({
@@ -640,6 +660,23 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/*  */}
         {/*  */}
         {/*  */}
+
+        <QuotationPdf
+          visible={pdfModalVisible}
+          pdfData={pdfData}
+          onCancel={hidePdf}
+          fileName={content?.quotationNumber ?? ''}
+        />
+
+        <QuotationPdf_part
+          isVisable={show_pdfPart}
+          onCancel={() => {
+            setShow_pdfPart(false);
+          }}
+          mainProductArr={pdfPartProps}
+          quotationId={content?.quotationNumber ?? ''}
+        />
+
         <EmployeeSelectorGroup
           showModal={showEmployeSelector}
           caption="請選擇審核人員"

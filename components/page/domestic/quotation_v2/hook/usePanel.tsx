@@ -21,6 +21,10 @@ interface Tprops {
   btnPostOnClick: () => void;
   cloneQuotation: () => void;
   cloneQuotation_relation: () => void;
+  //
+  showPdf: () => void;
+  showPdf_noDiscount: () => void;
+  showPdf_part: () => void;
 }
 
 // ================================================================================
@@ -36,6 +40,9 @@ const usePanel = ({
   btnPostOnClick,
   cloneQuotation,
   cloneQuotation_relation,
+  showPdf,
+  showPdf_noDiscount,
+  showPdf_part,
 }: Tprops) => {
   const router = useRouter();
 
@@ -47,12 +54,12 @@ const usePanel = ({
         cloneQuotation_relation={cloneQuotation_relation}
       />
     ),
-    // <ExportQuotation
-    //   key="ExportQuotation"
-    //   showPdf={showPdf}
-    //   setShowPdf_part={setShowPdf_part}
-    //   showPdf_noDiscount={showPdf_noDiscount}
-    // />,
+    <ExportQuotation
+      key="ExportQuotation"
+      showPdf={showPdf}
+      setShowPdf_part={showPdf_part}
+      showPdf_noDiscount={showPdf_noDiscount}
+    />,
   ];
 
   const panelList_disabled: TpanelList = [

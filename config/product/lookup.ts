@@ -183,3 +183,50 @@ export const lookup_motorPhase_reverse = {
   單相: '1',
   三相: '3',
 } as const;
+
+export const lookup_componentConfig = (doorModelName: string) => {
+  const slat = doorModelName === 'W2' ? '門片' : '捲門片';
+
+  return {
+    slat: {
+      name: doorModelName === 'W2' ? '門片' : '捲門片',
+      unit: '㎡',
+    },
+    bottomBar: {
+      name: '底座',
+      unit: 'M',
+    },
+    guideRail: {
+      name: '門軌',
+      unit: 'M',
+    },
+    sidePlate: {
+      name: '支版',
+      unit: '組',
+    },
+    roller: {
+      name: '捲軸',
+      unit: 'M',
+    },
+    motor: {
+      name: '馬達機',
+      unit: '組',
+    },
+    motorAccessories: {
+      name: '馬達配件',
+      unit: '組',
+    },
+    headBox: {
+      name: '門箱',
+      unit: 'M',
+    },
+    middlePillar: {
+      name: '中柱',
+      unit: '支',
+    },
+    backBone: {
+      name: '背撐',
+      unit: '支',
+    },
+  };
+};
