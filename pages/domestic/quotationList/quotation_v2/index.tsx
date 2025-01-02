@@ -4,7 +4,7 @@ import { useRouter, NextRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import { AxiosError } from 'axios';
 
 // components
@@ -112,6 +112,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // ======================================================================
 
 // region REFACTOR IMPORT
+
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
 import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
@@ -360,7 +362,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
 
-  const { reqPostQuotation, reqPatchQuotation } = kit_req({
+  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation } = kit_req({
     userId,
     quotationId,
     instance_quotationProduct,
@@ -379,10 +381,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instatnce_getQuotationId3,
     status,
   });
-
-  // ----------------------------------------------------------------------
-
-  // region METHOD
 
   const handlePatch = () => {
     const { destroy } = myAlert.input({
@@ -427,6 +425,33 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  const handleClone = async (isRelationQuotation?: boolean | undefined) => {
+    const { destroy } = myAlert.clear({
+      content: (
+        <SearchModal_customer
+          onRowClick={async (customer) => {
+            const customerId = customer.id;
+            destroy();
+            const res = await reqCloneQuotation({ customerId, isRelationQuotation });
+            setDisabled(true);
+
+            if (res) {
+              router.replace({
+                query: {
+                  id: res.id,
+                },
+              });
+            }
+          }}
+        />
+      ),
+      onCancel: () => destroy(),
+    });
+  };
+  // ----------------------------------------------------------------------
+
+  // region METHOD
+
   function handleSetQuotationPriceTotal({
     prodPriceAllTotal,
     otherPriceAllTotal,
@@ -457,7 +482,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     avgDiscount,
   });
 
-  const panelList = usePanel({
+  const { panelList, customeRight } = usePanel({
     disabled,
     isNewQuotation,
     btnEditOnClick: () => {
@@ -468,6 +493,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
     btnPatchOnClick: handlePatch,
     btnPostOnClick: handlePost,
+
+    cloneQuotation: () => {
+      handleClone();
+    },
+    cloneQuotation_relation: () => {
+      handleClone(true);
+    },
   });
 
   const history = useHistory({
@@ -531,6 +563,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             isNew={isNewQuotation}
             disabled={disabled}
           />,
+          ...customeRight,
         ]}
       />
       <div>
@@ -761,3 +794,5 @@ const useReviewr = ({
     dynaSelectorPropsList,
   };
 };
+
+// ================================================================================

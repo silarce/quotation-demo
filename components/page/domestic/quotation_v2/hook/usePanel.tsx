@@ -1,5 +1,17 @@
+import { useRouter } from 'next/router';
 import { TpanelList } from 'components/PageHeader/PageHeader02/PanelList';
 
+import Dropdown from 'components/global/gear/dropdown/Dropdown';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// icon
+import iconUpload from 'public/image/icon/upload.svg';
+import iconRedLock from 'public/image/icon/redLock.svg';
+
+// ================================================================================
 interface Tprops {
   disabled: boolean;
   isNewQuotation: boolean;
@@ -7,7 +19,13 @@ interface Tprops {
   btnCancelOnClick: () => void;
   btnPatchOnClick: () => void;
   btnPostOnClick: () => void;
+  cloneQuotation: () => void;
+  cloneQuotation_relation: () => void;
 }
+
+// ================================================================================
+
+// ================================================================================
 
 const usePanel = ({
   disabled,
@@ -16,15 +34,45 @@ const usePanel = ({
   btnCancelOnClick,
   btnPatchOnClick,
   btnPostOnClick,
-}: Tprops): TpanelList => {
-  const panelList_01: TpanelList = [
+  cloneQuotation,
+  cloneQuotation_relation,
+}: Tprops) => {
+  const router = useRouter();
+
+  const customeRight: React.ReactNode[] = [
+    !disabled ? null : (
+      <CloneQuotation
+        key="CloneQuotation"
+        cloneQuotation={cloneQuotation}
+        cloneQuotation_relation={cloneQuotation_relation}
+      />
+    ),
+    // <ExportQuotation
+    //   key="ExportQuotation"
+    //   showPdf={showPdf}
+    //   setShowPdf_part={setShowPdf_part}
+    //   showPdf_noDiscount={showPdf_noDiscount}
+    // />,
+  ];
+
+  const panelList_disabled: TpanelList = [
+    {
+      type: 'myButton',
+      label: '送審',
+      onClick: () => {},
+    },
     {
       type: 'myButton',
       label: '編輯',
       onClick: btnEditOnClick,
     },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
+    },
   ];
-  const panelList_02: TpanelList = [
+  const panelList_abled: TpanelList = [
     {
       type: 'redButton',
       label: isNewQuotation ? '新建報價單' : '更新報價單',
@@ -37,9 +85,68 @@ const usePanel = ({
     },
   ];
 
-  const panelList = disabled ? panelList_01 : panelList_02;
+  const panelList = disabled ? panelList_disabled : panelList_abled;
 
-  return panelList;
+  return { panelList, customeRight };
 };
 
+// ================================================================================
+
+const ExportQuotation = ({
+  showPdf,
+  setShowPdf_part,
+  showPdf_noDiscount,
+}: {
+  showPdf: () => void;
+  setShowPdf_part: () => void;
+  showPdf_noDiscount: () => void;
+}) => {
+  return (
+    <Dropdown
+      key="1"
+      // placement="bottomRight"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={showPdf}>
+          匯出報價單
+        </MyButton_v2>,
+        <MyButton_v2 key="2" img={iconUpload.src} onClick={setShowPdf_part}>
+          單價分析
+        </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={showPdf_noDiscount}>
+          {'匯出報價單(無折扣)'}
+        </MyButton_v2>,
+      ]}
+    >
+      匯出
+    </Dropdown>
+  );
+};
+
+const CloneQuotation = ({
+  cloneQuotation,
+  cloneQuotation_relation,
+}: {
+  cloneQuotation: () => void;
+  cloneQuotation_relation: () => void;
+}) => {
+  return (
+    <Dropdown
+      key="0"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" onClick={cloneQuotation}>
+          一般複製
+        </MyButton_v2>,
+        <MyButton_v2 key="2" onClick={cloneQuotation_relation}>
+          關聯報價
+        </MyButton_v2>,
+      ]}
+    >
+      複製報價單
+    </Dropdown>
+  );
+};
+
+// ================================================================================
 export { usePanel };

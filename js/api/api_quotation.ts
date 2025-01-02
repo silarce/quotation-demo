@@ -1795,7 +1795,7 @@ export const apiPostCopyQuotation = (body: TcopyQuotationDto) => {
   const api = '/quotation/copy-quotation';
 
   return axi
-    .post(api, body)
+    .post<TquotationDto>(api, body)
     .then(({ data }) => data)
     .catch((error) => {
       const err = error as AxiosError;
@@ -2369,11 +2369,15 @@ export const useGetQuotation_id_3 = (
       return;
     }
 
-    await apiPostCopyQuotation({
+    setIsFetching(true);
+    const res = await apiPostCopyQuotation({
       quotationId: raw.id,
       customerId,
       isRelationQuotation,
     });
+    setIsFetching(false);
+
+    return res;
   };
 
   // ------------------------------------------------------------------------

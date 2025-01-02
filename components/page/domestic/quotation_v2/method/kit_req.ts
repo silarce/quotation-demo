@@ -196,9 +196,25 @@ const kit_req = ({
     // }
   };
 
+  // 複製報價單
+  const reqCloneQuotation = async ({
+    customerId,
+    isRelationQuotation,
+  }: {
+    customerId: string;
+    isRelationQuotation?: boolean | undefined;
+  }) => {
+    return await reqCopyQuotation({
+      customerId,
+      isRelationQuotation,
+    });
+  };
+
+  // MARK: RETURN
   return {
     reqPostQuotation,
     reqPatchQuotation,
+    reqCloneQuotation,
   };
 };
 
