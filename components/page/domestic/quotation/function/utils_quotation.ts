@@ -383,9 +383,11 @@ const parseQuotationContentSituation = ({
   // const salesManagerEmployeeId = reviewSalesManagerEmployee || null;
   const managerEmployeeId = reviewManagerEmployee?.id || null;
 
+  const isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+
   const isSendToReview =
     status === 'Pending'
-      ? !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt)
+      ? isSendToReview_pending
       : !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
   const {
@@ -409,6 +411,7 @@ const parseQuotationContentSituation = ({
 
   return {
     isSendToReview,
+    isSendToReview_pending,
     //
     isReviewer,
     isSales,

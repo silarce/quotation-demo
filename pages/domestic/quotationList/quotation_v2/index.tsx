@@ -199,8 +199,45 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const userId = userInfo?.employee?.id;
 
   const isNewQuotation = !quotationId && !contentId;
+  const isQuotation = !!quotationId;
+  const isContent = !!contentId;
 
   // ----------------------------------------------------------------------
+
+  let {
+    // reviewSalesEmployeeId,
+    // reviewWorkDirectorEmployeeId,
+    // reviewCashierEmployeeId,
+    // reviewSupervisorEmployeeId,
+    // reviewSalesManagerEmployeeId,
+    // reviewManagerEmployeeId,
+    // isReviewer,
+    // isSales,
+    // isWorkDirector,
+    // isCashier,
+    // isSupervisor,
+    // eslint-disable-next-line prefer-const
+    // isSalesManagerEmployee,
+    // isManager,
+    // salesReviewedAt,
+    // supervisorReviewedAt,
+    // salesManagerReviewedAt,
+    // workDirectorReviewedAt,
+    // cashierReviewedAt,
+    managerReviewedAt,
+    toSalesAt,
+    toSupervisorAt,
+    toSalesManagerAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+    // isSendToReview,
+    // isSendToReview_pending,
+    isAttach,
+    isAllReviewedBeforePending,
+    // version,
+    // editNotes,
+  } = init_variable();
 
   // ----------------------------------------------------------------------
 
@@ -236,8 +273,24 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const content = quotationData?.latestContent || quotationContentData;
 
+  const haveVerifyForm = content?.verifyForm;
+
+  const attachedToContract = quotationData?.attachedToContract;
+  isAttach = attachedToContract ? true : undefined;
+
+  managerReviewedAt = content?.managerReviewedAt;
+  toSalesAt = content?.toSalesAt;
+  toSupervisorAt = content?.toSupervisorAt;
+  toSalesManagerAt = content?.toSalesManagerAt;
+  toWorkDirectorAt = content?.toWorkDirectorAt;
+  toCashierAt = content?.toCashierAt;
+  toManagerAt = content?.toManagerAt;
+
+  const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
+
   const {
     isSendToReview,
+    isSendToReview_pending,
     //
     isReviewer,
     isSales,
@@ -253,7 +306,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       })) ??
     {};
 
-  const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
+  if (content?.status === 'Budget' || content?.status === 'Bidding' || content?.status === 'Contracting') {
+    managerReviewedAt && (isAllReviewedBeforePending = true);
+  }
 
   // ----------------------------------------------------------------------
 
@@ -261,9 +316,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const [disabled, setDisabled] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
-  const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
+  const [state_status, setState_status] = useState<TquotationContentDto['status']>('Budget');
 
   const [showEmployeSelector, setShowEmployeSelector] = useState(false);
+
+  const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
   //   useQuotationTotalPrice({
@@ -380,7 +437,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setDisabled,
     state_quotationTotal,
     instatnce_getQuotationId3,
-    status,
+    status: state_status,
   });
 
   const handlePatch = () => {
@@ -449,6 +506,43 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onCancel: () => destroy(),
     });
   };
+
+  // 轉為準合約
+  const handleReqToPending = async () => {
+    if (!content) {
+      return;
+    }
+
+    if (!isAllReviewedBeforePending) {
+      myAlert.info({ title: '此報價單尚未審核完畢' });
+
+      return;
+    }
+
+    if (content.status === 'Pending') {
+      myAlert.info({ title: '此報價單已經是準合約' });
+    }
+
+    if (content.status === 'Contract') {
+      myAlert.info({ title: '此報價單已是合約' });
+    }
+
+    const { quotation } = (await reqToPending(content.id)) ?? {};
+
+    router.replace({
+      query: {
+        ...query,
+        status: quotation?.latestContent.status,
+      },
+    });
+  };
+
+  const handleReview = async () => {};
+
+  const handleSubmit = async () => {};
+
+  const handleReqUnlock = async () => {};
+
   // ----------------------------------------------------------------------
 
   // region METHOD
@@ -477,7 +571,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: content,
-    emptySomeProperty: status === 'Bidding',
+    emptySomeProperty: state_status === 'Bidding',
   });
 
   const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
@@ -502,6 +596,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { panelList, customeRight } = usePanel({
     disabled,
     isNewQuotation,
+    isQuotation,
+    isReviewer,
+    status: content?.status ?? '',
+    //
+    isAllReviewedBeforePending,
+    //
     btnEditOnClick: () => {
       setDisabled(false);
     },
@@ -517,6 +617,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     cloneQuotation_relation: () => {
       handleClone(true);
     },
+    handleReqToPending,
+
+    handleReview,
+    handleSubmit,
+    showVerifyForm: () => setReviewFormShow(true),
+    handleReqUnlock,
+    //
     showPdf,
     showPdf_noDiscount,
     showPdf_part: () => setShow_pdfPart(true),
@@ -538,10 +645,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:control_signature
 
-  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewr({
+  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewrUi({
     quotationData,
     agentEmployee,
-    status,
+    status: state_status,
   });
 
   // ----------------------------------------------------------------------
@@ -557,7 +664,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   useEffect(() => {
     const status = content?.status || 'Budget';
 
-    setStatus(status);
+    setState_status(status);
   }, [content]);
 
   // ----------------------------------------------------------------------
@@ -584,9 +691,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           additionRight={
             <QuotationStateSel
               key="0"
-              quotationState={{ value: status, label: quotationStatusLookup[status] }}
+              quotationState={{ value: state_status, label: quotationStatusLookup[state_status] }}
               setQuotationState={(option) => {
-                setStatus(option.value as TquotationContentDto['status']);
+                setState_status(option.value as TquotationContentDto['status']);
               }}
               history={history}
               isNew={isNewQuotation}
@@ -662,6 +769,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/*  */}
         {/*  */}
 
+        <ContractReviewForm
+          showModal={reviewFormShow}
+          readOnly={state_status === 'Pending' && isSendToReview_pending}
+          onCancel={() => setReviewFormShow(false)}
+          contentId={content?.id}
+          // contractNumber={latestContent?.quotationNumber ?? ''}
+          // projectName={latestContent?.projectName ?? ''}
+          // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+          // verifyForm={verifyForm}
+          onConfirm={update_quotation}
+          // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
+        />
+
         <QuotationPdf
           visible={pdfModalVisible}
           pdfData={pdfData}
@@ -719,7 +839,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 // =============================================================================
 
 // MARK:useReviewr
-const useReviewr = ({
+const useReviewrUi = ({
   quotationData,
   agentEmployee,
   status,

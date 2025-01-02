@@ -2345,7 +2345,7 @@ export const useGetQuotation_id_3 = (
 
     return await apiPatchQuotationToPending({ contentId })
       .then(async () => {
-        await update();
+        return await update();
       })
       .finally(() => {
         setIsFetching(false);

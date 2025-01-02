@@ -15,12 +15,24 @@ import iconRedLock from 'public/image/icon/redLock.svg';
 interface Tprops {
   disabled: boolean;
   isNewQuotation: boolean;
+  isQuotation: boolean;
+  isReviewer: boolean | undefined | null;
+  status: string;
+  //
+  isAllReviewedBeforePending: boolean;
+  //
   btnEditOnClick: () => void;
   btnCancelOnClick: () => void;
   btnPatchOnClick: () => void;
   btnPostOnClick: () => void;
   cloneQuotation: () => void;
   cloneQuotation_relation: () => void;
+
+  handleReqToPending: () => void;
+  handleReview: () => void;
+  handleSubmit: () => void;
+  showVerifyForm: () => void;
+  handleReqUnlock: () => void;
   //
   showPdf: () => void;
   showPdf_noDiscount: () => void;
@@ -34,6 +46,10 @@ interface Tprops {
 const usePanel = ({
   disabled,
   isNewQuotation,
+  isQuotation,
+  isReviewer,
+  status,
+
   btnEditOnClick,
   btnCancelOnClick,
   btnPatchOnClick,
@@ -43,6 +59,15 @@ const usePanel = ({
   showPdf,
   showPdf_noDiscount,
   showPdf_part,
+
+  isAllReviewedBeforePending,
+
+  handleReqToPending,
+
+  handleReview,
+  handleSubmit,
+  showVerifyForm,
+  handleReqUnlock,
 }: Tprops) => {
   const router = useRouter();
 
@@ -54,31 +79,16 @@ const usePanel = ({
         cloneQuotation_relation={cloneQuotation_relation}
       />
     ),
-    <ExportQuotation
-      key="ExportQuotation"
-      showPdf={showPdf}
-      setShowPdf_part={showPdf_part}
-      showPdf_noDiscount={showPdf_noDiscount}
-    />,
+    !disabled ? null : (
+      <ExportQuotation
+        key="ExportQuotation"
+        showPdf={showPdf}
+        setShowPdf_part={showPdf_part}
+        showPdf_noDiscount={showPdf_noDiscount}
+      />
+    ),
   ];
 
-  const panelList_disabled: TpanelList = [
-    {
-      type: 'myButton',
-      label: '送審',
-      onClick: () => {},
-    },
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: btnEditOnClick,
-    },
-    {
-      type: 'myButton',
-      label: '返回',
-      onClick: () => router.back(),
-    },
-  ];
   const panelList_abled: TpanelList = [
     {
       type: 'redButton',
@@ -89,6 +99,71 @@ const usePanel = ({
       type: 'myButton',
       label: '取消',
       onClick: btnCancelOnClick,
+    },
+  ];
+
+  const panelList_disabled: TpanelList = [
+    isQuotation && isAllReviewedBeforePending
+      ? {
+          type: 'redButton',
+          label: '轉為準合約',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定轉為準合約',
+              props: {
+                onOk: handleReqToPending,
+              },
+            });
+          },
+        }
+      : null,
+
+    isQuotation && isReviewer
+      ? {
+          type: 'myButton',
+          label: '審核',
+          onClick: handleReview,
+        }
+      : null,
+
+    isQuotation
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: handleSubmit,
+        }
+      : null,
+
+    !isNewQuotation && status === 'Pending' ? { type: 'myButton', label: '合約審核表', onClick: showVerifyForm } : null,
+
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: btnEditOnClick,
+    },
+
+    status === 'Pending' || status === 'TempPending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定並退回發包',
+          img: iconRedLock.src,
+          onClick: handleReqUnlock,
+          // onClick: () => {
+          //   myAlert.confirm({
+          //     title: '確定要解除鎖定?',
+          //     content: '此報價單將需要重新送審並回到發包狀態',
+          //     props: {
+          //       onOk: handleReqUnlock,
+          //     },
+          //   });
+          // },
+        }
+      : null,
+
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => router.back(),
     },
   ];
 
