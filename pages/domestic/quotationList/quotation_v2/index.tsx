@@ -385,7 +385,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const handlePatch = () => {
     const { destroy } = myAlert.input({
+      isTextArea: true,
       title: '報價單註解',
+      width: 500,
       onConfirm: (editNote) => {
         reqPatchQuotation({ editNote });
         destroy();
@@ -395,7 +397,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const handlePost = () => {
     const { destroy } = myAlert.input({
+      isTextArea: true,
       title: '報價單註解',
+      width: 500,
       onConfirm: async (editNote) => {
         destroy();
         const { newQuotation } = await reqPostQuotation({ editNote });
