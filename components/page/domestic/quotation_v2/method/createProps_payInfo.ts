@@ -3,7 +3,16 @@ import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInf
 import { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
 const createProps_payInfo = ({
-  instance_quotationPrice: { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate },
+  instance_quotationPrice: {
+    state_quotationTotal,
+    setQuotationPriceTotal,
+    setTuneTotal,
+    setCurrency,
+    setExchangeRate,
+
+    haveTax,
+    setHaveTax,
+  },
   kit_payInfo,
   state_quotationDiscount,
   avgDiscount,
@@ -16,7 +25,12 @@ const createProps_payInfo = ({
   avgDiscount: number;
 }): Tprops_quotationPayInfo['form'] => {
   const props_payInfo: Tprops_quotationPayInfo['form'] = {
-    haveTax: { value: true },
+    haveTax: {
+      value: haveTax,
+      onChange(value) {
+        setHaveTax(value);
+      },
+    },
     discountRate: { value: state_quotationDiscount },
     tuneTotal: {
       value: disabled ? Number(state_quotationTotal.tuneTotal).toLocaleString() : state_quotationTotal.tuneTotal,

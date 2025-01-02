@@ -50,6 +50,8 @@ const useQuotationTotalPrice = ({
   // const [state_quotationDiscount, setState_quotationDiscount] = useState<Tstate_quotaionDiscount>('100');
   const [state_quotationTotal, setState_quotationTotal] = useState<TstateQuotationTotal>(defaultState);
 
+  const [haveTax, _setHaveTax] = useState(false);
+
   // ---------------------------------------------------------------------------
 
   const setQuotationPriceTotal = (value: TstateQuotationTotal['prodPriceTotal']) => {
@@ -63,7 +65,7 @@ const useQuotationTotalPrice = ({
 
       copy.subTotal = subTotal;
 
-      const { salesTax, total, foreignTotal } = calcTotal(copy);
+      const { salesTax, total, foreignTotal } = calcTotal({ state: copy, haveTax });
 
       copy = {
         ...copy,
@@ -89,7 +91,7 @@ const useQuotationTotalPrice = ({
       const subTotal = new Decimal(prodPriceTotal).add(tuneTotal || 0).toNumber();
       copy.subTotal = subTotal;
 
-      const { salesTax, total, foreignTotal } = calcTotal(copy);
+      const { salesTax, total, foreignTotal } = calcTotal({ state: copy, haveTax });
 
       copy = {
         ...copy,
@@ -127,6 +129,24 @@ const useQuotationTotalPrice = ({
     });
   };
 
+  const setHaveTax = (haveTax: boolean) => {
+    _setHaveTax(haveTax);
+
+    setState_quotationTotal((prev) => {
+      let copy = { ...prev };
+      const { salesTax, total, foreignTotal } = calcTotal({ state: copy, haveTax });
+
+      copy = {
+        ...copy,
+        salesTax,
+        total,
+        foreignTotal,
+      };
+
+      return copy;
+    });
+  };
+
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
@@ -137,6 +157,18 @@ const useQuotationTotalPrice = ({
   //   setState_quotationDiscount((raw_quotationContent?.discount ?? '100') as `${number}` | '');
   // }, [raw_quotationContent?.discount, disabled]);
 
+  useEffect(() => {
+    let haveTax = true;
+
+    if (raw_quotationContent?.salesTax === 0) {
+      haveTax = false;
+    }
+
+    _setHaveTax(haveTax);
+  }, [raw_quotationContent, disabled]);
+
+  useEffect(() => {}, [haveTax]);
+
   // MARK: RETURN
   return {
     state_quotationTotal,
@@ -144,6 +176,8 @@ const useQuotationTotalPrice = ({
     setTuneTotal,
     setCurrency,
     setExchangeRate,
+    haveTax,
+    setHaveTax,
   };
 };
 
@@ -182,10 +216,10 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
 
 // ===========================================================================
 
-const calcTotal = (state: TstateQuotationTotal) => {
+const calcTotal = ({ state, haveTax }: { state: TstateQuotationTotal; haveTax: boolean }) => {
   const { subTotal, exchangeRate } = state;
 
-  const salesTax = new Decimal(subTotal).mul(taxRate).toDecimalPlaces(0).toNumber();
+  const salesTax = haveTax ? new Decimal(subTotal).mul(taxRate).toDecimalPlaces(0).toNumber() : 0;
   const total = new Decimal(subTotal).add(salesTax).toNumber();
 
   const foreignTotal = calcNTDToCurrency({

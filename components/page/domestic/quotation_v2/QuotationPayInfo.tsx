@@ -138,7 +138,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           className={classNames('m-auto mr-0 mb-5', !haveTax && 'invisible')}
           wrapperStyle={{ width: '97px' }}
           showBaseline="invisible"
-          disabled={!!haveTax || disabled}
+          disabled={disabled}
           checkBoxProps_v2={{
             props: {
               value: haveTax.value ? ['haveTax'] : [],
