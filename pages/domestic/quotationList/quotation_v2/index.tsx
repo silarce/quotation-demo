@@ -537,11 +537,30 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
-  const handleReview = async () => {};
-
   const handleSubmit = async () => {};
 
-  const handleReqUnlock = async () => {};
+  const handleReview = async () => {};
+
+  const handleReqUnlock = async () => {
+    myAlert.confirm({
+      title: '確定要解除鎖定?',
+      content: '此報價單將需要重新送審並回到發包狀態',
+      props: {
+        onOk: async () => {
+          const { quotation } = (await reqUnlock()) ?? {};
+
+          if (quotation) {
+            router.replace({
+              query: {
+                ...query,
+                status: quotation.latestContent.status,
+              },
+            });
+          }
+        },
+      },
+    });
+  };
 
   // ----------------------------------------------------------------------
 

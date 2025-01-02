@@ -148,15 +148,6 @@ const usePanel = ({
           label: '解除鎖定並退回發包',
           img: iconRedLock.src,
           onClick: handleReqUnlock,
-          // onClick: () => {
-          //   myAlert.confirm({
-          //     title: '確定要解除鎖定?',
-          //     content: '此報價單將需要重新送審並回到發包狀態',
-          //     props: {
-          //       onOk: handleReqUnlock,
-          //     },
-          //   });
-          // },
         }
       : null,
 
