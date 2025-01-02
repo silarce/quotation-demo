@@ -81,7 +81,11 @@ const kit_req = ({
   // MARK: reqPostQuotation
   const reqPostQuotation = async ({ editNote }: { editNote: string }) => {
     if (!userId) {
-      return myAlert.warning({ title: '沒有使用者ID' });
+      myAlert.warning({ title: '沒有使用者ID' });
+
+      return {
+        newQuotation: undefined,
+      };
     }
 
     if (!state_profile.customer) {
@@ -102,11 +106,13 @@ const kit_req = ({
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
-    const { isUpdated } = await reqPost({ body, attachmentArr });
+    const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
 
     if (isUpdated) {
       setDisabled(true);
     }
+
+    return { newQuotation };
   };
 
   // -----------------------------------------------------------------------

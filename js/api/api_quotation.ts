@@ -2112,6 +2112,7 @@ export const useGetQuotation_id_3 = (
     if (!res) {
       return {
         newQuotation: undefined,
+
         isUpdated: false,
       };
     }
@@ -2127,12 +2128,12 @@ export const useGetQuotation_id_3 = (
 
     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
 
-    const newQuotation = await update();
+    // const newQuotation = await update();
 
     setIsFetching(false);
 
     return {
-      newQuotation,
+      newQuotation: res,
       isUpdated: true,
     };
 

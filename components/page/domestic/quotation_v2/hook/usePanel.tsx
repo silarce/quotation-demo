@@ -1,36 +1,39 @@
 import { TpanelList } from 'components/PageHeader/PageHeader02/PanelList';
 
+interface Tprops {
+  disabled: boolean;
+  isNewQuotation: boolean;
+  btnEditOnClick: () => void;
+  btnCancelOnClick: () => void;
+  btnPatchOnClick: () => void;
+  btnPostOnClick: () => void;
+}
+
 const usePanel = ({
   disabled,
-  props_panelList_01,
-  props_panelList_02,
-}: {
-  disabled: boolean;
-  props_panelList_01: {
-    onEdit: () => void;
-  };
-  props_panelList_02: {
-    onCancel: () => void;
-    onUpload: () => void;
-  };
-}): TpanelList => {
+  isNewQuotation,
+  btnEditOnClick,
+  btnCancelOnClick,
+  btnPatchOnClick,
+  btnPostOnClick,
+}: Tprops): TpanelList => {
   const panelList_01: TpanelList = [
     {
       type: 'myButton',
       label: '編輯',
-      onClick: props_panelList_01.onEdit,
+      onClick: btnEditOnClick,
     },
   ];
   const panelList_02: TpanelList = [
     {
       type: 'redButton',
-      label: '上傳',
-      onClick: props_panelList_02.onUpload,
+      label: isNewQuotation ? '新建報價單' : '更新報價單',
+      onClick: isNewQuotation ? btnPostOnClick : btnPatchOnClick,
     },
     {
       type: 'myButton',
       label: '取消',
-      onClick: props_panelList_02.onCancel,
+      onClick: btnCancelOnClick,
     },
   ];
 

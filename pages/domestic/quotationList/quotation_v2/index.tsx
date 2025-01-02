@@ -360,7 +360,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
 
-  const { reqPatchQuotation } = kit_req({
+  const { reqPostQuotation, reqPatchQuotation } = kit_req({
     userId,
     quotationId,
     instance_quotationProduct,
@@ -383,12 +383,32 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region METHOD
 
-  const handleUpload = () => {
+  const handlePatch = () => {
     const { destroy } = myAlert.input({
       title: '報價單註解',
       onConfirm: (editNote) => {
         reqPatchQuotation({ editNote });
         destroy();
+      },
+    });
+  };
+
+  const handlePost = () => {
+    const { destroy } = myAlert.input({
+      title: '報價單註解',
+      onConfirm: async (editNote) => {
+        destroy();
+        const { newQuotation } = await reqPostQuotation({ editNote });
+
+        if (newQuotation) {
+          router.replace({
+            query: {
+              ...query,
+              id: newQuotation.id,
+              status: newQuotation.latestContent.status,
+            },
+          });
+        }
       },
     });
   };
@@ -425,17 +445,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const panelList = usePanel({
     disabled,
-    props_panelList_01: {
-      onEdit: () => {
-        setDisabled(false);
-      },
+    isNewQuotation,
+    btnEditOnClick: () => {
+      setDisabled(false);
     },
-    props_panelList_02: {
-      onCancel: () => {
-        setDisabled(true);
-      },
-      onUpload: handleUpload,
+    btnCancelOnClick: () => {
+      setDisabled(true);
     },
+    btnPatchOnClick: handlePatch,
+    btnPostOnClick: handlePost,
   });
 
   const history = useHistory({
