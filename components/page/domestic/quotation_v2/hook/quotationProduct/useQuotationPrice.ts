@@ -170,7 +170,7 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
       salesTax: Number(raw?.salesTax ?? '0'),
       total: Number(raw?.total ?? '0'),
       currency: raw?.currency ?? 'TWD 新臺幣',
-      exchangeRate: raw?.exchangeRate ?? '1',
+      exchangeRate: raw?.exchangeRate ?? '',
       foreignTotal: raw?.foreignTotal ?? '0',
     };
 
