@@ -36,7 +36,7 @@ const createProps_payInfo = ({
         setExchangeRate(value);
       },
     },
-    avgDiscount_withQty: avgDiscount,
+    avgDiscount: avgDiscount,
     subTotal: Number(state_quotationTotal.subTotal).toLocaleString(),
     salesTax: Number(state_quotationTotal.salesTax).toLocaleString(),
     total: Number(state_quotationTotal.total).toLocaleString(),

@@ -54,18 +54,20 @@ const calcProdSummary = ({
   });
 
   // page右下方的平均折數
-  const avgDiscount = prodDiscountTotal_d.div(prodQty_d).mul(100).toDecimalPlaces(3).toNumber();
+  const isProdQtyValid = prodQty_d.toNumber();
+  const avgDiscount = isProdQtyValid
+    ? prodDiscountTotal_d.div(prodQty_d).mul(100).toDecimalPlaces(3).toNumber()
+    : Number(state_quotationDiscount);
 
   // profile下的 門型彙總
-
   const doorModelSummery = Object.entries(doorModelSummery_d).reduce((doorModelSummery, [key, item]) => {
     const qty = item.quantity.toNumber();
-    const avgDiscount = item.discountTotal.div(item.quantity).mul(100).toDecimalPlaces(3).toNumber();
+    const avgDiscount_prod = item.discountTotal.div(item.quantity).mul(100).toDecimalPlaces(3).toNumber();
 
     doorModelSummery[key] = {
       doorModel: item.doorModel,
       quantity: qty,
-      avgDiscount: avgDiscount,
+      avgDiscount: avgDiscount_prod,
     };
 
     return doorModelSummery;

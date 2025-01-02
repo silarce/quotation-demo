@@ -67,7 +67,7 @@ interface Tform_pay {
     disabled?: boolean;
   };
 
-  avgDiscount_withQty: string | number; // 平均折數
+  avgDiscount: string | number; // 平均折數
   subTotal: string | number; // 小計
   salesTax: string | number; // 營業稅
   total: string | number; // 總計
@@ -116,7 +116,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
     currency,
     exchangeRate,
 
-    avgDiscount_withQty,
+    avgDiscount,
     subTotal,
     salesTax,
     total,
@@ -204,7 +204,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           </span>
 
           <div>
-            <span>{avgDiscount_withQty}</span>
+            <span>{avgDiscount}</span>
             <span>%</span>
           </div>
         </div>

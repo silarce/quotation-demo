@@ -170,6 +170,7 @@ const useQuotationProduct = ({
   onProdAllTotalChange: (alltotal: number) => void;
 }) => {
   const raw_productArr = raw_quotationContent?.products;
+  const defaultQuotationDiscount = (raw_quotationContent ? raw_quotationContent.discount : '100') as `${number}`;
 
   // ------------------------------------------------------------------------
   // 門型列表
@@ -189,13 +190,7 @@ const useQuotationProduct = ({
   }, [defaultState_prodDict, disabled]);
 
   // 總折數
-  const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(
-    (raw_quotationContent?.discount ?? '') as `${number}` | ''
-  );
-  // const { debouncedState: debounced_state_quotationDiscount, isBouncing: isBouncing_quotationDiscount } = useDebounce(
-  //   state_quotationDiscount,
-  //   500
-  // );
+  const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(defaultQuotationDiscount);
 
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
@@ -368,8 +363,8 @@ const useQuotationProduct = ({
   }, [activeProdKey]);
 
   useEffect(() => {
-    setState_quotationDiscount((raw_quotationContent?.discount ?? '') as `${number}` | '');
-  }, [disabled, raw_quotationContent]);
+    setState_quotationDiscount(defaultQuotationDiscount);
+  }, [disabled, defaultQuotationDiscount]);
 
   // -----------------------------------------------------------------------------
   // MARK: RETURN
