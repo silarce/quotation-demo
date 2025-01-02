@@ -2259,15 +2259,21 @@ export const useGetQuotation_id_3 = (
   // 送審
   // body送{}似乎是不變更審核人員，僅重置審核狀態
   const reqPatchReviewer = async ({
-    quotationId,
+    // quotationId,
     body,
   }: {
-    quotationId: string;
+    // quotationId: string;
     body: TsubmitReviewQotuationContentDto;
   }) => {
+    if (!raw) {
+      myAlert.warning({ title: '還未取得報價單' });
+
+      return;
+    }
+
     setIsFetching(true);
 
-    return await apiQuotationSubmitReview(quotationId, body)
+    return await apiQuotationSubmitReview(raw.id, body)
       .then(async (res) => {
         myAlert.success({ title: '送審成功' });
         await update();

@@ -538,7 +538,40 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   };
 
   // MARK: 送審
-  const handleSubmit = async () => {};
+  const handleSubmit = async ({
+    sales,
+    supervisor,
+  }: {
+    sales: TemployeeDto | undefined;
+    supervisor: TemployeeDto | undefined;
+  }) => {
+    if (!isQuotation) {
+      return;
+    }
+
+    const reviewSalesEmployeeId = sales?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+    if (status === 'Pending' && !reviewSalesEmployeeId) {
+      return myAlert.err({ title: '沒有業務' });
+    }
+
+    if (status === 'TempPending') {
+      if (!reviewSalesEmployeeId) {
+        return myAlert.info({ title: '請選擇業務' });
+      }
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      return myAlert.info({ title: '請選擇所有審核人員' });
+    }
+
+    const body = { reviewSalesEmployeeId, reviewSupervisorEmployeeId };
+
+    reqPatchReviewer({
+      body,
+    });
+
+    setShowEmployeSelector(false);
+  };
 
   // MARK: 審核
   const handleReview = async () => {
@@ -679,7 +712,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     handleReqToPending,
 
     handleReview,
-    handleSubmit,
+    handleSubmit: () => setShowEmployeSelector(true),
     showVerifyForm: () => setReviewFormShow(true),
     handleReqUnlock,
     //
@@ -868,17 +901,17 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             const sales = arr[0][0] as TemployeeDto | undefined;
             const supervisor = arr[1][0] as TemployeeDto | undefined;
 
-            // myAlert.confirm({
-            //   title: '確定送審',
-            //   props: {
-            //     onOk: () => {
-            //       reqPatchReviewer({
-            //         sales,
-            //         supervisor,
-            //       });
-            //     },
-            //   },
-            // });
+            myAlert.confirm({
+              title: '確定送審',
+              props: {
+                onOk: () => {
+                  handleSubmit({
+                    sales,
+                    supervisor,
+                  });
+                },
+              },
+            });
           }}
           onCancel={() => {
             setShowEmployeSelector(false);
