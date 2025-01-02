@@ -325,12 +325,16 @@ const Input = ({
   const inputSelProps: TinputSelProps = (() => {
     if (isTextArea) {
       return {
+        showBaseline: 'invisible',
         textareaProps: {
           allowNewLineByUser: true,
           props: {
             defaultValue,
             placeholder,
             name: 'input',
+            minRows: 5,
+            maxRows: 5,
+            className: 'border border-border',
           },
         },
       };
