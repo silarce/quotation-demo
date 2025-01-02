@@ -38,6 +38,8 @@ import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hoo
 
 // ===========================================================================
 
+type Tinstance_getQuotationId3 = ReturnType<typeof useGetQuotation_id_3>;
+
 // ===========================================================================
 const kit_req = ({
   userId,
@@ -53,6 +55,7 @@ const kit_req = ({
   update_quotation,
   setDisabled,
   state_quotationTotal,
+  instatnce_getQuotationId3,
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
@@ -67,7 +70,11 @@ const kit_req = ({
   update_quotation: () => Promise<void>;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   state_quotationTotal: TstateTotalPrice;
+  instatnce_getQuotationId3: Tinstance_getQuotationId3;
 }) => {
+  const { reqPost, reqPatch, reqReview, reqUnlock, reqPatchReviewer, reqCopyQuotation, reqToPending } =
+    instatnce_getQuotationId3;
+
   // MARK:reqPatchQuotation
   const reqPatchQuotation = async ({ editNote }: { editNote: string }) => {
     if (!userId) {
@@ -193,30 +200,45 @@ const kit_req = ({
       designUnitId: designUnit?.id || null,
     };
 
-    let shouldUpdate = false;
+    // const shouldUpdate = false;
 
-    setIsFetching(true);
+    // setIsFetching(true);
 
-    try {
-      const updatedQuotation = await apiPatchQuotation(body, quotationId);
-      const latestContentId = updatedQuotation.latestContent.id;
-      shouldUpdate = true;
-      const fileArr = await createFileArr();
+    const fileArr = await createFileArr();
+    const attachmentArr: FormData[] = [];
 
-      for (const file of fileArr) {
-        const formData = new FormData();
-        formData.append('file', file);
-        await apiPostQuotation_id_attachments(latestContentId, formData);
-      }
-    } catch (error) {
-    } finally {
-      if (shouldUpdate) {
-        await update_quotation();
-        setDisabled(true);
-      }
-
-      setIsFetching(false);
+    for (const file of fileArr) {
+      const formData = new FormData();
+      formData.append('file', file);
+      attachmentArr.push(formData);
     }
+
+    const { isUpdated: updated } = (await reqPatch({ body, attachmentArr })) ?? {};
+
+    if (updated) {
+      setDisabled(true);
+    }
+
+    // try {
+    //   const updatedQuotation = await apiPatchQuotation(body, quotationId);
+    //   const latestContentId = updatedQuotation.latestContent.id;
+    //   shouldUpdate = true;
+    //   const fileArr = await createFileArr();
+
+    //   for (const file of fileArr) {
+    //     const formData = new FormData();
+    //     formData.append('file', file);
+    //     await apiPostQuotation_id_attachments(latestContentId, formData);
+    //   }
+    // } catch (error) {
+    // } finally {
+    //   if (shouldUpdate) {
+    //     await update_quotation();
+    //     setDisabled(true);
+    //   }
+
+    //   setIsFetching(false);
+    // }
   };
 
   // -----------------------------------------------------------------------

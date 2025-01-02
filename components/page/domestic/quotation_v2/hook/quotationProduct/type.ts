@@ -354,7 +354,7 @@ interface TstateTotalPrice {
 
   //
   // quotationDiscount: `${number}` | ''; // 總折數 // 這個折數會作用在每個主產品上
-  averageDiscount: number; // 平均折數 // 浮點數
+  // averageDiscount: number; // 平均折數 // 浮點數
 
   tuneTotal: `${number}` | ''; // 小計調整
 

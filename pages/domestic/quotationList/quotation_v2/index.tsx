@@ -170,6 +170,21 @@ interface Tprops_useQuotation {
 
 // ======================================================================
 
+const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '業務',
+      limit: 1,
+    },
+    {
+      key: 'employee',
+      caption: '業務主管',
+      limit: 1,
+    },
+  ],
+});
+
 // ======================================================================
 
 // MARK: START
@@ -186,6 +201,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
 
+  // region GET DATA
+
+  const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
+    preBuiltPopulate: ['simple', 'attached'],
+  });
   const {
     isFetching: isFetching_update,
     //
@@ -203,9 +223,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqCopyQuotation,
     reqPatchQuotationContent_id_progress,
     reqToPending,
-  } = useGetQuotation_id_3(quotationId as string, {
-    preBuiltPopulate: ['simple', 'attached'],
-  });
+  } = instatnce_getQuotationId3;
 
   const {
     data: quotationContentData,
@@ -232,6 +250,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       })) ??
     {};
 
+  const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
+
   // ----------------------------------------------------------------------
 
   // region STATE MANAGEMENT
@@ -239,6 +259,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const [disabled, setDisabled] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
+
+  const [showEmployeSelector, setShowEmployeSelector] = useState(false);
 
   // const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
   //   useQuotationTotalPrice({
@@ -354,6 +376,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
     setDisabled,
     state_quotationTotal,
+    instatnce_getQuotationId3,
   });
 
   // ----------------------------------------------------------------------
@@ -428,6 +451,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       total={state_quotationTotal.total}
     />,
   ];
+
+  // MARK:control_signature
+
+  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewr({
+    quotationData,
+    agentEmployee,
+    status,
+  });
 
   // ----------------------------------------------------------------------
   // region useEffect
@@ -530,6 +561,44 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             <QuotationPayInfo disabled={disabled} form={props_payInfo} />
           </div>
         </div>
+        <SignatureBar
+          //
+          className={'mx-[50px] mt-[130px] mb-[40px]'}
+          control={control_signature}
+        />
+        {/*  */}
+        {/*  */}
+        {/*  */}
+        <EmployeeSelectorGroup
+          showModal={showEmployeSelector}
+          caption="請選擇審核人員"
+          isCancelOnConfirm={false}
+          defaultSeletedDataArrArr={defaultSeletedDataArrArr}
+          dynaSelectorPropsList={dynaSelectorPropsList}
+          onConfirm={(arr) => {
+            // 在Pedding，sales的選擇器會被跳過不顯示，但是arr結構不會變
+            const sales = arr[0][0] as TemployeeDto | undefined;
+            const supervisor = arr[1][0] as TemployeeDto | undefined;
+
+            // myAlert.confirm({
+            //   title: '確定送審',
+            //   props: {
+            //     onOk: () => {
+            //       reqPatchReviewer({
+            //         sales,
+            //         supervisor,
+            //       });
+            //     },
+            //   },
+            // });
+          }}
+          onCancel={() => {
+            setShowEmployeSelector(false);
+          }}
+        />
+        {/*  */}
+        {/*  */}
+        {/*  */}
       </div>
     </SubLayer>
   );
@@ -539,3 +608,118 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 //
 
 // =============================================================================
+
+// MARK:useReviewr
+const useReviewr = ({
+  quotationData,
+  agentEmployee,
+  status,
+}: {
+  quotationData: TquotationDto | undefined | null;
+  agentEmployee: TemployeeDto | undefined | null;
+  status: TquotationContentDto['status'];
+}) => {
+  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
+    const latestContent = quotationData?.latestContent;
+
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '總經理',
+        value: latestContent?.reviewManagerEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!latestContent?.managerReviewedAt,
+      },
+      {
+        label: '應收帳款',
+        value: latestContent?.reviewCashierEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!latestContent?.cashierReviewedAt,
+      },
+      {
+        label: '應收帳款',
+        value: latestContent?.reviewWorkDirectorEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!latestContent?.workDirectorReviewedAt,
+      },
+      // {
+      //   label: '業務經理',
+      //   value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
+      //   style: { width: '180px' },
+      //   isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
+      // },
+      {
+        label: '業務主管',
+        value: latestContent?.reviewSupervisorEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!latestContent?.supervisorReviewedAt,
+      },
+      {
+        label: '業務',
+        value: latestContent?.reviewSalesEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!latestContent?.salesReviewedAt,
+      },
+      {
+        label: '經辦',
+        value: agentEmployee?.chName,
+        style: { width: '180px' },
+      },
+    ];
+
+    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+      signatureArr.splice(1, 2);
+    }
+
+    // if (status === 'Pending') {
+    //   signatureArr.splice(5, 1);
+    // }
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
+      latestContent?.reviewSalesEmployee ? [latestContent.reviewSalesEmployee] : undefined,
+      latestContent?.reviewSupervisorEmployee ? [latestContent.reviewSupervisorEmployee] : undefined,
+    ];
+
+    const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
+
+    if (status === 'TempPending') {
+      // if (latestContent?.toSalesAt) {
+      //   dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+      // }
+
+      // if (latestContent?.toSupervisorAt) {
+      //   dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+      // }
+      dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+    }
+
+    if (status === 'Pending') {
+      // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+
+      // dynaSelectorPropsList[0].isSkip = true;
+
+      if (latestContent?.toSalesAt) {
+        dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+      }
+
+      if (latestContent?.toSupervisorAt) {
+        dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+      }
+    }
+
+    return {
+      control_signature,
+      defaultSeletedDataArrArr,
+      dynaSelectorPropsList,
+    };
+  }, [agentEmployee?.chName, quotationData?.latestContent, status]);
+
+  return {
+    control_signature,
+    defaultSeletedDataArrArr,
+    dynaSelectorPropsList,
+  };
+};
