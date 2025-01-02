@@ -575,25 +575,24 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         customeRight={customeRight}
       />
 
-      <div className="m-auto mr-5 mt-5 w-fit">
-        <QuotationStateSel
-          key="0"
-          quotationState={{ value: status, label: quotationStatusLookup[status] }}
-          setQuotationState={(option) => {
-            setStatus(option.value as TquotationContentDto['status']);
-          }}
-          history={history}
-          isNew={isNewQuotation}
-          disabled={disabled}
-        />
-      </div>
-
       <div>
         <QuotationProfile
           disabled={disabled}
           form={props_profileForm}
           quotationNumber={content?.quotationNumber ?? '---'}
           editNotes={content?.editNotes}
+          additionRight={
+            <QuotationStateSel
+              key="0"
+              quotationState={{ value: status, label: quotationStatusLookup[status] }}
+              setQuotationState={(option) => {
+                setStatus(option.value as TquotationContentDto['status']);
+              }}
+              history={history}
+              isNew={isNewQuotation}
+              disabled={disabled}
+            />
+          }
         />
 
         <InputSel

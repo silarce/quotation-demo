@@ -148,6 +148,7 @@ interface Tprops_profile {
   quotationNumber: string | undefined;
   quotationDate?: string;
   editNotes?: string;
+  additionRight?: React.ReactNode;
 }
 
 export type { Tprops_profile };
@@ -163,6 +164,7 @@ export default function QuotationProfile({
   quotationNumber,
   quotationDate,
   editNotes,
+  additionRight,
 }: Tprops_profile) {
   const {
     projectName,
@@ -544,8 +546,11 @@ export default function QuotationProfile({
           }}
         />
       </div>
-      {/* right */}
+
+      {/* MARK: right */}
+
       <div className={scss.right}>
+        {additionRight}
         <div>
           <InputSel
             disabled={true}
@@ -580,7 +585,6 @@ export default function QuotationProfile({
             }}
           />
         </div>
-
         <div>
           <InputSel
             disabled={true}
