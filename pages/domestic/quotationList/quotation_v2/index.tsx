@@ -572,20 +572,22 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         tag={quotationId ? `報價編號 ${content?.quotationNumber}` : '新增報價單'}
         panelList={panelList}
         customeLeft={customeLeft}
-        customeRight={[
-          <QuotationStateSel
-            key="0"
-            quotationState={{ value: status, label: quotationStatusLookup[status] }}
-            setQuotationState={(option) => {
-              setStatus(option.value as TquotationContentDto['status']);
-            }}
-            history={history}
-            isNew={isNewQuotation}
-            disabled={disabled}
-          />,
-          ...customeRight,
-        ]}
+        customeRight={customeRight}
       />
+
+      <div className="m-auto mr-5 mt-5 w-fit">
+        <QuotationStateSel
+          key="0"
+          quotationState={{ value: status, label: quotationStatusLookup[status] }}
+          setQuotationState={(option) => {
+            setStatus(option.value as TquotationContentDto['status']);
+          }}
+          history={history}
+          isNew={isNewQuotation}
+          disabled={disabled}
+        />
+      </div>
+
       <div>
         <QuotationProfile
           disabled={disabled}
