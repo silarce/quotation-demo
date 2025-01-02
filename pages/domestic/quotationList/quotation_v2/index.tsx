@@ -215,8 +215,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     attachmentArr,
     domain,
     //
-    reqPost,
-    reqPatch,
+    // reqPost,
+    // reqPatch,
     reqReview,
     reqUnlock,
     reqPatchReviewer,
@@ -377,6 +377,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setDisabled,
     state_quotationTotal,
     instatnce_getQuotationId3,
+    status,
   });
 
   // ----------------------------------------------------------------------
@@ -388,9 +389,18 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       isTextArea: true,
       title: '報價單註解',
       width: 500,
-      onConfirm: (editNote) => {
-        reqPatchQuotation({ editNote });
+      onConfirm: async (editNote) => {
         destroy();
+        const { newQuotation } = await reqPatchQuotation({ editNote });
+
+        if (newQuotation) {
+          router.replace({
+            query: {
+              ...query,
+              status: newQuotation.latestContent.status,
+            },
+          });
+        }
       },
     });
   };
@@ -491,6 +501,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       updateContent();
     }
   }, [quotationId, contentId]);
+
+  useEffect(() => {
+    const status = content?.status || 'Budget';
+
+    setStatus(status);
+  }, [content]);
 
   // ----------------------------------------------------------------------
 

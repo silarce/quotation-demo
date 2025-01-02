@@ -59,6 +59,7 @@ const kit_req = ({
   setDisabled,
   state_quotationTotal,
   instatnce_getQuotationId3,
+  status,
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
@@ -74,6 +75,7 @@ const kit_req = ({
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   state_quotationTotal: TstateTotalPrice;
   instatnce_getQuotationId3: Tinstance_getQuotationId3;
+  status: TquotationContentDto['status'];
 }) => {
   const { reqPost, reqPatch, reqReview, reqUnlock, reqPatchReviewer, reqCopyQuotation, reqToPending } =
     instatnce_getQuotationId3;
@@ -102,6 +104,7 @@ const kit_req = ({
       userId,
       annoArr,
       quotationRangeArr,
+      status,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -119,14 +122,21 @@ const kit_req = ({
 
   // MARK:reqPatchQuotation
   const reqPatchQuotation = async ({ editNote }: { editNote: string }) => {
+    const empty = {
+      newQuotation: undefined,
+      isUpdated: false,
+    };
+
     if (!userId) {
-      return myAlert.warning({ title: '沒有使用者ID' });
+      myAlert.warning({ title: '沒有使用者ID' });
+
+      return empty;
     }
 
     if (!quotationId) {
       myAlert.warning({ title: '沒有報價單ID' });
 
-      return;
+      return empty;
     }
 
     if (!state_profile.customer) {
@@ -143,6 +153,7 @@ const kit_req = ({
       userId,
       annoArr,
       quotationRangeArr,
+      status,
     });
 
     // const shouldUpdate = false;
@@ -151,11 +162,17 @@ const kit_req = ({
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
-    const { isUpdated } = await reqPatch({ body, attachmentArr });
+    const { newQuotation, newAttachmentArr, isUpdated } = await reqPatch({ body, attachmentArr });
 
     if (isUpdated) {
       setDisabled(true);
     }
+
+    return {
+      newQuotation,
+      newAttachmentArr,
+      isUpdated,
+    };
 
     // try {
     //   const updatedQuotation = await apiPatchQuotation(body, quotationId);
@@ -201,6 +218,7 @@ const createBody = ({
   userId,
   annoArr,
   quotationRangeArr,
+  status,
 }: {
   instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_useQuotationOther: Tinstance_useQuotationOther;
@@ -211,6 +229,7 @@ const createBody = ({
   userId: string;
   annoArr: string[];
   quotationRangeArr: string[];
+  status: TquotationContentDto['status'];
 }) => {
   const {
     calcProductBody: calcProduct,
@@ -290,7 +309,8 @@ const createBody = ({
     quantity: totalQty,
     editNotes: editNote,
     // !
-    status: 'Budget',
+    // status: 'Budget',
+    status: status,
     // !
     agentId: userId,
     // annotations: annoArr.map((anno) => anno.value),

@@ -2175,6 +2175,7 @@ export const useGetQuotation_id_3 = (
 
       return {
         newQuotation: undefined,
+        attachmentArr: undefined,
         isUpdated: false,
       };
     }
@@ -2191,6 +2192,7 @@ export const useGetQuotation_id_3 = (
     if (!res) {
       return {
         newQuotation: undefined,
+        newAttachmentArr: undefined,
         isUpdated,
       };
     }
@@ -2212,7 +2214,8 @@ export const useGetQuotation_id_3 = (
     setIsFetching(false);
 
     return {
-      newQuotation,
+      newQuotation: newQuotation?.quotation,
+      newAttachmentArr: newQuotation?.attachmentArr,
       isUpdated,
     };
 
@@ -2245,10 +2248,10 @@ export const useGetQuotation_id_3 = (
     //     setIsFetching(false);
     //   });
 
-    return {
-      newQuotation: res,
-      isUpdated,
-    };
+    // return {
+    //   newQuotation: res,
+    //   isUpdated,
+    // };
   };
 
   // ------------------------------------------------------------------------
