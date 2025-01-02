@@ -83,6 +83,30 @@ const kit_req = ({
     if (!userId) {
       return myAlert.warning({ title: '沒有使用者ID' });
     }
+
+    if (!state_profile.customer) {
+      myAlert.info({ title: '請選擇客戶' });
+    }
+
+    const body = createBody({
+      instance_quotationProduct,
+      instance_useQuotationOther,
+      state_profile,
+      state_payInfo,
+      state_quotationTotal,
+      editNote,
+      userId,
+      annoArr,
+      quotationRangeArr,
+    });
+
+    const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
+
+    const { isUpdated } = await reqPost({ body, attachmentArr });
+
+    if (isUpdated) {
+      setDisabled(true);
+    }
   };
 
   // -----------------------------------------------------------------------
@@ -121,9 +145,9 @@ const kit_req = ({
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
-    const { isUpdated: updated } = (await reqPatch({ body, attachmentArr })) ?? {};
+    const { isUpdated } = await reqPatch({ body, attachmentArr });
 
-    if (updated) {
+    if (isUpdated) {
       setDisabled(true);
     }
 
@@ -150,10 +174,15 @@ const kit_req = ({
   };
 
   return {
+    reqPostQuotation,
     reqPatchQuotation,
   };
 };
 
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
 // ==========================================================================
 
 const createBody = ({

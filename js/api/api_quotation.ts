@@ -2096,41 +2096,73 @@ export const useGetQuotation_id_3 = (
   const reqPost = async ({
     body,
     attachmentArr,
-    onPostSuccess,
-  }: {
+  }: // onPostSuccess,
+  {
     body: TcreateQuotationContentDto;
     attachmentArr: FormData[];
-    onPostSuccess?: (newQuotation: TquotationDto) => void;
+    // onPostSuccess?: (newQuotation: TquotationDto) => void;
   }) => {
     setIsFetching(true);
 
-    return await apiPostQuotation(body)
-      .then(async (newQuotation) => {
-        const contentId = newQuotation.latestContent.id;
-        let isSomethingWrong = false;
+    const res = await apiPostQuotation(body).catch((err) => {
+      myAlert.err({ title: '新增報價單失敗' });
+      console.log(err);
+    });
 
-        for (const attachment of attachmentArr) {
-          await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
-            isSomethingWrong = true;
-          });
-        }
+    if (!res) {
+      return {
+        newQuotation: undefined,
+        isUpdated: false,
+      };
+    }
 
-        isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+    const contentId = res.latestContent.id;
+    let isSomethingWrong = false;
 
-        return newQuotation;
-      })
-      .then((newQuotation) => {
-        onPostSuccess && onPostSuccess(newQuotation);
-
-        return newQuotation;
-      })
-      .catch((err) => {
-        myAlert.err({ title: '新增報價單失敗' });
-        console.log(err);
-      })
-      .finally(() => {
-        setIsFetching(false);
+    for (const attachment of attachmentArr) {
+      await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+        isSomethingWrong = true;
       });
+    }
+
+    isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+    const newQuotation = await update();
+
+    setIsFetching(false);
+
+    return {
+      newQuotation,
+      isUpdated: true,
+    };
+
+    // return await apiPostQuotation(body)
+    //   .then(async (newQuotation) => {
+    //     const contentId = newQuotation.latestContent.id;
+    //     let isSomethingWrong = false;
+
+    //     for (const attachment of attachmentArr) {
+    //       await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+    //         isSomethingWrong = true;
+    //       });
+    //     }
+
+    //     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+    //     return newQuotation;
+    //   })
+    //   .then((newQuotation) => {
+    //     onPostSuccess && onPostSuccess(newQuotation);
+
+    //     return newQuotation;
+    //   })
+    //   .catch((err) => {
+    //     myAlert.err({ title: '新增報價單失敗' });
+    //     console.log(err);
+    //   })
+    //   .finally(() => {
+    //     setIsFetching(false);
+    //   });
   };
 
   // ------------------------------------------------------------------------
@@ -2140,15 +2172,19 @@ export const useGetQuotation_id_3 = (
     if (!raw) {
       myAlert.info({ title: '還未取得報價單' });
 
-      return;
+      return {
+        newQuotation: undefined,
+        isUpdated: false,
+      };
     }
 
     let isUpdated = false;
 
     setIsFetching(true);
 
-    const res = await apiPatchQuotation(body, raw.id).catch(() => {
+    const res = await apiPatchQuotation(body, raw.id).catch((err) => {
       myAlert.err({ title: '更新報價單失敗' });
+      console.log(err);
     });
 
     if (!res) {
