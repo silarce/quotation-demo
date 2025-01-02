@@ -2298,9 +2298,10 @@ export const useGetQuotation_id_3 = (
     return await apiQuotationReview({ id: raw.id, body })
       .then(async (res) => {
         myAlert.success({ title: '審核成功' });
-        await update();
 
         return res;
+
+        // return await update();
       })
       .catch((err) => {
         myAlert.err({ title: '審核失敗', content: err.message });
@@ -2326,7 +2327,7 @@ export const useGetQuotation_id_3 = (
       .then(async () => {
         myAlert.success({ title: '解除鎖定成功', content: '該報價單改為發包' });
 
-        await update();
+        return await update();
       })
       .catch((error) => {
         const err = error as AxiosError<{ message: string }>;

@@ -537,10 +537,50 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  // MARK: 送審
   const handleSubmit = async () => {};
 
-  const handleReview = async () => {};
+  // MARK: 審核
+  const handleReview = async () => {
+    const callReq = async (isPass: boolean) => {
+      if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
+        myAlert.warning({ title: '請先送出合約審核表' });
 
+        return;
+      }
+
+      const body = {
+        reviewSalesEmployeeId: isSales ? userId : null,
+        reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+        // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+        reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
+        reviewCashierEmployeeId: isCashier ? userId : null,
+        reviewManagerEmployeeId: isManager ? userId : null,
+        reviewResult: isPass,
+      };
+
+      const res = await reqReview(body);
+
+      if (res?.status === 'Contract') {
+        router.back();
+      } else {
+        update_quotation();
+      }
+    };
+
+    const { destroy } = myAlert.clear({
+      content: (
+        <AskRevier
+          //
+          onPass={() => callReq(true)}
+          onNoPass={() => callReq(false)}
+          onCancel={() => destroy()}
+        />
+      ),
+    });
+  };
+
+  // MARK: 解除鎖定
   const handleReqUnlock = async () => {
     myAlert.confirm({
       title: '確定要解除鎖定?',
@@ -973,3 +1013,26 @@ const useReviewrUi = ({
 };
 
 // ================================================================================
+
+const AskRevier = ({
+  onPass,
+  onNoPass,
+  onCancel,
+}: {
+  onPass: () => void;
+  onNoPass: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <div className="p-10">
+      <p className="text-center text-2xl text-main mb-10">是否通過審核?</p>
+      <div className="flex justify-center gap-10 mt-4">
+        <MyButton_v2 onClick={onPass} theme="danger">
+          通過審核
+        </MyButton_v2>
+        <MyButton_v2 onClick={onNoPass}>不通過審核</MyButton_v2>
+        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
+      </div>
+    </div>
+  );
+};
