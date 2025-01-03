@@ -48,8 +48,11 @@ import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
+  optionDict_surface,
   optionsCreator_surface,
   optionsCreator_surface_onlyPaint,
+  optionsCreator_surface_galvanizedSteelPlate,
+  optionsCreator_surface_sst,
   optionsCreator_doorModel,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
@@ -70,6 +73,9 @@ import {
 
 const options_surface = optionsCreator_surface();
 const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
+const options_surface_galvanizedSteelPlate = optionsCreator_surface_galvanizedSteelPlate();
+const options_surface_surface_sst = optionsCreator_surface_sst();
+
 // const options_doorModel = optionsCreator_doorModel();
 const options_doorModelName = optionsCreator_doorModelName();
 const options_quoteType = optionsCreator_quoteType();
@@ -2345,7 +2351,12 @@ class Class_product {
 
     // 把黑鐵的label改為鐵材烤漆
     const blackIron = arr.find((item) => item.value === '黑鐵');
-    blackIron && (blackIron.label = '鐵材烤漆');
+
+    if (blackIron) {
+      blackIron.label = '鐵材烤漆';
+      // 某天說要把黑鐵(鐵材烤漆)這個選項拿掉
+      arr.splice(arr.indexOf(blackIron), 1);
+    }
 
     return arr;
   }
@@ -2424,6 +2435,14 @@ class Class_product {
       return undefined;
     }
 
+    if (this.material === 'SST#304' || this.material === 'SST#316') {
+      return optionsCreator_surface_sst();
+    }
+
+    if (this.material === '鍍鋅鋼板') {
+      return optionsCreator_surface_galvanizedSteelPlate();
+    }
+
     let options = options_surface_onlyPaint;
 
     const isSST = checkIsSST(this.material);
@@ -2438,12 +2457,6 @@ class Class_product {
         return item.value !== '無烤漆';
       });
     }
-
-    // if (this.doorType !== 'SJ-305D') {
-    //   options = options.filter((item) => {
-    //     return item.value !== '無烤漆';
-    //   });
-    // }
 
     return options;
   }
