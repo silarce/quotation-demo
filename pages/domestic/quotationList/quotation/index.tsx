@@ -310,6 +310,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
+  // console.log(isSendToReview);
+  // console.log(isSendToReview_pending);
+  // console.log(isReviewer);
+  // console.log(isSales);
+  // console.log(isWorkDirector);
+  // console.log(isCashier);
+  // console.log(isSupervisor);
+  // console.log(isManager);
+
   // ----------------------------------------------------------------------
 
   // region STATE MANAGEMENT
@@ -552,11 +561,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     const reviewSalesEmployeeId = sales?.id ?? null;
     const reviewSupervisorEmployeeId = supervisor?.id ?? null;
 
-    if (status === 'Pending' && !reviewSalesEmployeeId) {
+    if (content?.status === 'Pending' && !reviewSalesEmployeeId) {
       return myAlert.err({ title: '沒有業務' });
     }
 
-    if (status === 'TempPending') {
+    if (content?.status === 'TempPending') {
       if (!reviewSalesEmployeeId) {
         return myAlert.info({ title: '請選擇業務' });
       }
@@ -565,6 +574,20 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     }
 
     const body = { reviewSalesEmployeeId, reviewSupervisorEmployeeId };
+
+    reqPatchReviewer({
+      body,
+    });
+
+    setShowEmployeSelector(false);
+  };
+
+  const handleSubmit_pending = async () => {
+    if (!isQuotation) {
+      return;
+    }
+
+    const body = {};
 
     reqPatchReviewer({
       body,
@@ -657,6 +680,52 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setQuotationPriceTotal(quotationPriceTotal);
   }
 
+  const preHandleSubmit = () => {
+    if (content?.status === 'Pending') {
+      if (!haveVerifyForm) {
+        myAlert.warning({ title: '請先送出合約審核表' });
+
+        return;
+      }
+
+      if (toCashierAt) {
+        myAlert.info({ title: '此報價單已經送審' });
+
+        return;
+      }
+
+      console.log(content?.toSupervisorAt);
+
+      myAlert.confirm({
+        title: '送審後合約審核表將被鎖定',
+        content: '建議先確認合約審核表是否正確',
+        // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+        props: {
+          width: 450,
+          onOk: () => {
+            if (!content?.toSupervisorAt) {
+              setShowEmployeSelector(true);
+            } else {
+              handleSubmit_pending();
+            }
+
+            //
+          },
+          okText: '確定送審',
+          cancelText: '取消',
+        },
+      });
+
+      return;
+    }
+
+    if (toSalesAt || toSupervisorAt) {
+      myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+    } else {
+      setShowEmployeSelector(true);
+    }
+  };
+
   // ----------------------------------------------------------------------
   // region PROPS
 
@@ -691,6 +760,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     avgDiscount,
   });
 
+  // MARK:usePanel
   const { panelList, customeRight } = usePanel({
     disabled,
     isNewQuotation,
@@ -718,7 +788,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     handleReqToPending,
 
     handleReview,
-    handleSubmit: () => setShowEmployeSelector(true),
+    handleSubmit: preHandleSubmit,
     showVerifyForm: () => setReviewFormShow(true),
     handleReqUnlock,
     //

@@ -292,10 +292,14 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
   }
 
   const reviewers = getReviewerDict(props);
+  console.log(reviewers);
 
   // 按照reviewers的順序，假設user同時為sales與manager
   // 最後會是isSales:false isManager:true
   Object.entries(reviewers).forEach(([key, id]) => {
+    // console.log(id)
+    // console.log(userId)
+
     if (id === userId) {
       isReviewer = true;
 
@@ -350,6 +354,9 @@ const parseQuotationContentSituation = ({
   userId: string | undefined | null;
   quotationContent: TquotationContentDto;
 }) => {
+  // console.log(userId)
+  // console.log(quotationContent)
+
   const {
     reviewSalesEmployee,
     reviewWorkDirectorEmployee,
@@ -401,9 +408,9 @@ const parseQuotationContentSituation = ({
     ? checkIsReviewer({
         userId,
         reviewSalesEmployeeId: salesEmployeeId || undefined,
-        reviewSupervisorEmployeeId: workDirectorEmployeeId || undefined,
-        reviewWorkDirectorEmployeeId: cashierEmployeeId || undefined,
-        reviewCashierEmployeeId: supervisorEmployeeId || undefined,
+        reviewSupervisorEmployeeId: supervisorEmployeeId || undefined,
+        reviewWorkDirectorEmployeeId: workDirectorEmployeeId || undefined,
+        reviewCashierEmployeeId: cashierEmployeeId || undefined,
         reviewManagerEmployeeId: managerEmployeeId || undefined,
         ...quotationContent,
       })
