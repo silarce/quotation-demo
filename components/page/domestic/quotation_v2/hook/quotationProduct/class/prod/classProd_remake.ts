@@ -1448,6 +1448,8 @@ class ClassProd {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
+    value = `${fixedToFloat3(value || 0)}`;
+
     this.data.fullWidth = value;
 
     if (this.isSpecial) {
@@ -1525,6 +1527,7 @@ class ClassProd {
     return this.data.height;
   }
   set height(value) {
+    value = `${fixedToFloat3(value || 0)}`;
     this.data.height = value;
 
     if (this.isSpecial) {
@@ -1574,6 +1577,7 @@ class ClassProd {
     return this.data.boxD;
   }
   set boxD(value) {
+    value = `${fixedToFloat3(value || 0)}`;
     this.data.boxD = value;
     this.render();
   }
