@@ -86,11 +86,11 @@ const createProps_profileForm = ({
   state_profile,
   setState_profile,
   reqPatchTrackProgressOrProjectProgress,
-  isSendToReview,
+  allowEditClick,
 }: {
   state_profile: Tstate_profile;
   setState_profile: React.Dispatch<React.SetStateAction<Tstate_profile>>;
-  isSendToReview: boolean | undefined;
+  allowEditClick: boolean | undefined;
   //
   reqPatchTrackProgressOrProjectProgress: (props: {
     trackProgress?: string | null;
@@ -155,10 +155,10 @@ const createProps_profileForm = ({
     trackProgress: {
       value: state_profile.trackProgress,
       onChange: (v: string) => setState_profile((prev) => ({ ...prev, trackProgress: v })),
-      onEditClick: !isSendToReview
+      onEditClick: !allowEditClick
         ? null
         : async () => {
-            myAlert.input({
+            const { destroy } = myAlert.input({
               title: '更新追蹤狀態',
               isTextArea: true,
               width: 1000,
@@ -168,6 +168,8 @@ const createProps_profileForm = ({
                 if (res) {
                   setState_profile((prev) => ({ ...prev, trackProgress: res.trackProgress || '' }));
                 }
+
+                destroy();
               },
             });
           },
@@ -176,10 +178,10 @@ const createProps_profileForm = ({
     projectProgress: {
       value: state_profile.projectProgress,
       onChange: (v: string) => setState_profile((prev) => ({ ...prev, projectProgress: v })),
-      onEditClick: !isSendToReview
+      onEditClick: !allowEditClick
         ? null
         : async () => {
-            myAlert.input({
+            const { destroy } = myAlert.input({
               title: '更新工地進度',
               isTextArea: true,
               width: 1000,
@@ -189,6 +191,8 @@ const createProps_profileForm = ({
                 if (res) {
                   setState_profile((prev) => ({ ...prev, projectProgress: res.projectProgress || '' }));
                 }
+
+                destroy();
               },
             });
           },

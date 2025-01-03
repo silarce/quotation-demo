@@ -740,7 +740,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     state_profile,
     setState_profile,
     reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
-    isSendToReview,
+    allowEditClick: isSendToReview,
   });
 
   const props_payInfo = createProps_payInfo({
