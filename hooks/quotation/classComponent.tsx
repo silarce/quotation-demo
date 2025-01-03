@@ -9,7 +9,12 @@ import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody'
 
 import { TdoorComponentListDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
-import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_surface,
+  optionsCreator_surface_onlyPaint,
+  optionsCreator_surface_sst,
+  optionsCreator_surface_galvanizedSteelPlate,
+} from 'js/utils/options/productOptions';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
@@ -254,6 +259,14 @@ class Class_component {
 
     if (this.material === '鋁合金') {
       return undefined;
+    }
+
+    if (this.material === 'SST#304' || this.material === 'SST#316') {
+      return optionsCreator_surface_sst();
+    }
+
+    if (this.material === '鍍鋅鋼板') {
+      return optionsCreator_surface_galvanizedSteelPlate();
     }
 
     if (checkIsSST(this.material ?? '')) {
@@ -902,7 +915,7 @@ const comCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '75px' },
+      wrapperStyle: { width: '120px' },
       selectProps: {
         props: {
           // options 寫在class裡面

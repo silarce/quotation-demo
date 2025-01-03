@@ -7,6 +7,21 @@ import _ from 'lodash';
 
 export type { Toption };
 
+// ============================================================================
+
+const optionDict_surface = {
+  '2B': { value: '2B', label: '2B' },
+  HL: { value: 'HL', label: 'HL' },
+  BA: { value: 'BA', label: 'BA' },
+  'NO.4': { value: 'NO.4', label: 'NO.4' },
+  paint: { value: '烤漆', label: '烤漆' },
+  fluorocarbon: { value: '氟碳', label: '氟碳' },
+  noPaint: { value: '無烤漆', label: '無烤漆' },
+  PaintSpecifiedColor: { value: '烤漆指定色', label: '烤漆指定色' },
+};
+
+// ============================================================================
+
 const createOptionsCreator = ({ optionsArr }: { optionsArr: Toption[] }) => {
   const fuc = ({ haveEmpty }: { haveEmpty?: boolean } = {}): Toption[] => {
     const arr = optionsArr;
@@ -459,20 +474,39 @@ export const optionsCreator_bottomBarPlate_312 = createOptionsCreator({
 
 export const optionsCreator_surface = createOptionsCreator({
   optionsArr: [
-    { value: '2B', label: '2B' },
-    { value: 'HL', label: 'HL' },
-    { value: 'BA', label: 'BA' },
-    { value: 'NO.4', label: 'NO.4' },
-    { value: '烤漆', label: '烤漆' },
-    { value: '氟碳', label: '氟碳' },
-    { value: '無烤漆', label: '無烤漆' },
+    optionDict_surface['2B'],
+    optionDict_surface['HL'],
+    optionDict_surface['BA'],
+    optionDict_surface['NO.4'],
+    optionDict_surface['paint'],
+    optionDict_surface['fluorocarbon'],
+    optionDict_surface['noPaint'],
   ],
 });
 export const optionsCreator_surface_onlyPaint = createOptionsCreator({
   optionsArr: [
-    { value: '烤漆', label: '烤漆' },
-    { value: '氟碳', label: '氟碳' },
-    { value: '無烤漆', label: '無烤漆' },
+    //
+    optionDict_surface['paint'],
+    optionDict_surface['fluorocarbon'],
+    optionDict_surface['noPaint'],
+  ],
+});
+
+// 鍍鋅鋼板的表面，不適用於高耐鍍鋅鋼板
+export const optionsCreator_surface_galvanizedSteelPlate = createOptionsCreator({
+  optionsArr: [
+    optionDict_surface['paint'],
+    optionDict_surface['PaintSpecifiedColor'],
+    optionDict_surface['fluorocarbon'],
+  ],
+});
+
+// SST#304與SST#316的表面，不適用於其他名字包含"SST"或"不鏽鋼"的材質
+export const optionsCreator_surface_sst = createOptionsCreator({
+  optionsArr: [
+    //
+    optionDict_surface['PaintSpecifiedColor'],
+    optionDict_surface['fluorocarbon'],
   ],
 });
 
@@ -835,3 +869,5 @@ export const lookup_sprocketWheelModel_gearNumberAndChainQty = {
 };
 
 export { lookup_options_bottomBarAngleIronAndPlate, lookup_quoteType_doorModelName };
+
+export { optionDict_surface };
