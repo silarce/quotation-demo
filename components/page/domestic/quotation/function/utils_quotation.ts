@@ -292,7 +292,6 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
   }
 
   const reviewers = getReviewerDict(props);
-  console.log(reviewers);
 
   // 按照reviewers的順序，假設user同時為sales與manager
   // 最後會是isSales:false isManager:true

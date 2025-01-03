@@ -96,7 +96,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     material: {
       label: '材料',
-      style: { width: 90 },
+      style: { width: 120 },
       createNode({ disabled, classComponent }) {
         const v = classComponent.material;
         const options_material = classComponent.options_material;

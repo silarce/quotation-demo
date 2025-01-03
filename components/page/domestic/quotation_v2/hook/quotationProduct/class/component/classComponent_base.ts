@@ -62,6 +62,7 @@ interface Interface_ClassComponent_base {
   readonly onProdChangeMaterial: (prodMaterial: string | null | undefined) => void;
   readonly onProdChangeSurface: (prodSurface: string | null | undefined) => void;
   readonly renewDesc: () => void;
+  readonly renewSurface: () => void;
 
   availableComponents?: TdoorComponentListDto | undefined | null; // undefined視為未曾初始化
   changeRaw?: (v: string) => void;
@@ -153,6 +154,9 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
   set material(value) {
     this.state.material = value;
+
+    this.renewSurface();
+
     this.renewDesc();
 
     this.classProd?.isAllowReqChain && this.classProd?.reqChain_04();
@@ -314,6 +318,15 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   renewDesc() {
     // 將會在各個子類別中實作
   }
+  renewSurface() {
+    const options_surfacce = this.options_materialSurface;
+
+    const surface = this.state.materialSurface;
+
+    if (!options_surfacce?.some((option) => option.value === surface)) {
+      this.state.materialSurface = options_surfacce?.[0].value ?? '';
+    }
+  }
 
   // 在各個子類別中可能有各自的實作
   onProdChangeMaterial(prodMaterial: string | null | undefined) {
@@ -329,6 +342,8 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
         this.state.materialSurface = this.options_materialSurface[0].value;
       }
     }
+
+    this.renewSurface();
 
     this.renewDesc();
 

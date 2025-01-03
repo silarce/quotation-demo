@@ -120,6 +120,7 @@ const reqGetAvailableComponents = async (classProd: ClassProd) => {
 // MARK:reqGetBom
 const reqGetBom = async (classProd: ClassProd) => {
   const prodData = classProd.data;
+  const doorModelName = prodData.doorModelName;
 
   const componentDict = classProd.state.data_componentDict;
 
@@ -133,7 +134,15 @@ const reqGetBom = async (classProd: ClassProd) => {
     let materialSurface = component.materialSurface;
     const guideRailThickness = key === 'guideRail' ? classProd.data.guideRailThickness : undefined; // 門軌厚度
 
-    if (materialSurface === '烤漆' || materialSurface === '氟碳') {
+    if (
+      !(
+        doorModelName === 'SJ-302' ||
+        doorModelName === 'SJ-312' ||
+        doorModelName === 'SJ-303A' ||
+        doorModelName === 'SJ-303AS'
+      ) &&
+      (materialSurface === '烤漆' || materialSurface === '氟碳' || materialSurface === '烤漆指定色')
+    ) {
       materialSurface = '2B';
     }
 
