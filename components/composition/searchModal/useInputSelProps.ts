@@ -67,6 +67,7 @@ const createInputSel = ({
     case 'select':
       inputSelProps.selectProps = {
         props: {
+          menuPortalTarget: undefined,
           classNames: {
             menuPortal: () => classNames(scss.select_menuPortal, scss.plus),
           },
