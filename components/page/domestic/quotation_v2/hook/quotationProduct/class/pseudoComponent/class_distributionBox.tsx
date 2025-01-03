@@ -172,6 +172,9 @@ class Class_distributionBox implements Interface_ClassComponent_prime {
   renewDesc() {
     // do nothing
   }
+  renewSurface() {
+    // do nothing
+  }
 
   renewAllPrice() {
     this.classProd.renewDistributionBoxAllPrice();
