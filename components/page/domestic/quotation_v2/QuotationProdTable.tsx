@@ -203,7 +203,7 @@ const Table_prod = ({
       </div>
       {/*  */}
       <div className={classNames(scss.prodTable, className)}>
-        <div className={scss.table}>
+        <div className={classNames(scss.table, 'pb-5')}>
           <QuotationRow_dndThead
             className={scss.rowThead}
             // disabled={disabled}
@@ -493,7 +493,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
     <div>
       <div className={classNames(scss.title, 'p-[10px]')}>選配</div>
       <div className={classNames(scss.accessoryTable, className)}>
-        <div className={scss.table}>
+        <div className={classNames(scss.table, 'pb-5')}>
           <QuotationRow_dndThead
             className={scss.rowThead}
             // disabled={disabled}
