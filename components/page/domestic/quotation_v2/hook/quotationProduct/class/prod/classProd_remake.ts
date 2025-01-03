@@ -1036,18 +1036,13 @@ class ClassProd {
 
     const qniqQuestion = _.uniq(afterChangeQueue);
 
-    if (qniqQuestion.length !== afterChangeQueue.length) {
-      myAlert.warning({ title: '開發者提示', content: 'afterChangeQueue有重複的方法，預期不應重複' });
-      console.log('afterChangeQueue有重複的方法', afterChangeQueue);
-    }
-
     this.state.isFetching = true;
 
     this.render();
 
     let thisFuncName = '';
 
-    for (const _funcName of afterChangeQueue) {
+    for (const _funcName of qniqQuestion) {
       thisFuncName = _funcName;
       const funcName = _funcName as Parameters<ClassProd['addAfterChange']>[0];
 
@@ -1448,7 +1443,7 @@ class ClassProd {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    value = `${fixedToFloat3(value || 0)}`;
+    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
 
     this.data.fullWidth = value;
 
@@ -1527,7 +1522,7 @@ class ClassProd {
     return this.data.height;
   }
   set height(value) {
-    value = `${fixedToFloat3(value || 0)}`;
+    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
     this.data.height = value;
 
     if (this.isSpecial) {
@@ -1552,7 +1547,7 @@ class ClassProd {
     return this.data.boxB;
   }
   set boxB(value) {
-    value = `${fixedToFloat3(value || 0)}`;
+    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
     this.data.boxB = value;
 
     if (this.isSpecial) {
@@ -1577,7 +1572,7 @@ class ClassProd {
     return this.data.boxD;
   }
   set boxD(value) {
-    value = `${fixedToFloat3(value || 0)}`;
+    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
     this.data.boxD = value;
     this.render();
   }
