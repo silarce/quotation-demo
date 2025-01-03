@@ -1135,7 +1135,11 @@ class ClassProd {
 
     // 把黑鐵的label改為鐵材烤漆
     const blackIron = options.find((item) => item.value === '黑鐵');
-    blackIron && (blackIron.label = '鐵材烤漆');
+
+    if (blackIron) {
+      blackIron.label = '鐵材烤漆';
+      options.splice(options.indexOf(blackIron), 1); // 某天說要把鐵材烤漆選項拿掉
+    }
 
     return options;
   }
