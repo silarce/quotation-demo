@@ -72,7 +72,7 @@ const usePanel = ({
   const router = useRouter();
 
   const customeRight: React.ReactNode[] = [
-    !disabled ? null : (
+    !disabled || status === 'Pending' ? null : (
       <CloneQuotation
         key="CloneQuotation"
         cloneQuotation={cloneQuotation}
@@ -136,11 +136,13 @@ const usePanel = ({
 
     !isNewQuotation && status === 'Pending' ? { type: 'myButton', label: '合約審核表', onClick: showVerifyForm } : null,
 
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: btnEditOnClick,
-    },
+    status === 'Pending'
+      ? null
+      : {
+          type: 'myButton',
+          label: '編輯',
+          onClick: btnEditOnClick,
+        },
 
     status === 'Pending' || status === 'TempPending'
       ? {
