@@ -250,6 +250,7 @@ const createBody = ({
   const {
     calcProductBody: calcProduct,
     quotationDiscount,
+    avgDiscount,
     // state_totalPrice: {
     //   prodPriceTotal,
     //   averageDiscount,
@@ -290,7 +291,9 @@ const createBody = ({
     designUnit,
   } = state_profile;
 
-  const { deliveryLocation, deliveryDate, paymentMethodArr } = state_payInfo;
+  const { deliveryLocation, deliveryDate } = state_payInfo;
+  let paymentMethodArr = state_payInfo.paymentMethodArr;
+  paymentMethodArr = paymentMethodArr.map((item) => ({ ...item, totalPaymentRatio: item.totalPaymentRatio || '0' }));
 
   const {
     //
@@ -315,30 +318,23 @@ const createBody = ({
     contactPerson,
     contactNumber,
     faxNumber,
-    designatedBrand,
-    siteManager,
-    siteManagerNumber,
+    designatedBrand: designatedBrand || null,
+    siteManager: siteManager || null,
+    siteManagerNumber: siteManagerNumber || null,
     // !
-    requiredDoorType: '門型彙總',
+    // requiredDoorType: '門型彙總',
     // !
-    type,
+    type: type || null,
     quantity: totalQty,
     editNotes: editNote,
-    // !
-    // status: 'Budget',
     status: status,
-    // !
     agentId: userId,
-    // annotations: annoArr.map((anno) => anno.value),
-    // quotationRanges: quotationRangeArr.map((qr) => qr.value),
     annotations: annoArr,
     quotationRanges: quotationRangeArr,
     trackProgress,
     projectProgress,
-    discount: quotationDiscount || '100',
-    // !
-    averageDiscount: '999',
-    // !
+    discount: quotationDiscount || '0',
+    averageDiscount: `${avgDiscount}` || null,
     tuneTotal,
     subTotal,
     salesTax,
@@ -346,8 +342,8 @@ const createBody = ({
     deliveryLocation,
     deliveryDate: deliveryDate && deliveryDate.toISOString(),
     paymentMethods: paymentMethodArr,
-    exchangeRate,
-    foreignTotal,
+    exchangeRate: exchangeRate || null,
+    foreignTotal: foreignTotal || null,
     currency,
     products: quotationProductArr,
     others: formatToBody_other(),
