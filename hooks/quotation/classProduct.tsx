@@ -1181,8 +1181,25 @@ class Class_product {
       let materialSurface = item.componentInfo.materialSurface;
 
       // materialSurface臨時新增烤漆，烤漆的處理等同2B
-      if (materialSurface === '烤漆' || materialSurface === '氟碳') {
-        materialSurface = '2B';
+
+      if (
+        !(
+          this.doorType === 'SJ-302' ||
+          this.doorType === 'SJ-312' ||
+          this.doorType === 'SJ-303A' ||
+          this.doorType === 'SJ-303AS'
+        )
+      ) {
+        if (
+          //
+          materialSurface === '烤漆' ||
+          materialSurface === '氟碳' ||
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          materialSurface === '烤漆指定色'
+        ) {
+          materialSurface = '2B';
+        }
       }
 
       if (key === 'bottomBar') {

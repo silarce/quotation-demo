@@ -496,8 +496,8 @@ export const optionsCreator_surface_onlyPaint = createOptionsCreator({
 export const optionsCreator_surface_galvanizedSteelPlate = createOptionsCreator({
   optionsArr: [
     optionDict_surface['paint'],
-    optionDict_surface['PaintSpecifiedColor'],
     optionDict_surface['fluorocarbon'],
+    optionDict_surface['PaintSpecifiedColor'],
   ],
 });
 
@@ -505,8 +505,8 @@ export const optionsCreator_surface_galvanizedSteelPlate = createOptionsCreator(
 export const optionsCreator_surface_sst = createOptionsCreator({
   optionsArr: [
     //
-    optionDict_surface['PaintSpecifiedColor'],
     optionDict_surface['fluorocarbon'],
+    optionDict_surface['PaintSpecifiedColor'],
   ],
 });
 
