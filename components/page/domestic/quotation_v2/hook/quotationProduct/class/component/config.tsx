@@ -124,7 +124,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
 
     materialSurface: {
       label: '表面',
-      style: { width: 60 },
+      style: { width: 110 },
       createNode({ disabled, classComponent }) {
         const v = classComponent.materialSurface;
         const value = v ? { value: v, label: v } : null;

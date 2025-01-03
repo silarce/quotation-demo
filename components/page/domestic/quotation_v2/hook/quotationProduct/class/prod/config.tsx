@@ -620,7 +620,7 @@ const nodeConfig_origin: TnodeConfig = {
   materialSurface: {
     label: '表面',
     style: {
-      width: 80,
+      width: 110,
     },
     createNode({ disabled, classProd }) {
       const v = classProd.materialSurface;

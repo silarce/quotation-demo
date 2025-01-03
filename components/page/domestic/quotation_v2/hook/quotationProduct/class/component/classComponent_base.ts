@@ -20,7 +20,12 @@ import type { TdoorComponentListDto } from 'js/api/dtoTypes';
 import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 import type { Toption } from 'js/utils/options/options';
-import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_surface,
+  optionsCreator_surface_onlyPaint,
+  optionsCreator_surface_sst,
+  optionsCreator_surface_galvanizedSteelPlate,
+} from 'js/utils/options/productOptions';
 
 import { checkIsSST, checkIsGalvanized } from '../library';
 
@@ -222,11 +227,21 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   }
 
   get options_materialSurface() {
-    if (!this.material) {
+    const material = this.state.material;
+
+    if (!material) {
       return undefined;
     }
 
-    if (checkIsSST(this.material)) {
+    if (material === 'SST#304' || material === 'SST#316') {
+      return optionsCreator_surface_sst();
+    }
+
+    if (material === '鍍鋅鋼板') {
+      return optionsCreator_surface_galvanizedSteelPlate();
+    }
+
+    if (checkIsSST(material)) {
       return optionsCreator_surface();
     }
 
