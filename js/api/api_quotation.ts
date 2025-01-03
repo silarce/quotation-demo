@@ -2104,38 +2104,42 @@ export const useGetQuotation_id_3 = (
   }) => {
     setIsFetching(true);
 
-    const res = await apiPostQuotation(body).catch((err) => {
-      myAlert.err({ title: '新增報價單失敗' });
-      console.log(err);
-    });
+    try {
+      const res = await apiPostQuotation(body).catch((err) => {
+        myAlert.err({ title: '新增報價單失敗' });
+        console.log(err);
+      });
 
-    if (!res) {
+      if (!res) {
+        return {
+          newQuotation: undefined,
+          isUpdated: false,
+        };
+      }
+
+      const contentId = res.latestContent.id;
+      let isSomethingWrong = false;
+
+      for (const attachment of attachmentArr) {
+        await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+          isSomethingWrong = true;
+        });
+      }
+
+      isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+      return {
+        newQuotation: res,
+        isUpdated: true,
+      };
+    } catch (error) {
       return {
         newQuotation: undefined,
-
         isUpdated: false,
       };
+    } finally {
+      setIsFetching(false);
     }
-
-    const contentId = res.latestContent.id;
-    let isSomethingWrong = false;
-
-    for (const attachment of attachmentArr) {
-      await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
-        isSomethingWrong = true;
-      });
-    }
-
-    isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
-
-    // const newQuotation = await update();
-
-    setIsFetching(false);
-
-    return {
-      newQuotation: res,
-      isUpdated: true,
-    };
 
     // return await apiPostQuotation(body)
     //   .then(async (newQuotation) => {
