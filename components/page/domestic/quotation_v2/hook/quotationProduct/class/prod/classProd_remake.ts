@@ -84,22 +84,24 @@ import { createComponentDict } from '../createComponentDict';
 import {
   optionsCreator_surface,
   optionsCreator_surface_onlyPaint,
-  optionsCreator_doorModel,
-  optionsCreator_bottomBarAngleIron,
-  optionsCreator_bottomBarPlate,
-  optionsCreator_bottomBarAngleIron_303A,
-  optionsCreator_bottomBarPlate_303A,
-  optionsCreator_bottomBarAngleIron_303AS,
-  optionsCreator_bottomBarPlate_303AS,
-  optionsCreator_boxB_SJ302,
-  optionsCreator_boxB_SJ303A,
-  optionsCreator_boxB_SJ312,
-  optionsCreator_boxB_SJ305D,
+  optionsCreator_surface_sst,
+  optionsCreator_surface_galvanizedSteelPlate,
+  // optionsCreator_doorModel,
+  // optionsCreator_bottomBarAngleIron,
+  // optionsCreator_bottomBarPlate,
+  // optionsCreator_bottomBarAngleIron_303A,
+  // optionsCreator_bottomBarPlate_303A,
+  // optionsCreator_bottomBarAngleIron_303AS,
+  // optionsCreator_bottomBarPlate_303AS,
+  // optionsCreator_boxB_SJ302,
+  // optionsCreator_boxB_SJ303A,
+  // optionsCreator_boxB_SJ312,
+  // optionsCreator_boxB_SJ305D,
   optionsCreator_horsePower,
-  optionsCreator_quoteType,
+  // optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
-  optionsCreator_doorModelName,
-  lookup_quoteType_doorModelName,
+  // optionsCreator_doorModelName,
+  // lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 import { checkIsSST, checkIsGalvanized, fixedToFloat3 } from '../library';
@@ -109,8 +111,6 @@ import { createEmptyStateProd } from '../../emptyProdState';
 import { Toption } from 'js/utils/options/options';
 
 import { createEmptyComponentStateDict } from '../../emptyComponentState';
-
-import { handle__options_surface } from './handleProd/handle__options_surface';
 
 import {
   TerrRes,
@@ -1150,13 +1150,37 @@ class ClassProd {
       return undefined;
     }
 
-    // handle__options_surface
+    // const options = handle__options_surface(this.doorModelName)(this);
 
-    // if (!this._options_surface) {
-    //   this._options_surface = createOptions_surface(this);
-    // }
+    const material = this.data.materialName;
 
-    const options = handle__options_surface(this.doorModelName)(this);
+    if (material === 'SST#304' || material === 'SST#316') {
+      return optionsCreator_surface_sst();
+    }
+
+    if (material === '鍍鋅鋼板') {
+      return optionsCreator_surface_galvanizedSteelPlate();
+    }
+
+    let options = optionsCreator_surface_onlyPaint();
+
+    const isSST = checkIsSST(material);
+    const isGalvanized = checkIsGalvanized(material);
+
+    if (isSST) {
+      options = optionsCreator_surface();
+    }
+
+    if (
+      //
+      !isGalvanized &&
+      this.doorModelName !== 'SJ-305D' &&
+      this.doorModelName !== 'W2'
+    ) {
+      options = options.filter((item) => {
+        return item.value !== '無烤漆';
+      });
+    }
 
     return options;
   }
