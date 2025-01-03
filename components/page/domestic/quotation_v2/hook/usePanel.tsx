@@ -97,8 +97,10 @@ const usePanel = ({
     },
     {
       type: 'myButton',
-      label: '取消',
-      onClick: btnCancelOnClick,
+      // label: '取消',
+      label: isNewQuotation ? '返回' : '取消',
+      // onClick: btnCancelOnClick,
+      onClick: isNewQuotation ? () => router.back() : btnCancelOnClick,
     },
   ];
 

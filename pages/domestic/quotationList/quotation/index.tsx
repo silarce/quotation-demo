@@ -310,20 +310,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
-  // console.log(isSendToReview);
-  // console.log(isSendToReview_pending);
-  // console.log(isReviewer);
-  // console.log(isSales);
-  // console.log(isWorkDirector);
-  // console.log(isCashier);
-  // console.log(isSupervisor);
-  // console.log(isManager);
-
   // ----------------------------------------------------------------------
 
   // region STATE MANAGEMENT
 
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(!isNewQuotation);
   const [isFetching, setIsFetching] = useState(false);
   const [state_status, setState_status] = useState<TquotationContentDto['status']>('Budget');
 
