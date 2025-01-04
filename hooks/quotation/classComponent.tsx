@@ -633,14 +633,14 @@ class Class_component {
       return;
     }
 
-    if (
-      //
-      v === '無烤漆' &&
-      this.key === 'guideRail' &&
-      checkIsSST(this.material)
-    ) {
-      v = '2B';
-    }
+    // if (
+    //   //
+    //   v === '無烤漆' &&
+    //   this.key === 'guideRail' &&
+    //   checkIsSST(this.material)
+    // ) {
+    //   v = '2B';
+    // }
 
     this._com.materialSurface = v;
     this.callReqGetCodeNumber();
