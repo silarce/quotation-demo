@@ -4,8 +4,6 @@ import { useRouter, NextRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _, { set } from 'lodash';
-import { AxiosError } from 'axios';
 
 // components
 
@@ -46,23 +44,17 @@ import Summary, {
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
-import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-
-import CustomerSelector from 'components/global/gear/modal/customerSelector';
+// import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
+// import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+// import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
+// import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import Dropdown from 'components/global/gear/dropdown/Dropdown';
+// import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-// icon
-import iconUpload from 'public/image/icon/upload.svg';
-import iconRedLock from 'public/image/icon/redLock.svg';
-
-// utils
-import { urlToFile } from 'js/utils/helpers/urlToFile';
 import {
   init_variable,
   calcNTDToForeignCurrency,
@@ -105,11 +97,9 @@ import {
 // import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // type
-import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import { TuserDto, TcreateQuotationProductDto, TcustomerDto, TquotationContractDto } from 'js/api/dtoTypes';
 
-import { checkIsFloat } from 'js/utils/checkValue';
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { TuserDto } from 'js/api/dtoTypes';
+
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // ======================================================================
@@ -165,7 +155,7 @@ interface Tquery {
   id?: string;
   // 從查詢報價單的展開列表點進來的話query裡就會有contentId
   contentId?: string;
-  contractId?: string;
+  // contractId?: string;
 }
 // 三個資料來源 quotationId contentId contractId
 
@@ -206,7 +196,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const isNewQuotation = !quotationId && !contentId;
   const isQuotation = !!quotationId;
-  const isContent = !!contentId;
 
   // ----------------------------------------------------------------------
 
@@ -249,14 +238,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region GET DATA
 
-  // const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
-  //   preBuiltPopulate: ['simple', 'attached'],
-  // });
   const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
     designatedContentId: contentId,
   });
-
-  // console.log(instatnce_getQuotationId3);
 
   const {
     isFetching: isFetching_update,
@@ -265,7 +249,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     update: update_quotation,
     // attachment
     attachmentArr,
-    domain,
+    // domain,
     //
     isDesignatedContent,
     //
@@ -278,14 +262,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqPatchQuotationContent_id_progress,
     reqToPending,
   } = instatnce_getQuotationId3;
-
-  // const {
-  //   data: quotationContentData,
-  //   update: updateContent,
-  //   clearData: clearData_content,
-  // } = useGetQuotationContent_id(contentId as string);
-
-  // const content = quotationData?.latestContent || quotationContentData;
 
   const content = quotationData?.designatedContent;
 
@@ -372,13 +348,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const {
     quotationDiscount: state_quotationDiscount, // 總折數
-    // setQuotationDiscount,
-    //
-    // state_totalPrice, // 完整狀態
-    // setProdPriceTotal,
-    // setTuneTotal,
-    // setCurrency,
-    // setExchangeRate,
   } = instance_quotationProduct;
 
   const { state_profile, setState_profile } = useProfile({
@@ -472,7 +441,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         const { newQuotation } = await reqPatchQuotation({ editNote });
 
         if (newQuotation) {
-          const { contentId, contractId, ...rest } = query;
+          const {
+            contentId,
+            // contractId,
+            ...rest
+          } = query;
           router.replace({
             query: {
               ...rest,
@@ -494,7 +467,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         const { newQuotation } = await reqPostQuotation({ editNote });
 
         if (newQuotation) {
-          const { contentId, contractId, ...rest } = query;
+          const {
+            contentId,
+            //  contractId,
+            ...rest
+          } = query;
           router.replace({
             query: {
               ...rest,
@@ -1167,112 +1144,3 @@ const AskRevier = ({
 };
 
 // ================================================================================
-
-// type TquotationProductDto_addition = TquotationProductDto & {
-//   reducedQty: number; // 追減數量 // 好像用不到...
-//   changedQty: number; // 變更數量 // 好像用不到...
-// };
-
-// type TwholeContractProduct = Record<string, TquotationProductDto_addition>;
-
-// const useWholeContractProduct = ({ contract }: { contract: TquotationContractDto | undefined }) => {
-//   const [wholeContractProduct, setWholeContractProduct] = useState<TwholeContractProduct>({});
-
-//   const wholeContractProduct_pre = useMemo(() => {
-//     const dict: TwholeContractProduct = {};
-//     let somethingWrong = '';
-
-//     if (!contract) {
-//       return dict;
-//     }
-
-//     let subContracts = contract?.subContracts;
-//     subContracts = _.sortBy(subContracts, 'version');
-
-//     subContracts.forEach((contract) => {
-//       const { id: contractId } = contract;
-
-//       let products = contract.content.products;
-//       products = _.sortBy(products, 'order');
-
-//       products.forEach((prod) => {
-//         const { id, attachedToProductId, rootProductId } = prod;
-
-//         let type: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
-
-//         // 報價單中有變更追減就一定有變更追加
-//         // 報價單中有變更追加就一定有變更追減
-
-//         if (!attachedToProductId) {
-//           type = '追加';
-//         } else if (attachedToProductId && rootProductId === id) {
-//           type = '變更追加';
-//         } else if (attachedToProductId && rootProductId !== id) {
-//           type = '追減';
-//         }
-
-//         if (type === '追減') {
-//           const isExist = products.some((prod) => {
-//             return prod.id !== id && prod.attachedToProductId === attachedToProductId;
-//           });
-//           isExist && (type = '變更追減');
-//         }
-
-//         if (!type) {
-//           const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
-//           console.error('解析追加追減發生錯誤，預期外的組合');
-//           console.error(prod);
-//           console.error(content);
-//           somethingWrong = '解析追加追減發生錯誤，預期外的組合。';
-
-//           return;
-//         }
-
-//         if (type === '追加' || type === '變更追加') {
-//           dict[rootProductId] = {
-//             ...prod,
-//             reducedQty: 0,
-//             changedQty: 0,
-//           };
-
-//           return;
-//         }
-
-//         const rootProd = dict[rootProductId];
-
-//         if (!rootProd) {
-//           const content = `contractId:${contractId}，id:${id}，rootProductId:${rootProductId}`;
-//           console.error('rootProd不存在');
-//           console.error(content);
-//           console.error(dict);
-//           somethingWrong = somethingWrong + 'rootProd不存在。';
-
-//           return;
-//         }
-
-//         if (type === '追減') {
-//           rootProd.reducedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
-//           rootProd.quantity = prod.quantity;
-//         } else if (type === '變更追減') {
-//           rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
-//           rootProd.quantity = prod.quantity;
-//         }
-//       });
-//       //
-//     });
-
-//     if (somethingWrong) {
-//       myAlert.err({ title: somethingWrong });
-
-//       return {};
-//     }
-
-//     return dict;
-
-//     //
-//     //
-//     //
-//   }, [contract]);
-
-//   return wholeContractProduct;
-// };
