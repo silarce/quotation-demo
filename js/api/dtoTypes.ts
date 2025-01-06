@@ -2281,8 +2281,9 @@ export type TcreateQuotationContentDto = {
   siteManager?: string | null;
   // 工地主任電話
   siteManagerNumber?: string | null;
-  // 門型彙總
-  requiredDoorType?: string | null;
+
+  // 需求門型 棄用 有陣子被當作門型彙總來用
+  // requiredDoorType?: string | null;
   // 需求門型數量 // 可以用，但是棄用
   // requiredDoorQuantity?: number | null;
   // 預估折數 // 可以用，但是棄用
