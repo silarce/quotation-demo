@@ -1180,8 +1180,6 @@ class Class_product {
 
       let materialSurface = item.componentInfo.materialSurface;
 
-      // materialSurface臨時新增烤漆，烤漆的處理等同2B
-
       if (
         !(
           this.doorType === 'SJ-302' ||
@@ -1201,6 +1199,20 @@ class Class_product {
           materialSurface = '2B';
         }
       }
+
+      // if (
+      //   //
+      //   materialSurface === '烤漆' ||
+      //   materialSurface === '氟碳' ||
+      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   // @ts-ignore
+      //   materialSurface === '烤漆指定色' ||
+      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   // @ts-ignore
+      //   materialSurface === '無烤漆'
+      // ) {
+      //   materialSurface = '2B';
+      // }
 
       if (key === 'bottomBar') {
         materialSurface = undefined;
@@ -2453,11 +2465,15 @@ class Class_product {
     }
 
     if (this.material === 'SST#304' || this.material === 'SST#316') {
-      return optionsCreator_surface_sst();
+      const options = optionsCreator_surface_sst();
+
+      return options;
     }
 
     if (this.material === '鍍鋅鋼板') {
-      return optionsCreator_surface_galvanizedSteelPlate();
+      const options = optionsCreator_surface_galvanizedSteelPlate();
+
+      return options;
     }
 
     let options = options_surface_onlyPaint;
