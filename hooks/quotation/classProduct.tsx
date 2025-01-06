@@ -1180,42 +1180,39 @@ class Class_product {
 
       let materialSurface = item.componentInfo.materialSurface;
 
-      // materialSurface臨時新增烤漆，烤漆的處理等同2B
-
-      // 20250104 後端未部屬正式環境，臨時改回去
-      // if (
-      //   !(
-      //     this.doorType === 'SJ-302' ||
-      //     this.doorType === 'SJ-312' ||
-      //     this.doorType === 'SJ-303A' ||
-      //     this.doorType === 'SJ-303AS'
-      //   )
-      // ) {
-      //   if (
-      //     //
-      //     materialSurface === '烤漆' ||
-      //     materialSurface === '氟碳' ||
-      //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //     // @ts-ignore
-      //     materialSurface === '烤漆指定色'
-      //   ) {
-      //     materialSurface = '2B';
-      //   }
-      // }
-
       if (
-        //
-        materialSurface === '烤漆' ||
-        materialSurface === '氟碳' ||
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        materialSurface === '烤漆指定色' ||
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        materialSurface === '無烤漆'
+        !(
+          this.doorType === 'SJ-302' ||
+          this.doorType === 'SJ-312' ||
+          this.doorType === 'SJ-303A' ||
+          this.doorType === 'SJ-303AS'
+        )
       ) {
-        materialSurface = '2B';
+        if (
+          //
+          materialSurface === '烤漆' ||
+          materialSurface === '氟碳' ||
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          materialSurface === '烤漆指定色'
+        ) {
+          materialSurface = '2B';
+        }
       }
+
+      // if (
+      //   //
+      //   materialSurface === '烤漆' ||
+      //   materialSurface === '氟碳' ||
+      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   // @ts-ignore
+      //   materialSurface === '烤漆指定色' ||
+      //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   // @ts-ignore
+      //   materialSurface === '無烤漆'
+      // ) {
+      //   materialSurface = '2B';
+      // }
 
       if (key === 'bottomBar') {
         materialSurface = undefined;
@@ -2467,7 +2464,6 @@ class Class_product {
       return undefined;
     }
 
-    // 20250104 跟我說要無烤漆選項.....
     if (this.material === 'SST#304' || this.material === 'SST#316') {
       const options = optionsCreator_surface_sst();
 
