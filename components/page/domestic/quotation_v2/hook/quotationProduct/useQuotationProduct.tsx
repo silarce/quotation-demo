@@ -161,16 +161,19 @@ const nodeConfig_accessory_origin = createNodeConfig_accessory();
 
 // MARK:START
 const useQuotationProduct = ({
-  raw_quotationContent,
+  raw_quotationProductArr,
+  raw_quotationDiscount,
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
 }: {
-  raw_quotationContent: TquotationContentDto | undefined;
+  // raw_quotationContent: TquotationContentDto | undefined;
+  raw_quotationProductArr: TquotationContentDto['products'] | undefined;
+  raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
 }) => {
-  const raw_productArr = raw_quotationContent?.products;
-  const defaultQuotationDiscount = (raw_quotationContent ? raw_quotationContent.discount : '100') as `${number}`;
+  const raw_productArr = raw_quotationProductArr;
+  const defaultQuotationDiscount = (raw_quotationDiscount ? raw_quotationDiscount : '100') as `${number}`;
 
   // ------------------------------------------------------------------------
   // 門型列表

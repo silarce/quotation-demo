@@ -334,7 +334,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instance_quotationPrice;
 
   const instance_quotationProduct = useQuotationProduct({
-    raw_quotationContent: content,
+    // raw_quotationContent: content,
+    raw_quotationProductArr: content?.products,
+    raw_quotationDiscount: content?.discount,
     disabled,
     onProdAllTotalChange: (prodAllTotal) => {
       handleSetQuotationPriceTotal({
