@@ -18,6 +18,7 @@ interface Tprops {
   isQuotation: boolean;
   isReviewer: boolean | undefined | null;
   status: string;
+  isDesignatedContent: boolean;
   //
   isAllReviewedBeforePending: boolean;
   //
@@ -49,6 +50,7 @@ const usePanel = ({
   isQuotation,
   isReviewer,
   status,
+  isDesignatedContent,
 
   btnEditOnClick,
   btnCancelOnClick,
@@ -71,8 +73,66 @@ const usePanel = ({
 }: Tprops) => {
   const router = useRouter();
 
+  // -----------------------------------------------------------------------
+
+  const panel_update: TpanelList[number] = {
+    type: 'redButton',
+    label: isNewQuotation ? '新建報價單' : '更新報價單',
+    onClick: isNewQuotation ? btnPostOnClick : btnPatchOnClick,
+  };
+  const panel_cacel: TpanelList[number] = {
+    type: 'myButton',
+    label: isNewQuotation ? '返回' : '取消',
+    onClick: isNewQuotation ? () => router.back() : btnCancelOnClick,
+  };
+  const panel_turnToPending: TpanelList[number] = {
+    type: 'redButton',
+    label: '轉為準合約',
+    onClick: () => {
+      myAlert.confirm({
+        title: '確定轉為準合約',
+        props: {
+          onOk: handleReqToPending,
+        },
+      });
+    },
+  };
+  const panel_review: TpanelList[number] = {
+    type: 'myButton',
+    label: '審核',
+    onClick: handleReview,
+  };
+  const panel_submit: TpanelList[number] = {
+    type: 'myButton',
+    label: '送審',
+    onClick: handleSubmit,
+  };
+  const panel_showVerifyForm: TpanelList[number] = {
+    type: 'myButton',
+    label: '合約審核表',
+    onClick: showVerifyForm,
+  };
+  const panel_edit: TpanelList[number] = {
+    type: 'myButton',
+    label: '編輯',
+    onClick: btnEditOnClick,
+  };
+  const panel_unlock: TpanelList[number] = {
+    type: 'myButton',
+    label: '解除鎖定並退回發包',
+    img: iconRedLock.src,
+    onClick: handleReqUnlock,
+  };
+  const panel_return: TpanelList[number] = {
+    type: 'myButton',
+    label: '返回',
+    onClick: () => router.back(),
+  };
+
+  // -----------------------------------------------------------------------
+
   const customeRight: React.ReactNode[] = [
-    !disabled || status === 'Pending' ? null : (
+    !disabled || status === 'Pending' || isDesignatedContent ? null : (
       <CloneQuotation
         key="CloneQuotation"
         cloneQuotation={cloneQuotation}
@@ -90,77 +150,26 @@ const usePanel = ({
   ];
 
   const panelList_abled: TpanelList = [
-    {
-      type: 'redButton',
-      label: isNewQuotation ? '新建報價單' : '更新報價單',
-      onClick: isNewQuotation ? btnPostOnClick : btnPatchOnClick,
-    },
-    {
-      type: 'myButton',
-      // label: '取消',
-      label: isNewQuotation ? '返回' : '取消',
-      // onClick: btnCancelOnClick,
-      onClick: isNewQuotation ? () => router.back() : btnCancelOnClick,
-    },
+    //
+    panel_update,
+    panel_cacel,
   ];
 
-  const panelList_disabled: TpanelList = [
-    isQuotation && isAllReviewedBeforePending
-      ? {
-          type: 'redButton',
-          label: '轉為準合約',
-          onClick: () => {
-            myAlert.confirm({
-              title: '確定轉為準合約',
-              props: {
-                onOk: handleReqToPending,
-              },
-            });
-          },
-        }
-      : null,
-
-    isQuotation && isReviewer
-      ? {
-          type: 'myButton',
-          label: '審核',
-          onClick: handleReview,
-        }
-      : null,
-
-    isQuotation
-      ? {
-          type: 'myButton',
-          label: '送審',
-          onClick: handleSubmit,
-        }
-      : null,
-
-    !isNewQuotation && status === 'Pending' ? { type: 'myButton', label: '合約審核表', onClick: showVerifyForm } : null,
-
-    status === 'Pending'
-      ? null
-      : {
-          type: 'myButton',
-          label: '編輯',
-          onClick: btnEditOnClick,
-        },
-
-    status === 'Pending' || status === 'TempPending'
-      ? {
-          type: 'myButton',
-          label: '解除鎖定並退回發包',
-          img: iconRedLock.src,
-          onClick: handleReqUnlock,
-        }
-      : null,
-
-    {
-      type: 'myButton',
-      label: '返回',
-      onClick: () => router.back(),
-    },
+  const panelList_disabled_quotation: TpanelList = [
+    isQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
+    isQuotation && isReviewer ? panel_review : null,
+    isQuotation ? panel_submit : null,
+    !isNewQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+    status === 'Pending' ? null : panel_edit,
+    status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
+    panel_return,
   ];
+
+  const panelList_disabled_content: TpanelList = [panel_edit, panel_return];
+
+  const panelList_disabled: TpanelList = isDesignatedContent
+    ? panelList_disabled_content
+    : panelList_disabled_quotation;
 
   const panelList = disabled ? panelList_disabled : panelList_abled;
 

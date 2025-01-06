@@ -265,6 +265,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     attachmentArr,
     domain,
     //
+    isDesignatedContent,
+    //
     // reqPost,
     // reqPatch,
     reqReview,
@@ -771,6 +773,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     isQuotation,
     isReviewer,
     status: content?.status ?? '',
+    isDesignatedContent,
     //
     isAllReviewedBeforePending,
     //
