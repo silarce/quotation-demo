@@ -156,12 +156,16 @@ import scss from './index.module.scss';
 
 // region TYPE
 
+// 沒有id- 新增報價單
+// 有id，其他都沒有- 編輯報價單
+// 有id，有contentId- 編輯報價單，但是以指定content取代latestContent
 interface Tquery {
   id?: string;
   // 從查詢報價單的展開列表點進來的話query裡就會有contentId
   contentId?: string;
-  isContract?: string;
+  contractId?: string;
 }
+// 三個資料來源 quotationId contentId contractId
 
 interface Tprops_useQuotation {
   quotationId: undefined | string;
@@ -194,7 +198,7 @@ const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>
 export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { id: quotationId, contentId, isContract } = query;
+  const { id: quotationId, contentId } = query;
 
   const userId = userInfo?.employee?.id;
 
@@ -243,9 +247,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region GET DATA
 
+  // const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
+  //   preBuiltPopulate: ['simple', 'attached'],
+  // });
   const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
-    preBuiltPopulate: ['simple', 'attached'],
+    designatedContentId: contentId,
   });
+
+  // console.log(instatnce_getQuotationId3);
+
   const {
     isFetching: isFetching_update,
     //
@@ -265,13 +275,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqToPending,
   } = instatnce_getQuotationId3;
 
-  const {
-    data: quotationContentData,
-    update: updateContent,
-    clearData: clearData_content,
-  } = useGetQuotationContent_id(contentId as string);
+  // const {
+  //   data: quotationContentData,
+  //   update: updateContent,
+  //   clearData: clearData_content,
+  // } = useGetQuotationContent_id(contentId as string);
 
-  const content = quotationData?.latestContent || quotationContentData;
+  // const content = quotationData?.latestContent || quotationContentData;
+  const content = quotationData?.designatedContent;
 
   const haveVerifyForm = content?.verifyForm;
 
@@ -450,9 +461,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         const { newQuotation } = await reqPatchQuotation({ editNote });
 
         if (newQuotation) {
+          const { contentId, contractId, ...rest } = query;
           router.replace({
             query: {
-              ...query,
+              ...rest,
               status: newQuotation.latestContent.status,
             },
           });
@@ -471,9 +483,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         const { newQuotation } = await reqPostQuotation({ editNote });
 
         if (newQuotation) {
+          const { contentId, contractId, ...rest } = query;
           router.replace({
             query: {
-              ...query,
+              ...rest,
               id: newQuotation.id,
               status: newQuotation.latestContent.status,
             },
@@ -813,12 +826,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
   // region useEffect
   useEffect(() => {
-    if (quotationId) {
-      update_quotation();
-    } else if (contentId) {
-      updateContent();
-    }
-  }, [quotationId, contentId]);
+    update_quotation();
+    // if (quotationId) {
+    //   update_quotation();
+    // } else if (contentId) {
+    //   updateContent();
+    // }
+  }, [
+    quotationId,
+    //  contentId
+  ]);
 
   useEffect(() => {
     const status = content?.status || 'Budget';

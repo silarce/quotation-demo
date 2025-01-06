@@ -1791,6 +1791,7 @@ export const apiPatchQuotationToPending = ({ contentId }: { contentId: string })
 // };
 
 // 複製報價單
+// 僅會複製latest.cotent，不會複製contents
 export const apiPostCopyQuotation = (body: TcopyQuotationDto) => {
   const api = '/quotation/copy-quotation';
 
@@ -1998,18 +1999,52 @@ const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
 
 // MARK:useGetQuotation_id_3
 
+type TquotationDto_addition = TquotationDto & {
+  designatedContent: TquotationContentDto;
+};
+
 export const useGetQuotation_id_3 = (
   id: string | undefined | null,
   {
-    params,
-    preBuiltPopulate = ['simple'],
+    designatedContentId,
+    params: _params,
   }: {
+    designatedContentId?: string;
     params?: Tparams;
-    preBuiltPopulate?: TquotationPopulateList[];
   }
 ) => {
+  const { populate = [], ...restParams } = _params ?? {};
+
+  const populate_quotation = [
+    'latestContent.customer',
+    'latestContent.designUnit',
+    'latestContent.agentEmployee',
+
+    'latestContent.reviewSalesEmployee',
+    'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewSalesManagerEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewCashierEmployee',
+    'latestContent.reviewManagerEmployee',
+
+    'latestContent.products',
+    'latestContent.others',
+    'latestContent.verifyForm',
+  ];
+
+  const populate_content = populate_quotation.map((item) => item.replace('latestContent.', ''));
+
+  // const defaultPopulate = designatedContentId ? [] : populate_quotation;
+
+  const theParams = {
+    populate: [...populate_quotation, ...populate],
+    ...restParams,
+  };
+
+  // ------------------------------------------------------------------------
+
   const [isFetching, setIsFetching] = useState(false);
-  const [raw, setRaw] = useState<TquotationDto | null>();
+  const [raw, setRaw] = useState<TquotationDto_addition | null>();
   const [attachmentArr, setAttachmentArr] = useState<TfileDto[] | null>();
 
   // ------------------------------------------------------------------------
@@ -2033,20 +2068,40 @@ export const useGetQuotation_id_3 = (
       return;
     }
 
-    const theParams = {
-      populate: quotationPopulateGeter(preBuiltPopulate),
-      ...params,
-    };
-
     setIsFetching(true);
 
     const quotation = await apiGetQuotation_id(id, theParams)
       .then(async (quotation) => {
-        const prodIdArr = quotation.latestContent.products.map((prod) => prod.id);
-        const wholeProdArr = await getWholeProductArr(prodIdArr);
-        quotation.latestContent.products = wholeProdArr;
+        const quotation_addition: TquotationDto_addition = {
+          ...quotation,
+          designatedContent: quotation.latestContent,
+        };
 
-        return quotation;
+        if (designatedContentId) {
+          const content = await apiGetQuotationContent_Id_2(designatedContentId, { populate: populate_content });
+
+          if (content) {
+            quotation_addition.designatedContent = content;
+          }
+        }
+
+        return quotation_addition;
+      })
+      // .then(async (quotation) => {
+      //   const prodIdArr = quotation.latestContent.products.map((prod) => prod.id);
+      //   const wholeProdArr = await getWholeProductArr(prodIdArr);
+      //   quotation.latestContent.products = wholeProdArr;
+
+      //   return quotation;
+      // })
+      .then(async (quotation_addition) => {
+        const designatedContent = quotation_addition.designatedContent;
+
+        const prodIdArr = designatedContent.products.map((prod) => prod.id);
+        const wholeProdArr = await getWholeProductArr(prodIdArr);
+        designatedContent.products = wholeProdArr;
+
+        return quotation_addition;
       })
       .catch(() => {
         myAlert.notify.error({
@@ -2063,7 +2118,7 @@ export const useGetQuotation_id_3 = (
       return null;
     }
 
-    const contentId = quotation.latestContent.id;
+    const contentId = quotation.designatedContent.id;
 
     const attachmentArr = await apiGetQuotation_id_attachments(contentId)
       .then((attachmentArr) => {
@@ -2366,7 +2421,7 @@ export const useGetQuotation_id_3 = (
   // ------------------------------------------------------------------------
 
   // 複製報價單
-
+  // 僅會複製latest.cotent，不會複製contents
   const reqCopyQuotation = async ({
     customerId,
     isRelationQuotation = false,
@@ -2433,6 +2488,8 @@ export const useGetQuotation_id_3 = (
     // attachment
     attachmentArr,
     domain,
+    //
+    isDesignatedContent: !!designatedContentId,
     //
     reqPost,
     reqPatch,
