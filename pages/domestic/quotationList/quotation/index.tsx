@@ -77,25 +77,27 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import {
   TquotationDto,
   TquotationContentDto,
-  TcreateQuotationContentDto,
+  // TcreateQuotationContentDto,
   // useGetQuotation_id,
   // useGetQuotation_id_2,
   useGetQuotation_id_3,
-  apiPostQuotation,
-  apiPatchQuotation,
-  apiQuotationSubmitReview,
-  apiQuotationReview,
-  apiQuotationUnlock,
+  useWholeContractProduct,
+  // apiPostQuotation,
+  // apiPatchQuotation,
+  // apiQuotationSubmitReview,
+  // apiQuotationReview,
+  // apiQuotationUnlock,
   //
-  useQuotation_id_attachments,
-  apiPostQuotation_id_attachments,
-  apiDelQuotation_id_attachments,
+  // useQuotation_id_attachments,
+  // apiPostQuotation_id_attachments,
+  // apiDelQuotation_id_attachments,
   //
-  useGetQuotationContent_id,
+  // useGetQuotationContent_id,
   //
-  apiPatchQuotationToPending,
-  apiPostCopyQuotation,
-  apiPatchQuotationContent_id_progress,
+  // apiPatchQuotationToPending,
+  // apiPostCopyQuotation,
+  // apiPatchQuotationContent_id_progress,
+  // TquotationProductDto,
 } from 'js/api/api_quotation';
 
 // hook
@@ -104,7 +106,7 @@ import {
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import { TuserDto, TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
+import { TuserDto, TcreateQuotationProductDto, TcustomerDto, TquotationContractDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -284,12 +286,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // } = useGetQuotationContent_id(contentId as string);
 
   // const content = quotationData?.latestContent || quotationContentData;
+
   const content = quotationData?.designatedContent;
 
-  const haveVerifyForm = content?.verifyForm;
-
   const attachedToContract = quotationData?.attachedToContract;
-  isAttach = attachedToContract ? true : undefined;
+  isAttach = !!attachedToContract;
+
+  const ins = useWholeContractProduct({ contract: attachedToContract });
+
+  useEffect(() => {
+    console.log(ins);
+  }, [ins]);
+
+  const haveVerifyForm = content?.verifyForm;
 
   managerReviewedAt = content?.managerReviewedAt;
   toSalesAt = content?.toSalesAt;
@@ -1156,3 +1165,114 @@ const AskRevier = ({
     </div>
   );
 };
+
+// ================================================================================
+
+// type TquotationProductDto_addition = TquotationProductDto & {
+//   reducedQty: number; // 追減數量 // 好像用不到...
+//   changedQty: number; // 變更數量 // 好像用不到...
+// };
+
+// type TwholeContractProduct = Record<string, TquotationProductDto_addition>;
+
+// const useWholeContractProduct = ({ contract }: { contract: TquotationContractDto | undefined }) => {
+//   const [wholeContractProduct, setWholeContractProduct] = useState<TwholeContractProduct>({});
+
+//   const wholeContractProduct_pre = useMemo(() => {
+//     const dict: TwholeContractProduct = {};
+//     let somethingWrong = '';
+
+//     if (!contract) {
+//       return dict;
+//     }
+
+//     let subContracts = contract?.subContracts;
+//     subContracts = _.sortBy(subContracts, 'version');
+
+//     subContracts.forEach((contract) => {
+//       const { id: contractId } = contract;
+
+//       let products = contract.content.products;
+//       products = _.sortBy(products, 'order');
+
+//       products.forEach((prod) => {
+//         const { id, attachedToProductId, rootProductId } = prod;
+
+//         let type: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
+
+//         // 報價單中有變更追減就一定有變更追加
+//         // 報價單中有變更追加就一定有變更追減
+
+//         if (!attachedToProductId) {
+//           type = '追加';
+//         } else if (attachedToProductId && rootProductId === id) {
+//           type = '變更追加';
+//         } else if (attachedToProductId && rootProductId !== id) {
+//           type = '追減';
+//         }
+
+//         if (type === '追減') {
+//           const isExist = products.some((prod) => {
+//             return prod.id !== id && prod.attachedToProductId === attachedToProductId;
+//           });
+//           isExist && (type = '變更追減');
+//         }
+
+//         if (!type) {
+//           const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
+//           console.error('解析追加追減發生錯誤，預期外的組合');
+//           console.error(prod);
+//           console.error(content);
+//           somethingWrong = '解析追加追減發生錯誤，預期外的組合。';
+
+//           return;
+//         }
+
+//         if (type === '追加' || type === '變更追加') {
+//           dict[rootProductId] = {
+//             ...prod,
+//             reducedQty: 0,
+//             changedQty: 0,
+//           };
+
+//           return;
+//         }
+
+//         const rootProd = dict[rootProductId];
+
+//         if (!rootProd) {
+//           const content = `contractId:${contractId}，id:${id}，rootProductId:${rootProductId}`;
+//           console.error('rootProd不存在');
+//           console.error(content);
+//           console.error(dict);
+//           somethingWrong = somethingWrong + 'rootProd不存在。';
+
+//           return;
+//         }
+
+//         if (type === '追減') {
+//           rootProd.reducedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+//           rootProd.quantity = prod.quantity;
+//         } else if (type === '變更追減') {
+//           rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+//           rootProd.quantity = prod.quantity;
+//         }
+//       });
+//       //
+//     });
+
+//     if (somethingWrong) {
+//       myAlert.err({ title: somethingWrong });
+
+//       return {};
+//     }
+
+//     return dict;
+
+//     //
+//     //
+//     //
+//   }, [contract]);
+
+//   return wholeContractProduct;
+// };

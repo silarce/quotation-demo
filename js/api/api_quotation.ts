@@ -1,9 +1,10 @@
 // apiGetQuotationProducts
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import Decimal from 'decimal.js';
 
 import { axi, domain } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
@@ -2030,6 +2031,8 @@ export const useGetQuotation_id_3 = (
     'latestContent.products',
     'latestContent.others',
     'latestContent.verifyForm',
+
+    'attachedToContract.subContracts.content.products',
   ];
 
   const populate_content = populate_quotation.map((item) => item.replace('latestContent.', ''));
@@ -2049,11 +2052,11 @@ export const useGetQuotation_id_3 = (
 
   // ------------------------------------------------------------------------
 
-  const { attachedToContractId } = raw || {};
-  const {} = raw?.latestContent || {};
+  // const { attachedToContractId } = raw || {};
+  // const {} = raw?.latestContent || {};
 
   // 是否為追加追減報價單
-  const isAttached = attachedToContractId === undefined ? undefined : !!attachedToContractId;
+  // const isAttached = attachedToContractId === undefined ? undefined : !!attachedToContractId;
 
   // ------------------------------------------------------------------------
 
@@ -2490,6 +2493,8 @@ export const useGetQuotation_id_3 = (
     domain,
     //
     isDesignatedContent: !!designatedContentId,
+    // 是否為追加追減報價單
+    isAttachedQuotation: !!raw?.attachedToContractId,
     //
     reqPost,
     reqPatch,
@@ -2501,3 +2506,132 @@ export const useGetQuotation_id_3 = (
     reqToPending,
   };
 }; // useGetQuotation_id_3
+
+// ========================================================================
+
+export type TquotationProductDto_addition = TquotationProductDto & {
+  reducedQty: number; // 追減數量 // 好像用不到...
+  changedQty: number; // 變更數量 // 好像用不到...
+};
+
+export type TwholeContractProduct = Record<string, TquotationProductDto_addition>;
+
+export const useWholeContractProduct = ({ contract }: { contract: TquotationContractDto | undefined }) => {
+  const [wholeContractProduct, setWholeContractProduct] = useState<TwholeContractProduct>({});
+
+  const wholeContractProduct_pre = useMemo(() => {
+    const dict: TwholeContractProduct = {};
+    let somethingWrong = '';
+
+    if (!contract) {
+      return dict;
+    }
+
+    let subContracts = contract?.subContracts;
+    subContracts = _.sortBy(subContracts, 'version');
+
+    subContracts.forEach((contract) => {
+      const { id: contractId } = contract;
+
+      let products = contract.content.products;
+      products = _.sortBy(products, 'order');
+
+      products.forEach((prod) => {
+        const { id, attachedToProductId, rootProductId } = prod;
+
+        let type: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
+
+        // 報價單中有變更追減就一定有變更追加
+        // 報價單中有變更追加就一定有變更追減
+
+        if (!attachedToProductId) {
+          type = '追加';
+        } else if (attachedToProductId && rootProductId === id) {
+          type = '變更追加';
+        } else if (attachedToProductId && rootProductId !== id) {
+          type = '追減';
+        }
+
+        if (type === '追減') {
+          const isExist = products.some((prod) => {
+            return prod.id !== id && prod.attachedToProductId === attachedToProductId;
+          });
+          isExist && (type = '變更追減');
+        }
+
+        if (!type) {
+          const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
+          console.error('解析追加追減發生錯誤，預期外的組合');
+          console.error(prod);
+          console.error(content);
+          somethingWrong = '解析追加追減發生錯誤，預期外的組合。';
+
+          return;
+        }
+
+        if (type === '追加' || type === '變更追加') {
+          dict[rootProductId] = {
+            ...prod,
+            reducedQty: 0,
+            changedQty: 0,
+          };
+
+          return;
+        }
+
+        const rootProd = dict[rootProductId];
+
+        if (!rootProd) {
+          const content = `contractId:${contractId}，id:${id}，rootProductId:${rootProductId}`;
+          console.error('rootProd不存在');
+          console.error(content);
+          console.error(dict);
+          somethingWrong = somethingWrong + 'rootProd不存在。';
+
+          return;
+        }
+
+        if (type === '追減') {
+          rootProd.reducedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          rootProd.quantity = prod.quantity;
+        } else if (type === '變更追減') {
+          rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          rootProd.quantity = prod.quantity;
+        }
+      });
+      //
+    });
+
+    if (somethingWrong) {
+      myAlert.err({ title: somethingWrong });
+
+      return {};
+    }
+
+    return dict;
+    //
+  }, [contract]);
+
+  useEffect(() => {
+    const prodIdArr = Object.keys(wholeContractProduct_pre);
+
+    if (prodIdArr.length === 0) {
+      return;
+    }
+
+    const getItemsAndRenew = async () => {
+      const wholeProdArr = await getWholeProductArr(prodIdArr);
+      wholeProdArr.forEach((prod) => {
+        wholeContractProduct_pre[prod.id] = {
+          ...wholeContractProduct_pre[prod.id],
+          ...prod,
+        };
+      });
+    };
+
+    getItemsAndRenew();
+    setWholeContractProduct(wholeContractProduct_pre);
+  }, [wholeContractProduct_pre]);
+
+  return wholeContractProduct;
+};
