@@ -677,7 +677,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       designatedBrand: state_profile.designatedBrand ?? '',
       siteManager: state_profile.siteManager ?? '',
       siteManagerNumber: state_profile.siteManagerNumber ?? '',
-      requiredDoorType: doorModelSummary || null,
+      // requiredDoorType: doorModelSummary || null,
 
       // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
       // estimatedDiscount: state_profile.estimatedDiscount || null,
