@@ -1066,11 +1066,7 @@ const useWorksheet = create<Tworksheet>(
       ); // set
 
       if (contractProductItem) {
-        const {
-          serialNumber,
-          floor,
-          // locationArea
-        } = contractProductItem;
+        const { serialNumber, floor, locationArea } = contractProductItem;
 
         // const generalSpec = await get().reqGeneralSpec();
         const generalSpec = get().getIsSpecialProd()
@@ -1102,7 +1098,7 @@ const useWorksheet = create<Tworksheet>(
             state.generalSpec = generalSpec;
             state.serialNumber = serialNumber;
             state.floor = floor;
-            // state.locationArea = locationArea;
+            state.locationArea = locationArea;
           })
         );
 
