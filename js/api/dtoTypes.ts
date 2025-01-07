@@ -1712,6 +1712,13 @@ export type TquotationProductItemDto = {
   rootWorksheetItemId: string | null;
   // worksheet修改紀錄中第一個worksheetItem
   rootWorksheetItem?: TquotationProductItemDto;
+  //
+  // 門編號
+  serialNumber: string | null;
+  // 樓層
+  floor: string | null;
+  // 區域位置
+  locationArea: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3750,8 +3757,23 @@ export type TupdateContractProductItemDto = {
   components: TupdateQuotationProductComponentDto[];
 };
 
+export type TfloorLocations = {
+  serialNumber: string;
+  floor: string;
+  locationArea: string;
+};
+
+// 似乎是UpdateWorksheetProductsDto，後端沒有給我明確的答覆
 export type TupdateWorkSheet = {
   contractProductItems: TupdateContractProductItemDto[];
+  floorLocations: TfloorLocations[];
+
+  // floorLocations的內容會分配到contractProductItems中
+  // floorLocations的長度不可以超過總樘數
+  // 若floorLocations的item比contractProductItems少
+  // 則contractProductItems不會全部被分配
+  // 這是不是意味著floorLocations的長度應該至少與contractProductItems相等?
+  // 後端沒有給我明確的答覆
 };
 
 // 送審工作表用的
