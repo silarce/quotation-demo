@@ -779,24 +779,71 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   }
   //#endregion
 
-    //#region 詢價單
-    else if (type === "QReq") {
-      return (
-        <div className={style.newthead4}>
-          <span>序</span>
-          <span>單號</span>
-          <span>狀態</span>
-          <span>建立日期</span>
-          <span>申請人員</span>
-          <span>
-            {/* 廠商名稱 */}
-          </span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  //#region 詢價單
+  else if (type === "QReq") {
+    return (
+      <div className={style.newthead4}>
+        <span>序</span>
+        <span>單號</span>
+        <span>狀態</span>
+        <span>建立日期</span>
+        <span>申請人員</span>
+        <span>
+          {/* 廠商名稱 */}
+        </span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  else if (type === "PKing") {
+    return (
+      <div className={style.newthead5}>
+        <span>序</span>
+        <span>單號</span>
+        <span>狀態</span>
+        <span>建立日期</span>
+        <span>申請人員</span>
+        <span>備註</span>
+        <span></span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
+  }
+  //#region 進貨單
+  else if (type === "PReceipt") {
+    return (
+      <div className={style.newthead6}>
+        <span>序</span>
+        <span>單號</span>
+        <span>狀態</span>
+        <span>建立日期</span>
+        <span>需用日期</span>
+        <span>申請人員</span>
+        <span>廠商名稱</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
 
+  //#region 入庫單
+  else if (type === "PEntry") {
+    return (
+      <div className={style.newthead7}>
+        <span></span>
+        <span>序</span>
+        <span>單號</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>已入庫</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
 
   else {
     return null;

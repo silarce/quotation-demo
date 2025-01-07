@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -29,7 +29,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
-import { Modal, Radio, Space } from 'antd';
+import { Modal, Pagination, Radio, Space } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
@@ -48,6 +48,7 @@ import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-align';
 import { title } from 'process';
+import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -55,16 +56,20 @@ type Tquery = {
 
 export default function POrderDetail() {
     //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("採購單")
+    const [pagename, setPagename] = useState<string>("採購")
     const [statusarea, setStatusarea] = useState<boolean>(true)
     const [excelopen, setExcelopen] = useState<boolean>(true)
     const [printopen, setPrintopen] = useState<boolean>(true)
+    const [reviewopen, setReviewopen] = useState<boolean>(true)
+    const [transtitle, setTranTitle] = useState<string>("進貨")
+    const [transopen, setTransopen] = useState<boolean>(true)
     //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
         firstin,
-        item
+        item,
+        viewtype
     } = router.query;
 
     const parsedItem = item ? JSON.parse(item as string) : null;
@@ -76,6 +81,9 @@ export default function POrderDetail() {
     //#endregion
 
     //#region ===========【變數宣告】
+
+    const { update_2 } = useGlobal_review();
+
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -147,6 +155,11 @@ export default function POrderDetail() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+    const [keyword5, setKeyword5] = useState<string>("");
+    const [keyword6, setKeyword6] = useState<string>("");
+    const [keyword7, setKeyword7] = useState<string>("");
+    const [keyword8, setKeyword8] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -678,7 +691,7 @@ export default function POrderDetail() {
     //複製單據(同新增單據)
     const Add = async () => {
         if (data2.length === 0) {
-            myAlert.warning({ title: "採購項目不可為空" })
+            myAlert.warning({ title: `${pagename}項目不可為空` })
             return;
         }
         // return;
@@ -1037,20 +1050,21 @@ export default function POrderDetail() {
             // }
             // else {
             const review_query = {
-                purchaseorderuuid: uuidin,
-                purchaseorderid: idin,
-                create_at: create_atin,
-                create_by: create_byin,
-                status: '編輯中',
-                need_date: need_datein,
-                note: notein,
-                firstin: 1,
+                // purchaseorderuuid: uuidin,
+                // purchaseorderid: idin,
+                // create_at: create_atin,
+                // create_by: create_byin,
+                // status: '編輯中',
+                // need_date: need_datein,
+                // note: notein,
+                // firstin: 1,
+                item: JSON.stringify(parsedItem)
             };
 
             const conditionModel = {
                 document_id: idin,
                 document_uuid: uuidin,
-                document_type: pagename,
+                document_type: pagename + "單",
                 review_id: review_flow,
                 query: review_query,
                 user_id: userInfo?.employee?.id.toString(),
@@ -1080,7 +1094,7 @@ export default function POrderDetail() {
             const data = await response.json();
             setReviewflowdata([]);
             GetReviewById(uuidin);
-
+            update_2();
 
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -1168,7 +1182,7 @@ export default function POrderDetail() {
                         setReview_flow("");
                         setValue(null);
                         GetReviewHistory(uuidin);
-
+                        update_2();
                     } catch (error: any) {
                         console.log(error.message);
                     }
@@ -1251,6 +1265,7 @@ export default function POrderDetail() {
 
 
         setIsTrans(false);  //結束進貨模式
+        setPrbar(false);
     };
 
     //作廢單據
@@ -1556,198 +1571,241 @@ export default function POrderDetail() {
 
     //#endregion
 
+    //#region ===========【請購單篩選】
+
+    const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
+
+    // 當 keyword5, keyword6, keyword7 變化時進行篩選
+    useEffect(() => {
+        const filteredData = data4.filter((item) => {
+            const matchesKeyword5 = keyword5 ? item.purchaserequisitionid?.includes(keyword5) : true;
+            const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
+            const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+            const matchesKeyword8 = keyword8 ? item.productid?.includes(keyword8) : true;
+
+            return matchesKeyword5 && matchesKeyword6 && matchesKeyword7 && matchesKeyword8;
+        });
+
+        setFilteredData3(filteredData);
+        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
+    }, [keyword5, keyword6, keyword7, keyword8, data4]); // 監聽依賴項目
+
+    //#endregion
+
+    //#region ===========【分頁處理】
+    // 頁數相關狀態
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+
+    // 計算當前頁顯示的資料
+    const currentItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredData3.slice(startIndex, endIndex);
+    }, [itemsPerPage, currentPage, filteredData3]);
+
+    // 分頁切換處理函數
+    const handlePageChange = (page: any) => {
+        setCurrentPage(page);
+    };
+    //#endregion
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename + "：" + statusin} panelList={panelList}
+            <PageHeader02 tag={pagename + "單" + "：" + statusin} panelList={panelList}
                 customeRight={[
                     <>
-                        {(!isEditing && !isTrans) && (
-                            <button
-                                className={scss.shortsquarebtn}
-                                onClick={() => {
-                                    handleCopy();
-                                }}
-                                title="複製"
-                            >
-                                複製
-                            </button>
-                        )}
-                        {(statusin === "已核准" && !isTrans) && (
+                        {viewtype !== "review" && (
                             <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定結案嗎?',
-                                            props: {
-                                                onOk: () => {
-                                                    handleClose();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    title="單據結案"
-                                >
-                                    結案
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEditTrans();
-                                    }}
-                                    title="進貨"
-                                >
-                                    進貨
-                                </button>
+                                {(!isEditing && !isTrans) && (
+                                    <button
+                                        className={scss.shortsquarebtn}
+                                        onClick={() => {
+                                            handleCopy();
+                                        }}
+                                        title="複製"
+                                    >
+                                        複製
+                                    </button>
+                                )}
+                                {(statusin === "已核准" && !isTrans) && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定結案嗎?',
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleClose();
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                            title="單據結案"
+                                        >
+                                            結案
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleEditTrans();
+                                            }}
+                                            title="進貨"
+                                        >
+                                            進貨
+                                        </button>
+                                    </>
+                                )}
+                                {statusin === "已核准" && isTrans && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定新增嗎?',
+                                                    content: <>
+                                                        <h1>請確認進貨數量</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleAddTrans()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            新增進貨
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定要取消嗎?',
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleCancel()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            取消
+                                        </button>
+                                    </>
+                                )}
+
+                                {/* 編輯按鈕 */}
+                                {statusin === "編輯中" && !isEditing && (
+
+                                    <>
+
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                handleDelete();
+                                            }}
+                                            title="刪除單據"
+                                        >
+                                            刪除
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                setReviewbar(true);
+                                                setDocumenttitle(`【採購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
+                                            }}
+                                            title="審核流程"
+                                        >
+                                            審核流程
+                                        </button>
+
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleEdit()
+                                            }}
+                                        >
+                                            編輯
+                                        </button>
+                                    </>
+                                )}
+
+                                {statusin === "審核中" && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
+                                            title="單據抽回"
+                                            onClick={() => { handleGetReviewBack() }}>
+                                            抽單
+                                        </button>
+
+                                    </>
+                                )}
+                                {(!isEditing && !isTrans) && (
+                                    <>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: `確定要返回${pagename}單列表嗎?`,
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            router.back();
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            返回
+                                        </button >
+                                    </>
+                                )}
+                                {/* 儲存按鈕 */}
+                                {statusin === "編輯中" && isEditing && (
+                                    <>
+                                        <button
+                                            className={scss.shortredsquarebtn}
+                                            onClick={() => {
+                                                setIsEditing(false); // 儲存後結束編輯模式
+                                                setPrbar(false);
+                                                Update()
+
+                                                // NewAddPurchaseRequisition(); // 實際儲存邏輯
+                                            }}
+                                        >
+                                            儲存
+                                        </button>
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                myAlert.confirm({
+                                                    title: '確定要取消嗎?',
+                                                    content: <>
+                                                        <h1>未儲存的資料將不會保留</h1>
+                                                    </>,
+                                                    props: {
+                                                        onOk: () => {
+                                                            handleCancel()
+                                                        }
+                                                    }
+                                                })
+                                            }}
+                                        >
+                                            取消
+                                        </button>
+
+                                    </>
+
+                                )}
                             </>
-                        )}
-                        {statusin === "已核准" && isTrans && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定新增嗎?',
-                                            content: <>
-                                                <h1>請確認進貨數量</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleAddTrans()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    新增進貨
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-                            </>
-                        )}
-
-                        {/* 編輯按鈕 */}
-                        {statusin === "編輯中" && !isEditing && (
-
-                            <>
-
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        handleDelete();
-                                    }}
-                                    title="刪除單據"
-                                >
-                                    刪除
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        setReviewbar(true);
-                                        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
-                                    }}
-                                    title="審核流程"
-                                >
-                                    審核流程
-                                </button>
-
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEdit()
-                                    }}
-                                >
-                                    編輯
-                                </button>
-                            </>
-                        )}
-
-                        {statusin === "審核中" && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
-                                    title="單據抽回"
-                                    onClick={() => { handleGetReviewBack() }}>
-                                    抽單
-                                </button>
-
-                            </>
-                        )}
-                        {(!isEditing && !isTrans) && (
-                            <>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: `確定要返回${pagename}列表嗎?`,
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    router.back();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    返回
-                                </button >
-                            </>
-                        )}
-                        {/* 儲存按鈕 */}
-                        {statusin === "編輯中" && isEditing && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        setIsEditing(false); // 儲存後結束編輯模式
-                                        setPrbar(false);
-                                        Update()
-
-                                        // NewAddPurchaseRequisition(); // 實際儲存邏輯
-                                    }}
-                                >
-                                    儲存
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-
-                            </>
-
                         )}
                     </>
 
@@ -1759,59 +1817,62 @@ export default function POrderDetail() {
                         <>
                             {/* 編輯按鈕 */}
                             {/* {statusin === "編輯中" && !isEditing && ( */}
-
-                            <>
-                                {printopen && (
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handlePrint();
-                                        }}
-                                        title="列印單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        列印
-                                    </button>
-                                )}
-                                {excelopen && (
-
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handleExport();
-                                        }}
-                                        title="匯出單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        Excel
-                                    </button>
-                                )}
-                                {statusin === "編輯中" && isEditing && (
-
-                                    <>
+                            {viewtype !== "review" && (
+                                <>
+                                    {printopen && (
                                         <button
                                             className={scss.shortsquarebtn}
-                                            style={{
-                                            }}
                                             onClick={() => {
-                                                setPrbar(!prbar);
+                                                handlePrint();
                                             }}
+                                            title="列印單據"
+                                            style={{ margin: '0px 10px' }}
                                         >
-                                            <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
-                                                ☰
+                                            <span style={{ paddingRight: '5px' }}>
+                                                <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                             </span>
-                                            請購項目
+                                            列印
                                         </button>
-                                    </>
-                                )}
-                            </>
-                            {/* )} */}
+                                    )}
+                                    {excelopen && (
+
+                                        <button
+                                            className={scss.shortsquarebtn}
+                                            onClick={() => {
+                                                handleExport();
+                                            }}
+                                            title="匯出單據"
+                                            style={{ margin: '0px 10px' }}
+                                        >
+                                            <span style={{ paddingRight: '5px' }}>
+                                                <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                                            </span>
+                                            Excel
+                                        </button>
+                                    )}
+                                    {statusin === "編輯中" && isEditing && (
+
+                                        <>
+                                            <span style={{ fontSize: '18px', padding: '0px 10px' }}>
+
+                                                <button
+                                                    className={scss.shortsquarebtn}
+                                                    style={{
+                                                    }}
+                                                    onClick={() => {
+                                                        setPrbar(!prbar);
+                                                    }}
+                                                >
+                                                    <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
+                                                        ☰
+                                                    </span>
+                                                    請購項目
+                                                </button>
+                                            </span>
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </>
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
@@ -1869,11 +1930,11 @@ export default function POrderDetail() {
                         </div> */}
                         <div className={scss.head_body}>
                             <div>
-                                <div className={scss.head_content1}>
+                                <div className={scss.head_content0}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption={`${pagename}號`}
+                                            caption={`${pagename}單號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -2195,8 +2256,60 @@ export default function POrderDetail() {
                                             },
                                         }}
                                     />
+                                    {/* 搜尋欄位：依單號 */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                type: "text",
+                                                value: keyword5,
+                                                placeholder: "輸入單號",
+                                                onChange: (e) => setKeyword5(e.target.value),
+                                            },
+                                        }}
+                                    />
+                                    {/* 搜尋欄位：依料號 */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                style: {
+                                                    borderRight: '1px solid rgb(168, 168, 168)'
+                                                },
+                                                type: "text",
+                                                value: keyword8,
+                                                placeholder: "輸入料號",
+                                                onChange: (e) => setKeyword8(e.target.value),
+                                            },
+                                        }}
+                                    />
+                                    {/* 搜尋欄位：依品項規格 */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                type: "text",
+                                                value: keyword6,
+                                                placeholder: "輸入品名",
+                                                onChange: (e) => setKeyword6(e.target.value),
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        inputProps={{
+                                            props: {
+                                                type: "text",
+                                                value: keyword7,
+                                                placeholder: "輸入規格",
+                                                onChange: (e) => setKeyword7(e.target.value),
+                                            },
+                                        }}
+                                    />
                                 </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px', height: '350px' }}>
 
                                     <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
                                         <div className={scss.thead22}>
@@ -2217,163 +2330,174 @@ export default function POrderDetail() {
                                             <span>備註(用途說明)</span>
                                             <span></span>
                                         </div>
-                                        {data4 && (
-                                            data4.map((_item, index) => {
-                                                const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                                _item.totalprice = Totalprice;
+                                        {currentItems && currentItems.map((_item, index) => {
+                                            const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                                            _item.totalprice = Totalprice;
 
-                                                // 檢查是否已存在於 data2 中
-                                                const isChecked = data2.some(item => item.id === _item.id);
-                                                const handleCheckboxChange = (checked: any) => {
-                                                    console.log(data3);
-                                                    console.log(data2);
-                                                    if (checked) {
-                                                        // 複製 _item 並將剩餘數量取代原本的數量
-                                                        const updatedItem = { ..._item, quantity: _item.remaining_quantity };
+                                            // 檢查是否已存在於 data2 中
+                                            const isChecked = data2.some(item => item.id === _item.id);
+                                            const handleCheckboxChange = (checked: any) => {
+                                                console.log(data3);
+                                                console.log(data2);
+                                                if (checked) {
+                                                    // 複製 _item 並將剩餘數量取代原本的數量
+                                                    const updatedItem = { ..._item, quantity: _item.remaining_quantity };
 
-                                                        // 加入到 data2
-                                                        setData2(prevData2 => [...prevData2, updatedItem]);
-                                                    } else {
-                                                        // 從 data2 中移除
-                                                        setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
-                                                    }
-                                                };
-                                                return (
-                                                    <CellWithBar key={index} className={scss.panelHeader22}>
-                                                        <div className={scss.row01}>
-                                                            <span>
-                                                                {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                    // 加入到 data2
+                                                    setData2(prevData2 => [...prevData2, updatedItem]);
+                                                } else {
+                                                    // 從 data2 中移除
+                                                    setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
+                                                }
+                                            };
+                                            return (
+                                                <CellWithBar key={index} className={scss.panelHeader22}>
+                                                    <div className={scss.row01}>
+                                                        <span>
+                                                            {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button> */}
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={isChecked}
-                                                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
-                                                                    style={{
-                                                                        transform: 'scale(1.5)',
-                                                                        margin: '5px',
-                                                                        cursor: 'pointer'
-                                                                    }}
-                                                                />
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={isChecked}
+                                                                onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                                                style={{
+                                                                    transform: 'scale(1.5)',
+                                                                    margin: '5px',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            />
 
-                                                            </span>
-                                                            <span>{index + 1}</span>
-                                                            <span>{_item.purchaserequisitionid}</span>
-                                                            <span>
-                                                                <input
-                                                                    ref={productidRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.productid !== undefined ? _item.productid : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={nameRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.name !== undefined ? _item.name : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={specRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.spec !== undefined ? _item.spec : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={po_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                        color: '#ea1833'
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.po_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
+                                                        </span>
+                                                        <span>{index + 1}</span>
+                                                        <span>{_item.purchaserequisitionid}</span>
+                                                        <span>
+                                                            <input
+                                                                ref={productidRefs.current[index]}
+                                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                type="text"
+                                                                value={_item.productid !== undefined ? _item.productid : ''}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={nameRefs.current[index]}
+                                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                type="text"
+                                                                value={_item.name !== undefined ? _item.name : ''}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={specRefs.current[index]}
+                                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                type="text"
+                                                                value={_item.spec !== undefined ? _item.spec : ''}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={quantityRefs.current[index]}
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    width: '95%',
+                                                                }}
+                                                                type={'text'}
+                                                                value={_item.quantity}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={po_quantityRefs.current[index]}
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    width: '95%',
+                                                                    color: '#ea1833'
+                                                                }}
+                                                                type={'text'}
+                                                                value={_item.po_quantity}
+                                                                readOnly
+                                                            />
+                                                        </span>
 
-                                                            <span>
-                                                                <input
-                                                                    ref={remaining_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.remaining_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.unit !== undefined ? _item.unit : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.unitprice}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={totalpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.totalprice}
-                                                                    readOnly
+                                                        <span>
+                                                            <input
+                                                                ref={remaining_quantityRefs.current[index]}
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    width: '95%',
+                                                                }}
+                                                                type={'text'}
+                                                                value={_item.remaining_quantity}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={unitRefs.current[index]}
+                                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                type="text"
+                                                                value={_item.unit !== undefined ? _item.unit : ''}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={unitpriceRefs.current[index]}
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    width: '95%',
+                                                                }}
+                                                                type={'text'}
+                                                                value={_item.unitprice}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={totalpriceRefs.current[index]}
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    width: '95%',
+                                                                }}
+                                                                type={'text'}
+                                                                value={_item.totalprice}
+                                                                readOnly
 
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={noteRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.note !== undefined ? _item.note : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                );
+                                                            />
+                                                        </span>
+                                                        <span>
+                                                            <input
+                                                                ref={noteRefs.current[index]}
+                                                                style={{ backgroundColor: 'transparent', width: '95%' }}
+                                                                type="text"
+                                                                value={_item.note !== undefined ? _item.note : ''}
+                                                                readOnly
+                                                            />
+                                                        </span>
+                                                    </div>
+                                                </CellWithBar>
+                                            );
 
-                                            })
-                                        )}
+                                        })
+                                        }
                                     </div>
+                                </div>
+                                <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                                    {/* 分頁控制 */}
+                                    <Pagination
+                                        current={currentPage} // 當前頁碼
+                                        total={filteredData3.length} // 總數據量
+                                        pageSize={itemsPerPage} // 每頁顯示的數量
+                                        onChange={handlePageChange} // 處理頁面切換
+                                        showSizeChanger // 顯示頁數選擇器
+                                        pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                                        onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                                    />
                                 </div>
                             </>
                         )}
@@ -2423,9 +2547,9 @@ export default function POrderDetail() {
                                     <span>料號</span>
                                     <span>品名</span>
                                     <span>規格</span>
-                                    <span>已進</span>
-                                    <span>剩餘</span>
                                     <span>數量</span>
+                                    <span>已進貨</span>
+                                    <span>剩餘</span>
                                     <span>單位</span>
                                     <span>單價</span>
                                     <span>總價</span>
@@ -2504,6 +2628,24 @@ export default function POrderDetail() {
                                                             }}
                                                         />
                                                     </span>
+                                                    <span>
+                                                        <input
+                                                            ref={quantityRefs.current[index]}
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                borderBottom: isEditing ? "1px solid black" : "",
+                                                                width: '95%',
+                                                            }}
+                                                            type={isEditing ? 'number' : 'text'}
+                                                            // value={Number(_item.quantity)}
+                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                            value={isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()}
+                                                            readOnly={!isEditing}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
+                                                            }}
+                                                        />
+                                                    </span>
                                                     <span>{_item.alreadyinquantity}</span>
                                                     <span>
                                                         <input
@@ -2525,24 +2667,7 @@ export default function POrderDetail() {
                                                             }}
                                                         />
                                                     </span>
-                                                    <span>
-                                                        <input
-                                                            ref={quantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
-                                                            }}
-                                                        />
-                                                    </span>
+
                                                     <span>
                                                         <input
                                                             ref={unitRefs.current[index]}
@@ -2687,264 +2812,278 @@ export default function POrderDetail() {
                             <div>
                             </div>
                         </div>
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                審核流程
-                            </span>
-                        </div>
-                        {/* <div className={scss.body_foot2}> */}
-                        <div>
-                            {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
-                                <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                    尚未送審
-                                </div>
-                            ) : (
-                                reviewflowdata.map((item, index) => (
-                                    <div
-                                        key={index}
+                        {reviewopen && (
+                            <>
+
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
                                         style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
                                             display: 'flex',
-                                            justifyContent: 'space-evenly', // 水平均分
-                                            alignItems: 'center', // 垂直置中
-                                            gap: '10px',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
                                         }}
                                     >
-                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                        審核流程
+                                    </span>
+                                </div>
+                                {/* <div className={scss.body_foot2}> */}
+                                <div>
+                                    {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
+                                        <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                            尚未送審
+                                        </div>
+                                    ) : (
+                                        reviewflowdata.map((item, index) => (
                                             <div
-                                                key={stageIndex}
+                                                key={index}
                                                 style={{
-                                                    flex: 1, // 平均分配空間
                                                     display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'left', // 子項目置中
-                                                    textAlign: 'center', // 文字置中
-                                                    margin: '0 10px',
+                                                    justifyContent: 'space-evenly', // 水平均分
+                                                    alignItems: 'center', // 垂直置中
+                                                    gap: '10px',
                                                 }}
                                             >
-                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
-                                                    {stage.review_title}
-                                                </span>
-                                                <div
-                                                    style={{
-                                                        fontSize: '18px',
-                                                        display: 'flex', // 使名字和圖示並排
-                                                        alignItems: 'center', // 讓它們垂直對齊
-                                                        textAlign: 'left', // 讓文字靠左對齊
-                                                    }}
-                                                >
-                                                    <span>{stage.review_person}</span>
-                                                    {stage.review_time !== "0001-01-01T00:00:00" && (
-                                                        <span style={{ paddingLeft: '5px' }}>
-                                                            <img
-                                                                src={icon_review.src}
-                                                                alt="review_status"
-                                                                style={{
-                                                                    width: '25px',
-                                                                    height: '25px',
-                                                                }}
-                                                            />
+                                                {item.stages.map((stage: any, stageIndex: any) => (
+                                                    <div
+                                                        key={stageIndex}
+                                                        style={{
+                                                            flex: 1, // 平均分配空間
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'left', // 子項目置中
+                                                            textAlign: 'center', // 文字置中
+                                                            margin: '0 10px',
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
+                                                            {stage.review_title}
                                                         </span>
+                                                        <div
+                                                            style={{
+                                                                fontSize: '18px',
+                                                                display: 'flex', // 使名字和圖示並排
+                                                                alignItems: 'center', // 讓它們垂直對齊
+                                                                textAlign: 'left', // 讓文字靠左對齊
+                                                            }}
+                                                        >
+                                                            <span>{stage.review_person}</span>
+                                                            {stage.review_time !== "0001-01-01T00:00:00" && (
+                                                                <span style={{ paddingLeft: '5px' }}>
+                                                                    <img
+                                                                        src={icon_review.src}
+                                                                        alt="review_status"
+                                                                        style={{
+                                                                            width: '25px',
+                                                                            height: '25px',
+                                                                        }}
+                                                                    />
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))
+                                    )}
+
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.length > 0 ? (
+                                        reviewflowdata2.map((item, index) => (
+                                            <div key={index} style={{
+                                                flex: 1, // 平均分配空間
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'left', // 子項目置中
+                                                textAlign: 'center', // 文字置中
+                                                margin: '0 10px',
+                                            }}>
+                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                                                    {item.stage_user_title}
+                                                </span>
+                                                <div style={{
+                                                    fontSize: '18px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    textAlign: 'left',
+                                                }}>
+                                                    <span>{item.stage_user_name}</span>
+                                                    {/* 如果有需要顯示圖示，在此處添加 */}
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+
+                                        <></>
+                                    )}
+                                </div>
+                                {/* </div> */}
+                            </>
+                        )}
+                        {transopen && (
+                            <>
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
+                                        }}
+                                    >
+                                        {transtitle}紀錄
+                                    </span>
+                                </div>
+
+
+
+                                {data3.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚無紀錄
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={scss.head_content1}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="進貨次數"
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        type: "number",
+                                                        // style: { color: 'red' },
+                                                        value: data3.length,
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                                                <div className={scss.thead19}>
+                                                    <span>序</span>
+                                                    <span>單號</span>
+                                                    <span>日期</span>
+                                                    <span>狀態</span>
+                                                    <span>備註</span>
+                                                    <span></span>
+                                                </div>
+
+                                                {data3 && (
+                                                    data3.map((_item: any, index: number) => (
+                                                        <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
+                                                            // alert(_item.prodreceiptid);
+                                                            myAlert.confirm({
+                                                                title: '確定導向此單據嗎?',
+                                                                content: _item.prodreceiptid,
+                                                                props: {
+                                                                    onOk: () => {
+                                                                        router.push({
+                                                                            pathname: `/factoryDepartment/PReceiptDetail`,
+                                                                            query: {
+                                                                                item: JSON.stringify(_item),
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                }
+                                                            })
+                                                        }}>
+                                                            <div className={scss.row01}>
+                                                                <span>{index + 1}</span>
+                                                                <span>{_item.prodreceiptid}</span>
+                                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                <span>{_item.status}</span>
+                                                                <span>{_item.note}</span>
+                                                            </div>
+                                                        </CellWithBar>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {reviewopen && (
+                            <>
+
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
+                                        }}
+                                    >
+                                        審核紀錄
+                                    </span>
+                                </div>
+                                {reviewhistroydata.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚無紀錄
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={scss.head_content1}>
+
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="審核次數"
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        type: "number",
+                                                        // style: { color: 'red' },
+                                                        value: reviewhistroydata.length,
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                            <div className={scss.body_content1} >
+                                                <div style={{ overflowX: 'auto' }}>
+                                                    <Thead01 type={'ReviewHistory2'} />
+                                                    {reviewhistroydata && (
+                                                        reviewhistroydata.map((_item: any, index: number) => (
+                                                            <CellWithBar key={index} className={scss.panelHeader18} >
+                                                                <div className={scss.row01}>
+                                                                    <span>{index + 1}</span>
+                                                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                    <span>{_item.document_status}</span>
+                                                                    <span>{_item.current_stage}</span>
+                                                                    <span>{_item.review_person}</span>
+                                                                    <span>{_item.review_memo}</span>
+                                                                </div>
+                                                            </CellWithBar>
+                                                        ))
                                                     )}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ))
-                            )}
-
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
-                            {reviewflowdata2.length > 0 ? (
-                                reviewflowdata2.map((item, index) => (
-                                    <div key={index} style={{
-                                        flex: 1, // 平均分配空間
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'left', // 子項目置中
-                                        textAlign: 'center', // 文字置中
-                                        margin: '0 10px',
-                                    }}>
-                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
-                                            {item.stage_user_title}
-                                        </span>
-                                        <div style={{
-                                            fontSize: '18px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            textAlign: 'left',
-                                        }}>
-                                            <span>{item.stage_user_name}</span>
-                                            {/* 如果有需要顯示圖示，在此處添加 */}
                                         </div>
-                                    </div>
-                                ))
-                            ) : (
-
-                                <></>
-                            )}
-                        </div>
-                        {/* </div> */}
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                進貨紀錄
-                            </span>
-                        </div>
-
-
-
-                        {data3.length === 0 ? (
-                            <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                尚無紀錄
-                            </div>
-                        ) : (
-                            <>
-                                <div className={scss.head_content1}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="進貨次數"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                // style: { color: 'red' },
-                                                value: data3.length,
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                    <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
-                                        <div className={scss.thead19}>
-                                            <span>序</span>
-                                            <span>單號</span>
-                                            <span>日期</span>
-                                            <span>狀態</span>
-                                            <span>備註</span>
-                                            <span></span>
-                                        </div>
-
-                                        {data3 && (
-                                            data3.map((_item: any, index: number) => (
-                                                <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
-                                                    // alert(_item.prodreceiptid);
-                                                    myAlert.confirm({
-                                                        title: '確定導向此單據嗎?',
-                                                        content: _item.prodreceiptid,
-                                                        props: {
-                                                            onOk: () => {
-                                                                router.push({
-                                                                    pathname: `/factoryDepartment/PReceiptDetail`,
-                                                                    query: {
-                                                                        item: JSON.stringify(_item),
-                                                                    },
-                                                                });
-                                                            }
-                                                        }
-                                                    })
-                                                }}>
-                                                    <div className={scss.row01}>
-                                                        <span>{index + 1}</span>
-                                                        <span>{_item.prodreceiptid}</span>
-                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                        <span>{_item.status}</span>
-                                                        <span>{_item.note}</span>
-                                                    </div>
-                                                </CellWithBar>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                審核紀錄
-                            </span>
-                        </div>
-                        {reviewhistroydata.length === 0 ? (
-                            <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                尚無紀錄
-                            </div>
-                        ) : (
-                            <>
-                                <div className={scss.head_content1}>
-
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="審核次數"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                // style: { color: 'red' },
-                                                value: reviewhistroydata.length,
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                    <div className={scss.body_content1} >
-                                        <div style={{ overflowX: 'auto' }}>
-                                            <Thead01 type={'ReviewHistory2'} />
-                                            {reviewhistroydata && (
-                                                reviewhistroydata.map((_item: any, index: number) => (
-                                                    <CellWithBar key={index} className={scss.panelHeader18} >
-                                                        <div className={scss.row01}>
-                                                            <span>{index + 1}</span>
-                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                            <span>{_item.document_status}</span>
-                                                            <span>{_item.current_stage}</span>
-                                                            <span>{_item.review_person}</span>
-                                                            <span>{_item.review_memo}</span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                ))
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
@@ -3071,21 +3210,23 @@ export default function POrderDetail() {
                     <div className={scss.thead21}>
                         <span>名稱</span>
                         <span>地址</span>
-                        <span>統編</span>
+                        <span>聯絡人</span>
                         <span></span>
                     </div>
                     {filteredData2 && (
                         filteredData2.map((_item: any, index: number) => (
                             <CellWithBar key={index} className={scss.panelHeader21}
                                 onClick={() => {
-                                    setSuppliernamein(_item.name);
-                                    setSupplieraddressin(_item.county + _item.district + _item.address);
-                                    setSupplierphonein(_item.phone);
-                                    setSuppliertaxidin(_item.tax_id);
-                                    setSupplieridin(_item.customer_number);
-                                    setSupplierfaxin(_item.fax);
-                                    setSuppliercontactin(_item.contact);
-                                    setSupplieruuidin(_item.id);
+                                    setSuppliernamein(_item.name || ''); // 預設為空字串
+                                    setSupplieraddressin(
+                                        (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                    );
+                                    setSupplierphonein(_item.phone || '');
+                                    setSuppliertaxidin(_item.tax_id || '');
+                                    setSupplieridin(_item.customer_number || '');
+                                    setSupplierfaxin(_item.fax || '');
+                                    setSuppliercontactin(_item.contact || '');
+                                    setSupplieruuidin(_item.id || '');
                                     setCustomerbar(false);
                                 }}>
                                 <div className={scss.row01}>

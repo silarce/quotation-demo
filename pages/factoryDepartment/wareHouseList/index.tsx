@@ -307,8 +307,6 @@ export default function WareHouseList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList}
                 customeLeft={[
 
-
-
                 ]} />
             <div>
                 <Thead01 type={'WareHouse'} />
