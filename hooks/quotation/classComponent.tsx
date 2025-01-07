@@ -278,11 +278,11 @@ class Class_component {
       options = optionsCreator_surface();
     }
 
-    if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
-      options = options.filter((item) => {
-        return item.value !== '烤漆';
-      });
-    }
+    // if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
 
     return options;
   }
