@@ -1096,9 +1096,9 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.generalSpec = generalSpec;
-            state.serialNumber = serialNumber;
-            state.floor = floor;
-            state.locationArea = locationArea;
+            state.serialNumber = serialNumber ?? '';
+            state.floor = floor ?? '';
+            state.locationArea = locationArea ?? '';
           })
         );
 
