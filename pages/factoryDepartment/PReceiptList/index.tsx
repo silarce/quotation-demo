@@ -65,6 +65,7 @@ import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PReceiptList() {
     const [pagename, setPagename] = useState<string>("進貨")
+    const [reviewopen, setReviewopen] = useState<boolean>(false)
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -392,13 +393,13 @@ export default function PReceiptList() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
-                            gap: '5px', // 元素之間的間距
+                            // gap: '5px', // 元素之間的間距
                             flexWrap: 'wrap', // 如果空間不足，讓元素換行
                             paddingLeft: '10px'
                         }}
                     >
                         {/* 第一個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <select
                                 value={keyword3 || ''}
                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -411,6 +412,7 @@ export default function PReceiptList() {
                                     borderBottom: '1px solid #14256a',
                                     color: '#14256a',
                                     width: '100px',
+                                    marginTop: '-1px', // 調整負值以微調向上位置
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
@@ -427,9 +429,10 @@ export default function PReceiptList() {
                             <InputSel
                                 caption="起始日期"
                                 disabled={false}
-                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordstartdate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordstartdate(e);
@@ -440,13 +443,14 @@ export default function PReceiptList() {
                         </div>
 
                         {/* 第三個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 caption="截止日期"
                                 disabled={false}
                                 captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordenddate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordenddate(e);
@@ -457,7 +461,7 @@ export default function PReceiptList() {
                         </div>
 
                         {/* 第四個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 // caption="單號"
                                 disabled={false}
@@ -465,7 +469,7 @@ export default function PReceiptList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入單號',
-                                        style: { width: "250px" },
+                                        style: { width: "250px", paddingLeft: '5px' },
                                         value: keyword2,
                                         onChange: (e) => {
                                             setKeyword2(e.target.value)
@@ -482,7 +486,7 @@ export default function PReceiptList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入廠商名稱',
-                                        style: { width: "300px" },
+                                        style: { width: "300px", paddingLeft: '5px' },
                                         value: keyword4,
                                         onChange: (e) => {
                                             setKeyword4(e.target.value)
@@ -499,7 +503,7 @@ export default function PReceiptList() {
 
                 panelList={panelList} />
             <div>
-                <Thead01 type={'POrder'} />
+                <Thead01 type={'PReceipt'} />
                 <div>
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                     {searchdata && (
@@ -552,117 +556,121 @@ export default function PReceiptList() {
                                                         }} />
                                                     </span>
                                                 </div>
-                                                <div
-                                                    key={index}
-                                                    className={`${scss.row02}`}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '20px',
-                                                        padding: '10px 20px',
-                                                        cursor: 'pointer',
-                                                    }} // 水平排列
-                                                >
-                                                    {_item.stages.length === 0 ? (
-                                                        <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
-                                                    ) : (
-                                                        _item.stages.map((item: any, index: number) => {
-                                                            // 判斷圈圈顏色
-                                                            let circleColor = 'gray'; // 預設為灰色
-                                                            let textColor = 'gray'; // 預設文字顏色為灰色
+                                                {reviewopen && (
+                                                    <>
 
-                                                            if (item.review_order === 1 || item.review_status === '核准') {
-                                                                circleColor = 'green';
-                                                                textColor = 'black'; // 綠色的時候文字變為黑色
+                                                        <div
+                                                            key={index}
+                                                            className={`${scss.row02}`}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '20px',
+                                                                padding: '10px 20px',
+                                                                cursor: 'pointer',
+                                                            }} // 水平排列
+                                                        >
+                                                            {_item.stages.length === 0 ? (
+                                                                <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
+                                                            ) : (
+                                                                _item.stages.map((item: any, index: number) => {
+                                                                    // 判斷圈圈顏色
+                                                                    let circleColor = 'gray'; // 預設為灰色
+                                                                    let textColor = 'gray'; // 預設文字顏色為灰色
 
-                                                                // 如果是核准且存在下一關，設定下一關為簽核中
-                                                                if (
-                                                                    index < _item.stages.length - 1 && // 確保不是最後一關
-                                                                    _item.stages[index + 1].review_status === '' // 下一關的狀態是空
-                                                                ) {
-                                                                    _item.stages[index + 1].review_status = '簽核中';
-                                                                }
-                                                            } else if (
-                                                                item.review_status === '簽核中' &&
-                                                                index > 0 &&
-                                                                _item.stages[index - 1].review_order + 1 === item.review_order
-                                                            ) {
-                                                                circleColor = 'red';
-                                                                textColor = 'black'; // 紅色的時候文字變為黑色
-                                                            }
+                                                                    if (item.review_order === 1 || item.review_status === '核准') {
+                                                                        circleColor = 'green';
+                                                                        textColor = 'black'; // 綠色的時候文字變為黑色
 
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                    style={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '10px',
-                                                                    }}
-                                                                >
-                                                                    {/* 灰色框框 */}
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            backgroundColor: "#f5f5f5",
-                                                                            borderRadius: '15px',
-                                                                            padding: '5px 10px',
-                                                                            gap: '10px',
-                                                                        }}
-                                                                    >
-                                                                        {/* 左邊的圈圈 */}
+                                                                        // 如果是核准且存在下一關，設定下一關為簽核中
+                                                                        if (
+                                                                            index < _item.stages.length - 1 && // 確保不是最後一關
+                                                                            _item.stages[index + 1].review_status === '' // 下一關的狀態是空
+                                                                        ) {
+                                                                            _item.stages[index + 1].review_status = '簽核中';
+                                                                        }
+                                                                    } else if (
+                                                                        item.review_status === '簽核中' &&
+                                                                        index > 0 &&
+                                                                        _item.stages[index - 1].review_order + 1 === item.review_order
+                                                                    ) {
+                                                                        circleColor = 'red';
+                                                                        textColor = 'black'; // 紅色的時候文字變為黑色
+                                                                    }
+
+                                                                    return (
                                                                         <div
+                                                                            key={index}
                                                                             style={{
-                                                                                width: '10px',
-                                                                                height: '10px',
-                                                                                borderRadius: '50%',
-                                                                                backgroundColor: circleColor,
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '10px',
                                                                             }}
-                                                                        ></div>
-                                                                        {/* 名稱 */}
-                                                                        <span style={{ color: textColor }}>
-                                                                            {item.review_status}&nbsp;
-                                                                            {item.review_person_name}
-                                                                        </span>
-                                                                    </div>
-
-                                                                    {/* 右邊的箭頭，最後一筆不顯示 */}
-                                                                    {index < _item.stages.length - 1 && (
-                                                                        <div style={{ fontSize: '20px', color: 'black' }}>
-                                                                            <svg
-                                                                                width="32"
-                                                                                height="11"
-                                                                                viewBox="0 0 32 11"
-                                                                                fill="none"
-                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            {/* 灰色框框 */}
+                                                                            <div
+                                                                                style={{
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    backgroundColor: "#f5f5f5",
+                                                                                    borderRadius: '15px',
+                                                                                    padding: '5px 10px',
+                                                                                    gap: '10px',
+                                                                                }}
                                                                             >
-                                                                                <line
-                                                                                    x1="0.5"
-                                                                                    y1="5.5"
-                                                                                    x2="30.5"
-                                                                                    y2="5.5"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></line>
-                                                                                <path
-                                                                                    d="M27 2L31 5.5L27 9"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></path>
-                                                                            </svg>
+                                                                                {/* 左邊的圈圈 */}
+                                                                                <div
+                                                                                    style={{
+                                                                                        width: '10px',
+                                                                                        height: '10px',
+                                                                                        borderRadius: '50%',
+                                                                                        backgroundColor: circleColor,
+                                                                                    }}
+                                                                                ></div>
+                                                                                {/* 名稱 */}
+                                                                                <span style={{ color: textColor }}>
+                                                                                    {item.review_status}&nbsp;
+                                                                                    {item.review_person_name}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            {/* 右邊的箭頭，最後一筆不顯示 */}
+                                                                            {index < _item.stages.length - 1 && (
+                                                                                <div style={{ fontSize: '20px', color: 'black' }}>
+                                                                                    <svg
+                                                                                        width="32"
+                                                                                        height="11"
+                                                                                        viewBox="0 0 32 11"
+                                                                                        fill="none"
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                    >
+                                                                                        <line
+                                                                                            x1="0.5"
+                                                                                            y1="5.5"
+                                                                                            x2="30.5"
+                                                                                            y2="5.5"
+                                                                                            stroke="#404040"
+                                                                                            stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                        ></line>
+                                                                                        <path
+                                                                                            d="M27 2L31 5.5L27 9"
+                                                                                            stroke="#404040"
+                                                                                            stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                        ></path>
+                                                                                    </svg>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })
+                                                                    );
+                                                                })
 
-                                                    )}
+                                                            )}
 
-                                                </div>
-
+                                                        </div>
+                                                    </>
+                                                )}
 
                                             </>
 
@@ -676,8 +684,8 @@ export default function PReceiptList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th style={{ width: '150px' }}>已入</th>
                                                         <th style={{ width: '150px' }}>數量</th>
+                                                        <th style={{ width: '150px' }}>已入庫</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
                                                         <th>金額</th>
@@ -691,8 +699,8 @@ export default function PReceiptList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td style={{ width: '150px' }}>{detail.alreadyinquantity?.toLocaleString()}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px', color: '#ea1833' }}>{detail.alreadyinquantity?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>

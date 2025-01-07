@@ -392,13 +392,14 @@ export default function QReqList() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
-                            gap: '5px', // 元素之間的間距
+                            // gap: '5px', // 元素之間的間距
                             flexWrap: 'wrap', // 如果空間不足，讓元素換行
-                            paddingLeft: '10px'
+                            paddingLeft: '10px',
+                            marginTop:'-1px'
                         }}
                     >
                         {/* 第一個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <select
                                 value={keyword3 || ''}
                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -425,9 +426,10 @@ export default function QReqList() {
                             <InputSel
                                 caption="起始日期"
                                 disabled={false}
-                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordstartdate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordstartdate(e);
@@ -438,13 +440,14 @@ export default function QReqList() {
                         </div>
 
                         {/* 第三個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 caption="截止日期"
                                 disabled={false}
                                 captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordenddate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordenddate(e);
@@ -455,7 +458,7 @@ export default function QReqList() {
                         </div>
 
                         {/* 第四個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 // caption="單號"
                                 disabled={false}
@@ -463,7 +466,7 @@ export default function QReqList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入單號',
-                                        style: { width: "250px" },
+                                        style: { width: "250px", paddingLeft: '5px' },
                                         value: keyword2,
                                         onChange: (e) => {
                                             setKeyword2(e.target.value)
@@ -480,7 +483,7 @@ export default function QReqList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入廠商名稱',
-                                        style: { width: "300px" },
+                                        style: { width: "300px", paddingLeft: '5px' },
                                         value: keyword4,
                                         onChange: (e) => {
                                             setKeyword4(e.target.value)

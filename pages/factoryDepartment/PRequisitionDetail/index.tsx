@@ -1684,8 +1684,8 @@ export default function PRequisitionDetail() {
                                     <span>料號</span>
                                     <span>品名</span>
                                     <span>規格</span>
-                                    <span>已轉</span>
                                     <span>數量</span>
+                                    <span>已轉</span>
                                     <span>單位</span>
                                     <span>單價</span>
                                     <span>總價</span>
@@ -1762,24 +1762,6 @@ export default function PRequisitionDetail() {
                                                     </span>
                                                     <span>
                                                         <input
-                                                            ref={po_quantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.po_quantity : Number(_item.po_quantity).toLocaleString()}
-                                                            readOnly={true}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "po_quantity", e.target.value); {/* 處理變更 */ }
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
                                                             ref={quantityRefs.current[index]}
                                                             style={{
                                                                 backgroundColor: 'transparent',
@@ -1796,6 +1778,25 @@ export default function PRequisitionDetail() {
                                                             }}
                                                         />
                                                     </span>
+                                                    <span>
+                                                        <input
+                                                            ref={po_quantityRefs.current[index]}
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                borderBottom: isEditing ? "1px solid black" : "",
+                                                                width: '95%',
+                                                            }}
+                                                            type={isEditing ? 'number' : 'text'}
+                                                            // value={Number(_item.quantity)}
+                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                            value={isEditing ? _item.po_quantity : Number(_item.po_quantity).toLocaleString()}
+                                                            readOnly={true}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "po_quantity", e.target.value); {/* 處理變更 */ }
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    
                                                     <span>
                                                         <input
                                                             ref={unitRefs.current[index]}

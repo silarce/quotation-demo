@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -29,7 +29,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
-import { Collapse, Modal } from 'antd';
+import { Collapse, Modal, Pagination } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
@@ -126,6 +126,7 @@ export default function AddProdReceiptList() {
     const [keyword5, setKeyword5] = useState<string>("");
     const [keyword6, setKeyword6] = useState<string>("");
     const [keyword7, setKeyword7] = useState<string>("");
+    const [keyword8, setKeyword8] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -711,19 +712,38 @@ export default function AddProdReceiptList() {
     // 當 keyword5, keyword6, keyword7 變化時進行篩選
     useEffect(() => {
         const filteredData = data4.filter((item) => {
+            const matchesKeyword4 = keyword4 ? item.suppliername?.includes(keyword4) : true;
             const matchesKeyword5 = keyword5 ? item.purchaseorderid?.includes(keyword5) : true;
             const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
             const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+            const matchesKeyword8 = keyword8 ? item.productid?.includes(keyword8) : true;
 
-            return matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+            return matchesKeyword4 && matchesKeyword5 && matchesKeyword6 && matchesKeyword7 && matchesKeyword8;
         });
 
         setFilteredData3(filteredData);
-    }, [keyword5, keyword6, keyword7, data4]); // 監聽依賴項目
+        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
+    }, [keyword4, keyword5, keyword6, keyword7, keyword8, data4]); // 監聽依賴項目
 
     //#endregion
 
+    //#region ===========【分頁處理】
+    // 頁數相關狀態
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
 
+    // 計算當前頁顯示的資料
+    const currentItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredData3.slice(startIndex, endIndex);
+    }, [itemsPerPage, currentPage, filteredData3]);
+
+    // 分頁切換處理函數
+    const handlePageChange = (page: any) => {
+        setCurrentPage(page);
+    };
+    //#endregion
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             <PageHeader02 tag={"新增" + pagename} panelList={panelList}
@@ -1065,88 +1085,127 @@ export default function AddProdReceiptList() {
                                         採購項目
                                     </span>
                                 </div>
-                                <div className={scss.head_content1}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購數量"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                value: data3.length,
-                                            },
-                                        }}
-                                    />
-                                    {/* 搜尋欄位：依單號 */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
-                                                type: "text",
-                                                value: keyword5,
-                                                placeholder: "輸入單號",
-                                                onChange: (e) => setKeyword5(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                    {/* 搜尋欄位：依品項規格 */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
-                                                type: "text",
-                                                value: keyword6,
-                                                placeholder: "輸入品名",
-                                                onChange: (e) => setKeyword6(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                type: "text",
-                                                value: keyword7,
-                                                placeholder: "輸入規格",
-                                                onChange: (e) => setKeyword7(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                <div>
 
-                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                        <div className={scss.thead22}>
-                                            <span>
 
-                                            </span>
-                                            <span>序</span>
-                                            <span>採購單號</span>
-                                            <span>廠商</span>
-                                            <span>料號</span>
-                                            <span>品名</span>
-                                            <span>規格</span>
-                                            <span>數量</span>
-                                            <span>已進貨</span>
-                                            <span>剩餘數量</span>
-                                            <span>單位</span>
-                                            <span>單價</span>
-                                            <span>總價</span>
-                                            <span>備註(用途說明)</span>
-                                            <span></span>
-                                        </div>
-                                        {filteredData3 && (
-                                            filteredData3.map((_item, index) => {
+                                    <div className={scss.head_content1}>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="採購數量"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    type: "number",
+                                                    value: currentItems.length,
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依廠商 (下拉選單，distinct) */}
+                                        <select
+                                            id="vendorSelect"
+                                            value={keyword4}
+                                            onChange={(e) => {
+                                                setKeyword4(e.target.value)
+                                                e.target.blur(); // 讓 select 失去焦點
+                                            }}
+                                            style={{
+                                                borderRight: "1px solid rgb(168, 168, 168)",
+                                                padding: "5px",
+                                                fontSize: "18px",
+                                            }}
+                                        >
+                                            <option value="">全部</option>
+                                            {Array.from(
+                                                new Set(data4.map((vendor) => vendor.suppliername))
+                                            ).map((suppliername, index) => (
+                                                <option key={index} value={suppliername}>
+                                                    {suppliername}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* 搜尋欄位：依單號 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: {
+                                                        borderRight: '1px solid rgb(168, 168, 168)'
+                                                    },
+                                                    type: "text",
+                                                    value: keyword5,
+                                                    placeholder: "輸入單號",
+                                                    onChange: (e) => setKeyword5(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依料號 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: {
+                                                        borderRight: '1px solid rgb(168, 168, 168)'
+                                                    },
+                                                    type: "text",
+                                                    value: keyword8,
+                                                    placeholder: "輸入料號",
+                                                    onChange: (e) => setKeyword8(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依品項規格 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                    type: "text",
+                                                    value: keyword6,
+                                                    placeholder: "輸入品名",
+                                                    onChange: (e) => setKeyword6(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    type: "text",
+                                                    value: keyword7,
+                                                    placeholder: "輸入規格",
+                                                    onChange: (e) => setKeyword7(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px', height: '350px' }}>
+
+                                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                            <div className={scss.thead22}>
+                                                <span></span>
+                                                <span>序</span>
+                                                <span>採購單號</span>
+                                                <span>廠商</span>
+                                                <span>料號</span>
+                                                <span>品名</span>
+                                                <span>規格</span>
+                                                <span>數量</span>
+                                                <span>已進貨</span>
+                                                <span>剩餘數量</span>
+                                                <span>單位</span>
+                                                <span>單價</span>
+                                                <span>總價</span>
+                                                <span>備註(用途說明)</span>
+                                                <span></span>
+                                            </div>
+                                            {currentItems && currentItems.map((_item, index) => {
                                                 const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
                                                 _item.totalprice = Totalprice;
 
                                                 // 檢查是否已存在於 data2 中
                                                 const isChecked = data2.some(item => item.id === _item.id);
                                                 const handleCheckboxChange = (checked: any) => {
-                                                    console.log(data3);
-                                                    console.log(data2);
 
                                                     if (checked) {
                                                         // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
@@ -1332,9 +1391,20 @@ export default function AddProdReceiptList() {
                                                         </div>
                                                     </CellWithBar>
                                                 );
-
-                                            })
-                                        )}
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                                        {/* 分頁控制 */}
+                                        <Pagination
+                                            current={currentPage} // 當前頁碼
+                                            total={filteredData3.length} // 總數據量
+                                            pageSize={itemsPerPage} // 每頁顯示的數量
+                                            onChange={handlePageChange} // 處理頁面切換
+                                            showSizeChanger // 顯示頁數選擇器
+                                            pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                                            onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                                        />
                                     </div>
                                 </div>
                             </>
@@ -1662,14 +1732,16 @@ export default function AddProdReceiptList() {
                         filteredData2.map((_item: any, index: number) => (
                             <CellWithBar key={index} className={scss.panelHeader21}
                                 onClick={() => {
-                                    setSuppliernamein(_item.name);
-                                    setSupplieraddressin(_item.county + _item.district + _item.address);
-                                    setSupplierphonein(_item.phone);
-                                    setSuppliertaxidin(_item.tax_id);
-                                    setSupplieridin(_item.customer_number);
-                                    setSupplierfaxin(_item.fax);
-                                    setSuppliercontactin(_item.contact);
-                                    setSupplieruuidin(_item.id);
+                                    setSuppliernamein(_item.name || ''); // 預設為空字串
+                                    setSupplieraddressin(
+                                        (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                    );
+                                    setSupplierphonein(_item.phone || '');
+                                    setSuppliertaxidin(_item.tax_id || '');
+                                    setSupplieridin(_item.customer_number || '');
+                                    setSupplierfaxin(_item.fax || '');
+                                    setSuppliercontactin(_item.contact || '');
+                                    setSupplieruuidin(_item.id || '');
                                     setCustomerbar(false);
                                 }}>
                                 <div className={scss.row01}>

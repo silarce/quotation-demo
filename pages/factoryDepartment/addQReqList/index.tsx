@@ -2735,49 +2735,55 @@ export default function AddQReqList() {
                     </div>
                     {filteredData2 && (
                         filteredData2.map((_item: any, index: number) => (
-                            <CellWithBar key={index} className={scss.panelHeader21}
+                            <CellWithBar
+                                key={index}
+                                className={scss.panelHeader21}
                                 onClick={() => {
+                                    const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
+
                                     if (currentsupplier === 1) {
-                                        setSuppliernamein(_item.name);
-                                        setSupplieraddressin(_item.county + _item.district + _item.address);
-                                        setSupplierphonein(_item.phone);
-                                        setSuppliertaxidin(_item.tax_id);
-                                        setSupplieridin(_item.customer_number);
-                                        setSupplierfaxin(_item.fax);
-                                        setSuppliercontactin(_item.contact);
-                                        setSupplieruuidin(_item.id);
+                                        setSuppliernamein(safeValue(_item.name));
+                                        setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphonein(safeValue(_item.phone));
+                                        setSuppliertaxidin(safeValue(_item.tax_id));
+                                        setSupplieridin(safeValue(_item.customer_number));
+                                        setSupplierfaxin(safeValue(_item.fax));
+                                        setSuppliercontactin(safeValue(_item.contact));
+                                        setSupplieruuidin(safeValue(_item.id));
                                     } else if (currentsupplier === 2) {
-                                        setSuppliername2in(_item.name);
-                                        setSupplieraddress2in(_item.county + _item.district + _item.address);
-                                        setSupplierphone2in(_item.phone);
-                                        setSuppliertaxid2in(_item.tax_id);
-                                        setSupplierid2in(_item.customer_number);
-                                        setSupplierfax2in(_item.fax);
-                                        setSuppliercontact2in(_item.contact);
-                                        setSupplieruuid2in(_item.id);
+                                        setSuppliername2in(safeValue(_item.name));
+                                        setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphone2in(safeValue(_item.phone));
+                                        setSuppliertaxid2in(safeValue(_item.tax_id));
+                                        setSupplierid2in(safeValue(_item.customer_number));
+                                        setSupplierfax2in(safeValue(_item.fax));
+                                        setSuppliercontact2in(safeValue(_item.contact));
+                                        setSupplieruuid2in(safeValue(_item.id));
                                     } else if (currentsupplier === 3) {
-                                        setSuppliername3in(_item.name);
-                                        setSupplieraddress3in(_item.county + _item.district + _item.address);
-                                        setSupplierphone3in(_item.phone);
-                                        setSuppliertaxid3in(_item.tax_id);
-                                        setSupplierid3in(_item.customer_number);
-                                        setSupplierfax3in(_item.fax);
-                                        setSuppliercontact3in(_item.contact);
-                                        setSupplieruuid3in(_item.id);
+                                        setSuppliername3in(safeValue(_item.name));
+                                        setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphone3in(safeValue(_item.phone));
+                                        setSuppliertaxid3in(safeValue(_item.tax_id));
+                                        setSupplierid3in(safeValue(_item.customer_number));
+                                        setSupplierfax3in(safeValue(_item.fax));
+                                        setSuppliercontact3in(safeValue(_item.contact));
+                                        setSupplieruuid3in(safeValue(_item.id));
                                     }
 
                                     setCustomerbar(false);
-                                }}>
+                                }}
+                            >
                                 <div className={scss.row01}>
-                                    <span>{_item.name}</span>
-                                    <span>{_item.county}{_item.district}{_item.address}</span>
-                                    <span>{_item.contact}</span>
-                                    <span>{_item.review_person}</span>
-                                    <span>{_item.review_memo}</span>
+                                    <span>{_item.name || ''}</span>
+                                    <span>{`${_item.county || ''}${_item.district || ''}${_item.address || ''}`}</span>
+                                    <span>{_item.contact || ''}</span>
+                                    <span>{_item.review_person || ''}</span>
+                                    <span>{_item.review_memo || ''}</span>
                                 </div>
                             </CellWithBar>
                         ))
                     )}
+
                 </Modal>
             </div>
         </SubLayer >

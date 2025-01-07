@@ -391,13 +391,13 @@ export default function PKingList() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between', // 調整間距，或使用 space-around、space-evenly
-                            gap: '5px', // 元素之間的間距
+                            // gap: '5px', // 元素之間的間距
                             flexWrap: 'wrap', // 如果空間不足，讓元素換行
                             paddingLeft: '10px'
                         }}
                     >
                         {/* 第一個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <select
                                 value={keyword3 || ''}
                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -410,6 +410,7 @@ export default function PKingList() {
                                     borderBottom: '1px solid #14256a',
                                     color: '#14256a',
                                     width: '100px',
+                                    marginTop: '-1px'
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
@@ -424,9 +425,10 @@ export default function PKingList() {
                             <InputSel
                                 caption="起始日期"
                                 disabled={false}
-                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordstartdate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordstartdate(e);
@@ -437,13 +439,14 @@ export default function PKingList() {
                         </div>
 
                         {/* 第三個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 caption="截止日期"
                                 disabled={false}
                                 captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                 datePickerProps={{
                                     props: {
+                                        style: { paddingRight: '5px' },
                                         value: keywordenddate || null,
                                         onChange: (e: Moment | null) => {
                                             setKeywordenddate(e);
@@ -454,7 +457,7 @@ export default function PKingList() {
                         </div>
 
                         {/* 第四個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 // caption="單號"
                                 disabled={false}
@@ -462,7 +465,7 @@ export default function PKingList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入單號',
-                                        style: { width: "250px" },
+                                        style: { width: "250px", paddingLeft: '5px' },
                                         value: keyword2,
                                         onChange: (e) => {
                                             setKeyword2(e.target.value)
@@ -479,7 +482,7 @@ export default function PKingList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入備註',
-                                        style: { width: "300px" },
+                                        style: { width: "300px", paddingLeft: '5px'  },
                                         value: keyword4,
                                         onChange: (e) => {
                                             setKeyword4(e.target.value)
@@ -531,11 +534,11 @@ export default function PKingList() {
                                                     <span>
                                                         {getTaiwanDateStr(_item.create_at)}
                                                     </span>
-                                                    <span></span>
                                                     <span>
                                                         {_item.create_by}
                                                     </span>
                                                     <span>{_item.note}</span>
+                                                    <span></span>
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({

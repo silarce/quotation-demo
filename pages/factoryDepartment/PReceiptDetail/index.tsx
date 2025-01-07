@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -29,7 +29,7 @@ import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
-import { Modal, Radio, Space } from 'antd';
+import { Modal, Pagination, Radio, Space } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
@@ -60,8 +60,8 @@ export default function PReceiptDetail() {
     const [excelopen, setExcelopen] = useState<boolean>(false)
     const [printopen, setPrintopen] = useState<boolean>(false)
     const [reviewopen, setReviewopen] = useState<boolean>(false)
-    const [transtitle, setTranTitle] = useState<string>("")
-    const [transopen, setTransopen] = useState<boolean>(false)
+    const [transtitle, setTranTitle] = useState<string>("入庫")
+    const [transopen, setTransopen] = useState<boolean>(true)
     //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
@@ -102,6 +102,7 @@ export default function PReceiptDetail() {
     const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
@@ -151,9 +152,11 @@ export default function PReceiptDetail() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
     const [keyword5, setKeyword5] = useState<string>("");
     const [keyword6, setKeyword6] = useState<string>("");
     const [keyword7, setKeyword7] = useState<string>("");
+    const [keyword8, setKeyword8] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -245,6 +248,7 @@ export default function PReceiptDetail() {
         GetDetailById(parsedItem?.prodreceiptuuid);
         GetReviewById(parsedItem?.prodreceiptuuid);
         GetReviewHistory(parsedItem?.prodreceiptuuid);
+        GetTransById(parsedItem?.prodreceiptid);
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
@@ -756,103 +760,103 @@ export default function PReceiptDetail() {
         }
     };
 
-        //轉換單據
-        const Trans = async () => {
-            try {
-                setIsLoading(true);
-                const conditionModel = {
-                    purchaseorderuuid: uuidin,
-                    username: userInfo?.employee?.id.toString(),
-                    note: notein,
-                    data2: data2
-                    // create_at: moment().format('YYYY-MM-DD') || '',
-                    // need_date: need_datein,
-                    // create_by: userInfo?.employee?.id.toString(),
-                    // suppliername: suppliernamein,
-                    // supplierphone: supplierphonein,
-                    // suppliertaxid: suppliertaxidin,
-                    // supplieraddress: supplieraddressin,
-                    // supplierid: supplieridin,
-                    // shippingaddress: shippingaddressin,
-                    // suppliercontact: suppliercontactin,
-                    // supplierfax: supplierfaxin,
-                    // supplieruuid: supplieruuidin,
-                };
-    
-                var inputModel = {
-                    TypeName: 'ERP',
-                    ServiceName: 'WareHouseService',
-                    FunctionName: 'no',
-                    FilterConditions: JSON.stringify(conditionModel),
-                };
-    
-                const response = await fetch(`${setting.apipath}/WareHouse/NewTransferPOrderToPReceipt`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(inputModel)
-                });
-    
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const result = await response.json();
-    
-                if (result.success) {
-                    // 成功，顯示提示
-                    myAlert.success({ title: result.message, content: result.id });
-                    // setidin(result.id);
-                    // setuuidin(result.uuid);
-    
-                    // router.push({
-                    //     pathname: `/factoryDepartment/POrderList`,
-                    //     query: {
-                    //     },
-                    // });
-                } else {
-                    // 失敗，顯示錯誤提示
-                    console.log(result.message);
-                    myAlert.warning({ title: '失敗', content: result.message });
-                }
-    
-            } catch (error: any) {
-                setError(error.message);
+    //轉換單據
+    const Trans = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                prodreceiptuuid: uuidin,
+                username: userInfo?.employee?.id.toString(),
+                note: notein,
+                data2: data2
+                // create_at: moment().format('YYYY-MM-DD') || '',
+                // need_date: need_datein,
+                // create_by: userInfo?.employee?.id.toString(),
+                // suppliername: suppliernamein,
+                // supplierphone: supplierphonein,
+                // suppliertaxid: suppliertaxidin,
+                // supplieraddress: supplieraddressin,
+                // supplierid: supplieridin,
+                // shippingaddress: shippingaddressin,
+                // suppliercontact: suppliercontactin,
+                // supplierfax: supplierfaxin,
+                // supplieruuid: supplieruuidin,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/NewTransferPReceiptToPEntry`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
             }
-            finally {
-                setIsLoading(false);
+            const result = await response.json();
+
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: result.message, content: result.id });
+                // setidin(result.id);
+                // setuuidin(result.uuid);
+
+                // router.push({
+                //     pathname: `/factoryDepartment/POrderList`,
+                //     query: {
+                //     },
+                // });
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
             }
-        };
-    
-        //轉換紀錄
-        const GetTransById = async (id: any) => {
-            try {
-                const conditionModel = {
-                    purchaseorderid: id
-                };
-    
-                var inputModel = {
-                    TypeName: 'ERP',
-                    ServiceName: 'WareHouseService',
-                    FunctionName: 'no',
-                    FilterConditions: JSON.stringify(conditionModel),
-                };
-    
-                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-                const response = await fetch(`${setting.apipath}/WareHouse/NewGetPReceiptById?${queryParams}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const responsedata = await response.json();
-                setData3(responsedata);
-    
-            } catch (error: any) {
-                setError(error.message);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //轉換紀錄
+    const GetTransById = async (id: any) => {
+        try {
+            const conditionModel = {
+                id: id
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPEntryById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
             }
-            finally {
-                // setIsLoading(false);
-            }
-        };
+            const responsedata = await response.json();
+            setData3(responsedata);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
 
     //#endregion
 
@@ -1191,6 +1195,9 @@ export default function PReceiptDetail() {
         setSuppliertaxidin(originalsuppliertaxid);
         setShippingaddressin(originalshippingaddress);
         setIsEditing(false);  // 結束編輯模式
+
+        setIsTrans(false);  //結束進貨模式
+        setPrbar(false);
     };
 
     //作廢單據
@@ -1217,27 +1224,27 @@ export default function PReceiptDetail() {
 
     }
 
-        //編輯進貨
-        const handleEditTrans = () => {
-            setOriginalcreate_at(create_atin);
-            setOriginalneed_date(need_datein);
-            setOriginalnote(notein);
-            setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-            setOriginalsuppliername(suppliernamein);
-            setOriginalsupplieraddress(supplieraddressin);
-            setOriginalsupplierphone(supplierphonein);
-            setOriginalsuppliertaxid(suppliertaxidin);
-            setOriginalshippingaddress(shippingaddressin);
-            setIsTrans(true);
-        }
-    
-        //新增進貨
-        const handleAddTrans = async () => {
-            await Trans(); // 確保 Trans 完成
-            setIsTrans(false);
-            GetDetailById(uuidin);
-            // GetTransById(idin);//轉換紀錄
-        };
+    //編輯進貨
+    const handleEditTrans = () => {
+        setOriginalcreate_at(create_atin);
+        setOriginalneed_date(need_datein);
+        setOriginalnote(notein);
+        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+        setOriginalsuppliername(suppliernamein);
+        setOriginalsupplieraddress(supplieraddressin);
+        setOriginalsupplierphone(supplierphonein);
+        setOriginalsuppliertaxid(suppliertaxidin);
+        setOriginalshippingaddress(shippingaddressin);
+        setIsTrans(true);
+    }
+
+    //新增進貨
+    const handleAddTrans = async () => {
+        await Trans(); // 確保 Trans 完成
+        setIsTrans(false);
+        GetDetailById(uuidin);
+        GetTransById(idin);//轉換紀錄
+    };
 
 
     //列印單據
@@ -1250,7 +1257,7 @@ export default function PReceiptDetail() {
         Excel(idin, "po", "")
     }
 
-    
+
 
     //#endregion
 
@@ -1492,6 +1499,7 @@ export default function PReceiptDetail() {
 
 
     //#endregion
+
     //#region ===========【採購單篩選】
 
     const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
@@ -1499,16 +1507,37 @@ export default function PReceiptDetail() {
     // 當 keyword5, keyword6, keyword7 變化時進行篩選
     useEffect(() => {
         const filteredData = data4.filter((item) => {
+            const matchesKeyword4 = keyword4 ? item.suppliername?.includes(keyword4) : true;
             const matchesKeyword5 = keyword5 ? item.purchaseorderid?.includes(keyword5) : true;
             const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
             const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+            const matchesKeyword8 = keyword8 ? item.productid?.includes(keyword8) : true;
 
-            return matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+            return matchesKeyword4 && matchesKeyword5 && matchesKeyword6 && matchesKeyword7 && matchesKeyword8;
         });
 
         setFilteredData3(filteredData);
-    }, [keyword5, keyword6, keyword7, data4]); // 監聽依賴項目
+        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
+    }, [keyword4, keyword5, keyword6, keyword7, keyword8, data4]); // 監聽依賴項目
 
+    //#endregion
+
+    //#region ===========【分頁處理】
+    // 頁數相關狀態
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+
+    // 計算當前頁顯示的資料
+    const currentItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredData3.slice(startIndex, endIndex);
+    }, [itemsPerPage, currentPage, filteredData3]);
+
+    // 分頁切換處理函數
+    const handlePageChange = (page: any) => {
+        setCurrentPage(page);
+    };
     //#endregion
 
     return (
@@ -1525,19 +1554,8 @@ export default function PReceiptDetail() {
                         >
                             複製
                         </button> */}
-                        {/* 編輯按鈕 */}
-                        {statusin === "進貨中" && !isEditing && (
-
+                        {statusin === "進貨中" && isTrans && (
                             <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        handleDelete();
-                                    }}
-                                    title="刪除單據"
-                                >
-                                    刪除
-                                </button>
                                 <button
                                     className={scss.shortredsquarebtn}
                                     onClick={() => {
@@ -1554,7 +1572,49 @@ export default function PReceiptDetail() {
                                         })
                                     }}
                                 >
-                                    新增進貨
+                                    新增入庫
+                                </button>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        myAlert.confirm({
+                                            title: '確定要取消嗎?',
+                                            content: <>
+                                                <h1>未儲存的資料將不會保留</h1>
+                                            </>,
+                                            props: {
+                                                onOk: () => {
+                                                    handleCancel()
+                                                }
+                                            }
+                                        })
+                                    }}
+                                >
+                                    取消
+                                </button>
+                            </>
+                        )}
+                        {/* 編輯按鈕 */}
+                        {statusin === "進貨中" && !isEditing && !isTrans && (
+
+                            <>
+                                <button
+                                    className={scss.shortredsquarebtn}
+                                    onClick={() => {
+                                        handleDelete();
+                                    }}
+                                    title="刪除單據"
+                                >
+                                    刪除
+                                </button>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        handleEditTrans();
+                                    }}
+                                    title="入庫"
+                                >
+                                    入庫
                                 </button>
                                 {/* <button
                                     className={scss.shortsquarebtn}
@@ -1590,7 +1650,7 @@ export default function PReceiptDetail() {
 
                             </>
                         )}
-                        {!isEditing && (
+                        {(!isEditing && !isTrans) && (
                             <>
                                 <button
                                     className={scss.shortsquarebtn}
@@ -2085,88 +2145,127 @@ export default function PReceiptDetail() {
                                         採購項目
                                     </span>
                                 </div>
-                                <div className={scss.head_content1}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="請購數量"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                value: data3.length,
-                                            },
-                                        }}
-                                    />
-                                    {/* 搜尋欄位：依單號 */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
-                                                type: "text",
-                                                value: keyword5,
-                                                placeholder: "輸入單號",
-                                                onChange: (e) => setKeyword5(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                    {/* 搜尋欄位：依品項規格 */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                style: { borderRight: '1px solid rgb(168, 168, 168)' },
-                                                type: "text",
-                                                value: keyword6,
-                                                placeholder: "輸入品名",
-                                                onChange: (e) => setKeyword6(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        inputProps={{
-                                            props: {
-                                                type: "text",
-                                                value: keyword7,
-                                                placeholder: "輸入規格",
-                                                onChange: (e) => setKeyword7(e.target.value),
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                <div>
 
-                                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                        <div className={scss.thead22}>
-                                            <span>
 
-                                            </span>
-                                            <span>序</span>
-                                            <span>採購單號</span>
-                                            <span>廠商</span>
-                                            <span>料號</span>
-                                            <span>品名</span>
-                                            <span>規格</span>
-                                            <span>數量</span>
-                                            <span>已進貨</span>
-                                            <span>剩餘數量</span>
-                                            <span>單位</span>
-                                            <span>單價</span>
-                                            <span>總價</span>
-                                            <span>備註(用途說明)</span>
-                                            <span></span>
-                                        </div>
-                                        {filteredData3 && (
-                                            filteredData3.map((_item, index) => {
+                                    <div className={scss.head_content1}>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="採購數量"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    type: "number",
+                                                    value: currentItems.length,
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依廠商 (下拉選單，distinct) */}
+                                        <select
+                                            id="vendorSelect"
+                                            value={keyword4}
+                                            onChange={(e) => {
+                                                setKeyword4(e.target.value)
+                                                e.target.blur(); // 讓 select 失去焦點
+                                            }}
+                                            style={{
+                                                borderRight: "1px solid rgb(168, 168, 168)",
+                                                padding: "5px",
+                                                fontSize: "18px",
+                                            }}
+                                        >
+                                            <option value="">全部</option>
+                                            {Array.from(
+                                                new Set(data4.map((vendor) => vendor.suppliername))
+                                            ).map((suppliername, index) => (
+                                                <option key={index} value={suppliername}>
+                                                    {suppliername}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* 搜尋欄位：依單號 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: {
+                                                        borderRight: '1px solid rgb(168, 168, 168)'
+                                                    },
+                                                    type: "text",
+                                                    value: keyword5,
+                                                    placeholder: "輸入單號",
+                                                    onChange: (e) => setKeyword5(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依料號 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: {
+                                                        borderRight: '1px solid rgb(168, 168, 168)'
+                                                    },
+                                                    type: "text",
+                                                    value: keyword8,
+                                                    placeholder: "輸入料號",
+                                                    onChange: (e) => setKeyword8(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        {/* 搜尋欄位：依品項規格 */}
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                                                    type: "text",
+                                                    value: keyword6,
+                                                    placeholder: "輸入品名",
+                                                    onChange: (e) => setKeyword6(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            inputProps={{
+                                                props: {
+                                                    type: "text",
+                                                    value: keyword7,
+                                                    placeholder: "輸入規格",
+                                                    onChange: (e) => setKeyword7(e.target.value),
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px', height: '350px' }}>
+
+                                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                                            <div className={scss.thead22}>
+                                                <span></span>
+                                                <span>序</span>
+                                                <span>採購單號</span>
+                                                <span>廠商</span>
+                                                <span>料號</span>
+                                                <span>品名</span>
+                                                <span>規格</span>
+                                                <span>數量</span>
+                                                <span>已進貨</span>
+                                                <span>剩餘數量</span>
+                                                <span>單位</span>
+                                                <span>單價</span>
+                                                <span>總價</span>
+                                                <span>備註(用途說明)</span>
+                                                <span></span>
+                                            </div>
+                                            {currentItems && currentItems.map((_item, index) => {
                                                 const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
                                                 _item.totalprice = Totalprice;
 
                                                 // 檢查是否已存在於 data2 中
                                                 const isChecked = data2.some(item => item.id === _item.id);
                                                 const handleCheckboxChange = (checked: any) => {
-                                                    console.log(data3);
-                                                    console.log(data2);
 
                                                     if (checked) {
                                                         // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
@@ -2352,15 +2451,29 @@ export default function PReceiptDetail() {
                                                         </div>
                                                     </CellWithBar>
                                                 );
-
-                                            })
-                                        )}
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                                        {/* 分頁控制 */}
+                                        <Pagination
+                                            current={currentPage} // 當前頁碼
+                                            total={filteredData3.length} // 總數據量
+                                            pageSize={itemsPerPage} // 每頁顯示的數量
+                                            onChange={handlePageChange} // 處理頁面切換
+                                            showSizeChanger // 顯示頁數選擇器
+                                            pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                                            onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                                        />
                                     </div>
                                 </div>
                             </>
                         )}
                         <div
-                            style={{ paddingBottom: '18px' }}
+                            style={{
+                                paddingTop: `${prbar ? '18px' : '0px'}`,
+                                paddingBottom: '18px'
+                            }}
                         >
                             <span
                                 style={{
@@ -2402,8 +2515,9 @@ export default function PReceiptDetail() {
                                     <span>料號</span>
                                     <span>品名</span>
                                     <span>規格</span>
-                                    <span>已入庫</span>
                                     <span>數量</span>
+                                    <span>已入庫</span>
+                                    <span>剩餘</span>
                                     <span>單位</span>
                                     <span>單價</span>
                                     <span>總價</span>
@@ -2415,6 +2529,10 @@ export default function PReceiptDetail() {
                                     data2.map((_item, index) => {
                                         const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
                                         _item.totalprice = Totalprice
+                                        if (_item.wantinquantity === 0) {
+                                            const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
+                                            _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
+                                        }
                                         return (
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
@@ -2478,7 +2596,6 @@ export default function PReceiptDetail() {
                                                             }}
                                                         />
                                                     </span>
-                                                    <span>{_item.alreadyinquantity}</span>
                                                     <span>
                                                         <input
                                                             ref={quantityRefs.current[index]}
@@ -2494,6 +2611,27 @@ export default function PReceiptDetail() {
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
                                                                 handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
+                                                            }}
+                                                        />
+                                                    </span>
+                                                    <span>{_item.alreadyinquantity}</span>
+                                                    <span>
+                                                        <input
+                                                            ref={wantinquantityRefs.current[index]}
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                borderBottom: isTrans ? "1px solid black" : "",
+                                                                width: '95%',
+                                                                color: `${isTrans ? '#ea1833' : '#14256a'}`
+                                                            }}
+                                                            type={isTrans ? 'number' : 'text'}
+                                                            // value={Number(_item.quantity)}
+                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                            value={isTrans ? _item.wantinquantity : Number(_item.wantinquantity).toLocaleString()}
+                                                            readOnly={!isTrans}
+                                                            onChange={(e) => {
+                                                                handleStringChange(index, "wantinquantity", e.target.value); {/* 處理變更 */ }
+                                                                setCurrentIndex(index);
                                                             }}
                                                         />
                                                     </span>
@@ -2820,6 +2958,96 @@ export default function PReceiptDetail() {
                                 )}
                             </>
                         )}
+                        {transopen && (
+                            <>
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
+                                        }}
+                                    >
+                                        {transtitle}紀錄
+                                    </span>
+                                </div>
+
+
+
+                                {data3.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚無紀錄
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={scss.head_content1}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="進貨次數"
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        type: "number",
+                                                        // style: { color: 'red' },
+                                                        value: data3.length,
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                                                <div className={scss.thead19}>
+                                                    <span>序</span>
+                                                    <span>單號</span>
+                                                    <span>日期</span>
+                                                    <span>狀態</span>
+                                                    <span>備註</span>
+                                                    <span></span>
+                                                </div>
+
+                                                {data3 && (
+                                                    data3.map((_item: any, index: number) => (
+                                                        <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
+                                                            // alert(_item.prodreceiptid);
+                                                            myAlert.confirm({
+                                                                title: '確定導向此單據嗎?',
+                                                                content: _item.prodentryid,
+                                                                props: {
+                                                                    onOk: () => {
+                                                                        router.push({
+                                                                            pathname: `/factoryDepartment/PEntryDetail`,
+                                                                            query: {
+                                                                                item: JSON.stringify(_item),
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                }
+                                                            })
+                                                        }}>
+                                                            <div className={scss.row01}>
+                                                                <span>{index + 1}</span>
+                                                                <span>{_item.prodentryid}</span>
+                                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                <span>{_item.status}</span>
+                                                                <span>{_item.note}</span>
+                                                            </div>
+                                                        </CellWithBar>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -2944,21 +3172,23 @@ export default function PReceiptDetail() {
                     <div className={scss.thead21}>
                         <span>名稱</span>
                         <span>地址</span>
-                        <span>統編</span>
+                        <span>聯絡人</span>
                         <span></span>
                     </div>
                     {filteredData2 && (
                         filteredData2.map((_item: any, index: number) => (
                             <CellWithBar key={index} className={scss.panelHeader21}
                                 onClick={() => {
-                                    setSuppliernamein(_item.name);
-                                    setSupplieraddressin(_item.county + _item.district + _item.address);
-                                    setSupplierphonein(_item.phone);
-                                    setSuppliertaxidin(_item.tax_id);
-                                    setSupplieridin(_item.customer_number);
-                                    setSupplierfaxin(_item.fax);
-                                    setSuppliercontactin(_item.contact);
-                                    setSupplieruuidin(_item.id);
+                                    setSuppliernamein(_item.name || ''); // 預設為空字串
+                                    setSupplieraddressin(
+                                        (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                    );
+                                    setSupplierphonein(_item.phone || '');
+                                    setSuppliertaxidin(_item.tax_id || '');
+                                    setSupplieridin(_item.customer_number || '');
+                                    setSupplierfaxin(_item.fax || '');
+                                    setSuppliercontactin(_item.contact || '');
+                                    setSupplieruuidin(_item.id || '');
                                     setCustomerbar(false);
                                 }}>
                                 <div className={scss.row01}>

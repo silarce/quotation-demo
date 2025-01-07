@@ -61,7 +61,7 @@ export default function PKingDetail() {
     const [pagename, setPagename] = useState<string>("領料")
     const [statusarea, setStatusarea] = useState<boolean>(false)
     const [excelopen, setExcelopen] = useState<boolean>(false)
-    const [printopen, setPrintopen] = useState<boolean>(false)
+    const [printopen, setPrintopen] = useState<boolean>(true)
     const [reviewopen, setReviewopen] = useState<boolean>(false)
     const [transopen, setTransopen] = useState<boolean>(false)
     //#endregion
@@ -602,7 +602,7 @@ export default function PKingDetail() {
                     try {
                         const conditionModel = {
                             id: idin,
-                            type: "purchaseorder",
+                            type: "pickinglist",
                             clientip: ip,
                             data: []
                         };
@@ -708,7 +708,7 @@ export default function PKingDetail() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_領料單_${id}.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -1383,7 +1383,7 @@ export default function PKingDetail() {
             picking_qty: 0, // 領料數量
             pickinglistid: idin,
             pickinglistuuid: uuidin,
-            productid: '', // 使用 _item 的 productid 
+            productid: '', // 使用 _item 的 productid
             productuuid: '', // 使用 _item 的 productuuid
             quantity: 0, // 設置數量為 0
             remaining_quantity: 0, // 設置剩餘數量為
@@ -1738,7 +1738,7 @@ export default function PKingDetail() {
     const GetLayOut = async (whid: any, trayname: any, id: any) => {
         try {
 
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
                 whid: whid as string | undefined,
                 trayname: trayname as string | undefined,
@@ -1769,7 +1769,7 @@ export default function PKingDetail() {
         } catch (error: any) {
             setError(error.message);
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -2043,7 +2043,7 @@ export default function PKingDetail() {
     const minusWHPositionQuantity = async () => {
 
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 whpositionuuid: nowwhpositionuuid,
                 quantity: inboxquantity.toString() as string | undefined,
@@ -2066,7 +2066,8 @@ export default function PKingDetail() {
             const data = await response.json();
 
             getWhpositionDetailByProductId(nowproductid);
-            setNowpickingqty((parseInt(nowpickingqty) + 1).toString());
+            setNowpickingqty((parseInt(nowpickingqty) + inboxquantity).toString());
+            // alert(nowpickingqty);
             GetDetailById(uuidin);
             setWhpquantity((parseInt(whpquantity) - inboxquantity).toString());
             setInboxquantity(0);
@@ -2075,7 +2076,7 @@ export default function PKingDetail() {
             setError("getProdReceiptDetail:" + error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -2181,6 +2182,7 @@ export default function PKingDetail() {
     // 關閉儲格Modal
     const whpositionqModalClose = async () => {
         setWhpositionqmodalopen(false);
+        setSelectedItemId(null);
     }
 
     function handleinbox(item: any) {
@@ -3040,11 +3042,13 @@ export default function PKingDetail() {
                                     <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
                                         {/* 分頁控制 */}
                                         <Pagination
-                                            current={currentPage}  // 當前頁碼
+                                            current={currentPage} // 當前頁碼
                                             total={filteredData3.length} // 總數據量
-                                            pageSize={itemsPerPage}  // 每頁顯示的數量，這會根據 itemsPerPage 動態更新
-                                            onChange={handlePageChange}  // 處理頁面切換
-                                            onShowSizeChange={(current, size) => setItemsPerPage(size)}  // 更新每頁顯示項目數量
+                                            pageSize={itemsPerPage} // 每頁顯示的數量
+                                            onChange={handlePageChange} // 處理頁面切換
+                                            showSizeChanger // 顯示頁數選擇器
+                                            pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                                            onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
                                         />
                                     </div>
 
@@ -3097,9 +3101,9 @@ export default function PKingDetail() {
                                     <span>料號</span>
                                     <span>品名</span>
                                     <span>規格</span>
+                                    <span>數量</span>
                                     <span>已領</span>
                                     <span>剩餘</span>
-                                    <span>數量</span>
                                     <span>單位</span>
                                     <span>領料人員</span>
                                     <span>備註(用途說明)</span>
@@ -3123,7 +3127,7 @@ export default function PKingDetail() {
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
-                                                        <button
+                                                        {/* <button
                                                             style={{ display: (statusin === "編輯中" && isEditing) ? 'none' : '' }}
                                                             onClick={() => { handleinbox(_item) }}
                                                         >
@@ -3132,7 +3136,43 @@ export default function PKingDetail() {
                                                                 alt="tray"
                                                                 style={{ width: '30px', height: '20px' }}
                                                             />
+                                                        </button> */}
+                                                        <button
+                                                            onClick={() => handleinbox(_item)}
+                                                            style={{
+                                                                width: '30px',  // 調整按鈕大小，與圖片更匹配
+                                                                height: '30px', // 調整按鈕大小，與圖片更匹配
+                                                                border: '1px solid #ccc',
+                                                                display: `${!isEditing ? 'flex' : 'none'}`,  // 根據 isEditing 顯示或隱藏按鈕
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                                cursor: 'pointer',
+                                                                borderRadius: '5px',
+                                                                transition: 'background-color 0.3s'  // 添加過渡效果
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={icon_tray_out.src}
+                                                                alt="tray"
+                                                                style={{
+                                                                    width: '20px',  // 根據按鈕大小調整圖片尺寸
+                                                                    height: '20px', // 根據按鈕大小調整圖片尺寸
+                                                                    objectFit: 'contain',  // 確保圖片不會被拉伸
+                                                                    backgroundColor: 'transparent',  // 圖片背景透明
+                                                                    border: 'none'  // 確保圖片沒有邊框
+                                                                }}
+                                                            />
                                                         </button>
+
+
+
+
                                                     </span>
                                                     <span>{index + 1}</span>
                                                     <span>
@@ -3188,10 +3228,6 @@ export default function PKingDetail() {
                                                             }}
                                                         />
                                                     </span>
-                                                    <span>{_item.picking_qty}</span>
-                                                    <span>
-                                                        {_item.remaining_quantity}
-                                                    </span>
                                                     <span>
                                                         <input
                                                             ref={quantityRefs.current[index]}
@@ -3210,6 +3246,11 @@ export default function PKingDetail() {
                                                             }}
                                                         />
                                                     </span>
+                                                    <span>{_item.picking_qty}</span>
+                                                    <span>
+                                                        {_item.remaining_quantity}
+                                                    </span>
+
                                                     <span>
                                                         <input
                                                             ref={unitRefs.current[index]}
@@ -4142,7 +4183,6 @@ export default function PKingDetail() {
                                                 },
                                             }}
                                         />
-                                        {inboxquantity}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="領用數量"
