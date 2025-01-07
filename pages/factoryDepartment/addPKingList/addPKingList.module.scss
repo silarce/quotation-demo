@@ -275,6 +275,20 @@
   max-height: 350px;
 }
 
+.body_content2 {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    gap: 0px;
+    width: auto;
+    // margin-top: 4px;
+    // margin-left: 20px;
+    // margin-right: 20px;
+    // border:1px solid rgb(168, 168, 168);
+    overflow-x: hidden;
+    // background-color: gray;
+    // max-height: 350px;
+  }
+
 .body_foot1 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
@@ -337,7 +351,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 150px 150px 450px // gap: 5px;
+    grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 100px 50px 150px 450px 65px // gap: 5px;
     // gap: 5px;
   }
 }
@@ -702,7 +716,7 @@ div.panelHeader15 {
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 415px 415px 100px 50px 150px 150px 450px 65px;
+  grid-template-columns: 60px 30px 150px 415px 415px 100px 100px 100px 50px 150px 450px 65px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;
@@ -912,7 +926,7 @@ div.panelHeader21 {
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px 65px;
+  grid-template-columns: 60px 50px 150px 415px 415px 100px 50px 150px 150px 450px 65px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;
@@ -958,7 +972,7 @@ div.panelHeader22 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px
+    grid-template-columns: 60px 50px 150px 415px 415px 100px 50px 150px 150px 450px // gap: 5px;
     // gap: 5px;
   }
 }

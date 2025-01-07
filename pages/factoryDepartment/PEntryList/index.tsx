@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './PRequisitionList.module.scss';
+import scss from './PEntryList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -62,9 +62,10 @@ import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
+import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
-export default function PRequisitionList() {
-    const [pagename, setPagename] = useState<string>("請購")
+export default function PEntryList() {
+    const [pagename, setPagename] = useState<string>("入庫")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -111,18 +112,17 @@ export default function PRequisitionList() {
 
     //#region ===========【上方功能列】
     const panelList: TpanelList = [
-        {
-            type: 'addButton',
-            label: `新增${pagename}單`,
-            onClick: () => {
-                // setOpen(true);
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseRequisitionList`,
-                    query: {
-                    },
-                });
-            },
-        },
+        // {
+        //     type: 'addButton',
+        //     label: `新增${pagename}單`,
+        //     onClick: () => {
+        //         router.push({
+        //             pathname: `/factoryDepartment/addProdReceiptList`,
+        //             query: {
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -140,7 +140,7 @@ export default function PRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "編輯中",
+                type: "入庫中",
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -153,7 +153,7 @@ export default function PRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionWithReviews?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdEntryWithReviews?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -161,7 +161,7 @@ export default function PRequisitionList() {
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
-
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error: any) {
             // console.log(error.message);
@@ -176,7 +176,7 @@ export default function PRequisitionList() {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                purchaserequisitionuuid: id as string | undefined,
+                prodentryuuid: id as string | undefined,
             };
 
 
@@ -188,14 +188,16 @@ export default function PRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPurchaseRequisitionDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdEntryDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const responsedata = await response.json();
             // setData1(data);
+            console.log(responsedata);
             return responsedata
 
+            console.log()
 
         } catch (error: any) {
             setError(error.message);
@@ -313,10 +315,11 @@ export default function PRequisitionList() {
     //#endregion
 
     //#region  ===========【單據功能區】
-    //下拉單據明細
     const [details, setDetails] = useState<Record<number, any[]>>({});
+
     const handlePanelClick = async (id: number) => {
         const detailData = await GetDetailById(id);
+        console.log(detailData);
         setDetails((prevDetails) => ({
             ...prevDetails,
             [id]: detailData,
@@ -331,14 +334,14 @@ export default function PRequisitionList() {
         const endDate = keywordenddate;
         const id = keyword2.trim();
         const status = keyword3.trim();
-        const note = keyword4.trim();
+        const supplier = keyword4.trim();
 
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
             !id &&
             !status &&
-            !note) {
+            !supplier) {
             setSearchdata(data);
             return;
         }
@@ -355,7 +358,7 @@ export default function PRequisitionList() {
         // 模糊查詢請購單號
         if (id) {
             filteredData = filteredData.filter(item =>
-                item.purchaserequisitionid.toString().includes(id)
+                item.prodentryid.toString().includes(id)
             );
         }
 
@@ -366,12 +369,11 @@ export default function PRequisitionList() {
             );
         }
 
-        if (note) {
+        if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.note.toString().includes(note)
+                item.suppliername.toString().includes(supplier)
             );
         }
-
 
         setSearchdata(filteredData);
     };
@@ -380,12 +382,11 @@ export default function PRequisitionList() {
     useEffect(() => {
         filterData();
     }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
-
     //#endregion
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename+"單列表"}
+            <PageHeader02 tag={pagename + "單列表"}
                 customeLeft={[
                     <div
                         style={{
@@ -415,9 +416,9 @@ export default function PRequisitionList() {
                                 }}
                             >
                                 <option value="">全部</option> {/* 預設選項 */}
-                                <option value="編輯中">編輯中</option>
-                                <option value="審核中">審核中</option>
-                                <option value="已核准">已核准</option>
+                                <option value="入庫中">入庫中</option>
+                                {/* <option value="審核中">審核中</option>
+                                <option value="已核准">已核准</option> */}
                                 <option value="已結案">已結案</option>
                             </select>
 
@@ -440,7 +441,6 @@ export default function PRequisitionList() {
                                 }}
                             />
                         </div>
-
                         {/* 第三個選項 */}
                         <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
@@ -460,7 +460,7 @@ export default function PRequisitionList() {
                         </div>
 
                         {/* 第四個選項 */}
-                        <div>
+                        <div style={{ borderRight: '1px solid rgb(168, 168, 168)' }}>
                             <InputSel
                                 // caption="單號"
                                 disabled={false}
@@ -478,26 +478,13 @@ export default function PRequisitionList() {
                             />
                         </div>
                         <div>
-                            {/* <InputSel
+                            <InputSel
+                                // caption="單號"
                                 disabled={false}
                                 captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入廠商名稱',
-                                        style: { width: "300px" },
-                                        value: keyword4,
-                                        onChange: (e) => {
-                                            setKeyword4(e.target.value)
-                                        }
-                                    },
-                                }}
-                            /> */}
-                            <InputSel
-                                disabled={false}
-                                captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                inputProps={{
-                                    props: {
-                                        placeholder: '請輸入備註',
                                         style: { width: "300px", paddingLeft: '5px' },
                                         value: keyword4,
                                         onChange: (e) => {
@@ -508,15 +495,27 @@ export default function PRequisitionList() {
                             />
                         </div>
                     </div>
-
                 ]}
                 customeRight={[
+                    <span style={{ fontSize: '18px', padding: '0px 10px' }}>
 
+                        <button
+                            className={scss.shortsquarebtn}
+                            style={{
+                            }}
+                            onClick={() => {
+                                router.push("/factoryDepartment/PEntryIn");
+                                // setPrbar(!prbar);
+                            }}
+                        >
+                            待入品項列表
+                        </button>
+                    </span>
                 ]}
 
                 panelList={panelList} />
             <div>
-                <Thead01 type={'PRequisition'} />
+                <Thead01 type={'POrder'} />
                 <div>
                     {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                     {searchdata && (
@@ -528,7 +527,7 @@ export default function PRequisitionList() {
                                     className={scss.customCollapse}
                                     onChange={(key) => {
                                         if (key.includes("1")) {
-                                            handlePanelClick(_item.purchaserequisitionuuid);
+                                            handlePanelClick(_item.prodentryuuid);
                                         }
                                     }}
                                 >
@@ -541,10 +540,10 @@ export default function PRequisitionList() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row01} 
-                                                ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                                                ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
                                                 >
                                                     <span>{index + 1}</span>
-                                                    <span style={{ fontSize: '18px' }}>{_item.purchaserequisitionid}</span>
+                                                    <span style={{ fontSize: '18px' }}>{_item.prodentryid}</span>
                                                     <span style={{ color: '#ea1833' }}>
                                                         {_item.status}
                                                     </span>
@@ -557,18 +556,12 @@ export default function PRequisitionList() {
                                                     <span>
                                                         {_item.create_by}
                                                     </span>
-                                                    <span>{_item.note}</span>
+                                                    <span>{_item.suppliername}</span>
                                                     <span>
                                                         <IconDetail onClick={() => {
                                                             router.push({
-                                                                pathname: `/factoryDepartment/PRequisitionDetail`,
+                                                                pathname: `/factoryDepartment/PEntryDetail`,
                                                                 query: {
-                                                                    // purchaserequisitionuuid: _item.purchaserequisitionuuid,
-                                                                    // purchaserequisitionid: _item.purchaserequisitionid,
-                                                                    // create_at: _item.create_at,
-                                                                    // need_date: _item.need_date,
-                                                                    // create_by: _item.create_by,
-                                                                    // status: _item.status
                                                                     item: JSON.stringify(_item),
                                                                 },
                                                             });
@@ -699,8 +692,8 @@ export default function PRequisitionList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
+                                                        <th style={{ width: '150px' }}>已入庫</th>
                                                         <th style={{ width: '150px' }}>數量</th>
-                                                        <th style={{ width: '150px' }}>已轉採購</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
                                                         <th>金額</th>
@@ -708,14 +701,14 @@ export default function PRequisitionList() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {details[_item.purchaserequisitionuuid]?.map((detail: any, detailIndex: number) => (
+                                                    {details[_item.prodentryuuid]?.map((detail: any, detailIndex: number) => (
                                                         <tr key={detailIndex}>
                                                             <td style={{ width: '50px' }}>{detailIndex + 1}</td>
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
+                                                            <td style={{ width: '150px' }}>{detail.entry_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                                                            <td style={{ width: '150px',color:'#ea1833' }}>{detail.po_quantity ?? '0'}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>

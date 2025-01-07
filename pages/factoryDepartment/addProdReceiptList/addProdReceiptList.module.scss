@@ -170,32 +170,32 @@
 }
 
 .head_content0 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  gap: 20px;
-  width: auto;
-  // margin-top: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
-
-  div {
-      margin-right: 2px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 20px;
+    width: auto;
+    // margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+  
+    div {
+        margin-right: 2px;
+    }
+  
+    // background-color: gray;
   }
-
-  // background-color: gray;
-}
 
 .head_content1 {
   display: grid;
-  grid-template-columns: 30% 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-  // gap: 20px;
+  grid-template-columns:20% 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+//   gap: 20px;
   width: auto;
   // margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
   div {
-      margin-right: 2px;
+    margin-right: 2px;
   }
 
   // background-color: gray;
@@ -905,14 +905,14 @@ div.panelHeader21 {
 
 
 
-//#region 物料明細(請購帶入)
+//#region 物料明細(採購帶入)
 .thead22 {
   position: -webkit-sticky; // 為兼容性增加前綴
   position: sticky;
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px 65px;
+  grid-template-columns: 60px 30px 150px 300px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px 65px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;
@@ -937,7 +937,7 @@ div.panelHeader21 {
 
 //#endregion
 
-//物料明細(請購帶入)
+//物料明細(採購帶入)
 div.panelHeader22 {
   // padding-left: 15px;
   padding: 10px 20px;
@@ -958,7 +958,7 @@ div.panelHeader22 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 60px 30px 150px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px
+    grid-template-columns: 60px 30px 150px 300px 150px 415px 415px 100px 100px 100px 50px 150px 150px 450px
     // gap: 5px;
   }
 }

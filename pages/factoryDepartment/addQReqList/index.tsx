@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _ from 'lodash';
-
-import scss from './QReqDetail.module.scss';
+import scss from './addQReqList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -53,13 +52,14 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function QReqDetail() {
+export default function AddQReqList() {
     //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("詢價")
     const [statusarea, setStatusarea] = useState<boolean>(false)
-    const [excelopen, setExcelopen] = useState<boolean>(true)
+    const [excelopen, setExcelopen] = useState<boolean>(false)
     const [printopen, setPrintopen] = useState<boolean>(false)
     const [reviewopen, setReviewopen] = useState<boolean>(false)
+    const [transtitle, setTranTitle] = useState<string>("")
     const [transopen, setTransopen] = useState<boolean>(false)
 
     //#endregion
@@ -190,6 +190,7 @@ export default function QReqDetail() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -208,26 +209,17 @@ export default function QReqDetail() {
     const [handinputproductid, setHandinputproductid] = useState<string>("");
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
 
+    //編輯狀態
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [isTrans, setIsTrans] = useState(false);
-
-    const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
-
-
-
-
-
-
-
+    const [isEditing, setIsEditing] = useState(true);
 
 
     // 計算總價
     const [totalprice1, setTotalPrice1] = useState<string>("");
     const [taxprice1, setTaxPrice1] = useState<string>("");
     const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
+
     //#endregion
 
     //#region ===========【上方功能列】
@@ -240,8 +232,27 @@ export default function QReqDetail() {
     };
 
     //按鈕
+    //新增按鈕
     const panelList: TpanelList = [
+        {
 
+            type: 'myButton',
+            label: '返回',
+            onClick: () => {
+                myAlert.confirm({
+                    title: `確定要返回${pagename}單列表嗎?`,
+                    content: <>
+                        <h1>未儲存的資料將不會保留</h1>
+                    </>,
+                    props: {
+                        onOk: () => {
+                            router.back();
+                        }
+                    }
+                });
+            },
+
+        },
     ];
     //#endregion
 
@@ -280,53 +291,55 @@ export default function QReqDetail() {
         console.log(userInfo);
         if (!hasFetchedData.current) {
             getProduct();
+            setCreate_atin(moment().format('YYYY-MM-DD') || '');
+            setCreate_byin(userInfo?.employee?.chName.toString() || '');
             getCustomers();
             GetReviewFlow();//審核
             hasFetchedData.current = true;
         }
     }, []);
 
-    useEffect(() => {
-        console.log(parsedItem);
-        setuuidin(parsedItem?.id);
-        setidin(parsedItem?.quotereqid)
-        GetDetailById(parsedItem?.id);
-        // GetReviewById(parsedItem?.quoterequuid);
-        // GetReviewHistory(parsedItem?.quoterequuid);
-        // GetTransById(parsedItem?.purchaseorderid);
-        // getPRequisition();
-        setCreate_byin(parsedItem?.create_by);
-        setCreate_atin(parsedItem?.create_at);
-        setNeed_datein(parsedItem?.need_date);
-        setStatusin(parsedItem?.status);
-        setNotein(parsedItem?.note);
-        setInvoicein(parsedItem?.invoice);
-        setSupplieridin(parsedItem?.supplierid);
-        setSuppliernamein(parsedItem?.suppliername);
-        setSupplieraddressin(parsedItem?.supplieraddress);
-        setSupplierphonein(parsedItem?.supplierphone);
-        setSuppliertaxidin(parsedItem?.suppliertaxid);
-        setShippingaddressin(parsedItem?.shippingaddress);
-        setSupplierfaxin(parsedItem?.supplierfax);
-        setSuppliercontactin(parsedItem?.suppliercontact);
-        setSupplierid2in(parsedItem?.supplierid2);
-        setSuppliername2in(parsedItem?.suppliername2);
-        setSupplieraddress2in(parsedItem?.supplieraddress2);
-        setSupplierphone2in(parsedItem?.supplierphone2);
-        setSuppliertaxid2in(parsedItem?.suppliertaxid2);
-        setShippingaddress2in(parsedItem?.shippingaddress2);
-        setSupplierfax2in(parsedItem?.supplierfax2);
-        setSuppliercontact2in(parsedItem?.suppliercontact2);
-        setSupplierid3in(parsedItem?.supplierid3);
-        setSuppliername3in(parsedItem?.suppliername3);
-        setSupplieraddress3in(parsedItem?.supplieraddress3);
-        setSupplierphone3in(parsedItem?.supplierphone3);
-        setSuppliertaxid3in(parsedItem?.suppliertaxid3);
-        setShippingaddress3in(parsedItem?.shippingaddress3);
-        setSupplierfax3in(parsedItem?.supplierfax3);
-        setSuppliercontact3in(parsedItem?.suppliercontact3);
+    // useEffect(() => {
+    //     console.log(parsedItem);
+    //     setuuidin(parsedItem?.id);
+    //     setidin(parsedItem?.quotereqid)
+    //     GetDetailById(parsedItem?.id);
+    //     // GetReviewById(parsedItem?.quoterequuid);
+    //     // GetReviewHistory(parsedItem?.quoterequuid);
+    //     // GetTransById(parsedItem?.purchaseorderid);
+    //     // getPRequisition();
+    //     setCreate_byin(parsedItem?.create_by);
+    //     setCreate_atin(parsedItem?.create_at);
+    //     setNeed_datein(parsedItem?.need_date);
+    //     setStatusin(parsedItem?.status);
+    //     setNotein(parsedItem?.note);
+    //     setInvoicein(parsedItem?.invoice);
+    //     setSupplieridin(parsedItem?.supplierid);
+    //     setSuppliernamein(parsedItem?.suppliername);
+    //     setSupplieraddressin(parsedItem?.supplieraddress);
+    //     setSupplierphonein(parsedItem?.supplierphone);
+    //     setSuppliertaxidin(parsedItem?.suppliertaxid);
+    //     setShippingaddressin(parsedItem?.shippingaddress);
+    //     setSupplierfaxin(parsedItem?.supplierfax);
+    //     setSuppliercontactin(parsedItem?.suppliercontact);
+    //     setSupplierid2in(parsedItem?.supplierid2);
+    //     setSuppliername2in(parsedItem?.suppliername2);
+    //     setSupplieraddress2in(parsedItem?.supplieraddress2);
+    //     setSupplierphone2in(parsedItem?.supplierphone2);
+    //     setSuppliertaxid2in(parsedItem?.suppliertaxid2);
+    //     setShippingaddress2in(parsedItem?.shippingaddress2);
+    //     setSupplierfax2in(parsedItem?.supplierfax2);
+    //     setSuppliercontact2in(parsedItem?.suppliercontact2);
+    //     setSupplierid3in(parsedItem?.supplierid3);
+    //     setSuppliername3in(parsedItem?.suppliername3);
+    //     setSupplieraddress3in(parsedItem?.supplieraddress3);
+    //     setSupplierphone3in(parsedItem?.supplierphone3);
+    //     setSuppliertaxid3in(parsedItem?.suppliertaxid3);
+    //     setShippingaddress3in(parsedItem?.shippingaddress3);
+    //     setSupplierfax3in(parsedItem?.supplierfax3);
+    //     setSuppliercontact3in(parsedItem?.suppliercontact3);
 
-    }, [item]);
+    // }, [item]);
     //#endregion
 
     //#region ===========【API】
@@ -462,7 +475,8 @@ export default function QReqDetail() {
 
         try {
             const conditionModel = {
-                id: uuidin as string | undefined
+                id: uuidin as string | undefined,
+                data2: data2
             };
 
 
@@ -473,9 +487,15 @@ export default function QReqDetail() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewDeleteQuotereq?${queryParams}`);
-
+            // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            // const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
 
 
             if (!response.ok) {
@@ -488,7 +508,7 @@ export default function QReqDetail() {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
                 router.push({
-                    pathname: `/factoryDepartment/QReqList`,
+                    pathname: `/factoryDepartment/POrderList`,
                 });
             } else {
                 // 失敗，顯示錯誤提示
@@ -812,7 +832,7 @@ export default function QReqDetail() {
 
             if (result.success) {
                 // 成功，顯示提示
-                myAlert.success({ title: "複製成功", content: result.id });
+                myAlert.success({ title: result.message });
                 setidin(result.id);
                 setuuidin(result.uuid);
                 setStatusin("編輯中");
@@ -834,105 +854,6 @@ export default function QReqDetail() {
             setIsLoading(false);
         }
     };
-
-    //轉換單據
-    const Trans = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                purchaseorderuuid: uuidin,
-                username: userInfo?.employee?.id.toString(),
-                note: notein,
-                data2: data2
-                // create_at: moment().format('YYYY-MM-DD') || '',
-                // need_date: need_datein,
-                // create_by: userInfo?.employee?.id.toString(),
-                // suppliername: suppliernamein,
-                // supplierphone: supplierphonein,
-                // suppliertaxid: suppliertaxidin,
-                // supplieraddress: supplieraddressin,
-                // supplierid: supplieridin,
-                // shippingaddress: shippingaddressin,
-                // suppliercontact: suppliercontactin,
-                // supplierfax: supplierfaxin,
-                // supplieruuid: supplieruuidin,
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewTransferPOrderToPReceipt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message, content: result.id });
-                // setidin(result.id);
-                // setuuidin(result.uuid);
-
-                // router.push({
-                //     pathname: `/factoryDepartment/POrderList`,
-                //     query: {
-                //     },
-                // });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //轉換紀錄
-    const GetTransById = async (id: any) => {
-        try {
-            const conditionModel = {
-                purchaseorderid: id
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPReceiptById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-            setData3(responsedata);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    };
-
     //單據結案
     const Close = async (type: any) => {
         try {
@@ -964,39 +885,6 @@ export default function QReqDetail() {
             // setIsLoading(false);
         }
     }
-
-    //取請購(轉採購用)
-    const getPRequisition = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPRequisitionForAddPOrder?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-
-            setData4(responsedata);
-            setPrbarData(responsedata);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
 
     //#endregion
 
@@ -1216,7 +1104,7 @@ export default function QReqDetail() {
 
     const handleChoseflow = () => {
         setReviewbar(true);
-        setDocumenttitle(`【採購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
+        setDocumenttitle(`【詢價單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
     }
 
     const handleGetReviewBack = () => {
@@ -1309,55 +1197,17 @@ export default function QReqDetail() {
     //#endregion
 
     //#region ===========【單據功能區】
+    //新增
+    const handleAdd = () => {
+        Add();
+    }
+
     //編輯
     const handleEdit = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setOriginalsuppliername(suppliernamein);
-        setOriginalsupplieraddress(supplieraddressin);
-        setOriginalsupplierphone(supplierphonein);
-        setOriginalsuppliertaxid(suppliertaxidin);
-        setOriginalshippingaddress(shippingaddressin);
-        setOriginalsuppliername2(suppliername2in);
-        setOriginalsupplieraddress2(supplieraddress2in);
-        setOriginalsupplierphone2(supplierphone2in);
-        setOriginalsuppliertaxid2(suppliertaxid2in);
-        setOriginalshippingaddress2(shippingaddress2in);
-        setOriginalsuppliername3(suppliername3in);
-        setOriginalsupplieraddress3(supplieraddress3in);
-        setOriginalsupplierphone3(supplierphone3in);
-        setOriginalsuppliertaxid3(suppliertaxid3in);
-        setOriginalshippingaddress3(shippingaddress3in);
-        setIsEditing(true) // 進入編輯模式
     };
 
     //取消編輯
     const handleCancel = () => {
-        setCreate_atin(originalcreate_at);
-        setNeed_datein(originalneed_date);
-        setNotein(originalnote);
-        setData2([...originaldata2]);  // 確保還原為原始資料
-        setSuppliernamein(originalsuppliername);
-        setSupplieraddressin(originalsupplieraddress);
-        setSupplierphonein(originalsupplierphone);
-        setSuppliertaxidin(originalsuppliertaxid);
-        setShippingaddressin(originalshippingaddress);
-        setSuppliername2in(originalsuppliername2);
-        setSupplieraddress2in(originalsupplieraddress2);
-        setSupplierphone2in(originalsupplierphone2);
-        setSuppliertaxid2in(originalsuppliertaxid2);
-        setShippingaddress2in(originalshippingaddress2);
-        setSuppliername3in(originalsuppliername3);
-        setSupplieraddress3in(originalsupplieraddress3);
-        setSupplierphone3in(originalsupplierphone3);
-        setSuppliertaxid3in(originalsuppliertaxid3);
-        setShippingaddress3in(originalshippingaddress3);
-        setIsEditing(false);  // 結束編輯模式
-
-
-        setIsTrans(false);  //結束進貨模式
     };
 
     //作廢單據
@@ -1371,6 +1221,7 @@ export default function QReqDetail() {
             }
         })
     }
+
     //複製單據
     const handleCopy = () => {
         myAlert.confirm({
@@ -1383,28 +1234,6 @@ export default function QReqDetail() {
         })
 
     }
-
-    //編輯進貨
-    const handleEditTrans = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setOriginalsuppliername(suppliernamein);
-        setOriginalsupplieraddress(supplieraddressin);
-        setOriginalsupplierphone(supplierphonein);
-        setOriginalsuppliertaxid(suppliertaxidin);
-        setOriginalshippingaddress(shippingaddressin);
-        setIsTrans(true);
-    }
-
-    //新增進貨
-    const handleAddTrans = async () => {
-        await Trans(); // 確保 Trans 完成
-        setIsTrans(false);
-        GetDetailById(uuidin);
-        GetTransById(idin);
-    };
 
     //結案
     const handleClose = async () => {
@@ -1659,201 +1488,24 @@ export default function QReqDetail() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename + "單" + "：" + statusin} panelList={panelList}
+            <PageHeader02 tag={"新增" + pagename + "單"} panelList={panelList}
                 customeRight={[
+
                     <>
-                        {(!isEditing && !isTrans) && (
-                            <button
-                                className={scss.shortsquarebtn}
-                                onClick={() => {
-                                    handleCopy();
-                                }}
-                                title="複製"
-                            >
-                                複製
-                            </button>
-                        )}
-                        {(statusin === "已核准" && !isTrans) && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定結案嗎?',
-                                            props: {
-                                                onOk: () => {
-                                                    handleClose();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                    title="單據結案"
-                                >
-                                    結案
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEditTrans();
-                                    }}
-                                    title="進貨"
-                                >
-                                    進貨
-                                </button>
-                            </>
-                        )}
-                        {statusin === "已核准" && isTrans && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定新增嗎?',
-                                            content: <>
-                                                <h1>請確認進貨數量</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleAddTrans()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    新增進貨
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-                            </>
-                        )}
+                        <button
+                            className={scss.shortredsquarebtn}
+                            style={{
+                                display: `${status === "" ? '' : 'none'}`
+                            }}
+                            onClick={() => {
+                                // console.log(data2);
+                                handleAdd();
 
-                        {/* 編輯按鈕 */}
-                        {statusin === "編輯中" && !isEditing && (
-
-                            <>
-
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        handleDelete();
-                                    }}
-                                    title="刪除單據"
-                                >
-                                    刪除
-                                </button>
-                                <button
-                                    style={{ display: `${reviewopen ? '' : 'none'}` }}
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        setReviewbar(true);
-                                        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
-                                    }}
-                                    title="審核流程"
-                                >
-                                    審核流程
-                                </button>
-
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        handleEdit()
-                                    }}
-                                >
-                                    編輯
-                                </button>
-                            </>
-                        )}
-
-                        {statusin === "審核中" && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
-                                    title="單據抽回"
-                                    onClick={() => { handleGetReviewBack() }}>
-                                    抽單
-                                </button>
-
-                            </>
-                        )}
-                        {(!isEditing && !isTrans) && (
-                            <>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: `確定要返回${pagename}單列表嗎?`,
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    router.back();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    返回
-                                </button >
-                            </>
-                        )}
-                        {/* 儲存按鈕 */}
-                        {statusin === "編輯中" && isEditing && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-
-                                        setIsEditing(false); // 儲存後結束編輯模式
-                                        // setPrbar(false);
-                                        Update()
-
-                                        // NewAddPurchaseRequisition(); // 實際儲存邏輯
-                                    }}
-                                >
-                                    儲存
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-
-                            </>
-
-                        )}
+                            }}
+                        >
+                            儲存
+                        </button>
                     </>
-
 
                 ]
                 }
@@ -1895,7 +1547,7 @@ export default function QReqDetail() {
                                         Excel
                                     </button>
                                 )}
-                                {/* {statusin === "編輯中" && isEditing && (
+                                {statusin === "編輯中" && isEditing && (
 
                                     <>
                                         <button
@@ -1912,7 +1564,7 @@ export default function QReqDetail() {
                                             請購項目
                                         </button>
                                     </>
-                                )} */}
+                                )}
                             </>
                             {/* )} */}
                         </>
@@ -1920,56 +1572,6 @@ export default function QReqDetail() {
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        {/* <div className={scss.head_head1}>
-                            <div>
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    查詢
-                                </button>
-                            </div>
-                            <div>
-                                <button className={status === '未儲存' ? scss.disablesquarebtn : scss.squarebtn} onClick={() => { handlePreAddPR() }} title="新增單據">
-                                    <img src={status === '未儲存' ? icon_add2_gray.src : icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
-                                    新增
-                                </button>
-                                &nbsp;
-                                <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                    onClick={() => { handleAddPR() }}
-                                    title="儲存新增"
-                                    disabled={status !== '未儲存'}
-                                >
-                                    <img
-                                        src={status === '未儲存' ? icon_save.src : icon_save_gray.src}
-                                        alt="search"
-                                        style={{ height: '20px', width: '20px' }}
-                                    />
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button
-                                    className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn}
-                                    onClick={() => { handlecancelAddPR() }}
-                                    title="取消新增"
-                                    disabled={status !== '未儲存'}
-                                >
-                                    <img src={status === '未儲存' ? icon_cancel.src : icon_cancel_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    取消
-                                </button>
-                            </div>
-                            <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handleDeletePR(purchaserequisitionuuid) }} title="單據刪除">
-                                    <img src={icon_delete.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    刪除
-                                </button>
-                            </div>
-                            <div>
-                                <button style={{ display: `${status === "未送出" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { handlesaveAddPRDetail() }} title="單據申請">
-                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
-                                    送出
-                                </button>
-                            </div>
-                        </div> */}
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.head_content1}>
@@ -2011,35 +1613,6 @@ export default function QReqDetail() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
-                                            caption="請購類別"
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={false}
-                                            selectProps={{
-                                                props: {
-                                                    menuPortalTarget: undefined,
-                                                    styles: {
-                                                        menuPortal: (base) => ({
-                                                            ...base,
-                                                            zIndex: 1003,
-                                                        }),
-                                                    },
-                                                    options: [
-                                                        { value: '文具', label: '文具' },
-                                                        { value: '生產', label: '生產' },
-                                                        { value: '總務', label: '總務' },
-                                                    ],
-                                                    onChange: (option: any) => setSelectedValue(option?.value),
-                                                    value: selectedValue
-                                                        ? {
-                                                            value: selectedValue,
-                                                            label: selectedValue,
-                                                        }
-                                                        : null,
-                                                },
-                                            }}
-                                        /> */}
 
                                     </div>
                                     <div>
@@ -2069,47 +1642,8 @@ export default function QReqDetail() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="申請部門"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: userInfo?.employee?.jobs[0].department.name
-                                                },
-                                            }}
-                                        /> */}
-                                        {/* <InputSel
-                                            caption="需用日期"
-                                            className="global_tip_must"
-                                            disabled={!isEditing}
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            datePickerProps={{
-                                                props: {
-                                                    value: need_datein ? moment(need_datein) : null,
-                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
-                                                },
-                                            }}
-                                        /> */}
-
                                     </div>
                                     <div>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="發票號碼"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: invoicein,
-                                                    onChange: (e) => { setInvoicein(e.target.value) }
-                                                },
-                                            }}
-                                        /> */}
                                     </div>
                                 </div>
                                 <div className={scss.head_content2}>
@@ -2192,19 +1726,6 @@ export default function QReqDetail() {
                                         >
                                             ⋯
                                         </button>
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="收貨地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: shippingaddressin,
-                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
-                                                },
-                                            }}
-                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="備註說明"
@@ -2495,7 +2016,7 @@ export default function QReqDetail() {
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                        <button style={{ display: (isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -2755,7 +2276,7 @@ export default function QReqDetail() {
                                     })
                                 )}
                             </div>
-                            {statusin === "編輯中" && isEditing && (
+                            {isEditing && (
                                 <span style={{ paddingLeft: '22px', position: 'relative' }}>
                                     <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
                                         <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
@@ -2837,6 +2358,7 @@ export default function QReqDetail() {
                                     </span>
                                 </div>
                                 {/* <div className={scss.body_foot2}> */}
+
                                 <div>
                                     {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
                                         <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
@@ -2948,7 +2470,7 @@ export default function QReqDetail() {
                                             fontSize: '18px'
                                         }}
                                     >
-                                        進貨紀錄
+                                        {transtitle}
                                     </span>
                                 </div>
                                 {data3.length === 0 ? (
@@ -3261,6 +2783,7 @@ export default function QReqDetail() {
                             </CellWithBar>
                         ))
                     )}
+
                 </Modal>
             </div>
         </SubLayer >
