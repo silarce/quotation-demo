@@ -82,6 +82,7 @@ import {
 import { createComponentDict } from '../createComponentDict';
 
 import {
+  optionDict_surface,
   optionsCreator_surface,
   optionsCreator_surface_onlyPaint,
   optionsCreator_surface_sst,
@@ -1150,34 +1151,43 @@ class ClassProd {
     }
 
     // const options = handle__options_surface(this.doorModelName)(this);
+    const doorModelName = this.data.doorModelName;
+
+    if (doorModelName === 'SJ-305D') {
+      return [optionDict_surface.HL];
+    }
 
     const material = this.data.materialName;
 
-    if (material === 'SST#304' || material === 'SST#316') {
-      return optionsCreator_surface_sst();
-    }
-
-    if (material === '鍍鋅鋼板') {
-      return optionsCreator_surface_galvanizedSteelPlate();
-    }
-
     let options = optionsCreator_surface_onlyPaint();
 
-    const isSST = checkIsSST(material);
-    const isGalvanized = checkIsGalvanized(material);
+    if (material === 'SST#304' || material === 'SST#316') {
+      options = optionsCreator_surface_sst();
+    } else if (material === '鍍鋅鋼板') {
+      options = optionsCreator_surface_galvanizedSteelPlate();
+    } else {
+      const isSST = checkIsSST(material);
+      const isGalvanized = checkIsGalvanized(material);
 
-    if (isSST) {
-      options = optionsCreator_surface();
+      if (isSST) {
+        options = optionsCreator_surface();
+      }
+
+      if (
+        //
+        !isGalvanized &&
+        this.doorModelName !== 'SJ-305D' &&
+        this.doorModelName !== 'W2'
+      ) {
+        options = options.filter((item) => {
+          return item.value !== '無烤漆';
+        });
+      }
     }
 
-    if (
-      //
-      !isGalvanized &&
-      this.doorModelName !== 'SJ-305D' &&
-      this.doorModelName !== 'W2'
-    ) {
+    if (doorModelName === 'SJ-302' || doorModelName === 'SJ-303A' || doorModelName === 'SJ-303AS') {
       options = options.filter((item) => {
-        return item.value !== '無烤漆';
+        return item.value !== '烤漆';
       });
     }
 

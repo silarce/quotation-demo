@@ -21,6 +21,7 @@ import { TnodeConfig_component } from 'components/page/domestic/quotation_v2/hoo
 
 import type { Toption } from 'js/utils/options/options';
 import {
+  optionDict_surface,
   optionsCreator_surface,
   optionsCreator_surface_onlyPaint,
   optionsCreator_surface_sst,
@@ -237,19 +238,29 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       return undefined;
     }
 
+    const doorModelName = this.classProd?.data.doorModelName;
+
+    if (doorModelName === 'SJ-305D') {
+      return [optionDict_surface.HL];
+    }
+
+    let options = optionsCreator_surface_onlyPaint();
+
     if (material === 'SST#304' || material === 'SST#316') {
-      return optionsCreator_surface_sst();
+      options = optionsCreator_surface_sst();
+    } else if (material === '鍍鋅鋼板') {
+      options = optionsCreator_surface_galvanizedSteelPlate();
+    } else if (checkIsSST(material)) {
+      options = optionsCreator_surface();
     }
 
-    if (material === '鍍鋅鋼板') {
-      return optionsCreator_surface_galvanizedSteelPlate();
+    if (doorModelName === 'SJ-302' || doorModelName === 'SJ-303A' || doorModelName === 'SJ-303AS') {
+      options = options.filter((item) => {
+        return item.value !== '烤漆';
+      });
     }
 
-    if (checkIsSST(material)) {
-      return optionsCreator_surface();
-    }
-
-    return optionsCreator_surface_onlyPaint();
+    return options;
   }
 
   get availableComponents() {
