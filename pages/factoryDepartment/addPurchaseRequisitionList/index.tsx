@@ -48,8 +48,16 @@ type Tquery = {
 };
 
 export default function AddPurchaseRequisitionList() {
-    const [pagename, setPagename] = useState<string>("新增請購單")
+    //#region ===========【頁面參數】
+    const [pagename, setPagename] = useState<string>("請購")
+    const [statusarea, setStatusarea] = useState<boolean>(false)
+    const [excelopen, setExcelopen] = useState<boolean>(false)
+    const [printopen, setPrintopen] = useState<boolean>(false)
+    const [reviewopen, setReviewopen] = useState<boolean>(false)
+    const [transtitle, setTranTitle] = useState<string>("")
+    const [transopen, setTransopen] = useState<boolean>(false)
 
+    //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -129,6 +137,12 @@ export default function AddPurchaseRequisitionList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     // const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+
+    // 計算總價
+    const [totalprice1, setTotalPrice1] = useState<string>("");
+    const [taxprice1, setTaxPrice1] = useState<string>("");
+    const [totalpayprice1, setTotalPayPrice1] = useState<string>(""); 
+
     //#endregion
 
     //#region ===========【上方功能列】
@@ -320,7 +334,7 @@ export default function AddPurchaseRequisitionList() {
                 myAlert.success({ title: result.message });
                 setidin(result.id);
                 setuuidin(result.uuid);
-                setStatus("詢價中");
+                setStatus("編輯中");
                 router.push({
                     pathname: `/factoryDepartment/PRequisitionList`,
                     query: {
@@ -434,6 +448,37 @@ export default function AddPurchaseRequisitionList() {
         setSelectedItemId(itemId);
     };
 
+    // 明細異動處理
+    useEffect(() => {
+        console.log(data1);
+
+        // 每次 data2 更新時，重新計算總價和稅金
+        let totalprice = 0;
+        data2.forEach((element) => {
+            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+            const price = typeof element.totalprice === 'string'
+                ? parseFloat(element.totalprice.replace(/,/g, ''))
+                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+            console.log(price); // 顯示正確的數字格式
+            totalprice += price; // 將其加總
+        });
+
+        console.log(totalprice); // 應顯示正確的加總結果
+
+        // 四捨五入總價到小數點第二位
+        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算稅金，四捨五入到小數點第二位
+        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
+        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+    }, [data2]);
+
     //#endregion
 
     //#region ===========【物料篩選】
@@ -541,17 +586,9 @@ export default function AddPurchaseRequisitionList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename} panelList={panelList}
+            <PageHeader02 tag={"新增"+pagename+"單"} panelList={panelList}
                 customeRight={[
                     <>
-                        <button
-                            className={scss.shortsquarebtn}
-                            style={{
-                                display: `${status === "未送出" ? '' : 'none'}`
-                            }}
-                        >
-                            編輯
-                        </button>
                         <button
                             className={scss.shortredsquarebtn}
                             style={{
@@ -583,7 +620,7 @@ export default function AddPurchaseRequisitionList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="請購單號"
+                                            caption={`${pagename}單號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -595,7 +632,7 @@ export default function AddPurchaseRequisitionList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="申請人員"
+                                            caption="建立人員"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -606,7 +643,7 @@ export default function AddPurchaseRequisitionList() {
                                             }}
                                         />
                                         <InputSel
-                                            caption="請購日期"
+                                            caption="建立日期"
                                             className="global_tip_must"
                                             disabled={status === "未送出" ? true : false}
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
@@ -715,19 +752,32 @@ export default function AddPurchaseRequisitionList() {
                                 </div>
                             </div>
                             <div>
-                                {/* <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                    <InputSel
+                                {statusarea && (
+                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="小計"
+                                            disabled={true}
+                                            inputProps={{
+                                                props: {
+                                                    style: { textAlign: 'right' },
+                                                    value: totalprice1 || ' ',
+                                                },
+                                            }}
+                                        />
+                                        {/* <InputSel
                                         {...inputSelProps}
-                                        caption="單據狀態"
+                                        caption="合計"
                                         disabled={true}
                                         inputProps={{
                                             props: {
                                                 style: { color: 'red' },
                                                 value: status || ' ',
-                                            },
-                                        }}
-                                    />
-                                </div> */}
+                                                },
+                                                }}
+                                                /> */}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div
