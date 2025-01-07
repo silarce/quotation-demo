@@ -145,8 +145,6 @@ class Class_component {
       this.material = 'SST#304';
 
       if (this.options_surface) {
-        console.log(this.key);
-        console.log(this.options_surface);
         this.surface = this.options_surface[0].value;
       }
     }
@@ -280,11 +278,11 @@ class Class_component {
       options = optionsCreator_surface();
     }
 
-    if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
-      options = options.filter((item) => {
-        return item.value !== '烤漆';
-      });
-    }
+    // if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
 
     return options;
   }
