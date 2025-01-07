@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
-import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -296,7 +296,8 @@ export default function EditPickup() {
   // region PROPS
 
   const requirementRecordOptions = useMemo(() => {
-    const requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+    let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+    requirementRecords = _.orderBy(requirementRecords, 'createdAt');
 
     return requirementRecords.map((record) => {
       const { isPickupRecordAlreadyChoose } = record;
