@@ -254,11 +254,11 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
       options = optionsCreator_surface();
     }
 
-    if (doorModelName === 'SJ-302' || doorModelName === 'SJ-303A' || doorModelName === 'SJ-303AS') {
-      options = options.filter((item) => {
-        return item.value !== '烤漆';
-      });
-    }
+    // if (doorModelName === 'SJ-302' || doorModelName === 'SJ-303A' || doorModelName === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
 
     return options;
   }
