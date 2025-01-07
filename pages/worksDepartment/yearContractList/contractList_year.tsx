@@ -12,9 +12,6 @@ import ContractList_sorted, {
   Tcontrol_sortedContractList,
 } from 'components/page/worksDepartment/contracList/contractList_sorted';
 
-// css
-import style from '../contractList.module.scss';
-
 // api
 import { useGetContract, Tparams } from 'js/api/api_quotation';
 
@@ -315,7 +312,7 @@ export default function WdContractList() {
       {/* header panel */}
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
-      <div className={style.mainContainer}>
+      <div>
         <ContractList_sorted control={control_sortedContractList} />
       </div>
     </SubLayer>

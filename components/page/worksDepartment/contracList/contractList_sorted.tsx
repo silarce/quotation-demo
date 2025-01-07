@@ -130,7 +130,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
                   //
                   contract={item}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  onIconDetailClick={openQuotation}
                   onClick={() => {
                     //
                     if (isActive) {
@@ -173,7 +173,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
                   //
                   contract={item}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  onIconDetailClick={openQuotation}
                   onClick={() => setTargetContractId(contractId)}
                 />
               }
@@ -209,7 +209,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
                   //
                   contract={item}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  onIconDetailClick={openQuotation}
                   onClick={() => setTargetContractId(contractId)}
                 />
               }
@@ -281,7 +281,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
                   //
                   contract={item}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  onIconDetailClick={openQuotation}
                   onClick={() => setTargetContractId(contractId)}
                 />
               }
