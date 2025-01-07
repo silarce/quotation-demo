@@ -10,6 +10,7 @@ import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody'
 import { TdoorComponentListDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 import {
+  optionDict_surface,
   optionsCreator_surface,
   optionsCreator_surface_onlyPaint,
   optionsCreator_surface_sst,
@@ -261,19 +262,29 @@ class Class_component {
       return undefined;
     }
 
+    const doorType = this.prod.doorType;
+
+    if (doorType === 'SJ-305D') {
+      return [optionDict_surface.HL];
+    }
+
+    let options = optionsCreator_surface_onlyPaint();
+
     if (this.material === 'SST#304' || this.material === 'SST#316') {
-      return optionsCreator_surface_sst();
+      options = optionsCreator_surface_sst();
+    } else if (this.material === '鍍鋅鋼板') {
+      options = optionsCreator_surface_galvanizedSteelPlate();
+    } else if (checkIsSST(this.material ?? '')) {
+      options = optionsCreator_surface();
     }
 
-    if (this.material === '鍍鋅鋼板') {
-      return optionsCreator_surface_galvanizedSteelPlate();
-    }
+    // if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
 
-    if (checkIsSST(this.material ?? '')) {
-      return optionsCreator_surface();
-    }
-
-    return optionsCreator_surface_onlyPaint();
+    return options;
   }
 
   get options_desc_select() {
