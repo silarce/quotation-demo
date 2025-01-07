@@ -2491,11 +2491,11 @@ class Class_product {
       }
     }
 
-    if (this.doorType === 'SJ-302' || this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
-      options = options.filter((item) => {
-        return item.value !== '烤漆';
-      });
-    }
+    // if (this.doorType === 'SJ-302' || this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
 
     return options;
   }
