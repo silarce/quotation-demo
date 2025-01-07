@@ -145,8 +145,6 @@ class Class_component {
       this.material = 'SST#304';
 
       if (this.options_surface) {
-        console.log(this.key);
-        console.log(this.options_surface);
         this.surface = this.options_surface[0].value;
       }
     }
