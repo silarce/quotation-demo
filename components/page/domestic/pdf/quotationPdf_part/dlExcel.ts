@@ -57,8 +57,9 @@ const dlExcel = async ({ quotationId, mainProductArr }: { quotationId: string; m
 
   let rowCount = 4;
 
-  mainProductArr.forEach((item) => {
-    let { part } = item;
+  mainProductArr.forEach((prod) => {
+    let { part, surface } = prod;
+    surface === '烤漆指定色' && (surface = '烤漆');
 
     part = part.map((item, index) => {
       if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
@@ -71,22 +72,22 @@ const dlExcel = async ({ quotationId, mainProductArr }: { quotationId: string; m
     let rowIndex = rowCount + 1;
 
     const quotationNumberCell = sheet.getCell(`A${rowIndex}`);
-    quotationNumberCell.value = `報價編號：${item.quotationNumber}`;
+    quotationNumberCell.value = `報價編號：${prod.quotationNumber}`;
 
     const doorModelCell = sheet.getCell(`A${rowIndex + 1}`);
-    doorModelCell.value = `門型：${item.doorType}`;
+    doorModelCell.value = `門型：${prod.doorType}`;
 
     const categoryCell = sheet.getCell(`C${rowIndex}`);
-    categoryCell.value = `項目：${item.category}`;
+    categoryCell.value = `項目：${prod.category}`;
 
     const sizeCell = sheet.getCell(`C${rowIndex + 1}`);
-    sizeCell.value = `尺寸：${item.size}`;
+    sizeCell.value = `尺寸：${prod.size}`;
 
     const materialCaptionCell = sheet.getCell(`D${rowIndex}`);
     materialCaptionCell.value = '材質：';
 
     const materialCell = sheet.getCell(`E${rowIndex}`);
-    const material = item.material.includes('SST') ? 'SST' : item.material.includes('鍍鋅') ? '鍍鋅' : item.material;
+    const material = prod.material.includes('SST') ? 'SST' : prod.material.includes('鍍鋅') ? '鍍鋅' : prod.material;
     materialCell.value = material;
 
     const surfaceCaptionCell = sheet.getCell(`F${rowIndex}`);
@@ -94,7 +95,7 @@ const dlExcel = async ({ quotationId, mainProductArr }: { quotationId: string; m
     surfaceCaptionCell.alignment = { horizontal: 'right' };
 
     const surfaceCell = sheet.getCell(`G${rowIndex}`);
-    surfaceCell.value = item.surface;
+    surfaceCell.value = prod.surface;
 
     rowIndex = rowIndex + 2;
 
@@ -165,7 +166,7 @@ const dlExcel = async ({ quotationId, mainProductArr }: { quotationId: string; m
     priceTotalCaptionCell.value = '報價合計：';
 
     const priceTotalCell = sheet.getCell(`G${rowIndex}`);
-    priceTotalCell.value = Number(item.priceTotal.replaceAll(',', ''));
+    priceTotalCell.value = Number(prod.priceTotal.replaceAll(',', ''));
     priceTotalCell.numFmt = '###,##0';
 
     // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔

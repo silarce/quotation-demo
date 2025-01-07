@@ -9,7 +9,13 @@ import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody'
 
 import { TdoorComponentListDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
-import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
+import {
+  optionDict_surface,
+  optionsCreator_surface,
+  optionsCreator_surface_onlyPaint,
+  optionsCreator_surface_sst,
+  optionsCreator_surface_galvanizedSteelPlate,
+} from 'js/utils/options/productOptions';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
@@ -256,11 +262,29 @@ class Class_component {
       return undefined;
     }
 
-    if (checkIsSST(this.material ?? '')) {
-      return optionsCreator_surface();
+    const doorType = this.prod.doorType;
+
+    if (doorType === 'SJ-305D') {
+      return [optionDict_surface.HL];
     }
 
-    return optionsCreator_surface_onlyPaint();
+    let options = optionsCreator_surface_onlyPaint();
+
+    if (this.material === 'SST#304' || this.material === 'SST#316') {
+      options = optionsCreator_surface_sst();
+    } else if (this.material === '鍍鋅鋼板') {
+      options = optionsCreator_surface_galvanizedSteelPlate();
+    } else if (checkIsSST(this.material ?? '')) {
+      options = optionsCreator_surface();
+    }
+
+    // if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '烤漆';
+    //   });
+    // }
+
+    return options;
   }
 
   get options_desc_select() {
@@ -902,7 +926,7 @@ const comCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '75px' },
+      wrapperStyle: { width: '120px' },
       selectProps: {
         props: {
           // options 寫在class裡面

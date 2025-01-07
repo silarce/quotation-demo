@@ -237,7 +237,8 @@ const getReviewerDict = ({
   const arr: (keyof typeof dict)[] =
     status === 'Pending' // 狀態為準合約
       ? [
-          // 'sales', 'supervisor',
+          // 'sales',
+          'supervisor',
           'workDirector',
           'cashier',
           'manager',
@@ -303,6 +304,10 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
           reviewerRole = _.cloneDeep(reviewerRole_ori);
           reviewerRole.isSales = true;
           break;
+        case 'supervisor':
+          reviewerRole = _.cloneDeep(reviewerRole_ori);
+          reviewerRole.isSupervisor = true;
+          break;
         case 'workDirector':
           reviewerRole = _.cloneDeep(reviewerRole_ori);
           reviewerRole.isWorkDirector = true;
@@ -310,10 +315,6 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
         case 'cashier':
           reviewerRole = _.cloneDeep(reviewerRole_ori);
           reviewerRole.isCashier = true;
-          break;
-        case 'supervisor':
-          reviewerRole = _.cloneDeep(reviewerRole_ori);
-          reviewerRole.isSupervisor = true;
           break;
         case 'manager':
           reviewerRole = _.cloneDeep(reviewerRole_ori);
