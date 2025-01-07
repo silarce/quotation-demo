@@ -81,6 +81,9 @@ export default function ItemList({
         motorVendor,
         motorVoltage,
         horsepower,
+        floor,
+        locationArea,
+        //
       } = productItem;
 
       const electronicSupplies = {
@@ -107,6 +110,14 @@ export default function ItemList({
           {
             ...configList.itemNumber,
             children: itemNumber,
+          },
+          {
+            ...configList.floor,
+            children: floor,
+          },
+          {
+            ...configList.locationArea,
+            children: locationArea,
           },
           {
             ...configList.qty,
@@ -196,7 +207,9 @@ const CheckBox_readonly = ({ value }: { value?: boolean }) => {
 const keysArr = [
   'itemName', // 名稱
   'itemNumber', // 編號
-  'qty', // 樘數
+  'floor',
+  'locationArea',
+  'qty', // 樘數1
   'doorModelName', // 門型
   'motorVendor', // 馬達
   'motorVoltage', // 電壓
@@ -211,56 +224,66 @@ const configList: { [key: string]: Tconfig_table } = {
   itemName: {
     label: '名稱',
     width: 200,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   itemNumber: {
     label: '編號',
     width: 200,
+    justifyContent: 'flex-start',
+  },
+  floor: {
+    label: '樓層',
+    width: 60,
     justifyContent: 'center',
+  },
+  locationArea: {
+    label: '區域',
+    width: 200,
+    justifyContent: 'flex-start',
   },
   qty: {
     label: '樘數',
-    width: 200,
+    width: 60,
     justifyContent: 'center',
   },
   doorModelName: {
     label: '門型',
-    width: 200,
-    justifyContent: 'center',
+    width: 120,
+    justifyContent: 'flex-start',
   },
   motorVendor: {
     label: '馬達',
-    width: 200,
+    width: 60,
     justifyContent: 'center',
   },
   motorVoltage: {
     label: '電壓',
-    width: 200,
+    width: 60,
     justifyContent: 'center',
   },
   horsepower: {
     label: '馬力數',
-    width: 200,
+    width: 90,
     justifyContent: 'center',
   },
   obstacleSensor: {
     label: '障感器',
-    width: 200,
+    width: 80,
     justifyContent: 'center',
   },
   infrared: {
     label: '紅外線',
-    width: 200,
+    width: 80,
     justifyContent: 'center',
   },
   remoteControl: {
     label: '遙控器',
-    width: 200,
+    width: 80,
     justifyContent: 'center',
   },
   bounceDoor: {
     label: '彈射門',
-    width: 200,
+    width: 80,
     justifyContent: 'center',
   },
 };
