@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -70,7 +70,13 @@ export default function ItemList({
       }),
     };
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = Object.values(productItemList ?? {}).map((item, pIndex) => {
+    let productItemArr = Object.values(productItemList ?? {});
+    productItemArr = _.sortBy(productItemArr, [
+      ({ productItem }) => productItem.floor,
+      ({ productItem }) => productItem.doorModelName,
+    ]);
+
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = productItemArr.map((item, pIndex) => {
       const { productItem, qty } = item;
       const {
         //
