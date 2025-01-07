@@ -38,7 +38,7 @@ import {
 import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import scss from './electronicSupplies.module.scss';
+import scss from './index.module.scss';
 
 // utils
 // import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';

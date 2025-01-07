@@ -83,7 +83,11 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
 });
 
 // ==================================================================
-export default function EditElectronicSuppliesPickup() {
+export default function EditElectronicSuppliesPickup({
+  CustomPageHeader,
+}: {
+  CustomPageHeader?: (props: { disabled: boolean }) => JSX.Element;
+}) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { contractId, pickupRecordId } = query;
@@ -415,7 +419,14 @@ export default function EditElectronicSuppliesPickup() {
   // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
+      {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
+      {!CustomPageHeader && (
+        <PageHeader
+          returnBtn={disabled}
+          panelList={panelList}
+          contractNumber={data_contract?.contractNumber ?? '---'}
+        />
+      )}
 
       <div className={scss.container}>
         {/* info */}
