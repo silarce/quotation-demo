@@ -2464,30 +2464,36 @@ class Class_product {
       return undefined;
     }
 
-    if (this.material === 'SST#304' || this.material === 'SST#316') {
-      const options = optionsCreator_surface_sst();
-
-      return options;
-    }
-
-    if (this.material === '鍍鋅鋼板') {
-      const options = optionsCreator_surface_galvanizedSteelPlate();
-
-      return options;
+    if (this.doorType === 'SJ-305D') {
+      return [optionDict_surface.HL];
     }
 
     let options = options_surface_onlyPaint;
 
-    const isSST = checkIsSST(this.material);
-    const isGalvanized = checkIsGalvanized(this.material); // 是否鍍鋅
+    if (this.material === 'SST#304' || this.material === 'SST#316') {
+      options = optionsCreator_surface_sst();
+    } else if (this.material === '鍍鋅鋼板') {
+      options = optionsCreator_surface_galvanizedSteelPlate();
+    } else {
+      options = options_surface_onlyPaint;
 
-    if (isSST) {
-      options = options_surface;
+      const isSST = checkIsSST(this.material);
+      const isGalvanized = checkIsGalvanized(this.material); // 是否鍍鋅
+
+      if (isSST) {
+        options = options_surface;
+      }
+
+      if (!isGalvanized && this.doorType !== 'SJ-305D' && !this.isW2) {
+        options = options.filter((item) => {
+          return item.value !== '無烤漆';
+        });
+      }
     }
 
-    if (!isGalvanized && this.doorType !== 'SJ-305D' && !this.isW2) {
+    if (this.doorType === 'SJ-302' || this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
       options = options.filter((item) => {
-        return item.value !== '無烤漆';
+        return item.value !== '烤漆';
       });
     }
 
