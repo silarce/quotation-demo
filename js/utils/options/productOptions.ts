@@ -498,7 +498,7 @@ export const optionsCreator_surface_galvanizedSteelPlate = createOptionsCreator(
     optionDict_surface['paint'],
     optionDict_surface['fluorocarbon'],
     optionDict_surface['PaintSpecifiedColor'],
-    // optionDict_surface['noPaint'],
+    optionDict_surface['noPaint'],
   ],
 });
 
@@ -506,9 +506,12 @@ export const optionsCreator_surface_galvanizedSteelPlate = createOptionsCreator(
 export const optionsCreator_surface_sst = createOptionsCreator({
   optionsArr: [
     //
+    optionDict_surface['2B'],
+    optionDict_surface['HL'],
+    optionDict_surface['BA'],
+    optionDict_surface['NO.4'],
     optionDict_surface['fluorocarbon'],
     optionDict_surface['PaintSpecifiedColor'],
-    // optionDict_surface['noPaint'],
   ],
 });
 
