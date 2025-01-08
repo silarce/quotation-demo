@@ -48,6 +48,77 @@ const options_doorType = optionsCreator_quoteType();
 
 // =====================================================================
 
+// MARK: location
+function Form_product_location({ disabled }: { disabled: boolean | undefined }) {
+  const { locationArea, setLocationArea, floor, setFloor, serialNumberArr, setSerialNumber } = useWorksheet(
+    useShallow((state) => ({
+      locationArea: state.locationArea,
+      setLocationArea: state.setLocationArea,
+      floor: state.floor,
+      setFloor: state.setFloor,
+      serialNumberArr: state.serialNumberArr,
+      setSerialNumber: state.setSerialNumber,
+    }))
+  );
+
+  return (
+    <div className={scss.grid}>
+      <InputSel
+        {...basicConfig}
+        disabled={disabled}
+        caption="樓層"
+        inputProps={{
+          props: {
+            value: floor,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setFloor(e.target.value);
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        disabled={disabled}
+        caption="區域"
+        inputProps={{
+          props: {
+            value: locationArea,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setLocationArea(e.target.value);
+            },
+          },
+        }}
+      />
+      <div className="col-span-2">
+        <InputSel {...basicConfig} disabled={true} caption="門編號" showBaseline="invisible" />
+
+        {/* serialNumberArr
+        setSerialNumber */}
+
+        <ul className="grid grid-cols-8 gap-10">
+          {serialNumberArr.map((value, index) => {
+            return (
+              <li key={index}>
+                <input
+                  placeholder="選填"
+                  className={`border-b border-black w-full text-[${basicConfig.fontSize}px]`}
+                  readOnly={disabled}
+                  value={value}
+                  onChange={(e) => {
+                    setSerialNumber({ index, value: e.target.value });
+                  }}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+
 // MARK: basic
 
 function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
@@ -1556,6 +1627,7 @@ const basicConfig: TinputSelProps = {
 // ======================================================================
 
 export {
+  Form_product_location,
   Form_product_basic,
   Form_product_ABCD,
   Form_product_motor,

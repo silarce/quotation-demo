@@ -1712,6 +1712,13 @@ export type TquotationProductItemDto = {
   rootWorksheetItemId: string | null;
   // worksheet修改紀錄中第一個worksheetItem
   rootWorksheetItem?: TquotationProductItemDto;
+  //
+  // 門編號
+  serialNumber: string | null;
+  // 樓層
+  floor: string | null;
+  // 區域位置
+  locationArea: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -2378,6 +2385,10 @@ export type TquotationContractDto = {
   foreignTotal: string | null;
   // '匯率'
   exchangeRate: string | null;
+  //
+
+  // 已完工
+  isDone: boolean;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -3750,8 +3761,23 @@ export type TupdateContractProductItemDto = {
   components: TupdateQuotationProductComponentDto[];
 };
 
+export type TfloorLocations = {
+  serialNumber: string;
+  floor: string;
+  locationArea: string;
+};
+
+// 似乎是UpdateWorksheetProductsDto，後端沒有給我明確的答覆
 export type TupdateWorkSheet = {
   contractProductItems: TupdateContractProductItemDto[];
+  floorLocations: TfloorLocations[];
+
+  // floorLocations的內容會分配到contractProductItems中
+  // floorLocations的長度不可以超過總樘數
+  // 若floorLocations的item比contractProductItems少
+  // 則contractProductItems不會全部被分配
+  // 這是不是意味著floorLocations的長度應該至少與contractProductItems相等?
+  // 後端沒有給我明確的答覆
 };
 
 // 送審工作表用的
@@ -4088,7 +4114,7 @@ export type TaccountsReceivableDto = {
   hasUncollectedAmounts: boolean;
   // '已出貨，因故尚未安裝'
   hasNotInstall: boolean;
-  // '已完工'
+  // '已完工' // 棄用
   isDone: boolean;
   // '放款票期'
   paymentTenor: string | null;
@@ -4184,7 +4210,7 @@ export type TcreateAccountReceivableDto = {
   contractId: string | null;
   // 所屬合約Id;
   legacyContractId: string | null;
-  // 是否已做完
+  // 是否已完工 // 棄用
   isDone: boolean;
 };
 
