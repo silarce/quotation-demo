@@ -1876,7 +1876,8 @@ const useWorksheet = create<Tworksheet>(
         electricMotorDirection: motor.electricMotorDirection,
         //
         // headBox
-        headBoxThickness: headBox.headBoxThickness || null,
+        // 將小數位去掉，例如"3.0"轉變為"3"
+        headBoxThickness: headBox.headBoxThickness ? `${Number(headBox.headBoxThickness)}` : null,
         headBoxFront: headBox.headBoxFront,
         headBoxProtruding: headBox.headBoxProtruding || null,
         isIntegratedHeadBox: headBox.isIntegratedHeadBox,
@@ -1889,7 +1890,8 @@ const useWorksheet = create<Tworksheet>(
         slatCount: slat.slatCount || '0',
         //
         // guideRail
-        guideRailThickness: guideRail.guideRailThickness,
+        // 將小數位去掉，例如"3.0"轉變為"3"
+        guideRailThickness: guideRail.guideRailThickness ? `${Number(guideRail.guideRailThickness)}` : null,
         hasSilencingStrip: guideRail.hasSilencingStrip,
         guideRailType: guideRail.guideRailType,
         guideRail: guideRail.guideRail || null,
