@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import {
+  Form_product_location,
   Form_product_basic,
   Form_product_ABCD,
   Form_product_motor,
@@ -38,6 +39,10 @@ export default function WorksheetForm({
 
   return (
     <form className={scss.productForm}>
+      <div>
+        <p className={'mb-8 text-main text-xl font-bold'}>位置與編號：</p>
+        <Form_product_location disabled={disabled} />
+      </div>
       <div>
         <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
         <Form_product_basic disabled={disabled} />

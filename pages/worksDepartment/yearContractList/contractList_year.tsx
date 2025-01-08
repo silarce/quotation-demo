@@ -12,21 +12,14 @@ import ContractList_sorted, {
   Tcontrol_sortedContractList,
 } from 'components/page/worksDepartment/contracList/contractList_sorted';
 
-// css
-import style from '../contractList.module.scss';
-
 // api
 import { useGetContract, Tparams } from 'js/api/api_quotation';
 
-// type
-import { TnorthernCounty, TcentralCounty, TsouthernCounty, TeasternCounty, Tabroad } from 'js/api/dtoTypes';
-
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
 
 // ===========================================
-const optionDoorModel = optionsCreator_doorModelName({ haveEmpty: true });
+
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================
@@ -46,7 +39,17 @@ export default function WdContractList() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { doorType, county, district, address, customerName, keyWord, year, isDone } = router.query as Tquery;
+  const {
+    //
+    doorType,
+    county,
+    district,
+    address,
+    customerName,
+    keyWord,
+    year,
+    isDone,
+  } = router.query as Tquery;
 
   const { yearStart, yearEnd } = useMemo(() => {
     if (!year) {
@@ -108,23 +111,28 @@ export default function WdContractList() {
       },
 
       // 報價單若沒有accountReceivable，取得的資料連accountReceivable這個property都不會有
-      // 導致filter出錯
-      // 在後端做出處置前，先在前端過濾
+      // 送accountReceivable相關的參數會400錯誤
+      // 所以無法以api的filter過濾accountReceivable相關資料
+      // accountReceivable: { $notNull: true },
       // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : isDone === 'false' ? { $eq: false } : undefined,
       // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : { $ne: true },
-      // accountReceivable: { $notNull: true },
     },
   };
 
   const { data, update } = useGetContract(params);
-  // 在後端做出處置前，先在前端過濾
-  const dataArr = (data ?? []).filter((item) => {
-    if (isDone === 'true') {
-      return item.accountReceivable?.isDone === true;
-    } else {
-      return item.accountReceivable?.isDone !== true;
-    }
-  });
+
+  const dataArr = useMemo(() => {
+    // 因為無法使用api的filter過濾accountReceivable相關資料，所以在前端這邊過濾
+    const dataArr = (data ?? []).filter((item) => {
+      if (isDone === 'true') {
+        return item.accountReceivable?.isDone === true;
+      } else {
+        return item.accountReceivable?.isDone !== true;
+      }
+    });
+
+    return dataArr;
+  }, [data]);
 
   useEffect(() => {
     (async () => {
@@ -132,7 +140,7 @@ export default function WdContractList() {
       await update();
       setIsLoading(false);
     })();
-  }, [router.query]);
+  }, [doorType, county, district, address, customerName, keyWord, year, isDone]);
 
   const control_sortedContractList: Tcontrol_sortedContractList = useMemo(() => {
     const list: Tcontrol_sortedContractList = {
@@ -187,18 +195,6 @@ export default function WdContractList() {
         : contractNumber.startsWith('H-')
         ? list.southernArr.push(obj)
         : list.abroadArr.push(obj);
-
-      // if (northernCountyArr.includes(county as TnorthernCounty)) {
-      //   list.northernArr.push(obj);
-      // } else if (centralCountyArr.includes(county as TcentralCounty)) {
-      //   list.centralArr.push(obj);
-      // } else if (southernCountyArr.includes(county as TsouthernCounty)) {
-      //   list.southernArr.push(obj);
-      // } else if (easternCountyArr.includes(county as TeasternCounty)) {
-      //   list.easternArr.push(obj);
-      // } else if (abroadArr.includes(county as Tabroad)) {
-      //   list.abroadArr.push(obj);
-      // }
     });
 
     return list;
@@ -208,13 +204,6 @@ export default function WdContractList() {
   // ===================================================
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
-    // 現在後端filter doorModelName無效，所以先拿掉
-    // {
-    //   defaultValue: doorType ?? '',
-    //   options: optionDoorModel,
-    //   placeholder: '選擇門型',
-    //   width: '90px',
-    // },
     {
       options: optionsCounty,
       placeholder: '選擇縣市',
@@ -263,19 +252,6 @@ export default function WdContractList() {
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    // const doorType = (vArr[0] as Toption).value;
-    // const county = (vArr[0] as Toption).value;
-    // const customerName = vArr[1] as string;
-    // const keyWord = vArr[2] as string;
-    // router.push({
-    //   query: {
-    //     ...router.query,
-    //     // doorType,
-    //     county,
-    //     customerName,
-    //     keyWord,
-    //   },
-    // });
     router.push({
       query: {
         ...router.query,
@@ -315,25 +291,9 @@ export default function WdContractList() {
       {/* header panel */}
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
-      <div className={style.mainContainer}>
+      <div>
         <ContractList_sorted control={control_sortedContractList} />
       </div>
     </SubLayer>
   );
 }
-
-// // 判斷依據是跟後端要的
-// const northernCountyArr: TnorthernCounty[] = [
-//   '臺北市',
-//   '新北市',
-//   '基隆市',
-//   '新竹市',
-//   '桃園市',
-//   '新竹縣',
-//   '宜蘭縣',
-//   '連江縣',
-// ];
-// const centralCountyArr: TcentralCounty[] = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '金門縣'];
-// const southernCountyArr: TsouthernCounty[] = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣'];
-// const easternCountyArr: TeasternCounty[] = ['花蓮縣', '臺東縣'];
-// const abroadArr: Tabroad[] = ['海外'];
