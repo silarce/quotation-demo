@@ -44,9 +44,12 @@ import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 import SalarySettlement from 'pages/accounting/salarySettlement';
 import BonusPayout from 'pages/accounting/bonusPayout';
 import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
+import PRequisitionDetail from 'pages/factoryDepartment/PRequisitionDetail';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+import POrderDetail from 'pages/factoryDepartment/POrderDetail';
+import PReceiptDetail from 'pages/factoryDepartment/PReceiptDetail';
 
 export default function ReviewList() {
   // 全域狀態
@@ -122,7 +125,7 @@ export default function ReviewList() {
   ];
 
   //搜尋功能
-  const doSearch = (valueArr: (string | Toption | null)[]) => {};
+  const doSearch = (valueArr: (string | Toption | null)[]) => { };
 
   // 搜尋功能
   const searchGroup = {
@@ -416,27 +419,29 @@ export default function ReviewList() {
       if (reviewtype === '請購單') {
         const parsedQuery = JSON.parse(itemQuery.query);
 
+        // const query = {
+        //   purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
+        //   purchaserequisitionid: parsedQuery.purchaserequisitionid,
+        //   create_at: parsedQuery.create_at,
+        //   create_by: parsedQuery.create_by,
+        //   // status: `${document_status === "核准" ? "已核准" : document_status}`,
+        //   ...(document_status === '核准'
+        //     ? { status: '已核准' }
+        //     : document_status === '審核中'
+        //     ? { status: '審核中' }
+        //     : document_status === '駁回'
+        //     ? { status: '已駁回' }
+        //     : {}), // 根據不同情況設置 status
+        //   need_date: parsedQuery.need_date,
+        //   note: parsedQuery.note,
+        //   firstin: 1,
+        //   viewtype: 'review',
+        // };
+
         const query = {
-          purchaserequisitionuuid: parsedQuery.purchaserequisitionuuid,
-          purchaserequisitionid: parsedQuery.purchaserequisitionid,
-          create_at: parsedQuery.create_at,
-          create_by: parsedQuery.create_by,
-          // status: `${document_status === "核准" ? "已核准" : document_status}`,
-          ...(document_status === '核准'
-            ? { status: '已核准' }
-            : document_status === '審核中'
-            ? { status: '審核中' }
-            : document_status === '駁回'
-            ? { status: '已駁回' }
-            : {}), // 根據不同情況設置 status
-          need_date: parsedQuery.need_date,
-          note: parsedQuery.note,
-          firstin: 1,
+          item: parsedQuery.item,
           viewtype: 'review',
         };
-
-        // console.log('parsedQuery', parsedQuery);
-        // console.log('query', query)
 
         router.replace(
           {
@@ -447,30 +452,33 @@ export default function ReviewList() {
         );
       } else if (reviewtype === '採購單') {
         const parsedQuery = JSON.parse(itemQuery.query);
-        console.log(parsedQuery.need_date);
         router.replace(
           {
+            // query: {
+            //   purchaseorderuuid: parsedQuery.purchaseorderuuid,
+            //   purchaseorderid: parsedQuery.purchaseorderid,
+            //   suppliername: parsedQuery.suppliername,
+            //   suppliertaxid: parsedQuery.suppliertaxid,
+            //   supplieraddress: parsedQuery.supplieraddress,
+            //   supplierphone: parsedQuery.supplierphone,
+            //   invoice: parsedQuery.invoice,
+            //   create_at: parsedQuery.create_at,
+            //   create_by: parsedQuery.create_by,
+            //   ...(document_status === '核准'
+            //     ? { status: '已核准' }
+            //     : document_status === '審核中'
+            //       ? { status: '審核中' }
+            //       : document_status === '駁回'
+            //         ? { status: '已駁回' }
+            //         : {}), // 根據不同情況設置 status
+            //   note: parsedQuery.note,
+            //   need_date: parsedQuery.need_date,
+            //   firstin: 1,
+            //   shippingaddress: parsedQuery.shippingaddress,
+            //   viewtype: 'review',
+            // },
             query: {
-              purchaseorderuuid: parsedQuery.purchaseorderuuid,
-              purchaseorderid: parsedQuery.purchaseorderid,
-              suppliername: parsedQuery.suppliername,
-              suppliertaxid: parsedQuery.suppliertaxid,
-              supplieraddress: parsedQuery.supplieraddress,
-              supplierphone: parsedQuery.supplierphone,
-              invoice: parsedQuery.invoice,
-              create_at: parsedQuery.create_at,
-              create_by: parsedQuery.create_by,
-              ...(document_status === '核准'
-                ? { status: '已核准' }
-                : document_status === '審核中'
-                ? { status: '審核中' }
-                : document_status === '駁回'
-                ? { status: '已駁回' }
-                : {}), // 根據不同情況設置 status
-              note: parsedQuery.note,
-              need_date: parsedQuery.need_date,
-              firstin: 1,
-              shippingaddress: parsedQuery.shippingaddress,
+              item: parsedQuery.item,
               viewtype: 'review',
             },
           },
@@ -479,32 +487,35 @@ export default function ReviewList() {
         );
       } else if (reviewtype === '進貨單') {
         const parsedQuery = JSON.parse(itemQuery.query);
-        console.log(parsedQuery);
         router.replace(
           {
+            // query: {
+            //   prodreceiptuuid: parsedQuery.prodreceiptuuid,
+            //   prodreceiptid: parsedQuery.prodreceiptid,
+            //   purchaseorderuuid: parsedQuery.purchaseorderuuid,
+            //   purchaseorderid: parsedQuery.purchaseorderid,
+            //   purchaseordercreate_at: parsedQuery.purchaseordercreate_at,
+            //   purchaseordercreate_by: parsedQuery.purchaseordercreate_by,
+            //   suppliername: parsedQuery.suppliername,
+            //   suppliertaxid: parsedQuery.suppliertaxid,
+            //   supplieraddress: parsedQuery.supplieraddress,
+            //   supplierphone: parsedQuery.supplierphone,
+            //   invoice: parsedQuery.invoice,
+            //   create_at: parsedQuery.create_at,
+            //   create_by: parsedQuery.create_by,
+            //   ...(document_status === '核准'
+            //     ? { status: '已核准' }
+            //     : document_status === '審核中'
+            //       ? { status: '審核中' }
+            //       : document_status === '駁回'
+            //         ? { status: '已駁回' }
+            //         : {}), // 根據不同情況設置 status
+            //   note: parsedQuery.note,
+            //   firstin: 1,
+            //   viewtype: 'review',
+            // },
             query: {
-              prodreceiptuuid: parsedQuery.prodreceiptuuid,
-              prodreceiptid: parsedQuery.prodreceiptid,
-              purchaseorderuuid: parsedQuery.purchaseorderuuid,
-              purchaseorderid: parsedQuery.purchaseorderid,
-              purchaseordercreate_at: parsedQuery.purchaseordercreate_at,
-              purchaseordercreate_by: parsedQuery.purchaseordercreate_by,
-              suppliername: parsedQuery.suppliername,
-              suppliertaxid: parsedQuery.suppliertaxid,
-              supplieraddress: parsedQuery.supplieraddress,
-              supplierphone: parsedQuery.supplierphone,
-              invoice: parsedQuery.invoice,
-              create_at: parsedQuery.create_at,
-              create_by: parsedQuery.create_by,
-              ...(document_status === '核准'
-                ? { status: '已核准' }
-                : document_status === '審核中'
-                ? { status: '審核中' }
-                : document_status === '駁回'
-                ? { status: '已駁回' }
-                : {}), // 根據不同情況設置 status
-              note: parsedQuery.note,
-              firstin: 1,
+              item: parsedQuery.item,
               viewtype: 'review',
             },
           },
@@ -513,7 +524,6 @@ export default function ReviewList() {
         );
       } else if (reviewtype === '薪資單') {
         const parsedQuery = JSON.parse(itemQuery.query);
-        console.log(parsedQuery);
         router.replace(
           {
             query: {
@@ -527,7 +537,6 @@ export default function ReviewList() {
         );
       } else if (reviewtype === '獎金') {
         const parsedQuery = JSON.parse(itemQuery.query);
-        console.log(parsedQuery);
         router.replace(
           {
             query: {
@@ -1287,12 +1296,12 @@ export default function ReviewList() {
                           _item.review_status === '核准'
                             ? '核准' // 當前項目狀態為"核准"，顯示"核准"
                             : index === 0
-                            ? _item.review_order === 1
-                              ? '提出'
-                              : _item.review_status // 第一筆資料顯示"提出"或其他 review_status
-                            : data2[index - 1].review_status === '核准'
-                            ? '簽核中'
-                            : _item.review_status; // 根據前一筆的 review_status
+                              ? _item.review_order === 1
+                                ? '提出'
+                                : _item.review_status // 第一筆資料顯示"提出"或其他 review_status
+                              : data2[index - 1].review_status === '核准'
+                                ? '簽核中'
+                                : _item.review_status; // 根據前一筆的 review_status
 
                         return (
                           <CellWithBar key={index} className={scss.panelHeader22}>
@@ -1346,9 +1355,8 @@ export default function ReviewList() {
                     }}
                     title="核准"
                     style={{
-                      color: `${
-                        tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
-                      }`,
+                      color: `${tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
+                        }`,
                     }}
                   >
                     {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
@@ -1363,9 +1371,8 @@ export default function ReviewList() {
                     }}
                     title="駁回"
                     style={{
-                      color: `${
-                        tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
-                      }`,
+                      color: `${tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
+                        }`,
                     }}
                   >
                     {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
@@ -1404,9 +1411,12 @@ export default function ReviewList() {
                   {/* 當頁面加載完成後顯示內容 */}
                   {isPageLoaded ? (
                     <div>
-                      {reviewtype === '請購單' && <PurchaseRequisitionList key={theKey} />}
-                      {reviewtype === '採購單' && <PurchaseOrderList key={theKey} />}
-                      {reviewtype === '進貨單' && <ProdReceiptList key={theKey} />}
+                      {/* {reviewtype === '請購單' && <PurchaseRequisitionList key={theKey} />} */}
+                      {reviewtype === '請購單' && <PRequisitionDetail key={theKey} />}
+                      {/* {reviewtype === '採購單' && <PurchaseOrderList key={theKey} />} */}
+                      {reviewtype === '採購單' && <POrderDetail key={theKey} />}
+                      {/* {reviewtype === '進貨單' && <ProdReceiptList key={theKey} />} */}
+                      {reviewtype === '進貨單' && <PReceiptDetail key={theKey} />}
                       {reviewtype === '報價單' && <Quotation key={theKey} />}
                       {reviewtype === '薪資單' && <SalarySettlement key={theKey} />}
                       {reviewtype === '獎金' && <BonusPayout key={theKey} />}

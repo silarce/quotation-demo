@@ -55,10 +55,12 @@ type Tquery = {
 
 export default function QReqDetail() {
     //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("詢價單")
+    const [pagename, setPagename] = useState<string>("詢價")
     const [statusarea, setStatusarea] = useState<boolean>(false)
     const [excelopen, setExcelopen] = useState<boolean>(true)
     const [printopen, setPrintopen] = useState<boolean>(false)
+    const [reviewopen, setReviewopen] = useState<boolean>(false)
+    const [transopen, setTransopen] = useState<boolean>(false)
 
     //#endregion
 
@@ -460,8 +462,7 @@ export default function QReqDetail() {
 
         try {
             const conditionModel = {
-                id: uuidin as string | undefined,
-                data2: data2
+                id: uuidin as string | undefined
             };
 
 
@@ -472,15 +473,9 @@ export default function QReqDetail() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            // const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder?${queryParams}`);
-            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/NewDeleteQuotereq?${queryParams}`);
+
 
 
             if (!response.ok) {
@@ -493,7 +488,7 @@ export default function QReqDetail() {
                 // 成功，顯示提示
                 myAlert.success({ title: result.message });
                 router.push({
-                    pathname: `/factoryDepartment/POrderList`,
+                    pathname: `/factoryDepartment/QReqList`,
                 });
             } else {
                 // 失敗，顯示錯誤提示
@@ -759,28 +754,39 @@ export default function QReqDetail() {
     //複製單據(同新增單據)
     const Add = async () => {
         if (data2.length === 0) {
-            myAlert.warning({ title: "採購項目不可為空" })
+            myAlert.warning({ title: `${pagename}項目不可為空` })
             return;
         }
         // return;
         try {
             setIsLoading(true);
             const conditionModel = {
-                // create_at: create_atin,
-                // need_date: moment(need_datein).format('YYYY-MM-DD'),
-                create_at: moment().format('YYYY-MM-DD') || '',
-                need_date: moment().format('YYYY-MM-DD') || '',
+                create_at: create_atin,
+                need_date: moment(need_datein).format('YYYY-MM-DD'),
                 create_by: userInfo?.employee?.id.toString(),
                 note: notein,
+                supplierid: supplieridin,
                 suppliername: suppliernamein,
                 supplierphone: supplierphonein,
                 suppliertaxid: suppliertaxidin,
                 supplieraddress: supplieraddressin,
-                supplierid: supplieridin,
-                shippingaddress: shippingaddressin,
                 suppliercontact: suppliercontactin,
                 supplierfax: supplierfaxin,
-                supplieruuid: supplieruuidin,
+                shippingaddress: shippingaddressin,
+                supplierid2: supplierid2in,
+                suppliername2: suppliername2in,
+                supplierphone2: supplierphone2in,
+                suppliertaxid2: suppliertaxid2in,
+                supplieraddress2: supplieraddress2in,
+                suppliercontact2: suppliercontact2in,
+                supplierfax2: supplierfax2in,
+                supplierid3: supplierid3in,
+                suppliername3: suppliername3in,
+                supplierphone3: supplierphone3in,
+                suppliertaxid3: suppliertaxid3in,
+                supplieraddress3: supplieraddress3in,
+                suppliercontact3: suppliercontact3in,
+                supplierfax3: supplierfax3in,
                 data2: data2
             };
 
@@ -791,7 +797,7 @@ export default function QReqDetail() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewAddPurchaseOrder`, {
+            const response = await fetch(`${setting.apipath}/WareHouse/NewAddQuotereq`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -811,7 +817,7 @@ export default function QReqDetail() {
                 setuuidin(result.uuid);
                 setStatusin("編輯中");
                 router.push({
-                    pathname: `/factoryDepartment/POrderList`,
+                    pathname: `/factoryDepartment/QReqList`,
                     query: {
                     },
                 });
@@ -1653,7 +1659,7 @@ export default function QReqDetail() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename + "：" + statusin} panelList={panelList}
+            <PageHeader02 tag={pagename + "單" + "：" + statusin} panelList={panelList}
                 customeRight={[
                     <>
                         {(!isEditing && !isTrans) && (
@@ -1738,7 +1744,7 @@ export default function QReqDetail() {
                         )}
 
                         {/* 編輯按鈕 */}
-                        {statusin === "未結案" && !isEditing && (
+                        {statusin === "編輯中" && !isEditing && (
 
                             <>
 
@@ -1752,6 +1758,7 @@ export default function QReqDetail() {
                                     刪除
                                 </button>
                                 <button
+                                    style={{ display: `${reviewopen ? '' : 'none'}` }}
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         setReviewbar(true);
@@ -1791,7 +1798,7 @@ export default function QReqDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         myAlert.confirm({
-                                            title: `確定要返回${pagename}列表嗎?`,
+                                            title: `確定要返回${pagename}單列表嗎?`,
                                             content: <>
                                                 <h1>未儲存的資料將不會保留</h1>
                                             </>,
@@ -1808,7 +1815,7 @@ export default function QReqDetail() {
                             </>
                         )}
                         {/* 儲存按鈕 */}
-                        {statusin === "未結案" && isEditing && (
+                        {statusin === "編輯中" && isEditing && (
                             <>
                                 <button
                                     className={scss.shortredsquarebtn}
@@ -1888,7 +1895,7 @@ export default function QReqDetail() {
                                         Excel
                                     </button>
                                 )}
-                                {statusin === "編輯中" && isEditing && (
+                                {/* {statusin === "編輯中" && isEditing && (
 
                                     <>
                                         <button
@@ -1905,7 +1912,7 @@ export default function QReqDetail() {
                                             請購項目
                                         </button>
                                     </>
-                                )}
+                                )} */}
                             </>
                             {/* )} */}
                         </>
@@ -1969,7 +1976,7 @@ export default function QReqDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption={`${pagename}號`}
+                                            caption={`${pagename}單號`}
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ paddingBottom: '10px' }}
                                             disabled={true}
@@ -2432,7 +2439,7 @@ export default function QReqDetail() {
                                     fontSize: '18px'
                                 }}
                             >
-                                詢價項目
+                                {pagename}項目
                             </span>
                         </div>
                         <div className={scss.head_content1}>
@@ -2488,7 +2495,7 @@ export default function QReqDetail() {
                                             <CellWithBar key={index} className={scss.panelHeader20}>
                                                 <div className={scss.row01}>
                                                     <span>
-                                                        <button style={{ display: (statusin === "未結案" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                        <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button>
@@ -2748,7 +2755,7 @@ export default function QReqDetail() {
                                     })
                                 )}
                             </div>
-                            {statusin === "未結案" && isEditing && (
+                            {statusin === "編輯中" && isEditing && (
                                 <span style={{ paddingLeft: '22px', position: 'relative' }}>
                                     <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
                                         <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
@@ -2808,264 +2815,273 @@ export default function QReqDetail() {
                             <div>
                             </div>
                         </div>
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                審核流程
-                            </span>
-                        </div>
-                        {/* <div className={scss.body_foot2}> */}
-                        <div>
-                            {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
-                                <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                    尚未送審
-                                </div>
-                            ) : (
-                                reviewflowdata.map((item, index) => (
-                                    <div
-                                        key={index}
+                        {reviewopen && (
+                            <>
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
                                         style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
                                             display: 'flex',
-                                            justifyContent: 'space-evenly', // 水平均分
-                                            alignItems: 'center', // 垂直置中
-                                            gap: '10px',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
                                         }}
                                     >
-                                        {item.stages.map((stage: any, stageIndex: any) => (
+                                        審核流程
+                                    </span>
+                                </div>
+                                {/* <div className={scss.body_foot2}> */}
+                                <div>
+                                    {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
+                                        <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                            尚未送審
+                                        </div>
+                                    ) : (
+                                        reviewflowdata.map((item, index) => (
                                             <div
-                                                key={stageIndex}
+                                                key={index}
                                                 style={{
-                                                    flex: 1, // 平均分配空間
                                                     display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'left', // 子項目置中
-                                                    textAlign: 'center', // 文字置中
-                                                    margin: '0 10px',
+                                                    justifyContent: 'space-evenly', // 水平均分
+                                                    alignItems: 'center', // 垂直置中
+                                                    gap: '10px',
                                                 }}
                                             >
-                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
-                                                    {stage.review_title}
-                                                </span>
-                                                <div
-                                                    style={{
-                                                        fontSize: '18px',
-                                                        display: 'flex', // 使名字和圖示並排
-                                                        alignItems: 'center', // 讓它們垂直對齊
-                                                        textAlign: 'left', // 讓文字靠左對齊
-                                                    }}
-                                                >
-                                                    <span>{stage.review_person}</span>
-                                                    {stage.review_time !== "0001-01-01T00:00:00" && (
-                                                        <span style={{ paddingLeft: '5px' }}>
-                                                            <img
-                                                                src={icon_review.src}
-                                                                alt="review_status"
-                                                                style={{
-                                                                    width: '25px',
-                                                                    height: '25px',
-                                                                }}
-                                                            />
+                                                {item.stages.map((stage: any, stageIndex: any) => (
+                                                    <div
+                                                        key={stageIndex}
+                                                        style={{
+                                                            flex: 1, // 平均分配空間
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'left', // 子項目置中
+                                                            textAlign: 'center', // 文字置中
+                                                            margin: '0 10px',
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
+                                                            {stage.review_title}
                                                         </span>
-                                                    )}
+                                                        <div
+                                                            style={{
+                                                                fontSize: '18px',
+                                                                display: 'flex', // 使名字和圖示並排
+                                                                alignItems: 'center', // 讓它們垂直對齊
+                                                                textAlign: 'left', // 讓文字靠左對齊
+                                                            }}
+                                                        >
+                                                            <span>{stage.review_person}</span>
+                                                            {stage.review_time !== "0001-01-01T00:00:00" && (
+                                                                <span style={{ paddingLeft: '5px' }}>
+                                                                    <img
+                                                                        src={icon_review.src}
+                                                                        alt="review_status"
+                                                                        style={{
+                                                                            width: '25px',
+                                                                            height: '25px',
+                                                                        }}
+                                                                    />
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ))
+                                    )}
+
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                    {reviewflowdata2.length > 0 ? (
+                                        reviewflowdata2.map((item, index) => (
+                                            <div key={index} style={{
+                                                flex: 1, // 平均分配空間
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'left', // 子項目置中
+                                                textAlign: 'center', // 文字置中
+                                                margin: '0 10px',
+                                            }}>
+                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                                                    {item.stage_user_title}
+                                                </span>
+                                                <div style={{
+                                                    fontSize: '18px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    textAlign: 'left',
+                                                }}>
+                                                    <span>{item.stage_user_name}</span>
+                                                    {/* 如果有需要顯示圖示，在此處添加 */}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ))
-                            )}
+                                        ))
+                                    ) : (
 
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
-                            {reviewflowdata2.length > 0 ? (
-                                reviewflowdata2.map((item, index) => (
-                                    <div key={index} style={{
-                                        flex: 1, // 平均分配空間
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'left', // 子項目置中
-                                        textAlign: 'center', // 文字置中
-                                        margin: '0 10px',
-                                    }}>
-                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
-                                            {item.stage_user_title}
-                                        </span>
-                                        <div style={{
-                                            fontSize: '18px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            textAlign: 'left',
-                                        }}>
-                                            <span>{item.stage_user_name}</span>
-                                            {/* 如果有需要顯示圖示，在此處添加 */}
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-
-                                <></>
-                            )}
-                        </div>
-                        {/* </div> */}
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                進貨紀錄
-                            </span>
-                        </div>
-
-
-
-                        {data3.length === 0 ? (
-                            <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                尚無紀錄
-                            </div>
-                        ) : (
-                            <>
-                                <div className={scss.head_content1}>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="進貨次數"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                // style: { color: 'red' },
-                                                value: data3.length,
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                    <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
-                                        <div className={scss.thead19}>
-                                            <span>序</span>
-                                            <span>單號</span>
-                                            <span>日期</span>
-                                            <span>狀態</span>
-                                            <span>備註</span>
-                                            <span></span>
-                                        </div>
-
-                                        {data3 && (
-                                            data3.map((_item: any, index: number) => (
-                                                <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
-                                                    // alert(_item.prodreceiptid);
-                                                    myAlert.confirm({
-                                                        title: '確定導向此單據嗎?',
-                                                        content: _item.prodreceiptid,
-                                                        props: {
-                                                            onOk: () => {
-                                                                router.push({
-                                                                    pathname: `/factoryDepartment/PReceiptDetail`,
-                                                                    query: {
-                                                                        item: JSON.stringify(_item),
-                                                                    },
-                                                                });
-                                                            }
-                                                        }
-                                                    })
-                                                }}>
-                                                    <div className={scss.row01}>
-                                                        <span>{index + 1}</span>
-                                                        <span>{_item.prodreceiptid}</span>
-                                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                        <span>{_item.status}</span>
-                                                        <span>{_item.note}</span>
-                                                    </div>
-                                                </CellWithBar>
-                                            ))
-                                        )}
-                                    </div>
+                                        <></>
+                                    )}
                                 </div>
                             </>
                         )}
-                        <div
-                            style={{
-                                paddingTop: '18px',
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                審核紀錄
-                            </span>
-                        </div>
-                        {reviewhistroydata.length === 0 ? (
-                            <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                尚無紀錄
-                            </div>
-                        ) : (
+                        {/* </div> */}
+                        {transopen && (
                             <>
-                                <div className={scss.head_content1}>
-
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="審核次數"
-                                        disabled={true}
-                                        inputProps={{
-                                            props: {
-                                                type: "number",
-                                                // style: { color: 'red' },
-                                                value: reviewhistroydata.length,
-                                            },
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
                                         }}
-                                    />
+                                    >
+                                        進貨紀錄
+                                    </span>
                                 </div>
-                                <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                    <div className={scss.body_content1} >
-                                        <div style={{ overflowX: 'auto' }}>
-                                            <Thead01 type={'ReviewHistory2'} />
-                                            {reviewhistroydata && (
-                                                reviewhistroydata.map((_item: any, index: number) => (
-                                                    <CellWithBar key={index} className={scss.panelHeader18} >
-                                                        <div className={scss.row01}>
-                                                            <span>{index + 1}</span>
-                                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                            <span>{_item.document_status}</span>
-                                                            <span>{_item.current_stage}</span>
-                                                            <span>{_item.review_person}</span>
-                                                            <span>{_item.review_memo}</span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                ))
-                                            )}
-                                        </div>
+                                {data3.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚無紀錄
                                     </div>
+                                ) : (
+                                    <>
+                                        <div className={scss.head_content1}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="進貨次數"
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        type: "number",
+                                                        // style: { color: 'red' },
+                                                        value: data3.length,
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                                                <div className={scss.thead19}>
+                                                    <span>序</span>
+                                                    <span>單號</span>
+                                                    <span>日期</span>
+                                                    <span>狀態</span>
+                                                    <span>備註</span>
+                                                    <span></span>
+                                                </div>
+
+                                                {data3 && (
+                                                    data3.map((_item: any, index: number) => (
+                                                        <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
+                                                            // alert(_item.prodreceiptid);
+                                                            myAlert.confirm({
+                                                                title: '確定導向此單據嗎?',
+                                                                content: _item.prodreceiptid,
+                                                                props: {
+                                                                    onOk: () => {
+                                                                        router.push({
+                                                                            pathname: `/factoryDepartment/PReceiptDetail`,
+                                                                            query: {
+                                                                                item: JSON.stringify(_item),
+                                                                            },
+                                                                        });
+                                                                    }
+                                                                }
+                                                            })
+                                                        }}>
+                                                            <div className={scss.row01}>
+                                                                <span>{index + 1}</span>
+                                                                <span>{_item.prodreceiptid}</span>
+                                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                <span>{_item.status}</span>
+                                                                <span>{_item.note}</span>
+                                                            </div>
+                                                        </CellWithBar>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {reviewopen && (
+                            <>
+                                <div
+                                    style={{
+                                        paddingTop: '18px',
+                                        paddingBottom: '18px'
+                                    }}
+                                >
+                                    <span
+                                        style={{
+                                            height: '50px',
+                                            backgroundColor: '#f5f5f5',
+                                            display: 'flex',
+                                            justifyContent: 'center', // 水平置中
+                                            alignItems: 'center',     // 垂直置中
+                                            fontSize: '18px'
+                                        }}
+                                    >
+                                        審核紀錄
+                                    </span>
                                 </div>
+                                {reviewhistroydata.length === 0 ? (
+                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
+                                        尚無紀錄
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className={scss.head_content1}>
+
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="審核次數"
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        type: "number",
+                                                        // style: { color: 'red' },
+                                                        value: reviewhistroydata.length,
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                                            <div className={scss.body_content1} >
+                                                <div style={{ overflowX: 'auto' }}>
+                                                    <Thead01 type={'ReviewHistory2'} />
+                                                    {reviewhistroydata && (
+                                                        reviewhistroydata.map((_item: any, index: number) => (
+                                                            <CellWithBar key={index} className={scss.panelHeader18} >
+                                                                <div className={scss.row01}>
+                                                                    <span>{index + 1}</span>
+                                                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                                    <span>{_item.document_status}</span>
+                                                                    <span>{_item.current_stage}</span>
+                                                                    <span>{_item.review_person}</span>
+                                                                    <span>{_item.review_memo}</span>
+                                                                </div>
+                                                            </CellWithBar>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
@@ -3197,45 +3213,50 @@ export default function QReqDetail() {
                     </div>
                     {filteredData2 && (
                         filteredData2.map((_item: any, index: number) => (
-                            <CellWithBar key={index} className={scss.panelHeader21}
+                            <CellWithBar
+                                key={index}
+                                className={scss.panelHeader21}
                                 onClick={() => {
+                                    const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
+
                                     if (currentsupplier === 1) {
-                                        setSuppliernamein(_item.name);
-                                        setSupplieraddressin(_item.county + _item.district + _item.address);
-                                        setSupplierphonein(_item.phone);
-                                        setSuppliertaxidin(_item.tax_id);
-                                        setSupplieridin(_item.customer_number);
-                                        setSupplierfaxin(_item.fax);
-                                        setSuppliercontactin(_item.contact);
-                                        setSupplieruuidin(_item.id);
+                                        setSuppliernamein(safeValue(_item.name));
+                                        setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphonein(safeValue(_item.phone));
+                                        setSuppliertaxidin(safeValue(_item.tax_id));
+                                        setSupplieridin(safeValue(_item.customer_number));
+                                        setSupplierfaxin(safeValue(_item.fax));
+                                        setSuppliercontactin(safeValue(_item.contact));
+                                        setSupplieruuidin(safeValue(_item.id));
                                     } else if (currentsupplier === 2) {
-                                        setSuppliername2in(_item.name);
-                                        setSupplieraddress2in(_item.county + _item.district + _item.address);
-                                        setSupplierphone2in(_item.phone);
-                                        setSuppliertaxid2in(_item.tax_id);
-                                        setSupplierid2in(_item.customer_number);
-                                        setSupplierfax2in(_item.fax);
-                                        setSuppliercontact2in(_item.contact);
-                                        setSupplieruuid2in(_item.id);
+                                        setSuppliername2in(safeValue(_item.name));
+                                        setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphone2in(safeValue(_item.phone));
+                                        setSuppliertaxid2in(safeValue(_item.tax_id));
+                                        setSupplierid2in(safeValue(_item.customer_number));
+                                        setSupplierfax2in(safeValue(_item.fax));
+                                        setSuppliercontact2in(safeValue(_item.contact));
+                                        setSupplieruuid2in(safeValue(_item.id));
                                     } else if (currentsupplier === 3) {
-                                        setSuppliername3in(_item.name);
-                                        setSupplieraddress3in(_item.county + _item.district + _item.address);
-                                        setSupplierphone3in(_item.phone);
-                                        setSuppliertaxid3in(_item.tax_id);
-                                        setSupplierid3in(_item.customer_number);
-                                        setSupplierfax3in(_item.fax);
-                                        setSuppliercontact3in(_item.contact);
-                                        setSupplieruuid3in(_item.id);
+                                        setSuppliername3in(safeValue(_item.name));
+                                        setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                        setSupplierphone3in(safeValue(_item.phone));
+                                        setSuppliertaxid3in(safeValue(_item.tax_id));
+                                        setSupplierid3in(safeValue(_item.customer_number));
+                                        setSupplierfax3in(safeValue(_item.fax));
+                                        setSuppliercontact3in(safeValue(_item.contact));
+                                        setSupplieruuid3in(safeValue(_item.id));
                                     }
 
                                     setCustomerbar(false);
-                                }}>
+                                }}
+                            >
                                 <div className={scss.row01}>
-                                    <span>{_item.name}</span>
-                                    <span>{_item.county}{_item.district}{_item.address}</span>
-                                    <span>{_item.contact}</span>
-                                    <span>{_item.review_person}</span>
-                                    <span>{_item.review_memo}</span>
+                                    <span>{_item.name || ''}</span>
+                                    <span>{`${_item.county || ''}${_item.district || ''}${_item.address || ''}`}</span>
+                                    <span>{_item.contact || ''}</span>
+                                    <span>{_item.review_person || ''}</span>
+                                    <span>{_item.review_memo || ''}</span>
                                 </div>
                             </CellWithBar>
                         ))

@@ -39,12 +39,14 @@ function ContractList_pre(
     viewRef_top,
     activeContractId,
     onChangeActiveContract,
+    targetUrl,
   }: {
     contractArr: Tcontract[];
     viewRef?: (node?: Element | null | undefined) => void;
     viewRef_top?: (node?: Element | null | undefined) => void;
     activeContractId: string | undefined;
     onChangeActiveContract: (contractId: string | undefined) => void;
+    targetUrl: string;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -96,7 +98,7 @@ function ContractList_pre(
           describe: '',
           onIconClick: () => {
             router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              pathname: targetUrl,
               query: { contractId: activeContractId, version: item.version },
             });
           },
@@ -132,7 +134,7 @@ function ContractList_pre(
           const { contractId } = item;
           const isActive = activeContractId === contractId;
 
-          const openQuotation = (e: MouseEvent) => {
+          const handleIconDetailClick = (e: MouseEvent) => {
             e.stopPropagation();
             router.replace({
               query: {
@@ -152,7 +154,7 @@ function ContractList_pre(
             });
 
             router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              pathname: targetUrl,
               query: { contractId, version: 1 },
             });
           };
@@ -170,7 +172,7 @@ function ContractList_pre(
                   viewRef={theViewRef}
                   contract={item}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  onIconDetailClick={handleIconDetailClick}
                 />
               }
             >

@@ -31,6 +31,7 @@ import {
   //
   TquotationProductItemDto,
   TupdateContractProductItemDto,
+  TfloorLocations,
   TdoorModelInfoDto,
   TquotationProductComponentDto,
   TdoorComponentType,
@@ -170,6 +171,15 @@ type Tworksheet = {
   setCalcTarget: (value: 'fullWidth' | 'WG') => void;
   // calcFullWidth: () => `${number}`;
   // calcWG: () => `${number}`;
+  //
+  locationArea: string;
+  setLocationArea: (value: string) => void;
+  floor: string;
+  setFloor: (value: string) => void;
+  serialNumberArr: string[];
+  // setSerialNumberArr: (value: string[]) => void;
+  setSerialNumber: (props: { index: number; value: string }) => void;
+
   //
   basicSpec: {
     quoteType: string;
@@ -370,6 +380,7 @@ type Tworksheet = {
   // -----------------------------------------------------------------------------
 
   getUpdateWorkSheetItemArr: () => TupdateContractProductItemDto[] | null;
+  getFloorLocations: () => TfloorLocations[] | null;
 
   // -----------------------------------------------------------------------------
   //
@@ -427,6 +438,38 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
+    locationArea: '',
+    setLocationArea: (value) => {
+      set(
+        produce((state) => {
+          state.locationArea = value;
+        })
+      );
+    },
+
+    floor: '',
+    setFloor: (value) => {
+      set(
+        produce((state) => {
+          state.floor = value;
+        })
+      );
+    },
+    serialNumberArr: [],
+    // setSerialNumberArr: (serialNumberArr) => {
+    //   set(
+    //     produce((state) => {
+    //       state.serialNumberArr = serialNumberArr;
+    //     })
+    //   );
+    // },
+    setSerialNumber: ({ index, value }) => {
+      set(
+        produce((state) => {
+          state.serialNumberArr[index] = value;
+        })
+      );
+    },
 
     basicSpec: {
       quoteType: '',
@@ -876,6 +919,15 @@ const useWorksheet = create<Tworksheet>(
         );
       }
 
+      if (contractProductItemArr) {
+        const serialNumberArr = contractProductItemArr.map((item) => item.serialNumber || '');
+        set(
+          produce((state) => {
+            state.serialNumberArr = serialNumberArr;
+          })
+        );
+      }
+
       set(
         produce<Tworksheet>((state) => {
           const componentArr = contractProductItem?.components;
@@ -1014,6 +1066,8 @@ const useWorksheet = create<Tworksheet>(
       ); // set
 
       if (contractProductItem) {
+        const { serialNumber, floor, locationArea } = contractProductItem;
+
         // const generalSpec = await get().reqGeneralSpec();
         const generalSpec = get().getIsSpecialProd()
           ? cre_EmptyGeneralSpec()
@@ -1042,6 +1096,9 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.generalSpec = generalSpec;
+            state.serialNumber = serialNumber ?? '';
+            state.floor = floor ?? '';
+            state.locationArea = locationArea ?? '';
           })
         );
 
@@ -1819,7 +1876,8 @@ const useWorksheet = create<Tworksheet>(
         electricMotorDirection: motor.electricMotorDirection,
         //
         // headBox
-        headBoxThickness: headBox.headBoxThickness || null,
+        // 將小數位去掉，例如"3.0"轉變為"3"
+        headBoxThickness: headBox.headBoxThickness ? `${Number(headBox.headBoxThickness)}` : null,
         headBoxFront: headBox.headBoxFront,
         headBoxProtruding: headBox.headBoxProtruding || null,
         isIntegratedHeadBox: headBox.isIntegratedHeadBox,
@@ -1832,7 +1890,8 @@ const useWorksheet = create<Tworksheet>(
         slatCount: slat.slatCount || '0',
         //
         // guideRail
-        guideRailThickness: guideRail.guideRailThickness,
+        // 將小數位去掉，例如"3.0"轉變為"3"
+        guideRailThickness: guideRail.guideRailThickness ? `${Number(guideRail.guideRailThickness)}` : null,
         hasSilencingStrip: guideRail.hasSilencingStrip,
         guideRailType: guideRail.guideRailType,
         guideRail: guideRail.guideRail || null,
@@ -1907,6 +1966,23 @@ const useWorksheet = create<Tworksheet>(
 
       return updateWorkSheetArr;
     },
+
+    getFloorLocations: () => {
+      const { floor, locationArea, serialNumberArr } = get();
+
+      const arr = serialNumberArr.map((serialNumber) => {
+        const floorLocation: TfloorLocations = {
+          floor,
+          locationArea,
+          serialNumber,
+        };
+
+        return floorLocation;
+      });
+
+      return arr;
+    },
+
     // ---------------------------------------------------------------------
     //
   }) // set get
