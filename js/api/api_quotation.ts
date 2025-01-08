@@ -2621,6 +2621,7 @@ export const useWholeContractProduct = ({ contract }: { contract: TquotationCont
 
     const getItemsAndRenew = async () => {
       const wholeProdArr = await getWholeProductArr(prodIdArr);
+
       wholeProdArr.forEach((prod) => {
         wholeContractProduct_pre[prod.id] = {
           ...wholeContractProduct_pre[prod.id],
@@ -2628,10 +2629,11 @@ export const useWholeContractProduct = ({ contract }: { contract: TquotationCont
           quantity: wholeContractProduct_pre[prod.id].quantity,
         };
       });
+
+      setWholeContractProduct(wholeContractProduct_pre);
     };
 
     getItemsAndRenew();
-    setWholeContractProduct(wholeContractProduct_pre);
   }, [wholeContractProduct_pre]);
 
   return wholeContractProduct;

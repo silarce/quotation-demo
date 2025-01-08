@@ -41,12 +41,14 @@ interface Tprops {
   instance_useQuotationProductInstance: TuseQuotationProductInstance;
   disabled: boolean;
   className?: string;
+  showQuotationDiscount?: TtableProps['showQuotationDiscount'];
 }
 
 interface TtableProps {
   instance_useQuotationProductInstance: TuseQuotationProductInstance;
   disabled: boolean;
   className?: string;
+  showQuotationDiscount?: boolean;
 }
 
 // ===================================================================
@@ -55,17 +57,25 @@ interface TtableProps {
 // 這個元件就是useQuotationProduct實例與UI元件的轉接器，
 // 本來就預期會與useQuotationProduct高度耦合
 export default function QuotationProdTable(tableProps: Tprops) {
-  const { instance_useQuotationProductInstance, disabled, className } = tableProps;
+  const {
+    //
+    instance_useQuotationProductInstance,
+    disabled,
+    className,
+    showQuotationDiscount = true,
+  } = tableProps;
 
   const activedProd = instance_useQuotationProductInstance.activedProd;
-
-  // console.log(activedProd);
 
   // MARK:RENDER
   return (
     <div id="zxc" className={classNames(className)}>
       {/* 主產品 product */}
-      <Table_prod instance_useQuotationProductInstance={instance_useQuotationProductInstance} disabled={disabled} />
+      <Table_prod
+        instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+        disabled={disabled}
+        showQuotationDiscount={showQuotationDiscount}
+      />
       <br />
 
       <Spin spinning={!!activedProd?.isFetching}>
@@ -143,6 +153,7 @@ const Table_prod = ({
   instance_useQuotationProductInstance,
   disabled,
   className,
+  showQuotationDiscount,
 }: TtableProps) => {
   const {
     // classProdDict,
@@ -181,22 +192,24 @@ const Table_prod = ({
     >
       <div className={scss.tablePanel}>
         <span className={scss.title}>主產品設定</span>
-        <InputSel_prod
-          caption="總折數 : "
-          wrapperStyle={{ width: 130, gap: 5 }}
-          disabled={disabled}
-          inputProps={{
-            props: {
-              type: 'number',
-              value: quotationDiscount,
-              onChange(e) {
-                setQuotationDiscount(e.target.value as `${number}` | '');
+        {showQuotationDiscount && (
+          <InputSel_prod
+            caption="總折數 : "
+            wrapperStyle={{ width: 130, gap: 5 }}
+            disabled={disabled}
+            inputProps={{
+              props: {
+                type: 'number',
+                value: quotationDiscount,
+                onChange(e) {
+                  setQuotationDiscount(e.target.value as `${number}` | '');
+                },
               },
-            },
-          }}
-          fontSize="18"
-          captionSize="18"
-        />
+            }}
+            fontSize="18"
+            captionSize="18"
+          />
+        )}
         {/* <SquareBtn className="ml-2" sharp="mini">
           編輯欄位排序
         </SquareBtn> */}

@@ -273,9 +273,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // wholeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
   const wholeContractProductDict = useWholeContractProduct({ contract: attachedToContract });
 
-  useEffect(() => {
-    console.log(wholeContractProductDict);
+  const wholeContractProductArr = useMemo(() => {
+    const arr = Object.values(wholeContractProductDict);
+
+    return arr.length ? arr : undefined;
   }, [wholeContractProductDict]);
+
+  // useEffect(() => {
+  //   console.log(wholeContractProductDict);
+  // }, [wholeContractProductDict]);
 
   // w ----------------------------------------------------------
 
@@ -348,6 +354,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
       });
     },
+  });
+
+  const instance_wholeContractProduct = useQuotationProduct({
+    raw_quotationProductArr: wholeContractProductArr,
+    raw_quotationDiscount: undefined,
+    disabled,
+    onProdAllTotalChange: () => {},
   });
 
   const { avgDiscount, doorModelSummery } = instance_quotationProduct;
@@ -897,6 +910,27 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <br />
         <br />
+        {wholeContractProductArr && (
+          <>
+            <div className={'px-[48px]'}>
+              <div className="border border-red-500">
+                <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
+                <QuotationProdTable
+                  disabled={true}
+                  instance_useQuotationProductInstance={instance_wholeContractProduct}
+                  showQuotationDiscount={false}
+                />
+              </div>
+            </div>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+          </>
+        )}
+
         <div className={'px-[50px]'}>
           <QuotationProdTable disabled={disabled} instance_useQuotationProductInstance={instance_quotationProduct} />
           <QuotationOther disabled={disabled} instance_useQuotationOther={instance_useQuotationOther} />
