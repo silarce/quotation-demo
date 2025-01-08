@@ -236,13 +236,7 @@ const getReviewerDict = ({
 
   const arr: (keyof typeof dict)[] =
     status === 'Pending' // 狀態為準合約
-      ? [
-          // 'sales',
-          'supervisor',
-          'workDirector',
-          'cashier',
-          'manager',
-        ]
+      ? ['sales', 'supervisor', 'workDirector', 'cashier', 'manager']
       : ['sales', 'supervisor', 'manager'];
 
   const reviewers: Treviewers = {
