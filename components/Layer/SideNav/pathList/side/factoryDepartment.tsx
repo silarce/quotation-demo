@@ -1,6 +1,7 @@
-import { devPass, erpFeaturesLookup, TsidePathConfig } from "../type";
+import { devPass, erpFeaturesLookup, TsidePathConfig } from '../type';
 
 export default function SidePatFactoryDepartment() {
+
     return ((): TsidePathConfig => {
         const path = '/factoryDepartment';
 
@@ -19,6 +20,21 @@ export default function SidePatFactoryDepartment() {
                         {
                             label: '新增請購',
                             path: path + '/addPurchaseRequisitionList',
+                            erpFeature: [fac],
+                        },
+                        {
+                            label: '價格查詢',
+                            // path: path + '/quotereqList',
+                            path: path + '/PriQueryList',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/PriQueryList') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
                             erpFeature: [fac],
                         },
                         {

@@ -692,8 +692,8 @@ export default function PEntryList() {
                                                         <th style={{ width: '100px' }}>料號</th>
                                                         <th style={{ width: '300px' }}>名稱</th>
                                                         <th style={{ width: '400px' }}>規格</th>
-                                                        <th style={{ width: '150px' }}>已入庫</th>
                                                         <th style={{ width: '150px' }}>數量</th>
+                                                        <th style={{ width: '150px' }}>已入庫</th>
                                                         <th style={{ width: '80px' }}>單位</th>
                                                         <th style={{ width: '150px' }}>單價</th>
                                                         <th>金額</th>
@@ -707,8 +707,8 @@ export default function PEntryList() {
                                                             <td style={{ width: '100px' }}>{detail.productid}</td>
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
-                                                            <td style={{ width: '150px' }}>{detail.entry_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px',color:'#ea1833' }}>{detail.entry_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>
