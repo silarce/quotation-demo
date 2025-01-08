@@ -22,6 +22,21 @@ export default function SidePatFactoryDepartment() {
                             erpFeature: [fac],
                         },
                         {
+                            label: '價格查詢',
+                            // path: path + '/quotereqList',
+                            path: path + '/PriQueryList',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/PriQueryList') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
+                            erpFeature: [fac],
+                        },
+                        {
                             label: '詢價列表',
                             // path: path + '/quotereqList',
                             path: path + '/QReqList',
