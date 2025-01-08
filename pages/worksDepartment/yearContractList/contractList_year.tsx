@@ -109,30 +109,17 @@ export default function WdContractList() {
         $gte: yearStart,
         $lte: yearEnd,
       },
-
-      // 報價單若沒有accountReceivable，取得的資料連accountReceivable這個property都不會有
-      // 送accountReceivable相關的參數會400錯誤
-      // 所以無法以api的filter過濾accountReceivable相關資料
-      // accountReceivable: { $notNull: true },
-      // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : isDone === 'false' ? { $eq: false } : undefined,
-      // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : { $ne: true },
+      isDone: { $eq: isDone === 'true' },
     },
   };
 
   const { data, update } = useGetContract(params);
 
   const dataArr = useMemo(() => {
-    // 因為無法使用api的filter過濾accountReceivable相關資料，所以在前端這邊過濾
-    const dataArr = (data ?? []).filter((item) => {
-      if (isDone === 'true') {
-        return item.accountReceivable?.isDone === true;
-      } else {
-        return item.accountReceivable?.isDone !== true;
-      }
-    });
+    return data ?? [];
 
-    return dataArr;
-  }, [data]);
+    // // 因為無法使用api的filter過濾accountReceivable相關資料，所以在前端這邊過濾
+  }, [data, isDone]);
 
   useEffect(() => {
     (async () => {
