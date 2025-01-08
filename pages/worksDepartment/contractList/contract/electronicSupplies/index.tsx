@@ -25,23 +25,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-// import _ from 'lodash';
-// import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-
-// antd
-import { Popover } from 'antd';
 
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
 import PickupRecord from 'components/page/worksDepartment/electronicSupplies/pickupRecord';
 import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
+import Profile, { TdoorQtySubTotalList } from 'components/page/worksDepartment/electronicSupplies/profile';
+
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
@@ -57,26 +54,10 @@ import {
   useElectronicSupplies_id,
 } from 'js/api/api_engineering';
 
-import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
-
 // css
 import scss from './electronicSupplies.module.scss';
 
-// utils
-// import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
-
-import {
-  TemployeeDto,
-  //
-  TworksheetDto,
-  TquotationProductItemDto,
-} from 'js/api/dtoTypes';
-
-import {
-  Tstate_electronicItem,
-  Tstate_info,
-  createEmptyStateInfo,
-} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+import { useCalcDoorModal } from 'components/page/worksDepartment/electronicSupplies/hook/useCalcDoorModal';
 
 // ------------------------------------------------------------------
 
@@ -85,9 +66,9 @@ type Tquery = {
   listName: 'itemList' | 'supplyList' | 'pickupRecord' | 'requirementRecord' | undefined;
 };
 
-type TdoorQtySubTotalList = {
-  [doorModelName: string]: number;
-};
+// type TdoorQtySubTotalList = {
+//   [doorModelName: string]: number;
+// };
 
 // ------------------------------------------------------------------
 
@@ -205,59 +186,13 @@ export default function ElectronicSupplies() {
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies}>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
       <div className={scss.container}>
-        <div className={scss.info}>
-          <InputSel
-            caption="工程編號"
-            showBaseline="invisible"
-            captionStyle={{ width: '80px' }}
-            wrapperStyle={{ gap: '25px' }}
-            inputProps={{
-              props: {
-                value: projectNumber,
-                readOnly: true,
-              },
-            }}
-          />
-          <InputSel
-            caption="工程名稱"
-            showBaseline="invisible"
-            captionStyle={{ width: '80px' }}
-            wrapperStyle={{ gap: '25px' }}
-            inputProps={{
-              props: {
-                value: projectName,
-                readOnly: true,
-              },
-            }}
-          />
-
-          <InputSel
-            caption="門型數量"
-            showBaseline="invisible"
-            captionStyle={{ width: '80px' }}
-            wrapperStyle={{ gap: '25px' }}
-            inputProps={{
-              props: {
-                value: doorQtyTotal,
-                readOnly: true,
-              },
-            }}
-            suffix={<Info doorModalQtyList={doorModalQtyList} />}
-          />
-          <InputSel
-            caption="領料狀態"
-            showBaseline="invisible"
-            captionStyle={{ width: '80px' }}
-            wrapperStyle={{ gap: '25px' }}
-            inputProps={{
-              props: {
-                value: hasFinishPickUp ? '送電材料皆領料完成' : '尚未領料完成',
-                readOnly: true,
-                className: classNames(scss.supplyStatus, hasFinishPickUp && scss.isDone),
-              },
-            }}
-          />
-        </div>
+        <Profile
+          projectNumber={projectNumber}
+          projectName={projectName}
+          doorQtyTotal={doorQtyTotal}
+          doorModalQtyList={doorModalQtyList}
+          hasFinishPickUp={hasFinishPickUp}
+        />
 
         <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
           {listName === 'itemList' && <ItemList className={scss.table} worksheetArr={worksheet ?? []} />}
@@ -271,78 +206,10 @@ export default function ElectronicSupplies() {
     </SubLayer>
   );
 }
-// ===========================================================
-
-// region COMPONENT
-
-const Info = ({ doorModalQtyList }: { doorModalQtyList: TdoorQtySubTotalList }) => {
-  const Content = (
-    <ul>
-      {Object.entries(doorModalQtyList).map(([key, qty]) => {
-        return (
-          <li key={key} className="flex gap-3">
-            <span>{key}</span>
-            <span>{qty}樘</span>
-          </li>
-        );
-      })}
-    </ul>
-  );
-
-  return (
-    <Popover content={Content} trigger={'hover'} placement="right">
-      <div>
-        <Icon_info />
-      </div>
-    </Popover>
-  );
-};
 
 // =======================================================================
 
 // region HOOK
-
-const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
-  const obj: {
-    doorModalQtyList: TdoorQtySubTotalList;
-    doorQtyTotal: number;
-  } = useMemo(() => {
-    const list: TdoorQtySubTotalList = {};
-    let total = 0;
-
-    worksheetArr.forEach((worksheet) => {
-      const { latestRecord, isAbandoned, isAlreadyToElectronicSupplies } = worksheet;
-
-      if (isAbandoned || !isAlreadyToElectronicSupplies) {
-        return;
-      }
-
-      const { contractProductItems } = latestRecord;
-
-      if (!contractProductItems?.[0]) {
-        return;
-      }
-
-      const qty = contractProductItems.length;
-      const doorModelName = contractProductItems[0].doorModelName;
-
-      if (!list[doorModelName]) {
-        list[doorModelName] = 0;
-      }
-
-      list[doorModelName] += qty;
-      total += qty;
-    }); // forEach
-
-    return {
-      doorModalQtyList: list,
-      doorQtyTotal: total,
-    };
-    //
-  }, [worksheetArr]);
-
-  return obj;
-};
 
 const usePanelList = ({
   //

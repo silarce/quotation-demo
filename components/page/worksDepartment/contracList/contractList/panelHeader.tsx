@@ -42,13 +42,13 @@ export type { TtheadInfo };
 export default function PanelHeader({
   contract,
   isActive,
-  openQuotation,
+  onIconDetailClick,
   onClick,
   viewRef,
 }: {
   contract: TtheadInfo;
   isActive: boolean;
-  openQuotation: (e: MouseEvent) => void;
+  onIconDetailClick: (e: MouseEvent) => void;
   onClick?: () => void;
   viewRef?: (node?: Element | null | undefined) => void | undefined;
 }) {
@@ -83,7 +83,7 @@ export default function PanelHeader({
         <span>{doorQty}</span>
         <span>{budgetAmount}</span> */}
         <div>
-          <IconDetail onClick={openQuotation} />
+          <IconDetail onClick={onIconDetailClick} />
         </div>
       </div>
       {/* row02 */}

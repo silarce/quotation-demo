@@ -284,6 +284,7 @@ export default function Worksheet({
     useShallow((state) => ({
       worksheetId: state.worksheetId,
       getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
+      getFloorLocations: state.getFloorLocations,
     }))
   );
 
@@ -370,10 +371,12 @@ export default function Worksheet({
     const document_status = activeRecordData!.addition?.reviewArr?.[0].document_status;
 
     const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
+    const floorLocations = worksheetExport.getFloorLocations();
 
-    if (contractProductItems) {
+    if (contractProductItems && floorLocations) {
       const body = {
         contractProductItems,
+        floorLocations,
       };
 
       try {
