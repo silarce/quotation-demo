@@ -39,7 +39,17 @@ export default function WdContractList() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { doorType, county, district, address, customerName, keyWord, year, isDone } = router.query as Tquery;
+  const {
+    //
+    doorType,
+    county,
+    district,
+    address,
+    customerName,
+    keyWord,
+    year,
+    isDone,
+  } = router.query as Tquery;
 
   const { yearStart, yearEnd } = useMemo(() => {
     if (!year) {
@@ -130,7 +140,7 @@ export default function WdContractList() {
       await update();
       setIsLoading(false);
     })();
-  }, [router.query]);
+  }, [doorType, county, district, address, customerName, keyWord, year, isDone]);
 
   const control_sortedContractList: Tcontrol_sortedContractList = useMemo(() => {
     const list: Tcontrol_sortedContractList = {

@@ -32,16 +32,20 @@ type Tcontrol = {
   abroadArr: Tcontract[];
 };
 
+type Tquery = {
+  targetContractId?: string | undefined;
+};
+
 export type { Tcontract, Tcontrol as Tcontrol_sortedContractList };
 
 // ========================
 
 export default function ContractList_sorted({ control }: { control: Tcontrol }) {
   const router = useRouter();
+  const query = router.query as Tquery;
+  const { targetContractId } = query;
 
   // ------------------------------------------------------------------
-
-  const [targetContractId, setTargetContractId] = useState<string>();
 
   const [contractList, setContractList] = useState<{ [key: string]: TquotationContractDto | undefined }>({});
 
@@ -95,205 +99,84 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
   return (
     <div className={style.container}>
       <Thead />
-      {/*  */}
-      <Collapse
-        //
-        expandIcon={() => <></>}
-        accordion={false}
-        destroyInactivePanel={true}
-        activeKey={targetContractId}
-      >
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>北部</span>
-        </div>
-        {northernArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  onIconDetailClick={openQuotation}
-                  onClick={() => {
-                    //
-                    if (isActive) {
-                      setTargetContractId(undefined);
-                    } else {
-                      setTargetContractId(contractId);
-                    }
-                  }}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>中部</span>
-        </div>
-        {centralArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  onIconDetailClick={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>南部</span>
-        </div>
-        {southernArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  onIconDetailClick={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-        {/* <div className={style.sortTitle}>
-          <span>東部</span>
-        </div>
-        {easternArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })} */}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>海外或其他</span>
-        </div>
-        {abroadArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  onIconDetailClick={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-      </Collapse>
+      {/*  */}ㄋ
+      <List label="北部" arr={northernArr} createContractDetailArr={createContractDetailArr} />
+      <List label="中部" arr={centralArr} createContractDetailArr={createContractDetailArr} />
+      <List label="南部" arr={southernArr} createContractDetailArr={createContractDetailArr} />
+      <List label="海外或其他" arr={abroadArr} createContractDetailArr={createContractDetailArr} />
     </div>
   );
 }
 
 // =========================================================================
+
+const List = ({
+  label,
+  arr,
+  createContractDetailArr,
+}: {
+  label: string;
+  arr: Tcontract[];
+  createContractDetailArr: (contractId: string) => Tdetail[];
+}) => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { targetContractId } = query;
+
+  return (
+    <Collapse
+      //
+      expandIcon={() => <></>}
+      accordion={false}
+      destroyInactivePanel={true}
+      activeKey={targetContractId}
+    >
+      <div className={style.sortTitle}>
+        <span>{label}</span>
+      </div>
+      {arr.map((item) => {
+        const { contractId } = item;
+        const isActive = contractId === targetContractId;
+
+        const openQuotation = (e: MouseEvent) => {
+          e.stopPropagation();
+          router.push({
+            pathname: '/worksDepartment/contractList/contract/workContactDoc',
+            query: { contractId, version: 1 },
+          });
+        };
+
+        const detailArr = createContractDetailArr(contractId);
+
+        return (
+          <Panel
+            key={contractId}
+            className={style.panel}
+            header={
+              <PanelHeader
+                //
+                contract={item}
+                isActive={isActive}
+                onIconDetailClick={openQuotation}
+                onClick={() => {
+                  //
+                  if (isActive) {
+                    router.replace({
+                      query: { ...query, targetContractId: undefined },
+                    });
+                  } else {
+                    router.replace({
+                      query: { ...query, targetContractId: contractId },
+                    });
+                  }
+                }}
+              />
+            }
+          >
+            <PanelBody contractDetailArr={detailArr} />
+          </Panel>
+        );
+      })}
+    </Collapse>
+  );
+};
