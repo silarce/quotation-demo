@@ -98,7 +98,7 @@ function ContractList_pre(
           describe: '',
           onIconClick: () => {
             router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              pathname: targetUrl,
               query: { contractId: activeContractId, version: item.version },
             });
           },
