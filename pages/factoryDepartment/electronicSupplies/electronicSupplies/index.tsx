@@ -1,60 +1,25 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-// import _ from 'lodash';
-// import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
-// antd
-import { Popover } from 'antd';
-
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
-import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
 import PickupRecord from 'components/page/worksDepartment/electronicSupplies/pickupRecord';
-import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
-import Profile, { TdoorQtySubTotalList } from 'components/page/worksDepartment/electronicSupplies/profile';
+import Profile from 'components/page/worksDepartment/electronicSupplies/profile';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
-import {
-  //
-  useGetContract_id,
-  useGetContract_id_finalProductItem,
-} from 'js/api/api_quotation';
-import {
-  //
-  apiPostElectronicSupplies,
-  useGetEngineeringContact,
-  useElectronicSupplies_id,
-} from 'js/api/api_engineering';
-
-import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
+import { useGetContract_id } from 'js/api/api_quotation';
+import { useElectronicSupplies_id } from 'js/api/api_engineering';
 
 // css
 import scss from './index.module.scss';
-
-// utils
-// import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
-
-import {
-  TemployeeDto,
-  //
-  TworksheetDto,
-  TquotationProductItemDto,
-} from 'js/api/dtoTypes';
-
-import {
-  Tstate_electronicItem,
-  Tstate_info,
-  createEmptyStateInfo,
-} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
 import { useCalcDoorModal } from 'components/page/worksDepartment/electronicSupplies/hook/useCalcDoorModal';
 
@@ -128,7 +93,6 @@ export default function ElectronicSupplies() {
 
   useEffect(() => {
     update();
-    // update_finalProductItem();
   }, []);
 
   // -----------------------------------------------------------------
