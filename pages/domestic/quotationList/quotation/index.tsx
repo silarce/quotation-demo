@@ -268,11 +268,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const attachedToContract = quotationData?.attachedToContract;
   isAttach = !!attachedToContract;
 
-  const ins = useWholeContractProduct({ contract: attachedToContract });
+  // w ----------------------------------------------------------
+
+  // wholeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
+  const wholeContractProductDict = useWholeContractProduct({ contract: attachedToContract });
 
   useEffect(() => {
-    console.log(ins);
-  }, [ins]);
+    console.log(wholeContractProductDict);
+  }, [wholeContractProductDict]);
+
+  // w ----------------------------------------------------------
 
   const haveVerifyForm = content?.verifyForm;
 
@@ -334,7 +339,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instance_quotationPrice;
 
   const instance_quotationProduct = useQuotationProduct({
-    // raw_quotationContent: content,
     raw_quotationProductArr: content?.products,
     raw_quotationDiscount: content?.discount,
     disabled,

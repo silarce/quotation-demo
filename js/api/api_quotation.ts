@@ -2625,6 +2625,7 @@ export const useWholeContractProduct = ({ contract }: { contract: TquotationCont
         wholeContractProduct_pre[prod.id] = {
           ...wholeContractProduct_pre[prod.id],
           ...prod,
+          quantity: wholeContractProduct_pre[prod.id].quantity,
         };
       });
     };
