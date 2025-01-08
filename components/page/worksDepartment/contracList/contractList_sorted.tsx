@@ -1,4 +1,5 @@
 import { useState, useEffect, MouseEvent } from 'react';
+import classNames from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -14,7 +15,7 @@ import { Collapse } from 'antd';
 import { useGetContract_id, TquotationContractDto } from 'js/api/api_quotation';
 
 // css
-import style from './contractList.module.scss';
+import scss from './contractList_sorted.module.scss';
 
 const { Panel } = Collapse;
 
@@ -95,15 +96,53 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
 
   const { northernArr, centralArr, southernArr, abroadArr } = control;
 
+  const arr = [
+    {
+      label: '北部',
+      contractArr: northernArr,
+    },
+    {
+      label: '中部',
+      contractArr: centralArr,
+    },
+    {
+      label: '南部',
+      contractArr: southernArr,
+    },
+    {
+      label: '海外或其他',
+      contractArr: abroadArr,
+    },
+  ];
+
   // ------------------------------------------------------------------
   return (
-    <div className={style.container}>
-      <Thead />
-      {/*  */}ㄋ
-      <List label="北部" arr={northernArr} createContractDetailArr={createContractDetailArr} />
-      <List label="中部" arr={centralArr} createContractDetailArr={createContractDetailArr} />
-      <List label="南部" arr={southernArr} createContractDetailArr={createContractDetailArr} />
-      <List label="海外或其他" arr={abroadArr} createContractDetailArr={createContractDetailArr} />
+    <div className={scss.container}>
+      {/* <Thead /> */}
+      <Collapse
+        //
+        expandIcon={() => <></>}
+        // accordion={true}
+        destroyInactivePanel={true}
+      >
+        {arr.map((item, index) => {
+          const { label, contractArr } = item;
+
+          return (
+            <Panel
+              key={index}
+              className={classNames(scss.panel, scss.locationPanel, scss.plus)}
+              header={
+                <div className={scss.sortTitle}>
+                  <span>{label}</span>
+                </div>
+              }
+            >
+              <List key={label} contractArr={contractArr} createContractDetailArr={createContractDetailArr} />
+            </Panel>
+          );
+        })}
+      </Collapse>
     </div>
   );
 }
@@ -111,12 +150,10 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
 // =========================================================================
 
 const List = ({
-  label,
-  arr,
+  contractArr,
   createContractDetailArr,
 }: {
-  label: string;
-  arr: Tcontract[];
+  contractArr: Tcontract[];
   createContractDetailArr: (contractId: string) => Tdetail[];
 }) => {
   const router = useRouter();
@@ -127,14 +164,11 @@ const List = ({
     <Collapse
       //
       expandIcon={() => <></>}
-      accordion={false}
+      // accordion={false}
       destroyInactivePanel={true}
       activeKey={targetContractId}
     >
-      <div className={style.sortTitle}>
-        <span>{label}</span>
-      </div>
-      {arr.map((item) => {
+      {contractArr.map((item) => {
         const { contractId } = item;
         const isActive = contractId === targetContractId;
 
@@ -151,7 +185,7 @@ const List = ({
         return (
           <Panel
             key={contractId}
-            className={style.panel}
+            className={scss.panel}
             header={
               <PanelHeader
                 //

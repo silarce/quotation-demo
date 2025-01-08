@@ -1,0 +1,46 @@
+@use "styles/theme01" as *;
+
+.container {
+  padding: 4px;
+  padding-top: 0;
+  :global(.ant-collapse) {
+    border: none;
+  }
+}
+
+.panel {
+  :global(.ant-collapse-header) {
+    display: block !important;
+    padding: 0 !important;
+    background-color: #fff;
+  }
+
+  :global(.ant-collapse-content-box) {
+    padding: 0;
+  }
+}
+
+.locationPanel.plus {
+  position: relative;
+
+  :global(.ant-collapse-header) {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  :global(.ant-collapse-content) {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.sortTitle {
+  padding: 12px 15px;
+  background-color: theme("colors.bgc01");
+  border-bottom: solid 1px theme("colors.border");
+  span {
+    color: theme("colors.sub");
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
