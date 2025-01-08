@@ -14,60 +14,80 @@ export default function SidePatFactoryDepartment() {
           erpFeature: devPass,
           list: [
             {
-              label: '詢價管理',
-              path: path + '/quotereqList',
+              label: '新增請購',
+              path: path + '/addPurchaseRequisitionList',
               erpFeature: [fac],
             },
             {
-              label: '請購申請',
-              path: path + '/addPurchaseRequisition',
-              erpFeature: [fac],
-            },
-            {
-              label: '請購管理',
-              path: path + '/purchaseRequisitionList',
+              label: '詢價列表',
+              // path: path + '/quotereqList',
+              path: path + '/QReqList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/purchaseRequisitionList') {
+                if (pathname === '/factoryDepartment/QReqList') {
                   return true;
-                } else if (pathname === '/factoryDepartment/quotereqDetailList') {
+                } else if (pathname === '/factoryDepartment/addQReqList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/QReqDetail') {
+                  return true;
+                }
+
+                return false;
+              },
+              erpFeature: [fac],
+            },
+            {
+              label: '請購列表',
+              path: path + '/PRequisitionList',
+              activeChecker: ({ router }) => {
+                const { pathname, query } = router;
+
+                if (pathname === '/factoryDepartment/PRequisitionList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/PRequisitionDetail') {
                   return true;
                 }
 
                 return false;
               },
               query: {
-                type: 'purchaseRequisitionList',
+                type: 'PRequisitionList',
               },
               erpFeature: [fac],
             },
             {
-              label: '採購管理',
-              path: path + '/purchaseOrderList',
+              label: '採購列表',
+              path: path + '/POrderList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/purchaseOrderList') {
+                if (pathname === '/factoryDepartment/POrderList') {
                   return true;
-                } else if (pathname === '/factoryDepartment/addPurchaseOrder') {
+                } else if (pathname === '/factoryDepartment/addPurchaseOrderList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/POrderDetail') {
                   return true;
                 }
 
                 return false;
               },
               query: {
-                type: 'purchaseOrderList',
+                type: 'POrderList',
               },
               erpFeature: [fac],
             },
             {
-              label: '進貨管理',
-              path: path + '/prodReceiptList',
+              label: '進貨列表',
+              path: path + '/PReceiptList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/prodReceiptList') {
+                if (pathname === '/factoryDepartment/PReceiptList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/addProdReceiptList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/PReceiptDetail') {
                   return true;
                 }
 
@@ -85,36 +105,42 @@ export default function SidePatFactoryDepartment() {
           erpFeature: devPass,
           list: [
             {
-              label: '領料管理',
-              path: path + '/pickingList',
+              label: '入庫列表',
+              path: path + '/PEntryList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/pickingList') {
+                if (pathname === '/factoryDepartment/PEntryList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/PEntryDetail') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/PEntryIn') {
                   return true;
                 }
 
                 return false;
               },
               query: {
-                type: 'prodReceiptList',
+                type: 'PEntryList',
               },
               erpFeature: [fac],
             },
             {
-              label: '入庫管理',
-              path: path + '/prodEntryList',
+              label: '領料列表',
+              path: path + '/PKingList',
               activeChecker: ({ router }) => {
                 const { pathname, query } = router;
 
-                if (pathname === '/factoryDepartment/prodEntryList') {
+                if (pathname === '/factoryDepartment/PKingList') {
+                  return true;
+                } else if (pathname === '/factoryDepartment/PKingDetail') {
                   return true;
                 }
 
                 return false;
               },
               query: {
-                type: 'prodEntryList',
+                type: 'PKingList',
               },
               erpFeature: [fac],
             },
