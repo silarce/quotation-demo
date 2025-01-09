@@ -832,15 +832,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // region useEffect
   useEffect(() => {
     update_quotation();
-    // if (quotationId) {
-    //   update_quotation();
-    // } else if (contentId) {
-    //   updateContent();
-    // }
-  }, [
-    quotationId,
-    //  contentId
-  ]);
+  }, [quotationId]);
 
   useEffect(() => {
     const status = content?.status || 'Budget';
@@ -852,10 +844,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: RENDER
   return (
-    <SubLayer
-      isLoading_all={isFetching_update || isFetching}
-      // isLoading_subLayer={true}
-    >
+    <SubLayer isLoading_all={isFetching_update || isFetching}>
       <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
 
       <div>
@@ -865,16 +854,18 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           quotationNumber={content?.quotationNumber ?? '---'}
           editNotes={content?.editNotes}
           additionRight={
-            <QuotationStateSel
-              key="0"
-              quotationState={{ value: state_status, label: quotationStatusLookup[state_status] }}
-              setQuotationState={(option) => {
-                setState_status(option.value as TquotationContentDto['status']);
-              }}
-              history={history}
-              isNew={isNewQuotation}
-              disabled={disabled}
-            />
+            isNewAttachmentQuotation ? null : (
+              <QuotationStateSel
+                key="0"
+                quotationState={{ value: state_status, label: quotationStatusLookup[state_status] }}
+                setQuotationState={(option) => {
+                  setState_status(option.value as TquotationContentDto['status']);
+                }}
+                history={history}
+                isNew={isNewQuotation}
+                disabled={disabled}
+              />
+            )
           }
         />
 
@@ -926,6 +917,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
         <div className={'px-[50px]'}>
           <QuotationProdTable disabled={disabled} instance_useQuotationProductInstance={instance_quotationProduct} />
+          <br />
+          <br />
+          <br />
           <QuotationOther disabled={disabled} instance_useQuotationOther={instance_useQuotationOther} />
         </div>
 
