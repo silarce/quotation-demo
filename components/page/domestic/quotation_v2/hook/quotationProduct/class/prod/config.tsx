@@ -57,7 +57,8 @@ const options_quoteType = optionsCreator_quoteType();
 const InputSel_prod_select = (props: TinputSelProps) => {
   const { selectProps } = props;
 
-  selectProps?.props && (selectProps.props.menuPortalTarget ??= document.getElementById('quotationProdTableWrapper'));
+  // selectProps?.props && (selectProps.props.menuPortalTarget ??= document.getElementById('quotationProdTableWrapper'));
+  selectProps?.props && (selectProps.props.menuPortalTarget = undefined);
 
   return <InputSel_prod {...props} />;
 };

@@ -163,12 +163,14 @@ const nodeConfig_accessory_origin = createNodeConfig_accessory();
 const useQuotationProduct = ({
   raw_quotationProductArr,
   raw_quotationDiscount,
+  iterativeContractProductArr,
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
 }: {
   // raw_quotationContent: TquotationContentDto | undefined;
   raw_quotationProductArr: TquotationContentDto['products'] | undefined;
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
+  iterativeContractProductArr: TquotationContentDto['products'] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
 }) => {
@@ -187,17 +189,27 @@ const useQuotationProduct = ({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
   });
+  const defaultState_iterativeProdDict = useDefaultState_prodDict({
+    raw_productArr: iterativeContractProductArr,
+    doorModelDict: isReady ? doorModelDict || null : undefined,
+  });
 
   // 深拷貝，避免在編輯state_prodDict內的物件時影響原始的defaultState
   const defaultState_copy = useMemo(() => {
     return _.cloneDeep(defaultState_prodDict);
   }, [defaultState_prodDict, disabled]);
 
+  const defaultState_iterative_copy = useMemo(() => {
+    return _.cloneDeep(defaultState_iterativeProdDict);
+  }, [defaultState_iterativeProdDict, disabled]);
+
   // 總折數
   const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(defaultQuotationDiscount);
 
   const [prodKeyArr, setProdKeyArr] = useState<string[]>(defaultState_copy.prodKeyArr); // 主產品的key
   const [activeProdKey, setActiveProdKey] = useState<string>();
+
+  const [activeProdKey_iterative, setActiveProdKey_iterative] = useState<string>();
 
   const [cellKeyArr, setCellKeyArr] = useState<TcellKey[]>([...defaultKeyArr]); // 欄位的key
   const [cellKeyArr_component, setCellKeyArr_component] = useState<TcellKey_component[]>([...defaultKeyArr_component]); // 欄位的key
@@ -206,6 +218,14 @@ const useQuotationProduct = ({
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
   const { debouncedState: debounced_state_prodDict, isBouncing } = useDebounce(state_prodDict, 500);
+
+  const [state_iterativeProdDict, setState_iterativeProdDict] = useState<TstateProdDict>(
+    defaultState_iterative_copy.stateProdDict
+  );
+  const { debouncedState: debounced_state__iterativeProdDict, isBouncing: isBouncing_iterative } = useDebounce(
+    state_prodDict,
+    500
+  );
 
   const nodeConfig_prime = useMemo(() => {
     return createNodeConfig_prime({
@@ -222,6 +242,8 @@ const useQuotationProduct = ({
     return { avgDiscount, doorModelSummery };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced_state_prodDict]);
+
+  const iterativeProdKeyArr = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
@@ -283,6 +305,7 @@ const useQuotationProduct = ({
   // region CREATE CLASS
 
   const activedProd = activeProdKey ? state_prodDict[activeProdKey] : undefined;
+  const activedProd_iterative = activeProdKey_iterative ? state_iterativeProdDict[activeProdKey_iterative] : undefined;
 
   const {
     createSetProd,
@@ -307,6 +330,28 @@ const useQuotationProduct = ({
   });
 
   const {
+    createClassProd: createClassProd_iterative,
+    createSetProd: createSetProd_iterative,
+    // createSetComponent,
+    createSetAccessory: createSetAccessory_iterative,
+    createActivedClassAccessoryDict: createActivedClassAccessoryDict_iterative,
+    createActivedClassComponentDict: createActivedClassComponentDict_iterative,
+    //
+    // addEmptyProd,
+    // removeProd,
+    // copyProd,
+  } = kit_createClass({
+    setState_prodDict: setState_iterativeProdDict,
+    nodeConfig_prime,
+    state_quotationDiscount: '',
+    onProdAllTotalChange: () => {},
+    setProdKeyArr: () => {},
+    state_prodDict: state_iterativeProdDict,
+    activeProdKey: activeProdKey_iterative,
+    setActiveProdKey: setActiveProdKey_iterative,
+  });
+
+  const {
     //
     activedClassProd,
     activedClassComponentDict,
@@ -318,6 +363,20 @@ const useQuotationProduct = ({
     createActivedClassComponentDict,
     createSetProd,
     createSetAccessory,
+  });
+
+  const {
+    //
+    activedClassProd: activedClassProd_iterative,
+    activedClassComponentDict: activedClassComponentDict_iterative,
+    activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
+    activedClassAccessoryDict: activedClassAccessoryDict_iterative,
+  } = useActivedClass({
+    activedProd: activedProd_iterative,
+    createClassProd: createClassProd_iterative,
+    createActivedClassComponentDict: createActivedClassComponentDict_iterative,
+    createSetProd: createSetProd_iterative,
+    createSetAccessory: createSetAccessory_iterative,
   });
 
   // -----------------------------------------------------------------------
@@ -357,6 +416,12 @@ const useQuotationProduct = ({
   }, [defaultState_copy, disabled]);
 
   useEffect(() => {
+    setState_iterativeProdDict(defaultState_iterative_copy.stateProdDict);
+    // setProdKeyArr(defaultState_copy.prodKeyArr);
+    setActiveProdKey_iterative(undefined);
+  }, [defaultState_iterative_copy, disabled]);
+
+  useEffect(() => {
     if (activedProd) {
       const activedClassProd = createClassProd(activedProd);
 
@@ -375,11 +440,20 @@ const useQuotationProduct = ({
   return {
     // classProdDict,
     // activedClassProd,
+    state_prodDict,
     activedProd,
     activedClassProd,
     activedClassComponentDict,
     activedClassPseudoComponentDict,
     activedClassAccessoryDict,
+    //
+    state_iterativeProdDict,
+    activedProd_iterative,
+    activedClassProd_iterative,
+    activedClassComponentDict_iterative,
+    activedClassPseudoComponentDict_iterative,
+    activedClassAccessoryDict_iterative,
+    iterativeProdKeyArr,
     //
     cellKeyArr,
     setCellKeyArr,
@@ -419,7 +493,6 @@ const useQuotationProduct = ({
     //
     //
     //
-    state_prodDict,
 
     // lookup_classProd,
     // nodeConfig_prime,

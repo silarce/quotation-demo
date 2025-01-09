@@ -104,7 +104,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   // MARK:RENDER
   return (
-    <div id="zxc" className={classNames(className)}>
+    <div className={classNames(className)}>
       {/* 主產品 product */}
       <Table_prod
         instance_useQuotationProductInstance={instance_useQuotationProductInstance}
@@ -285,6 +285,10 @@ const Table_prod = ({
             {prodKeyArr.map((prodKey, index) => {
               const stateProd = state_prodDict[prodKey];
               const isActive = activedProd === stateProd;
+
+              console.log(prodKey);
+              console.log(state_prodDict);
+              console.log(stateProd);
 
               return (
                 <QuotationRow_dealClass_memo
@@ -765,7 +769,7 @@ const QuotationRow_dealClass = ({
         isActive={isActive}
         left={left}
         right={right}
-        // dragHandleInvisible={true}
+        dragHandleInvisible={isIterativeProd}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);
