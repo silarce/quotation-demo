@@ -1,11 +1,17 @@
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
-import { useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
-import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
-import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
-import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
-import { usePayInfo, Tstate_payInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
+import {
+  // useQuotationProduct,
+  Tinstance_useQuotationProduct,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
+// import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
+// import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
+// import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
+import {
+  //  usePayInfo,
+  Tstate_payInfo,
+} from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 
 import type { Tstate_profile } from 'components/page/domestic/quotation_v2/type_quotation';
 
@@ -40,7 +46,6 @@ import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hoo
 
 type Tinstance_getQuotationId3 = ReturnType<typeof useGetQuotation_id_3>;
 
-type Tinstance_useQuotationProduct = ReturnType<typeof useQuotationProduct>;
 type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
 
 // ===========================================================================

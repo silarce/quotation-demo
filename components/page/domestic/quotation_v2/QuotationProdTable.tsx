@@ -27,7 +27,20 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 // css
 import scss from './QuotationProdTable.module.scss';
 
-import { TuseQuotationProductInstance, TstateProd } from './hook/quotationProduct/useQuotationProduct';
+import {
+  ClassProd,
+  Tinstance_useQuotationProduct,
+  // Tinstance_useQuotationProduct,
+  TstateProd,
+  TclassComponentDict,
+  // TcreateSetComponent,
+  // TcreateSetAccessory,
+  TclassAccessoryDict,
+  TstateProdDict,
+  // TsetComponent,
+  // TsetAccessory,
+  TclassPsuedoComponentDict,
+} from './hook/quotationProduct/useQuotationProduct';
 
 import { SearchModal_prodAccessories } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodAccessories';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
@@ -35,42 +48,51 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 // ===================================================================
 
 interface TprodHookInstance {
-  activedProd: TuseQuotationProductInstance['activedProd'];
-  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
-  setCellKeyArr: TuseQuotationProductInstance['setCellKeyArr'];
-  prodKeyArr: TuseQuotationProductInstance['prodKeyArr'];
-  setProdKeyArr: TuseQuotationProductInstance['setProdKeyArr'];
-  choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
-  nodeConfig_origin: TuseQuotationProductInstance['nodeConfig_origin'];
-  quotationDiscount: TuseQuotationProductInstance['quotationDiscount'];
-  setQuotationDiscount: TuseQuotationProductInstance['setQuotationDiscount'];
-  state_prodDict: TuseQuotationProductInstance['state_prodDict'];
-  createClassProd: TuseQuotationProductInstance['createClassProd'];
-  activedClassProd: TuseQuotationProductInstance['activedClassProd'];
-  addEmptyProd: TuseQuotationProductInstance['addEmptyProd'];
-  removeProd: TuseQuotationProductInstance['removeProd'];
-  copyProd: TuseQuotationProductInstance['copyProd'];
+  prodKeyArr: string[];
+  state_prodDict: TstateProdDict;
+  activedProd: TstateProd | undefined;
+  activedClassProd: ClassProd | undefined;
+  activedClassComponentDict: TclassComponentDict | undefined;
+  activedClassPseudoComponentDict: TclassPsuedoComponentDict | undefined;
+  activedClassAccessoryDict: TclassAccessoryDict | undefined;
+
+  // activedProd: Tinstance_useQuotationProduct['activedProd'];
+  cellKeyArr: Tinstance_useQuotationProduct['cellKeyArr'];
+  setCellKeyArr: Tinstance_useQuotationProduct['setCellKeyArr'];
+  // prodKeyArr: Tinstance_useQuotationProduct['prodKeyArr'];
+  setProdKeyArr: Tinstance_useQuotationProduct['setProdKeyArr'];
+  choseActiveProd: Tinstance_useQuotationProduct['choseActiveProd'];
+  nodeConfig_origin: Tinstance_useQuotationProduct['nodeConfig_origin'];
+  quotationDiscount: Tinstance_useQuotationProduct['quotationDiscount'];
+  setQuotationDiscount: Tinstance_useQuotationProduct['setQuotationDiscount'];
+  // state_prodDict: Tinstance_useQuotationProduct['state_prodDict'];
+  createClassProd: Tinstance_useQuotationProduct['createClassProd'];
+  // activedClassProd: Tinstance_useQuotationProduct['activedClassProd'];
+  addEmptyProd: Tinstance_useQuotationProduct['addEmptyProd'];
+  removeProd: Tinstance_useQuotationProduct['removeProd'];
+  copyProd: Tinstance_useQuotationProduct['copyProd'];
   //
-  // activedProd: TuseQuotationProductInstance['activedProd'];
-  activedClassComponentDict: TuseQuotationProductInstance['activedClassComponentDict'];
-  activedClassPseudoComponentDict: TuseQuotationProductInstance['activedClassPseudoComponentDict'];
-  cellKeyArr_component: TuseQuotationProductInstance['cellKeyArr_component'];
-  setCellKeyArr_component: TuseQuotationProductInstance['setCellKeyArr_component'];
-  componentKeyArr: TuseQuotationProductInstance['componentKeyArr'];
-  setComponentKeyArr: TuseQuotationProductInstance['setComponentKeyArr'];
-  nodeConfig_component_origin: TuseQuotationProductInstance['nodeConfig_component_origin'];
+  // activedProd: Tinstance_useQuotationProduct['activedProd'];
+  // activedClassComponentDict: Tinstance_useQuotationProduct['activedClassComponentDict'];
+  // activedClassPseudoComponentDict: Tinstance_useQuotationProduct['activedClassPseudoComponentDict'];
+  cellKeyArr_component: Tinstance_useQuotationProduct['cellKeyArr_component'];
+  setCellKeyArr_component: Tinstance_useQuotationProduct['setCellKeyArr_component'];
+  componentKeyArr: Tinstance_useQuotationProduct['componentKeyArr'];
+  setComponentKeyArr: Tinstance_useQuotationProduct['setComponentKeyArr'];
+  nodeConfig_component_origin: Tinstance_useQuotationProduct['nodeConfig_component_origin'];
   //
-  // activedClassProd: TuseQuotationProductInstance['activedClassProd'];
-  activedClassAccessoryDict: TuseQuotationProductInstance['activedClassAccessoryDict'];
-  cellKeyArr_accessory: TuseQuotationProductInstance['cellKeyArr_accessory'];
-  setCellKeyArr_accessory: TuseQuotationProductInstance['setCellKeyArr_accessory'];
-  accessoryKeyArr: TuseQuotationProductInstance['accessoryKeyArr'];
-  setAccessoryKeyArr: TuseQuotationProductInstance['setAccessoryKeyArr'];
-  nodeConfig_accessory_origin: TuseQuotationProductInstance['nodeConfig_accessory_origin'];
+  // activedClassProd: Tinstance_useQuotationProduct['activedClassProd'];
+  // activedClassAccessoryDict: Tinstance_useQuotationProduct['activedClassAccessoryDict'];
+  cellKeyArr_accessory: Tinstance_useQuotationProduct['cellKeyArr_accessory'];
+  setCellKeyArr_accessory: Tinstance_useQuotationProduct['setCellKeyArr_accessory'];
+  accessoryKeyArr: Tinstance_useQuotationProduct['accessoryKeyArr'];
+  setAccessoryKeyArr: Tinstance_useQuotationProduct['setAccessoryKeyArr'];
+  nodeConfig_accessory_origin: Tinstance_useQuotationProduct['nodeConfig_accessory_origin'];
 }
 
 interface Tprops {
-  instance_useQuotationProductInstance: TprodHookInstance;
+  // instance_useQuotationProductInstance: TprodHookInstance;
+  instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
@@ -78,12 +100,19 @@ interface Tprops {
 }
 
 interface TtableProps {
-  instance_useQuotationProductInstance: TprodHookInstance;
+  // instance_useQuotationProductInstance: TprodHookInstance;
+  instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
   isIterativeProd?: boolean;
 }
+
+// ===================================================================
+
+const throwErr = () => {
+  throw new Error('預期不可以呼叫這個方法');
+};
 
 // ===================================================================
 
@@ -93,12 +122,13 @@ interface TtableProps {
 export default function QuotationProdTable(tableProps: Tprops) {
   const {
     //
-    instance_useQuotationProductInstance,
     disabled,
     className,
     showQuotationDiscount = true,
     isIterativeProd,
   } = tableProps;
+
+  const instance_useQuotationProductInstance = tableProps.instance_useQuotationProductInstance;
 
   const activedProd = instance_useQuotationProductInstance.activedProd;
 
@@ -179,12 +209,15 @@ const Table_prod = ({
   isIterativeProd,
 }: TtableProps) => {
   const {
+    state_prodDict,
     activedProd,
+    activedClassProd,
+
+    prodKeyArr,
+    setProdKeyArr,
 
     cellKeyArr,
     setCellKeyArr,
-    prodKeyArr,
-    setProdKeyArr,
 
     choseActiveProd,
 
@@ -193,10 +226,10 @@ const Table_prod = ({
     quotationDiscount,
     setQuotationDiscount,
 
-    state_prodDict,
+    // state_prodDict,
 
     createClassProd,
-    activedClassProd,
+    // activedClassProd,
 
     addEmptyProd,
     removeProd,
@@ -690,12 +723,12 @@ const QuotationRow_dealClass = ({
 
   disabled: boolean;
   isActive: boolean;
-  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
+  cellKeyArr: Tinstance_useQuotationProduct['cellKeyArr'];
   index: number;
 
   isIterativeProd?: boolean;
 
-  instance_useQuotationProductInstance: TprodHookInstance;
+  instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
 
   stateProd: TstateProd;
   prodKey: string;

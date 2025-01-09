@@ -101,7 +101,7 @@ import {
   calcPriceDiscount_percent,
   //
 } from './method/calcProd';
-import { calcProdSummary } from './method/calcProdSummary';
+import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary';
 
 import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
@@ -116,8 +116,6 @@ type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
 }) => TsetComponent<T>;
 
 type TcreateSetAccessory = (props: { prodKey: string; accessoryKey: string }) => TsetAccessory;
-
-type TuseQuotationProductInstance = ReturnType<typeof useQuotationProduct>;
 
 type TclassComponentDict = {
   [K in TdoorComponentType]?: K extends 'slat'
@@ -152,10 +150,60 @@ interface TclassAccessoryDict {
   [key: string]: Class_accessory;
 }
 
+interface Tinstance_useQuotationProduct {
+  state_prodDict: TstateProdDict;
+  activedProd: TstateProd | undefined;
+  activedClassProd: ClassProd | undefined;
+  prodKeyArr: string[];
+
+  activedClassComponentDict: TclassComponentDict | undefined;
+  activedClassPseudoComponentDict: TclassPsuedoComponentDict | undefined;
+  activedClassAccessoryDict: TclassAccessoryDict | undefined;
+
+  cellKeyArr: TcellKey[];
+  setCellKeyArr: React.Dispatch<React.SetStateAction<TcellKey[]>>;
+  setProdKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
+
+  choseActiveProd: (stateProd: TstateProd | undefined) => void;
+
+  cellKeyArr_component: TcellKey_component[];
+  setCellKeyArr_component: React.Dispatch<React.SetStateAction<TcellKey_component[]>>;
+  componentKeyArr: TdoorComponentType[] | undefined;
+  setComponentKeyArr: (newKeyArr: TdoorComponentType[]) => void;
+
+  cellKeyArr_accessory: TcellKey_accessory[];
+  setCellKeyArr_accessory: React.Dispatch<React.SetStateAction<TcellKey_accessory[]>>;
+  accessoryKeyArr: string[] | undefined;
+  setAccessoryKeyArr: (newKeyArr: string[]) => void;
+
+  nodeConfig_origin: TnodeConfig;
+  nodeConfig_component_origin: TnodeConfig_component;
+  nodeConfig_accessory_origin: TnodeConfig_accessory;
+
+  quotationDiscount: `${number}` | '';
+  setQuotationDiscount: (value: `${number}` | '') => void;
+
+  // createActivedClassComponentDict: aaaaa;
+  // createActivedClassAccessoryDict: aaaaa;
+  createClassProd: (stateProd: TstateProd) => ClassProd;
+  calcProductBody: () => ReturnType<typeof _calcProductBody>;
+  calcProdAllTotal: (newState_prodDict?: TstateProdDict) => number;
+
+  addEmptyProd: () => void;
+  removeProd: (prodKey: string) => void;
+  copyProd: (prodKey: string) => void;
+  avgDiscount: number;
+  doorModelSummery: Record<string, TdoorModelSummeryItem>;
+}
+
 // ================================================================================
 
 const nodeConfig_component_origin = createNodeConfig_component();
 const nodeConfig_accessory_origin = createNodeConfig_accessory();
+
+const throwErr = () => {
+  throw new Error('合約總主產品表格預期不可以呼叫這個方法');
+};
 
 // ================================================================================
 
@@ -243,7 +291,7 @@ const useQuotationProduct = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced_state_prodDict]);
 
-  const iterativeProdKeyArr = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
+  const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
@@ -258,6 +306,10 @@ const useQuotationProduct = ({
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
     setActiveProdKey(stateProd?.key);
+  };
+
+  const choseActiveProd_iterative = (stateProd: TstateProd | undefined) => {
+    setActiveProdKey_iterative(stateProd?.key);
   };
 
   const setComponentKeyArr = (newKeyArr: TdoorComponentType[]) => {
@@ -436,45 +488,40 @@ const useQuotationProduct = ({
   }, [disabled, defaultQuotationDiscount]);
 
   // -----------------------------------------------------------------------------
-  // MARK: RETURN
-  return {
-    // classProdDict,
-    // activedClassProd,
+  // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+
+  const instance: Tinstance_useQuotationProduct = {
     state_prodDict,
     activedProd,
     activedClassProd,
+    prodKeyArr,
+
     activedClassComponentDict,
     activedClassPseudoComponentDict,
     activedClassAccessoryDict,
     //
-    state_iterativeProdDict,
-    activedProd_iterative,
-    activedClassProd_iterative,
-    activedClassComponentDict_iterative,
-    activedClassPseudoComponentDict_iterative,
-    activedClassAccessoryDict_iterative,
-    iterativeProdKeyArr,
+
     //
     cellKeyArr,
     setCellKeyArr,
-    prodKeyArr,
     setProdKeyArr,
     //
     choseActiveProd,
     //
-    // activedClassComponentArr,
-    // activedClassComponentDict,
+
     cellKeyArr_component,
     setCellKeyArr_component,
     componentKeyArr: activedProd?.componentKeyArr,
     setComponentKeyArr,
     //
-    // activedClassAccessoryDict,
+
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
     accessoryKeyArr: activedProd?.accessoryKeyArr,
     setAccessoryKeyArr,
-    // showAccessorySelector,
+
     //
     nodeConfig_origin,
     nodeConfig_component_origin,
@@ -485,25 +532,11 @@ const useQuotationProduct = ({
     quotationDiscount: state_quotationDiscount, // 總折數
     setQuotationDiscount,
     //
-    // state_totalPrice, // 完整狀態
-    // setProdPriceTotal,
-    // setTuneTotal,
-    // setCurrency,
-    // setExchangeRate,
-    //
-    //
-    //
 
-    // lookup_classProd,
-    // nodeConfig_prime,
-
-    createActivedClassComponentDict,
-    createActivedClassAccessoryDict,
     createClassProd,
-    //
     calcProductBody,
     calcProdAllTotal,
-    //
+
     addEmptyProd,
     removeProd,
     copyProd,
@@ -511,6 +544,140 @@ const useQuotationProduct = ({
     avgDiscount,
     doorModelSummery,
   };
+
+  const instance_iterative: Tinstance_useQuotationProduct = {
+    state_prodDict: state_iterativeProdDict,
+    activedProd: activedProd_iterative,
+    activedClassProd: activedClassProd_iterative,
+    prodKeyArr: prodKeyArr_iterative,
+
+    activedClassComponentDict: activedClassComponentDict_iterative,
+    activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
+    activedClassAccessoryDict: activedClassAccessoryDict_iterative,
+
+    componentKeyArr: activedProd_iterative?.componentKeyArr,
+    choseActiveProd: choseActiveProd_iterative,
+    accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
+    //
+    setProdKeyArr: throwErr,
+    setComponentKeyArr: throwErr,
+    setAccessoryKeyArr: throwErr,
+    setQuotationDiscount: throwErr,
+    calcProductBody: throwErr,
+    calcProdAllTotal: throwErr,
+    addEmptyProd: throwErr,
+    removeProd: throwErr,
+    copyProd: throwErr,
+    //
+    createClassProd,
+    //
+    cellKeyArr,
+    setCellKeyArr,
+
+    cellKeyArr_component,
+    setCellKeyArr_component,
+
+    cellKeyArr_accessory,
+    setCellKeyArr_accessory,
+    //
+    nodeConfig_origin,
+    nodeConfig_component_origin,
+    nodeConfig_accessory_origin,
+    //
+    quotationDiscount: '', // 總折數
+    //
+
+    //
+    avgDiscount: -1,
+    doorModelSummery: {},
+  };
+
+  // MARK: RETURN
+
+  return {
+    instance,
+    instance_iterative,
+  };
+
+  // return {
+  //   // classProdDict,
+  //   // activedClassProd,
+  //   state_prodDict,
+  //   activedProd,
+  //   activedClassProd,
+  //   prodKeyArr,
+
+  //   activedClassComponentDict,
+  //   activedClassPseudoComponentDict,
+  //   activedClassAccessoryDict,
+  //   //
+  //   // state_iterativeProdDict,
+  //   // activedProd_iterative,
+  //   // activedClassProd_iterative,
+  //   // prodKeyArr_iterative,
+
+  //   // activedClassComponentDict_iterative,
+  //   // activedClassPseudoComponentDict_iterative,
+  //   // activedClassAccessoryDict_iterative,
+
+  //   // componentKeyArr_iterative: activedProd_iterative?.componentKeyArr,
+  //   // choseActiveProd_iterative,
+  //   //
+  //   cellKeyArr,
+  //   setCellKeyArr,
+  //   setProdKeyArr,
+  //   //
+  //   choseActiveProd,
+  //   //
+  //   // activedClassComponentArr,
+  //   // activedClassComponentDict,
+  //   cellKeyArr_component,
+  //   setCellKeyArr_component,
+  //   componentKeyArr: activedProd?.componentKeyArr,
+  //   setComponentKeyArr,
+  //   //
+  //   // activedClassAccessoryDict,
+  //   cellKeyArr_accessory,
+  //   setCellKeyArr_accessory,
+  //   accessoryKeyArr: activedProd?.accessoryKeyArr,
+  //   setAccessoryKeyArr,
+  //   // showAccessorySelector,
+  //   //
+  //   nodeConfig_origin,
+  //   nodeConfig_component_origin,
+  //   nodeConfig_accessory_origin,
+  //   //
+  //   //
+  //   //
+  //   quotationDiscount: state_quotationDiscount, // 總折數
+  //   setQuotationDiscount,
+  //   //
+  //   // state_totalPrice, // 完整狀態
+  //   // setProdPriceTotal,
+  //   // setTuneTotal,
+  //   // setCurrency,
+  //   // setExchangeRate,
+  //   //
+  //   //
+  //   //
+
+  //   // lookup_classProd,
+  //   // nodeConfig_prime,
+  //   createClassProd,
+  //   calcProductBody,
+  //   calcProdAllTotal,
+
+  //   // createActivedClassComponentDict,
+  //   // createActivedClassAccessoryDict,
+  //   //
+  //   //
+  //   addEmptyProd,
+  //   removeProd,
+  //   copyProd,
+  //   //
+  //   avgDiscount,
+  //   doorModelSummery,
+  // };
 };
 
 // MARK: END
@@ -521,7 +688,8 @@ const useQuotationProduct = ({
 // ================================================================================
 
 export type {
-  TuseQuotationProductInstance,
+  // TuseQuotationProductInstance,
+  Tinstance_useQuotationProduct,
   TstateProd,
   TclassComponentDict,
   TcreateSetComponent,
@@ -531,5 +699,9 @@ export type {
   TsetComponent,
   TsetAccessory,
   TclassPsuedoComponentDict,
+  // TstateProdDict,
+  // TclassComponentDict,
+  // TclassPsuedoComponentDict,
+  // TclassAccessoryDict,
 };
 export { useQuotationProduct, ClassProd };

@@ -3,6 +3,18 @@ import { TstateProdDict } from '../type';
 
 import { calcPriceDiscount_percent } from './calcProd';
 
+type TdoorModelSummeryItem = {
+  doorModel: string;
+  quantity: number;
+  avgDiscount: number;
+};
+
+type TdoorModelSummeryItem_d = {
+  doorModel: string;
+  quantity: Decimal;
+  discountTotal: Decimal;
+};
+
 const calcProdSummary = ({
   state_prodDict,
   state_quotationDiscount,
@@ -14,18 +26,6 @@ const calcProdSummary = ({
 
   let prodQty_d = new Decimal(0);
   let prodDiscountTotal_d = new Decimal(0);
-
-  type TdoorModelSummeryItem_d = {
-    doorModel: string;
-    quantity: Decimal;
-    discountTotal: Decimal;
-  };
-
-  type TdoorModelSummeryItem = {
-    doorModel: string;
-    quantity: number;
-    avgDiscount: number;
-  };
 
   const doorModelSummery_d: Record<string, TdoorModelSummeryItem_d> = {};
 
@@ -78,3 +78,4 @@ const calcProdSummary = ({
 };
 
 export { calcProdSummary };
+export type { TdoorModelSummeryItem };

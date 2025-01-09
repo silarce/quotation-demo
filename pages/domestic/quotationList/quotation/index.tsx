@@ -328,7 +328,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //     disabled,
   //   });
 
-  const instance_quotationProduct = useQuotationProduct({
+  // const instance_quotationProduct = useQuotationProduct({
+  const { instance: instance_quotationProduct, instance_iterative } = useQuotationProduct({
     raw_quotationProductArr: content?.products,
     raw_quotationDiscount: content?.discount,
     iterativeContractProductArr: iterativeContractProductArr,
@@ -901,17 +902,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                 <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
                 <QuotationProdTable
                   disabled={true}
-                  instance_useQuotationProductInstance={{
-                    ...instance_quotationProduct,
-                    prodKeyArr: instance_quotationProduct.iterativeProdKeyArr,
-                    state_prodDict: instance_quotationProduct.state_iterativeProdDict,
-                    activedProd: instance_quotationProduct.activedProd_iterative,
-                    activedClassProd: instance_quotationProduct.activedClassProd_iterative,
-                    activedClassComponentDict: instance_quotationProduct.activedClassComponentDict_iterative,
-                    activedClassPseudoComponentDict:
-                      instance_quotationProduct.activedClassPseudoComponentDict_iterative,
-                    activedClassAccessoryDict: instance_quotationProduct.activedClassAccessoryDict_iterative,
-                  }}
+                  instance_useQuotationProductInstance={instance_iterative}
                   showQuotationDiscount={false}
                   isIterativeProd={true}
                 />
