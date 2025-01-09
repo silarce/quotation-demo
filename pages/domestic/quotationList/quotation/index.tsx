@@ -115,7 +115,11 @@ import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
 
 import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
 
-import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
+import {
+  useProfile,
+  createProps_profileForm,
+  Traw_profile,
+} from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
 
 import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
@@ -196,7 +200,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const userId = userInfo?.employee?.id;
 
   const isNewQuotation = !quotationId && !contentId;
-  const isQuotation = !!quotationId;
+  const isQuotation = !!quotationId && !contentId;
+
   const isNewAttachmentQuotation = isNewQuotation && !!contractId;
 
   // ----------------------------------------------------------------------
@@ -240,7 +245,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region GET DATA
 
-  const { instatnce_getQuotationId3, content, attachedToContract, iterativeContractProductArr } = useData();
+  const {
+    //
+    instatnce_getQuotationId3,
+    content,
+    attachedToContract,
+    iterativeContractProductArr,
+    contractProfile,
+  } = useData();
   isAttach = !!attachedToContract;
 
   const {
@@ -263,19 +275,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqPatchQuotationContent_id_progress,
     reqToPending,
   } = instatnce_getQuotationId3;
-
-  // w ----------------------------------------------------------
-
-  // iterativeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
-  // const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
-
-  // const iterativeContractProductArr = useMemo(() => {
-  //   const arr = Object.values(iterativeContractProductDict);
-
-  //   return arr.length ? arr : undefined;
-  // }, [iterativeContractProductDict]);
-
-  // w ----------------------------------------------------------
 
   const haveVerifyForm = content?.verifyForm;
 
@@ -328,13 +327,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //     raw_quotationContent: content,
   //     disabled,
   //   });
-  const instance_quotationPrice = useQuotationTotalPrice({
-    raw_quotationContent: content,
-    disabled,
-  });
-
-  const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
-    instance_quotationPrice;
 
   const instance_quotationProduct = useQuotationProduct({
     raw_quotationProductArr: content?.products,
@@ -355,6 +347,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     onProdAllTotalChange: () => {},
   });
 
+  const instance_quotationPrice = useQuotationTotalPrice({
+    raw_quotationContent: content,
+    disabled,
+  });
+
+  const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
+    instance_quotationPrice;
+
   const { avgDiscount, doorModelSummery } = instance_quotationProduct;
 
   const {
@@ -363,7 +363,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const { state_profile, setState_profile } = useProfile({
     disabled,
-    quotationContent: content,
+    profile: isNewAttachmentQuotation ? contractProfile : content,
   });
 
   const {
@@ -1178,6 +1178,7 @@ const AskRevier = ({
 
 // ================================================================================
 
+// MARK:useData
 const useData = () => {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -1190,10 +1191,10 @@ const useData = () => {
   const { data: raw_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
 
   const quotationData = instatnce_getQuotationId3.raw;
-  const content = quotationData?.designatedContent;
 
   const attachedToContract = quotationData?.attachedToContract || raw_contract;
 
+  // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
   const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
 
   const iterativeContractProductArr = useMemo(() => {
@@ -1201,6 +1202,42 @@ const useData = () => {
 
     return arr.length ? arr : undefined;
   }, [iterativeContractProductDict]);
+
+  // ----------------------------------------------------------------------
+
+  const content = quotationData?.designatedContent;
+
+  const contractProfile = useMemo(() => {
+    if (!raw_contract) {
+      return undefined;
+    }
+
+    const contractContent = raw_contract.content;
+
+    const defaultProfile: Traw_profile = {
+      projectName: contractContent.projectName,
+      validityPeriod: contractContent.validityPeriod,
+      county: contractContent.county,
+      district: contractContent.district,
+      address: contractContent.address,
+      contactPerson: contractContent.contactPerson,
+      contactNumber: contractContent.contactNumber,
+      faxNumber: contractContent.faxNumber,
+      trackProgress: contractContent.trackProgress,
+      projectProgress: contractContent.projectProgress,
+      designatedBrand: contractContent.designatedBrand,
+      siteManager: contractContent.siteManager,
+      siteManagerNumber: contractContent.siteManagerNumber,
+      type: contractContent.type,
+      isLost: contractContent.isLost,
+      customer: contractContent.customer,
+      designUnit: contractContent.designUnit,
+    };
+
+    return defaultProfile;
+  }, [raw_contract]);
+
+  // ----------------------------------------------------------------------
 
   useEffect(() => {
     // quotation如果並不歸屬於該contract會出問題
@@ -1215,5 +1252,6 @@ const useData = () => {
     content,
     attachedToContract,
     iterativeContractProductArr,
+    contractProfile,
   };
 };

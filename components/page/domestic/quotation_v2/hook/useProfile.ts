@@ -11,14 +11,29 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ==========================================================================
 
-const useProfile = ({
-  disabled,
-  quotationContent,
-}: {
-  disabled: boolean;
-  quotationContent: TquotationContentDto | undefined;
-}) => {
-  const defaultState = useDefaultState(quotationContent);
+type Traw_profile = Pick<
+  TquotationContentDto,
+  | 'projectName'
+  | 'validityPeriod'
+  | 'county'
+  | 'district'
+  | 'address'
+  | 'contactPerson'
+  | 'contactNumber'
+  | 'faxNumber'
+  | 'trackProgress'
+  | 'projectProgress'
+  | 'designatedBrand'
+  | 'siteManager'
+  | 'siteManagerNumber'
+  | 'type'
+  | 'isLost'
+  | 'customer'
+  | 'designUnit'
+>;
+
+const useProfile = ({ disabled, profile }: { disabled: boolean; profile: Traw_profile | undefined }) => {
+  const defaultState = useDefaultState(profile);
 
   const [state, setState] = useState<Tstate_profile>(defaultState);
 
@@ -32,7 +47,7 @@ const useProfile = ({
   };
 }; // useQuotation
 
-const useDefaultState = (raw_content: TquotationContentDto | undefined) => {
+const useDefaultState = (raw_profile: Traw_profile | undefined) => {
   const defaultState = useMemo(() => {
     const {
       projectName = '',
@@ -52,7 +67,7 @@ const useDefaultState = (raw_content: TquotationContentDto | undefined) => {
       isLost = false,
       customer = null,
       designUnit = null,
-    } = raw_content || {};
+    } = raw_profile || {};
 
     const defaultState: Tstate_profile = {
       projectName,
@@ -75,7 +90,7 @@ const useDefaultState = (raw_content: TquotationContentDto | undefined) => {
     };
 
     return defaultState;
-  }, [raw_content]);
+  }, [raw_profile]);
 
   return defaultState;
 };
@@ -255,4 +270,7 @@ const createProps_profileForm = ({
   return props_form;
 };
 
+// ===========================================================================
 export { useProfile, createProps_profileForm };
+
+export type { Traw_profile };
