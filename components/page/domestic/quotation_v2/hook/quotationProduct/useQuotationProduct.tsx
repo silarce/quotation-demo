@@ -187,7 +187,7 @@ interface Tinstance_useQuotationProduct {
   // createActivedClassAccessoryDict: aaaaa;
   createClassProd: (stateProd: TstateProd) => ClassProd;
   calcProductBody: () => ReturnType<typeof _calcProductBody>;
-  calcProdAllTotal: (newState_prodDict?: TstateProdDict) => number;
+  calcProdAllTotal: () => number;
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
@@ -300,8 +300,8 @@ const useQuotationProduct = ({
   //
   //
 
-  const onProdAllTotalChange = (state_prodDict?: TstateProdDict) => {
-    _onProdAllTotalChange(calcProdAllTotal(state_prodDict));
+  const onProdAllTotalChange = () => {
+    _onProdAllTotalChange(calcProdAllTotal());
   };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
@@ -435,8 +435,27 @@ const useQuotationProduct = ({
 
   // region METHOD
 
-  function calcProdAllTotal(newState_prodDict?: TstateProdDict) {
-    const prodDict = newState_prodDict ?? state_prodDict;
+  function calcProdAllTotal() {
+    // newState_prodDict?: TstateProdDict
+    // const prodDict = newState_prodDict ?? state_prodDict;
+
+    // FIXME
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+    // 要把報價單總產品算進來
+
+    const prodDict = state_prodDict;
 
     let total_d = new Decimal(0);
     // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變

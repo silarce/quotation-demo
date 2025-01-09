@@ -11,7 +11,6 @@ import {
 
 import type { TsetProd } from '../type';
 import type {
-  TuseQuotationProductInstance,
   TstateProd,
   TclassComponentDict,
   TcreateSetComponent,
