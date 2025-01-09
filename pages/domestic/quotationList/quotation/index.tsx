@@ -767,6 +767,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { panelList, customeRight } = usePanel({
     disabled,
     isNewQuotation,
+    isNewAttachmentQuotation,
     isQuotation,
     isReviewer,
     status: content?.status ?? '',
@@ -823,6 +824,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     status: state_status,
   });
 
+  let tag = `報價編號 ${content?.quotationNumber}`;
+  isNewQuotation && (tag = '新增報價單');
+  isNewAttachmentQuotation && (tag = '新增追加追減報價單');
+
   // ----------------------------------------------------------------------
   // region useEffect
   useEffect(() => {
@@ -851,12 +856,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       isLoading_all={isFetching_update || isFetching}
       // isLoading_subLayer={true}
     >
-      <PageHeader02
-        tag={quotationId ? `報價編號 ${content?.quotationNumber}` : '新增報價單'}
-        panelList={panelList}
-        customeLeft={customeLeft}
-        customeRight={customeRight}
-      />
+      <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
 
       <div>
         <QuotationProfile

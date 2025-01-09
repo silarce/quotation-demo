@@ -16,6 +16,7 @@ interface Tprops {
   disabled: boolean;
   isNewQuotation: boolean;
   isQuotation: boolean;
+  isNewAttachmentQuotation: boolean;
   isReviewer: boolean | undefined | null;
   status: string;
   isDesignatedContent: boolean;
@@ -47,6 +48,7 @@ interface Tprops {
 const usePanel = ({
   disabled,
   isNewQuotation,
+  isNewAttachmentQuotation,
   isQuotation,
   isReviewer,
   status,
@@ -75,9 +77,13 @@ const usePanel = ({
 
   // -----------------------------------------------------------------------
 
+  let label_update = '更新報價單';
+  isNewQuotation && (label_update = '新建報價單');
+  isNewAttachmentQuotation && (label_update = '新建追加追減報價單');
+
   const panel_update: TpanelList[number] = {
     type: 'redButton',
-    label: isNewQuotation ? '新建報價單' : '更新報價單',
+    label: label_update,
     onClick: isNewQuotation ? btnPostOnClick : btnPatchOnClick,
   };
   const panel_cacel: TpanelList[number] = {
