@@ -73,7 +73,7 @@ import {
   // useGetQuotation_id,
   // useGetQuotation_id_2,
   useGetQuotation_id_3,
-  useWholeContractProduct,
+  useIterativeContractProduct,
   // apiPostQuotation,
   // apiPatchQuotation,
   // apiQuotationSubmitReview,
@@ -270,18 +270,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // w ----------------------------------------------------------
 
-  // wholeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
-  const wholeContractProductDict = useWholeContractProduct({ contract: attachedToContract });
+  // interativeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
+  const interativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
 
-  const wholeContractProductArr = useMemo(() => {
-    const arr = Object.values(wholeContractProductDict);
+  const interativeContractProductArr = useMemo(() => {
+    const arr = Object.values(interativeContractProductDict);
 
     return arr.length ? arr : undefined;
-  }, [wholeContractProductDict]);
-
-  // useEffect(() => {
-  //   console.log(wholeContractProductDict);
-  // }, [wholeContractProductDict]);
+  }, [interativeContractProductDict]);
 
   // w ----------------------------------------------------------
 
@@ -356,8 +352,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const instance_wholeContractProduct = useQuotationProduct({
-    raw_quotationProductArr: wholeContractProductArr,
+  const instance_interativeContractProduct = useQuotationProduct({
+    raw_quotationProductArr: interativeContractProductArr,
     raw_quotationDiscount: undefined,
     disabled,
     onProdAllTotalChange: () => {},
@@ -910,16 +906,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <br />
         <br />
-        {wholeContractProductArr && (
+        {interativeContractProductArr && (
           <>
             <div className={'px-[48px]'}>
               <div className="border border-red-500">
                 <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
                 <QuotationProdTable
                   disabled={true}
-                  instance_useQuotationProductInstance={instance_wholeContractProduct}
+                  instance_useQuotationProductInstance={instance_interativeContractProduct}
                   showQuotationDiscount={false}
-                  isWholeProd={true}
+                  isIterativeProd={true}
                 />
               </div>
             </div>

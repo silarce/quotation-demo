@@ -12,8 +12,8 @@ import {
   QuotationRow_dndThead,
   QuotationRow_dnd,
   Table_dnd,
-  Panel_wholeProd_right_thead,
-  Panel_wholeProd_right,
+  Panel_iterativeProd_right_thead,
+  Panel_iterativeProd_right,
 } from 'components/page/domestic/quotation_v2/quotationRow';
 import { Cell_indexNumber, Cell_delete, Cell_copy, Cell_reset, Cell_copy2 } from './hook/quotationProduct/ui/cell';
 
@@ -45,7 +45,7 @@ interface Tprops {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
-  isWholeProd?: TtableProps['isWholeProd'];
+  isIterativeProd?: TtableProps['isIterativeProd'];
 }
 
 interface TtableProps {
@@ -53,7 +53,7 @@ interface TtableProps {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
-  isWholeProd?: boolean;
+  isIterativeProd?: boolean;
 }
 
 // ===================================================================
@@ -68,7 +68,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
     disabled,
     className,
     showQuotationDiscount = true,
-    isWholeProd,
+    isIterativeProd,
   } = tableProps;
 
   const activedProd = instance_useQuotationProductInstance.activedProd;
@@ -81,7 +81,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
         instance_useQuotationProductInstance={instance_useQuotationProductInstance}
         disabled={disabled}
         showQuotationDiscount={showQuotationDiscount}
-        isWholeProd={isWholeProd}
+        isIterativeProd={isIterativeProd}
       />
       <br />
 
@@ -161,7 +161,7 @@ const Table_prod = ({
   disabled,
   className,
   showQuotationDiscount,
-  isWholeProd,
+  isIterativeProd,
 }: TtableProps) => {
   const {
     // classProdDict,
@@ -204,16 +204,16 @@ const Table_prod = ({
     </Panel_prod>
   );
 
-  if (isWholeProd) {
+  if (isIterativeProd) {
     theadLeft = (
-      <Panel_wholeProd className_reset="invisible" className_copy="invisible" className_copy2="invisible">
+      <Panel_iterativeProd className_reset="invisible" className_copy="invisible" className_copy2="invisible">
         <Cell
           className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
           style={nodeConfig_origin['itemName'].style}
         >
           {nodeConfig_origin['itemName'].label}
         </Cell>
-      </Panel_wholeProd>
+      </Panel_iterativeProd>
     );
   }
 
@@ -260,7 +260,7 @@ const Table_prod = ({
             configDict={nodeConfig_origin}
             dragHandleInvisible={true}
             left={theadLeft}
-            right={<Panel_wholeProd_right_thead />}
+            right={<Panel_iterativeProd_right_thead />}
           />
           <Table_dnd
             items={prodKeyArr}
@@ -290,7 +290,7 @@ const Table_prod = ({
                   activedClassProd={activedClassProd}
                   removeProd={removeProd}
                   copyProd={copyProd}
-                  isWholeProd={isWholeProd}
+                  isIterativeProd={isIterativeProd}
                 />
               );
             })}
@@ -668,7 +668,7 @@ const QuotationRow_dealClass = ({
   //
   removeProd,
   copyProd,
-  isWholeProd,
+  isIterativeProd,
 }: {
   stateProd: TstateProd;
 
@@ -684,7 +684,7 @@ const QuotationRow_dealClass = ({
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
   removeProd: (prodKey: string) => void;
   copyProd: (prodKey: string) => void;
-  isWholeProd?: boolean;
+  isIterativeProd?: boolean;
 }) => {
   const [viewRef, inView] = useInView();
 
@@ -711,18 +711,18 @@ const QuotationRow_dealClass = ({
     </>
   );
 
-  if (isWholeProd) {
+  if (isIterativeProd) {
     left = (
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
-        <Panel_wholeProd>
+        <Panel_iterativeProd>
           <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
             {nodeConfig_itemName.createNode({
               disabled,
               classProd,
             })}
           </Cell>
-        </Panel_wholeProd>
+        </Panel_iterativeProd>
       </>
     );
   }
@@ -742,7 +742,7 @@ const QuotationRow_dealClass = ({
         isActive={isActive}
         left={left}
         right={
-          <Panel_wholeProd_right
+          <Panel_iterativeProd_right
             qty="9999"
             price="9999"
             reduceValue="9999"
@@ -822,7 +822,7 @@ const Panel_prod = ({
   );
 };
 
-const Panel_wholeProd = ({
+const Panel_iterativeProd = ({
   indexNumber,
   className_reset,
   className_copy,
@@ -851,19 +851,3 @@ const Panel_wholeProd = ({
     </>
   );
 };
-
-// ==========================================================================
-// const Panel_wholeProd_right = () => {
-//   return (
-//     <>
-//       {/* <Cell>
-//         <InputSel_prod inputProps={{}} />
-//       </Cell> */}
-
-//       <Cell>aaaa</Cell>
-//       <Cell>aaaa</Cell>
-//       <Cell>aaaa</Cell>
-//       <Cell>aaaa</Cell>
-//     </>
-//   );
-// };

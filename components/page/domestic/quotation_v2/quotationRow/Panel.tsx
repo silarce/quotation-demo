@@ -153,4 +153,4 @@ const config_wholeProd_right: Record<'qty' | 'reduce' | 'modify' | 'price', Tcon
 };
 
 // =====================================================================
-export { Panel_basic, AttachPanel, Panel_wholeProd_right_thead, Panel_wholeProd_right };
+export { Panel_basic, AttachPanel, Panel_wholeProd_right_thead as Panel_iterativeProd_right_thead, Panel_wholeProd_right as Panel_iterativeProd_right };
