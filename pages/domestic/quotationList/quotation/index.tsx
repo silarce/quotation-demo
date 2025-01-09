@@ -73,6 +73,7 @@ import {
   // useGetQuotation_id,
   // useGetQuotation_id_2,
   useGetQuotation_id_3,
+  useGetContract_id_forAttach,
   useIterativeContractProduct,
   // apiPostQuotation,
   // apiPatchQuotation,
@@ -155,7 +156,7 @@ interface Tquery {
   id?: string;
   // 從查詢報價單的展開列表點進來的話query裡就會有contentId
   contentId?: string;
-  // contractId?: string;
+  contractId?: string;
 }
 // 三個資料來源 quotationId contentId contractId
 
@@ -190,12 +191,13 @@ const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>
 export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { id: quotationId, contentId } = query;
+  const { id: quotationId, contentId, contractId } = query;
 
   const userId = userInfo?.employee?.id;
 
   const isNewQuotation = !quotationId && !contentId;
   const isQuotation = !!quotationId;
+  const isNewAttachmentQuotation = isNewQuotation && !!contractId;
 
   // ----------------------------------------------------------------------
 
@@ -238,9 +240,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region GET DATA
 
-  const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
-    designatedContentId: contentId,
-  });
+  const { instatnce_getQuotationId3, content, attachedToContract, iterativeContractProductArr } = useData();
+  isAttach = !!attachedToContract;
 
   const {
     isFetching: isFetching_update,
@@ -263,21 +264,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     reqToPending,
   } = instatnce_getQuotationId3;
 
-  const content = quotationData?.designatedContent;
-
-  const attachedToContract = quotationData?.attachedToContract;
-  isAttach = !!attachedToContract;
-
   // w ----------------------------------------------------------
 
   // iterativeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
-  const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
+  // const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
 
-  const iterativeContractProductArr = useMemo(() => {
-    const arr = Object.values(iterativeContractProductDict);
+  // const iterativeContractProductArr = useMemo(() => {
+  //   const arr = Object.values(iterativeContractProductDict);
 
-    return arr.length ? arr : undefined;
-  }, [iterativeContractProductDict]);
+  //   return arr.length ? arr : undefined;
+  // }, [iterativeContractProductDict]);
 
   // w ----------------------------------------------------------
 
@@ -1181,3 +1177,43 @@ const AskRevier = ({
 };
 
 // ================================================================================
+
+const useData = () => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { id: quotationId, contentId, contractId } = query;
+
+  const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
+    designatedContentId: contentId,
+  });
+
+  const { data: raw_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+
+  const quotationData = instatnce_getQuotationId3.raw;
+  const content = quotationData?.designatedContent;
+
+  const attachedToContract = quotationData?.attachedToContract || raw_contract;
+
+  const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
+
+  const iterativeContractProductArr = useMemo(() => {
+    const arr = Object.values(iterativeContractProductDict);
+
+    return arr.length ? arr : undefined;
+  }, [iterativeContractProductDict]);
+
+  useEffect(() => {
+    // quotation如果並不歸屬於該contract會出問題
+    // 所以要確保若是能取得quotation就不取得contract
+    if (contractId && !quotationId && !contentId) {
+      update_contract();
+    }
+  }, [quotationId, contentId, contractId]);
+
+  return {
+    instatnce_getQuotationId3,
+    content,
+    attachedToContract,
+    iterativeContractProductArr,
+  };
+};
