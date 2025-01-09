@@ -34,7 +34,7 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 // ===================================================================
 
-interface ThookInstance {
+interface TprodHookInstance {
   activedProd: TuseQuotationProductInstance['activedProd'];
   cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
   setCellKeyArr: TuseQuotationProductInstance['setCellKeyArr'];
@@ -70,7 +70,7 @@ interface ThookInstance {
 }
 
 interface Tprops {
-  instance_useQuotationProductInstance: ThookInstance;
+  instance_useQuotationProductInstance: TprodHookInstance;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
@@ -78,7 +78,7 @@ interface Tprops {
 }
 
 interface TtableProps {
-  instance_useQuotationProductInstance: ThookInstance;
+  instance_useQuotationProductInstance: TprodHookInstance;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
@@ -289,22 +289,15 @@ const Table_prod = ({
               return (
                 <QuotationRow_dealClass_memo
                   key={prodKey}
+                  rerenderTrigger01={stateProd.renderCount}
+                  prodKey={prodKey}
                   stateProd={stateProd}
                   disabled={disabled}
                   isActive={isActive}
                   cellKeyArr={cellKeyArr}
                   index={index}
-                  //
-                  rerenderTrigger01={stateProd.renderCount}
-                  //
-                  prodKey={prodKey}
-                  choseActiveProd={choseActiveProd}
-                  createClassProd={createClassProd}
-                  //
-                  activedClassProd={activedClassProd}
-                  removeProd={removeProd}
-                  copyProd={copyProd}
                   isIterativeProd={isIterativeProd}
+                  instance_useQuotationProductInstance={instance_useQuotationProductInstance}
                 />
               );
             })}
@@ -664,37 +657,44 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
 const QuotationRow_dealClass = ({
   //
-  stateProd,
-
-  prodKey,
 
   isActive,
   index,
   disabled,
   cellKeyArr,
-  choseActiveProd,
-  createClassProd,
-  activedClassProd,
-  //
-  removeProd,
-  copyProd,
+  // choseActiveProd,
+  // createClassProd,
+  // activedClassProd,
+  // //
+  // removeProd,
+  // copyProd,
   isIterativeProd,
+
+  stateProd,
+  prodKey,
+
+  instance_useQuotationProductInstance: {
+    //
+    choseActiveProd,
+    createClassProd,
+    activedClassProd,
+    removeProd,
+    copyProd,
+  },
 }: {
-  stateProd: TstateProd;
-
-  prodKey: string;
-
-  isActive: boolean;
-  index: number;
-  disabled: boolean;
-  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
-  choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
-  createClassProd: TuseQuotationProductInstance['createClassProd'];
-  activedClassProd: TuseQuotationProductInstance['activedClassProd'];
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
-  removeProd: (prodKey: string) => void;
-  copyProd: (prodKey: string) => void;
+
+  disabled: boolean;
+  isActive: boolean;
+  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
+  index: number;
+
   isIterativeProd?: boolean;
+
+  instance_useQuotationProductInstance: TprodHookInstance;
+
+  stateProd: TstateProd;
+  prodKey: string;
 }) => {
   const [viewRef, inView] = useInView();
 
@@ -765,6 +765,7 @@ const QuotationRow_dealClass = ({
         isActive={isActive}
         left={left}
         right={right}
+        // dragHandleInvisible={true}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);
