@@ -1,5 +1,5 @@
 import { useState, useEffect, memo } from 'react';
-import _ from 'lodash';
+
 import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
 
@@ -18,17 +18,11 @@ import {
 import { Cell_indexNumber, Cell_delete, Cell_copy, Cell_reset, Cell_copy2 } from './hook/quotationProduct/ui/cell';
 
 // antd
-import { Tabs, Spin } from 'antd';
+import { Spin } from 'antd';
 
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-
-// icon
-import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-import iconReset from 'public/image/icon/reset.svg';
-// import iconChange from 'public/image/icon/change.svg';
-import iconCopy2 from 'public/image/icon/copy2.svg';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -40,8 +34,43 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 // ===================================================================
 
+interface ThookInstance {
+  activedProd: TuseQuotationProductInstance['activedProd'];
+  cellKeyArr: TuseQuotationProductInstance['cellKeyArr'];
+  setCellKeyArr: TuseQuotationProductInstance['setCellKeyArr'];
+  prodKeyArr: TuseQuotationProductInstance['prodKeyArr'];
+  setProdKeyArr: TuseQuotationProductInstance['setProdKeyArr'];
+  choseActiveProd: TuseQuotationProductInstance['choseActiveProd'];
+  nodeConfig_origin: TuseQuotationProductInstance['nodeConfig_origin'];
+  quotationDiscount: TuseQuotationProductInstance['quotationDiscount'];
+  setQuotationDiscount: TuseQuotationProductInstance['setQuotationDiscount'];
+  state_prodDict: TuseQuotationProductInstance['state_prodDict'];
+  createClassProd: TuseQuotationProductInstance['createClassProd'];
+  activedClassProd: TuseQuotationProductInstance['activedClassProd'];
+  addEmptyProd: TuseQuotationProductInstance['addEmptyProd'];
+  removeProd: TuseQuotationProductInstance['removeProd'];
+  copyProd: TuseQuotationProductInstance['copyProd'];
+  //
+  // activedProd: TuseQuotationProductInstance['activedProd'];
+  activedClassComponentDict: TuseQuotationProductInstance['activedClassComponentDict'];
+  activedClassPseudoComponentDict: TuseQuotationProductInstance['activedClassPseudoComponentDict'];
+  cellKeyArr_component: TuseQuotationProductInstance['cellKeyArr_component'];
+  setCellKeyArr_component: TuseQuotationProductInstance['setCellKeyArr_component'];
+  componentKeyArr: TuseQuotationProductInstance['componentKeyArr'];
+  setComponentKeyArr: TuseQuotationProductInstance['setComponentKeyArr'];
+  nodeConfig_component_origin: TuseQuotationProductInstance['nodeConfig_component_origin'];
+  //
+  // activedClassProd: TuseQuotationProductInstance['activedClassProd'];
+  activedClassAccessoryDict: TuseQuotationProductInstance['activedClassAccessoryDict'];
+  cellKeyArr_accessory: TuseQuotationProductInstance['cellKeyArr_accessory'];
+  setCellKeyArr_accessory: TuseQuotationProductInstance['setCellKeyArr_accessory'];
+  accessoryKeyArr: TuseQuotationProductInstance['accessoryKeyArr'];
+  setAccessoryKeyArr: TuseQuotationProductInstance['setAccessoryKeyArr'];
+  nodeConfig_accessory_origin: TuseQuotationProductInstance['nodeConfig_accessory_origin'];
+}
+
 interface Tprops {
-  instance_useQuotationProductInstance: TuseQuotationProductInstance;
+  instance_useQuotationProductInstance: ThookInstance;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
@@ -49,7 +78,7 @@ interface Tprops {
 }
 
 interface TtableProps {
-  instance_useQuotationProductInstance: TuseQuotationProductInstance;
+  instance_useQuotationProductInstance: ThookInstance;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
@@ -98,20 +127,6 @@ export default function QuotationProdTable(tableProps: Tprops) {
           disabled={disabled}
         />
       </Spin>
-      {/* <Tabs>
-        <Tabs.TabPane tab="材料配件" key="1">
-          <Table_component
-            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-            disabled={disabled}
-          />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="選配設定" key="2">
-          <Table_accessory
-            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-            disabled={disabled}
-          />
-        </Tabs.TabPane>
-      </Tabs> */}
     </div>
   );
 }
@@ -164,30 +179,25 @@ const Table_prod = ({
   isIterativeProd,
 }: TtableProps) => {
   const {
-    // classProdDict,
-    // activedClassProd: activeClassProd,
     activedProd,
-    //
+
     cellKeyArr,
     setCellKeyArr,
     prodKeyArr,
     setProdKeyArr,
-    //
+
     choseActiveProd,
-    //
+
     nodeConfig_origin,
-    //
+
     quotationDiscount,
     setQuotationDiscount,
-    //
-    //
-    //
+
     state_prodDict,
-    // lookup_classProd,
-    // nodeConfig_prime,
+
     createClassProd,
     activedClassProd,
-    //
+
     addEmptyProd,
     removeProd,
     copyProd,
@@ -204,6 +214,8 @@ const Table_prod = ({
     </Panel_prod>
   );
 
+  let theadRight: React.ReactNode = null;
+
   if (isIterativeProd) {
     theadLeft = (
       <Panel_iterativeProd className_reset="invisible" className_copy="invisible" className_copy2="invisible">
@@ -215,6 +227,8 @@ const Table_prod = ({
         </Cell>
       </Panel_iterativeProd>
     );
+
+    theadRight = <Panel_iterativeProd_right_thead />;
   }
 
   return (
@@ -260,7 +274,7 @@ const Table_prod = ({
             configDict={nodeConfig_origin}
             dragHandleInvisible={true}
             left={theadLeft}
-            right={<Panel_iterativeProd_right_thead />}
+            right={theadRight}
           />
           <Table_dnd
             items={prodKeyArr}
@@ -319,7 +333,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
     setComponentKeyArr,
     nodeConfig_component_origin,
 
-    createActivedClassComponentDict,
+    // createActivedClassComponentDict,
   } = instance_useQuotationProductInstance;
 
   const [activeIndex, setActiveIndex] = useState<number | string | undefined>(undefined);
@@ -495,18 +509,14 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 // MARK:Table_accessory
 const Table_accessory = ({ instance_useQuotationProductInstance, disabled, className }: TtableProps) => {
   const {
-    // activedProd,
     activedClassProd,
     activedClassAccessoryDict,
-    // showAccessorySelector,
-    // activedClassAccessoryDict,
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
     accessoryKeyArr,
     setAccessoryKeyArr,
     nodeConfig_accessory_origin,
-
-    createActivedClassAccessoryDict,
+    // createActivedClassAccessoryDict,
   } = instance_useQuotationProductInstance;
 
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
@@ -711,6 +721,8 @@ const QuotationRow_dealClass = ({
     </>
   );
 
+  let right: React.ReactNode = null;
+
   if (isIterativeProd) {
     left = (
       <>
@@ -724,6 +736,17 @@ const QuotationRow_dealClass = ({
           </Cell>
         </Panel_iterativeProd>
       </>
+    );
+
+    right = (
+      <Panel_iterativeProd_right
+        qty="9999"
+        price="9999"
+        reduceValue="9999"
+        modifyValue="9999"
+        onReduceChange={() => {}}
+        onModifyChange={() => {}}
+      />
     );
   }
 
@@ -741,16 +764,7 @@ const QuotationRow_dealClass = ({
         //
         isActive={isActive}
         left={left}
-        right={
-          <Panel_iterativeProd_right
-            qty="9999"
-            price="9999"
-            reduceValue="9999"
-            modifyValue="9999"
-            onReduceChange={() => {}}
-            onModifyChange={() => {}}
-          />
-        }
+        right={right}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);

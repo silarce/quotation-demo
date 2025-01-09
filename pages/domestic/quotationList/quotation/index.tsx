@@ -916,7 +916,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         )}
 
         <div className={'px-[50px]'}>
-          <QuotationProdTable disabled={disabled} instance_useQuotationProductInstance={instance_quotationProduct} />
+          <QuotationProdTable
+            disabled={disabled}
+            instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
+          />
           <br />
           <br />
           <br />
