@@ -187,6 +187,7 @@ const useQuotationProduct = ({
     raw_productArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
   });
+
   // 深拷貝，避免在編輯state_prodDict內的物件時影響原始的defaultState
   const defaultState_copy = useMemo(() => {
     return _.cloneDeep(defaultState_prodDict);

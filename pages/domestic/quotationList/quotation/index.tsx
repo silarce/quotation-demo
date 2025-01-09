@@ -270,14 +270,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // w ----------------------------------------------------------
 
-  // interativeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
-  const interativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
+  // iterativeContractProductDict為原合約與所有追加追減合約的主產品迭代後的結果
+  const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
 
-  const interativeContractProductArr = useMemo(() => {
-    const arr = Object.values(interativeContractProductDict);
+  const iterativeContractProductArr = useMemo(() => {
+    const arr = Object.values(iterativeContractProductDict);
 
     return arr.length ? arr : undefined;
-  }, [interativeContractProductDict]);
+  }, [iterativeContractProductDict]);
 
   // w ----------------------------------------------------------
 
@@ -352,8 +352,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const instance_interativeContractProduct = useQuotationProduct({
-    raw_quotationProductArr: interativeContractProductArr,
+  const instance_iterativeContractProduct = useQuotationProduct({
+    raw_quotationProductArr: iterativeContractProductArr,
     raw_quotationDiscount: undefined,
     disabled,
     onProdAllTotalChange: () => {},
@@ -906,14 +906,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <br />
         <br />
-        {interativeContractProductArr && (
+        {iterativeContractProductArr && (
           <>
             <div className={'px-[48px]'}>
               <div className="border border-red-500">
                 <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
                 <QuotationProdTable
                   disabled={true}
-                  instance_useQuotationProductInstance={instance_interativeContractProduct}
+                  instance_useQuotationProductInstance={instance_iterativeContractProduct}
                   showQuotationDiscount={false}
                   isIterativeProd={true}
                 />

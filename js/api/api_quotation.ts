@@ -291,8 +291,8 @@ export const useGetQuotation_id_2 = (
 
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-        await getInterativeProductArr(prodIdArr).then((interativeProdArr) => {
-          res.latestContent.products = interativeProdArr;
+        await getIterativeProductArr(prodIdArr).then((iterativeProdArr) => {
+          res.latestContent.products = iterativeProdArr;
         });
       }
 
@@ -310,7 +310,7 @@ export const useGetQuotation_id_2 = (
     }
   };
 
-  const renewProd = (interativeProd: TquotationProductDto) => {
+  const renewProd = (iterativeProd: TquotationProductDto) => {
     setRes((res) => {
       if (!res) {
         return res;
@@ -318,8 +318,8 @@ export const useGetQuotation_id_2 = (
 
       const copy = { ...res };
 
-      const index = copy.latestContent.products.findIndex((prod) => interativeProd.id === prod.id);
-      copy.latestContent.products[index] = interativeProd;
+      const index = copy.latestContent.products.findIndex((prod) => iterativeProd.id === prod.id);
+      copy.latestContent.products[index] = iterativeProd;
 
       return copy;
     });
@@ -354,7 +354,7 @@ export const useGetQuotation_id_2 = (
       }
 
       const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-      await getInterativeProductArr(prodIdArr).then((wholdProdArr) => {
+      await getIterativeProductArr(prodIdArr).then((wholdProdArr) => {
         res.latestContent.products = wholdProdArr;
       });
     };
@@ -1189,8 +1189,8 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 
     return await apiGetContract_Id(id, params).then(async (res) => {
       const prodIdArr = res.content.products.map(({ id }) => id);
-      const interativeProdArr = await getInterativeProductArr(prodIdArr);
-      res.content.products = interativeProdArr;
+      const iterativeProdArr = await getIterativeProductArr(prodIdArr);
+      res.content.products = iterativeProdArr;
 
       setRes(res);
 
@@ -1238,7 +1238,7 @@ export const useGetContract_id_contentProductItems = (
         // //     return await apiGetQuotationProducts(productId);
         // //   })
         // // );
-        const productArr = await getInterativeProductArr(res.content.products.map(({ id }) => id));
+        const productArr = await getIterativeProductArr(res.content.products.map(({ id }) => id));
         res.content.products = productArr;
 
         const version_num = Number(version);
@@ -1260,7 +1260,7 @@ export const useGetContract_id_contentProductItems = (
             // // );
 
             const prodIdArr = theSubContract!.content.products.map(({ id }) => id) ?? [];
-            const productArr = await getInterativeProductArr(prodIdArr);
+            const productArr = await getIterativeProductArr(prodIdArr);
 
             theSubContract!.content.products = productArr;
           }
@@ -1842,19 +1842,19 @@ export const apiPatchQuotationContent_id_progress = (contentId: string, body: Tp
 
 // region FUNCTION
 
-const getInterativeProductArr = async (prodIdArr: string[]) => {
+const getIterativeProductArr = async (prodIdArr: string[]) => {
   const chunk = _.chunk(prodIdArr, 20); // api一次最多取20筆
-  const interativeProdArr: TquotationProductDto[] = [];
+  const iterativeProdArr: TquotationProductDto[] = [];
 
   for (const chunkIndex in chunk) {
     const idArr = chunk[chunkIndex];
 
     await apiGetQuotationMultiProducts(idArr).then((prodArr) => {
-      interativeProdArr.push(...prodArr);
+      iterativeProdArr.push(...prodArr);
     });
   }
 
-  return interativeProdArr;
+  return iterativeProdArr;
 };
 
 // ========================================================================
@@ -2101,8 +2101,8 @@ export const useGetQuotation_id_3 = (
         const designatedContent = quotation_addition.designatedContent;
 
         const prodIdArr = designatedContent.products.map((prod) => prod.id);
-        const interativeProdArr = await getInterativeProductArr(prodIdArr);
-        designatedContent.products = interativeProdArr;
+        const iterativeProdArr = await getIterativeProductArr(prodIdArr);
+        designatedContent.products = iterativeProdArr;
 
         return quotation_addition;
       })
@@ -2514,13 +2514,13 @@ export type TquotationProductDto_addition = TquotationProductDto & {
   changedQty: number; // 變更數量 // 好像用不到...
 };
 
-export type TinterativeContractProduct = Record<string, TquotationProductDto_addition>;
+export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
 
 export const useIterativeContractProduct = ({ contract }: { contract: TquotationContractDto | undefined }) => {
-  const [interativeContractProduct, setInterativeContractProduct] = useState<TinterativeContractProduct>({});
+  const [iterativeContractProduct, setIterativeContractProduct] = useState<TiterativeContractProduct>({});
 
-  const interativeContractProduct_pre = useMemo(() => {
-    const dict: TinterativeContractProduct = {};
+  const iterativeContractProduct_pre = useMemo(() => {
+    const dict: TiterativeContractProduct = {};
     let somethingWrong = '';
 
     if (!contract) {
@@ -2613,28 +2613,28 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
   }, [contract]);
 
   useEffect(() => {
-    const prodIdArr = Object.keys(interativeContractProduct_pre);
+    const prodIdArr = Object.keys(iterativeContractProduct_pre);
 
     if (prodIdArr.length === 0) {
       return;
     }
 
     const getItemsAndRenew = async () => {
-      const interativeProdArr = await getInterativeProductArr(prodIdArr);
+      const iterativeProdArr = await getIterativeProductArr(prodIdArr);
 
-      interativeProdArr.forEach((prod) => {
-        interativeContractProduct_pre[prod.id] = {
-          ...interativeContractProduct_pre[prod.id],
+      iterativeProdArr.forEach((prod) => {
+        iterativeContractProduct_pre[prod.id] = {
+          ...iterativeContractProduct_pre[prod.id],
           ...prod,
-          quantity: interativeContractProduct_pre[prod.id].quantity,
+          quantity: iterativeContractProduct_pre[prod.id].quantity,
         };
       });
 
-      setInterativeContractProduct(interativeContractProduct_pre);
+      setIterativeContractProduct(iterativeContractProduct_pre);
     };
 
     getItemsAndRenew();
-  }, [interativeContractProduct_pre]);
+  }, [iterativeContractProduct_pre]);
 
-  return interativeContractProduct;
+  return iterativeContractProduct;
 };
