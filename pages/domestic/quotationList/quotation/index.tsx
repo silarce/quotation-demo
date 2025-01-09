@@ -919,6 +919,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                   disabled={true}
                   instance_useQuotationProductInstance={instance_wholeContractProduct}
                   showQuotationDiscount={false}
+                  isWholeProd={true}
                 />
               </div>
             </div>

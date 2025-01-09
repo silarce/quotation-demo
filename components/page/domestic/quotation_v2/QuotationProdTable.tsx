@@ -12,8 +12,10 @@ import {
   QuotationRow_dndThead,
   QuotationRow_dnd,
   Table_dnd,
+  Panel_wholeProd_right_thead,
+  Panel_wholeProd_right,
 } from 'components/page/domestic/quotation_v2/quotationRow';
-import { Cell_indexNumber, Cell_delete, Cell_copy } from './hook/quotationProduct/ui/cell';
+import { Cell_indexNumber, Cell_delete, Cell_copy, Cell_reset, Cell_copy2 } from './hook/quotationProduct/ui/cell';
 
 // antd
 import { Tabs, Spin } from 'antd';
@@ -25,7 +27,8 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconReset from 'public/image/icon/reset.svg';
-import iconChange from 'public/image/icon/change.svg';
+// import iconChange from 'public/image/icon/change.svg';
+import iconCopy2 from 'public/image/icon/copy2.svg';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -42,6 +45,7 @@ interface Tprops {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
+  isWholeProd?: TtableProps['isWholeProd'];
 }
 
 interface TtableProps {
@@ -49,6 +53,7 @@ interface TtableProps {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
+  isWholeProd?: boolean;
 }
 
 // ===================================================================
@@ -63,6 +68,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
     disabled,
     className,
     showQuotationDiscount = true,
+    isWholeProd,
   } = tableProps;
 
   const activedProd = instance_useQuotationProductInstance.activedProd;
@@ -75,6 +81,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
         instance_useQuotationProductInstance={instance_useQuotationProductInstance}
         disabled={disabled}
         showQuotationDiscount={showQuotationDiscount}
+        isWholeProd={isWholeProd}
       />
       <br />
 
@@ -154,6 +161,7 @@ const Table_prod = ({
   disabled,
   className,
   showQuotationDiscount,
+  isWholeProd,
 }: TtableProps) => {
   const {
     // classProdDict,
@@ -184,6 +192,30 @@ const Table_prod = ({
     removeProd,
     copyProd,
   } = instance_useQuotationProductInstance;
+
+  let theadLeft = (
+    <Panel_prod className_delete="invisible" className_copy="invisible">
+      <Cell
+        className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
+        style={nodeConfig_origin['itemName'].style}
+      >
+        {nodeConfig_origin['itemName'].label}
+      </Cell>
+    </Panel_prod>
+  );
+
+  if (isWholeProd) {
+    theadLeft = (
+      <Panel_wholeProd className_reset="invisible" className_copy="invisible" className_copy2="invisible">
+        <Cell
+          className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
+          style={nodeConfig_origin['itemName'].style}
+        >
+          {nodeConfig_origin['itemName'].label}
+        </Cell>
+      </Panel_wholeProd>
+    );
+  }
 
   return (
     <div
@@ -227,19 +259,8 @@ const Table_prod = ({
             }}
             configDict={nodeConfig_origin}
             dragHandleInvisible={true}
-            left={
-              <>
-                <Cell_delete className={'invisible'} onClick={() => {}} />
-                <Cell_copy className={'invisible'} onClick={() => {}} />
-                <Cell_indexNumber />
-                <Cell
-                  className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
-                  style={nodeConfig_origin['itemName'].style}
-                >
-                  {nodeConfig_origin['itemName'].label}
-                </Cell>
-              </>
-            }
+            left={theadLeft}
+            right={<Panel_wholeProd_right_thead />}
           />
           <Table_dnd
             items={prodKeyArr}
@@ -269,6 +290,7 @@ const Table_prod = ({
                   activedClassProd={activedClassProd}
                   removeProd={removeProd}
                   copyProd={copyProd}
+                  isWholeProd={isWholeProd}
                 />
               );
             })}
@@ -630,40 +652,6 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 // ===================================================================
 // ===================================================================
 
-// const Cell_indexNumber = (props: Tprops_cell) => {
-//   return <Cell className={classNames('w-5')} {...props} />;
-// };
-
-// const Cell_delete = ({
-//   //
-//   onClick,
-//   className,
-//   ...props
-// }: Omit<Tprops_cell, 'children' | 'onClick'> & {
-//   onClick: () => void;
-// }) => {
-//   return (
-//     <Cell className={classNames('w-5 text-center', className)} {...props}>
-//       <IconDelete01 onClick={onClick} />
-//     </Cell>
-//   );
-// };
-
-// const Cell_copy = ({
-//   //
-//   onClick,
-//   className,
-//   ...props
-// }: Omit<Tprops_cell, 'children' | 'onClick'> & {
-//   onClick: () => void;
-// }) => {
-//   return (
-//     <Cell className={classNames('w-5 text-center', className)} {...props}>
-//       <IconCopy onClick={onClick} />
-//     </Cell>
-//   );
-// };
-
 const QuotationRow_dealClass = ({
   //
   stateProd,
@@ -680,6 +668,7 @@ const QuotationRow_dealClass = ({
   //
   removeProd,
   copyProd,
+  isWholeProd,
 }: {
   stateProd: TstateProd;
 
@@ -695,6 +684,7 @@ const QuotationRow_dealClass = ({
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
   removeProd: (prodKey: string) => void;
   copyProd: (prodKey: string) => void;
+  isWholeProd?: boolean;
 }) => {
   const [viewRef, inView] = useInView();
 
@@ -703,20 +693,39 @@ const QuotationRow_dealClass = ({
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
 
-  const left = (
+  let left = (
     <>
       <div ref={viewRef} className={scss.viewIndicator} />
-      <Cell_delete onClick={() => removeProd(classProd.key)} />
-      <Cell_copy onClick={() => copyProd(classProd.key)} />
-      <Cell_indexNumber>{index + 1}</Cell_indexNumber>
-      <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
-        {nodeConfig_itemName.createNode({
-          disabled,
-          classProd,
-        })}
-      </Cell>
+      <Panel_prod
+        onDeleteClick={() => removeProd(classProd.key)}
+        onCopyClick={() => copyProd(classProd.key)}
+        indexNumber={index + 1}
+      >
+        <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+          {nodeConfig_itemName.createNode({
+            disabled,
+            classProd,
+          })}
+        </Cell>
+      </Panel_prod>
     </>
   );
+
+  if (isWholeProd) {
+    left = (
+      <>
+        <div ref={viewRef} className={scss.viewIndicator} />
+        <Panel_wholeProd>
+          <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
+            {nodeConfig_itemName.createNode({
+              disabled,
+              classProd,
+            })}
+          </Cell>
+        </Panel_wholeProd>
+      </>
+    );
+  }
 
   return (
     <Spin spinning={classProd.isFetching}>
@@ -732,6 +741,16 @@ const QuotationRow_dealClass = ({
         //
         isActive={isActive}
         left={left}
+        right={
+          <Panel_wholeProd_right
+            qty="9999"
+            price="9999"
+            reduceValue="9999"
+            modifyValue="9999"
+            onReduceChange={() => {}}
+            onModifyChange={() => {}}
+          />
+        }
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);
@@ -777,3 +796,74 @@ const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) =>
     // prev.createClassProd === next.createClassProd
   );
 });
+
+const Panel_prod = ({
+  className_delete,
+  onDeleteClick,
+  className_copy,
+  onCopyClick,
+  indexNumber,
+  children,
+}: {
+  className_delete?: string;
+  className_copy?: string;
+  onDeleteClick?: () => void;
+  onCopyClick?: () => void;
+  indexNumber?: React.ReactNode;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <>
+      <Cell_delete className={className_delete} onClick={onDeleteClick} />
+      <Cell_copy className={className_copy} onClick={onCopyClick} />
+      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
+      {children}
+    </>
+  );
+};
+
+const Panel_wholeProd = ({
+  indexNumber,
+  className_reset,
+  className_copy,
+  className_copy2,
+  onResetClick,
+  onCopyClick,
+  onCopy2Click,
+  children,
+}: {
+  indexNumber?: React.ReactNode;
+  className_reset?: string;
+  className_copy?: string;
+  className_copy2?: string;
+  onResetClick?: () => void; //
+  onCopyClick?: () => void; //
+  onCopy2Click?: () => void; //
+  children?: React.ReactNode;
+}) => {
+  return (
+    <>
+      <Cell_reset className={className_reset} onClick={onResetClick} />
+      <Cell_copy className={className_copy} onClick={onCopyClick} />
+      <Cell_copy2 className={className_copy2} onClick={onCopy2Click} />
+      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
+      {children}
+    </>
+  );
+};
+
+// ==========================================================================
+// const Panel_wholeProd_right = () => {
+//   return (
+//     <>
+//       {/* <Cell>
+//         <InputSel_prod inputProps={{}} />
+//       </Cell> */}
+
+//       <Cell>aaaa</Cell>
+//       <Cell>aaaa</Cell>
+//       <Cell>aaaa</Cell>
+//       <Cell>aaaa</Cell>
+//     </>
+//   );
+// };

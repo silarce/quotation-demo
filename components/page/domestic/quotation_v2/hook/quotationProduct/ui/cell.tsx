@@ -1,7 +1,10 @@
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 import iconReset from 'public/image/icon/reset.svg';
-import iconChange from 'public/image/icon/change.svg';
+// import iconChange from 'public/image/icon/change.svg';
+import iconCopy2 from 'public/image/icon/copy2.svg';
+
+import Image from 'next/image';
 
 import classNames from 'classnames';
 
@@ -22,7 +25,7 @@ const Cell_delete = ({
   className,
   ...props
 }: Omit<Tprops_cell, 'children' | 'onClick'> & {
-  onClick: () => void;
+  onClick?: () => void;
 }) => {
   return (
     <Cell className={classNames('w-5 text-center', className)} {...props}>
@@ -32,12 +35,11 @@ const Cell_delete = ({
 };
 
 const Cell_copy = ({
-  //
   onClick,
   className,
   ...props
 }: Omit<Tprops_cell, 'children' | 'onClick'> & {
-  onClick: () => void;
+  onClick?: () => void;
 }) => {
   return (
     <Cell className={classNames('w-5 text-center', className)} {...props}>
@@ -46,4 +48,32 @@ const Cell_copy = ({
   );
 };
 
-export { Cell_indexNumber, Cell_delete, Cell_copy };
+const Cell_reset = ({
+  onClick,
+  className,
+  ...props
+}: Omit<Tprops_cell, 'children' | 'onClick'> & {
+  onClick?: () => void;
+}) => {
+  return (
+    <Cell className={classNames('w-5 text-center', className)} {...props}>
+      <Image src={iconReset} alt="reset" onClick={onClick} className="cursor-pointer" />
+    </Cell>
+  );
+};
+
+const Cell_copy2 = ({
+  onClick,
+  className,
+  ...props
+}: Omit<Tprops_cell, 'children' | 'onClick'> & {
+  onClick?: () => void;
+}) => {
+  return (
+    <Cell className={classNames('w-5 text-center', className)} {...props}>
+      <Image src={iconCopy2} alt="reset" onClick={onClick} className="cursor-pointer" />
+    </Cell>
+  );
+};
+
+export { Cell_indexNumber, Cell_delete, Cell_copy, Cell_reset, Cell_copy2 };
