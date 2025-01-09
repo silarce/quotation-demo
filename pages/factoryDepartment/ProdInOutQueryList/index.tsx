@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './PriQueryList.module.scss';
+import scss from './ProdInOutQueryList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -64,8 +64,8 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
-export default function PriQueryList() {
-    const [pagename, setPagename] = useState<string>("價格查詢")
+export default function ProdInOutQueryList() {
+    const [pagename, setPagename] = useState<string>("出入庫查詢")
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -99,7 +99,7 @@ export default function PriQueryList() {
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
-    const [keyword5, setKeyword5] = useState<string>("");
+    const [keyword5, setKeyword5] = useState<string>("出庫");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -175,7 +175,7 @@ export default function PriQueryList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "價格查詢",
+                type: keyword5,
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -188,7 +188,7 @@ export default function PriQueryList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetAllQuotereqDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetInOutDetail?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -376,8 +376,6 @@ export default function PriQueryList() {
 
 
     const filterData = () => {
-        const startDate = keywordstartdate;
-        const endDate = keywordenddate;
         const type = keyword5.trim();
         const supplier = keyword1.trim();
         const productid = keyword2.trim();
@@ -385,9 +383,7 @@ export default function PriQueryList() {
         const spec = keyword4.trim();
 
         // 檢查是否所有條件都為空
-        if ((!startDate || !startDate.isValid()) &&
-            (!endDate || !endDate.isValid()) &&
-            !type &&
+        if (!type &&
             !supplier &&
             !productid &&
             !name &&
@@ -397,22 +393,22 @@ export default function PriQueryList() {
         }
 
         // 過濾資料
-        let filteredData = data.filter(item => {
-            const createAt = moment(item.create_at);
-            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
-                ? true
-                : createAt.isBetween(startDate, endDate, 'days', '[]');
-            return isDateInRange;
-        });
+        // let filteredData = data.filter(item => {
+        //     const createAt = moment(item.create_at);
+        //     const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+        //         ? true
+        //         : createAt.isBetween(startDate, endDate, 'days', '[]');
+        //     return isDateInRange;
+        // });
 
-        // let filteredData = data;
+        let filteredData = data;
 
         // 模糊查詢價格類別(詢價/進價)
-        if (type) {
-            filteredData = filteredData.filter(item =>
-                item.detail_type.toString().includes(type)
-            );
-        }
+        // if (type) {
+        //     filteredData = filteredData.filter(item =>
+        //         item.detail_type.toString().includes(type)
+        //     );
+        // }
 
         // 模糊查詢單據狀態
         if (supplier) {
@@ -446,7 +442,7 @@ export default function PriQueryList() {
     useEffect(() => {
         filterData();
         setCurrentPage(1);
-    }, [keywordenddate, keywordstartdate, keyword1, keyword2, keyword3, keyword4, keyword5, data]);
+    }, [keyword1, keyword2, keyword3, keyword4, keyword5, data]);
     //#endregion
 
     //#region ===========【分頁處理】
@@ -467,6 +463,11 @@ export default function PriQueryList() {
     };
     //#endregion
 
+    //#region===========【API】
+    useEffect(() => {
+        Get();
+    }, [keyword5]);
+    //#endregion
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={pagename + "列表"}
@@ -487,7 +488,8 @@ export default function PriQueryList() {
                     padding: '20px',
                     border: '1px solid #ccc',
                     // backgroundColor: '#f9f9f9',
-                    zIndex: '1000'
+                    zIndex: '1000',
+                    
                 }}>
                 {/* 每個項目 */}
                 <div>
@@ -500,7 +502,7 @@ export default function PriQueryList() {
                             display: 'block',
                         }}
                     >
-                        價格種類
+                        查詢種類
                     </label>
                     <select
                         value={keyword5 || ''}
@@ -516,36 +518,9 @@ export default function PriQueryList() {
                             marginTop: '-1px', // 調整負值以微調向上位置
                         }}
                     >
-                        <option value="">全部</option>
-                        <option value="詢價">詢價</option>
-                        <option value="進價">進價</option>
+                        <option value="出庫">出庫</option>
+                        <option value="入庫">入庫</option>
                     </select>
-                    {/* 廠商名稱 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        廠商名稱
-                    </label>
-                    <InputSel
-                        // caption="單號"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        inputProps={{
-                            props: {
-                                placeholder: '請輸入廠商名稱',
-                                style: { width: "300px", paddingLeft: '5px' },
-                                value: keyword1,
-                                onChange: (e) => {
-                                    setKeyword1(e.target.value)
-                                }
-                            },
-                        }}
-                    />
                     {/* 料號 */}
                     <label
                         style={{
@@ -574,7 +549,8 @@ export default function PriQueryList() {
                 </div>
 
                 <div>
-                    <label
+                    {/* 廠商名稱 */}
+                    {/* <label
                         style={{
                             fontSize: "16px",
                             fontWeight: "bold",
@@ -582,24 +558,20 @@ export default function PriQueryList() {
                             display: 'block',
                         }}
                     >
-                        起始日期
+                        廠商名稱
                     </label>
-                    {/* 起始日期 */}
-                    <InputSel
-                        // caption="起始日期"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
-                        datePickerProps={{
-                            props: {
-                                style: { paddingRight: '5px' },
-                                value: keywordstartdate || null,
-                                onChange: (e: Moment | null) => {
-                                    setKeywordstartdate(e);
-                                },
-                            },
+                    <input
+                        type="text"
+                        placeholder="請輸入廠商名稱"
+                        style={{
+                            width: '100%',
+                            padding: "8px",
+                            border: "1px solid #ccc",
+                            fontSize: "16px",
                         }}
-                    />
-
+                        value={keyword1}
+                        onChange={(e) => setKeyword1(e.target.value)}
+                    /> */}
                     {/* 隱藏保留位置 */}
                     <label
                         style={{
@@ -637,7 +609,6 @@ export default function PriQueryList() {
                         品名
                     </label>
                     <InputSel
-                        // caption="單號"
                         disabled={false}
                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                         inputProps={{
@@ -652,58 +623,8 @@ export default function PriQueryList() {
                         }}
                     />
                 </div>
-                <div>
-                    {/* 規格 - 隱藏但保留位置 */}
-                    {/* <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                    >
-                        規格
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="請輸入規格"
-                        style={{
-                            width: '100%',
-                            padding: "8px",
-                            border: "1px solid #ccc",
-                            fontSize: "16px",
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                        value={keyword4}
-                        onChange={(e) => setKeyword4(e.target.value)}
-                    /> */}
-                    {/* 截止日期 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        截止日期
-                    </label>
-                    <InputSel
-                        // caption="截止日期"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        datePickerProps={{
-                            props: {
-                                style: { paddingRight: '5px' },
-                                value: keywordenddate || null,
-                                onChange: (e: Moment | null) => {
-                                    setKeywordenddate(e);
-                                },
-                            },
-                        }}
-                    />
 
+                <div>
                     {/* 隱藏保留位置 */}
                     <label
                         style={{
@@ -728,6 +649,7 @@ export default function PriQueryList() {
                         }}
                         value={"保留位置"}
                     />
+
                     {/* 規格 */}
                     <label
                         style={{
@@ -740,7 +662,6 @@ export default function PriQueryList() {
                         規格
                     </label>
                     <InputSel
-                        // caption="單號"
                         disabled={false}
                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                         inputProps={{
@@ -764,9 +685,9 @@ export default function PriQueryList() {
                     // marginRight: '20px',
                     // height: '660px'
                     // height: '480px'
-                    height: `${isCollapsed ? '460px' : '660px'}`
+                    height: `${isCollapsed ? '510px' : '660px'}`
                 }}>
-                <div className={scss.body_content1} style={{ overflowX: 'auto', maxHeight: `${isCollapsed ? '460px' : '660px'}` }} >
+                <div className={scss.body_content1} style={{ overflowX: 'auto', maxHeight: `${isCollapsed ? '480px' : '660px'}` }} >
                     {/* <Thead01 type={'PEntry'} /> */}
                     <div className={scss.head15}>
                         <span>
@@ -805,9 +726,6 @@ export default function PriQueryList() {
                         <span>規格</span>
                         <span>數量</span>
                         <span>單位</span>
-                        <span>單價</span>
-                        <span>總價</span>
-                        <span>廠商</span>
                         <span></span>
                     </div>
                     {/* {searchdata && (searchdata.map((_item: any, index: number) => ( */}
@@ -815,43 +733,22 @@ export default function PriQueryList() {
                         return (
                             <CellWithBar key={index} className={scss.panelHeader15}
                                 onClick={() => {
-                                    // 深拷貝 _item 物件，避免直接修改原始資料
-                                    let updatedItem = { ..._item };
-
-                                    if (updatedItem.detail_type === "詢價") {
-                                        // 如果是詢價，改變欄位名稱
-                                        updatedItem = {
-                                            ...updatedItem,
-                                            id: updatedItem.uuid,            // uuid 改為原本的 id
-                                            quotereqid: updatedItem.id,      // id 改為原本的 quotereqid
-                                        };
-                                    } else if (updatedItem.detail_type === "進價") {
-                                        // 如果是進價，改變欄位名稱
-                                        updatedItem = {
-                                            ...updatedItem,
-                                            prodreceiptuuid: updatedItem.uuid, // uuid 改為原本的 prodreceiptuuid
-                                            prodreceiptid: updatedItem.id,    // id 改為原本的 prodreceiptid
-                                        };
-                                    }
-
                                     myAlert.confirm({
                                         title: '確定導向此單據嗎?',
-                                        content: updatedItem.detail_main_id,
+                                        content: _item.prodreceiptid,
                                         props: {
                                             onOk: () => {
                                                 router.push({
                                                     pathname:
-                                                        `${updatedItem.detail_type === "詢價" ? '/factoryDepartment/QReqDetail' : '/factoryDepartment/PReceiptDetail'}`,
+                                                        `${_item.detail_type === "出庫" ? '/factoryDepartment/PKingDetail' : '/factoryDepartment/PEntryDetail'}`,
                                                     query: {
-                                                        item: JSON.stringify(updatedItem),
+                                                        item: JSON.stringify(_item),
                                                     },
                                                 });
                                             }
                                         }
                                     })
-                                }}
-
-                            >
+                                }}>
                                 <>
                                     <div
                                         key={index}
@@ -873,11 +770,6 @@ export default function PriQueryList() {
                                         <span>{_item.detail_spec}</span>
                                         <span>{Number(_item.detail_quantity).toLocaleString()}</span>
                                         <span>{_item.detail_unit}</span>
-                                        <span style={{ color: '#ea1833' }}>{Number(_item.detail_unitprice).toLocaleString()}</span>
-                                        <span>{Number(_item.detail_totalprice).toLocaleString()}</span>
-                                        <span>
-                                            {_item.detail_suppliername}
-                                        </span>
                                     </div>
                                 </>
                             </CellWithBar>

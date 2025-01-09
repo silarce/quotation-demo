@@ -124,6 +124,21 @@ export default function SidePatFactoryDepartment() {
                     erpFeature: devPass,
                     list: [
                         {
+                            label: '出入庫查詢',
+                            // path: path + '/quotereqList',
+                            path: path + '/ProdInOutQueryList',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/ProdInOutQueryList') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
+                            erpFeature: [fac],
+                        },
+                        {
                             label: '入庫列表',
                             path: path + '/PEntryList',
                             activeChecker: ({ router }) => {
