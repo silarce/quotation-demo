@@ -2539,27 +2539,12 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
       products.forEach((prod) => {
         const { id, attachedToProductId, rootProductId } = prod;
 
-        let type: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
+        const attachType = parseAttachProd({
+          quotationProduct: prod,
+          quotationProductArr: products,
+        });
 
-        // 報價單中有變更追減就一定有變更追加
-        // 報價單中有變更追加就一定有變更追減
-
-        if (!attachedToProductId) {
-          type = '追加';
-        } else if (attachedToProductId && rootProductId === id) {
-          type = '變更追加';
-        } else if (attachedToProductId && rootProductId !== id) {
-          type = '追減';
-        }
-
-        if (type === '追減') {
-          const isExist = products.some((prod) => {
-            return prod.id !== id && prod.attachedToProductId === attachedToProductId;
-          });
-          isExist && (type = '變更追減');
-        }
-
-        if (!type) {
+        if (!attachType) {
           const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
           console.error('解析追加追減發生錯誤，預期外的組合');
           console.error(prod);
@@ -2569,7 +2554,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
           return;
         }
 
-        if (type === '追加' || type === '變更追加') {
+        if (attachType === '追加' || attachType === '變更追加') {
           dict[rootProductId] = {
             ...prod,
             reducedQty: 0,
@@ -2591,10 +2576,10 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
           return;
         }
 
-        if (type === '追減') {
+        if (attachType === '追減') {
           rootProd.reducedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
-        } else if (type === '變更追減') {
+        } else if (attachType === '變更追減') {
           rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
         }
@@ -2637,4 +2622,36 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
   }, [iterativeContractProduct_pre]);
 
   return iterativeContractProduct;
+};
+
+export const parseAttachProd = ({
+  quotationProduct,
+  quotationProductArr,
+}: {
+  quotationProduct: TquotationProductDto;
+  quotationProductArr: TquotationProductDto[];
+}) => {
+  const { id, attachedToProductId, rootProductId } = quotationProduct;
+
+  let attachType: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
+
+  // 報價單中有變更追減就一定有變更追加
+  // 報價單中有變更追加就一定有變更追減
+
+  if (!attachedToProductId) {
+    attachType = '追加';
+  } else if (attachedToProductId && rootProductId === id) {
+    attachType = '變更追加';
+  } else if (attachedToProductId && rootProductId !== id) {
+    attachType = '追減';
+  }
+
+  if (attachType === '追減') {
+    const isExist = quotationProductArr.some((prod) => {
+      return prod.id !== id && prod.attachedToProductId === attachedToProductId;
+    });
+    isExist && (attachType = '變更追減');
+  }
+
+  return attachType;
 };
