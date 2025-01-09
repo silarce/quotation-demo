@@ -1,4 +1,5 @@
 import { useState, useEffect, MouseEvent } from 'react';
+import classNames from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -14,7 +15,7 @@ import { Collapse } from 'antd';
 import { useGetContract_id, TquotationContractDto } from 'js/api/api_quotation';
 
 // css
-import style from './contractList.module.scss';
+import scss from './contractList_sorted.module.scss';
 
 const { Panel } = Collapse;
 
@@ -32,16 +33,20 @@ type Tcontrol = {
   abroadArr: Tcontract[];
 };
 
+type Tquery = {
+  targetContractId?: string | undefined;
+};
+
 export type { Tcontract, Tcontrol as Tcontrol_sortedContractList };
 
 // ========================
 
 export default function ContractList_sorted({ control }: { control: Tcontrol }) {
   const router = useRouter();
+  const query = router.query as Tquery;
+  const { targetContractId } = query;
 
   // ------------------------------------------------------------------
-
-  const [targetContractId, setTargetContractId] = useState<string>();
 
   const [contractList, setContractList] = useState<{ [key: string]: TquotationContractDto | undefined }>({});
 
@@ -91,209 +96,121 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
 
   const { northernArr, centralArr, southernArr, abroadArr } = control;
 
+  const arr = [
+    {
+      label: '北部',
+      contractArr: northernArr,
+    },
+    {
+      label: '中部',
+      contractArr: centralArr,
+    },
+    {
+      label: '南部',
+      contractArr: southernArr,
+    },
+    {
+      label: '海外或其他',
+      contractArr: abroadArr,
+    },
+  ];
+
   // ------------------------------------------------------------------
   return (
-    <div className={style.container}>
-      <Thead />
-      {/*  */}
+    <div className={scss.container}>
+      {/* <Thead /> */}
       <Collapse
         //
         expandIcon={() => <></>}
-        accordion={false}
+        // accordion={true}
         destroyInactivePanel={true}
-        activeKey={targetContractId}
       >
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>北部</span>
-        </div>
-        {northernArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
+        {arr.map((item, index) => {
+          const { label, contractArr } = item;
 
           return (
             <Panel
-              key={contractId}
-              className={style.panel}
+              key={index}
+              className={classNames(scss.panel, scss.locationPanel, scss.plus)}
               header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => {
-                    //
-                    if (isActive) {
-                      setTargetContractId(undefined);
-                    } else {
-                      setTargetContractId(contractId);
-                    }
-                  }}
-                />
+                <div className={scss.sortTitle}>
+                  <span>{label}</span>
+                </div>
               }
             >
-              <PanelBody contractDetailArr={detailArr} />
+              <List key={label} contractArr={contractArr} createContractDetailArr={createContractDetailArr} />
             </Panel>
           );
         })}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>中部</span>
-        </div>
-        {centralArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>南部</span>
-        </div>
-        {southernArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
-        {/* <div className={style.sortTitle}>
-          <span>東部</span>
-        </div>
-        {easternArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })} */}
-        {/*  */}
-        <div className={style.sortTitle}>
-          <span>海外或其他</span>
-        </div>
-        {abroadArr.map((item) => {
-          const { contractId } = item;
-          const isActive = contractId === targetContractId;
-
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: { contractId, version: 1 },
-            });
-          };
-
-          const detailArr = createContractDetailArr(contractId);
-
-          return (
-            <Panel
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  contract={item}
-                  isActive={isActive}
-                  openQuotation={openQuotation}
-                  onClick={() => setTargetContractId(contractId)}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={detailArr} />
-            </Panel>
-          );
-        })}
-        {/*  */}
       </Collapse>
     </div>
   );
 }
 
 // =========================================================================
+
+const List = ({
+  contractArr,
+  createContractDetailArr,
+}: {
+  contractArr: Tcontract[];
+  createContractDetailArr: (contractId: string) => Tdetail[];
+}) => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { targetContractId } = query;
+
+  return (
+    <Collapse
+      //
+      expandIcon={() => <></>}
+      // accordion={false}
+      destroyInactivePanel={true}
+      activeKey={targetContractId}
+    >
+      {contractArr.map((item) => {
+        const { contractId } = item;
+        const isActive = contractId === targetContractId;
+
+        const openQuotation = (e: MouseEvent) => {
+          e.stopPropagation();
+          router.push({
+            pathname: '/worksDepartment/contractList/contract/workContactDoc',
+            query: { contractId, version: 1 },
+          });
+        };
+
+        const detailArr = createContractDetailArr(contractId);
+
+        return (
+          <Panel
+            key={contractId}
+            className={scss.panel}
+            header={
+              <PanelHeader
+                //
+                contract={item}
+                isActive={isActive}
+                onIconDetailClick={openQuotation}
+                onClick={() => {
+                  //
+                  if (isActive) {
+                    router.replace({
+                      query: { ...query, targetContractId: undefined },
+                    });
+                  } else {
+                    router.replace({
+                      query: { ...query, targetContractId: contractId },
+                    });
+                  }
+                }}
+              />
+            }
+          >
+            <PanelBody contractDetailArr={detailArr} />
+          </Panel>
+        );
+      })}
+    </Collapse>
+  );
+};

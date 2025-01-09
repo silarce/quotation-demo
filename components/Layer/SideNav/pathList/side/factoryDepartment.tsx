@@ -1,6 +1,7 @@
-import { devPass, erpFeaturesLookup, TsidePathConfig } from "../type";
+import { devPass, erpFeaturesLookup, TsidePathConfig } from '../type';
 
 export default function SidePatFactoryDepartment() {
+
     return ((): TsidePathConfig => {
         const path = '/factoryDepartment';
 
