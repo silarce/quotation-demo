@@ -620,7 +620,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
             {activedClassProd?.isSpecial ? '特殊門無選配' : '新增選配'}
           </SquareBtn>
         </div>
-        <DragableModal show={showSelector} onCrossClick={() => setShowSelector(false)}>
+        <DragableModal style={{ zIndex: 50 }} show={showSelector} onCrossClick={() => setShowSelector(false)}>
           <SearchModal_prodAccessories
             doorNModelName={activedClassProd?.doorModelName ?? ''}
             onConfirm={(v) => {
