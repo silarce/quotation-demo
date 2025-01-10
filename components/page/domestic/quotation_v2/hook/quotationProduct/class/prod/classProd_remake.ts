@@ -2008,6 +2008,69 @@ class ClassProd {
     this.data.totalPrice = value;
     this.render();
   }
+
+  // MARK:qty_reduce
+  get qty_reduce() {
+    return this.state.qty_reduce;
+  }
+  set qty_reduce(value) {
+    value = `${fixedToFloat3(value || 0)}`;
+
+    const qtyAllow = new Decimal(this.qty_remain).add(this.state.qty_reduce || 0).toNumber();
+
+    if (qtyAllow < Number(value || 0)) {
+      return;
+    }
+
+    const qty_reduce = Number(value || 0);
+    const qty_modify = this.state.qty_modify;
+    const unitPrice = this.data.unitPrice || 0;
+
+    this.state.qty_reduce = value;
+
+    const deductedPrice = new Decimal(qty_reduce).add(qty_modify).mul(unitPrice).mul(-1).toNumber();
+    this.state.deductedPrice = deductedPrice;
+
+    this.render();
+  }
+
+  // MARK:qty_modify
+  get qty_modify() {
+    return this.state.qty_modify;
+  }
+  set qty_modify(value) {
+    value = fixedToFloat3(value);
+
+    const qtyAllow = this.qty_remain + this.state.qty_modify;
+
+    if (qtyAllow < value) {
+      throw new Error('數量不足');
+    }
+
+    this.state.qty_modify = value;
+
+    const qty_reduce = this.state.qty_reduce || 0;
+    const qty_modify = this.state.qty_modify;
+    const unitPrice = this.data.unitPrice || 0;
+
+    const deductedPrice = new Decimal(qty_reduce).add(qty_modify).mul(unitPrice).mul(-1).toNumber();
+    this.state.deductedPrice = deductedPrice;
+
+    this.render();
+  }
+
+  // MARK:deductedPrice
+  get deductedPrice() {
+    return this.state.deductedPrice;
+  }
+
+  get qty_remain() {
+    const quantity = this.data.quantity || 0;
+    const qty_reduce = this.state.qty_reduce || 0;
+    const qty_modify = this.state.qty_modify;
+
+    return new Decimal(quantity).minus(qty_reduce).minus(qty_modify).toNumber();
+  }
 }
 // MARK: END
 

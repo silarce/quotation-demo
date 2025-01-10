@@ -86,14 +86,14 @@ const Panel_iterativeProd_right = ({
   reduceValue,
   onReduceChange,
   modifyValue,
-  onModifyChange,
-}: {
+}: // onModifyChange,
+{
   qty: React.ReactNode;
   price: React.ReactNode;
   reduceValue: string;
-  modifyValue: string;
+  modifyValue: React.ReactNode;
   onReduceChange: (value: `${number}` | '') => void;
-  onModifyChange: (value: `${number}` | '') => void;
+  // onModifyChange: (value: `${number}` | '') => void;
 }) => {
   const config = config_wholeProd_right;
 
@@ -116,7 +116,8 @@ const Panel_iterativeProd_right = ({
         />
       </Cell>
       <Cell style={config.modify.style}>
-        <InputSel_prod
+        <InputSel_prod node={modifyValue} showBaseline="invisible" />
+        {/* <InputSel_prod
           inputProps={{
             props: {
               type: 'number',
@@ -126,7 +127,7 @@ const Panel_iterativeProd_right = ({
               },
             },
           }}
-        />
+        /> */}
       </Cell>
       <Cell style={config.price.style}>
         <InputSel_prod node={price} showBaseline="invisible" />

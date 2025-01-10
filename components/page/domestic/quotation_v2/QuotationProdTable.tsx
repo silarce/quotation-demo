@@ -689,7 +689,6 @@ const QuotationRow_dealClass = ({
 
   const [visible_copy, setVisible_copy] = useState(false);
 
-  // const classProd = activedClassProd || createClassProd(stateProd);
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
@@ -746,12 +745,14 @@ const QuotationRow_dealClass = ({
 
     right = (
       <Panel_iterativeProd_right
-        qty="9999"
-        price="9999"
-        reduceValue="9999"
-        modifyValue="9999"
-        onReduceChange={() => {}}
-        onModifyChange={() => {}}
+        qty={classProd.quantity}
+        price={classProd.deductedPrice}
+        reduceValue={classProd.qty_reduce}
+        modifyValue={classProd.qty_modify}
+        onReduceChange={(v) => {
+          classProd.qty_reduce = v;
+        }}
+        // onModifyChange={() => {}}
       />
     );
   }

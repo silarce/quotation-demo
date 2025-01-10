@@ -72,6 +72,12 @@ const useDefaultState_prodDict = ({
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
         generalSpecs: undefined,
         availableComponents: undefined,
+
+        qty_reduce: '',
+        qty_modify: 0,
+        deductedPrice: 0,
+        extendProductIdArr: [],
+        rootProductId: undefined,
       };
 
       dict[data_prod.id] = state;
@@ -407,6 +413,12 @@ const createEmptyStateProd = () => {
     doorModel: null,
     generalSpecs: null,
     availableComponents: null,
+
+    qty_reduce: '',
+    qty_modify: 0,
+    deductedPrice: 0,
+    extendProductIdArr: [],
+    rootProductId: undefined,
   };
 
   return stateProd;

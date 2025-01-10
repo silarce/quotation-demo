@@ -94,6 +94,12 @@ const createEmptyStateProd = (key: string) => {
     generateDoorProductBom: null,
     isFetching: false,
     afterChangeQueue: undefined,
+
+    qty_reduce: '',
+    qty_modify: 0,
+    deductedPrice: 0,
+    extendProductIdArr: [],
+    rootProductId: undefined,
   };
 
   return emptyStateProd;
