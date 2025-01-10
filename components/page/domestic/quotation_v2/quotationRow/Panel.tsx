@@ -1,9 +1,19 @@
 import Image from 'next/image';
 
+// antd
+import { Popover } from 'antd';
+
 import { InputSel_prod } from '../hook/quotationProduct/ui/InputSel_prod';
 
 // import { Cell, Tprops_cell } from './index';
 import { Cell, Cell_dnd, Tprops_cell } from './Cell';
+import {
+  Cell_indexNumber,
+  Cell_delete,
+  Cell_copy,
+  Cell_reset,
+  Cell_copy2,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/cell';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -57,7 +67,7 @@ const AttachPanel = () => {
   );
 };
 
-const Panel_wholeProd_right_thead = () => {
+const Panel_iterativeProd_right_thead = () => {
   const config = config_wholeProd_right;
 
   return (
@@ -70,7 +80,7 @@ const Panel_wholeProd_right_thead = () => {
   );
 };
 
-const Panel_wholeProd_right = ({
+const Panel_iterativeProd_right = ({
   qty,
   price,
   reduceValue,
@@ -125,6 +135,84 @@ const Panel_wholeProd_right = ({
   );
 };
 
+const Panel_prod = ({
+  className_delete,
+  onDeleteClick,
+  className_copy,
+  onCopyClick,
+  indexNumber,
+  children,
+}: {
+  className_delete?: string;
+  className_copy?: string;
+  onDeleteClick?: () => void;
+  onCopyClick?: () => void;
+  indexNumber?: React.ReactNode;
+  children?: React.ReactNode;
+}) => {
+  return (
+    <>
+      <Cell_delete className={className_delete} onClick={onDeleteClick} />
+      <Cell_copy className={className_copy} onClick={onCopyClick} />
+      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
+      {children}
+    </>
+  );
+};
+
+const Panel_iterativeProd = ({
+  indexNumber,
+  className_reset,
+  className_copy,
+  className_copy2,
+  onResetClick,
+  onCopyClick,
+  onCopy2Click,
+  children,
+}: {
+  indexNumber?: React.ReactNode;
+  className_reset?: string;
+  className_copy?: string;
+  className_copy2?: string;
+  onResetClick?: () => void; //
+  onCopyClick?: () => void; //
+  onCopy2Click?: () => void; //
+  children?: React.ReactNode;
+}) => {
+  return (
+    <>
+      <Cell_reset className={className_reset} onClick={onResetClick} />
+      <Cell_copy className={className_copy} onClick={onCopyClick} />
+      <Cell_copy2 className={className_copy2} onClick={onCopy2Click} />
+      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
+      {children}
+    </>
+  );
+};
+
+const Panel_accessory = ({
+  //
+  children,
+  indexNumber,
+  onDeleteClick,
+
+  className_delete,
+}: {
+  children?: React.ReactNode;
+  indexNumber?: React.ReactNode;
+  onDeleteClick?: () => void;
+
+  className_delete?: string;
+}) => {
+  return (
+    <>
+      <Cell_delete className={className_delete} onClick={onDeleteClick} />
+      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
+      {children}
+    </>
+  );
+};
+
 // =====================================================================
 
 type TconfigItem = {
@@ -153,4 +241,12 @@ const config_wholeProd_right: Record<'qty' | 'reduce' | 'modify' | 'price', Tcon
 };
 
 // =====================================================================
-export { Panel_basic, AttachPanel, Panel_wholeProd_right_thead as Panel_iterativeProd_right_thead, Panel_wholeProd_right as Panel_iterativeProd_right };
+export {
+  Panel_basic,
+  AttachPanel,
+  Panel_iterativeProd_right_thead,
+  Panel_iterativeProd_right,
+  Panel_prod,
+  Panel_iterativeProd,
+  Panel_accessory,
+};

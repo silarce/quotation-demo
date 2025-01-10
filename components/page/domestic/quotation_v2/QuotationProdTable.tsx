@@ -3,6 +3,9 @@ import { useState, useEffect, memo } from 'react';
 import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
 
+// antd
+import { Spin } from 'antd';
+
 // component
 import {
   Tprops_cell,
@@ -14,11 +17,10 @@ import {
   Table_dnd,
   Panel_iterativeProd_right_thead,
   Panel_iterativeProd_right,
+  Panel_prod,
+  Panel_iterativeProd,
+  Panel_accessory,
 } from 'components/page/domestic/quotation_v2/quotationRow';
-import { Cell_indexNumber, Cell_delete, Cell_copy, Cell_reset, Cell_copy2 } from './hook/quotationProduct/ui/cell';
-
-// antd
-import { Spin } from 'antd';
 
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
@@ -47,51 +49,7 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 
 // ===================================================================
 
-interface TprodHookInstance {
-  prodKeyArr: string[];
-  state_prodDict: TstateProdDict;
-  activedProd: TstateProd | undefined;
-  activedClassProd: ClassProd | undefined;
-  activedClassComponentDict: TclassComponentDict | undefined;
-  activedClassPseudoComponentDict: TclassPsuedoComponentDict | undefined;
-  activedClassAccessoryDict: TclassAccessoryDict | undefined;
-
-  // activedProd: Tinstance_useQuotationProduct['activedProd'];
-  cellKeyArr: Tinstance_useQuotationProduct['cellKeyArr'];
-  setCellKeyArr: Tinstance_useQuotationProduct['setCellKeyArr'];
-  // prodKeyArr: Tinstance_useQuotationProduct['prodKeyArr'];
-  setProdKeyArr: Tinstance_useQuotationProduct['setProdKeyArr'];
-  choseActiveProd: Tinstance_useQuotationProduct['choseActiveProd'];
-  nodeConfig_origin: Tinstance_useQuotationProduct['nodeConfig_origin'];
-  quotationDiscount: Tinstance_useQuotationProduct['quotationDiscount'];
-  setQuotationDiscount: Tinstance_useQuotationProduct['setQuotationDiscount'];
-  // state_prodDict: Tinstance_useQuotationProduct['state_prodDict'];
-  createClassProd: Tinstance_useQuotationProduct['createClassProd'];
-  // activedClassProd: Tinstance_useQuotationProduct['activedClassProd'];
-  addEmptyProd: Tinstance_useQuotationProduct['addEmptyProd'];
-  removeProd: Tinstance_useQuotationProduct['removeProd'];
-  copyProd: Tinstance_useQuotationProduct['copyProd'];
-  //
-  // activedProd: Tinstance_useQuotationProduct['activedProd'];
-  // activedClassComponentDict: Tinstance_useQuotationProduct['activedClassComponentDict'];
-  // activedClassPseudoComponentDict: Tinstance_useQuotationProduct['activedClassPseudoComponentDict'];
-  cellKeyArr_component: Tinstance_useQuotationProduct['cellKeyArr_component'];
-  setCellKeyArr_component: Tinstance_useQuotationProduct['setCellKeyArr_component'];
-  componentKeyArr: Tinstance_useQuotationProduct['componentKeyArr'];
-  setComponentKeyArr: Tinstance_useQuotationProduct['setComponentKeyArr'];
-  nodeConfig_component_origin: Tinstance_useQuotationProduct['nodeConfig_component_origin'];
-  //
-  // activedClassProd: Tinstance_useQuotationProduct['activedClassProd'];
-  // activedClassAccessoryDict: Tinstance_useQuotationProduct['activedClassAccessoryDict'];
-  cellKeyArr_accessory: Tinstance_useQuotationProduct['cellKeyArr_accessory'];
-  setCellKeyArr_accessory: Tinstance_useQuotationProduct['setCellKeyArr_accessory'];
-  accessoryKeyArr: Tinstance_useQuotationProduct['accessoryKeyArr'];
-  setAccessoryKeyArr: Tinstance_useQuotationProduct['setAccessoryKeyArr'];
-  nodeConfig_accessory_origin: Tinstance_useQuotationProduct['nodeConfig_accessory_origin'];
-}
-
 interface Tprops {
-  // instance_useQuotationProductInstance: TprodHookInstance;
   instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
   disabled: boolean;
   className?: string;
@@ -100,19 +58,12 @@ interface Tprops {
 }
 
 interface TtableProps {
-  // instance_useQuotationProductInstance: TprodHookInstance;
   instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
   isIterativeProd?: boolean;
 }
-
-// ===================================================================
-
-const throwErr = () => {
-  throw new Error('預期不可以呼叫這個方法');
-};
 
 // ===================================================================
 
@@ -580,16 +531,14 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
             configDict={nodeConfig_accessory_origin}
             dragHandleInvisible={true}
             left={
-              <>
-                <Cell_delete className={'invisible'} onClick={() => {}} />
-                <Cell_indexNumber className="invisible" />
+              <Panel_accessory className_delete="invisible">
                 <Cell
                   className={classNames('text-xl text-main', nodeConfig_accessory_origin['name'].className)}
                   style={nodeConfig_accessory_origin['name'].style}
                 >
                   {nodeConfig_accessory_origin['name'].label}
                 </Cell>
-              </>
+              </Panel_accessory>
             }
           />
 
@@ -613,16 +562,17 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
               const nodeConfig_name = classAccessory.nodeConfig['name'];
 
               const left = (
-                <>
-                  <Cell_delete onClick={() => activedClassProd?.removeAccessory(acceKey)} />
-                  <Cell_indexNumber>{index + 1}</Cell_indexNumber>
+                <Panel_accessory
+                  onDeleteClick={() => activedClassProd?.removeAccessory(acceKey)}
+                  indexNumber={index + 1}
+                >
                   <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
                     {nodeConfig_name.createNode({
                       disabled,
                       classAcce: classAccessory,
                     })}
                   </Cell>
-                </>
+                </Panel_accessory>
               );
 
               return (
@@ -848,58 +798,3 @@ const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) =>
     // prev.createClassProd === next.createClassProd
   );
 });
-
-const Panel_prod = ({
-  className_delete,
-  onDeleteClick,
-  className_copy,
-  onCopyClick,
-  indexNumber,
-  children,
-}: {
-  className_delete?: string;
-  className_copy?: string;
-  onDeleteClick?: () => void;
-  onCopyClick?: () => void;
-  indexNumber?: React.ReactNode;
-  children?: React.ReactNode;
-}) => {
-  return (
-    <>
-      <Cell_delete className={className_delete} onClick={onDeleteClick} />
-      <Cell_copy className={className_copy} onClick={onCopyClick} />
-      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
-      {children}
-    </>
-  );
-};
-
-const Panel_iterativeProd = ({
-  indexNumber,
-  className_reset,
-  className_copy,
-  className_copy2,
-  onResetClick,
-  onCopyClick,
-  onCopy2Click,
-  children,
-}: {
-  indexNumber?: React.ReactNode;
-  className_reset?: string;
-  className_copy?: string;
-  className_copy2?: string;
-  onResetClick?: () => void; //
-  onCopyClick?: () => void; //
-  onCopy2Click?: () => void; //
-  children?: React.ReactNode;
-}) => {
-  return (
-    <>
-      <Cell_reset className={className_reset} onClick={onResetClick} />
-      <Cell_copy className={className_copy} onClick={onCopyClick} />
-      <Cell_copy2 className={className_copy2} onClick={onCopy2Click} />
-      <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
-      {children}
-    </>
-  );
-};
