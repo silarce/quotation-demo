@@ -537,7 +537,7 @@ div.panelHeader26 {
 
 }
 
-.search_content {
+.search_content1 {
   display: grid;
   grid-template-columns: 300px 1fr 1fr; // 左右兩邊比例，可以調整
   gap: 15px;
@@ -545,7 +545,30 @@ div.panelHeader26 {
   // margin-left: 20px;
   // margin-right: 20px;
   padding-bottom: 5px;
-  border-bottom: 1px solid rgb(214, 214, 214);
+
+  // background-color: gray;
+}
+
+.search_content2 {
+  display: grid;
+  grid-template-columns: 300px 300px 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+  padding-bottom: 5px;
+
+  // background-color: gray;
+}
+
+.search_content3 {
+  display: grid;
+  grid-template-columns: 300px 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+  padding-bottom: 5px;
 
   // background-color: gray;
 }

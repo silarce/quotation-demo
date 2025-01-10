@@ -385,6 +385,7 @@ export default function BomList() {
 
         try {
             const data = {
+                id: handinputproductuuid,
                 parent_product: parent_product,
                 productid: handinputproductid,
                 quantity: handinputquantity,
