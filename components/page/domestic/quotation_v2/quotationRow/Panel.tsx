@@ -169,6 +169,7 @@ const Panel_iterativeProd = ({
   onCopyClick,
   onCopy2Click,
   children,
+  renderProps_copy = (cellCopy) => cellCopy,
 }: {
   indexNumber?: React.ReactNode;
   className_reset?: string;
@@ -178,11 +179,12 @@ const Panel_iterativeProd = ({
   onCopyClick?: () => void; //
   onCopy2Click?: () => void; //
   children?: React.ReactNode;
+  renderProps_copy?: (cellCopy: React.ReactNode) => React.ReactNode;
 }) => {
   return (
     <>
       <Cell_reset className={className_reset} onClick={onResetClick} />
-      <Cell_copy className={className_copy} onClick={onCopyClick} />
+      {renderProps_copy(<Cell_copy className={className_copy} onClick={onCopyClick} />)}
       <Cell_copy2 className={className_copy2} onClick={onCopy2Click} />
       <Cell_indexNumber>{indexNumber}</Cell_indexNumber>
       {children}

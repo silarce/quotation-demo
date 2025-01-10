@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
 
 // antd
-import { Spin } from 'antd';
+import { Spin, Popover } from 'antd';
 
 // component
 import {
@@ -687,6 +687,8 @@ const QuotationRow_dealClass = ({
 }) => {
   const [viewRef, inView] = useInView();
 
+  const [visible_copy, setVisible_copy] = useState(false);
+
   // const classProd = activedClassProd || createClassProd(stateProd);
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
@@ -716,7 +718,22 @@ const QuotationRow_dealClass = ({
     left = (
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
-        <Panel_iterativeProd onCopyClick={() => copyProd({ prodKey: classProd.key })}>
+        <Panel_iterativeProd
+          onCopyClick={() => {
+            copyProd({ prodKey: classProd.key });
+            setVisible_copy(true);
+            setTimeout(() => {
+              setVisible_copy(false);
+            }, 1000);
+          }}
+          renderProps_copy={(cellCopy) => {
+            return (
+              <Popover content="已複製" visible={visible_copy}>
+                {cellCopy}
+              </Popover>
+            );
+          }}
+        >
           <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
             {nodeConfig_itemName.createNode({
               disabled,
