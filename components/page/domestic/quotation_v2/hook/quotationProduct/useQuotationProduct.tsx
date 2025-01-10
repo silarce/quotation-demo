@@ -193,7 +193,8 @@ interface Tinstance_useQuotationProduct {
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
-  copyProd: (prodKey: string) => void;
+  // copyProd: (props: { prodKey: string }) => void;
+  copyProd: ReturnType<typeof kit_createClass>['copyProd'];
   avgDiscount: number;
   doorModelSummery: Record<string, TdoorModelSummeryItem>;
 }
@@ -624,7 +625,15 @@ const useQuotationProduct = ({
     // calcProdAllTotal: throwErr,
     addEmptyProd: throwErr,
     removeProd: throwErr,
-    copyProd: throwErr,
+    //
+    copyProd: ({ prodKey }) => {
+      if (!prodKey) {
+        throw new Error('instance_iterative的copyProd出錯。prodKey不存在');
+      }
+
+      const stateProd = state_iterativeProdDict[prodKey];
+      copyProd({ stateProd });
+    },
     //
     createClassProd,
     //

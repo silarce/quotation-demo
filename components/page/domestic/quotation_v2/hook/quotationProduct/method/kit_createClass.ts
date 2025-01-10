@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 import { createClassComponentDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/createClassComponentDict';
 import { createAccessoryDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/createAccessoryDict';
@@ -38,6 +39,9 @@ import {
   useDefaultState_prodDict,
   createEmptyStateProd,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
+
+import type { XOR } from 'ts-essentials';
+import { isOpacityEffect } from 'html2canvas/dist/types/render/effects';
 
 // ===========================================================================
 
@@ -211,8 +215,17 @@ const kit_createClass = ({
     }
   };
 
-  const copyProd = (prodKey: string) => {
-    const copyedProd = state_prodDict[prodKey];
+  const copyProd = ({ prodKey, stateProd }: XOR<{ prodKey: string }, { stateProd: TstateProd }>) => {
+    if (!prodKey && !stateProd) {
+      throw new Error('copyProd出錯，prodKey與stateProd同時不存在');
+    }
+
+    let copyedProd = prodKey ? state_prodDict[prodKey] : stateProd;
+    copyedProd = _.cloneDeep(copyedProd);
+
+    if (!copyedProd) {
+      throw new Error('copyProd出錯，copyedProd不存在');
+    }
 
     const data_prod = {
       ...copyedProd.data_prod,

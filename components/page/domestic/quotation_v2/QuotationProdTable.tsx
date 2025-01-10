@@ -697,7 +697,7 @@ const QuotationRow_dealClass = ({
       <div ref={viewRef} className={scss.viewIndicator} />
       <Panel_prod
         onDeleteClick={() => removeProd(classProd.key)}
-        onCopyClick={() => copyProd(classProd.key)}
+        onCopyClick={() => copyProd({ prodKey: classProd.key })}
         indexNumber={index + 1}
       >
         <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
@@ -716,7 +716,7 @@ const QuotationRow_dealClass = ({
     left = (
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
-        <Panel_iterativeProd>
+        <Panel_iterativeProd onCopyClick={() => copyProd({ prodKey: classProd.key })}>
           <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
             {nodeConfig_itemName.createNode({
               disabled,
