@@ -39,8 +39,6 @@ const calcProdSummary = ({
       quotationDiscount: state_quotationDiscount || 0,
     });
 
-    console.log(priceDiscount_percent);
-
     prodQty_d = prodQty_d.add(quantity || 0);
     prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
 
