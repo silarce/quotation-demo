@@ -39,6 +39,8 @@ const calcProdSummary = ({
       quotationDiscount: state_quotationDiscount || 0,
     });
 
+    console.log(priceDiscount_percent);
+
     prodQty_d = prodQty_d.add(quantity || 0);
     prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
 
@@ -49,8 +51,11 @@ const calcProdSummary = ({
     };
 
     doorModelSummery_d[doorModelName].quantity = doorModelSummery_d[doorModelName].quantity.add(quantity || 0);
+
+    const subDiscountTotal = new Decimal(priceDiscount_percent).mul(quantity || 0);
+
     doorModelSummery_d[doorModelName].discountTotal =
-      doorModelSummery_d[doorModelName].discountTotal.add(priceDiscount_percent);
+      doorModelSummery_d[doorModelName].discountTotal.add(subDiscountTotal);
   });
 
   // page右下方的平均折數
