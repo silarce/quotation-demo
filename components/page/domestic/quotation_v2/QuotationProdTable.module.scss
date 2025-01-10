@@ -18,9 +18,16 @@
   .bottom {
     padding: 5px;
     background-color: white;
+    display: flex;
+    justify-content: space-between;
+
     .btn {
       position: sticky;
       left: 5px;
+    }
+    .total {
+      color: theme("colors.main");
+      font-size: 16px;
     }
   }
 }

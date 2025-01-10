@@ -291,10 +291,11 @@ const Table_prod = ({
             })}
           </Table_dnd>
         </div>
-        <div className={classNames(scss.bottom, disabled && 'invisible')}>
-          <SquareBtn sharp="mini" onClick={addEmptyProd} className={scss.btn}>
+        <div className={classNames(scss.bottom)}>
+          <SquareBtn sharp="mini" onClick={addEmptyProd} className={classNames(scss.btn, disabled && 'invisible')}>
             新增主產品
           </SquareBtn>
+          <div className={scss.total}>複價合計：9999999</div>
         </div>
       </div>
     </div>
