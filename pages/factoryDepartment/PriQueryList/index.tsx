@@ -66,7 +66,7 @@ import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function PriQueryList() {
     const [pagename, setPagename] = useState<string>("價格查詢")
-
+    const [autoRefresh, setAutoRefresh] = useState<number>(1)//分鐘
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -166,6 +166,18 @@ export default function PriQueryList() {
         Get();
     }, []);
 
+    //#endregion
+
+    //#endregion ===========【自動更新】
+    useEffect(() => {
+        // 定義一個 interval，每隔 5 分鐘執行一次 Get 函式
+        const intervalId = setInterval(() => {
+            Get();
+        }, autoRefresh * 60 * 1000); // 5 分鐘 = 5 * 60 * 1000 毫秒
+
+        // 清除 interval，避免記憶體洩漏
+        return () => clearInterval(intervalId);
+    }, []); // 確保只在組件掛載時設定一次
     //#endregion
 
     //#region ===========【API】
@@ -469,7 +481,7 @@ export default function PriQueryList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={pagename + "列表"}
+            <PageHeader02 tag={pagename}
                 customeLeft={[
                     <>
                         {/* {windowSize.width} */}
@@ -480,8 +492,7 @@ export default function PriQueryList() {
                 ]}
 
                 panelList={panelList} />
-
-            <div className={scss.search_content}
+            <div
                 style={{
                     display: `${isCollapsed ? '' : 'none'}`,
                     padding: '20px',
@@ -489,119 +500,72 @@ export default function PriQueryList() {
                     // backgroundColor: '#f9f9f9',
                     zIndex: '1000'
                 }}>
-                {/* 每個項目 */}
-                <div>
-                    {/* 種類下拉選單 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        價格種類
-                    </label>
-                    <select
-                        value={keyword5 || ''}
-                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                            setKeyword5(e.target.value);
-                            e.target.blur(); // 讓 select 失去焦點
-                        }}
-                        disabled={false} // 根據需求設置是否禁用
-                        style={{
-                            fontSize: '18px',
-                            borderBottom: '1px solid #14256a',
-                            width: '100%',
-                            marginTop: '-1px', // 調整負值以微調向上位置
-                        }}
-                    >
-                        <option value="">全部</option>
-                        <option value="詢價">詢價</option>
-                        <option value="進價">進價</option>
-                    </select>
-                    {/* 廠商名稱 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        廠商名稱
-                    </label>
-                    <InputSel
-                        // caption="單號"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        inputProps={{
-                            props: {
-                                placeholder: '請輸入廠商名稱',
-                                style: { width: "300px", paddingLeft: '5px' },
-                                value: keyword1,
-                                onChange: (e) => {
-                                    setKeyword1(e.target.value)
-                                }
-                            },
-                        }}
-                    />
-                    {/* 料號 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        料號
-                    </label>
-                    <InputSel
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        inputProps={{
-                            props: {
-                                placeholder: '請輸入料號',
-                                style: { width: "300px", paddingLeft: '5px' },
-                                value: keyword2,
-                                onChange: (e) => {
-                                    setKeyword2(e.target.value)
-                                }
-                            },
-                        }}
-                    />
-                </div>
 
-                <div>
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        起始日期
-                    </label>
-                    {/* 起始日期 */}
-                    <InputSel
-                        // caption="起始日期"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
-                        datePickerProps={{
-                            props: {
-                                style: { paddingRight: '5px' },
-                                value: keywordstartdate || null,
-                                onChange: (e: Moment | null) => {
-                                    setKeywordstartdate(e);
+                <div className={scss.search_content1}>
+                    {/* 每個項目 */}
+                    <div>
+                        {/* 種類下拉選單 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            價格種類
+                        </label>
+                        <select
+                            value={keyword5 || ''}
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                setKeyword5(e.target.value);
+                                e.target.blur(); // 讓 select 失去焦點
+                            }}
+                            disabled={false} // 根據需求設置是否禁用
+                            style={{
+                                fontSize: '18px',
+                                borderBottom: '1px solid #14256a',
+                                width: '100%',
+                                marginTop: '-1px', // 調整負值以微調向上位置
+                            }}
+                        >
+                            <option value="">全部</option>
+                            <option value="詢價">詢價</option>
+                            <option value="進價">進價</option>
+                        </select>
+
+                    </div>
+                    <div>
+                        {/* 廠商名稱 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            廠商名稱
+                        </label>
+                        <InputSel
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入廠商名稱',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword1,
+                                    onChange: (e) => {
+                                        setKeyword1(e.target.value)
+                                    }
                                 },
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    </div>
+                    <div>
 
-                    {/* 隱藏保留位置 */}
-                    <label
+                        {/* 隱藏保留位置 */}
+                        {/* <label
                         style={{
                             fontSize: "16px",
                             fontWeight: "bold",
@@ -623,150 +587,160 @@ export default function PriQueryList() {
                             visibility: 'hidden', // 隱藏但保留位置
                         }}
                         value={"保留位置"}
-                    />
-
-                    {/* 品名 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        品名
-                    </label>
-                    <InputSel
-                        // caption="單號"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        inputProps={{
-                            props: {
-                                placeholder: '請輸入品名',
-                                style: { width: "300px", paddingLeft: '5px' },
-                                value: keyword3,
-                                onChange: (e) => {
-                                    setKeyword3(e.target.value)
-                                }
-                            },
-                        }}
-                    />
-                </div>
-                <div>
-                    {/* 規格 - 隱藏但保留位置 */}
-                    {/* <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                    >
-                        規格
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="請輸入規格"
-                        style={{
-                            width: '100%',
-                            padding: "8px",
-                            border: "1px solid #ccc",
-                            fontSize: "16px",
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                        value={keyword4}
-                        onChange={(e) => setKeyword4(e.target.value)}
                     /> */}
-                    {/* 截止日期 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        截止日期
-                    </label>
-                    <InputSel
-                        // caption="截止日期"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        datePickerProps={{
-                            props: {
-                                style: { paddingRight: '5px' },
-                                value: keywordenddate || null,
-                                onChange: (e: Moment | null) => {
-                                    setKeywordenddate(e);
-                                },
-                            },
-                        }}
-                    />
 
-                    {/* 隱藏保留位置 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                    >
-                        保留位置
-                    </label>
-                    <input
-                        type="text"
-                        placeholder="保留位置"
-                        style={{
-                            width: '100%',
-                            // padding: "8px",
-                            border: "1px solid #ccc",
-                            fontSize: "16px",
-                            visibility: 'hidden', // 隱藏但保留位置
-                        }}
-                        value={"保留位置"}
-                    />
-                    {/* 規格 */}
-                    <label
-                        style={{
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            marginRight: "10px",
-                            display: 'block',
-                        }}
-                    >
-                        規格
-                    </label>
-                    <InputSel
-                        // caption="單號"
-                        disabled={false}
-                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                        inputProps={{
-                            props: {
-                                placeholder: '請輸入規格',
-                                style: { width: "300px", paddingLeft: '5px' },
-                                value: keyword4,
-                                onChange: (e) => {
-                                    setKeyword4(e.target.value)
-                                }
-                            },
-                        }}
-                    />
+                    </div>
                 </div>
-            </div>
+                <div className={scss.search_content2}>
+                    <div>
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            起始日期
+                        </label>
+                        {/* 起始日期 */}
+                        <InputSel
+                            // caption="起始日期"
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px', paddingLeft: '5px' }}
+                            datePickerProps={{
+                                props: {
+                                    style: { paddingRight: '5px' },
+                                    value: keywordstartdate || null,
+                                    onChange: (e: Moment | null) => {
+                                        setKeywordstartdate(e);
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                    <div>
+                        {/* 截止日期 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            截止日期
+                        </label>
+                        <InputSel
+                            // caption="截止日期"
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            datePickerProps={{
+                                props: {
+                                    style: { paddingRight: '5px' },
+                                    value: keywordenddate || null,
+                                    onChange: (e: Moment | null) => {
+                                        setKeywordenddate(e);
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                    <div></div>
+                </div>
+                <div className={scss.search_content3}>
+                    <div>
+                        {/* 料號 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            料號
+                        </label>
+                        <InputSel
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入料號',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword2,
+                                    onChange: (e) => {
+                                        setKeyword2(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
+                    </div>
+                    <div>
+                        {/* 品名 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            品名
+                        </label>
+                        <InputSel
+                            // caption="單號"
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入品名',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword3,
+                                    onChange: (e) => {
+                                        setKeyword3(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
+                    </div>
+                    <div>
+                        {/* 規格 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            規格
+                        </label>
+                        <InputSel
+                            // caption="單號"
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入規格',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword4,
+                                    onChange: (e) => {
+                                        setKeyword4(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
+                    </div>
+                </div>
 
+            </div>
             <div
                 style={{
                     border: '1px solid rgb(168, 168, 168)',
-                    // marginLeft: '20px',
-                    // marginRight: '20px',
-                    // height: '660px'
-                    // height: '480px'
-                    height: `${isCollapsed ? '460px' : '660px'}`
+                    height: `${isCollapsed ? '443px' : '660px'}`
                 }}>
-                <div className={scss.body_content1} style={{ overflowX: 'auto', maxHeight: `${isCollapsed ? '460px' : '660px'}` }} >
+                <div className={scss.body_content1} style={{ overflowX: 'auto', maxHeight: `${isCollapsed ? '443px' : '660px'}` }} >
                     {/* <Thead01 type={'PEntry'} /> */}
                     <div className={scss.head15}>
                         <span>
