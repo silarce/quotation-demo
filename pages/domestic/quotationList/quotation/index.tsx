@@ -329,7 +329,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //   });
 
   // const instance_quotationProduct = useQuotationProduct({
-  const { instance: instance_quotationProduct, instance_iterative } = useQuotationProduct({
+  const {
+    instance: instance_quotationProduct,
+    instance_iterative,
+    allProdTotal,
+    allProdTotal_iterative,
+    theProductTotal,
+  } = useQuotationProduct({
     raw_quotationProductArr: content?.products,
     raw_quotationDiscount: content?.discount,
     iterativeContractProductArr: iterativeContractProductArr,
@@ -409,7 +415,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     raw_contentOtherArr: content?.others,
     onOtherPriceAllTotalChange(total) {
       handleSetQuotationPriceTotal({
-        prodPriceAllTotal: instance_quotationProduct.calcProdAllTotal(),
+        // prodPriceAllTotal: instance_quotationProduct.calcProdAllTotal(),
+        prodPriceAllTotal: theProductTotal,
         otherPriceAllTotal: total,
       });
     },
@@ -905,6 +912,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                   instance_useQuotationProductInstance={instance_iterative}
                   showQuotationDiscount={false}
                   isIterativeProd={true}
+                  prodTotal={allProdTotal_iterative}
                 />
               </div>
             </div>
@@ -921,6 +929,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           <QuotationProdTable
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
+            prodTotal={allProdTotal}
           />
           <br />
           <br />

@@ -98,7 +98,9 @@ import {
   // calcProdTotalPrice,
   // w注意 calcAndRenewAllProdPrice_sideEffect有副作用
   calcAndRenewAllProdPrice_sideEffect,
+  calcAndRenewAllProdPrice,
   calcPriceDiscount_percent,
+  calcProdAllTotal as the_calcProdAllTotal,
   //
 } from './method/calcProd';
 import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary';
@@ -187,7 +189,7 @@ interface Tinstance_useQuotationProduct {
   // createActivedClassAccessoryDict: aaaaa;
   createClassProd: (stateProd: TstateProd) => ClassProd;
   calcProductBody: () => ReturnType<typeof _calcProductBody>;
-  calcProdAllTotal: () => number;
+  // calcProdAllTotal: () => number;
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
@@ -215,7 +217,6 @@ const useQuotationProduct = ({
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
 }: {
-  // raw_quotationContent: TquotationContentDto | undefined;
   raw_quotationProductArr: TquotationContentDto['products'] | undefined;
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
   iterativeContractProductArr: TquotationContentDto['products'] | undefined;
@@ -265,14 +266,9 @@ const useQuotationProduct = ({
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
-  const { debouncedState: debounced_state_prodDict, isBouncing } = useDebounce(state_prodDict, 500);
 
   const [state_iterativeProdDict, setState_iterativeProdDict] = useState<TstateProdDict>(
     defaultState_iterative_copy.stateProdDict
-  );
-  const { debouncedState: debounced_state__iterativeProdDict, isBouncing: isBouncing_iterative } = useDebounce(
-    state_prodDict,
-    500
   );
 
   const nodeConfig_prime = useMemo(() => {
@@ -280,6 +276,28 @@ const useQuotationProduct = ({
       doorModelDict,
     });
   }, [doorModelDict]);
+
+  const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
+
+  // ______________________________________________________________________
+  const {
+    //
+    debouncedState: debounced_state_prodDict,
+    isBouncing: isBouncing_state_prodDict,
+  } = useDebounce(state_prodDict, 500);
+
+  const {
+    //
+    debouncedState: debounced_state_iterativeProdDict,
+    isBouncing: isBouncing_state_iterativeProdDict,
+  } = useDebounce(state_prodDict, 500);
+
+  const {
+    //
+    debouncedState: debounced_state_quotationDiscount,
+    isBouncing: isBouncing_state_quotationDiscount,
+  } = useDebounce(state_quotationDiscount, 300);
+  // ______________________________________________________________________
 
   const { avgDiscount, doorModelSummery } = useMemo(() => {
     const { avgDiscount, doorModelSummery } = calcProdSummary({
@@ -291,7 +309,20 @@ const useQuotationProduct = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced_state_prodDict]);
 
-  const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
+  const allProdTotal = useMemo(() => {
+    return the_calcProdAllTotal({ state_prodDict });
+  }, [debounced_state_prodDict]);
+
+  const allProdTotal_iterative = useMemo(() => {
+    // FIXME 晚點要改 不是計算複價，是計算追減與變更後扣掉的金額
+    // 預期是負數
+    return 0;
+    // return the_calcProdAllTotal({ state_prodDict: debounced_state_iterativeProdDict });
+  }, [debounced_state_iterativeProdDict]);
+
+  const theProductTotal = useMemo(() => {
+    return new Decimal(allProdTotal).add(allProdTotal_iterative).toNumber();
+  }, [allProdTotal, allProdTotal_iterative]);
 
   // -----------------------------------------------------------------------
   // region STATE HANDLER
@@ -300,9 +331,9 @@ const useQuotationProduct = ({
   //
   //
 
-  const onProdAllTotalChange = () => {
-    _onProdAllTotalChange(calcProdAllTotal());
-  };
+  // const onProdAllTotalChange = () => {
+  //   _onProdAllTotalChange(calcProdAllTotal());
+  // };
 
   const choseActiveProd = (stateProd: TstateProd | undefined) => {
     setActiveProdKey(stateProd?.key);
@@ -344,12 +375,14 @@ const useQuotationProduct = ({
     setState_quotationDiscount(value);
 
     // w注意 calcAndRenewAllProdPrice_sideEffect有副作用
-    calcAndRenewAllProdPrice_sideEffect({
-      prodDict: state_prodDict,
-      quotationDiscount: value,
-    });
+    // calcAndRenewAllProdPrice_sideEffect會給改變state_prodDict的內容卻不會新狀態...
+    // 為什麼不避免副作用?因為要改的東西太多了，難以一一抽離出來
+    // calcAndRenewAllProdPrice_sideEffect({
+    //   prodDict: state_prodDict,
+    //   quotationDiscount: value,
+    // });
 
-    onProdAllTotalChange();
+    // onProdAllTotalChange();
   };
 
   // -----------------------------------------------------------------------
@@ -374,7 +407,7 @@ const useQuotationProduct = ({
     setState_prodDict,
     nodeConfig_prime,
     state_quotationDiscount,
-    onProdAllTotalChange,
+    onProdAllTotalChange: () => {}, // 重構完成後確認沒問題就把這個參數拿掉
     setProdKeyArr,
     state_prodDict,
     activeProdKey,
@@ -435,37 +468,37 @@ const useQuotationProduct = ({
 
   // region METHOD
 
-  function calcProdAllTotal() {
-    // newState_prodDict?: TstateProdDict
-    // const prodDict = newState_prodDict ?? state_prodDict;
+  // function calcProdAllTotal() {
+  //   // newState_prodDict?: TstateProdDict
+  //   // const prodDict = newState_prodDict ?? state_prodDict;
 
-    // FIXME
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
-    // 要把報價單總產品算進來
+  //   // FIXME
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
+  //   // 要把報價單總產品算進來
 
-    const prodDict = state_prodDict;
+  //   const prodDict = state_prodDict;
 
-    let total_d = new Decimal(0);
-    // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
-    // 不會有物件狀態未更新而金額不對的問題
-    Object.values(prodDict).forEach((prod) => {
-      total_d = total_d.add(prod.data_prod.totalPrice || 0);
-    });
+  //   let total_d = new Decimal(0);
+  //   // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
+  //   // 不會有物件狀態未更新而金額不對的問題
+  //   Object.values(prodDict).forEach((prod) => {
+  //     total_d = total_d.add(prod.data_prod.totalPrice || 0);
+  //   });
 
-    return total_d.toNumber();
-  }
+  //   return total_d.toNumber();
+  // }
 
   const calcProductBody = () => {
     return _calcProductBody({
@@ -506,6 +539,23 @@ const useQuotationProduct = ({
     setState_quotationDiscount(defaultQuotationDiscount);
   }, [disabled, defaultQuotationDiscount]);
 
+  useEffect(() => {
+    const newState_prodDict = calcAndRenewAllProdPrice({
+      prodDict: state_prodDict,
+      // 因為state_quotationDiscount更及時
+      // 所以用state_quotationDiscount而不用debounced_state_quotationDiscount
+      quotationDiscount: state_quotationDiscount,
+    });
+
+    setState_prodDict(newState_prodDict);
+
+    // calcAndRenewAllProdPrice
+  }, [debounced_state_quotationDiscount]);
+
+  useEffect(() => {
+    _onProdAllTotalChange(theProductTotal);
+  }, [theProductTotal]);
+
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -516,46 +566,36 @@ const useQuotationProduct = ({
     activedProd,
     activedClassProd,
     prodKeyArr,
-
     activedClassComponentDict,
     activedClassPseudoComponentDict,
     activedClassAccessoryDict,
-    //
-
+    componentKeyArr: activedProd?.componentKeyArr,
+    accessoryKeyArr: activedProd?.accessoryKeyArr,
+    choseActiveProd,
     //
     cellKeyArr,
     setCellKeyArr,
     setProdKeyArr,
     //
-    choseActiveProd,
-    //
-
     cellKeyArr_component,
     setCellKeyArr_component,
-    componentKeyArr: activedProd?.componentKeyArr,
     setComponentKeyArr,
     //
-
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
-    accessoryKeyArr: activedProd?.accessoryKeyArr,
     setAccessoryKeyArr,
-
     //
     nodeConfig_origin,
     nodeConfig_component_origin,
     nodeConfig_accessory_origin,
     //
-    //
-    //
     quotationDiscount: state_quotationDiscount, // 總折數
     setQuotationDiscount,
     //
-
     createClassProd,
     calcProductBody,
-    calcProdAllTotal,
-
+    // calcProdAllTotal,
+    //
     addEmptyProd,
     removeProd,
     copyProd,
@@ -569,21 +609,19 @@ const useQuotationProduct = ({
     activedProd: activedProd_iterative,
     activedClassProd: activedClassProd_iterative,
     prodKeyArr: prodKeyArr_iterative,
-
     activedClassComponentDict: activedClassComponentDict_iterative,
     activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
     activedClassAccessoryDict: activedClassAccessoryDict_iterative,
-
     componentKeyArr: activedProd_iterative?.componentKeyArr,
-    choseActiveProd: choseActiveProd_iterative,
     accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
+    choseActiveProd: choseActiveProd_iterative,
     //
     setProdKeyArr: throwErr,
     setComponentKeyArr: throwErr,
     setAccessoryKeyArr: throwErr,
     setQuotationDiscount: throwErr,
     calcProductBody: throwErr,
-    calcProdAllTotal: throwErr,
+    // calcProdAllTotal: throwErr,
     addEmptyProd: throwErr,
     removeProd: throwErr,
     copyProd: throwErr,
@@ -616,87 +654,11 @@ const useQuotationProduct = ({
   return {
     instance,
     instance_iterative,
+    isBouncing: isBouncing_state_prodDict || isBouncing_state_iterativeProdDict || isBouncing_state_quotationDiscount,
+    allProdTotal,
+    allProdTotal_iterative,
+    theProductTotal,
   };
-
-  // return {
-  //   // classProdDict,
-  //   // activedClassProd,
-  //   state_prodDict,
-  //   activedProd,
-  //   activedClassProd,
-  //   prodKeyArr,
-
-  //   activedClassComponentDict,
-  //   activedClassPseudoComponentDict,
-  //   activedClassAccessoryDict,
-  //   //
-  //   // state_iterativeProdDict,
-  //   // activedProd_iterative,
-  //   // activedClassProd_iterative,
-  //   // prodKeyArr_iterative,
-
-  //   // activedClassComponentDict_iterative,
-  //   // activedClassPseudoComponentDict_iterative,
-  //   // activedClassAccessoryDict_iterative,
-
-  //   // componentKeyArr_iterative: activedProd_iterative?.componentKeyArr,
-  //   // choseActiveProd_iterative,
-  //   //
-  //   cellKeyArr,
-  //   setCellKeyArr,
-  //   setProdKeyArr,
-  //   //
-  //   choseActiveProd,
-  //   //
-  //   // activedClassComponentArr,
-  //   // activedClassComponentDict,
-  //   cellKeyArr_component,
-  //   setCellKeyArr_component,
-  //   componentKeyArr: activedProd?.componentKeyArr,
-  //   setComponentKeyArr,
-  //   //
-  //   // activedClassAccessoryDict,
-  //   cellKeyArr_accessory,
-  //   setCellKeyArr_accessory,
-  //   accessoryKeyArr: activedProd?.accessoryKeyArr,
-  //   setAccessoryKeyArr,
-  //   // showAccessorySelector,
-  //   //
-  //   nodeConfig_origin,
-  //   nodeConfig_component_origin,
-  //   nodeConfig_accessory_origin,
-  //   //
-  //   //
-  //   //
-  //   quotationDiscount: state_quotationDiscount, // 總折數
-  //   setQuotationDiscount,
-  //   //
-  //   // state_totalPrice, // 完整狀態
-  //   // setProdPriceTotal,
-  //   // setTuneTotal,
-  //   // setCurrency,
-  //   // setExchangeRate,
-  //   //
-  //   //
-  //   //
-
-  //   // lookup_classProd,
-  //   // nodeConfig_prime,
-  //   createClassProd,
-  //   calcProductBody,
-  //   calcProdAllTotal,
-
-  //   // createActivedClassComponentDict,
-  //   // createActivedClassAccessoryDict,
-  //   //
-  //   //
-  //   addEmptyProd,
-  //   removeProd,
-  //   copyProd,
-  //   //
-  //   avgDiscount,
-  //   doorModelSummery,
-  // };
 };
 
 // MARK: END

@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 import type { TstateProd, TstateProdDict, TstateComponentData } from '../type';
 
@@ -120,7 +121,115 @@ const calcAndRenewAllProdPrice_sideEffect = ({
 
     const { data_prod, data_componentDict, data_accessoryDict } = stateProd;
 
-    const { distributionBoxQuantity, distributionBoxPrice, installationFeeQuantity, installationFeePrice } = data_prod;
+    // const { distributionBoxQuantity, distributionBoxPrice, installationFeeQuantity, installationFeePrice } = data_prod;
+
+    const priceDiscount_percent = calcPriceDiscount_percent({
+      prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
+      quotationDiscount: quotationDiscount || 0,
+    });
+
+    // ___________________________________________________________________
+    // ___________________________________________________________________
+
+    Object.entries(data_componentDict).forEach(([_key, com]) => {
+      const key = _key as keyof typeof data_componentDict;
+
+      const theComponent = data_componentDict[key];
+
+      if (!theComponent) {
+        return;
+      }
+
+      const {
+        //  dualPrice,
+        unitPrice,
+        totalPrice,
+      } = calcAllPrice({
+        price: com.price || 0,
+        quantity: com.quantity || 0,
+        priceDiscount_percent,
+      });
+
+      // theComponent.dualPrice = dualPrice;
+      theComponent.unitPrice = unitPrice;
+      theComponent.totalPrice = totalPrice;
+      theComponent.renderCount = (theComponent.renderCount ?? 0) + 1;
+    });
+
+    // ___________________________________________________________________
+    // ___________________________________________________________________
+
+    Object.entries(data_accessoryDict).forEach(([key, acce]) => {
+      const copy = { ...acce };
+      const { quantity, price } = copy;
+
+      const {
+        // dualPrice,
+        unitPrice,
+        totalPrice,
+      } = calcAllPrice({
+        price: price || 0,
+        quantity: quantity || 0,
+        priceDiscount_percent,
+      });
+
+      // copy.dualPrice = `${dualPrice}` as `${number}`;
+      copy.unitPrice = `${unitPrice}` as `${number}`;
+      copy.totalPrice = `${totalPrice}` as `${number}`;
+
+      data_accessoryDict[key] = copy;
+    });
+
+    // ___________________________________________________________________
+    // ___________________________________________________________________
+
+    const { distributionBoxUnitPrice, distributionBoxTotalPrice, installationFeeUnitPrice, installationFeeTotalPrice } =
+      calcProdDistributionBoxAndInstallationFee({
+        stateProd,
+        priceDiscount_percent,
+      });
+
+    data_prod.distributionBoxUnitPrice = distributionBoxUnitPrice;
+    data_prod.distributionBoxTotalPrice = distributionBoxTotalPrice;
+
+    data_prod.installationFeeUnitPrice = installationFeeUnitPrice;
+    data_prod.installationFeeTotalPrice = installationFeeTotalPrice;
+
+    // ___________________________________________________________________
+    // ___________________________________________________________________
+
+    const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
+      stateProd,
+      quotationDiscount,
+    });
+
+    data_prod.price = price;
+    data_prod.dualPrice = dualPrice;
+    data_prod.unitPrice = unitPrice;
+    data_prod.totalPrice = totalPrice;
+  });
+
+  // ___________________________________________________________________
+  // ___________________________________________________________________
+
+  return prodDict;
+};
+
+const calcAndRenewAllProdPrice = ({
+  prodDict,
+  quotationDiscount,
+}: {
+  prodDict: TstateProdDict;
+  quotationDiscount: `${number}` | '';
+}) => {
+  prodDict = _.cloneDeep(prodDict);
+
+  Object.values(prodDict).forEach((stateProd) => {
+    stateProd.renderCount = (stateProd.renderCount ?? 0) + 1;
+
+    const { data_prod, data_componentDict, data_accessoryDict } = stateProd;
+
+    // const { distributionBoxQuantity, distributionBoxPrice, installationFeeQuantity, installationFeePrice } = data_prod;
 
     const priceDiscount_percent = calcPriceDiscount_percent({
       prodDiscount: (data_prod.discount || 0) as `${number}` | 0,
@@ -287,11 +396,27 @@ const calcProdDistributionBoxAndInstallationFee = ({
   };
 };
 
+// MAKR:calcProdAllTotal
+function calcProdAllTotal({ state_prodDict }: { state_prodDict: TstateProdDict }) {
+  const prodDict = state_prodDict;
+
+  let total_d = new Decimal(0);
+  // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
+  // 不會有物件狀態未更新而金額不對的問題
+  Object.values(prodDict).forEach((prod) => {
+    total_d = total_d.add(prod.data_prod.totalPrice || 0);
+  });
+
+  return total_d.toNumber();
+}
+
 // ========================================================================
 export {
   calcProdTotalPrice,
   calcAndRenewAllProdPrice_sideEffect,
+  calcAndRenewAllProdPrice,
   calcAllPrice,
   calcPriceDiscount_percent,
   calcProdDistributionBoxAndInstallationFee,
+  calcProdAllTotal,
 };

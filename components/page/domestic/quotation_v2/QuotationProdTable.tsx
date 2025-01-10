@@ -55,6 +55,7 @@ interface Tprops {
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
   isIterativeProd?: TtableProps['isIterativeProd'];
+  prodTotal?: TtableProps['prodTotal'];
 }
 
 interface TtableProps {
@@ -63,6 +64,7 @@ interface TtableProps {
   className?: string;
   showQuotationDiscount?: boolean;
   isIterativeProd?: boolean;
+  prodTotal?: React.ReactNode;
 }
 
 // ===================================================================
@@ -77,6 +79,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
     className,
     showQuotationDiscount = true,
     isIterativeProd,
+    prodTotal,
   } = tableProps;
 
   const instance_useQuotationProductInstance = tableProps.instance_useQuotationProductInstance;
@@ -92,6 +95,7 @@ export default function QuotationProdTable(tableProps: Tprops) {
         disabled={disabled}
         showQuotationDiscount={showQuotationDiscount}
         isIterativeProd={isIterativeProd}
+        prodTotal={prodTotal}
       />
       <br />
 
@@ -158,6 +162,7 @@ const Table_prod = ({
   className,
   showQuotationDiscount,
   isIterativeProd,
+  prodTotal,
 }: TtableProps) => {
   const {
     state_prodDict,
@@ -270,10 +275,6 @@ const Table_prod = ({
               const stateProd = state_prodDict[prodKey];
               const isActive = activedProd === stateProd;
 
-              console.log(prodKey);
-              console.log(state_prodDict);
-              console.log(stateProd);
-
               return (
                 <QuotationRow_dealClass_memo
                   key={prodKey}
@@ -295,7 +296,7 @@ const Table_prod = ({
           <SquareBtn sharp="mini" onClick={addEmptyProd} className={classNames(scss.btn, disabled && 'invisible')}>
             新增主產品
           </SquareBtn>
-          <div className={scss.total}>複價合計：9999999</div>
+          <div className={scss.total}>複價合計：{prodTotal}</div>
         </div>
       </div>
     </div>
