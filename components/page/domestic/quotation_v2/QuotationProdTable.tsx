@@ -25,6 +25,7 @@ import {
 // gear
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -663,12 +664,12 @@ const QuotationRow_dealClass = ({
   prodKey,
 
   instance_useQuotationProductInstance: {
-    //
     choseActiveProd,
     createClassProd,
     activedClassProd,
     removeProd,
     copyProd,
+    modifyProd,
   },
 }: {
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
@@ -724,6 +725,23 @@ const QuotationRow_dealClass = ({
             setTimeout(() => {
               setVisible_copy(false);
             }, 1000);
+          }}
+          onCopy2Click={() => {
+            const { destroy } = myAlert.input({
+              title: `可變更數量：${classProd.qty_remain}`,
+              placeholder: '請輸入正整數',
+              props_input: {
+                type: 'number',
+                min: 0,
+                step: 0,
+              },
+              onConfirm: (v) => {
+                modifyProd({ prodKey: classProd.key, qty_modify: Number(v) });
+                destroy();
+              },
+            });
+
+            // modifyProd({ prodKey: classProd.key });
           }}
           renderProps_copy={(cellCopy) => {
             return (

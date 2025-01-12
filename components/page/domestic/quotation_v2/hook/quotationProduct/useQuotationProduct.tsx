@@ -3,6 +3,8 @@ import Decimal from 'decimal.js';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import { useDebounce } from 'hooks/useDebounce';
@@ -104,6 +106,7 @@ import {
   calcAndRenewAllProdPrice,
   calcPriceDiscount_percent,
   calcProdAllTotal as the_calcProdAllTotal,
+  calcProdRemain,
   //
 } from './method/calcProd';
 import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary';
@@ -155,6 +158,9 @@ interface TclassAccessoryDict {
   [key: string]: Class_accessory;
 }
 
+// type Tcopy = ReturnType<typeof kit_createClass>['copyProd'];
+type Tcopy = Parameters<ReturnType<typeof kit_createClass>['copyProd']>;
+
 interface Tinstance_useQuotationProduct {
   state_prodDict: TstateProdDict;
   activedProd: TstateProd | undefined;
@@ -196,10 +202,11 @@ interface Tinstance_useQuotationProduct {
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
-  // copyProd: (props: { prodKey: string }) => void;
-  copyProd: ReturnType<typeof kit_createClass>['copyProd'];
+  copyProd: (...params: Parameters<ReturnType<typeof kit_createClass>['copyProd']>) => void;
   avgDiscount: number;
   doorModelSummery: Record<string, TdoorModelSummeryItem>;
+
+  modifyProd: (props: { qty_modify: number; prodKey: string }) => void;
 }
 
 // ================================================================================
@@ -440,6 +447,49 @@ const useQuotationProduct = ({
     setActiveProdKey: setActiveProdKey_iterative,
   });
 
+  const copyProd_iterativeToNormal = ({ prodKey }: { prodKey?: string | undefined }) => {
+    if (!prodKey) {
+      throw new Error('instance_iterative的copyProd出錯。prodKey不存在');
+    }
+
+    const stateProd = state_iterativeProdDict[prodKey];
+    copyProd({ stateProd });
+  };
+
+  const modifyProd = ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
+    const stateProd_iterative = state_iterativeProdDict[prodKey];
+
+    const rootProductId = stateProd_iterative.data_prod.id;
+    const allowQty = calcProdRemain({ stateProd: stateProd_iterative });
+
+    if (!rootProductId) {
+      throw new Error('modifyProd方法出錯，rootProductId不存在');
+    } else if (rootProductId !== prodKey) {
+      throw new Error('modifyProd方法出錯，rootProductId不等於prodKey');
+    } else if (qty_modify === 0) {
+      return;
+    } else if (!Number.isInteger(qty_modify) || qty_modify < 0) {
+      myAlert.err({ title: '數量只能是正整數' });
+
+      return;
+    } else if (allowQty < qty_modify) {
+      myAlert.err({ title: '數量不可超過剩餘數量' });
+
+      return;
+    }
+
+    stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
+
+    const newProd = copyProd({ stateProd: stateProd_iterative });
+    newProd.data_prod.rootProductId = rootProductId;
+
+    stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
+    stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
+
+    // state_iterativeProdDict[prodKey] = { ...stateProd_iterative };
+    setState_iterativeProdDict({ ...state_iterativeProdDict });
+  };
+
   const {
     //
     activedClassProd,
@@ -606,6 +656,8 @@ const useQuotationProduct = ({
     //
     avgDiscount,
     doorModelSummery,
+    //
+    modifyProd: throwErr,
   };
 
   const instance_iterative: Tinstance_useQuotationProduct = {
@@ -620,23 +672,8 @@ const useQuotationProduct = ({
     accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
     choseActiveProd: choseActiveProd_iterative,
     //
-    setProdKeyArr: throwErr,
-    setComponentKeyArr: throwErr,
-    setAccessoryKeyArr: throwErr,
-    setQuotationDiscount: throwErr,
-    calcProductBody: throwErr,
-    // calcProdAllTotal: throwErr,
-    addEmptyProd: throwErr,
-    removeProd: throwErr,
-    //
-    copyProd: ({ prodKey }) => {
-      if (!prodKey) {
-        throw new Error('instance_iterative的copyProd出錯。prodKey不存在');
-      }
-
-      const stateProd = state_iterativeProdDict[prodKey];
-      copyProd({ stateProd });
-    },
+    copyProd: copyProd_iterativeToNormal,
+    modifyProd,
     //
     createClassProd,
     //
@@ -659,6 +696,15 @@ const useQuotationProduct = ({
     //
     avgDiscount: -1,
     doorModelSummery: {},
+    //
+    setProdKeyArr: throwErr,
+    setComponentKeyArr: throwErr,
+    setAccessoryKeyArr: throwErr,
+    setQuotationDiscount: throwErr,
+    calcProductBody: throwErr,
+    // calcProdAllTotal: throwErr,
+    addEmptyProd: throwErr,
+    removeProd: throwErr,
   };
 
   // MARK: RETURN

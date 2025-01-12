@@ -76,7 +76,7 @@ const useDefaultState_prodDict = ({
         qty_reduce: '',
         qty_modify: 0,
         deductedPrice: 0,
-        extendProductIdArr: [],
+        modifyedProductKeyArr: [],
         rootProductId: undefined,
       };
 
@@ -417,7 +417,7 @@ const createEmptyStateProd = () => {
     qty_reduce: '',
     qty_modify: 0,
     deductedPrice: 0,
-    extendProductIdArr: [],
+    modifyedProductKeyArr: [],
     rootProductId: undefined,
   };
 

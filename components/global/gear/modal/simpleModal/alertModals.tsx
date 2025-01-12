@@ -250,7 +250,16 @@ const ModalClear = (props?: ModalFuncProps) => {
 
 // ====================================================
 
-const ModalInut = (props: {
+const ModalInut = ({
+  onConfirm,
+  isTextArea,
+  defaultValue,
+  placeholder,
+  width = 'auto',
+  props_input,
+  className,
+  ...rest
+}: {
   title?: string | number;
   props?: ModalFuncProps;
   className?: string;
@@ -259,9 +268,8 @@ const ModalInut = (props: {
   isTextArea?: boolean;
   defaultValue?: string;
   placeholder?: string;
+  props_input?: React.InputHTMLAttributes<HTMLInputElement>;
 }) => {
-  const { onConfirm, isTextArea, defaultValue, placeholder, width = 'auto', ...rest } = props;
-
   const modal = Modal.confirm({
     icon: <></>,
     ...modalProps,
@@ -273,8 +281,8 @@ const ModalInut = (props: {
       style: { display: 'none' },
     },
     width,
+    className: classNames(style.confirm, modalProps.className, className),
     ...rest,
-    className: classNames(style.confirm, modalProps.className, props?.className),
   });
 
   modal.update({
@@ -286,6 +294,7 @@ const ModalInut = (props: {
         defaultValue={defaultValue}
         onConfirm={onConfirm}
         onCancel={modal.destroy}
+        props_input={props_input}
       />
     ),
   });
@@ -314,6 +323,7 @@ const Input = ({
   onConfirm,
   onCancel,
   className,
+  props_input,
 }: {
   isTextArea?: boolean;
   placeholder?: string;
@@ -321,6 +331,7 @@ const Input = ({
   onConfirm?: (value: string) => void;
   onCancel?: () => void;
   className?: string;
+  props_input?: React.InputHTMLAttributes<HTMLInputElement>;
 }) => {
   const inputSelProps: TinputSelProps = (() => {
     if (isTextArea) {
@@ -342,8 +353,9 @@ const Input = ({
       return {
         inputProps: {
           props: {
-            defaultValue,
             placeholder,
+            ...props_input,
+            defaultValue,
             name: 'input',
           },
         },

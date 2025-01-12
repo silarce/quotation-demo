@@ -410,6 +410,19 @@ function calcProdAllTotal({ state_prodDict }: { state_prodDict: TstateProdDict }
   return total_d.toNumber();
 }
 
+const calcProdRemain = ({ stateProd }: { stateProd: TstateProd }) => {
+  const {
+    qty_reduce,
+    qty_modify,
+    data_prod: { quantity },
+  } = stateProd;
+
+  return new Decimal(quantity || 0)
+    .minus(qty_reduce || 0)
+    .minus(qty_modify || 0)
+    .toNumber();
+};
+
 // ========================================================================
 export {
   calcProdTotalPrice,
@@ -419,4 +432,5 @@ export {
   calcPriceDiscount_percent,
   calcProdDistributionBoxAndInstallationFee,
   calcProdAllTotal,
+  calcProdRemain,
 };

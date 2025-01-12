@@ -341,8 +341,9 @@ interface TstateProd {
   qty_reduce: `${number}` | ''; // 追減數量
   qty_modify: number; // 變更數量
   deductedPrice: number; // 追減變更金額
-  extendProductIdArr: string[]; // 變更產品id
-  rootProductId?: string;
+  modifyedProductKeyArr: string[]; // 變更產品id
+
+  // rootProductId?: string;
 }
 
 interface TstateProdDict {

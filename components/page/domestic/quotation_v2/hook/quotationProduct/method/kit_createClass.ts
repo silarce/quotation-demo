@@ -227,6 +227,15 @@ const kit_createClass = ({
       throw new Error('copyProd出錯，copyedProd不存在');
     }
 
+    copyedProd = {
+      ...copyedProd,
+      qty_reduce: '',
+      qty_modify: 0,
+      deductedPrice: 0,
+      modifyedProductKeyArr: [],
+      // rootProductId: undefined,
+    };
+
     const data_prod = {
       ...copyedProd.data_prod,
       id: undefined,
@@ -260,6 +269,8 @@ const kit_createClass = ({
     });
 
     onProdAllTotalChange(newProdDict);
+
+    return newProd;
   };
 
   return {

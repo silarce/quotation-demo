@@ -38,28 +38,6 @@ import {
 
 import type { TclassComponentDict } from '../../useQuotationProduct';
 
-// api
-// import {
-//   Thp,
-//   //
-//   TpcgsPrams,
-//   apiGetProdCalcGeneralSpec,
-//   //
-//   TpcdsPrams,
-//   apiGetProdCalcDetailSpec,
-//   //
-//   TpacParams,
-//   apiGetProdAvailableComponents,
-//   //
-//   TgetBoxDParams,
-//   TgetBoxDParams_strict,
-//   //
-//   TgenerateDoorProductBomDto,
-//   apiPostProdGenerateDoorProductBom,
-//   //
-//   apiGetboxD,
-// } from 'js/api/api_product';
-
 import { createAssetUrl } from 'js/api/api_product';
 
 // utils
@@ -131,8 +109,7 @@ import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndTh
 import { Tstate_accountant } from 'components/wholePage/collection';
 import { calcAllPrice, calcPriceDiscount_percent } from '../../method/calcProd';
 
-import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee } from '../../method/calcProd';
-import { TagsOutlined } from '@ant-design/icons';
+import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee, calcProdRemain } from '../../method/calcProd';
 
 // ================================================================================
 
@@ -2065,11 +2042,7 @@ class ClassProd {
   }
 
   get qty_remain() {
-    const quantity = this.data.quantity || 0;
-    const qty_reduce = this.state.qty_reduce || 0;
-    const qty_modify = this.state.qty_modify;
-
-    return new Decimal(quantity).minus(qty_reduce).minus(qty_modify).toNumber();
+    return calcProdRemain({ stateProd: this.state });
   }
 }
 // MARK: END
