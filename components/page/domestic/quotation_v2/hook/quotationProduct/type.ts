@@ -38,6 +38,12 @@ import {
 interface TstateProdData {
   //
   readonly id: string | null | undefined;
+  // 來源產品Id
+  readonly attachedToProductId?: string | null;
+  // 源頭產品
+  // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
+  readonly rootProductId?: string;
+
   // 項目名
   itemName: string;
   // 折數
@@ -201,12 +207,6 @@ interface TstateProdData {
 
   // 排序
   order?: number;
-
-  // 來源產品Id
-  attachedToProductId?: string | null;
-  // 源頭產品
-  // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
-  rootProductId?: string;
 }
 
 // ========================================================================

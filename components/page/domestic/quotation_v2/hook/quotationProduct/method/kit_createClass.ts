@@ -219,14 +219,14 @@ const kit_createClass = ({
   const copyProd = ({
     //
     stateProd,
-    attachedToProductId,
-    rootProductId,
+    // attachedToProductId,
+    // rootProductId,
     quantity,
     attachedToProduct,
   }: {
     stateProd: TstateProd;
-    attachedToProductId?: string;
-    rootProductId?: string;
+    // attachedToProductId?: string;
+    // rootProductId?: string;
     quantity?: number;
     attachedToProduct?: TstateProd;
   }) => {
@@ -243,23 +243,35 @@ const kit_createClass = ({
       throw new Error('copyProd出錯，copyedProd不存在');
     }
 
+    // const action = attachedToProduct ? '變更追加' : '純追加';
+    const action = attachedToProduct ? 'modify' : 'add';
+    const attachedToProductId = attachedToProduct?.data_prod.id;
+
+    if (action === 'modify' && !attachedToProductId) {
+      console.log('attachedToProduct', attachedToProduct);
+
+      throw new Error('copyProd出錯，變更時attachedToProductId不存在');
+    }
+
     copyedProd = {
       ...copyedProd,
       qty_reduce: '',
-      // qty_modify: 0,
       deductedPrice: 0,
       modifyedProduct: {},
-
-      attachedToProduct,
-      // rootProductId: undefined,
+      attachedToProduct: undefined,
     };
 
     const data_prod = {
       ...copyedProd.data_prod,
-      id: undefined,
-      attachedToProductId,
-      rootProductId,
+      id: undefined as string | undefined,
+      rootProductId: undefined,
+      attachedToProductId: undefined,
     };
+
+    if (action === 'modify') {
+      copyedProd.attachedToProduct = attachedToProduct;
+      data_prod.id = attachedToProductId!;
+    }
 
     quantity !== undefined && (data_prod.quantity = `${quantity}`);
 

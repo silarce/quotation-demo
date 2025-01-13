@@ -490,7 +490,6 @@ const useQuotationProduct = ({
 
     const newProd = copyProd({
       stateProd: stateProd_iterative,
-      attachedToProductId: stateProd_iterative.key,
       quantity: qty_modify,
       attachedToProduct: stateProd_iterative,
     });
