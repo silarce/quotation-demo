@@ -113,6 +113,8 @@ import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary
 
 import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
+import type { TquotationProductDto_addition } from 'js/api/api_quotation';
+
 // ================================================================================
 
 type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
@@ -231,7 +233,7 @@ const useQuotationProduct = ({
 }: {
   raw_quotationProductArr: TquotationContentDto['products'] | undefined;
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
-  iterativeContractProductArr: TquotationContentDto['products'] | undefined;
+  iterativeContractProductArr: TquotationProductDto_addition[] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
 }) => {

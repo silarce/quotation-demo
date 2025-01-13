@@ -101,6 +101,7 @@ const createEmptyStateProd = (key: string) => {
     // modifyedProductKeyArr: [],
     modifyedProduct: {},
     // rootProductId: undefined,
+    latestIterativeId: undefined,
   };
 
   return emptyStateProd;

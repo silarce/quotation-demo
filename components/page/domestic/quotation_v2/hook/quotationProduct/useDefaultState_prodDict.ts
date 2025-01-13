@@ -11,6 +11,7 @@ import type {
 } from 'js/api/dtoTypes';
 
 import type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData } from './type';
+import type { TquotationProductDto_addition } from 'js/api/api_quotation';
 
 interface TdefaultState {
   stateProdDict: TstateProdDict;
@@ -23,7 +24,7 @@ const useDefaultState_prodDict = ({
   raw_productArr,
   doorModelDict,
 }: {
-  raw_productArr: undefined | TquotationProductDto[];
+  raw_productArr: TquotationProductDto[] | TquotationProductDto_addition[] | undefined;
   doorModelDict: Record<string, TdoorModelInfoDto> | null | undefined;
   // isIterative;
 }) => {
@@ -40,7 +41,11 @@ const useDefaultState_prodDict = ({
     const dict: TstateProdDict = {};
     const keyArr: string[] = [];
 
-    raw_productArr_copy.forEach((raw) => {
+    raw_productArr_copy.forEach((_raw) => {
+      const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
+
+      const latestIterativeId = 'latestIterativeId' in raw ? raw.latestIterativeId : undefined;
+
       keyArr.push(raw.id);
 
       const data_prod = createDateProd(raw);
@@ -79,6 +84,7 @@ const useDefaultState_prodDict = ({
         // modifyedProductKeyArr: [],
         modifyedProduct: {},
         // rootProductId: undefined,
+        latestIterativeId: latestIterativeId,
       };
 
       dict[data_prod.id] = state;
@@ -421,6 +427,7 @@ const createEmptyStateProd = () => {
     // modifyedProductKeyArr: [],
     modifyedProduct: {},
     // rootProductId: undefined,
+    latestIterativeId: undefined,
   };
 
   return stateProd;

@@ -351,6 +351,7 @@ interface TstateProd {
   >;
 
   attachedToProduct?: TstateProd; // 附屬產品
+  latestIterativeId?: string | undefined; // 最後迭代id
 
   // rootProductId?: string;
 }

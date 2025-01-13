@@ -65,6 +65,7 @@ export type {
   TquotationAccounting_modifyContract,
   TbonusDto,
 } from './dtoTypes';
+export type { TquotationProductDto_addition };
 
 type TgetQuotation = {
   data: TquotationDto[];
@@ -2509,9 +2510,10 @@ export const useGetQuotation_id_3 = (
 
 // ========================================================================
 
-export type TquotationProductDto_addition = TquotationProductDto & {
+type TquotationProductDto_addition = TquotationProductDto & {
   reducedQty: number; // 追減數量 // 好像用不到...
   changedQty: number; // 變更數量 // 好像用不到...
+  latestIterativeId: string;
 };
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
@@ -2559,6 +2561,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
             ...prod,
             reducedQty: 0,
             changedQty: 0,
+            latestIterativeId: rootProductId,
           };
 
           return;
@@ -2583,7 +2586,10 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
           rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
         }
+
+        rootProd.latestIterativeId = prod.id;
       });
+
       //
     });
 
