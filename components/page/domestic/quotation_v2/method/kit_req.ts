@@ -58,6 +58,7 @@ type TcalcProductBody = () => TreturnTypeCalcProductBody;
 const kit_req = ({
   userId,
   quotationId,
+  contractId,
   instance_quotationProduct,
   instance_quotationProduct_iterative,
   instance_useQuotationOther,
@@ -76,6 +77,7 @@ const kit_req = ({
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
+  contractId: string | undefined;
 
   instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_quotationProduct_iterative: Tinstance_useQuotationProduct | undefined | null;
@@ -147,6 +149,58 @@ const kit_req = ({
     }
 
     return { newQuotation };
+  };
+
+  const reqModifyQuotation = async ({ editNote }: { editNote: string }) => {
+    if (!instance_quotationProduct_iterative) {
+      throw new Error('reqModify錯誤，instance_iterative is undefined');
+    } else if (!userId) {
+      throw new Error('reqModify錯誤，沒有使用者ID');
+    } else if (!contractId) {
+      throw new Error('reqModify錯誤，沒有contractId');
+    } else if (!state_profile.customer) {
+      myAlert.info({ title: '請選擇客戶' });
+    }
+
+    const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+    const {
+      quotationProductArr,
+      isAllDoorModalValid,
+      //  invalidComponentArr,
+      totalQty,
+    } = calcProductBody();
+
+    const body = createBody({
+      quotationDiscount: quotationDiscount || '0',
+      avgDiscount,
+      quotationProductArr,
+      totalQty,
+
+      // instance_quotationProduct,
+      instance_useQuotationOther,
+      state_profile,
+      state_payInfo,
+      state_quotationTotal,
+      editNote,
+      userId,
+      annoArr,
+      quotationRangeArr,
+      status,
+      // calcProductBody,
+    });
+
+    const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
+
+    // const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
+    const newQuotation = await apiQuotationModify(contractId, body);
+
+    return newQuotation;
+
+    // if (isUpdated) {
+    //   setDisabled(true);
+    // }
+
+    // return { newQuotation };
   };
 
   // -----------------------------------------------------------------------
@@ -239,16 +293,6 @@ const kit_req = ({
     // }
   };
 
-  const reqModify = () => {
-    if (!instance_quotationProduct_iterative) {
-      throw new Error('reqModify錯誤，instance_iterative is undefined');
-    }
-    // apiQuotationModify
-
-    const { state_prodDict } = instance_quotationProduct;
-    const { state_prodDict: state_prodDict_iterative } = instance_quotationProduct_iterative;
-  };
-
   // MARK:reqCloneQuotation
   // 複製報價單
   const reqCloneQuotation = async ({
@@ -269,6 +313,7 @@ const kit_req = ({
     reqPostQuotation,
     reqPatchQuotation,
     reqCloneQuotation,
+    reqModifyQuotation,
   };
 };
 

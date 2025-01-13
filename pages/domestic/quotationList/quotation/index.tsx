@@ -433,9 +433,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
 
-  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation } = kit_req({
+  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation, reqModifyQuotation } = kit_req({
     userId,
     quotationId,
+    contractId,
     instance_quotationProduct,
     instance_quotationProduct_iterative: instance_iterative,
     instance_useQuotationOther,
@@ -496,6 +497,29 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             //  contractId,
             ...rest
           } = query;
+          router.replace({
+            query: {
+              ...rest,
+              id: newQuotation.id,
+              status: newQuotation.latestContent.status,
+            },
+          });
+        }
+      },
+    });
+  };
+
+  const handleModify = () => {
+    const { destroy } = myAlert.input({
+      isTextArea: true,
+      title: '報價單註解',
+      width: 500,
+      onConfirm: async (editNote) => {
+        destroy();
+        const newQuotation = await reqModifyQuotation({ editNote });
+
+        if (newQuotation) {
+          const { contentId, contractId, ...rest } = query;
           router.replace({
             query: {
               ...rest,
@@ -796,6 +820,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
     btnPatchOnClick: handlePatch,
     btnPostOnClick: handlePost,
+    btnModifyOnClick: handleModify,
 
     cloneQuotation: () => {
       handleClone();

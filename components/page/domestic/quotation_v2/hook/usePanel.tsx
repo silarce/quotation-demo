@@ -25,8 +25,11 @@ interface Tprops {
   //
   btnEditOnClick: () => void;
   btnCancelOnClick: () => void;
+
   btnPatchOnClick: () => void;
+  btnModifyOnClick: () => void;
   btnPostOnClick: () => void;
+
   cloneQuotation: () => void;
   cloneQuotation_relation: () => void;
 
@@ -56,8 +59,11 @@ const usePanel = ({
 
   btnEditOnClick,
   btnCancelOnClick,
+
   btnPatchOnClick,
   btnPostOnClick,
+  btnModifyOnClick,
+
   cloneQuotation,
   cloneQuotation_relation,
   showPdf,
@@ -77,14 +83,22 @@ const usePanel = ({
 
   // -----------------------------------------------------------------------
 
-  let label_update = '更新報價單';
-  isNewQuotation && (label_update = '新建報價單');
-  isNewAttachmentQuotation && (label_update = '新建追加追減報價單');
+  const { label_update, btnUpdateOnClick } = (() => {
+    let label_update = '更新報價單';
+    isNewQuotation && (label_update = '新建報價單');
+    isNewAttachmentQuotation && (label_update = '新建追加追減報價單');
+
+    let btnUpdateOnClick = btnPatchOnClick;
+    isNewQuotation && (btnUpdateOnClick = btnPostOnClick);
+    isNewAttachmentQuotation && (btnUpdateOnClick = btnModifyOnClick);
+
+    return { label_update, btnUpdateOnClick };
+  })();
 
   const panel_update: TpanelList[number] = {
     type: 'redButton',
     label: label_update,
-    onClick: isNewQuotation ? btnPostOnClick : btnPatchOnClick,
+    onClick: btnUpdateOnClick,
   };
   const panel_cacel: TpanelList[number] = {
     type: 'myButton',

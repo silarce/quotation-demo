@@ -1518,7 +1518,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
   const api = `/quotation/${contractId}/modify`;
 
   return axi
-    .patch(api, body)
+    .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
