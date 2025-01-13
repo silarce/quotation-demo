@@ -207,6 +207,7 @@ interface Tinstance_useQuotationProduct {
   doorModelSummery: Record<string, TdoorModelSummeryItem>;
 
   modifyProd: (props: { qty_modify: number; prodKey: string }) => void;
+  resetModify: (props: { prodKey: string }) => void;
 }
 
 // ================================================================================
@@ -490,6 +491,26 @@ const useQuotationProduct = ({
     setState_iterativeProdDict({ ...state_iterativeProdDict });
   };
 
+  const resetModify = ({ prodKey }: { prodKey: string }) => {
+    const state_prodDict_copy = { ...state_prodDict };
+    const state_iterativeProdDict_copy = { ...state_iterativeProdDict };
+    const prodKeyArr_copy = [...prodKeyArr];
+
+    const stateProd_iterative = state_iterativeProdDict_copy[prodKey];
+
+    stateProd_iterative.modifyedProductKeyArr.forEach((key) => {
+      delete state_prodDict_copy[key];
+      prodKeyArr_copy.splice(prodKeyArr_copy.indexOf(key), 1);
+    });
+    stateProd_iterative.qty_modify = 0;
+    stateProd_iterative.modifyedProductKeyArr = [];
+    stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
+
+    setState_prodDict(state_prodDict_copy);
+    setState_iterativeProdDict(state_iterativeProdDict_copy);
+    setProdKeyArr(prodKeyArr_copy);
+  };
+
   const {
     //
     activedClassProd,
@@ -626,6 +647,7 @@ const useQuotationProduct = ({
     doorModelSummery,
     //
     modifyProd: throwErr,
+    resetModify: throwErr,
   };
 
   const instance_iterative: Tinstance_useQuotationProduct = {
@@ -642,6 +664,7 @@ const useQuotationProduct = ({
     //
     copyProd: copyProd_iterativeToNormal,
     modifyProd,
+    resetModify,
     //
     createClassProd,
     //

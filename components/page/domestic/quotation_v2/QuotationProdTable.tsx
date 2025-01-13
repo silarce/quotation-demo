@@ -670,6 +670,7 @@ const QuotationRow_dealClass = ({
     removeProd,
     copyProd,
     modifyProd,
+    resetModify,
   },
 }: {
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
@@ -719,6 +720,7 @@ const QuotationRow_dealClass = ({
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
         <Panel_iterativeProd
+          onResetClick={() => resetModify({ prodKey: classProd.key })}
           onCopyClick={() => {
             copyProd({ prodKey: classProd.key });
             setVisible_copy(true);
