@@ -689,7 +689,7 @@ const QuotationRow_dealClass = ({
 }) => {
   const [viewRef, inView] = useInView();
 
-  const [visible_copy, setVisible_copy] = useState(false);
+  const [copyedTip, setCopyedTip] = useState(false);
 
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
@@ -720,12 +720,13 @@ const QuotationRow_dealClass = ({
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
         <Panel_iterativeProd
+          indexNumber={index + 1}
           onResetClick={() => resetModify({ prodKey: classProd.key })}
           onCopyClick={() => {
             copyProd({ prodKey: classProd.key });
-            setVisible_copy(true);
+            setCopyedTip(true);
             setTimeout(() => {
-              setVisible_copy(false);
+              setCopyedTip(false);
             }, 1000);
           }}
           onCopy2Click={() => {
@@ -747,7 +748,7 @@ const QuotationRow_dealClass = ({
           }}
           renderProps_copy={(cellCopy) => {
             return (
-              <Popover content="已複製" visible={visible_copy}>
+              <Popover content="已複製" visible={copyedTip}>
                 {cellCopy}
               </Popover>
             );
