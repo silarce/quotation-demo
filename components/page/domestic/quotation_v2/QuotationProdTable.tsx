@@ -55,9 +55,8 @@ interface Tprops {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
-  isIterativeProd?: TtableProps['isIterativeProd'];
+  // isIterativeProd?: TtableProps['isIterativeProd'];
   prodTotal?: TtableProps['prodTotal'];
-  isIterativeProdExist?: boolean;
 }
 
 interface TtableProps {
@@ -65,19 +64,11 @@ interface TtableProps {
   disabled: boolean;
   className?: string;
   showQuotationDiscount?: boolean;
-  isIterativeProd?: boolean;
+  // isIterativeProd?: boolean;
   prodTotal?: React.ReactNode;
 }
 
 // ===================================================================
-
-type Tcontext = {
-  showQuotationDiscount?: boolean;
-  isIterativeProd?: boolean;
-  isIterativeProdExist?: boolean;
-};
-
-const Context = createContext<Tcontext>(null!);
 
 // MARK: START
 // 這個元件就是useQuotationProduct實例與UI元件的轉接器，
@@ -88,9 +79,8 @@ export default function QuotationProdTable(tableProps: Tprops) {
     disabled,
     className,
     showQuotationDiscount = true,
-    isIterativeProd,
+    // isIterativeProd,
     prodTotal,
-    isIterativeProdExist,
   } = tableProps;
 
   createContext(tableProps);
@@ -101,33 +91,31 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   // MARK:RENDER
   return (
-    <Context.Provider value={{ showQuotationDiscount, isIterativeProd, isIterativeProdExist }}>
-      <div className={classNames(className)}>
-        {/* 主產品 product */}
-        <Table_prod
+    <div className={classNames(className)}>
+      {/* 主產品 product */}
+      <Table_prod
+        instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+        disabled={disabled}
+        showQuotationDiscount={showQuotationDiscount}
+        // isIterativeProd={isIterativeProd}
+        prodTotal={prodTotal}
+      />
+      <br />
+
+      <Spin spinning={!!activedProd?.isFetching}>
+        <Table_component
           instance_useQuotationProductInstance={instance_useQuotationProductInstance}
           disabled={disabled}
-          showQuotationDiscount={showQuotationDiscount}
-          isIterativeProd={isIterativeProd}
-          prodTotal={prodTotal}
         />
-        <br />
-
-        <Spin spinning={!!activedProd?.isFetching}>
-          <Table_component
-            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-            disabled={disabled}
-          />
-        </Spin>
-        <br />
-        <Spin spinning={!!activedProd?.isFetching}>
-          <Table_accessory
-            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-            disabled={disabled}
-          />
-        </Spin>
-      </div>
-    </Context.Provider>
+      </Spin>
+      <br />
+      <Spin spinning={!!activedProd?.isFetching}>
+        <Table_accessory
+          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+          disabled={disabled}
+        />
+      </Spin>
+    </div>
   );
 }
 
@@ -176,10 +164,10 @@ const Table_prod = ({
   disabled,
   className,
   showQuotationDiscount,
-  isIterativeProd,
+  // isIterativeProd,
   prodTotal,
 }: TtableProps) => {
-  const { isIterativeProdExist } = useContext(Context);
+  // const { isIterativeProdExist } = useContext(Context);
 
   const {
     state_prodDict,
@@ -207,6 +195,8 @@ const Table_prod = ({
     addEmptyProd,
     // removeProd,
     // copyProd,
+    isIterativeProd,
+    isIterativeProdExist,
   } = instance_useQuotationProductInstance;
 
   const nodeConfig_itemName = nodeConfig_origin['itemName'];
@@ -310,7 +300,7 @@ const Table_prod = ({
                   isActive={isActive}
                   cellKeyArr={cellKeyArr}
                   index={index}
-                  isIterativeProd={isIterativeProd}
+                  // isIterativeProd={isIterativeProd}
                   instance_useQuotationProductInstance={instance_useQuotationProductInstance}
                 />
               );
@@ -682,7 +672,7 @@ const QuotationRow_dealClass = ({
   // //
   // removeProd,
   // copyProd,
-  isIterativeProd,
+  // isIterativeProd,
 
   stateProd,
   prodKey,
@@ -695,6 +685,8 @@ const QuotationRow_dealClass = ({
     copyProd,
     modifyProd,
     resetModify,
+    isIterativeProdExist,
+    isIterativeProd,
   },
 }: {
   rerenderTrigger01?: any; // 只在QuotationRow_dealClass_memo使用
@@ -711,8 +703,6 @@ const QuotationRow_dealClass = ({
   stateProd: TstateProd;
   prodKey: string;
 }) => {
-  const { isIterativeProdExist } = useContext(Context);
-
   const [viewRef, inView] = useInView();
 
   const [copyedTip, setCopyedTip] = useState(false);

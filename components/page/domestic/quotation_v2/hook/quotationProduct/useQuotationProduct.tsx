@@ -205,6 +205,9 @@ interface Tinstance_useQuotationProduct {
   copyProd: (props: { prodKey: string }) => void;
   modifyProd: (props: { qty_modify: number; prodKey: string }) => void;
   resetModify: (props: { prodKey: string }) => void;
+
+  isIterativeProd: boolean;
+  isIterativeProdExist: boolean;
 }
 
 // ================================================================================
@@ -287,6 +290,8 @@ const useQuotationProduct = ({
   }, [doorModelDict]);
 
   const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
+
+  const isIterativeProdExist = !!Object.keys(state_iterativeProdDict);
 
   // ______________________________________________________________________
   const {
@@ -683,57 +688,65 @@ const useQuotationProduct = ({
     avgDiscount,
     doorModelSummery,
     //
+    isIterativeProd: false,
+    isIterativeProdExist,
+    //
     modifyProd: throwErr,
     resetModify: throwErr,
   };
 
-  const instance_iterative: Tinstance_useQuotationProduct = {
-    state_prodDict: state_iterativeProdDict,
-    activedProd: activedProd_iterative,
-    activedClassProd: activedClassProd_iterative,
-    prodKeyArr: prodKeyArr_iterative,
-    activedClassComponentDict: activedClassComponentDict_iterative,
-    activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
-    activedClassAccessoryDict: activedClassAccessoryDict_iterative,
-    componentKeyArr: activedProd_iterative?.componentKeyArr,
-    accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
-    choseActiveProd: choseActiveProd_iterative,
-    //
-    copyProd: copyProd_iterativeToNormal,
-    modifyProd,
-    resetModify,
-    //
-    createClassProd,
-    //
-    cellKeyArr,
-    setCellKeyArr,
+  const instance_iterative: Tinstance_useQuotationProduct | null = !isIterativeProdExist
+    ? null
+    : {
+        state_prodDict: state_iterativeProdDict,
+        activedProd: activedProd_iterative,
+        activedClassProd: activedClassProd_iterative,
+        prodKeyArr: prodKeyArr_iterative,
+        activedClassComponentDict: activedClassComponentDict_iterative,
+        activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
+        activedClassAccessoryDict: activedClassAccessoryDict_iterative,
+        componentKeyArr: activedProd_iterative?.componentKeyArr,
+        accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
+        choseActiveProd: choseActiveProd_iterative,
+        //
+        copyProd: copyProd_iterativeToNormal,
+        modifyProd,
+        resetModify,
+        //
+        createClassProd,
+        //
+        cellKeyArr,
+        setCellKeyArr,
 
-    cellKeyArr_component,
-    setCellKeyArr_component,
+        cellKeyArr_component,
+        setCellKeyArr_component,
 
-    cellKeyArr_accessory,
-    setCellKeyArr_accessory,
-    //
-    nodeConfig_origin,
-    nodeConfig_component_origin,
-    nodeConfig_accessory_origin,
-    //
-    quotationDiscount: '', // 總折數
-    //
+        cellKeyArr_accessory,
+        setCellKeyArr_accessory,
+        //
+        nodeConfig_origin,
+        nodeConfig_component_origin,
+        nodeConfig_accessory_origin,
+        //
+        quotationDiscount: '', // 總折數
+        //
 
-    //
-    avgDiscount: -1,
-    doorModelSummery: {},
-    //
-    setProdKeyArr: throwErr,
-    setComponentKeyArr: throwErr,
-    setAccessoryKeyArr: throwErr,
-    setQuotationDiscount: throwErr,
-    calcProductBody: throwErr,
-    // calcProdAllTotal: throwErr,
-    addEmptyProd: throwErr,
-    removeProd: throwErr,
-  };
+        //
+        avgDiscount: -1,
+        doorModelSummery: {},
+        //
+        isIterativeProd: true,
+        isIterativeProdExist,
+        //
+        setProdKeyArr: throwErr,
+        setComponentKeyArr: throwErr,
+        setAccessoryKeyArr: throwErr,
+        setQuotationDiscount: throwErr,
+        calcProductBody: throwErr,
+        // calcProdAllTotal: throwErr,
+        addEmptyProd: throwErr,
+        removeProd: throwErr,
+      };
 
   // MARK: RETURN
 

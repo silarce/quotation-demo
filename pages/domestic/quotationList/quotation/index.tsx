@@ -902,7 +902,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <br />
         <br />
-        {iterativeContractProductArr && (
+        {instance_iterative && (
           <>
             <div className={'px-[48px]'}>
               <div className="border border-red-500">
@@ -911,7 +911,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                   disabled={true}
                   instance_useQuotationProductInstance={instance_iterative}
                   showQuotationDiscount={false}
-                  isIterativeProd={true}
+                  // isIterativeProd={true}
                   prodTotal={allProdTotal_iterative}
                 />
               </div>
@@ -930,7 +930,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
             prodTotal={allProdTotal}
-            isIterativeProdExist={!!iterativeContractProductArr?.length}
+            // isIterativeProdExist={!!iterativeContractProductArr?.length}
           />
           <br />
           <br />
