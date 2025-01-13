@@ -930,6 +930,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
             prodTotal={allProdTotal}
+            isIterativeProdExist={!!iterativeContractProductArr?.length}
           />
           <br />
           <br />

@@ -69,6 +69,7 @@ interface TconfigItem_prod {
   readonly label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  className_thead?: string;
   createNode: (params: {
     //
     classProd: ClassProd;
@@ -78,6 +79,7 @@ interface TconfigItem_prod {
 
 type TcellKey = keyof Pick<
   ClassProd,
+  | 'attachedToProductName'
   | 'itemName' // 項目名
   | 'discount' // 折數
   | 'quoteType' // 報價別
@@ -193,9 +195,25 @@ const lookup_options_boxB: Tlookup_options_boxB = {
 // MARK:nodeConfig_origin
 
 const nodeConfig_origin: TnodeConfig = {
+  attachedToProductName: {
+    label: '來源主產品',
+    style: { width: 100 },
+    className_thead: 'text-lg text-main',
+    createNode({ disabled, classProd }) {
+      const inputProps: TinputSelProps = {
+        disabled,
+        showBaseline: 'invisible',
+        node: classProd.attachedToProductName,
+      };
+
+      return <InputSel_prod {...inputProps} />;
+    },
+  },
+
   itemName: {
     label: '項目',
     style: { width: 100 },
+    className_thead: 'text-lg text-main',
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {

@@ -343,6 +343,8 @@ interface TstateProd {
   deductedPrice: number; // 追減變更金額
   modifyedProductKeyArr: string[]; // 變更產品id
 
+  attachedToProduct?: TstateProd; // 附屬產品
+
   // rootProductId?: string;
 }
 

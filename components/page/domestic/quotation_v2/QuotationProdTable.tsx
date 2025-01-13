@@ -1,4 +1,4 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useContext, createContext } from 'react';
 
 import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
@@ -57,6 +57,7 @@ interface Tprops {
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
   isIterativeProd?: TtableProps['isIterativeProd'];
   prodTotal?: TtableProps['prodTotal'];
+  isIterativeProdExist?: boolean;
 }
 
 interface TtableProps {
@@ -70,6 +71,14 @@ interface TtableProps {
 
 // ===================================================================
 
+type Tcontext = {
+  showQuotationDiscount?: boolean;
+  isIterativeProd?: boolean;
+  isIterativeProdExist?: boolean;
+};
+
+const Context = createContext<Tcontext>(null!);
+
 // MARK: START
 // 這個元件就是useQuotationProduct實例與UI元件的轉接器，
 // 本來就預期會與useQuotationProduct高度耦合
@@ -81,7 +90,10 @@ export default function QuotationProdTable(tableProps: Tprops) {
     showQuotationDiscount = true,
     isIterativeProd,
     prodTotal,
+    isIterativeProdExist,
   } = tableProps;
+
+  createContext(tableProps);
 
   const instance_useQuotationProductInstance = tableProps.instance_useQuotationProductInstance;
 
@@ -89,31 +101,33 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   // MARK:RENDER
   return (
-    <div className={classNames(className)}>
-      {/* 主產品 product */}
-      <Table_prod
-        instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-        disabled={disabled}
-        showQuotationDiscount={showQuotationDiscount}
-        isIterativeProd={isIterativeProd}
-        prodTotal={prodTotal}
-      />
-      <br />
+    <Context.Provider value={{ showQuotationDiscount, isIterativeProd, isIterativeProdExist }}>
+      <div className={classNames(className)}>
+        {/* 主產品 product */}
+        <Table_prod
+          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+          disabled={disabled}
+          showQuotationDiscount={showQuotationDiscount}
+          isIterativeProd={isIterativeProd}
+          prodTotal={prodTotal}
+        />
+        <br />
 
-      <Spin spinning={!!activedProd?.isFetching}>
-        <Table_component
-          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-          disabled={disabled}
-        />
-      </Spin>
-      <br />
-      <Spin spinning={!!activedProd?.isFetching}>
-        <Table_accessory
-          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-          disabled={disabled}
-        />
-      </Spin>
-    </div>
+        <Spin spinning={!!activedProd?.isFetching}>
+          <Table_component
+            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+            disabled={disabled}
+          />
+        </Spin>
+        <br />
+        <Spin spinning={!!activedProd?.isFetching}>
+          <Table_accessory
+            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+            disabled={disabled}
+          />
+        </Spin>
+      </div>
+    </Context.Provider>
   );
 }
 
@@ -165,10 +179,12 @@ const Table_prod = ({
   isIterativeProd,
   prodTotal,
 }: TtableProps) => {
+  const { isIterativeProdExist } = useContext(Context);
+
   const {
     state_prodDict,
     activedProd,
-    activedClassProd,
+    // activedClassProd,
 
     prodKeyArr,
     setProdKeyArr,
@@ -176,7 +192,7 @@ const Table_prod = ({
     cellKeyArr,
     setCellKeyArr,
 
-    choseActiveProd,
+    // choseActiveProd,
 
     nodeConfig_origin,
 
@@ -185,21 +201,29 @@ const Table_prod = ({
 
     // state_prodDict,
 
-    createClassProd,
+    // createClassProd,
     // activedClassProd,
 
     addEmptyProd,
-    removeProd,
-    copyProd,
+    // removeProd,
+    // copyProd,
   } = instance_useQuotationProductInstance;
+
+  const nodeConfig_itemName = nodeConfig_origin['itemName'];
+  const nodeConfig_attachedToProductName = nodeConfig_origin['attachedToProductName'];
 
   let theadLeft = (
     <Panel_prod className_delete="invisible" className_copy="invisible">
-      <Cell
-        className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
-        style={nodeConfig_origin['itemName'].style}
-      >
-        {nodeConfig_origin['itemName'].label}
+      {isIterativeProdExist && (
+        <Cell
+          className={classNames(nodeConfig_attachedToProductName.className_thead)}
+          style={nodeConfig_attachedToProductName.style}
+        >
+          {nodeConfig_attachedToProductName.label}
+        </Cell>
+      )}
+      <Cell className={classNames(nodeConfig_itemName.className_thead)} style={nodeConfig_itemName.style}>
+        {nodeConfig_itemName.label}
       </Cell>
     </Panel_prod>
   );
@@ -210,7 +234,7 @@ const Table_prod = ({
     theadLeft = (
       <Panel_iterativeProd className_reset="invisible" className_copy="invisible" className_copy2="invisible">
         <Cell
-          className={classNames('text-lg text-main', nodeConfig_origin['itemName'].className)}
+          className={classNames(nodeConfig_origin['itemName'].className_thead)}
           style={nodeConfig_origin['itemName'].style}
         >
           {nodeConfig_origin['itemName'].label}
@@ -687,6 +711,8 @@ const QuotationRow_dealClass = ({
   stateProd: TstateProd;
   prodKey: string;
 }) => {
+  const { isIterativeProdExist } = useContext(Context);
+
   const [viewRef, inView] = useInView();
 
   const [copyedTip, setCopyedTip] = useState(false);
@@ -694,6 +720,7 @@ const QuotationRow_dealClass = ({
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
+  const nodeConfig_attachedToProductName = classProd.nodeConfig['attachedToProductName'];
 
   let left = (
     <>
@@ -703,6 +730,17 @@ const QuotationRow_dealClass = ({
         onCopyClick={() => copyProd({ prodKey: classProd.key })}
         indexNumber={index + 1}
       >
+        {isIterativeProdExist && (
+          <Cell
+            className={classNames(nodeConfig_attachedToProductName.className)}
+            style={nodeConfig_attachedToProductName.style}
+          >
+            {nodeConfig_attachedToProductName.createNode({
+              disabled,
+              classProd,
+            })}
+          </Cell>
+        )}
         <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
           {nodeConfig_itemName.createNode({
             disabled,
@@ -743,8 +781,6 @@ const QuotationRow_dealClass = ({
                 destroy();
               },
             });
-
-            // modifyProd({ prodKey: classProd.key });
           }}
           renderProps_copy={(cellCopy) => {
             return (

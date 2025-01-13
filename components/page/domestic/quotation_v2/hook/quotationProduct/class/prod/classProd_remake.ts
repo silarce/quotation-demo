@@ -2041,8 +2041,14 @@ class ClassProd {
     return this.state.deductedPrice;
   }
 
+  // MARK:qty_remain
   get qty_remain() {
     return calcProdRemain({ stateProd: this.state });
+  }
+
+  // MARK:attachedToProductName
+  get attachedToProductName() {
+    return this.state.attachedToProduct?.data_prod.itemName ?? '';
   }
 }
 // MARK: END
