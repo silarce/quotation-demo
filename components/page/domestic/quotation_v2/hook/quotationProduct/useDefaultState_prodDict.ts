@@ -23,9 +23,11 @@ interface TdefaultState {
 const useDefaultState_prodDict = ({
   raw_productArr,
   doorModelDict,
+  action,
 }: {
   raw_productArr: TquotationProductDto[] | TquotationProductDto_addition[] | undefined;
   doorModelDict: Record<string, TdoorModelInfoDto> | null | undefined;
+  action?: TstateProd['action'];
   // isIterative;
 }) => {
   const defaultState: TdefaultState = useMemo(() => {
@@ -85,6 +87,7 @@ const useDefaultState_prodDict = ({
         modifyedProduct: {},
         // rootProductId: undefined,
         latestIterativeId: latestIterativeId,
+        action: action || '追加',
       };
 
       dict[data_prod.id] = state;
@@ -428,6 +431,7 @@ const createEmptyStateProd = () => {
     modifyedProduct: {},
     // rootProductId: undefined,
     latestIterativeId: undefined,
+    action: '追加',
   };
 
   return stateProd;

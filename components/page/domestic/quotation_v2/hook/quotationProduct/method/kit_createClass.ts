@@ -217,16 +217,11 @@ const kit_createClass = ({
 
   // const copyProd = ({ prodKey, stateProd }: XOR<{ prodKey: string }, { stateProd: TstateProd }>) => {
   const copyProd = ({
-    //
     stateProd,
-    // attachedToProductId,
-    // rootProductId,
     quantity,
     attachedToProduct,
   }: {
     stateProd: TstateProd;
-    // attachedToProductId?: string;
-    // rootProductId?: string;
     quantity?: number;
     attachedToProduct?: TstateProd;
   }) => {
@@ -259,6 +254,7 @@ const kit_createClass = ({
       deductedPrice: 0,
       modifyedProduct: {},
       attachedToProduct: undefined,
+      action: '追加',
     };
 
     const data_prod = {
@@ -271,6 +267,7 @@ const kit_createClass = ({
     if (action === 'modify') {
       copyedProd.attachedToProduct = attachedToProduct;
       data_prod.id = attachedToProductId!;
+      copyedProd.action = '變更追加';
     }
 
     quantity !== undefined && (data_prod.quantity = `${quantity}`);

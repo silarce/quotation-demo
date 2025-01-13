@@ -255,6 +255,7 @@ const useQuotationProduct = ({
   const defaultState_iterativeProdDict = useDefaultState_prodDict({
     raw_productArr: iterativeContractProductArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
+    action: '追減', // 總主產品預設為追減
   });
 
   // 深拷貝，避免在編輯state_prodDict內的物件時影響原始的defaultState

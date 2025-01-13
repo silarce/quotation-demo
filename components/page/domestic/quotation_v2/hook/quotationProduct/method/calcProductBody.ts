@@ -69,7 +69,9 @@ const calcProductBody = ({
         .sub(qty_reduce || 0)
         .sub(qty_modify)
         .toNumber();
+
       copy.data_prod.quantity = `${quantity}`;
+      copy.action = '追減'; // 其實應該已經在呼叫useDefaultState_prodDict的時候設為追減了
 
       return copy;
     });

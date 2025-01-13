@@ -102,6 +102,7 @@ const createEmptyStateProd = (key: string) => {
     modifyedProduct: {},
     // rootProductId: undefined,
     latestIterativeId: undefined,
+    action: '追加',
   };
 
   return emptyStateProd;
