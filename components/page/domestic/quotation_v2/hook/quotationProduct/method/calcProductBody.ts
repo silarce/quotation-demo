@@ -49,10 +49,14 @@ const calcProductBody = ({
     })
     .map((stateProd) => {
       const copy = { ...stateProd };
+      copy.attachedToProduct = stateProd;
+
       copy.data_prod = {
         ...copy.data_prod,
         attachedToProductId: copy.data_prod.id,
       };
+
+      // attachedToProduct
 
       const { qty_reduce, modifyedProduct } = copy;
       const qty_modify = Object.values(modifyedProduct)
@@ -114,6 +118,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
 
     data_accessoryDict,
     accessoryKeyArr,
+    attachedToProduct,
   } = stateProd;
 
   const componentArr = componentKeyArr.map((key) => data_componentDict[key]);
@@ -179,7 +184,8 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
 
   const formated: TcreateQuotationProductDto = {
     // 產品id
-    id: data_prod.id || undefined,
+    // id: data_prod.id || undefined,
+    id: attachedToProduct?.data_prod.id || undefined, // 追減或變更追加，id要送來源產品id
     // 來源產品
     attachedToProductId: data_prod.attachedToProductId,
 
