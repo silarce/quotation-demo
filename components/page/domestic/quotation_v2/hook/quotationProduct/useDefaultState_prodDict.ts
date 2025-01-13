@@ -74,9 +74,10 @@ const useDefaultState_prodDict = ({
         availableComponents: undefined,
 
         qty_reduce: '',
-        qty_modify: 0,
+        // qty_modify: 0,
         deductedPrice: 0,
-        modifyedProductKeyArr: [],
+        // modifyedProductKeyArr: [],
+        modifyedProduct: {},
         // rootProductId: undefined,
       };
 
@@ -415,9 +416,10 @@ const createEmptyStateProd = () => {
     availableComponents: null,
 
     qty_reduce: '',
-    qty_modify: 0,
+    // qty_modify: 0,
     deductedPrice: 0,
-    modifyedProductKeyArr: [],
+    // modifyedProductKeyArr: [],
+    modifyedProduct: {},
     // rootProductId: undefined,
   };
 

@@ -246,9 +246,9 @@ const kit_createClass = ({
     copyedProd = {
       ...copyedProd,
       qty_reduce: '',
-      qty_modify: 0,
+      // qty_modify: 0,
       deductedPrice: 0,
-      modifyedProductKeyArr: [],
+      modifyedProduct: {},
 
       attachedToProduct,
       // rootProductId: undefined,

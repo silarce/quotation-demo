@@ -339,9 +339,16 @@ interface TstateProd {
   //
 
   qty_reduce: `${number}` | ''; // 追減數量
-  qty_modify: number; // 變更數量
+  // qty_modify: number; // 變更數量
   deductedPrice: number; // 追減變更金額
-  modifyedProductKeyArr: string[]; // 變更產品id
+  // modifyedProductKeyArr: string[]; // 變更產品id
+  modifyedProduct: Record<
+    string,
+    {
+      key: string;
+      quantity: number;
+    }
+  >;
 
   attachedToProduct?: TstateProd; // 附屬產品
 

@@ -410,12 +410,26 @@ function calcProdAllTotal({ state_prodDict }: { state_prodDict: TstateProdDict }
   return total_d.toNumber();
 }
 
+const calcQtyModify = ({ modifyedProduct }: { modifyedProduct: TstateProd['modifyedProduct'] }) => {
+  const qty = Object.values(modifyedProduct)
+    .reduce((current, prod) => {
+      current = current.add(prod.quantity);
+
+      return current;
+    }, new Decimal(0))
+    .toNumber();
+
+  return qty;
+};
+
 const calcProdRemain = ({ stateProd }: { stateProd: TstateProd }) => {
   const {
     qty_reduce,
-    qty_modify,
+    modifyedProduct,
     data_prod: { quantity },
   } = stateProd;
+
+  const qty_modify = calcQtyModify({ modifyedProduct });
 
   return new Decimal(quantity || 0)
     .minus(qty_reduce || 0)
@@ -432,5 +446,6 @@ export {
   calcPriceDiscount_percent,
   calcProdDistributionBoxAndInstallationFee,
   calcProdAllTotal,
+  calcQtyModify,
   calcProdRemain,
 };

@@ -481,7 +481,7 @@ const useQuotationProduct = ({
       return;
     }
 
-    stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
+    // stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
 
     const newProd = copyProd({
       stateProd: stateProd_iterative,
@@ -490,7 +490,11 @@ const useQuotationProduct = ({
       attachedToProduct: stateProd_iterative,
     });
 
-    stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
+    // stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
+    stateProd_iterative.modifyedProduct[newProd.key] = {
+      key: newProd.key,
+      quantity: qty_modify,
+    };
     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
 
     setState_iterativeProdDict({ ...state_iterativeProdDict });
@@ -503,18 +507,28 @@ const useQuotationProduct = ({
 
     const stateProd_iterative = state_iterativeProdDict_copy[prodKey];
 
-    stateProd_iterative.modifyedProductKeyArr.forEach((key) => {
+    // stateProd_iterative.modifyedProductKeyArr.forEach((key) => {
+    //   delete state_prodDict_copy[key];
+    //   prodKeyArr_copy.splice(prodKeyArr_copy.indexOf(key), 1);
+    // });
+    Object.keys(stateProd_iterative.modifyedProduct).forEach((key) => {
       delete state_prodDict_copy[key];
       prodKeyArr_copy.splice(prodKeyArr_copy.indexOf(key), 1);
     });
-    stateProd_iterative.qty_modify = 0;
-    stateProd_iterative.modifyedProductKeyArr = [];
+
+    // stateProd_iterative.qty_modify = 0;
+    // stateProd_iterative.modifyedProductKeyArr = [];
+    stateProd_iterative.modifyedProduct = {};
     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
 
     setState_prodDict(state_prodDict_copy);
     setState_iterativeProdDict(state_iterativeProdDict_copy);
     setProdKeyArr(prodKeyArr_copy);
   };
+
+  // const removeProd_withIterative = (prodKey: string) => {
+  //   const stateProdWillRemove = state_prodDict[prodKey];
+  // };
 
   const {
     //

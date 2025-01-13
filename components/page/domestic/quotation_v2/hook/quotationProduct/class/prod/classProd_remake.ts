@@ -109,7 +109,12 @@ import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndTh
 import { Tstate_accountant } from 'components/wholePage/collection';
 import { calcAllPrice, calcPriceDiscount_percent } from '../../method/calcProd';
 
-import { calcProdTotalPrice, calcProdDistributionBoxAndInstallationFee, calcProdRemain } from '../../method/calcProd';
+import {
+  calcProdTotalPrice,
+  calcProdDistributionBoxAndInstallationFee,
+  calcQtyModify,
+  calcProdRemain,
+} from '../../method/calcProd';
 
 // ================================================================================
 
@@ -2000,7 +2005,7 @@ class ClassProd {
     }
 
     const qty_reduce = Number(value || 0);
-    const qty_modify = this.state.qty_modify;
+    const qty_modify = this.qty_modify;
     const unitPrice = this.data.unitPrice || 0;
 
     this.state.qty_reduce = value;
@@ -2013,28 +2018,28 @@ class ClassProd {
 
   // MARK:qty_modify
   get qty_modify() {
-    return this.state.qty_modify;
+    return calcQtyModify({ modifyedProduct: this.state.modifyedProduct });
   }
-  set qty_modify(value) {
-    value = fixedToFloat3(value);
+  // set qty_modify(value) {
+  //   value = fixedToFloat3(value);
 
-    const qtyAllow = this.qty_remain + this.state.qty_modify;
+  //   const qtyAllow = this.qty_remain + this.state.qty_modify;
 
-    if (qtyAllow < value) {
-      throw new Error('數量不足');
-    }
+  //   if (qtyAllow < value) {
+  //     throw new Error('數量不足');
+  //   }
 
-    this.state.qty_modify = value;
+  //   this.state.qty_modify = value;
 
-    const qty_reduce = this.state.qty_reduce || 0;
-    const qty_modify = this.state.qty_modify;
-    const unitPrice = this.data.unitPrice || 0;
+  //   const qty_reduce = this.state.qty_reduce || 0;
+  //   const qty_modify = this.state.qty_modify;
+  //   const unitPrice = this.data.unitPrice || 0;
 
-    const deductedPrice = new Decimal(qty_reduce).add(qty_modify).mul(unitPrice).mul(-1).toNumber();
-    this.state.deductedPrice = deductedPrice;
+  //   const deductedPrice = new Decimal(qty_reduce).add(qty_modify).mul(unitPrice).mul(-1).toNumber();
+  //   this.state.deductedPrice = deductedPrice;
 
-    this.render();
-  }
+  //   this.render();
+  // }
 
   // MARK:deductedPrice
   get deductedPrice() {

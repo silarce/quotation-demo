@@ -96,9 +96,10 @@ const createEmptyStateProd = (key: string) => {
     afterChangeQueue: undefined,
 
     qty_reduce: '',
-    qty_modify: 0,
+    // qty_modify: 0,
     deductedPrice: 0,
-    modifyedProductKeyArr: [],
+    // modifyedProductKeyArr: [],
+    modifyedProduct: {},
     // rootProductId: undefined,
   };
 
