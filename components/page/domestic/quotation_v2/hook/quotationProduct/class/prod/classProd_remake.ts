@@ -618,6 +618,10 @@ class ClassProd {
       availableComponents,
     });
 
+    if (changedMotorVendor) {
+      this.data.motorVendor = changedMotorVendor;
+    }
+
     Object.entries(this.state.data_componentDict).forEach(([_key, component]) => {
       const key = _key as keyof typeof this.state.data_componentDict;
 
