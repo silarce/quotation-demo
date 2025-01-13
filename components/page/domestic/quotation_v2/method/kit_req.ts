@@ -20,6 +20,7 @@ import {
   TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
+  TcreateQuotationProductDto,
   // useGetQuotation_id,
   // useGetQuotation_id_2,
   useGetQuotation_id_3,
@@ -110,8 +111,21 @@ const kit_req = ({
       myAlert.info({ title: '請選擇客戶' });
     }
 
+    const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+    const {
+      quotationProductArr,
+      isAllDoorModalValid,
+      //  invalidComponentArr,
+      totalQty,
+    } = calcProductBody();
+
     const body = createBody({
-      instance_quotationProduct,
+      quotationDiscount: quotationDiscount || '0',
+      avgDiscount,
+      quotationProductArr,
+      totalQty,
+
+      // instance_quotationProduct,
       instance_useQuotationOther,
       state_profile,
       state_payInfo,
@@ -121,7 +135,7 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      calcProductBody,
+      // calcProductBody,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -160,8 +174,19 @@ const kit_req = ({
       myAlert.info({ title: '請選擇客戶' });
     }
 
+    const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+    const {
+      quotationProductArr,
+      isAllDoorModalValid,
+      //  invalidComponentArr,
+      totalQty,
+    } = calcProductBody();
+
     const body = createBody({
-      instance_quotationProduct,
+      quotationDiscount: quotationDiscount || '0',
+      avgDiscount,
+      quotationProductArr,
+      totalQty,
       instance_useQuotationOther,
       state_profile,
       state_payInfo,
@@ -171,7 +196,7 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      calcProductBody,
+      // calcProductBody,
     });
 
     // const shouldUpdate = false;
@@ -254,7 +279,11 @@ const kit_req = ({
 // ==========================================================================
 
 const createBody = ({
-  instance_quotationProduct,
+  quotationDiscount,
+  avgDiscount,
+  quotationProductArr,
+  totalQty,
+  // instance_quotationProduct,
   instance_useQuotationOther,
   state_profile,
   state_payInfo,
@@ -264,9 +293,15 @@ const createBody = ({
   annoArr,
   quotationRangeArr,
   status,
-  calcProductBody,
-}: {
-  instance_quotationProduct: Tinstance_useQuotationProduct;
+}: // calcProductBody,
+{
+  quotationDiscount: `${number}`;
+  avgDiscount: number;
+  quotationProductArr: TcreateQuotationProductDto[];
+  totalQty: number;
+  // calcProductBody: TcalcProductBody;
+
+  // instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_useQuotationOther: Tinstance_useQuotationOther;
   state_profile: Tstate_profile;
   state_payInfo: Tstate_payInfo;
@@ -276,24 +311,15 @@ const createBody = ({
   annoArr: string[];
   quotationRangeArr: string[];
   status: TquotationContentDto['status'];
-  calcProductBody: TcalcProductBody;
 }) => {
-  const {
-    quotationDiscount,
-    avgDiscount,
+  // const { quotationDiscount, avgDiscount } = instance_quotationProduct;
 
-    // state_totalPrice: {
-    //   prodPriceTotal,
-    //   averageDiscount,
-    //   tuneTotal,
-    //   subTotal,
-    //   salesTax,
-    //   total,
-    //   currency,
-    //   exchangeRate,
-    //   foreignTotal,
-    // },
-  } = instance_quotationProduct;
+  // const {
+  //   quotationProductArr,
+  //   isAllDoorModalValid,
+  //   //  invalidComponentArr,
+  //   totalQty,
+  // } = calcProductBody();
 
   const { formatToBody_other } = instance_useQuotationOther;
 
@@ -301,12 +327,6 @@ const createBody = ({
   //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
   // }
 
-  const {
-    quotationProductArr,
-    isAllDoorModalValid,
-    //  invalidComponentArr,
-    totalQty,
-  } = calcProductBody();
   const {
     projectName,
     validityPeriod,
