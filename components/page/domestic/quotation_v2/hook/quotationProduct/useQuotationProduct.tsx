@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { remove } from 'lodash';
 import { nanoid } from 'nanoid';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -526,9 +526,26 @@ const useQuotationProduct = ({
     setProdKeyArr(prodKeyArr_copy);
   };
 
-  // const removeProd_withIterative = (prodKey: string) => {
-  //   const stateProdWillRemove = state_prodDict[prodKey];
-  // };
+  const removeProd_withIterative = (prodKey: string) => {
+    const stateProdWillRemove = state_prodDict[prodKey];
+    const attachedToProductKey = stateProdWillRemove.attachedToProduct?.key;
+    const attachedToProduct = attachedToProductKey ? state_iterativeProdDict[attachedToProductKey] : undefined;
+
+    removeProd(prodKey);
+
+    // if (!attachedToProduct?.modifyedProduct[prodKey]) {
+    //   console.log(attachedToProduct);
+    //   console.log(prodKey);
+
+    //   throw new Error(`removeProd_withIterative方法出錯，找不到modifyedProduct[${prodKey}]`);
+    // }
+
+    if (attachedToProduct) {
+      delete attachedToProduct.modifyedProduct[prodKey];
+      attachedToProduct.renderCount = (attachedToProduct.renderCount ?? 0) + 1;
+      setState_iterativeProdDict({ ...state_iterativeProdDict });
+    }
+  };
 
   const {
     //
@@ -659,7 +676,8 @@ const useQuotationProduct = ({
     // calcProdAllTotal,
     //
     addEmptyProd,
-    removeProd,
+    // removeProd,
+    removeProd: removeProd_withIterative,
     copyProd: copy_prodToProd,
     //
     avgDiscount,
