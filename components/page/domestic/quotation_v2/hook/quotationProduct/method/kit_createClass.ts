@@ -215,13 +215,21 @@ const kit_createClass = ({
     }
   };
 
-  const copyProd = ({ prodKey, stateProd }: XOR<{ prodKey: string }, { stateProd: TstateProd }>) => {
-    if (!prodKey && !stateProd) {
-      throw new Error('copyProd出錯，prodKey與stateProd同時不存在');
-    }
+  // const copyProd = ({ prodKey, stateProd }: XOR<{ prodKey: string }, { stateProd: TstateProd }>) => {
+  const copyProd = ({
+    //
+    stateProd,
+  }: {
+    stateProd: TstateProd;
+  }) => {
+    // if (!prodKey && !stateProd) {
+    //   throw new Error('copyProd出錯，prodKey與stateProd同時不存在');
+    // }
 
-    let copyedProd = prodKey ? state_prodDict[prodKey] : stateProd;
-    copyedProd = _.cloneDeep(copyedProd);
+    // let copyedProd = prodKey ? state_prodDict[prodKey] : stateProd;
+    // copyedProd = _.cloneDeep(copyedProd);
+
+    let copyedProd = _.cloneDeep(stateProd);
 
     if (!copyedProd) {
       throw new Error('copyProd出錯，copyedProd不存在');

@@ -158,9 +158,6 @@ interface TclassAccessoryDict {
   [key: string]: Class_accessory;
 }
 
-// type Tcopy = ReturnType<typeof kit_createClass>['copyProd'];
-type Tcopy = Parameters<ReturnType<typeof kit_createClass>['copyProd']>;
-
 interface Tinstance_useQuotationProduct {
   state_prodDict: TstateProdDict;
   activedProd: TstateProd | undefined;
@@ -202,10 +199,10 @@ interface Tinstance_useQuotationProduct {
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
-  copyProd: (...params: Parameters<ReturnType<typeof kit_createClass>['copyProd']>) => void;
   avgDiscount: number;
   doorModelSummery: Record<string, TdoorModelSummeryItem>;
 
+  copyProd: (props: { prodKey: string }) => void;
   modifyProd: (props: { qty_modify: number; prodKey: string }) => void;
   resetModify: (props: { prodKey: string }) => void;
 }
@@ -448,7 +445,12 @@ const useQuotationProduct = ({
     setActiveProdKey: setActiveProdKey_iterative,
   });
 
-  const copyProd_iterativeToNormal = ({ prodKey }: { prodKey?: string | undefined }) => {
+  const copy_prodToProd: Tinstance_useQuotationProduct['copyProd'] = ({ prodKey }) => {
+    const stateProd = state_prodDict[prodKey];
+    copyProd({ stateProd });
+  };
+
+  const copyProd_iterativeToNormal: Tinstance_useQuotationProduct['copyProd'] = ({ prodKey }: { prodKey: string }) => {
     if (!prodKey) {
       throw new Error('instance_iterative的copyProd出錯。prodKey不存在');
     }
@@ -641,7 +643,7 @@ const useQuotationProduct = ({
     //
     addEmptyProd,
     removeProd,
-    copyProd,
+    copyProd: copy_prodToProd,
     //
     avgDiscount,
     doorModelSummery,
