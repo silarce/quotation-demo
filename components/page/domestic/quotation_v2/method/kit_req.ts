@@ -42,12 +42,16 @@ import {
 } from 'js/api/api_quotation';
 
 import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
+import { calcProductBody as _calcProductBody } from '../hook/quotationProduct/method/calcProductBody';
 
 // ===========================================================================
 
 type Tinstance_getQuotationId3 = ReturnType<typeof useGetQuotation_id_3>;
 
 type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
+
+type TreturnTypeCalcProductBody = ReturnType<typeof _calcProductBody>;
+type TcalcProductBody = () => TreturnTypeCalcProductBody;
 
 // ===========================================================================
 const kit_req = ({
@@ -67,6 +71,7 @@ const kit_req = ({
   state_quotationTotal,
   instatnce_getQuotationId3,
   status,
+  calcProductBody,
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
@@ -86,6 +91,7 @@ const kit_req = ({
   state_quotationTotal: TstateTotalPrice;
   instatnce_getQuotationId3: Tinstance_getQuotationId3;
   status: TquotationContentDto['status'];
+  calcProductBody: TcalcProductBody;
 }) => {
   const { reqPost, reqPatch, reqReview, reqUnlock, reqPatchReviewer, reqCopyQuotation, reqToPending } =
     instatnce_getQuotationId3;
@@ -115,6 +121,7 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+      calcProductBody,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -164,6 +171,7 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+      calcProductBody,
     });
 
     // const shouldUpdate = false;
@@ -256,6 +264,7 @@ const createBody = ({
   annoArr,
   quotationRangeArr,
   status,
+  calcProductBody,
 }: {
   instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_useQuotationOther: Tinstance_useQuotationOther;
@@ -267,11 +276,12 @@ const createBody = ({
   annoArr: string[];
   quotationRangeArr: string[];
   status: TquotationContentDto['status'];
+  calcProductBody: TcalcProductBody;
 }) => {
   const {
-    calcProductBody: calcProduct,
     quotationDiscount,
     avgDiscount,
+
     // state_totalPrice: {
     //   prodPriceTotal,
     //   averageDiscount,
@@ -296,7 +306,7 @@ const createBody = ({
     isAllDoorModalValid,
     //  invalidComponentArr,
     totalQty,
-  } = calcProduct();
+  } = calcProductBody();
   const {
     projectName,
     validityPeriod,

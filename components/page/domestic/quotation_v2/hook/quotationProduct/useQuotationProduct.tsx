@@ -194,7 +194,7 @@ interface Tinstance_useQuotationProduct {
   // createActivedClassComponentDict: aaaaa;
   // createActivedClassAccessoryDict: aaaaa;
   createClassProd: (stateProd: TstateProd) => ClassProd;
-  calcProductBody: () => ReturnType<typeof _calcProductBody>;
+  // calcProductBody: () => ReturnType<typeof _calcProductBody>;
   // calcProdAllTotal: () => number;
 
   addEmptyProd: () => void;
@@ -691,7 +691,7 @@ const useQuotationProduct = ({
     setQuotationDiscount,
     //
     createClassProd,
-    calcProductBody,
+    // calcProductBody,
     // calcProdAllTotal,
     //
     addEmptyProd,
@@ -756,7 +756,7 @@ const useQuotationProduct = ({
         setComponentKeyArr: throwErr,
         setAccessoryKeyArr: throwErr,
         setQuotationDiscount: throwErr,
-        calcProductBody: throwErr,
+        // calcProductBody: throwErr,
         // calcProdAllTotal: throwErr,
         addEmptyProd: throwErr,
         removeProd: throwErr,
@@ -771,6 +771,7 @@ const useQuotationProduct = ({
     allProdTotal,
     allProdTotal_iterative,
     theProductTotal,
+    calcProductBody,
   };
 };
 

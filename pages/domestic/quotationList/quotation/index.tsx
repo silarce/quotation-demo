@@ -336,6 +336,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     allProdTotal,
     allProdTotal_iterative,
     theProductTotal,
+    calcProductBody,
   } = useQuotationProduct({
     raw_quotationProductArr: content?.products,
     raw_quotationDiscount: content?.discount,
@@ -451,6 +452,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     state_quotationTotal,
     instatnce_getQuotationId3,
     status: state_status,
+    calcProductBody,
   });
 
   const handlePatch = () => {
