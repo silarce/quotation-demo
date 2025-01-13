@@ -483,13 +483,15 @@ const useQuotationProduct = ({
 
     stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
 
-    const newProd = copyProd({ stateProd: stateProd_iterative });
-    newProd.data_prod.rootProductId = rootProductId;
+    const newProd = copyProd({
+      stateProd: stateProd_iterative,
+      attachedToProductId: stateProd_iterative.key,
+      quantity: qty_modify,
+    });
 
     stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
 
-    // state_iterativeProdDict[prodKey] = { ...stateProd_iterative };
     setState_iterativeProdDict({ ...state_iterativeProdDict });
   };
 

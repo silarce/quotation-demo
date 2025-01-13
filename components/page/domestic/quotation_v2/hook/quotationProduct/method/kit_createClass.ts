@@ -219,8 +219,14 @@ const kit_createClass = ({
   const copyProd = ({
     //
     stateProd,
+    attachedToProductId = undefined,
+    rootProductId = undefined,
+    quantity,
   }: {
     stateProd: TstateProd;
+    attachedToProductId?: string;
+    rootProductId?: string;
+    quantity?: number;
   }) => {
     // if (!prodKey && !stateProd) {
     //   throw new Error('copyProd出錯，prodKey與stateProd同時不存在');
@@ -247,9 +253,11 @@ const kit_createClass = ({
     const data_prod = {
       ...copyedProd.data_prod,
       id: undefined,
-      attachedToProductId: undefined,
-      rootProductId: undefined,
+      attachedToProductId,
+      rootProductId,
     };
+
+    quantity !== undefined && (data_prod.quantity = `${quantity}`);
 
     const newProd: TstateProd = {
       ...copyedProd,
