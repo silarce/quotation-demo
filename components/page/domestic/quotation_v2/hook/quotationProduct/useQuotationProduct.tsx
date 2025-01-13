@@ -522,38 +522,6 @@ const useQuotationProduct = ({
 
   // region METHOD
 
-  // function calcProdAllTotal() {
-  //   // newState_prodDict?: TstateProdDict
-  //   // const prodDict = newState_prodDict ?? state_prodDict;
-
-  //   // FIXME
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-  //   // 要把報價單總產品算進來
-
-  //   const prodDict = state_prodDict;
-
-  //   let total_d = new Decimal(0);
-  //   // 運作如預期的話，state_prodDict裡每一個物件的參考都不會改變
-  //   // 不會有物件狀態未更新而金額不對的問題
-  //   Object.values(prodDict).forEach((prod) => {
-  //     total_d = total_d.add(prod.data_prod.totalPrice || 0);
-  //   });
-
-  //   return total_d.toNumber();
-  // }
-
   const calcProductBody = () => {
     return _calcProductBody({
       prodKeyArr,

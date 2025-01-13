@@ -77,7 +77,7 @@ const useDefaultState_prodDict = ({
         qty_modify: 0,
         deductedPrice: 0,
         modifyedProductKeyArr: [],
-        rootProductId: undefined,
+        // rootProductId: undefined,
       };
 
       dict[data_prod.id] = state;
@@ -418,7 +418,7 @@ const createEmptyStateProd = () => {
     qty_modify: 0,
     deductedPrice: 0,
     modifyedProductKeyArr: [],
-    rootProductId: undefined,
+    // rootProductId: undefined,
   };
 
   return stateProd;
