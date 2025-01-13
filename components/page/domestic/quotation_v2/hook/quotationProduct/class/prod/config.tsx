@@ -857,17 +857,30 @@ const nodeConfig_origin: TnodeConfig = {
       width: 55,
     },
     createNode({ disabled, classProd }) {
-      const inputProps: TinputSelProps['inputProps'] = {
-        props: {
-          type: 'number',
-          value: classProd.quantity,
-          onChange: (e) => {
-            classProd.quantity = e.target.value as `${number}` | '';
+      const isAttached = classProd.isAttached;
+
+      const inputSelProps_input: TinputSelProps = {
+        disabled,
+        inputProps: {
+          props: {
+            type: 'number',
+            value: classProd.quantity,
+            onChange: (e) => {
+              classProd.quantity = e.target.value as `${number}` | '';
+            },
           },
         },
       };
 
-      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+      const inputSelProps_attached: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'invisible',
+        node: classProd.quantity,
+      };
+
+      const inputSelProps = isAttached ? inputSelProps_attached : inputSelProps_input;
+
+      return <InputSel_prod {...inputSelProps} />;
     },
   },
 

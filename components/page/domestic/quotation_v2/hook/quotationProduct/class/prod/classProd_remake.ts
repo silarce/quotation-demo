@@ -2055,6 +2055,10 @@ class ClassProd {
     return calcProdRemain({ stateProd: this.state });
   }
 
+  get isAttached() {
+    return !!this.state.attachedToProduct;
+  }
+
   // MARK:attachedToProductName
   get attachedToProductName() {
     return this.state.attachedToProduct?.data_prod.itemName ?? '';
