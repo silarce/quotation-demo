@@ -46,6 +46,8 @@ const calcProductBody = ({
       if (!qty_reduce && !Object.keys(modifyedProduct).length) {
         return false;
       }
+
+      return true;
     })
     .map((stateProd) => {
       const copy = { ...stateProd };
