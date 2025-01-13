@@ -38,6 +38,7 @@ import {
   apiPatchQuotationToPending,
   apiPostCopyQuotation,
   apiPatchQuotationContent_id_progress,
+  apiQuotationModify,
 } from 'js/api/api_quotation';
 
 import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
@@ -53,6 +54,7 @@ const kit_req = ({
   userId,
   quotationId,
   instance_quotationProduct,
+  instance_quotationProduct_iterative,
   instance_useQuotationOther,
   state_profile,
   state_payInfo,
@@ -68,7 +70,10 @@ const kit_req = ({
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
+
   instance_quotationProduct: Tinstance_useQuotationProduct;
+  instance_quotationProduct_iterative: Tinstance_useQuotationProduct | undefined | null;
+
   instance_useQuotationOther: Tinstance_useQuotationOther;
   state_profile: Tstate_profile;
   state_payInfo: Tstate_payInfo;
@@ -201,6 +206,17 @@ const kit_req = ({
     // }
   };
 
+  const reqModify = () => {
+    if (!instance_quotationProduct_iterative) {
+      throw new Error('reqModify錯誤，instance_iterative is undefined');
+    }
+    // apiQuotationModify
+
+    const { state_prodDict } = instance_quotationProduct;
+    const { state_prodDict: state_prodDict_iterative } = instance_quotationProduct_iterative;
+  };
+
+  // MARK:reqCloneQuotation
   // 複製報價單
   const reqCloneQuotation = async ({
     customerId,
@@ -275,7 +291,12 @@ const createBody = ({
   //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
   // }
 
-  const { quotationProductArr, isAllDoorModalValid, invalidComponentArr, totalQty } = calcProduct();
+  const {
+    quotationProductArr,
+    isAllDoorModalValid,
+    //  invalidComponentArr,
+    totalQty,
+  } = calcProduct();
   const {
     projectName,
     validityPeriod,

@@ -93,9 +93,9 @@ import {
 } from './useDefaultState_prodDict';
 
 // method
-import { formatProdStateToBody } from './method/formatProdStateToBody';
-import { createClassComponentDict } from './method/createClassComponentDict';
-import { createAccessoryDict } from './method/createAccessoryDict';
+// import { formatProdStateToBody } from './method/formatProdStateToBody';
+// import { createClassComponentDict } from './method/createClassComponentDict';
+// import { createAccessoryDict } from './method/createAccessoryDict';
 import { calcProductBody as _calcProductBody } from './method/calcProductBody';
 
 import {
@@ -586,10 +586,25 @@ const useQuotationProduct = ({
   const calcProductBody = () => {
     return _calcProductBody({
       prodKeyArr,
-      createClassProd,
       state_prodDict,
+      state_iterativeProdDict,
+      createClassProd,
     });
   };
+
+  // const calcProductBody_2 = () => {
+  //   const body_normal = _calcProductBody({
+  //     prodKeyArr,
+  //     createClassProd,
+  //     state_prodDict,
+  //   });
+
+  //   const body_iterative = _calcProductBody({
+  //     prodKeyArr: prodKeyArr_iterative,
+  //     createClassProd: createClassProd_iterative,
+  //     state_prodDict: state_iterativeProdDict,
+  //   });
+  // };
 
   // -----------------------------------------------------------------------
   // region useEffect
