@@ -291,7 +291,7 @@ const useQuotationProduct = ({
 
   const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
 
-  const isIterativeProdExist = !!Object.keys(state_iterativeProdDict);
+  const isIterativeProdExist = !!Object.keys(state_iterativeProdDict).length;
 
   // ______________________________________________________________________
   const {
