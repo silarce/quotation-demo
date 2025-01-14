@@ -2511,8 +2511,8 @@ export const useGetQuotation_id_3 = (
 // ========================================================================
 
 type TquotationProductDto_addition = TquotationProductDto & {
-  reducedQty: number; // 追減數量 // 好像用不到...
-  changedQty: number; // 變更數量 // 好像用不到...
+  qty_reduce: number; // 追減數量 // 好像用不到...
+  qty_modify: number; // 變更數量 // 好像用不到...
   latestIterativeId: string;
 };
 
@@ -2541,12 +2541,12 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
       products.forEach((prod) => {
         const { id, attachedToProductId, rootProductId } = prod;
 
-        const attachType = parseAttachProd({
+        const action = parseProdAction({
           quotationProduct: prod,
           quotationProductArr: products,
         });
 
-        if (!attachType) {
+        if (!action) {
           const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
           console.error('解析追加追減發生錯誤，預期外的組合');
           console.error(prod);
@@ -2556,11 +2556,11 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
           return;
         }
 
-        if (attachType === '追加' || attachType === '變更追加') {
+        if (action === '追加' || action === '變更追加') {
           dict[rootProductId] = {
             ...prod,
-            reducedQty: 0,
-            changedQty: 0,
+            qty_reduce: 0,
+            qty_modify: 0,
             latestIterativeId: rootProductId,
           };
 
@@ -2579,11 +2579,11 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
           return;
         }
 
-        if (attachType === '追減') {
-          rootProd.reducedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+        if (action === '追減') {
+          rootProd.qty_reduce = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
-        } else if (attachType === '變更追減') {
-          rootProd.changedQty = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+        } else if (action === '變更追減') {
+          rootProd.qty_modify = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
         }
 
@@ -2630,7 +2630,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
   return iterativeContractProduct;
 };
 
-export const parseAttachProd = ({
+export const parseProdAction = ({
   quotationProduct,
   quotationProductArr,
 }: {
