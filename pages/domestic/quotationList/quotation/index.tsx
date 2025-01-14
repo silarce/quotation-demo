@@ -1247,10 +1247,23 @@ const useData = () => {
     const arr = Object.values(iterativeContractProductDict);
     const prodArr = content?.products ? [...content.products] : [];
 
+    let parsedProdArr = prodArr.map((_prod) => {
+      const prod = { ..._prod, addition: {} } as TprodSource;
+
+      const action = parseProdAction({
+        quotationProduct: prod,
+        quotationProductArr: prodArr,
+      });
+
+      prod.addition.action = action;
+
+      return prod;
+    });
+
     if (!arr.length) {
       return {
         iterativeContractProductArr: undefined,
-        prodArr: undefined,
+        prodArr: parsedProdArr,
       };
     }
 
@@ -1269,22 +1282,7 @@ const useData = () => {
 
       return acc;
     }, {} as Record<string, TprodSource>);
-    let parsedProdArr = prodArr.map((_prod) => {
-      const prod = { ..._prod, addition: {} } as TprodSource;
 
-      // type TparsedProd = typeof prod & { action: ReturnType<typeof parseProdAction> };
-
-      const action = parseProdAction({
-        quotationProduct: prod,
-        quotationProductArr: prodArr,
-      });
-
-      prod.addition.action = action;
-
-      // const parsedProd: TparsedProd = { ...prod, action };
-
-      return prod;
-    });
     const parsedProdArr_modify = parsedProdArr.filter((prod) => prod.addition.action === '變更追加');
     const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
 
