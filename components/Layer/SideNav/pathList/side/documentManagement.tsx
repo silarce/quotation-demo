@@ -13,17 +13,17 @@ export default function SidePathDocumentManagement() {
             list: [
                 {
                     label: '審核管理',
-                    erpFeature: [fac],
+                    erpFeature: 'allPass',
                     list: [
                         {
                             label: '審核清單',
                             path: path + '/reviewList',
-                            erpFeature: [fac],
+                            erpFeature: 'allPass',
                         },
                         {
                             label: '自訂審核',
                             path: path + '/flowList',
-                            erpFeature: [fac],
+                            erpFeature: 'allPass',
                         },
                     ],
                 },

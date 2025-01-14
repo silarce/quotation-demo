@@ -2398,6 +2398,10 @@ export type TquotationContractDto = {
   foreignTotal: string | null;
   // '匯率'
   exchangeRate: string | null;
+  //
+
+  // 已完工
+  isDone: boolean;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -4126,7 +4130,7 @@ export type TaccountsReceivableDto = {
   hasUncollectedAmounts: boolean;
   // '已出貨，因故尚未安裝'
   hasNotInstall: boolean;
-  // '已完工'
+  // '已完工' // 棄用
   isDone: boolean;
   // '放款票期'
   paymentTenor: string | null;
@@ -4222,7 +4226,7 @@ export type TcreateAccountReceivableDto = {
   contractId: string | null;
   // 所屬合約Id;
   legacyContractId: string | null;
-  // 是否已做完
+  // 是否已完工 // 棄用
   isDone: boolean;
 };
 

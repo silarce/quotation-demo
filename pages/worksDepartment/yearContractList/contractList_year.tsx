@@ -51,17 +51,6 @@ export default function WdContractList() {
     isDone,
   } = router.query as Tquery;
 
-  const { yearStart, yearEnd } = useMemo(() => {
-    if (!year) {
-      return { yearStart: undefined, yearEnd: undefined };
-    }
-
-    const yearStart = moment().year(Number(year)).startOf('year').toISOString();
-    const yearEnd = moment().year(Number(year)).endOf('year').toISOString();
-
-    return { yearStart, yearEnd };
-  }, [year]);
-
   // =====================================================================
   const [countyState, setCountyState] = useState<string | undefined>(undefined);
   const [districtState, setDistrictState] = useState<string | undefined>(undefined);
@@ -79,60 +68,47 @@ export default function WdContractList() {
 
   // =====================================================================
 
-  const params: Tparams = {
-    pageSize: 99999,
-    sort: 'contractNumber',
-    order: 'ASC',
-    populate: [
-      //
-      'content.customer',
-      'content.agentEmployee',
-      'content.reviewSalesEmployee',
-      'accountReceivable',
-      'content.products',
-    ],
+  const params: Tparams = useMemo(() => {
+    const yearStart = year ? moment().year(Number(year)).startOf('year').toISOString() : undefined;
+    const yearEnd = year ? moment().year(Number(year)).endOf('year').toISOString() : undefined;
 
-    filter: {
-      'content.product.doorModelName': { $eq: doorType },
-      'content.customer.name': { $contains: customerName },
-      $and: {
-        'content.county': { $eq: county || undefined },
-        'content.district': { $eq: district || undefined },
-        'content.address': { $contains: address || undefined },
-      },
-      $or: {
-        'content.projectName': { $contains: keyWord },
-        'content.quotationNumber': { $contains: keyWord },
-      },
-      engineeringContactId: { $notNull: true },
-      'content.quotationDate': {
-        $gte: yearStart,
-        $lte: yearEnd,
-      },
+    const params: Tparams = {
+      pageSize: 99999,
+      sort: 'contractNumber',
+      order: 'ASC',
+      populate: [
+        'content.customer',
+        'content.agentEmployee',
+        'content.reviewSalesEmployee',
+        'accountReceivable',
+        'content.products',
+      ],
 
-      // 報價單若沒有accountReceivable，取得的資料連accountReceivable這個property都不會有
-      // 送accountReceivable相關的參數會400錯誤
-      // 所以無法以api的filter過濾accountReceivable相關資料
-      // accountReceivable: { $notNull: true },
-      // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : isDone === 'false' ? { $eq: false } : undefined,
-      // 'accountReceivable.isDone': isDone === 'true' ? { $eq: true } : { $ne: true },
-    },
-  };
+      filter: {
+        'content.product.doorModelName': { $eq: doorType },
+        'content.customer.name': { $contains: customerName },
+        $and: {
+          'content.county': { $eq: county || undefined },
+          'content.district': { $eq: district || undefined },
+          'content.address': { $contains: address || undefined },
+        },
+        $or: {
+          'content.projectName': { $contains: keyWord },
+          'content.quotationNumber': { $contains: keyWord },
+        },
+        engineeringContactId: { $notNull: true },
+        'content.quotationDate': {
+          $gte: yearStart,
+          $lte: yearEnd,
+        },
+        isDone: { $eq: isDone === 'true' },
+      },
+    };
+
+    return params;
+  }, [address, county, customerName, district, doorType, isDone, keyWord, year]);
 
   const { data, update } = useGetContract(params);
-
-  const dataArr = useMemo(() => {
-    // 因為無法使用api的filter過濾accountReceivable相關資料，所以在前端這邊過濾
-    const dataArr = (data ?? []).filter((item) => {
-      if (isDone === 'true') {
-        return item.accountReceivable?.isDone === true;
-      } else {
-        return item.accountReceivable?.isDone !== true;
-      }
-    });
-
-    return dataArr;
-  }, [data]);
 
   useEffect(() => {
     (async () => {
@@ -140,18 +116,17 @@ export default function WdContractList() {
       await update();
       setIsLoading(false);
     })();
-  }, [doorType, county, district, address, customerName, keyWord, year, isDone]);
+  }, [params]);
 
   const control_sortedContractList: Tcontrol_sortedContractList = useMemo(() => {
     const list: Tcontrol_sortedContractList = {
       northernArr: [],
       centralArr: [],
       southernArr: [],
-      // easternArr: [],
       abroadArr: [],
     };
 
-    dataArr.forEach((contract) => {
+    data?.forEach((contract) => {
       const { content, accountReceivable, unReviewPicture, unReviewWorkSheet } = contract;
       let { contractNumber } = contract;
       contractNumber = contractNumber || '';
