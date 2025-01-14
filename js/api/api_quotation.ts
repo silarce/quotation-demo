@@ -2170,6 +2170,8 @@ export const useGetQuotation_id_3 = (
       });
 
       if (!res) {
+        setIsFetching(false);
+
         return {
           newQuotation: undefined,
           isUpdated: false,
@@ -2253,6 +2255,8 @@ export const useGetQuotation_id_3 = (
     });
 
     if (!res) {
+      setIsFetching(false);
+
       return {
         newQuotation: undefined,
         newAttachmentArr: undefined,
