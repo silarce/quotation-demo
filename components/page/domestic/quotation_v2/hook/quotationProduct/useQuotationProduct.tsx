@@ -541,13 +541,6 @@ const useQuotationProduct = ({
 
     removeProd(prodKey);
 
-    // if (!attachedToProduct?.modifyedProduct[prodKey]) {
-    //   console.log(attachedToProduct);
-    //   console.log(prodKey);
-
-    //   throw new Error(`removeProd_withIterative方法出錯，找不到modifyedProduct[${prodKey}]`);
-    // }
-
     if (attachedToProduct) {
       delete attachedToProduct.modifyedProduct[prodKey];
       attachedToProduct.renderCount = (attachedToProduct.renderCount ?? 0) + 1;

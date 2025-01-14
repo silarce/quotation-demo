@@ -2519,6 +2519,13 @@ type TquotationProductDto_addition = TquotationProductDto & {
   qty_modify: number; // 變更數量 // 好像用不到...
   latestIterativeId: string;
   deductedPrice: number;
+  modifyedProduct: Record<
+    string,
+    {
+      key: string;
+      quantity: number;
+    }
+  >;
 };
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
@@ -2568,6 +2575,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
             qty_modify: 0,
             deductedPrice: 0,
             latestIterativeId: rootProductId,
+            modifyedProduct: {},
           };
 
           return;

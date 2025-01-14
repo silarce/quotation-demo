@@ -18,6 +18,22 @@ interface TdefaultState {
   prodKeyArr: string[];
 }
 
+type Taddition = {
+  qty_reduce: number; // 追減數量 // 好像用不到...
+  // qty_modify: number; // 變更數量 // 好像用不到...
+  latestIterativeId: string;
+  deductedPrice: number;
+  modifyedProduct: Record<
+    string,
+    {
+      key: string;
+      quantity: number;
+    }
+  >;
+};
+
+type TprodSource = TquotationProductDto & { addition: Taddition };
+
 // ===========================================================================
 // MARK:useDefaultState
 const useDefaultState_prodDict = ({
@@ -50,6 +66,7 @@ const useDefaultState_prodDict = ({
       // let qty_modify = 0;
       let latestIterativeId = '';
       let deductedPrice = 0;
+      let modifyedProduct: TstateProd['modifyedProduct'] = {};
 
       if (isTquotationProductDtoAddition(raw)) {
         // raw 是 TquotationProductDto_addition
@@ -57,6 +74,7 @@ const useDefaultState_prodDict = ({
         deductedPrice = raw.deductedPrice;
         // qty_modify = raw.qty_modify;
         latestIterativeId = raw.latestIterativeId;
+        modifyedProduct = raw.modifyedProduct;
       }
 
       keyArr.push(raw.id);
@@ -95,7 +113,7 @@ const useDefaultState_prodDict = ({
         // qty_modify: 0,
         deductedPrice,
         // modifyedProductKeyArr: [],
-        modifyedProduct: {},
+        modifyedProduct: modifyedProduct,
         // rootProductId: undefined,
         latestIterativeId: latestIterativeId,
         action: action || '追加',

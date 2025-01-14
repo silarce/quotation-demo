@@ -1252,27 +1252,65 @@ const useData = () => {
     }
 
     const dict = { ...iterativeContractProductDict };
+    let parsedProdArr = prodArr.map((prod) => {
+      type TparsedProd = typeof prod & { action: ReturnType<typeof parseProdAction> };
 
-    prodArr?.forEach((prod) => {
-      const result = parseProdAction({
+      const action = parseProdAction({
         quotationProduct: prod,
         quotationProductArr: prodArr,
       });
 
-      if (result === '追減') {
+      const parsedProd: TparsedProd = { ...prod, action };
+
+      return parsedProd;
+    });
+    const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.action === '變更追減');
+
+    parsedProdArr?.forEach((prod) => {
+      // const result = parseProdAction({
+      //   quotationProduct: prod,
+      //   quotationProductArr: prodArr,
+      // });
+
+      // console.log(result);
+      const action = prod.action;
+
+      if (action === '追減') {
         const rootProd = dict[prod.rootProductId];
 
         const rootProdQty = rootProd.quantity;
         rootProd.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
         rootProd.deductedPrice = new Decimal(rootProd.qty_reduce).mul(rootProd.price).toNumber();
 
-        prodArr.splice(prodArr.indexOf(prod), 1);
+        // parsedProdArr.splice(parsedProdArr.indexOf(prod), 1);
+      } else if (action === '變更追減') {
+        // parsedProdArr.splice(parsedProdArr.indexOf(prod), 1);
+      } else if (action === '變更追加') {
+        const attachedToProductId = prod.attachedToProductId;
+        const prod_modifyReduce = parsedProdArr_modifyReduce.find(
+          (prod) => prod.attachedToProductId === attachedToProductId
+        );
+
+        if (!prod_modifyReduce) {
+          throw new Error('useData，變更追加找不到對應的變更追減');
+        }
+
+        const rootProductId = prod_modifyReduce.rootProductId;
+        const rootProd = dict[rootProductId];
+        rootProd.modifyedProduct[prod.id] = {
+          key: prod.id,
+          quantity: prod.quantity,
+        };
+        // const rootProdQty = rootProd.quantity;
       }
+      //
     });
+
+    parsedProdArr = parsedProdArr.filter((prod) => prod.action !== '追減' && prod.action !== '變更追減');
 
     const iterativeContractProductArr = Object.values(dict);
 
-    return { iterativeContractProductArr, prodArr };
+    return { iterativeContractProductArr, prodArr: parsedProdArr };
   }, [iterativeContractProductDict, content?.products]);
 
   // console.log('iterativeContractProductDict', iterativeContractProductDict);
