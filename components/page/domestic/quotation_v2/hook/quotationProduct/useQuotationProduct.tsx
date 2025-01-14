@@ -211,11 +211,7 @@ interface Tinstance_useQuotationProduct {
   quotationDiscount: `${number}` | '';
   setQuotationDiscount: (value: `${number}` | '') => void;
 
-  // createActivedClassComponentDict: aaaaa;
-  // createActivedClassAccessoryDict: aaaaa;
   createClassProd: (stateProd: TstateProd) => ClassProd;
-  // calcProductBody: () => ReturnType<typeof _calcProductBody>;
-  // calcProdAllTotal: () => number;
 
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
@@ -489,17 +485,50 @@ const useQuotationProduct = ({
     copyProd({ stateProd });
   };
 
+  // const modifyProd = useCallback(
+  //   ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
+  //     const stateProd_iterative = state_iterativeProdDict[prodKey];
+
+  //     const allowQty = calcProdRemain({ stateProd: stateProd_iterative });
+
+  //     if (qty_modify === 0) {
+  //       return;
+  //     } else if (!Number.isInteger(qty_modify) || qty_modify < 0) {
+  //       myAlert.err({ title: '數量只能是正整數' });
+
+  //       return;
+  //     } else if (allowQty < qty_modify) {
+  //       myAlert.err({ title: '數量不可超過剩餘數量' });
+
+  //       return;
+  //     }
+
+  //     // stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
+
+  //     const newProd = copyProd({
+  //       stateProd: stateProd_iterative,
+  //       quantity: qty_modify,
+  //       attachedToProduct: stateProd_iterative,
+  //       quotationDiscount: state_quotationDiscount || 0,
+  //     });
+
+  //     // stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
+  //     stateProd_iterative.modifyedProduct[newProd.key] = {
+  //       key: newProd.key,
+  //       quantity: qty_modify,
+  //     };
+  //     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
+
+  //     setState_iterativeProdDict({ ...state_iterativeProdDict });
+  //   },
+  //   [state_iterativeProdDict, state_quotationDiscount]
+  // );
+
   const modifyProd = ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
     const stateProd_iterative = state_iterativeProdDict[prodKey];
 
-    // const rootProductId = stateProd_iterative.data_prod.id;
     const allowQty = calcProdRemain({ stateProd: stateProd_iterative });
 
-    // if (!rootProductId) {
-    //   throw new Error('modifyProd方法出錯，rootProductId不存在');
-    // } else if (rootProductId !== prodKey) {
-    //   throw new Error('modifyProd方法出錯，rootProductId不等於prodKey');
-    // } else
     if (qty_modify === 0) {
       return;
     } else if (!Number.isInteger(qty_modify) || qty_modify < 0) {
@@ -518,6 +547,7 @@ const useQuotationProduct = ({
       stateProd: stateProd_iterative,
       quantity: qty_modify,
       attachedToProduct: stateProd_iterative,
+      quotationDiscount: state_quotationDiscount || 0,
     });
 
     // stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
@@ -677,6 +707,8 @@ const useQuotationProduct = ({
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
+
+  console.log(activedProd);
 
   const instance: Tinstance_useQuotationProduct = {
     state_prodDict,

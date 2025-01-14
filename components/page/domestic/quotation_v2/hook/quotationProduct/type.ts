@@ -268,8 +268,8 @@ interface TstateComponentData<T extends keyof TcomponentRawDataDict> {
   dualPrice?: number; // 牌價複價 // 虛值
   unitPrice?: number; // 單價 = 牌價 * 主產品折數 * 總折數 // 虛值
   totalPrice?: number; // 複價 = 單價 * 數量 // 虛值
-
   //
+  isInited?: boolean;
 }
 
 type Tdata_componentDict = {

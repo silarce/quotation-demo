@@ -109,12 +109,17 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   setClassProd(classProd: ClassProd) {
     this.classProd = classProd;
 
-    if (
-      this.state.dualPrice === undefined ||
-      this.state.unitPrice === undefined ||
-      this.state.totalPrice === undefined
-    ) {
+    // if (
+    //   this.state.dualPrice === undefined ||
+    //   this.state.unitPrice === undefined ||
+    //   this.state.totalPrice === undefined
+    // ) {
+    //   this.renewComponentAllPrice();
+    //   this.render();
+    // }
+    if (!this.state.isInited) {
       this.renewComponentAllPrice();
+      this.state.isInited = true;
       this.render();
     }
   }

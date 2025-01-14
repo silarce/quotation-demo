@@ -40,8 +40,7 @@ import {
   createEmptyStateProd,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
 
-import type { XOR } from 'ts-essentials';
-import { isOpacityEffect } from 'html2canvas/dist/types/render/effects';
+import { calcProdTotalPrice } from './calcProd';
 
 // ===========================================================================
 
@@ -220,18 +219,13 @@ const kit_createClass = ({
     stateProd,
     quantity,
     attachedToProduct,
+    quotationDiscount,
   }: {
     stateProd: TstateProd;
     quantity?: number;
     attachedToProduct?: TstateProd;
+    quotationDiscount?: number | `${number}`;
   }) => {
-    // if (!prodKey && !stateProd) {
-    //   throw new Error('copyProd出錯，prodKey與stateProd同時不存在');
-    // }
-
-    // let copyedProd = prodKey ? state_prodDict[prodKey] : stateProd;
-    // copyedProd = _.cloneDeep(copyedProd);
-
     let copyedProd = _.cloneDeep(stateProd);
 
     if (!copyedProd) {
@@ -264,13 +258,49 @@ const kit_createClass = ({
       attachedToProductId: undefined,
     };
 
-    if (action === 'modify') {
-      copyedProd.rootProduct = attachedToProduct;
-      data_prod.id = attachedToProductId!;
-      copyedProd.action = '變更追加';
-    }
-
     quantity !== undefined && (data_prod.quantity = `${quantity}`);
+
+    copyedProd.data_prod = data_prod;
+
+    if (action === 'modify') {
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
+
+      copyedProd.rootProduct = attachedToProduct;
+      copyedProd.action = '變更追加';
+
+      data_prod.id = attachedToProductId!;
+
+      const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
+        stateProd: copyedProd,
+        quotationDiscount: quotationDiscount || 0,
+      });
+
+      data_prod.dualPrice = dualPrice;
+      data_prod.unitPrice = unitPrice;
+      data_prod.totalPrice = totalPrice;
+
+      const copmonentDict = copyedProd.data_componentDict;
+
+      for (const component of Object.values(copmonentDict)) {
+        component.isInited = false;
+      }
+    }
 
     const newProd: TstateProd = {
       ...copyedProd,
