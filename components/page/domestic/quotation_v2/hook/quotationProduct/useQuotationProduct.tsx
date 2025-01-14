@@ -470,14 +470,15 @@ const useQuotationProduct = ({
   const modifyProd = ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
     const stateProd_iterative = state_iterativeProdDict[prodKey];
 
-    const rootProductId = stateProd_iterative.data_prod.id;
+    // const rootProductId = stateProd_iterative.data_prod.id;
     const allowQty = calcProdRemain({ stateProd: stateProd_iterative });
 
-    if (!rootProductId) {
-      throw new Error('modifyProd方法出錯，rootProductId不存在');
-    } else if (rootProductId !== prodKey) {
-      throw new Error('modifyProd方法出錯，rootProductId不等於prodKey');
-    } else if (qty_modify === 0) {
+    // if (!rootProductId) {
+    //   throw new Error('modifyProd方法出錯，rootProductId不存在');
+    // } else if (rootProductId !== prodKey) {
+    //   throw new Error('modifyProd方法出錯，rootProductId不等於prodKey');
+    // } else
+    if (qty_modify === 0) {
       return;
     } else if (!Number.isInteger(qty_modify) || qty_modify < 0) {
       myAlert.err({ title: '數量只能是正整數' });

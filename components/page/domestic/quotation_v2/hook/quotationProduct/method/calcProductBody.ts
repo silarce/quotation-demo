@@ -116,14 +116,20 @@ const calcProductBody = ({
 const formatProdStateToBody = (stateProd: TstateProd) => {
   const {
     data_prod,
-
     data_componentDict,
     componentKeyArr,
-
     data_accessoryDict,
     accessoryKeyArr,
     attachedToProduct,
+    action,
   } = stateProd;
+
+  // 追減或變更追加，id要送來源產品id
+  let id: string | undefined = undefined;
+  action === '變更追加' || (action === '追減' && (id = attachedToProduct?.latestIterativeId));
+
+  let attachedToProductId: string | undefined = undefined;
+  action === '變更追加' && (attachedToProductId = attachedToProduct?.latestIterativeId);
 
   const componentArr = componentKeyArr.map((key) => data_componentDict[key]);
 
@@ -188,10 +194,9 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
 
   const formated: TcreateQuotationProductDto = {
     // 產品id
-    // id: data_prod.id || undefined,
-    id: attachedToProduct?.data_prod.id || undefined, // 追減或變更追加，id要送來源產品id
+    id,
     // 來源產品
-    attachedToProductId: data_prod.attachedToProductId,
+    attachedToProductId,
 
     // 折數
     discount: data_prod.discount, // `${number}`
