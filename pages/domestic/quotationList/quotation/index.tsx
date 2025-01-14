@@ -944,6 +944,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                 <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
                 <QuotationProdTable
                   disabled={true}
+                  disabled_iterativeProd={disabled}
                   instance_useQuotationProductInstance={instance_iterative}
                   showQuotationDiscount={false}
                   // isIterativeProd={true}

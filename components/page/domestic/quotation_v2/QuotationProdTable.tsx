@@ -53,6 +53,7 @@ import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 interface Tprops {
   instance_useQuotationProductInstance: Tinstance_useQuotationProduct;
   disabled: boolean;
+  disabled_iterativeProd?: boolean;
   className?: string;
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
   // isIterativeProd?: TtableProps['isIterativeProd'];
@@ -68,6 +69,14 @@ interface TtableProps {
   prodTotal?: React.ReactNode;
 }
 
+interface Tcontext {
+  disabled_iterativeProd?: boolean;
+}
+
+// ===================================================================
+
+const Context = createContext<Tcontext>(null!);
+
 // ===================================================================
 
 // MARK: START
@@ -77,13 +86,12 @@ export default function QuotationProdTable(tableProps: Tprops) {
   const {
     //
     disabled,
+    disabled_iterativeProd,
     className,
     showQuotationDiscount = true,
     // isIterativeProd,
     prodTotal,
   } = tableProps;
-
-  createContext(tableProps);
 
   const instance_useQuotationProductInstance = tableProps.instance_useQuotationProductInstance;
 
@@ -91,31 +99,33 @@ export default function QuotationProdTable(tableProps: Tprops) {
 
   // MARK:RENDER
   return (
-    <div className={classNames(className)}>
-      {/* 主產品 product */}
-      <Table_prod
-        instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-        disabled={disabled}
-        showQuotationDiscount={showQuotationDiscount}
-        // isIterativeProd={isIterativeProd}
-        prodTotal={prodTotal}
-      />
-      <br />
+    <Context.Provider value={{ disabled_iterativeProd: disabled_iterativeProd }}>
+      <div className={classNames(className)}>
+        {/* 主產品 product */}
+        <Table_prod
+          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+          disabled={disabled}
+          showQuotationDiscount={showQuotationDiscount}
+          // isIterativeProd={isIterativeProd}
+          prodTotal={prodTotal}
+        />
+        <br />
 
-      <Spin spinning={!!activedProd?.isFetching}>
-        <Table_component
-          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-          disabled={disabled}
-        />
-      </Spin>
-      <br />
-      <Spin spinning={!!activedProd?.isFetching}>
-        <Table_accessory
-          instance_useQuotationProductInstance={instance_useQuotationProductInstance}
-          disabled={disabled}
-        />
-      </Spin>
-    </div>
+        <Spin spinning={!!activedProd?.isFetching}>
+          <Table_component
+            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+            disabled={disabled}
+          />
+        </Spin>
+        <br />
+        <Spin spinning={!!activedProd?.isFetching}>
+          <Table_accessory
+            instance_useQuotationProductInstance={instance_useQuotationProductInstance}
+            disabled={disabled}
+          />
+        </Spin>
+      </div>
+    </Context.Provider>
   );
 }
 
@@ -424,6 +434,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
                 // onDragStart={(e) => {
                 //   choseActiveProd(undefined);
                 // }}
+                dragHandleInvisible={disabled}
               >
                 {cellKeyArr_component.map((cellKey, cIndex) => {
                   const { style, className, createNode } = classComponent.nodeConfig[cellKey];
@@ -580,6 +591,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
               const left = (
                 <Panel_accessory
+                  className_delete={classNames(disabled && 'invisible')}
                   onDeleteClick={() => activedClassProd?.removeAccessory(acceKey)}
                   indexNumber={index + 1}
                 >
@@ -603,6 +615,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
                   isActive={activeIndex === index}
                   left={left}
                   onClick={() => setActiveIndex(index)}
+                  dragHandleInvisible={disabled}
                 >
                   {cellKeyArr_accessory.map((cellKey) => {
                     const { style, className, createNode } = classAccessory.nodeConfig[cellKey];
@@ -703,6 +716,8 @@ const QuotationRow_dealClass = ({
   stateProd: TstateProd;
   prodKey: string;
 }) => {
+  const { disabled_iterativeProd } = useContext(Context);
+
   const [viewRef, inView] = useInView();
 
   const [copyedTip, setCopyedTip] = useState(false);
@@ -716,6 +731,8 @@ const QuotationRow_dealClass = ({
     <>
       <div ref={viewRef} className={scss.viewIndicator} />
       <Panel_prod
+        className_delete={classNames(disabled && 'invisible')}
+        className_copy={classNames(disabled && 'invisible')}
         onDeleteClick={() => removeProd(classProd.key)}
         onCopyClick={() => copyProd({ prodKey: classProd.key })}
         indexNumber={index + 1}
@@ -748,6 +765,9 @@ const QuotationRow_dealClass = ({
       <>
         <div ref={viewRef} className={scss.viewIndicator} />
         <Panel_iterativeProd
+          className_reset={classNames(disabled_iterativeProd && 'invisible')}
+          className_copy={classNames(disabled_iterativeProd && 'invisible')}
+          className_copy2={classNames(disabled_iterativeProd && 'invisible')}
           indexNumber={index + 1}
           onResetClick={() => resetModify({ prodKey: classProd.key })}
           onCopyClick={() => {
@@ -792,6 +812,7 @@ const QuotationRow_dealClass = ({
 
     right = (
       <Panel_iterativeProd_right
+        disabled={disabled_iterativeProd}
         qty={classProd.quantity}
         price={classProd.deductedPrice}
         reduceValue={classProd.qty_reduce}
@@ -819,7 +840,7 @@ const QuotationRow_dealClass = ({
         isActive={isActive}
         left={left}
         right={right}
-        dragHandleInvisible={isIterativeProd}
+        dragHandleInvisible={disabled || isIterativeProd}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);

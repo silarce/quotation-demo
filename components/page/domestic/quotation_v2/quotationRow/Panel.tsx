@@ -81,6 +81,7 @@ const Panel_iterativeProd_right_thead = () => {
 };
 
 const Panel_iterativeProd_right = ({
+  disabled,
   qty,
   price,
   reduceValue,
@@ -88,6 +89,7 @@ const Panel_iterativeProd_right = ({
   modifyValue,
 }: // onModifyChange,
 {
+  disabled?: boolean;
   qty: React.ReactNode;
   price: React.ReactNode;
   reduceValue: string;
@@ -104,6 +106,7 @@ const Panel_iterativeProd_right = ({
       </Cell>
       <Cell style={config.reduce.style}>
         <InputSel_prod
+          disabled={disabled}
           inputProps={{
             props: {
               type: 'number',
