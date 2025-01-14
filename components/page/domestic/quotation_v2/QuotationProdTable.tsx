@@ -672,6 +672,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 // ===================================================================
 // ===================================================================
 
+// MARK:QuotationRow_dealClass
 const QuotationRow_dealClass = ({
   //
 
@@ -679,13 +680,6 @@ const QuotationRow_dealClass = ({
   index,
   disabled,
   cellKeyArr,
-  // choseActiveProd,
-  // createClassProd,
-  // activedClassProd,
-  // //
-  // removeProd,
-  // copyProd,
-  // isIterativeProd,
 
   stateProd,
   prodKey,
@@ -875,8 +869,12 @@ const QuotationRow_dealClass = ({
 };
 
 const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
+  const [rerenderTrigger02_prev] = [prev.instance_useQuotationProductInstance.isIterativeProdExist];
+  const [rerenderTrigger02_next] = [next.instance_useQuotationProductInstance.isIterativeProdExist];
+
   return (
     prev.rerenderTrigger01 === next.rerenderTrigger01 &&
+    rerenderTrigger02_prev === rerenderTrigger02_next &&
     // prev.stateProd === next.stateProd &&
     prev.disabled === next.disabled &&
     prev.isActive === next.isActive &&

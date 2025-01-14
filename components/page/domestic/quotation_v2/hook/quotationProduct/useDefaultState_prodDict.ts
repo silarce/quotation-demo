@@ -62,23 +62,6 @@ const useDefaultState_prodDict = ({
     const keyArr: string[] = [];
 
     prodSource_copy.forEach((prodSource) => {
-      // const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
-
-      // let qty_reduce = '' as `${number}` | '';
-      // // let qty_modify = 0;
-      // let latestIterativeId = '';
-      // let deductedPrice = 0;
-      // let modifyedProduct: TstateProd['modifyedProduct'] = {};
-
-      // if (isTquotationProductDtoAddition(raw)) {
-      //   // raw 是 TquotationProductDto_addition
-      //   qty_reduce = `${raw.qty_reduce}`;
-      //   deductedPrice = raw.deductedPrice;
-      //   // qty_modify = raw.qty_modify;
-      //   latestIterativeId = raw.latestIterativeId;
-      //   modifyedProduct = raw.modifyedProduct;
-      // }
-
       const {
         addition: {
           //

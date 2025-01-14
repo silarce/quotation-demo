@@ -260,7 +260,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     contractProfile,
     prodArr,
   } = useData();
-  isAttach = !!attachedToContract;
+  isAttach = !!iterativeContractProductArr?.length;
 
   const {
     isFetching: isFetching_update,
@@ -971,7 +971,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           <br />
           <br />
           <br />
-          <QuotationOther disabled={disabled} instance_useQuotationOther={instance_useQuotationOther} />
+          <QuotationOther disabled={isAttach || disabled} instance_useQuotationOther={instance_useQuotationOther} />
         </div>
 
         {/* prod */}
