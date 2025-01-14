@@ -31,18 +31,18 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './QuotationProdTable.module.scss';
 
 import {
-  ClassProd,
+  // ClassProd,
   Tinstance_useQuotationProduct,
   // Tinstance_useQuotationProduct,
   TstateProd,
-  TclassComponentDict,
+  // TclassComponentDict,
   // TcreateSetComponent,
   // TcreateSetAccessory,
-  TclassAccessoryDict,
-  TstateProdDict,
+  // TclassAccessoryDict,
+  // TstateProdDict,
   // TsetComponent,
   // TsetAccessory,
-  TclassPsuedoComponentDict,
+  // TclassPsuedoComponentDict,
 } from './hook/quotationProduct/useQuotationProduct';
 
 import { SearchModal_prodAccessories } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodAccessories';
@@ -869,18 +869,20 @@ const QuotationRow_dealClass = ({
 };
 
 const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
-  const [rerenderTrigger02_prev] = [prev.instance_useQuotationProductInstance.isIterativeProdExist];
-  const [rerenderTrigger02_next] = [next.instance_useQuotationProductInstance.isIterativeProdExist];
+  return false;
 
-  return (
-    prev.rerenderTrigger01 === next.rerenderTrigger01 &&
-    rerenderTrigger02_prev === rerenderTrigger02_next &&
-    // prev.stateProd === next.stateProd &&
-    prev.disabled === next.disabled &&
-    prev.isActive === next.isActive &&
-    prev.cellKeyArr === next.cellKeyArr &&
-    prev.index === next.index
-    // &&
-    // prev.createClassProd === next.createClassProd
-  );
+  // const [rerenderTrigger02_prev] = [prev.instance_useQuotationProductInstance.isIterativeProdExist];
+  // const [rerenderTrigger02_next] = [next.instance_useQuotationProductInstance.isIterativeProdExist];
+
+  // return (
+  //   prev.rerenderTrigger01 === next.rerenderTrigger01 &&
+  //   rerenderTrigger02_prev === rerenderTrigger02_next &&
+  //   // prev.stateProd === next.stateProd &&
+  //   prev.disabled === next.disabled &&
+  //   prev.isActive === next.isActive &&
+  //   prev.cellKeyArr === next.cellKeyArr &&
+  //   prev.index === next.index
+  //   // &&
+  //   // prev.createClassProd === next.createClassProd
+  // );
 });
