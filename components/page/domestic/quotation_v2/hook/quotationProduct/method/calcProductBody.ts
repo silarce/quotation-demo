@@ -52,7 +52,7 @@ const calcProductBody = ({
     })
     .map((stateProd) => {
       const copy = { ...stateProd };
-      copy.attachedToProduct = stateProd;
+      copy.rootProduct = stateProd;
 
       copy.data_prod = {
         ...copy.data_prod,
@@ -121,16 +121,16 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     componentKeyArr,
     data_accessoryDict,
     accessoryKeyArr,
-    attachedToProduct,
+    rootProduct: rootProduct,
     action,
   } = stateProd;
 
   // 追減或變更追加，id要送來源產品id
   let id: string | undefined = undefined;
-  (action === '變更追加' || action === '追減') && (id = attachedToProduct?.latestIterativeId);
+  (action === '變更追加' || action === '追減') && (id = rootProduct?.latestIterativeId);
 
   let attachedToProductId: string | undefined = undefined;
-  action === '追減' && (attachedToProductId = attachedToProduct?.latestIterativeId);
+  action === '追減' && (attachedToProductId = rootProduct?.latestIterativeId);
 
   const componentArr = componentKeyArr.map((key) => data_componentDict[key]);
 

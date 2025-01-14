@@ -79,7 +79,7 @@ interface TconfigItem_prod {
 
 type TcellKey = keyof Pick<
   ClassProd,
-  | 'attachedToProductName'
+  | 'rootProductName'
   | 'itemName' // 項目名
   | 'discount' // 折數
   | 'quoteType' // 報價別
@@ -195,15 +195,15 @@ const lookup_options_boxB: Tlookup_options_boxB = {
 // MARK:nodeConfig_origin
 
 const nodeConfig_origin: TnodeConfig = {
-  attachedToProductName: {
-    label: '來源主產品',
+  rootProductName: {
+    label: '源主產品',
     style: { width: 100 },
     className_thead: 'text-lg text-main',
     createNode({ disabled, classProd }) {
       const inputProps: TinputSelProps = {
         disabled,
         showBaseline: 'invisible',
-        node: classProd.attachedToProductName,
+        node: classProd.rootProductName,
       };
 
       return <InputSel_prod {...inputProps} />;

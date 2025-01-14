@@ -350,7 +350,7 @@ interface TstateProd {
     }
   >;
 
-  attachedToProduct?: TstateProd; // 附屬產品
+  rootProduct?: TstateProd; // 附屬產品
   latestIterativeId?: string | undefined; // 最後迭代id
 
   action: '追加' | '追減' | '變更追加' | undefined;

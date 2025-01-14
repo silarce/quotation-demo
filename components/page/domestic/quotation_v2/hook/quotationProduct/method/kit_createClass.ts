@@ -253,7 +253,7 @@ const kit_createClass = ({
       qty_reduce: '',
       deductedPrice: 0,
       modifyedProduct: {},
-      attachedToProduct: undefined,
+      rootProduct: undefined,
       action: '追加',
     };
 
@@ -265,7 +265,7 @@ const kit_createClass = ({
     };
 
     if (action === 'modify') {
-      copyedProd.attachedToProduct = attachedToProduct;
+      copyedProd.rootProduct = attachedToProduct;
       data_prod.id = attachedToProductId!;
       copyedProd.action = '變更追加';
     }

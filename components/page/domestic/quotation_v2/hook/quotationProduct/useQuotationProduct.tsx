@@ -554,14 +554,14 @@ const useQuotationProduct = ({
 
   const removeProd_withIterative = (prodKey: string) => {
     const stateProdWillRemove = state_prodDict[prodKey];
-    const attachedToProductKey = stateProdWillRemove.attachedToProduct?.key;
-    const attachedToProduct = attachedToProductKey ? state_iterativeProdDict[attachedToProductKey] : undefined;
+    const rootProductKey = stateProdWillRemove.rootProduct?.key;
+    const rootProduct = rootProductKey ? state_iterativeProdDict[rootProductKey] : undefined;
 
     removeProd(prodKey);
 
-    if (attachedToProduct) {
-      delete attachedToProduct.modifyedProduct[prodKey];
-      attachedToProduct.renderCount = (attachedToProduct.renderCount ?? 0) + 1;
+    if (rootProduct) {
+      delete rootProduct.modifyedProduct[prodKey];
+      rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
       setState_iterativeProdDict({ ...state_iterativeProdDict });
     }
   };

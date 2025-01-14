@@ -2056,12 +2056,12 @@ class ClassProd {
   }
 
   get isAttached() {
-    return !!this.state.attachedToProduct;
+    return !!this.state.rootProduct;
   }
 
   // MARK:attachedToProductName
-  get attachedToProductName() {
-    return this.state.attachedToProduct?.data_prod.itemName ?? '';
+  get rootProductName() {
+    return this.state.rootProduct?.data_prod.itemName ?? '';
   }
 }
 // MARK: END
