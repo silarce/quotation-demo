@@ -42,8 +42,9 @@ const calcProductBody = ({
   const stateProdArr_iterative: TstateProd[] = Object.values(state_iterativeProdDict)
     .filter((stateProd) => {
       const { qty_reduce, modifyedProduct } = stateProd;
+      const qty_reduce_num = Number(qty_reduce || 0);
 
-      if (!qty_reduce && !Object.keys(modifyedProduct).length) {
+      if (!qty_reduce_num && !Object.keys(modifyedProduct).length) {
         return false;
       }
 
