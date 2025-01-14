@@ -12,27 +12,28 @@ import type {
 
 import type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData } from './type';
 import type { TquotationProductDto_addition } from 'js/api/api_quotation';
+import { TprodSource } from './useQuotationProduct';
 
 interface TdefaultState {
   stateProdDict: TstateProdDict;
   prodKeyArr: string[];
 }
 
-type Taddition = {
-  qty_reduce: number; // 追減數量 // 好像用不到...
-  // qty_modify: number; // 變更數量 // 好像用不到...
-  latestIterativeId: string;
-  deductedPrice: number;
-  modifyedProduct: Record<
-    string,
-    {
-      key: string;
-      quantity: number;
-    }
-  >;
-};
+// type Taddition = {
+//   qty_reduce: number; // 追減數量 // 好像用不到...
+//   // qty_modify: number; // 變更數量 // 好像用不到...
+//   latestIterativeId: string;
+//   deductedPrice: number;
+//   modifyedProduct: Record<
+//     string,
+//     {
+//       key: string;
+//       quantity: number;
+//     }
+//   >;
+// };
 
-type TprodSource = TquotationProductDto & { addition: Taddition };
+// type TprodSource = TquotationProductDto & { addition: Taddition };
 
 // ===========================================================================
 // MARK:useDefaultState
@@ -41,7 +42,8 @@ const useDefaultState_prodDict = ({
   doorModelDict,
   action,
 }: {
-  raw_productArr: TquotationProductDto[] | TquotationProductDto_addition[] | undefined;
+  // raw_productArr: TquotationProductDto[] | TquotationProductDto_addition[] | undefined;
+  raw_productArr: TprodSource[] | undefined;
   doorModelDict: Record<string, TdoorModelInfoDto> | null | undefined;
   action?: TstateProd['action'];
   // isIterative;
@@ -59,23 +61,33 @@ const useDefaultState_prodDict = ({
     const dict: TstateProdDict = {};
     const keyArr: string[] = [];
 
-    raw_productArr_copy.forEach((_raw) => {
-      const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
+    raw_productArr_copy.forEach((raw) => {
+      // const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
 
-      let qty_reduce = '' as `${number}` | '';
-      // let qty_modify = 0;
-      let latestIterativeId = '';
-      let deductedPrice = 0;
-      let modifyedProduct: TstateProd['modifyedProduct'] = {};
+      // let qty_reduce = '' as `${number}` | '';
+      // // let qty_modify = 0;
+      // let latestIterativeId = '';
+      // let deductedPrice = 0;
+      // let modifyedProduct: TstateProd['modifyedProduct'] = {};
 
-      if (isTquotationProductDtoAddition(raw)) {
-        // raw 是 TquotationProductDto_addition
-        qty_reduce = `${raw.qty_reduce}`;
-        deductedPrice = raw.deductedPrice;
-        // qty_modify = raw.qty_modify;
-        latestIterativeId = raw.latestIterativeId;
-        modifyedProduct = raw.modifyedProduct;
-      }
+      // if (isTquotationProductDtoAddition(raw)) {
+      //   // raw 是 TquotationProductDto_addition
+      //   qty_reduce = `${raw.qty_reduce}`;
+      //   deductedPrice = raw.deductedPrice;
+      //   // qty_modify = raw.qty_modify;
+      //   latestIterativeId = raw.latestIterativeId;
+      //   modifyedProduct = raw.modifyedProduct;
+      // }
+
+      const {
+        addition: {
+          //
+          qty_reduce,
+          deductedPrice = 0,
+          modifyedProduct = {},
+          latestIterativeId,
+        } = {},
+      } = raw;
 
       keyArr.push(raw.id);
 
@@ -109,13 +121,11 @@ const useDefaultState_prodDict = ({
         generalSpecs: undefined,
         availableComponents: undefined,
 
-        qty_reduce,
-        // qty_modify: 0,
+        qty_reduce: qty_reduce ? `${qty_reduce}` : '',
         deductedPrice,
-        // modifyedProductKeyArr: [],
         modifyedProduct: modifyedProduct,
-        // rootProductId: undefined,
         latestIterativeId: latestIterativeId,
+
         action: action || '追加',
       };
 

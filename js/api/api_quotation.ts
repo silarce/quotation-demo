@@ -2515,17 +2515,17 @@ export const useGetQuotation_id_3 = (
 // ========================================================================
 
 type TquotationProductDto_addition = TquotationProductDto & {
-  qty_reduce: number; // 追減數量 // 好像用不到...
-  qty_modify: number; // 變更數量 // 好像用不到...
+  // qty_reduce: number; // 追減數量 // 好像用不到...
+  // qty_modify: number; // 變更數量 // 好像用不到...
   latestIterativeId: string;
-  deductedPrice: number;
-  modifyedProduct: Record<
-    string,
-    {
-      key: string;
-      quantity: number;
-    }
-  >;
+  // deductedPrice: number;
+  // modifyedProduct: Record<
+  //   string,
+  //   {
+  //     key: string;
+  //     quantity: number;
+  //   }
+  // >;
 };
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
@@ -2571,11 +2571,11 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
         if (action === '追加' || action === '變更追加') {
           dict[rootProductId] = {
             ...prod,
-            qty_reduce: 0,
-            qty_modify: 0,
-            deductedPrice: 0,
+            // qty_reduce: 0,
+            // qty_modify: 0,
+            // deductedPrice: 0,
             latestIterativeId: rootProductId,
-            modifyedProduct: {},
+            // modifyedProduct: {},
           };
 
           return;

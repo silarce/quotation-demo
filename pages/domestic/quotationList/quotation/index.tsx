@@ -132,7 +132,10 @@ import QuotationAttachment from 'components/page/domestic/quotation_v2/Quotation
 import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
-import { useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
+import {
+  useQuotationProduct,
+  TprodSource,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
 
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
@@ -1247,12 +1250,26 @@ const useData = () => {
     if (!arr.length) {
       return {
         iterativeContractProductArr: undefined,
-        prodArr,
+        prodArr: undefined,
       };
     }
 
-    const dict = { ...iterativeContractProductDict };
-    let parsedProdArr = prodArr.map((prod) => {
+    // const dict = { ...iterativeContractProductDict };
+    const dict = Object.entries(iterativeContractProductDict).reduce((acc, [key, prod]) => {
+      acc[key] = {
+        ...prod,
+        addition: {
+          qty_reduce: 0,
+          deductedPrice: 0,
+          latestIterativeId: prod.latestIterativeId,
+          modifyedProduct: {},
+        },
+      };
+
+      return acc;
+    }, {} as Record<string, TprodSource>);
+    let parsedProdArr = prodArr.map((_prod) => {
+      const prod = { ..._prod, addition: {} } as TprodSource;
       type TparsedProd = typeof prod & { action: ReturnType<typeof parseProdAction> };
 
       const action = parseProdAction({
@@ -1279,8 +1296,8 @@ const useData = () => {
         const rootProd = dict[prod.rootProductId];
 
         const rootProdQty = rootProd.quantity;
-        rootProd.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
-        rootProd.deductedPrice = new Decimal(rootProd.qty_reduce).mul(rootProd.price).toNumber();
+        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
+        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce).mul(rootProd.price).toNumber();
 
         // parsedProdArr.splice(parsedProdArr.indexOf(prod), 1);
       } else if (action === '變更追減') {
@@ -1297,7 +1314,7 @@ const useData = () => {
 
         const rootProductId = prod_modifyReduce.rootProductId;
         const rootProd = dict[rootProductId];
-        rootProd.modifyedProduct[prod.id] = {
+        rootProd.addition.modifyedProduct![prod.id] = {
           key: prod.id,
           quantity: prod.quantity,
         };
@@ -1367,8 +1384,9 @@ const useData = () => {
     instatnce_getQuotationId3,
     content,
     attachedToContract,
-    iterativeContractProductArr,
     contractProfile,
+    //
     prodArr,
+    iterativeContractProductArr,
   };
 };

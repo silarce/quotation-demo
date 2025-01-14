@@ -113,9 +113,25 @@ import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary
 
 import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
-import type { TquotationProductDto_addition } from 'js/api/api_quotation';
+import type { TquotationProductDto, TquotationProductDto_addition } from 'js/api/api_quotation';
 
 // ================================================================================
+
+type Taddition = {
+  qty_reduce?: number; // 追減數量 // 好像用不到...
+  // qty_modify: number; // 變更數量 // 好像用不到...
+  latestIterativeId?: string;
+  deductedPrice?: number;
+  modifyedProduct?: Record<
+    string,
+    {
+      key: string;
+      quantity: number;
+    }
+  >;
+};
+
+type TprodSource = TquotationProductDto & { addition: Taddition };
 
 type TcreateSetComponent = <T extends keyof TstateProd['data_componentDict']>({
   pordKey,
@@ -231,9 +247,11 @@ const useQuotationProduct = ({
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
 }: {
-  raw_quotationProductArr: TquotationContentDto['products'] | undefined;
+  raw_quotationProductArr: TprodSource[] | undefined;
+  iterativeContractProductArr: TprodSource[] | undefined;
+  // raw_quotationProductArr: TquotationContentDto['products'] | undefined;
+  // iterativeContractProductArr: TquotationProductDto_addition[] | undefined;
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
-  iterativeContractProductArr: TquotationProductDto_addition[] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
 }) => {
@@ -795,5 +813,6 @@ export type {
   // TclassComponentDict,
   // TclassPsuedoComponentDict,
   // TclassAccessoryDict,
+  TprodSource,
 };
 export { useQuotationProduct, ClassProd };
