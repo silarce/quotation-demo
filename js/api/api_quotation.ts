@@ -2518,6 +2518,7 @@ type TquotationProductDto_addition = TquotationProductDto & {
   qty_reduce: number; // 追減數量 // 好像用不到...
   qty_modify: number; // 變更數量 // 好像用不到...
   latestIterativeId: string;
+  deductedPrice: number;
 };
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
@@ -2565,6 +2566,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
             ...prod,
             qty_reduce: 0,
             qty_modify: 0,
+            deductedPrice: 0,
             latestIterativeId: rootProductId,
           };
 

@@ -1264,6 +1264,7 @@ const useData = () => {
 
         const rootProdQty = rootProd.quantity;
         rootProd.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
+        rootProd.deductedPrice = new Decimal(rootProd.qty_reduce).mul(rootProd.price).toNumber();
 
         prodArr.splice(prodArr.indexOf(prod), 1);
       }

@@ -49,10 +49,12 @@ const useDefaultState_prodDict = ({
       let qty_reduce = '' as `${number}` | '';
       // let qty_modify = 0;
       let latestIterativeId = '';
+      let deductedPrice = 0;
 
       if (isTquotationProductDtoAddition(raw)) {
         // raw 是 TquotationProductDto_addition
         qty_reduce = `${raw.qty_reduce}`;
+        deductedPrice = raw.deductedPrice;
         // qty_modify = raw.qty_modify;
         latestIterativeId = raw.latestIterativeId;
       }
@@ -91,7 +93,7 @@ const useDefaultState_prodDict = ({
 
         qty_reduce,
         // qty_modify: 0,
-        deductedPrice: 0,
+        deductedPrice,
         // modifyedProductKeyArr: [],
         modifyedProduct: {},
         // rootProductId: undefined,
