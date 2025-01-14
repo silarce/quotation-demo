@@ -174,10 +174,6 @@ $deleteBarHeight: 36px;
   margin-top: 20px;
   font-size: $fontSize;
   font-weight: $fontWeight;
-
-  > span:nth-child(3) {
-    transform: translateX(8px);
-  }
 }
 
 .tfoot {
