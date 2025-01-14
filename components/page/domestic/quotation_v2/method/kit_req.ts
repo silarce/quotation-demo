@@ -17,28 +17,28 @@ import type { Tstate_profile } from 'components/page/domestic/quotation_v2/type_
 
 // api
 import {
-  TquotationDto,
+  // TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
   TcreateQuotationProductDto,
   // useGetQuotation_id,
   // useGetQuotation_id_2,
   useGetQuotation_id_3,
-  apiPostQuotation,
-  apiPatchQuotation,
-  apiQuotationSubmitReview,
-  apiQuotationReview,
-  apiQuotationUnlock,
-  //
-  useQuotation_id_attachments,
-  apiPostQuotation_id_attachments,
-  apiDelQuotation_id_attachments,
-  //
-  useGetQuotationContent_id,
-  //
-  apiPatchQuotationToPending,
-  apiPostCopyQuotation,
-  apiPatchQuotationContent_id_progress,
+  // apiPostQuotation,
+  // apiPatchQuotation,
+  // apiQuotationSubmitReview,
+  // apiQuotationReview,
+  // apiQuotationUnlock,
+  // //
+  // useQuotation_id_attachments,
+  // apiPostQuotation_id_attachments,
+  // apiDelQuotation_id_attachments,
+  // //
+  // useGetQuotationContent_id,
+  // //
+  // apiPatchQuotationToPending,
+  // apiPostCopyQuotation,
+  // apiPatchQuotationContent_id_progress,
   apiQuotationModify,
 } from 'js/api/api_quotation';
 

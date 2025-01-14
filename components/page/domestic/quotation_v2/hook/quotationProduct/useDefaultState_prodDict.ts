@@ -46,7 +46,16 @@ const useDefaultState_prodDict = ({
     raw_productArr_copy.forEach((_raw) => {
       const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
 
-      const latestIterativeId = 'latestIterativeId' in raw ? raw.latestIterativeId : undefined;
+      let qty_reduce = '' as `${number}` | '';
+      // let qty_modify = 0;
+      let latestIterativeId = '';
+
+      if (isTquotationProductDtoAddition(raw)) {
+        // raw 是 TquotationProductDto_addition
+        qty_reduce = `${raw.qty_reduce}`;
+        // qty_modify = raw.qty_modify;
+        latestIterativeId = raw.latestIterativeId;
+      }
 
       keyArr.push(raw.id);
 
@@ -80,7 +89,7 @@ const useDefaultState_prodDict = ({
         generalSpecs: undefined,
         availableComponents: undefined,
 
-        qty_reduce: '',
+        qty_reduce,
         // qty_modify: 0,
         deductedPrice: 0,
         // modifyedProductKeyArr: [],
@@ -436,6 +445,14 @@ const createEmptyStateProd = () => {
 
   return stateProd;
 };
+
+// ========================================================================
+
+function isTquotationProductDtoAddition(
+  raw: TquotationProductDto | TquotationProductDto_addition
+): raw is TquotationProductDto_addition {
+  return (raw as TquotationProductDto_addition).latestIterativeId !== undefined;
+}
 
 // ========================================================================
 export { useDefaultState_prodDict, createEmptyStateProd };

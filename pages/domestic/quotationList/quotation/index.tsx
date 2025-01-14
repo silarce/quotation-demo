@@ -149,6 +149,8 @@ import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationPr
 // css
 import scss from './index.module.scss';
 
+import { parseProdAction } from 'js/api/api_quotation';
+
 // ======================================================================
 // ======================================================================
 
@@ -253,6 +255,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     attachedToContract,
     iterativeContractProductArr,
     contractProfile,
+    prodArr,
   } = useData();
   isAttach = !!attachedToContract;
 
@@ -338,7 +341,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     theProductTotal,
     calcProductBody,
   } = useQuotationProduct({
-    raw_quotationProductArr: content?.products,
+    raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
     iterativeContractProductArr: iterativeContractProductArr,
     disabled,
@@ -1235,15 +1238,51 @@ const useData = () => {
   // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
   const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
 
-  const iterativeContractProductArr = useMemo(() => {
-    const arr = Object.values(iterativeContractProductDict);
+  const content = quotationData?.designatedContent;
 
-    return arr.length ? arr : undefined;
-  }, [iterativeContractProductDict]);
+  const { iterativeContractProductArr, prodArr } = useMemo(() => {
+    const arr = Object.values(iterativeContractProductDict);
+    const prodArr = content?.products ? [...content.products] : [];
+
+    if (!arr.length) {
+      return {
+        iterativeContractProductArr: undefined,
+        prodArr,
+      };
+    }
+
+    const dict = { ...iterativeContractProductDict };
+
+    prodArr?.forEach((prod) => {
+      const result = parseProdAction({
+        quotationProduct: prod,
+        quotationProductArr: prodArr,
+      });
+
+      if (result === '追減') {
+        const rootProd = dict[prod.rootProductId];
+
+        const rootProdQty = rootProd.quantity;
+        rootProd.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
+
+        prodArr.splice(prodArr.indexOf(prod), 1);
+      }
+    });
+
+    const iterativeContractProductArr = Object.values(dict);
+
+    return { iterativeContractProductArr, prodArr };
+  }, [iterativeContractProductDict, content?.products]);
+
+  // console.log('iterativeContractProductDict', iterativeContractProductDict);
+  // console.log(
+  //   'iterativeContractProductDict',
+  //   iterativeContractProductDict['f704affd-ac60-425f-8ed5-e458aed06ac4'].qty_reduce
+  // );
+  // console.log(quotationData?.latestContent?.products);
+  // parseProdAction
 
   // ----------------------------------------------------------------------
-
-  const content = quotationData?.designatedContent;
 
   const contractProfile = useMemo(() => {
     if (!raw_contract) {
@@ -1291,5 +1330,6 @@ const useData = () => {
     attachedToContract,
     iterativeContractProductArr,
     contractProfile,
+    prodArr,
   };
 };

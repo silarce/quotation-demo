@@ -2580,10 +2580,10 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
         }
 
         if (action === '追減') {
-          rootProd.qty_reduce = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          // rootProd.qty_reduce = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
         } else if (action === '變更追減') {
-          rootProd.qty_modify = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          // rootProd.qty_modify = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
           rootProd.quantity = prod.quantity;
         }
 
