@@ -620,6 +620,11 @@ const Tbody = ({
   isConrtract?: boolean;
   currency: string;
 }) => {
+  const { haveTax } = useContext(AccountReceivableContext);
+
+  const tax_str = new Decimal(taxRate).mul(100).toString();
+  const label_tax = haveTax ? `營業稅${tax_str}%` : '無營業稅';
+
   return (
     <div className={scss.tbody}>
       <div>{children}</div>
@@ -629,7 +634,7 @@ const Tbody = ({
           {subTotal}
         </CurrencyBox>
 
-        <span>營業稅5%</span>
+        <span>{label_tax}</span>
         <CurrencyBox currency={currency} width="120px">
           {tax}
         </CurrencyBox>
