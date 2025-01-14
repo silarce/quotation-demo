@@ -200,7 +200,7 @@ const Table_prod = ({
   } = instance_useQuotationProductInstance;
 
   const nodeConfig_itemName = nodeConfig_origin['itemName'];
-  const nodeConfig_attachedToProductName = nodeConfig_origin['attachedToProductName'];
+  const nodeConfig_attachedToProductName = nodeConfig_origin['rootProductName'];
 
   let theadLeft = (
     <Panel_prod className_delete="invisible" className_copy="invisible">
@@ -710,7 +710,7 @@ const QuotationRow_dealClass = ({
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
-  const nodeConfig_attachedToProductName = classProd.nodeConfig['attachedToProductName'];
+  const nodeConfig_attachedToProductName = classProd.nodeConfig['rootProductName'];
 
   let left = (
     <>

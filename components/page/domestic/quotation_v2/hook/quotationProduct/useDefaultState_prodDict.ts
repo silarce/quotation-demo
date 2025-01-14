@@ -38,30 +38,30 @@ interface TdefaultState {
 // ===========================================================================
 // MARK:useDefaultState
 const useDefaultState_prodDict = ({
-  raw_productArr,
+  prodSourceArr,
   doorModelDict,
   action,
+  stateProdDict_iterative,
 }: {
-  // raw_productArr: TquotationProductDto[] | TquotationProductDto_addition[] | undefined;
-  raw_productArr: TprodSource[] | undefined;
+  prodSourceArr: TprodSource[] | undefined;
   doorModelDict: Record<string, TdoorModelInfoDto> | null | undefined;
   action?: TstateProd['action'];
-  // isIterative;
+  stateProdDict_iterative?: TstateProdDict;
 }) => {
   const defaultState: TdefaultState = useMemo(() => {
-    if (!raw_productArr || doorModelDict === undefined) {
+    if (!prodSourceArr || doorModelDict === undefined) {
       return {
         stateProdDict: {} as TstateProdDict,
         prodKeyArr: [] as string[],
       };
     }
 
-    const raw_productArr_copy = _.cloneDeep(raw_productArr);
+    const prodSource_copy = _.cloneDeep(prodSourceArr);
 
     const dict: TstateProdDict = {};
     const keyArr: string[] = [];
 
-    raw_productArr_copy.forEach((raw) => {
+    prodSource_copy.forEach((prodSource) => {
       // const raw = _raw as TquotationProductDto | TquotationProductDto_addition;
 
       // let qty_reduce = '' as `${number}` | '';
@@ -86,22 +86,36 @@ const useDefaultState_prodDict = ({
           deductedPrice = 0,
           modifyedProduct = {},
           latestIterativeId,
+          rootRootProductKey,
         } = {},
-      } = raw;
+      } = prodSource;
 
-      keyArr.push(raw.id);
+      keyArr.push(prodSource.id);
 
-      const data_prod = createDateProd(raw);
+      const data_prod = createDateProd(prodSource);
 
-      let componentsArr = raw.items[0]?.components ?? [];
+      let componentsArr = prodSource.items[0]?.components ?? [];
       componentsArr = _.sortBy(componentsArr, 'order');
       const data_componentDict = createData_componentDict(componentsArr);
       const componentKeyArr = componentsArr.map((item) => item.type);
 
-      let accessoriesArr = raw.items[0]?.accessories ?? [];
+      let accessoriesArr = prodSource.items[0]?.accessories ?? [];
       accessoriesArr = _.sortBy(accessoriesArr, 'order');
       const data_accessoryDict = createData_accessoryDict(accessoriesArr);
       const accessoryKeyArr = Object.keys(data_accessoryDict);
+
+      let rootProduct: TstateProd | undefined = undefined;
+
+      if (rootRootProductKey) {
+        rootProduct = stateProdDict_iterative?.[rootRootProductKey];
+
+        if (!rootProduct) {
+          console.error('stateProdDict_iterative', stateProdDict_iterative);
+          console.error('prodSource', prodSource);
+
+          throw new Error('useDefaultState_prodDict: 找不到rootProduct');
+        }
+      }
 
       // 在這裡，generalSpecs與availableComponents必須是undefined
       // undefined視為未曾初始化
@@ -127,6 +141,8 @@ const useDefaultState_prodDict = ({
         latestIterativeId: latestIterativeId,
 
         action: action || '追加',
+
+        rootProduct,
       };
 
       dict[data_prod.id] = state;
@@ -136,7 +152,7 @@ const useDefaultState_prodDict = ({
       stateProdDict: dict,
       prodKeyArr: keyArr,
     };
-  }, [raw_productArr, doorModelDict]);
+  }, [prodSourceArr, doorModelDict]);
 
   return defaultState;
 };

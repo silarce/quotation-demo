@@ -129,6 +129,7 @@ type Taddition = {
       quantity: number;
     }
   >;
+  rootRootProductKey?: string;
 };
 
 type TprodSource = TquotationProductDto & { addition: Taddition };
@@ -266,14 +267,16 @@ const useQuotationProduct = ({
 
   // region STATE
 
-  const defaultState_prodDict = useDefaultState_prodDict({
-    raw_productArr,
-    doorModelDict: isReady ? doorModelDict || null : undefined,
-  });
   const defaultState_iterativeProdDict = useDefaultState_prodDict({
-    raw_productArr: iterativeContractProductArr,
+    prodSourceArr: iterativeContractProductArr,
     doorModelDict: isReady ? doorModelDict || null : undefined,
     action: '追減', // 總主產品預設為追減
+  });
+
+  const defaultState_prodDict = useDefaultState_prodDict({
+    prodSourceArr: raw_productArr,
+    doorModelDict: isReady ? doorModelDict || null : undefined,
+    stateProdDict_iterative: defaultState_iterativeProdDict.stateProdDict,
   });
 
   // 深拷貝，避免在編輯state_prodDict內的物件時影響原始的defaultState

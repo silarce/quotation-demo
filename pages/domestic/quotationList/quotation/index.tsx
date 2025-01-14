@@ -1318,6 +1318,7 @@ const useData = () => {
           key: prod.id,
           quantity: prod.quantity,
         };
+        prod.addition.rootRootProductKey = rootProductId;
         // const rootProdQty = rootProd.quantity;
       }
       //
