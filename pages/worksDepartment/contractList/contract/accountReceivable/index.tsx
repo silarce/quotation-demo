@@ -70,6 +70,7 @@ type Tquery = {
 
 type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
+  haveTax: boolean;
 };
 
 type TreqPatchAccountReceivable = (body: TupdateAccountReceivableDto) => Promise<void>;
@@ -160,6 +161,8 @@ export default function AccountReceivable({
       incomeBillList_noInvoice,
     };
   }, [accountReceivable?.incomeBillList]);
+
+  const haveTax = !!content?.salesTax;
 
   // const { productArr, latestQuotationDiscount } = useProdArr(contract);
 
@@ -554,8 +557,9 @@ export default function AccountReceivable({
   const contextValue = useMemo(() => {
     return {
       customer: contract?.content.customer,
+      haveTax,
     };
-  }, [contract?.content.customer]);
+  }, [contract?.content.customer, haveTax]);
 
   // --------------------------------------------------------------------------
   // region RENDER

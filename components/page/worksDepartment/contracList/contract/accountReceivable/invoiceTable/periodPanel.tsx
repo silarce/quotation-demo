@@ -44,6 +44,8 @@ import { IconEdit, IconCheck02, Icon_info } from 'public/image/icon/svgComponent
 import { AccountReceivableContext } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
 import { isInteger } from 'js/utils/checkValue';
+
+import { taxRate } from 'config/config_common';
 // ==========================================================================
 
 type Tcenter = {
@@ -141,6 +143,7 @@ function PeriodPanel_pre(
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
   const Selector_contract = useSelector_contract(contractId);
+  const { haveTax } = useContext(AccountReceivableContext);
 
   // --------------------------------------------------------------------------
   const isTotal = !!totalsTotal;
@@ -176,10 +179,12 @@ function PeriodPanel_pre(
     rowIndex,
     key,
     value,
+    haveTax,
   }: {
     rowIndex: number;
     key: 'completedQuantity' | 'completedPayment';
     value: string;
+    haveTax: boolean;
   }) => {
     setState_period((period) => {
       period = { ...period };
@@ -195,14 +200,14 @@ function PeriodPanel_pre(
         row.completedQuantity = new Decimal(value || 0).div(basePrice).toDecimalPlaces(3).toString();
       }
 
-      const totals_num = calcTotals(period.rowArr);
+      const totals_num = calcTotals(period.rowArr, { haveTax });
 
       period.subTotal = totals_num.subTotal;
       period.tax = totals_num.tax;
       period.contractTotal = totals_num.contractTotal;
 
       period.retainage = calcRetainage(period);
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax });
 
       return period;
     });
@@ -321,6 +326,7 @@ function PeriodPanel_pre(
             rowIndex,
             key: 'completedQuantity',
             value,
+            haveTax,
           });
         },
         oncompletedPaymentChange: (value) => {
@@ -332,6 +338,7 @@ function PeriodPanel_pre(
             rowIndex,
             key: 'completedPayment',
             value,
+            haveTax,
           });
         },
       };
@@ -357,6 +364,7 @@ function PeriodPanel_pre(
     const other: Tcenter['other'] = new Class_OtherNode({
       state_period,
       setState_period,
+      haveTax,
     });
 
     // _______________________________________________________________________
@@ -1174,7 +1182,11 @@ const TheInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
 
 // region FUNCTION
 
-const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
+const calcTotals = (
+  //
+  rowArr: { completedPayment: number | string }[],
+  { haveTax }: { haveTax: boolean }
+) => {
   let subTotal_d = new Decimal(0);
 
   rowArr.forEach((row) => {
@@ -1182,7 +1194,9 @@ const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
     subTotal_d = subTotal_d.add(completedPayment);
   });
 
-  const tax_d = subTotal_d.mul(0.05).toDecimalPlaces(0);
+  const taxRate_ = haveTax ? taxRate : 0;
+
+  const tax_d = subTotal_d.mul(taxRate_).toDecimalPlaces(0);
 
   return {
     subTotal: subTotal_d.toNumber(),
@@ -1191,7 +1205,7 @@ const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
   };
 };
 
-const calcPrice = (state_period: Tstate_period) => {
+const calcPrice = (state_period: Tstate_period, { haveTax }: { haveTax: boolean }) => {
   const period = state_period;
 
   const {
@@ -1204,7 +1218,7 @@ const calcPrice = (state_period: Tstate_period) => {
     minusWriteOffDeposit,
   } = period;
 
-  const totals_num = calcTotals(period.rowArr);
+  const totals_num = calcTotals(period.rowArr, { haveTax });
   let price_d = new Decimal(totals_num.contractTotal);
 
   minusRetainage && (price_d = price_d.sub(retainage || 0));
@@ -1261,7 +1275,9 @@ const useDefaultState = ({
   finalProdArr: TquotationProductDto[];
   data_otherArr: TquotationContentOtherDto[];
 }) => {
-  const { customer } = useContext(AccountReceivableContext);
+  const { customer, haveTax } = useContext(AccountReceivableContext);
+
+  console.log('fooo');
 
   const { defaultState, isNew } = useMemo(() => {
     const isNew = !data_period;
@@ -1338,7 +1354,7 @@ const useDefaultState = ({
 
     rowArr.push(...rowArr_other);
 
-    const totals_num = calcTotals(rowArr);
+    const totals_num = calcTotals(rowArr, { haveTax });
 
     // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
     const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0] as TaccountsReceivableInvoiceDto | undefined;
@@ -1432,17 +1448,20 @@ class Class_OtherNode {
     //
     state_period,
     setState_period,
+    haveTax,
   }: {
     state_period: Tstate_period;
     setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
+    haveTax: boolean;
   }) {
     this.state_period = _.cloneDeep(state_period);
     this.setState_period = setState_period;
+    this.haveTax = haveTax;
   }
 
   readonly state_period: Tstate_period;
   readonly setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
-
+  readonly haveTax: boolean;
   // --------------------------------------------------------------------------
 
   get id() {
@@ -1477,7 +1496,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.retainage = value;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       period.retainagePercent = calcRegainagePercent(period);
 
@@ -1502,7 +1521,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.deduction = value;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1525,7 +1544,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.writeOffDeposit = value;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1544,7 +1563,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.minusRetainage = bool;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1557,7 +1576,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.minusDeduction = bool;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1570,7 +1589,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.minusWriteOffDeposit = bool;
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1591,7 +1610,7 @@ class Class_OtherNode {
       }
 
       period.retainage = calcRetainage(period);
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });
@@ -1605,7 +1624,7 @@ class Class_OtherNode {
       period = { ...period };
       period.retainagePercent = value;
       period.retainage = calcRetainage(period);
-      period.price = calcPrice(period);
+      period.price = calcPrice(period, { haveTax: this.haveTax });
 
       return period;
     });

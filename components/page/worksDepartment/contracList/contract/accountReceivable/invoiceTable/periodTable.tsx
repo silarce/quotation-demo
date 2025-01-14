@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useContext } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -26,6 +26,10 @@ import type {
 
 // api
 import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+
+import { AccountReceivableContext } from 'pages/worksDepartment/contractList/contract/accountReceivable';
+
+import { taxRate } from 'config/config_common';
 
 // ========================================================================
 // region type
@@ -158,6 +162,8 @@ export default function PeriodTable({
   currency: string;
   contractId: string | undefined;
 }) {
+  const { haveTax } = useContext(AccountReceivableContext);
+
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
 
@@ -314,7 +320,9 @@ export default function PeriodTable({
       };
     });
 
-    const tax_d = subTotal_d.mul(0.05).toDecimalPlaces(0);
+    const taxRate_ = haveTax ? taxRate : 0;
+
+    const tax_d = subTotal_d.mul(taxRate_).toDecimalPlaces(0);
 
     const totals = {
       subTotal: subTotal_d.toNumber().toLocaleString(),
