@@ -129,6 +129,8 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
   let id: string | undefined = undefined;
   (action === '變更追加' || action === '追減') && (id = rootProduct?.latestIterativeId);
 
+  // 雖然在這裡是追減，但是在送給後端並傳回來後，若該主產品涉及到變更
+  // parseProdAction會把這個主產品分析為變更追減
   let attachedToProductId: string | undefined = undefined;
   action === '追減' && (attachedToProductId = rootProduct?.latestIterativeId);
 

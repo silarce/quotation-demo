@@ -1285,15 +1285,10 @@ const useData = () => {
 
       return prod;
     });
+    const parsedProdArr_modify = parsedProdArr.filter((prod) => prod.addition.action === '變更追加');
     const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
 
     parsedProdArr?.forEach((prod) => {
-      // const result = parseProdAction({
-      //   quotationProduct: prod,
-      //   quotationProductArr: prodArr,
-      // });
-
-      // console.log(result);
       const action = prod.addition.action;
 
       if (action === '追減') {
@@ -1302,10 +1297,29 @@ const useData = () => {
         const rootProdQty = rootProd.quantity;
         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce).mul(rootProd.price).toNumber();
-
-        // parsedProdArr.splice(parsedProdArr.indexOf(prod), 1);
       } else if (action === '變更追減') {
-        // parsedProdArr.splice(parsedProdArr.indexOf(prod), 1);
+        const attachedToProductId = prod.attachedToProductId;
+
+        const rootProd = dict[prod.rootProductId];
+        const rootProdQty = rootProd.quantity;
+
+        const modifyBelong = parsedProdArr_modify.filter((modifyedProd) => {
+          return modifyedProd.attachedToProductId === attachedToProductId;
+        });
+
+        const qty_modify = modifyBelong
+          .reduce((acc, prod) => {
+            acc = acc.add(prod.quantity || 0);
+
+            return acc;
+          }, new Decimal(0))
+          .toNumber();
+
+        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).sub(qty_modify).toNumber();
+        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
+          .add(qty_modify)
+          .mul(rootProd.price)
+          .toNumber();
       } else if (action === '變更追加') {
         const attachedToProductId = prod.attachedToProductId;
         const prod_modifyReduce = parsedProdArr_modifyReduce.find(
