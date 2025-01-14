@@ -126,10 +126,10 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
 
   // 追減或變更追加，id要送來源產品id
   let id: string | undefined = undefined;
-  action === '變更追加' || (action === '追減' && (id = attachedToProduct?.latestIterativeId));
+  (action === '變更追加' || action === '追減') && (id = attachedToProduct?.latestIterativeId);
 
   let attachedToProductId: string | undefined = undefined;
-  action === '變更追加' && (attachedToProductId = attachedToProduct?.latestIterativeId);
+  action === '追減' && (attachedToProductId = attachedToProduct?.latestIterativeId);
 
   const componentArr = componentKeyArr.map((key) => data_componentDict[key]);
 
