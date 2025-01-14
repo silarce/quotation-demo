@@ -130,6 +130,7 @@ type Taddition = {
     }
   >;
   rootRootProductKey?: string;
+  action: TstateProd['action'];
 };
 
 type TprodSource = TquotationProductDto & { addition: Taddition };

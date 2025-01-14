@@ -1263,6 +1263,7 @@ const useData = () => {
           deductedPrice: 0,
           latestIterativeId: prod.latestIterativeId,
           modifyedProduct: {},
+          action: undefined,
         },
       };
 
@@ -1270,18 +1271,21 @@ const useData = () => {
     }, {} as Record<string, TprodSource>);
     let parsedProdArr = prodArr.map((_prod) => {
       const prod = { ..._prod, addition: {} } as TprodSource;
-      type TparsedProd = typeof prod & { action: ReturnType<typeof parseProdAction> };
+
+      // type TparsedProd = typeof prod & { action: ReturnType<typeof parseProdAction> };
 
       const action = parseProdAction({
         quotationProduct: prod,
         quotationProductArr: prodArr,
       });
 
-      const parsedProd: TparsedProd = { ...prod, action };
+      prod.addition.action = action;
 
-      return parsedProd;
+      // const parsedProd: TparsedProd = { ...prod, action };
+
+      return prod;
     });
-    const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.action === '變更追減');
+    const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
 
     parsedProdArr?.forEach((prod) => {
       // const result = parseProdAction({
@@ -1290,7 +1294,7 @@ const useData = () => {
       // });
 
       // console.log(result);
-      const action = prod.action;
+      const action = prod.addition.action;
 
       if (action === '追減') {
         const rootProd = dict[prod.rootProductId];
@@ -1324,7 +1328,9 @@ const useData = () => {
       //
     });
 
-    parsedProdArr = parsedProdArr.filter((prod) => prod.action !== '追減' && prod.action !== '變更追減');
+    parsedProdArr = parsedProdArr.filter(
+      (prod) => prod.addition.action !== '追減' && prod.addition.action !== '變更追減'
+    );
 
     const iterativeContractProductArr = Object.values(dict);
 
