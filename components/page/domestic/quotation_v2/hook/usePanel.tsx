@@ -11,14 +11,17 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import iconUpload from 'public/image/icon/upload.svg';
 import iconRedLock from 'public/image/icon/redLock.svg';
 
+import type { TquotationType } from 'pages/domestic/quotationList/quotation';
+
 // ================================================================================
 interface Tprops {
   disabled: boolean;
+  quotationType: TquotationType;
 
-  isQuotation: boolean;
-  isAttachmentQuotation: boolean;
-  isNewQuotation: boolean;
-  isNewAttachmentQuotation: boolean;
+  // isQuotation: boolean;
+  // isAttachmentQuotation: boolean;
+  // isNewQuotation: boolean;
+  // isNewAttachmentQuotation: boolean;
 
   isReviewer: boolean | undefined | null;
   status: string;
@@ -54,11 +57,11 @@ interface Tprops {
 
 const usePanel = ({
   disabled,
-
-  isQuotation,
-  isAttachmentQuotation,
-  isNewQuotation,
-  isNewAttachmentQuotation,
+  quotationType,
+  // isQuotation,
+  // isAttachmentQuotation,
+  // isNewQuotation,
+  // isNewAttachmentQuotation,
 
   isReviewer,
   status,
@@ -89,30 +92,56 @@ const usePanel = ({
 }: Tprops) => {
   const router = useRouter();
 
+  const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
+
   // -----------------------------------------------------------------------
 
   const { label_update, btnUpdateOnClick } = (() => {
     let label_update = '更新報價單';
-    isNewQuotation && (label_update = '新建報價單');
-    isNewAttachmentQuotation && (label_update = '新建追加追減報價單');
 
     let btnUpdateOnClick = btnPatchOnClick;
-    isNewQuotation && (btnUpdateOnClick = btnPostOnClick);
-    isNewAttachmentQuotation && (btnUpdateOnClick = btnModifyOnClick);
-    isAttachmentQuotation && (btnUpdateOnClick = btnPatchModifyOnClick);
+
+    // if (isNewQuotation) {
+    //   btnUpdateOnClick = btnPostOnClick;
+    //   label_update = '新建報價單';
+    // } else if (isNewAttachmentQuotation) {
+    //   btnUpdateOnClick = btnModifyOnClick;
+    //   label_update = '新建追加追減報價單';
+    // } else if (isAttachmentQuotation) {
+    //   btnUpdateOnClick = btnPatchModifyOnClick;
+    //   label_update = '更新追加追減報價單';
+    // }
+    if (quotationType === 'new') {
+      btnUpdateOnClick = btnPostOnClick;
+      label_update = '新建報價單';
+    } else if (quotationType === 'newAttachment') {
+      btnUpdateOnClick = btnModifyOnClick;
+      label_update = '新建追加追減報價單';
+    } else if (quotationType === 'oldAttachment') {
+      btnUpdateOnClick = btnPatchModifyOnClick;
+      label_update = '更新追加追減報價單';
+    }
 
     return { label_update, btnUpdateOnClick };
   })();
+
+  let label_cancel = '取消';
+  let onClick_cancel = btnCancelOnClick;
+
+  if (quotationType === 'new') {
+    label_cancel = '返回';
+    onClick_cancel = () => router.back();
+  }
 
   const panel_update: TpanelList[number] = {
     type: 'redButton',
     label: label_update,
     onClick: btnUpdateOnClick,
   };
-  const panel_cacel: TpanelList[number] = {
+  const panel_cancel: TpanelList[number] = {
     type: 'myButton',
-    label: isNewQuotation ? '返回' : '取消',
-    onClick: isNewQuotation ? () => router.back() : btnCancelOnClick,
+    label: label_cancel,
+    onClick: onClick_cancel,
   };
   const panel_turnToPending: TpanelList[number] = {
     type: 'redButton',
@@ -181,18 +210,27 @@ const usePanel = ({
   const panelList_abled: TpanelList = [
     //
     panel_update,
-    panel_cacel,
+    panel_cancel,
   ];
 
   const panelList_disabled_quotation: TpanelList = [
-    isQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
-    isQuotation && isReviewer ? panel_review : null,
-    isQuotation ? panel_submit : null,
-    !isNewQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+    isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
+    isOldQuotation && isReviewer ? panel_review : null,
+    isOldQuotation ? panel_submit : null,
+    !isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
     status === 'Pending' ? null : panel_edit,
     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
     panel_return,
   ];
+  // const panelList_disabled_quotation: TpanelList = [
+  //   isQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
+  //   isQuotation && isReviewer ? panel_review : null,
+  //   isQuotation ? panel_submit : null,
+  //   !isNewQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+  //   status === 'Pending' ? null : panel_edit,
+  //   status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
+  //   panel_return,
+  // ];
 
   const panelList_disabled_content: TpanelList = [panel_edit, panel_return];
 

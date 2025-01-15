@@ -178,6 +178,8 @@ interface Tprops_useQuotation {
   content: TquotationContentDto;
 }
 
+type TquotationType = 'new' | 'old' | 'newAttachment' | 'oldAttachment' | undefined;
+
 // ======================================================================
 
 const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
@@ -205,10 +207,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const userId = userInfo?.employee?.id;
 
-  const isNewQuotation = !quotationId && !contentId;
-  const isQuotation = !!quotationId && !contentId;
+  let quotationType: TquotationType = undefined;
 
-  const isNewAttachmentQuotation = isNewQuotation && !!contractId;
+  // const isNewQuotation = !quotationId && !contentId;
+  // const isQuotation = !!quotationId && !contentId;
+
+  // const isNewAttachmentQuotation = isNewQuotation && !!contractId;
 
   // ----------------------------------------------------------------------
 
@@ -261,6 +265,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     prodArr,
   } = useData();
   isAttach = !!iterativeContractProductArr?.length;
+
+  !quotationId && !contentId && (quotationType = 'new');
+  quotationId && !contentId && (quotationType = 'old');
+  quotationType === 'new' && !!contractId && (quotationType = 'newAttachment');
+  quotationType === 'old' && !!iterativeContractProductArr?.length && (quotationType = 'oldAttachment');
+
+  const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
   const {
     isFetching: isFetching_update,
@@ -321,7 +332,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // region STATE MANAGEMENT
 
-  const [disabled, setDisabled] = useState(!isNewQuotation);
+  const [disabled, setDisabled] = useState(!(quotationType === 'new' || quotationType === 'newAttachment'));
   const [isFetching, setIsFetching] = useState(false);
   const [state_status, setState_status] = useState<TquotationContentDto['status']>('Budget');
 
@@ -379,7 +390,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const { state_profile, setState_profile } = useProfile({
     disabled,
-    profile: isNewAttachmentQuotation ? contractProfile : content,
+    profile: quotationType === 'newAttachment' ? contractProfile : content,
   });
 
   const {
@@ -550,6 +561,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
         if (newQuotation) {
           update_quotation();
+          setDisabled(true);
         }
       },
     });
@@ -617,7 +629,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     sales: TemployeeDto | undefined;
     supervisor: TemployeeDto | undefined;
   }) => {
-    if (!isQuotation) {
+    if (!isOldQuotation) {
       return;
     }
 
@@ -646,7 +658,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   };
 
   const handleSubmit_pending = async () => {
-    if (!isQuotation) {
+    if (!isOldQuotation) {
       return;
     }
 
@@ -827,10 +839,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { panelList, customeRight } = usePanel({
     disabled,
 
-    isQuotation,
-    isAttachmentQuotation: isAttach,
-    isNewQuotation,
-    isNewAttachmentQuotation,
+    // isQuotation,
+    // isAttachmentQuotation: isAttach,
+    // isNewQuotation,
+    // isNewAttachmentQuotation,
+    quotationType,
 
     isReviewer,
     status: content?.status ?? '',
@@ -890,8 +903,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   let tag = `報價編號 ${content?.quotationNumber}`;
-  isNewQuotation && (tag = '新增報價單');
-  isNewAttachmentQuotation && (tag = '新增追加追減報價單');
+  quotationType === 'new' && (tag = '新增報價單');
+  quotationType === 'newAttachment' && (tag = '新增追加追減報價單');
 
   // ----------------------------------------------------------------------
   // region useEffect
@@ -919,7 +932,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           quotationNumber={content?.quotationNumber ?? '---'}
           editNotes={content?.editNotes}
           additionRight={
-            isNewAttachmentQuotation ? null : (
+            quotationType === 'newAttachment' ? null : (
               <QuotationStateSel
                 key="0"
                 quotationState={{ value: state_status, label: quotationStatusLookup[state_status] }}
@@ -927,7 +940,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                   setState_status(option.value as TquotationContentDto['status']);
                 }}
                 history={history}
-                isNew={isNewQuotation}
+                isNew={!isOldQuotation}
                 disabled={disabled}
               />
             )
@@ -1423,3 +1436,5 @@ const useData = () => {
     iterativeContractProductArr,
   };
 };
+
+export type { TquotationType };
