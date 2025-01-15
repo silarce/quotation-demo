@@ -414,10 +414,10 @@ const productTomainProduct = ({
 
   const components = [..._components];
 
-  const fullWidtn_cm = new Decimal(fullWidth || 0).mul(100).toNumber();
-  const height_cm = new Decimal(height || 0).mul(100).toNumber();
-  const boxB_cm = new Decimal(boxB || 0).mul(100).toNumber();
-  const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).mul(100).toNumber();
+  const fullWidtn_cm = new Decimal(fullWidth || 0).div(10).toNumber();
+  const height_cm = new Decimal(height || 0).div(10).toNumber();
+  const boxB_cm = new Decimal(boxB || 0).div(10).toNumber();
+  const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).div(10).toNumber();
   const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
 
   const size = `${fullWidtn_cm}${bounceDoorWidth_formated} X ${height_cm} + ${boxB_cm}`;
@@ -462,8 +462,6 @@ const productTomainProduct = ({
   const { part_distributionBox, part_installationFee } = prodToPart({
     product_item,
   });
-
-  console.log(part_distributionBox.totalPrice);
 
   const mainProduct: TmainProduct = {
     quotationNumber: quotationNumber,
