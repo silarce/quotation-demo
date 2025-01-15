@@ -40,7 +40,7 @@ interface TdefaultState {
 const useDefaultState_prodDict = ({
   prodSourceArr,
   doorModelDict,
-  action,
+  action: action_cover,
   stateProdDict_iterative,
 }: {
   prodSourceArr: TprodSource[] | undefined;
@@ -72,6 +72,7 @@ const useDefaultState_prodDict = ({
           rootRootProductKey,
           quotationDiscount,
           priceDiscount_percent,
+          action,
         } = {},
       } = prodSource;
 
@@ -127,7 +128,7 @@ const useDefaultState_prodDict = ({
 
         latestIterativeId: latestIterativeId,
 
-        action: action || '追加',
+        action: action_cover || action || '追加',
 
         rootProduct,
       };

@@ -484,6 +484,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       calcProductBody,
     });
 
+  // MARK:更新報價單
   const handlePatch = () => {
     const { destroy } = myAlert.input({
       isTextArea: true,
@@ -510,6 +511,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  // MARK:新增報價單
   const handlePost = () => {
     const { destroy } = myAlert.input({
       isTextArea: true,
@@ -537,6 +539,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  // MARK:追加追減報價單
   const handleModify = () => {
     const { destroy } = myAlert.input({
       isTextArea: true,
@@ -560,6 +563,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  // MARK:更新追加追減報價單
   const handlePatchModify = () => {
     const { destroy } = myAlert.input({
       isTextArea: true,
@@ -577,6 +581,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
+  // MARK:複製報價單
   const handleClone = async (isRelationQuotation?: boolean | undefined) => {
     const { destroy } = myAlert.clear({
       content: (
@@ -601,7 +606,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     });
   };
 
-  // 轉為準合約
+  // MARK:轉為準合約
   const handleReqToPending = async () => {
     if (!content) {
       return;
@@ -1296,6 +1301,8 @@ const useData = () => {
 
       prod.addition.action = action;
 
+      // console.log(action);
+
       return prod;
     });
 
@@ -1399,6 +1406,8 @@ const useData = () => {
 
     return { iterativeContractProductArr, prodArr: parsedProdArr };
   }, [iterativeContractProductDict, content?.products]);
+
+  //
 
   const prodArrForPDf = useMemo(() => {
     let iterativeContractProductArr_modifyed = (iterativeContractProductArr ?? []).filter((prod) => {
