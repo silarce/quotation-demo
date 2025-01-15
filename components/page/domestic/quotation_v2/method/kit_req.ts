@@ -40,6 +40,7 @@ import {
   // apiPostCopyQuotation,
   // apiPatchQuotationContent_id_progress,
   apiQuotationModify,
+  apiPostQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
 import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
@@ -151,6 +152,7 @@ const kit_req = ({
     return { newQuotation };
   };
 
+  // MARK:reqModifyQuotation
   const reqModifyQuotation = async ({ editNote }: { editNote: string }) => {
     if (!instance_quotationProduct_iterative) {
       throw new Error('reqModify錯誤，instance_iterative is undefined');
@@ -193,6 +195,19 @@ const kit_req = ({
 
     // const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
     const newQuotation = await apiQuotationModify(contractId, body);
+    const contentId = newQuotation.latestContent.id;
+
+    let isSomethingWrong = false;
+
+    if (newQuotation) {
+      for (const attachment of attachmentArr) {
+        await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+          isSomethingWrong = true;
+        });
+      }
+
+      isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+    }
 
     return newQuotation;
 
