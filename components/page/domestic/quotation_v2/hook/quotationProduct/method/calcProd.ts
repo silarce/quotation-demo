@@ -437,6 +437,15 @@ const calcProdRemain = ({ stateProd }: { stateProd: TstateProd }) => {
     .toNumber();
 };
 
+const calcProdDeductedPrice = ({ stateProd }: { stateProd: TstateProd }) => {
+  const { qty_reduce, modifyedProduct } = stateProd;
+  const qty_modify = calcQtyModify({ modifyedProduct });
+  const qty = new Decimal(qty_reduce || 0).add(qty_modify || 0);
+  const deductedPrice = new Decimal(stateProd.data_prod.unitPrice || 0).mul(qty).mul(-1).toNumber();
+
+  return deductedPrice;
+};
+
 // ========================================================================
 export {
   calcProdTotalPrice,
@@ -448,4 +457,5 @@ export {
   calcProdAllTotal,
   calcQtyModify,
   calcProdRemain,
+  calcProdDeductedPrice,
 };

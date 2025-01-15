@@ -107,7 +107,7 @@ import {
   calcPriceDiscount_percent,
   calcProdAllTotal as the_calcProdAllTotal,
   calcProdRemain,
-  //
+  calcProdDeductedPrice,
 } from './method/calcProd';
 import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary';
 
@@ -325,7 +325,7 @@ const useQuotationProduct = ({
     //
     debouncedState: debounced_state_iterativeProdDict,
     isBouncing: isBouncing_state_iterativeProdDict,
-  } = useDebounce(state_prodDict, 500);
+  } = useDebounce(state_iterativeProdDict, 500);
 
   const {
     //
@@ -349,10 +349,13 @@ const useQuotationProduct = ({
   }, [debounced_state_prodDict]);
 
   const allProdTotal_iterative = useMemo(() => {
-    // FIXME 晚點要改 不是計算複價，是計算追減與變更後扣掉的金額
-    // 預期是負數
-    return 0;
-    // return the_calcProdAllTotal({ state_prodDict: debounced_state_iterativeProdDict });
+    return Object.values(state_iterativeProdDict)
+      .reduce((total, stateProd) => {
+        total = total.add(stateProd.deductedPrice || 0);
+
+        return total;
+      }, new Decimal(0))
+      .toNumber();
   }, [debounced_state_iterativeProdDict]);
 
   const theProductTotal = useMemo(() => {
@@ -485,45 +488,6 @@ const useQuotationProduct = ({
     copyProd({ stateProd });
   };
 
-  // const modifyProd = useCallback(
-  //   ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
-  //     const stateProd_iterative = state_iterativeProdDict[prodKey];
-
-  //     const allowQty = calcProdRemain({ stateProd: stateProd_iterative });
-
-  //     if (qty_modify === 0) {
-  //       return;
-  //     } else if (!Number.isInteger(qty_modify) || qty_modify < 0) {
-  //       myAlert.err({ title: '數量只能是正整數' });
-
-  //       return;
-  //     } else if (allowQty < qty_modify) {
-  //       myAlert.err({ title: '數量不可超過剩餘數量' });
-
-  //       return;
-  //     }
-
-  //     // stateProd_iterative.qty_modify = new Decimal(qty_modify || 0).add(stateProd_iterative.qty_modify || 0).toNumber();
-
-  //     const newProd = copyProd({
-  //       stateProd: stateProd_iterative,
-  //       quantity: qty_modify,
-  //       attachedToProduct: stateProd_iterative,
-  //       quotationDiscount: state_quotationDiscount || 0,
-  //     });
-
-  //     // stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
-  //     stateProd_iterative.modifyedProduct[newProd.key] = {
-  //       key: newProd.key,
-  //       quantity: qty_modify,
-  //     };
-  //     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
-
-  //     setState_iterativeProdDict({ ...state_iterativeProdDict });
-  //   },
-  //   [state_iterativeProdDict, state_quotationDiscount]
-  // );
-
   const modifyProd = ({ qty_modify, prodKey }: { qty_modify: number; prodKey: string }) => {
     const stateProd_iterative = state_iterativeProdDict[prodKey];
 
@@ -550,11 +514,13 @@ const useQuotationProduct = ({
       quotationDiscount: state_quotationDiscount || 0,
     });
 
-    // stateProd_iterative.modifyedProductKeyArr.push(newProd.key);
     stateProd_iterative.modifyedProduct[newProd.key] = {
       key: newProd.key,
       quantity: qty_modify,
     };
+
+    stateProd_iterative.deductedPrice = calcProdDeductedPrice({ stateProd: stateProd_iterative });
+
     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
 
     setState_iterativeProdDict({ ...state_iterativeProdDict });
@@ -707,8 +673,6 @@ const useQuotationProduct = ({
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
-
-  console.log(activedProd);
 
   const instance: Tinstance_useQuotationProduct = {
     state_prodDict,

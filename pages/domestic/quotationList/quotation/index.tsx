@@ -1350,14 +1350,6 @@ const useData = () => {
     return { iterativeContractProductArr, prodArr: parsedProdArr };
   }, [iterativeContractProductDict, content?.products]);
 
-  // console.log('iterativeContractProductDict', iterativeContractProductDict);
-  // console.log(
-  //   'iterativeContractProductDict',
-  //   iterativeContractProductDict['f704affd-ac60-425f-8ed5-e458aed06ac4'].qty_reduce
-  // );
-  // console.log(quotationData?.latestContent?.products);
-  // parseProdAction
-
   // ----------------------------------------------------------------------
 
   const contractProfile = useMemo(() => {

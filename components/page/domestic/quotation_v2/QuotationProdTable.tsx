@@ -321,7 +321,9 @@ const Table_prod = ({
           <SquareBtn sharp="mini" onClick={addEmptyProd} className={classNames(scss.btn, disabled && 'invisible')}>
             新增主產品
           </SquareBtn>
-          <div className={scss.total}>複價合計：{prodTotal}</div>
+          <div className={scss.total}>
+            {isIterativeProd ? '追減變更合計' : '複價合計'}：{prodTotal}
+          </div>
         </div>
       </div>
     </div>
