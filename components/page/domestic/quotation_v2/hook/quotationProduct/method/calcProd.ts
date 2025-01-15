@@ -2,6 +2,8 @@ import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 import type { TstateProd, TstateProdDict, TstateComponentData } from '../type';
+import type { TprodSource } from '../useQuotationProduct';
+import type { XOR } from 'ts-essentials';
 
 // MARK:calcProdTotalPrice
 const calcProdTotalPrice = ({
@@ -422,12 +424,31 @@ const calcQtyModify = ({ modifyedProduct }: { modifyedProduct: TstateProd['modif
   return qty;
 };
 
-const calcProdRemain = ({ stateProd }: { stateProd: TstateProd }) => {
-  const {
-    qty_reduce,
-    modifyedProduct,
-    data_prod: { quantity },
-  } = stateProd;
+const calcProdRemain = ({
+  stateProd,
+  prodSource,
+}: XOR<
+  {
+    stateProd: TstateProd;
+  },
+  {
+    prodSource: TprodSource;
+  }
+>) => {
+  let qty_reduce: number | `${number}` = 0;
+  let modifyedProduct: TstateProd['modifyedProduct'] & TprodSource['addition']['modifyedProduct'] = {};
+  let quantity: number | `${number}` = 0;
+
+  if (stateProd) {
+    qty_reduce = stateProd.qty_reduce || 0;
+    modifyedProduct = stateProd.modifyedProduct;
+    quantity = stateProd.data_prod.quantity || 0;
+  } else if (prodSource) {
+    const addition = prodSource.addition;
+    qty_reduce = addition.qty_reduce || 0;
+    modifyedProduct = addition.modifyedProduct || {};
+    quantity = prodSource.quantity || 0;
+  }
 
   const qty_modify = calcQtyModify({ modifyedProduct });
 

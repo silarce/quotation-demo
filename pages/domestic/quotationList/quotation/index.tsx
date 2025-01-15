@@ -4,6 +4,7 @@ import { useRouter, NextRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // components
 
@@ -31,14 +32,14 @@ import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel
 import ContractReviewForm, {
   useDefaultPaymentRatio_quotationContent,
 } from 'components/composition/contractReviewForm/contractReviewForm';
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
-import Summary, {
-  TsummaryControl,
-  TpayInfoControl,
-} from 'components/page/domestic/quotation/quotation/summary/summary';
+// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+// import Summary, {
+//   TsummaryControl,
+//   TpayInfoControl,
+// } from 'components/page/domestic/quotation/quotation/summary/summary';
 // import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
@@ -154,6 +155,11 @@ import scss from './index.module.scss';
 
 import { parseProdAction } from 'js/api/api_quotation';
 
+import {
+  calcQtyModify,
+  calcProdRemain,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/calcProd';
+
 // ======================================================================
 // ======================================================================
 
@@ -260,9 +266,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instatnce_getQuotationId3,
     content,
     attachedToContract,
-    iterativeContractProductArr,
     contractProfile,
+
     prodArr,
+    iterativeContractProductArr,
+
+    prodArrForPDf,
   } = useData();
   isAttach = !!iterativeContractProductArr?.length;
 
@@ -813,6 +822,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: content,
+    attachedProdArr: prodArrForPDf,
     emptySomeProperty: state_status === 'Bidding',
   });
 
@@ -1384,6 +1394,46 @@ const useData = () => {
     return { iterativeContractProductArr, prodArr: parsedProdArr };
   }, [iterativeContractProductDict, content?.products]);
 
+  const prodArrForPDf = useMemo(() => {
+    let iterativeContractProductArr_modifyed = (iterativeContractProductArr ?? []).filter((prod) => {
+      let pass = false;
+      const { qty_reduce, modifyedProduct } = prod.addition;
+      !!qty_reduce && (pass = true);
+      !!Object.keys(modifyedProduct ?? {}).length && (pass = true);
+
+      return pass;
+    });
+
+    iterativeContractProductArr_modifyed = _.cloneDeep(iterativeContractProductArr_modifyed);
+
+    iterativeContractProductArr_modifyed = iterativeContractProductArr_modifyed?.map((prod) => {
+      const modifyedProduct = prod.addition.modifyedProduct;
+
+      const qty_modify = calcQtyModify({ modifyedProduct: modifyedProduct ?? {} });
+      const qty_reduce = prod.addition.qty_reduce;
+      prod.quantity = new Decimal(qty_modify)
+        .add(qty_reduce || 0)
+        .mul(-1)
+        .toNumber();
+
+      prod.dualPrice = new Decimal(prod.quantity).mul(prod.price).toNumber();
+      // 其實addition.deductionPrice就等於算出來的prod.totalPrice了`，不一樣的話不正常
+      prod.totalPrice = new Decimal(prod.quantity).mul(prod.unitPrice).toNumber();
+
+      return prod;
+    });
+
+    let prodArrForPDf = [...iterativeContractProductArr_modifyed, ...prodArr];
+    prodArrForPDf = prodArrForPDf.map((prod, index) => {
+      prod.order = index;
+
+      return prod;
+    });
+
+    return prodArrForPDf;
+    //
+  }, [prodArr, iterativeContractProductArr]);
+
   // ----------------------------------------------------------------------
 
   const contractProfile = useMemo(() => {
@@ -1434,6 +1484,8 @@ const useData = () => {
     //
     prodArr,
     iterativeContractProductArr,
+    //
+    prodArrForPDf,
   };
 };
 
