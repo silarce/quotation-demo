@@ -40,7 +40,7 @@ import {
   createEmptyStateProd,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
 
-import { calcProdTotalPrice } from './calcProd';
+import { calcProdTotalPrice, calcPriceDiscount_percent, calcProdDistributionBoxAndInstallationFee } from './calcProd';
 
 // ===========================================================================
 
@@ -263,28 +263,30 @@ const kit_createClass = ({
     copyedProd.data_prod = data_prod;
 
     if (action === 'modify') {
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-      // 接著處理配電箱及按鈕開關羽按裝及製造費用的單價與複價
-
       copyedProd.rootProduct = attachedToProduct;
       copyedProd.action = '變更追加';
 
+      const priceDiscount_percent = calcPriceDiscount_percent({
+        prodDiscount: data_prod.discount,
+        quotationDiscount: state_quotationDiscount,
+      });
+
       data_prod.id = attachedToProductId!;
+
+      const {
+        distributionBoxUnitPrice,
+        distributionBoxTotalPrice,
+        installationFeeUnitPrice,
+        installationFeeTotalPrice,
+      } = calcProdDistributionBoxAndInstallationFee({
+        stateProd: copyedProd,
+        priceDiscount_percent: priceDiscount_percent,
+      });
+
+      data_prod.distributionBoxUnitPrice = distributionBoxUnitPrice;
+      data_prod.distributionBoxTotalPrice = distributionBoxTotalPrice;
+      data_prod.installationFeeUnitPrice = installationFeeUnitPrice;
+      data_prod.installationFeeTotalPrice = installationFeeTotalPrice;
 
       const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
         stateProd: copyedProd,
