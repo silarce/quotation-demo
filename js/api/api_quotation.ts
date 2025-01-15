@@ -2675,3 +2675,18 @@ export const parseProdAction = ({
 
   return attachType;
 };
+
+export const apiPatchModifyQuotation = ({
+  quotationId,
+  body,
+}: {
+  quotationId: string;
+  body: TcreateModifyQuotationDto;
+}) => {
+  const api = `quotation/modify-quotation/${quotationId}`;
+
+  return axi
+    .patch<TquotationDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};

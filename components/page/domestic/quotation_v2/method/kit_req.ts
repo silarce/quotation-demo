@@ -41,6 +41,7 @@ import {
   // apiPatchQuotationContent_id_progress,
   apiQuotationModify,
   apiPostQuotation_id_attachments,
+  apiPatchModifyQuotation,
 } from 'js/api/api_quotation';
 
 import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
@@ -218,6 +219,74 @@ const kit_req = ({
     // return { newQuotation };
   };
 
+  // MARK:reqPatchModifiedQuotation
+
+  const reqPatchModifiedQuotation = async ({ editNote }: { editNote: string }) => {
+    if (!quotationId) {
+      throw new Error('reqPatchModifiedQuotation錯誤，沒有quotationId');
+    }
+
+    if (!instance_quotationProduct_iterative) {
+      throw new Error('reqModify錯誤，instance_iterative is undefined');
+    } else if (!userId) {
+      throw new Error('reqModify錯誤，沒有使用者ID');
+    } else if (!state_profile.customer) {
+      myAlert.info({ title: '請選擇客戶' });
+    }
+
+    const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+    const {
+      quotationProductArr,
+      // isAllDoorModalValid,
+      //  invalidComponentArr,
+      totalQty,
+    } = calcProductBody();
+
+    const body = createBody({
+      quotationDiscount: quotationDiscount || '0',
+      avgDiscount,
+      quotationProductArr,
+      totalQty,
+
+      // instance_quotationProduct,
+      instance_useQuotationOther,
+      state_profile,
+      state_payInfo,
+      state_quotationTotal,
+      editNote,
+      userId,
+      annoArr,
+      quotationRangeArr,
+      status,
+      // calcProductBody,
+    });
+
+    const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
+
+    // const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
+    const newQuotation = await apiPatchModifyQuotation({
+      quotationId: quotationId,
+      body,
+    });
+
+    const contentId = newQuotation.latestContent.id;
+    let isSomethingWrong = false;
+
+    if (newQuotation) {
+      for (const attachment of attachmentArr) {
+        await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+          isSomethingWrong = true;
+        });
+      }
+
+      isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+    }
+
+    return newQuotation;
+
+    // apiPatchModifyQuotation
+  };
+
   // -----------------------------------------------------------------------
 
   // MARK:reqPatchQuotation
@@ -329,6 +398,7 @@ const kit_req = ({
     reqPatchQuotation,
     reqCloneQuotation,
     reqModifyQuotation,
+    reqPatchModifiedQuotation,
   };
 };
 

@@ -14,9 +14,12 @@ import iconRedLock from 'public/image/icon/redLock.svg';
 // ================================================================================
 interface Tprops {
   disabled: boolean;
-  isNewQuotation: boolean;
+
   isQuotation: boolean;
+  isAttachmentQuotation: boolean;
+  isNewQuotation: boolean;
   isNewAttachmentQuotation: boolean;
+
   isReviewer: boolean | undefined | null;
   status: string;
   isDesignatedContent: boolean;
@@ -29,6 +32,7 @@ interface Tprops {
   btnPatchOnClick: () => void;
   btnModifyOnClick: () => void;
   btnPostOnClick: () => void;
+  btnPatchModifyOnClick: () => void;
 
   cloneQuotation: () => void;
   cloneQuotation_relation: () => void;
@@ -50,9 +54,12 @@ interface Tprops {
 
 const usePanel = ({
   disabled,
+
+  isQuotation,
+  isAttachmentQuotation,
   isNewQuotation,
   isNewAttachmentQuotation,
-  isQuotation,
+
   isReviewer,
   status,
   isDesignatedContent,
@@ -63,6 +70,7 @@ const usePanel = ({
   btnPatchOnClick,
   btnPostOnClick,
   btnModifyOnClick,
+  btnPatchModifyOnClick,
 
   cloneQuotation,
   cloneQuotation_relation,
@@ -91,6 +99,7 @@ const usePanel = ({
     let btnUpdateOnClick = btnPatchOnClick;
     isNewQuotation && (btnUpdateOnClick = btnPostOnClick);
     isNewAttachmentQuotation && (btnUpdateOnClick = btnModifyOnClick);
+    isAttachmentQuotation && (btnUpdateOnClick = btnPatchModifyOnClick);
 
     return { label_update, btnUpdateOnClick };
   })();

@@ -439,28 +439,29 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
 
-  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation, reqModifyQuotation } = kit_req({
-    userId,
-    quotationId,
-    contractId,
-    instance_quotationProduct,
-    instance_quotationProduct_iterative: instance_iterative,
-    instance_useQuotationOther,
-    state_profile,
-    state_payInfo,
-    annoArr: annoArr.map((anno) => anno.value),
-    quotationRangeArr: quotationRangeArr.map((qr) => qr.value),
-    setIsFetching,
-    createFileArr,
-    update_quotation: async () => {
-      await update_quotation();
-    },
-    setDisabled,
-    state_quotationTotal,
-    instatnce_getQuotationId3,
-    status: state_status,
-    calcProductBody,
-  });
+  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation, reqModifyQuotation, reqPatchModifiedQuotation } =
+    kit_req({
+      userId,
+      quotationId,
+      contractId,
+      instance_quotationProduct,
+      instance_quotationProduct_iterative: instance_iterative,
+      instance_useQuotationOther,
+      state_profile,
+      state_payInfo,
+      annoArr: annoArr.map((anno) => anno.value),
+      quotationRangeArr: quotationRangeArr.map((qr) => qr.value),
+      setIsFetching,
+      createFileArr,
+      update_quotation: async () => {
+        await update_quotation();
+      },
+      setDisabled,
+      state_quotationTotal,
+      instatnce_getQuotationId3,
+      status: state_status,
+      calcProductBody,
+    });
 
   const handlePatch = () => {
     const { destroy } = myAlert.input({
@@ -533,6 +534,22 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
               status: newQuotation.latestContent.status,
             },
           });
+        }
+      },
+    });
+  };
+
+  const handlePatchModify = () => {
+    const { destroy } = myAlert.input({
+      isTextArea: true,
+      title: '報價單註解',
+      width: 500,
+      onConfirm: async (editNote) => {
+        destroy();
+        const newQuotation = await reqPatchModifiedQuotation({ editNote });
+
+        if (newQuotation) {
+          update_quotation();
         }
       },
     });
@@ -809,9 +826,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // MARK:usePanel
   const { panelList, customeRight } = usePanel({
     disabled,
+
+    isQuotation,
+    isAttachmentQuotation: isAttach,
     isNewQuotation,
     isNewAttachmentQuotation,
-    isQuotation,
+
     isReviewer,
     status: content?.status ?? '',
     isDesignatedContent,
@@ -827,6 +847,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     btnPatchOnClick: handlePatch,
     btnPostOnClick: handlePost,
     btnModifyOnClick: handleModify,
+    btnPatchModifyOnClick: handlePatchModify,
 
     cloneQuotation: () => {
       handleClone();
