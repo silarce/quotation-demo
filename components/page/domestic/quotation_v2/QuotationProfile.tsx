@@ -225,6 +225,7 @@ export default function QuotationProfile({
   const addressProps: TaddressProps = {
     county: {
       props: {
+        menuPortalTarget: undefined,
         isDisabled: disabled,
         value: county.value ? { value: county.value, label: county.value } : null,
         onChange: (option: Toption | null) => {
@@ -234,6 +235,7 @@ export default function QuotationProfile({
     },
     district: {
       props: {
+        menuPortalTarget: undefined,
         isDisabled: disabled,
         value: district.value ? { value: district.value, label: district.value } : null,
         onChange: (option: Toption | null) => {
@@ -610,6 +612,7 @@ export default function QuotationProfile({
             disabled={disabled}
             selectProps={{
               props: {
+                menuPortalTarget: undefined,
                 options: optionsCreator_quotationType(),
                 value: { value: type.value, label: type.value },
                 onChange: (option) => {
