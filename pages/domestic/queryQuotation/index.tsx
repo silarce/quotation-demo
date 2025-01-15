@@ -273,7 +273,8 @@ export default function Budget() {
             query,
           };
           const href_body_attach = {
-            pathname: '/domestic/quotationList/attachQuotation',
+            // pathname: '/domestic/quotationList/attachQuotation',
+            pathname: '/domestic/quotationList/quotation',
             query: {
               ...query,
             },
