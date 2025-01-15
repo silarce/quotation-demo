@@ -319,6 +319,11 @@ class ClassProd {
     keepDistributionBoxQuantity && (newState.data_prod.distributionBoxQuantity = data_prod.distributionBoxQuantity);
     keepQuantity && (newState.data_prod.quantity = data_prod.quantity);
 
+    // 這三個基本上不允許在這裡變動
+    newState.rootProduct = this.state.rootProduct;
+    newState.latestIterativeId = this.state.latestIterativeId;
+    newState.action = this.state.action;
+
     Object.clearAndAssign(this.state, newState);
   }
 
