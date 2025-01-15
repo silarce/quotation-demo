@@ -10,7 +10,7 @@ type Tprops = {
 
 const DoorSummary = ({ list }: Tprops) => {
   return (
-    <ul>
+    <ul className={scss.doorSummary}>
       {list.map(({ doorModel, quantity, avgDiscount }, index) => {
         return (
           <li key={index} className={scss.li}>

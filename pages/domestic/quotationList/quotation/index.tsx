@@ -954,10 +954,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             </div>
             <br />
             <br />
-            <br />
-            <br />
-            <br />
-            <br />
           </>
         )}
 
@@ -1295,7 +1291,10 @@ const useData = () => {
 
         const rootProdQty = rootProd.quantity;
         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
-        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce).mul(rootProd.price).toNumber();
+        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
+          .mul(rootProd.price)
+          .mul(-1)
+          .toNumber();
       } else if (action === '變更追減') {
         const attachedToProductId = prod.attachedToProductId;
 
@@ -1318,6 +1317,7 @@ const useData = () => {
         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
           .add(qty_modify)
           .mul(rootProd.price)
+          .mul(-1)
           .toNumber();
       } else if (action === '變更追加') {
         const attachedToProductId = prod.attachedToProductId;
