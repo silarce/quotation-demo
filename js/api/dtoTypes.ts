@@ -1080,13 +1080,13 @@ export type TquotationProductDto = {
   isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
   headBoxThickness: string | null;
-  // 單價
+  /**單價 */
   unitPrice: number;
-  // 牌價
+  /**牌價 */
   price: number;
-  // 牌價複價
+  /**牌價複價 */
   dualPrice: number;
-  // 複價
+  /**複價 */
   totalPrice: number;
   // 防颱
   isAntiTyphoon: boolean | null;
