@@ -533,18 +533,13 @@ const useQuotationProduct = ({
 
     const stateProd_iterative = state_iterativeProdDict_copy[prodKey];
 
-    // stateProd_iterative.modifyedProductKeyArr.forEach((key) => {
-    //   delete state_prodDict_copy[key];
-    //   prodKeyArr_copy.splice(prodKeyArr_copy.indexOf(key), 1);
-    // });
     Object.keys(stateProd_iterative.modifyedProduct).forEach((key) => {
       delete state_prodDict_copy[key];
       prodKeyArr_copy.splice(prodKeyArr_copy.indexOf(key), 1);
     });
 
-    // stateProd_iterative.qty_modify = 0;
-    // stateProd_iterative.modifyedProductKeyArr = [];
     stateProd_iterative.modifyedProduct = {};
+    stateProd_iterative.deductedPrice = calcProdDeductedPrice({ stateProd: stateProd_iterative });
     stateProd_iterative.renderCount = (stateProd_iterative.renderCount ?? 0) + 1;
 
     setState_prodDict(state_prodDict_copy);
@@ -559,11 +554,18 @@ const useQuotationProduct = ({
 
     removeProd(prodKey);
 
-    if (rootProduct) {
-      delete rootProduct.modifyedProduct[prodKey];
-      rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
-      setState_iterativeProdDict({ ...state_iterativeProdDict });
+    if (!rootProduct) {
+      console.error('prodKey', prodKey);
+      console.error('state_prodDict', state_prodDict);
+
+      throw new Error('removeProd_withIterative，rootProduct不存在');
     }
+
+    delete rootProduct.modifyedProduct[prodKey];
+    rootProduct.deductedPrice = calcProdDeductedPrice({ stateProd: rootProduct });
+
+    rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
+    setState_iterativeProdDict({ ...state_iterativeProdDict });
   };
 
   const {
