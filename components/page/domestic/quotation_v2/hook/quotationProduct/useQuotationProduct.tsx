@@ -131,7 +131,10 @@ type Taddition = {
   rootRootProductKey?: string;
   action: TstateProd['action'];
   //
-  quotationDiscount: number | `${number}`;
+  // 因為材料配件原始的型別並沒有unitPrice與totalPrice
+  // 為了可以使總主產品的材料配件顯示正確的unitPrice與totalPrice
+  // 必須在迭代時就取得所屬報價單的discount
+  quotationDiscount: number | `${number}`; // 會送到TstateProd['quotationDiscount_iterativeProd']
   priceDiscount_percent: number | `${number}`;
 };
 
@@ -468,7 +471,7 @@ const useQuotationProduct = ({
   } = kit_createClass({
     setState_prodDict: setState_iterativeProdDict,
     nodeConfig_prime,
-    state_quotationDiscount: '',
+    state_quotationDiscount: null,
     onProdAllTotalChange: () => {},
     setProdKeyArr: () => {},
     state_prodDict: state_iterativeProdDict,

@@ -338,10 +338,10 @@ interface TstateProd {
   afterChangeQueue?: string[];
   //
 
+  // ____________________________________________________________
+  // 這幾個是總主產品用的
   qty_reduce: `${number}` | ''; // 追減數量
-  // qty_modify: number; // 變更數量
   deductedPrice: number; // 追減變更金額
-  // modifyedProductKeyArr: string[]; // 變更產品id
   modifyedProduct: Record<
     string,
     {
@@ -349,6 +349,8 @@ interface TstateProd {
       quantity: number;
     }
   >;
+  quotationDiscount_iterativeProd?: number | `${number}`; //
+  // ____________________________________________________________
 
   rootProduct?: TstateProd; // 附屬產品
   latestIterativeId?: string | undefined; // 最後迭代id

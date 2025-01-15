@@ -57,7 +57,7 @@ const kit_createClass = ({
 }: {
   setState_prodDict: React.Dispatch<React.SetStateAction<TstateProdDict>>;
   nodeConfig_prime: TnodeConfig;
-  state_quotationDiscount: `${number}` | '';
+  state_quotationDiscount: `${number}` | '' | null;
   onProdAllTotalChange: (state_prodDict?: TstateProdDict) => void;
   setProdKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
   state_prodDict: TstateProdDict;
@@ -149,11 +149,16 @@ const kit_createClass = ({
 
   // MARK:createClassProd
   const createClassProd = (stateProd: TstateProd) => {
+    const quotationDiscount_iterativeProd = stateProd.quotationDiscount_iterativeProd;
+
+    const quotationDiscount =
+      state_quotationDiscount === null ? quotationDiscount_iterativeProd : state_quotationDiscount;
+
     const classProd = new ClassProd({
       stateProd: stateProd,
       setStateProd: createSetProd(stateProd.key),
       nodeConfig: nodeConfig_prime,
-      quotationDiscount: state_quotationDiscount || 0,
+      quotationDiscount: quotationDiscount || 0,
       onPordTotalChange: onProdAllTotalChange,
     });
 
@@ -268,7 +273,7 @@ const kit_createClass = ({
 
       const priceDiscount_percent = calcPriceDiscount_percent({
         prodDiscount: data_prod.discount,
-        quotationDiscount: state_quotationDiscount,
+        quotationDiscount: state_quotationDiscount || '',
       });
 
       data_prod.id = attachedToProductId!;

@@ -70,6 +70,8 @@ const useDefaultState_prodDict = ({
           modifyedProduct = {},
           latestIterativeId,
           rootRootProductKey,
+          quotationDiscount,
+          priceDiscount_percent,
         } = {},
       } = prodSource;
 
@@ -121,6 +123,8 @@ const useDefaultState_prodDict = ({
         qty_reduce: qty_reduce ? `${qty_reduce}` : '',
         deductedPrice,
         modifyedProduct: modifyedProduct,
+        quotationDiscount_iterativeProd: quotationDiscount,
+
         latestIterativeId: latestIterativeId,
 
         action: action || '追加',
