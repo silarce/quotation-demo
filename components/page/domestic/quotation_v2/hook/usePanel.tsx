@@ -94,6 +94,14 @@ const usePanel = ({
 
   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
+  const notAllowCopy =
+    !disabled ||
+    status === 'Pending' ||
+    isDesignatedContent ||
+    quotationType === 'new' ||
+    quotationType === 'newAttachment' ||
+    quotationType === 'oldAttachment';
+
   // -----------------------------------------------------------------------
 
   const { label_update, btnUpdateOnClick } = (() => {
@@ -190,7 +198,7 @@ const usePanel = ({
   // -----------------------------------------------------------------------
 
   const customeRight: React.ReactNode[] = [
-    !disabled || status === 'Pending' || isDesignatedContent ? null : (
+    notAllowCopy ? null : (
       <CloneQuotation
         key="CloneQuotation"
         cloneQuotation={cloneQuotation}
