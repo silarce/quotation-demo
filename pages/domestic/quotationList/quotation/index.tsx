@@ -825,6 +825,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
     quotationContent: content,
+    prodArrForPDf,
   });
 
   const props_profileForm = createProps_profileForm({

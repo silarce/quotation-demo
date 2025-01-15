@@ -29,6 +29,9 @@ import type {
   TquotationProductComponentDto,
   TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
+
+import type { TprodSource } from '../../quotation_v2/hook/quotationProduct/useQuotationProduct';
+
 // ===================================================================
 
 type TmainProduct = {
@@ -401,6 +404,7 @@ const productTomainProduct = ({
     //
     accessories,
     components: _components,
+    //
   } = product_item;
 
   const priceDiscount_percent = calcPriceDiscount_percent({
@@ -451,9 +455,15 @@ const productTomainProduct = ({
     return part;
   });
 
+  const { distributionBoxTotalPrice, installationFeeTotalPrice } = product_item;
+
+  totalPrice_d = totalPrice_d.add(distributionBoxTotalPrice || 0).add(installationFeeTotalPrice || 0);
+
   const { part_distributionBox, part_installationFee } = prodToPart({
     product_item,
   });
+
+  console.log(part_distributionBox.totalPrice);
 
   const mainProduct: TmainProduct = {
     quotationNumber: quotationNumber,
@@ -469,24 +479,40 @@ const productTomainProduct = ({
   return mainProduct;
 };
 
-const usePdfPart = ({ quotationContent }: { quotationContent: TquotationContentDto | undefined }) => {
+const usePdfPart = ({
+  quotationContent,
+  prodArrForPDf,
+}: {
+  quotationContent: TquotationContentDto | undefined;
+  prodArrForPDf?: TprodSource[];
+}) => {
   const [show_pdfPart, setShow_pdfPart] = useState(false);
 
   const pdfPartProps = useMemo(() => {
-    const { quotationNumber, products, discount } = quotationContent ?? {};
+    const { quotationNumber, discount } = quotationContent ?? {};
 
-    const pdfPartProps: TmainProduct[] = (products ?? []).map((prod) => {
+    const products: TprodSource[] | TquotationProductDto[] = prodArrForPDf
+      ? prodArrForPDf
+      : quotationContent?.products ?? [];
+
+    const pdfPartProps: TmainProduct[] = products.map((_prod) => {
+      const prod = _prod as TprodSource | TquotationProductDto;
+
       const { items } = prod;
+
+      const addition = 'addition' in prod ? prod.addition : undefined;
+
+      const quotationDiscount = (addition?.quotationDiscount ?? discount ?? '0') as number | `${number}`;
 
       return productTomainProduct({
         quotationNumber: quotationNumber ?? '',
         product_item: items[0],
-        quotationDiscount: (discount ?? '0') as `${number}`,
+        quotationDiscount: quotationDiscount,
       });
     });
 
     return pdfPartProps;
-  }, [quotationContent]);
+  }, [quotationContent, prodArrForPDf]);
 
   return { pdfPartProps, show_pdfPart, setShow_pdfPart };
 };
