@@ -2526,6 +2526,7 @@ type TquotationProductDto_addition = TquotationProductDto & {
   //     quantity: number;
   //   }
   // >;
+  quotationDiscount: number | `${number}`;
 };
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
@@ -2546,6 +2547,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
 
     subContracts.forEach((contract) => {
       const { id: contractId } = contract;
+      const quotationDiscount = contract.content.discount;
 
       let products = contract.content.products;
       products = _.sortBy(products, 'order');
@@ -2575,6 +2577,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
             // qty_modify: 0,
             // deductedPrice: 0,
             latestIterativeId: rootProductId,
+            quotationDiscount: Number(quotationDiscount || 0),
             // modifyedProduct: {},
           };
 

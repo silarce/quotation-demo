@@ -158,6 +158,7 @@ import { parseProdAction } from 'js/api/api_quotation';
 import {
   calcQtyModify,
   calcProdRemain,
+  calcPriceDiscount_percent,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/calcProd';
 
 // ======================================================================
@@ -778,8 +779,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         return;
       }
 
-      console.log(content?.toSupervisorAt);
-
       myAlert.confirm({
         title: '送審後合約審核表將被鎖定',
         content: '建議先確認合約審核表是否正確',
@@ -792,8 +791,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             } else {
               handleSubmit_pending();
             }
-
-            //
           },
           okText: '確定送審',
           cancelText: '取消',
@@ -1308,8 +1305,14 @@ const useData = () => {
       };
     }
 
-    // const dict = { ...iterativeContractProductDict };
     const dict = Object.entries(iterativeContractProductDict).reduce((acc, [key, prod]) => {
+      const { discount, quotationDiscount } = prod;
+
+      const priceDiscount_percent = calcPriceDiscount_percent({
+        prodDiscount: Number(discount || 0),
+        quotationDiscount: quotationDiscount,
+      });
+
       acc[key] = {
         ...prod,
         addition: {
@@ -1318,6 +1321,8 @@ const useData = () => {
           latestIterativeId: prod.latestIterativeId,
           modifyedProduct: {},
           action: undefined,
+          quotationDiscount,
+          priceDiscount_percent,
         },
       };
 

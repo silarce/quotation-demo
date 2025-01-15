@@ -118,8 +118,7 @@ import type { TquotationProductDto, TquotationProductDto_addition } from 'js/api
 // ================================================================================
 
 type Taddition = {
-  qty_reduce?: number; // 追減數量 // 好像用不到...
-  // qty_modify: number; // 變更數量 // 好像用不到...
+  qty_reduce?: number; // 追減數量
   latestIterativeId?: string;
   deductedPrice?: number;
   modifyedProduct?: Record<
@@ -131,6 +130,9 @@ type Taddition = {
   >;
   rootRootProductKey?: string;
   action: TstateProd['action'];
+  //
+  quotationDiscount: number | `${number}`;
+  priceDiscount_percent: number | `${number}`;
 };
 
 type TprodSource = TquotationProductDto & { addition: Taddition };
