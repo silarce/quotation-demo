@@ -969,7 +969,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
                   instance_useQuotationProductInstance={instance_iterative}
                   showQuotationDiscount={false}
                   // isIterativeProd={true}
-                  prodTotal={allProdTotal_iterative}
+                  prodTotal={allProdTotal_iterative.toLocaleString()}
                 />
               </div>
             </div>
@@ -982,7 +982,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           <QuotationProdTable
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
-            prodTotal={allProdTotal}
+            prodTotal={allProdTotal.toLocaleString()}
             // isIterativeProdExist={!!iterativeContractProductArr?.length}
           />
           <br />

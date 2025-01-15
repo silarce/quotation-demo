@@ -810,7 +810,7 @@ const QuotationRow_dealClass = ({
       <Panel_iterativeProd_right
         disabled={disabled_iterativeProd}
         qty={classProd.quantity}
-        price={classProd.deductedPrice}
+        price={classProd.deductedPrice.toLocaleString()}
         reduceValue={classProd.qty_reduce}
         modifyValue={classProd.qty_modify}
         onReduceChange={(v) => {
