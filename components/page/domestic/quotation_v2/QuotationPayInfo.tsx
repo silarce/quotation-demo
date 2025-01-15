@@ -94,6 +94,7 @@ interface Tform_info {
 
 interface Tprops_quotationPayInfo {
   disabled: boolean;
+  disabled_taxAndCurrency: boolean;
   form: Tform_pay & Tform_info;
 }
 
@@ -102,13 +103,7 @@ export type { Tprops_quotationPayInfo };
 // ========================================================================
 
 // MARK: START
-export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
-  const {
-    disabled,
-    form,
-    //
-  } = props;
-
+export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, form }: Tprops_quotationPayInfo) {
   const {
     haveTax,
     discountRate,
@@ -138,7 +133,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
           className={classNames('m-auto mr-0 mb-5', !haveTax && 'invisible')}
           wrapperStyle={{ width: '97px' }}
           showBaseline="invisible"
-          disabled={disabled}
+          disabled={disabled || disabled_taxAndCurrency}
           checkBoxProps_v2={{
             props: {
               value: haveTax.value ? ['haveTax'] : [],
@@ -276,7 +271,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
             <InputSel
               wrapperStyle={{ width: 150 }}
               showBaseline="auto"
-              disabled={disabled || currency.disabled}
+              disabled={disabled || currency.disabled || disabled_taxAndCurrency}
               selectProps={{
                 props: {
                   placeholder: '',
@@ -306,7 +301,7 @@ export default function QuotationPayInfo(props: Tprops_quotationPayInfo) {
               className={classNames('bg-transparent', (disabled || exchangeRate.disabled) && scss.noBaseLine)}
               value={exchangeRate.value}
               onChange={(e) => exchangeRate.onChange?.(e.target.value as TnumberStr)}
-              readOnly={disabled || exchangeRate.disabled}
+              readOnly={disabled || exchangeRate.disabled || disabled_taxAndCurrency}
             />
           </div>
         </div>
