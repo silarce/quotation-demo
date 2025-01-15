@@ -1,8 +1,7 @@
 // 報價單
-import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
-import { useRouter, NextRouter } from 'next/router';
-import moment, { Moment } from 'moment';
-import classNames from 'classnames';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/router';
+
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
@@ -177,14 +176,6 @@ interface Tquery {
 }
 // 三個資料來源 quotationId contentId contractId
 
-interface Tprops_useQuotation {
-  quotationId: undefined | string;
-  contentId: undefined | string;
-  isNew: undefined | boolean;
-  quotationNumber: undefined | string;
-  content: TquotationContentDto;
-}
-
 type TquotationType = 'new' | 'old' | 'newAttachment' | 'oldAttachment' | undefined;
 
 // ======================================================================
@@ -350,13 +341,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const [reviewFormShow, setReviewFormShow] = useState(false);
 
-  // const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
-  //   useQuotationTotalPrice({
-  //     raw_quotationContent: content,
-  //     disabled,
-  //   });
-
-  // const instance_quotationProduct = useQuotationProduct({
   const {
     instance: instance_quotationProduct,
     instance_iterative,
@@ -364,6 +348,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     allProdTotal_iterative,
     theProductTotal,
     calcProductBody,
+    doorModelSummery,
+    doorModelSummery_reduceModified,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -392,7 +378,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
     instance_quotationPrice;
 
-  const { avgDiscount, doorModelSummery } = instance_quotationProduct;
+  const { avgDiscount } = instance_quotationProduct;
 
   const {
     quotationDiscount: state_quotationDiscount, // 總折數
@@ -920,6 +906,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   quotationType === 'new' && (tag = '新增報價單');
   quotationType === 'newAttachment' && (tag = '新增追加追減報價單');
 
+  // const doorSummaryArr = Object.values(doorModelSummery).concat(doorModelSummery_reduceModified);
+  const doorSummaryArr = [...doorModelSummery_reduceModified, ...Object.values(doorModelSummery)];
+
   // ----------------------------------------------------------------------
   // region useEffect
   useEffect(() => {
@@ -967,17 +956,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           showBaseline="invisible"
           captionStyle={{ width: '120px' }}
           wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-          node={
-            <DoorSummary
-              list={Object.values(doorModelSummery).map((item) => {
-                return {
-                  doorModel: item.doorModel,
-                  quantity: item.quantity,
-                  avgDiscount: item.avgDiscount,
-                };
-              })}
-            />
-          }
+          node={<DoorSummary list={doorSummaryArr} />}
         />
 
         {/* prod */}

@@ -109,7 +109,11 @@ import {
   calcProdRemain,
   calcProdDeductedPrice,
 } from './method/calcProd';
-import { calcProdSummary, TdoorModelSummeryItem } from './method/calcProdSummary';
+import {
+  calcProdSummary,
+  doorModelSummery_reduceModified as calcDoorModelSummery_reduceModified,
+  TdoorModelSummeryItem,
+} from './method/calcProdSummary';
 
 import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
@@ -221,7 +225,6 @@ interface Tinstance_useQuotationProduct {
   addEmptyProd: () => void;
   removeProd: (prodKey: string) => void;
   avgDiscount: number;
-  doorModelSummery: Record<string, TdoorModelSummeryItem>;
 
   copyProd: (props: { prodKey: string }) => void;
   modifyProd: (props: { qty_modify: number; prodKey: string }) => void;
@@ -348,6 +351,10 @@ const useQuotationProduct = ({
     return { avgDiscount, doorModelSummery };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced_state_prodDict]);
+
+  const doorModelSummery_reduceModified = useMemo(() => {
+    return calcDoorModelSummery_reduceModified({ state_prodDict: state_iterativeProdDict });
+  }, [debounced_state_iterativeProdDict]);
 
   const allProdTotal = useMemo(() => {
     return the_calcProdAllTotal({ state_prodDict });
@@ -722,7 +729,7 @@ const useQuotationProduct = ({
     copyProd: copy_prodToProd,
     //
     avgDiscount,
-    doorModelSummery,
+
     //
     isIterativeProd: false,
     isIterativeProdExist,
@@ -769,7 +776,7 @@ const useQuotationProduct = ({
 
         //
         avgDiscount: -1,
-        doorModelSummery: {},
+
         //
         isIterativeProd: true,
         isIterativeProdExist,
@@ -794,6 +801,8 @@ const useQuotationProduct = ({
     allProdTotal_iterative,
     theProductTotal,
     calcProductBody,
+    doorModelSummery,
+    doorModelSummery_reduceModified,
   };
 };
 

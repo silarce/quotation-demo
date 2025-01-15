@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import { TstateProdDict } from '../type';
 
-import { calcPriceDiscount_percent } from './calcProd';
+import { calcPriceDiscount_percent, calcQtyModify, calcQtyReduceModified } from './calcProd';
 
 type TdoorModelSummeryItem = {
   doorModel: string;
@@ -80,5 +80,52 @@ const calcProdSummary = ({
   return { avgDiscount, doorModelSummery };
 };
 
-export { calcProdSummary };
+const calcDoorModelSummery_reduceModified = ({ state_prodDict }: { state_prodDict: TstateProdDict }) => {
+  const reduceModifiedProdArr = Object.values(state_prodDict).filter((stateProd) => {
+    return !!calcQtyReduceModified({ stateProd });
+  });
+
+  const itemDict: Record<string, TdoorModelSummeryItem_d> = {};
+
+  reduceModifiedProdArr.forEach((stateProd) => {
+    const {
+      quotationDiscount_iterativeProd,
+      data_prod: { discount, doorModelName },
+    } = stateProd;
+
+    const reduceModifiedQty = calcQtyReduceModified({ stateProd });
+    const priceDiscount_percent = calcPriceDiscount_percent({
+      prodDiscount: discount || 0,
+      quotationDiscount: quotationDiscount_iterativeProd || 0,
+    });
+
+    if (!itemDict[doorModelName]) {
+      itemDict[doorModelName] = {
+        doorModel: doorModelName,
+        quantity: new Decimal(0),
+        discountTotal: new Decimal(0),
+      };
+    }
+
+    const item = itemDict[doorModelName];
+    item.quantity = item.quantity.add(reduceModifiedQty);
+    const discountTotal = item.quantity.mul(priceDiscount_percent);
+    item.discountTotal = item.discountTotal.add(discountTotal);
+  });
+
+  const doorModelSummery = Object.values(itemDict).map((item) => {
+    const avgDiscount = item.discountTotal.div(item.quantity).mul(100).toDecimalPlaces(3).toNumber();
+    const summery: TdoorModelSummeryItem = {
+      doorModel: item.doorModel,
+      quantity: item.quantity.mul(-1).toNumber(),
+      avgDiscount: avgDiscount,
+    };
+
+    return summery;
+  });
+
+  return doorModelSummery;
+};
+
+export { calcProdSummary, calcDoorModelSummery_reduceModified as doorModelSummery_reduceModified };
 export type { TdoorModelSummeryItem };
