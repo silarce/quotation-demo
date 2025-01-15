@@ -335,7 +335,7 @@ const calcAllPrice = ({
   quantity: number | `${number}`;
   priceDiscount_percent: number | `${number}`; // 浮點數
 }) => {
-  const dualPrice = new Decimal(price || 0).mul(quantity).toNumber();
+  const dualPrice = new Decimal(price || 0).mul(quantity).toDecimalPlaces(0).toNumber();
   const unitPrice = new Decimal(price || 0).mul(priceDiscount_percent).toDecimalPlaces(0).toNumber();
   const totalPrice = new Decimal(unitPrice)
     .mul(quantity || 0)
