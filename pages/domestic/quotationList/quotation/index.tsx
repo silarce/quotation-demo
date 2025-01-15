@@ -558,6 +558,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
               status: newQuotation.latestContent.status,
             },
           });
+          setDisabled(true);
         }
       },
     });
