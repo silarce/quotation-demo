@@ -80,6 +80,8 @@ type TincomeBill = {
   id: UniqueIdentifier; // 就是string | number // id 必須唯一
   invoiceId: UniqueIdentifier; //  同所屬invoice
   importAccountingNumber: React.ReactNode;
+
+  noteNumber: string | null;
   noteMaturityDate: React.ReactNode; // 票據到期日
 
   receiveDate: React.ReactNode;
@@ -132,6 +134,10 @@ export default function IncomeBillSorting({
   readonly?: boolean;
   currency: string;
 }) {
+  // console.log('incomeBillList_noInvoice', incomeBillList_noInvoice);
+  // console.log('periodArr', periodArr);
+  // console.log('-------------------------------');
+
   // 幣別一樣時才需要計算amountNotCollected
   // 因為算一算其實不會怎麼樣，所以簡單處理，隱藏就好
   const showAmountNotCollected = currency === currency_tw;
@@ -140,6 +146,8 @@ export default function IncomeBillSorting({
 
   const [stateList, setStateList] = useState<TstateList>({});
   const [activeIncomeBill, setActiveIncomeBill] = useState<TincomeBill>();
+
+  console.log(stateList);
 
   // -----------------------------------------------------------------------------
 
@@ -286,17 +294,21 @@ export default function IncomeBillSorting({
           id: incomeBillId,
           receiveDate,
           importAccountingNumber,
+
+          noteNumber,
           noteMaturityDate,
+
           receivablePayment,
           accountsReceivableDeduction,
           receivablePaymentForAccountReceivable,
         } = incomeBill;
 
-        return {
+        const result: TincomeBill = {
           id: incomeBillId,
           invoiceId,
           receiveDate: getTaiwanDateStr(receiveDate) || '---',
           importAccountingNumber: importAccountingNumber || '---',
+          noteNumber,
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate) || '---',
           // price: price.toLocaleString(),
           receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
@@ -304,7 +316,9 @@ export default function IncomeBillSorting({
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
           raw: incomeBill,
-        } as TincomeBill;
+        };
+
+        return result;
       }); // incomeBillArr
 
       list[invoiceId] = {
@@ -625,6 +639,7 @@ const Group_Dnd = ({
               id,
               receiveDate: insertDate,
               importAccountingNumber,
+              noteNumber,
               noteMaturityDate,
               receivablePaymentForAccountReceivable: price,
             } = incomeBill;
@@ -638,7 +653,7 @@ const Group_Dnd = ({
                 incomeBill={incomeBill}
               >
                 <span>{insertDate}</span>
-                <span>{importAccountingNumber}</span>
+                <span>{noteNumber !== null ? noteNumber : importAccountingNumber}</span>
                 <span>{noteMaturityDate}</span>
                 {/* <span>{price}</span> */}
                 <InputSel
@@ -907,24 +922,28 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]):
       id: incomeBillId,
       receiveDate,
       importAccountingNumber,
+      noteNumber,
       noteMaturityDate,
       receivablePayment,
       accountsReceivableDeduction,
       receivablePaymentForAccountReceivable,
     } = incomeBill;
 
-    return {
+    const resuult: TincomeBill = {
       id: incomeBillId,
       invoiceId: 'noInvoice',
       receiveDate: getTaiwanDateStr(receiveDate),
       importAccountingNumber,
+      noteNumber,
       noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
       receivablePaymentForAccountReceivable: receivablePaymentForAccountReceivable?.toLocaleString(),
       receivablePaymentForAccountReceivable_num: receivablePaymentForAccountReceivable || 0,
       accountsReceivableDeduction,
       isRelationedInvoiceChanged: false,
       raw: incomeBill,
-    } as TincomeBill;
+    };
+
+    return resuult;
   });
 
   return {
