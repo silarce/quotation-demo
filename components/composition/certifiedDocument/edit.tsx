@@ -143,9 +143,9 @@ export default function Edit({
   allowdAddDocType,
 }: {
   className?: string;
-  onPanelChange: (panel: TpanelList | undefined) => void;
-  contract: TquotationContractDto | undefined;
-  update_contract: () => Promise<unknown>;
+  onPanelChange?: (panel: TpanelList | undefined) => void;
+  contract?: TquotationContractDto | undefined;
+  update_contract?: () => Promise<unknown>;
   allowdAddDocType?: TdocType[];
 }) {
   const router = useRouter();
@@ -327,7 +327,7 @@ export default function Edit({
           certifiedDocumentId: id,
         },
       });
-      await update_contract();
+      await update_contract?.();
       await update_data_CertifiedDocument();
     });
     setDisabled(true);
@@ -403,7 +403,7 @@ export default function Edit({
 
     setIsFetching(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(async () => {
-      await update_contract();
+      await update_contract?.();
       await update_data_CertifiedDocument();
     });
     setDisabled(true);
@@ -461,7 +461,7 @@ export default function Edit({
 
     setIsFetching(true);
     await apiDeleteCertificatedDoc(certifiedDocumentId).then(async () => {
-      await update_contract();
+      await update_contract?.();
       router.back();
     });
     setIsFetching(false);
@@ -601,10 +601,10 @@ export default function Edit({
   }, [state_docStyle]);
 
   useEffect(() => {
-    onPanelChange(panelList);
+    onPanelChange?.(panelList);
 
     return () => {
-      onPanelChange(undefined);
+      onPanelChange?.(undefined);
     };
   }, [panelList]);
 
@@ -670,7 +670,17 @@ export default function Edit({
         }
 
         if (!list[settleProductId]) {
-          const settleProduct = settleProductList[settleProductId];
+          const settleProduct: TsettleProductDto | undefined = settleProductList[settleProductId] as
+            | TsettleProductDto
+            | undefined;
+
+          if (!settleProduct) {
+            console.error('settleProduct不存在');
+            console.error('settleProductList', settleProductList);
+            console.error('settleProductId', settleProductId);
+
+            return;
+          }
 
           const {
             itemName,

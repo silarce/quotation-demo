@@ -46,6 +46,7 @@ import BonusPayout from 'pages/accounting/bonusPayout';
 import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
 import PRequisitionDetail from 'pages/factoryDepartment/PRequisitionDetail';
 import TransferOrder from 'pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit';
+import CertifiedDocument from 'components/composition/certifiedDocument/edit';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
@@ -559,6 +560,14 @@ export default function ReviewList() {
 
         router.replace({ query }, undefined, { shallow: true });
       } else if (reviewtype === '調貨單') {
+        const parsedQuery = JSON.parse(itemQuery.query);
+        const query = {
+          ...parsedQuery,
+          viewtype: 'review',
+        };
+
+        router.replace({ query }, undefined, { shallow: true });
+      } else if (reviewtype === '證明文件') {
         const parsedQuery = JSON.parse(itemQuery.query);
         const query = {
           ...parsedQuery,
@@ -1437,6 +1446,7 @@ export default function ReviewList() {
                       {reviewtype === '調貨單' && (
                         <TransferOrder key={theKey} userInfo={userInfo!} isForbidden={true} />
                       )}
+                      {reviewtype === '證明文件' && <CertifiedDocument key={theKey} />}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示
