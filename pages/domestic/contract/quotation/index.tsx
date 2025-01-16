@@ -974,7 +974,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
           />
         )}
 
-        {tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
+        {tab === 'certifiedDocument' && (
+          <CertifiedDocument onPanelListChange={dynaPanelListReducer} allowdAddDocType={['防火證明']} />
+        )}
 
         <InputModal
           visible={!!inputModalConfig?.visible}

@@ -132,21 +132,19 @@ const Selector_settleProduct_memo = memo(Selector_settleProduct, (preState, next
 
 // =========================================================================
 
-// ███████ ████████  █████  ██████  ████████
-// ██         ██    ██   ██ ██   ██    ██
-// ███████    ██    ███████ ██████     ██
-//      ██    ██    ██   ██ ██   ██    ██
-// ███████    ██    ██   ██ ██   ██    ██
+// MARK: START
 export default function Edit({
   className,
   onPanelChange,
   contract,
   update_contract,
+  allowdAddDocType,
 }: {
   className?: string;
   onPanelChange: (panel: TpanelList | undefined) => void;
   contract: TquotationContractDto | undefined;
   update_contract: () => Promise<unknown>;
+  allowdAddDocType?: TdocType[];
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -546,27 +544,9 @@ export default function Edit({
   // _________________________________________________________________________
   // _________________________________________________________________________
 
-  // const selectedSettleProduct = useMemo(() => {
-  //   const settleProducts = contract?.content.settleProducts;
-
-  //   const arr: TsettleProductDto[] = [];
-
-  //   settleProducts?.forEach((prod) => {
-  //     if (state_itemList[prod.id]) {
-  //       arr.push(prod);
-  //     }
-  //   });
-
-  //   return arr;
-  // }, [contract, state_itemList]);
-
   // --------------------------------------------------------------------------
 
-  // ███████ ███████ ███████ ███████  ██████ ████████
-  // ██      ██      ██      ██      ██         ██
-  // █████   █████   █████   █████   ██         ██
-  // ██      ██      ██      ██      ██         ██
-  // ███████ ██      ██      ███████  ██████    ██
+  // region useEffect
 
   useEffect(() => {
     if (state_docStyle !== '保固書') {
@@ -645,6 +625,7 @@ export default function Edit({
 
         if (!list[settleProductId]) {
           const settleProduct = settleProductList[settleProductId];
+
           const {
             itemName,
             fullWidth,
@@ -717,11 +698,7 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  // ██████  ███████ ███    ██ ██████  ███████ ██████
-  // ██   ██ ██      ████   ██ ██   ██ ██      ██   ██
-  // ██████  █████   ██ ██  ██ ██   ██ █████   ██████
-  // ██   ██ ██      ██  ██ ██ ██   ██ ██      ██   ██
-  // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
+  // MARK: RENDER
   return (
     <div className={classNames(className)}>
       <div className="w-[1100px] ml-10">
@@ -733,6 +710,7 @@ export default function Edit({
           editInfo={editInfo}
           editDate={editDate}
           setState_docStyle={setState_docStyle}
+          allowdAddDocType={allowdAddDocType}
         />
 
         <Table01 className="mt-10" style={{ width: '100%' }} {...control_table} />
@@ -891,6 +869,7 @@ const InputGroup = ({
   editDate,
   state_docStyle,
   setState_docStyle,
+  allowdAddDocType,
 }: {
   disabled?: boolean;
   state_info: Tstate_info;
@@ -898,7 +877,14 @@ const InputGroup = ({
   editInfo: TeditInfo;
   editDate: TeditDate;
   setState_docStyle: React.Dispatch<React.SetStateAction<TdocType | undefined>>;
+  allowdAddDocType: TdocType[] | undefined;
 }) => {
+  let docTypeOptions = optionsCreator_certifyType();
+
+  if (allowdAddDocType) {
+    docTypeOptions = docTypeOptions.filter((item) => allowdAddDocType.includes(item.value as TdocType));
+  }
+
   return (
     <Wrapper_inpuSel_01 className="w-[845px]">
       <InputSel
@@ -914,7 +900,7 @@ const InputGroup = ({
                 zIndex: 3,
               }),
             },
-            options: optionsCreator_certifyType(),
+            options: docTypeOptions,
             value: state_docStyle
               ? {
                   value: state_docStyle,
@@ -1403,27 +1389,6 @@ const usePanelList = ({
 
   return panelList;
 };
-
-// const useSelecotr_settleProduct = () => {
-//   const Selector = useMemo(() => {
-//     const Selector_settleProduct = selectModalCreator_multi<['settleProduct']>({
-//       selectorArr: [
-//         {
-//           key: 'settleProduct',
-//           caption: '結算產品',
-//         },
-//       ],
-//     });
-
-//     const Selector_settleProduct_memo = memo(Selector_settleProduct, (preState, nextState) => {
-//       return preState.showModal === nextState.showModal;
-//     });
-
-//     return Selector_settleProduct_memo;
-//   }, []);
-
-//   return Selector;
-// };
 
 // ==============================================================================
 
