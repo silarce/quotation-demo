@@ -5188,7 +5188,7 @@ export type TupdateCertificatedDocDto_pre = Pick<
   | 'description'
   | 'note'
   | 'docStyle'
-  | 'status'
+  // | 'status'
   | 'snapShot'
 > & {
   products: TupdateCertificatedProductDto[]; // 不可以是空陣列
