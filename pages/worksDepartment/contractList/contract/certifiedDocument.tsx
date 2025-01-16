@@ -57,7 +57,7 @@ export default function CertifiedDocument_page() {
       />
 
       <div>
-        <CertifiedDocument onPanelListChange={setCompositionDynPanelList} showDocType={['保固書']} />
+        <CertifiedDocument onPanelListChange={setCompositionDynPanelList} showDocType={['保固書', '出廠證明']} />
       </div>
     </SubLayer>
   );
