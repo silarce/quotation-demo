@@ -172,7 +172,7 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  let isReviewer = false;
+  // let isReviewer = false;
   let isDoneReview: boolean | undefined = undefined; // 是否已審核完畢
   let isSealed = false; // 是否已用印
 
@@ -200,7 +200,7 @@ export default function Edit({
     status,
   } = data_certifiedDocument ?? {};
 
-  isReviewer = checkReviewer(userInfo, data_certifiedDocument);
+  // isReviewer = checkReviewer(userInfo, data_certifiedDocument);
   isDoneReview = checkIsDoneReview(data_certifiedDocument);
   isSealed = status === '已用印';
 
@@ -476,39 +476,39 @@ export default function Edit({
     return list;
   }, [contract?.content.settleProducts]);
 
-  const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
-    const signatureArr = [
-      {
-        label: '總經理',
-        className: 'w-[210px]',
-        value: reviewManagerEmployee?.chName ?? '',
-      },
-      {
-        label: '擔保人',
-        className: 'w-[210px]',
-        value: reviewGuarantorEmployee?.chName ?? '',
-      },
-      {
-        label: '製表人',
-        className: 'w-[210px]',
-        value: agentEmployee?.chName ?? '',
-      },
-    ];
+  // const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
+  //   const signatureArr = [
+  //     {
+  //       label: '總經理',
+  //       className: 'w-[210px]',
+  //       value: reviewManagerEmployee?.chName ?? '',
+  //     },
+  //     {
+  //       label: '擔保人',
+  //       className: 'w-[210px]',
+  //       value: reviewGuarantorEmployee?.chName ?? '',
+  //     },
+  //     {
+  //       label: '製表人',
+  //       className: 'w-[210px]',
+  //       value: agentEmployee?.chName ?? '',
+  //     },
+  //   ];
 
-    const defaultSeletedDataArrArr: Parameters<typeof Selector_employee>[0]['defaultSeletedDataArrArr'] = [
-      reviewGuarantorEmployee ? [reviewGuarantorEmployee] : [],
-      // state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
-    ];
+  //   const defaultSeletedDataArrArr: Parameters<typeof Selector_employee>[0]['defaultSeletedDataArrArr'] = [
+  //     reviewGuarantorEmployee ? [reviewGuarantorEmployee] : [],
+  //     // state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
+  //   ];
 
-    const control_signature = {
-      signatureArr,
-    };
+  //   const control_signature = {
+  //     signatureArr,
+  //   };
 
-    return {
-      control_signature,
-      defaultSeletedDataArrArr,
-    };
-  }, [reviewGuarantorEmployee, contract?.content.settleProducts, disabled]);
+  //   return {
+  //     control_signature,
+  //     defaultSeletedDataArrArr,
+  //   };
+  // }, [reviewGuarantorEmployee, contract?.content.settleProducts, disabled]);
 
   // _________________________________________________________________________
   // _________________________________________________________________________
@@ -525,7 +525,7 @@ export default function Edit({
     reqPatchCertificatedDoc_review,
     reqDeleteCertificatedDoc,
     // certificateId: certifiedDocumentId ?? '',
-    isReviewer,
+    // isReviewer,
     isSealed,
     isDoneReview,
   });
@@ -747,14 +747,14 @@ export default function Edit({
           }}
         />
 
-        <SignatureBar
+        {/* <SignatureBar
           className="mt-10 w-fit"
           disabled={disabled}
           control={control_signature}
           style={{ justifyContent: 'flex-start', gap: '50px' }}
-        />
+        /> */}
       </div>
-      <Selector_employee_memo
+      {/* <Selector_employee_memo
         showModal={state_showSelector_employee}
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
@@ -766,7 +766,7 @@ export default function Edit({
         onCancel={() => {
           setState_showSelector_employee(false);
         }}
-      />
+      /> */}
 
       <Selector_settleProduct_memo
         //
@@ -1219,7 +1219,7 @@ const usePanelList = ({
   reqPatchCertificatedDoc,
   reqPatchCertificatedDoc_review,
   reqDeleteCertificatedDoc,
-  isReviewer,
+  // isReviewer,
   isSealed,
   isDoneReview,
 }: // certificateId,
@@ -1234,7 +1234,7 @@ const usePanelList = ({
   reqPatchCertificatedDoc: () => void;
   reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
   reqDeleteCertificatedDoc: () => void;
-  isReviewer: boolean;
+  // isReviewer: boolean;
   isSealed: boolean;
   isDoneReview: boolean | undefined;
   // certificateId: string;
@@ -1338,7 +1338,7 @@ const usePanelList = ({
       isSealed ? btn_isSealed : null,
       !isSealed ? btn_deleted : null,
       !isSealed ? btn_submit : null,
-      !isSealed && isReviewer ? btn_review : null,
+      // !isSealed && isReviewer ? btn_review : null,
       isSealed || isDoneReview ? btn_issueCertificate : null,
       !isSealed ? btn_edit : null,
       {
@@ -1382,7 +1382,7 @@ const usePanelList = ({
     router,
     setDisabled,
     setState_showSelector,
-    isReviewer,
+    // isReviewer,
     isSealed,
     isDoneReview,
   ]);
