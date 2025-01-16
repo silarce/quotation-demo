@@ -120,13 +120,13 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   };
 
   // ----------------------------------------------------
-  const [signature, setSignature] = useState<Tsignature>(emptySignature());
+  // const [signature, setSignature] = useState<Tsignature>(emptySignature());
 
-  const changeSignature = (key: keyof Tsignature, v: TemployeeDto) => {
-    setSignature((signature) => {
-      return { ...signature, [key]: v };
-    });
-  };
+  // const changeSignature = (key: keyof Tsignature, v: TemployeeDto) => {
+  //   setSignature((signature) => {
+  //     return { ...signature, [key]: v };
+  //   });
+  // };
 
   // ----------------------------------------------------
 
@@ -192,17 +192,17 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
       dispatchDate: dispatchDate ?? '',
     });
 
-    const isNew = !exchangeId;
+    // const isNew = !exchangeId;
 
-    const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+    // const theFormCompleter = isNew ? userInfo.employee : formCompleter;
 
-    setSignature({
-      accounting,
-      warehouseEmployee,
-      factoryEmployee,
-      supervisor,
-      formCompleter: theFormCompleter,
-    });
+    // setSignature({
+    //   accounting,
+    //   warehouseEmployee,
+    //   factoryEmployee,
+    //   supervisor,
+    //   formCompleter: theFormCompleter,
+    // });
 
     const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
     setTransferArr(recoreds);
@@ -243,29 +243,29 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------
 
-  const controll_signature: Tcontroll_signature = {
-    accounting: {
-      employee: signature.accounting,
-      onChange: (v: TemployeeDto) => changeSignature('accounting', v),
-    },
-    warehouseEmployee: {
-      employee: signature.warehouseEmployee,
-      onChange: (v: TemployeeDto) => changeSignature('warehouseEmployee', v),
-    },
-    factoryEmployee: {
-      employee: signature.factoryEmployee,
-      onChange: (v: TemployeeDto) => changeSignature('factoryEmployee', v),
-    },
-    supervisor: {
-      employee: signature.supervisor,
-      onChange: (v: TemployeeDto) => changeSignature('supervisor', v),
-    },
-    formCompleter: {
-      employee: signature.formCompleter,
-      // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
-      forbidden: true,
-    },
-  };
+  // const controll_signature: Tcontroll_signature = {
+  //   accounting: {
+  //     employee: signature.accounting,
+  //     onChange: (v: TemployeeDto) => changeSignature('accounting', v),
+  //   },
+  //   warehouseEmployee: {
+  //     employee: signature.warehouseEmployee,
+  //     onChange: (v: TemployeeDto) => changeSignature('warehouseEmployee', v),
+  //   },
+  //   factoryEmployee: {
+  //     employee: signature.factoryEmployee,
+  //     onChange: (v: TemployeeDto) => changeSignature('factoryEmployee', v),
+  //   },
+  //   supervisor: {
+  //     employee: signature.supervisor,
+  //     onChange: (v: TemployeeDto) => changeSignature('supervisor', v),
+  //   },
+  //   formCompleter: {
+  //     employee: signature.formCompleter,
+  //     // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+  //     forbidden: true,
+  //   },
+  // };
 
   // ----------------------------------------------------
 
@@ -302,11 +302,11 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     const body: TcreateExchgangeDto = {
       ...profile,
       exchangeRecords: transferArr,
-      accountingId: signature.accounting?.id ?? '',
-      warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
-      factoryEmployeeId: signature.factoryEmployee?.id ?? '',
-      supervisorId: signature.supervisor?.id ?? '',
-      formCompleterId: signature.formCompleter?.id ?? '',
+      // accountingId: signature.accounting?.id ?? '',
+      // warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
+      // factoryEmployeeId: signature.factoryEmployee?.id ?? '',
+      // supervisorId: signature.supervisor?.id ?? '',
+      // formCompleterId: signature.formCompleter?.id ?? '',
       contractId: contractId,
     };
 
@@ -451,7 +451,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
             }}
             updateTrigger={attachmentUpdateTrigger}
           />
-          <Signature controll={controll_signature} disabled={disabled} />
+          {/* <Signature controll={controll_signature} disabled={disabled} /> */}
         </div>
       </div>
     </SubLayer>
@@ -468,13 +468,13 @@ const emptyProfileOri = (): Tprofile => ({
   dispatchDate: '',
 });
 
-const emptySignature = () => ({
-  accounting: undefined,
-  warehouseEmployee: undefined,
-  factoryEmployee: undefined,
-  supervisor: undefined,
-  formCompleter: undefined,
-});
+// const emptySignature = () => ({
+//   accounting: undefined,
+//   warehouseEmployee: undefined,
+//   factoryEmployee: undefined,
+//   supervisor: undefined,
+//   formCompleter: undefined,
+// });
 
 const emptyTransferOri = (): Ttransfer => ({
   goodsName: '',

@@ -3513,11 +3513,13 @@ export type TcreateExchgangeDto = {
   projectNumber: string; // 工程編號
   projectName: string;
   exchangeRecords: TcreateExchangeRecordDto[];
-  accountingId: string;
-  warehouseEmployeeId: string;
-  factoryEmployeeId: string;
-  supervisorId: string;
-  formCompleterId: string;
+
+  accountingId?: string; // 棄用
+  warehouseEmployeeId?: string; // 棄用
+  factoryEmployeeId?: string; // 棄用
+  supervisorId?: string; // 棄用
+  formCompleterId?: string; // 棄用
+
   contractId?: string | null;
   legacyContractId?: string | null;
 };
