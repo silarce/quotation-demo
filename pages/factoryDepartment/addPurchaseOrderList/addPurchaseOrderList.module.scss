@@ -54,6 +54,7 @@
   width: 100%;
   overflow-y: auto;
   top: 0;
+  padding-bottom: 20px;
 }
 
 .left_tite_main {
@@ -187,7 +188,7 @@
 
 .head_content1 {
   display: grid;
-  grid-template-columns: 30% 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 20% 1fr 1fr 1fr 1fr;; // 左右兩邊比例，可以調整
   // gap: 20px;
   width: auto;
   // margin-top: 5px;

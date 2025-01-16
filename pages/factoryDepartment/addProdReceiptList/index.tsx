@@ -213,7 +213,7 @@ export default function AddProdReceiptList() {
             label: '返回',
             onClick: () => {
                 myAlert.confirm({
-                    title: `確定要返回採購單列表嗎?`,
+                    title: `確定要返回嗎?`,
                     content: <>
                         <h1>未儲存的資料將不會保留</h1>
                     </>,
@@ -326,7 +326,13 @@ export default function AddProdReceiptList() {
                 note: notein,
                 data2: data2,
                 username: userInfo?.employee?.id.toString(),
-                purchaseorderid: purchaseorderid
+                purchaseorderid: purchaseorderid,
+                suppliername: suppliernamein,
+                supplieraddress: supplieraddressin,
+                supplierphone: supplierphonein,
+                suppliertaxid: suppliertaxidin,
+                suppliercontact: suppliercontactin,
+                supplierfax: supplierfaxin
             };
 
             var inputModel = {
@@ -363,7 +369,7 @@ export default function AddProdReceiptList() {
             } else {
                 // 失敗，顯示錯誤提示
                 console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
+                myAlert.warning({ title: result.message, content: result.message });
             }
 
         } catch (error: any) {
@@ -677,6 +683,7 @@ export default function AddProdReceiptList() {
     //#endregion
 
     //#region ===========【廠商篩選】
+    const [isFilterVisible, setIsFilterVisible] = useState(false);
     const [customerbar, setCustomerbar] = useState(false);
     const [countyOptions, setCountyOptions] = useState<string[]>([]);
     const [filteredData2, setFilteredData2] = useState<any[]>([]);
@@ -685,6 +692,10 @@ export default function AddProdReceiptList() {
         name: '',
         contact: ''
     });
+
+    useEffect(() => {
+        setIsFilterVisible(true);
+    }, [suppliernamein])
 
     // 根據篩選條件更新資料
     useEffect(() => {
@@ -917,6 +928,19 @@ export default function AddProdReceiptList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="廠商統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            // disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin,
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="廠商名稱"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -924,7 +948,17 @@ export default function AddProdReceiptList() {
                                             inputProps={{
                                                 props: {
                                                     value: suppliernamein,
-                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                    // onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setSuppliernamein(value);
+                                                        setFilters({ ...filters, name: value });
+                                                        setFilteredData2(
+                                                            data.filter((item) =>
+                                                                item.name.toLowerCase().includes(value.toLowerCase())
+                                                            )
+                                                        );
+                                                    }
                                                 },
                                             }}
                                         />
@@ -971,6 +1005,19 @@ export default function AddProdReceiptList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="聯絡人員"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            // disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliercontactin,
+                                                    onChange: (e) => { setSuppliercontactin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="廠商電話"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -984,14 +1031,14 @@ export default function AddProdReceiptList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商傳真"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             // disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplierfaxin,
+                                                    onChange: (e) => { setSupplierfaxin(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1020,11 +1067,75 @@ export default function AddProdReceiptList() {
                                                 setCustomerbar(true);
                                             }}
                                         >
-                                            ⋯
+                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
 
 
                                     </div>
+                                </div>
+                                <div
+                                    style={{
+                                        position: 'relative',
+                                        width: '50%',
+                                        padding: '10px',
+                                        // border: '1px solid #ccc',
+                                        borderRadius: '4px',
+                                    }}
+                                >
+                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: 0,
+                                                width: '100%',
+                                                backgroundColor: 'white',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '4px',
+                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                zIndex: 1005,
+                                                maxHeight: '300px',
+                                                overflowY: 'auto',
+                                            }}
+                                        >
+                                            {filteredData2.map((_item, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setSuppliernamein(_item.name || '');
+                                                        setSupplieraddressin(
+                                                            (_item.county || '') +
+                                                            (_item.district || '') +
+                                                            (_item.address || '')
+                                                        );
+                                                        setSupplierphonein(_item.phone || '');
+                                                        setSuppliertaxidin(_item.tax_id || '');
+                                                        setSupplieridin(_item.customer_number || '');
+                                                        setSupplierfaxin(_item.fax || '');
+                                                        setSuppliercontactin(_item.contact || '');
+                                                        setSupplieruuidin(_item.id || '');
+                                                        setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                    }}
+                                                    style={{
+                                                        padding: '10px',
+                                                        cursor: 'pointer',
+                                                        borderBottom: '1px solid #f0f0f0',
+                                                    }}
+                                                >
+                                                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                                                        {_item.name} {_item.conta}
+                                                    </div>
+                                                    <div style={{ fontSize: '16px', color: '#888' }}>
+                                                        {_item.county} {_item.district} {_item.address}
+                                                    </div>
+                                                    <div style={{ fontSize: '16px', color: '#555' }}>
+                                                        聯絡人: {_item.contact}
+                                                    </div>
+
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div>
