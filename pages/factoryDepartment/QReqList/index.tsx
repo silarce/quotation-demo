@@ -605,7 +605,7 @@ export default function QReqList() {
                                                                         detail.supplier3_name}
                                                             </td>
 
-                                                            <td>
+                                                            <td style={{ color: '#ea1833'}}>
                                                                 {detail.supplier1_unitprice ? detail.supplier1_unitprice?.toLocaleString() :
                                                                     detail.supplier2_unitprice ? detail.supplier2_unitprice?.toLocaleString() :
                                                                         detail.supplier3_unitprice ? detail.supplier3_unitprice?.toLocaleString() :

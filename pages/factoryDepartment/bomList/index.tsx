@@ -1006,6 +1006,7 @@ export default function BomList() {
                                     <input
                                         type="text"
                                         placeholder="請輸入料號"
+                                        readOnly
                                         value={handinputproductid}
                                         onChange={handleProductidChange}
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
@@ -1015,6 +1016,7 @@ export default function BomList() {
                                     <input
                                         type="text"
                                         placeholder="請輸入品項名稱"
+                                        readOnly
                                         value={handinputname}
                                         onChange={handleNameChange}
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
@@ -1025,6 +1027,7 @@ export default function BomList() {
                                     <input
                                         type="text"
                                         placeholder="請輸入品項規格"
+                                        readOnly
                                         value={handinputspec}
                                         onChange={handleSpecChange}
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
@@ -1035,6 +1038,7 @@ export default function BomList() {
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
                                         type="text"
                                         placeholder='材質'
+                                        readOnly
                                         value={handinputmaterial}
                                         onChange={(e) => {
                                             setHandinputmaterial(e.target.value);
@@ -1046,6 +1050,7 @@ export default function BomList() {
                                     <input
                                         type="text"
                                         placeholder='表面'
+                                        readOnly
                                         value={handinputsurface}
                                         onChange={(e) => setHandinputsurface(e.target.value)}
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
@@ -1064,6 +1069,7 @@ export default function BomList() {
                                     <input
                                         type="text"
                                         placeholder='單位'
+                                        readOnly
                                         value={handinputunit}
                                         onChange={(e) => setHandinputunit(e.target.value)}
                                         style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
