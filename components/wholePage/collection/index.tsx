@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -517,8 +518,15 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             );
           })}
 
-          <div className={scss.totalPriceWrapper}>
-            <span className={scss.totalPrice}>{totalPrice_localString}</span>
+          {/* note summary */}
+          <div className={scss.noteSummary}>
+            <div className={classNames(paymentType !== '票據' && 'hidden')}>
+              <span>數量</span>：<span>{data_accountant.length}</span>
+            </div>
+            <div>
+              <span>合計</span>：<span>{totalPrice_localString}</span>
+            </div>
+            {/* <span className={scss.totalPrice}>{totalPrice_localString}</span> */}
           </div>
         </div>
 
