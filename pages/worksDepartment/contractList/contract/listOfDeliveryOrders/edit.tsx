@@ -496,6 +496,7 @@ export default function Edit({
         panelList={forbidden ? undefined : panelList}
         tagCallback={tagCallback}
         contractNumber={contract?.content.quotationNumber}
+        linkForbidden={forbidden}
       />
 
       <div>
