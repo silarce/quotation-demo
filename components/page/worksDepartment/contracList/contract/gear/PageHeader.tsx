@@ -234,17 +234,17 @@ export default function PageHeader({
         },
       },
     },
-    {
-      label: '修繕報價',
-      disabled: true,
-      href: {
-        pathname: `${pathHead}/undefined`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
+    // {
+    //   label: '修繕報價',
+    //   disabled: true,
+    //   href: {
+    //     pathname: `${pathHead}/undefined`,
+    //     query: {
+    //       contractId,
+    //       version,
+    //     },
+    //   },
+    // },
     // {
     //   label: '證明書/保固書',
     //   disabled: true,
