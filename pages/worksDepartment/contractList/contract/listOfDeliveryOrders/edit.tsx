@@ -74,7 +74,14 @@ type Ttransfer = {
 };
 
 // -----------------------------------------------------------
-export default function Edit({ userInfo }: { userInfo: TuserDto }) {
+export default function Edit({
+  //
+  userInfo,
+  forbidden,
+}: {
+  userInfo: TuserDto;
+  forbidden?: boolean;
+}) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { contractId, exchangeId } = query;
@@ -485,8 +492,8 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        returnBtn={disabled}
-        panelList={panelList}
+        returnBtn={forbidden ? false : disabled}
+        panelList={forbidden ? undefined : panelList}
         tagCallback={tagCallback}
         contractNumber={contract?.content.quotationNumber}
       />

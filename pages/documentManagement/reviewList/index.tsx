@@ -45,6 +45,7 @@ import SalarySettlement from 'pages/accounting/salarySettlement';
 import BonusPayout from 'pages/accounting/bonusPayout';
 import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
 import PRequisitionDetail from 'pages/factoryDepartment/PRequisitionDetail';
+import TransferOrder from 'pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
@@ -125,7 +126,7 @@ export default function ReviewList() {
   ];
 
   //搜尋功能
-  const doSearch = (valueArr: (string | Toption | null)[]) => { };
+  const doSearch = (valueArr: (string | Toption | null)[]) => {};
 
   // 搜尋功能
   const searchGroup = {
@@ -553,6 +554,14 @@ export default function ReviewList() {
         const query = {
           ...parsedQuery,
           //   status,
+          viewtype: 'review',
+        };
+
+        router.replace({ query }, undefined, { shallow: true });
+      } else if (reviewtype === '調貨單') {
+        const parsedQuery = JSON.parse(itemQuery.query);
+        const query = {
+          ...parsedQuery,
           viewtype: 'review',
         };
 
@@ -1296,12 +1305,12 @@ export default function ReviewList() {
                           _item.review_status === '核准'
                             ? '核准' // 當前項目狀態為"核准"，顯示"核准"
                             : index === 0
-                              ? _item.review_order === 1
-                                ? '提出'
-                                : _item.review_status // 第一筆資料顯示"提出"或其他 review_status
-                              : data2[index - 1].review_status === '核准'
-                                ? '簽核中'
-                                : _item.review_status; // 根據前一筆的 review_status
+                            ? _item.review_order === 1
+                              ? '提出'
+                              : _item.review_status // 第一筆資料顯示"提出"或其他 review_status
+                            : data2[index - 1].review_status === '核准'
+                            ? '簽核中'
+                            : _item.review_status; // 根據前一筆的 review_status
 
                         return (
                           <CellWithBar key={index} className={scss.panelHeader22}>
@@ -1355,8 +1364,9 @@ export default function ReviewList() {
                     }}
                     title="核准"
                     style={{
-                      color: `${tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
-                        }`,
+                      color: `${
+                        tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
+                      }`,
                     }}
                   >
                     {/* <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
@@ -1371,8 +1381,9 @@ export default function ReviewList() {
                     }}
                     title="駁回"
                     style={{
-                      color: `${tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
-                        }`,
+                      color: `${
+                        tabshow === '審核中' || tabshow === '審核完成' || data.length === 0 ? '#5b5a5ad6' : '#14256a'
+                      }`,
                     }}
                   >
                     {/* <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
@@ -1423,6 +1434,7 @@ export default function ReviewList() {
                       {reviewtype === '工作表' && (
                         <Worksheet key={theKey} userInfo={userInfo!} userErpFeature={erpFeature} isAdmin={false} />
                       )}
+                      {reviewtype === '調貨單' && <TransferOrder key={theKey} userInfo={userInfo!} forbidden={true} />}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示
