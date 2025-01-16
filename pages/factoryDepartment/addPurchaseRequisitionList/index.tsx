@@ -198,7 +198,7 @@ export default function AddPurchaseRequisitionList() {
             label: '返回',
             onClick: () => {
                 myAlert.confirm({
-                    title: `確定要返回請購單列表嗎?`,
+                    title: `確定要返回嗎?`,
                     content: <>
                         <h1>未儲存的資料將不會保留</h1>
                     </>,
