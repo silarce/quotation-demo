@@ -8,7 +8,8 @@ import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_ta
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // gear
-import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+// import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+import { ReviewFlow } from '../review/reviewFlow';
 
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
@@ -61,6 +62,8 @@ export default function CertifiedDocumentList({
     contractId,
     params
   );
+
+  // console.log(data_certificatedDocArr);
 
   // ========================================================================
 
@@ -154,34 +157,35 @@ export default function CertifiedDocumentList({
 
         // contractId,
         // contract,
+        addition: { reviewArr },
       } = data;
 
       const qty = products.length;
 
-      const control_processChain: Tcontrol_processChain = {
-        statusArr: [
-          {
-            label: `製表 ${agentEmployee?.chName ?? ''}`,
-            dotColor: 'green',
-          },
-          {
-            label: `擔保 ${reviewGuarantorEmployee?.chName ?? ''}`,
-            dotColor: checkReview(toGuarantorAt, guarantorReviewedAt),
-          },
-          {
-            label: `會計 ${reviewAccountingEmployee?.chName ?? ''}`,
-            dotColor: checkReview(toAccountingAt, accountingReviewedAt),
-          },
-          {
-            label: `審核 ${reviewAuditorEmployee?.chName ?? ''}`,
-            dotColor: checkReview(toAuditorAt, auditorReviewedAt),
-          },
-          {
-            label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
-            dotColor: checkReview(toManagerAt, managerReviewedAt),
-          },
-        ],
-      };
+      // const control_processChain: Tcontrol_processChain = {
+      //   statusArr: [
+      //     {
+      //       label: `製表 ${agentEmployee?.chName ?? ''}`,
+      //       dotColor: 'green',
+      //     },
+      //     {
+      //       label: `擔保 ${reviewGuarantorEmployee?.chName ?? ''}`,
+      //       dotColor: checkReview(toGuarantorAt, guarantorReviewedAt),
+      //     },
+      //     {
+      //       label: `會計 ${reviewAccountingEmployee?.chName ?? ''}`,
+      //       dotColor: checkReview(toAccountingAt, accountingReviewedAt),
+      //     },
+      //     {
+      //       label: `審核 ${reviewAuditorEmployee?.chName ?? ''}`,
+      //       dotColor: checkReview(toAuditorAt, auditorReviewedAt),
+      //     },
+      //     {
+      //       label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
+      //       dotColor: checkReview(toManagerAt, managerReviewedAt),
+      //     },
+      //   ],
+      // };
 
       return {
         minHeight: tableConfig.row.minHeight,
@@ -233,7 +237,8 @@ export default function CertifiedDocumentList({
             ...cellConfig.btn,
           },
           {
-            children: <ProcessChain control={control_processChain} />,
+            // children: <ProcessChain control={control_processChain} />,
+            children: <ReviewFlow raw={reviewArr} />,
             className: classNames(scss.processChainCell, scss.plus),
             style: {
               flex: '0 0 100%',
