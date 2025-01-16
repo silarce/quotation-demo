@@ -64,8 +64,10 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PKingList() {
+    //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("領料")
-
+    const [reviewopen, setReviewopen] = useState<boolean>(false)
+    //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -482,7 +484,7 @@ export default function PKingList() {
                                 inputProps={{
                                     props: {
                                         placeholder: '請輸入備註',
-                                        style: { width: "300px", paddingLeft: '5px'  },
+                                        style: { width: "300px", paddingLeft: '5px' },
                                         value: keyword4,
                                         onChange: (e) => {
                                             setKeyword4(e.target.value)
@@ -550,19 +552,23 @@ export default function PKingList() {
                                                         }} />
                                                     </span>
                                                 </div>
-                                                <div
-                                                    key={index}
-                                                    className={`${scss.row02}`}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '20px',
-                                                        padding: '10px 20px',
-                                                        cursor: 'pointer',
-                                                    }} // 水平排列
-                                                >
-                                                </div>
+                                                {reviewopen && (
+                                                    <>
 
+                                                        <div
+                                                            key={index}
+                                                            className={`${scss.row02}`}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '20px',
+                                                                padding: '10px 20px',
+                                                                cursor: 'pointer',
+                                                            }} // 水平排列
+                                                        >
+                                                        </div>
+                                                    </>
+                                                )}
                                             </>
 
                                         )}
@@ -591,7 +597,7 @@ export default function PKingList() {
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                                                            <td style={{ width: '150px' }}>{detail.picking_qty?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px', color: '#ea1833' }}>{detail.picking_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>

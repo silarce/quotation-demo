@@ -1055,7 +1055,7 @@ export default function PEntryIn() {
                             className={scss.shortsquarebtn}
                             onClick={() => {
                                 myAlert.confirm({
-                                    title: `確定要返回入庫單列表嗎?`,
+                                    title: `確定要返回嗎?`,
                                     content: <>
                                         <h1>未儲存的資料將不會保留</h1>
                                     </>,
