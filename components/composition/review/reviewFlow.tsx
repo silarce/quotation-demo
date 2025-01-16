@@ -54,11 +54,11 @@ const useReviewFlow = ({
   uuid,
   autoUpdate = true,
 }: {
-  uuid?: string;
+  uuid?: string; // 資料的id
   autoUpdate?: boolean;
 } = {}) => {
   const router = useRouter();
-  const query = router.query as { id?: string | undefined };
+  const query = router.query as { id?: string | undefined }; // id為資料的id
   const document_uuid = uuid || query.id;
 
   const {

@@ -24,6 +24,8 @@ import Profile, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
@@ -44,6 +46,9 @@ import {
 import { TuserDto } from 'js/api/dtoTypes';
 
 // -----------------------------------------------------------
+
+type Tquery = { contractId: string; exchangeId: string | undefined };
+
 type Tprofile = {
   sheetNumber: string;
   projectNumber: string;
@@ -52,13 +57,13 @@ type Tprofile = {
   dispatchDate: string;
 };
 
-type Tsignature = {
-  accounting: TemployeeDto | undefined;
-  warehouseEmployee: TemployeeDto | undefined;
-  factoryEmployee: TemployeeDto | undefined;
-  supervisor: TemployeeDto | undefined;
-  formCompleter: TemployeeDto | undefined;
-};
+// type Tsignature = {
+//   accounting: TemployeeDto | undefined;
+//   warehouseEmployee: TemployeeDto | undefined;
+//   factoryEmployee: TemployeeDto | undefined;
+//   supervisor: TemployeeDto | undefined;
+//   formCompleter: TemployeeDto | undefined;
+// };
 
 type Ttransfer = {
   id?: string;
@@ -71,11 +76,20 @@ type Ttransfer = {
 // -----------------------------------------------------------
 export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
-  const { contractId, exchangeId } = router.query as { contractId: string; exchangeId: string | undefined };
+  const query = router.query as Tquery;
+  const { contractId, exchangeId } = query;
+
+  const userId = userInfo.employee?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(!!exchangeId);
   const [attachmentUpdateTrigger, setAttachmentUpdateTrigger] = useState(0);
+
+  const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
+  const [transferArr, setTransferArr] = useState<Ttransfer[]>([]);
+
+  const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
+  const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id(contractId);
@@ -85,33 +99,19 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(exchangeId);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await update_contract();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得合約失敗', content: err.message });
-      }
-
-      try {
-        await update_exchange();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得調(退)貨單失敗', content: err.message });
-      }
-
-      setIsLoading(false);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId, exchangeId]);
-  useEffect(() => {
-    update_engineeringContact();
-  }, [engineeringContactId]);
+  const {
+    ReviewFlow,
+    // reviewFlow,
+    // reviewFlowArr,
+    // isFetching,
+    // isFirstLoaded,
+    // update,
+    reqAddReview,
+    // reqSentReviewStop,
+    // sentReviewStop,
+  } = useReviewFlow({ uuid: exchange?.id });
 
   // ----------------------------------------------------
-  const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
 
   const changeProfile = (key: keyof Tprofile, v: string) => {
     setProfile((profile) => {
@@ -129,8 +129,6 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   // };
 
   // ----------------------------------------------------
-
-  const [transferArr, setTransferArr] = useState<Ttransfer[]>([]);
 
   const addTransfer = () => {
     setTransferArr((transferList) => {
@@ -160,55 +158,6 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
       return newTransferList;
     });
   };
-
-  // ----------------------------------------------------
-
-  const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
-  const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
-
-  // ----------------------------------------------------
-
-  useEffect(() => {
-    const { projectName, projectNumber } = engineeringContact ?? {};
-    const {
-      sheetNumber,
-      // projectName,
-      // projectNumber: engineeringNumber,
-      requirementsDate,
-      dispatchDate,
-      //
-      accounting,
-      warehouseEmployee,
-      factoryEmployee,
-      supervisor,
-      formCompleter,
-    } = exchange ?? {};
-
-    setProfile({
-      sheetNumber: sheetNumber ?? '',
-      projectNumber: projectNumber ?? '',
-      projectName: projectName ?? '',
-      requirementsDate: requirementsDate ?? '',
-      dispatchDate: dispatchDate ?? '',
-    });
-
-    // const isNew = !exchangeId;
-
-    // const theFormCompleter = isNew ? userInfo.employee : formCompleter;
-
-    // setSignature({
-    //   accounting,
-    //   warehouseEmployee,
-    //   factoryEmployee,
-    //   supervisor,
-    //   formCompleter: theFormCompleter,
-    // });
-
-    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
-    setTransferArr(recoreds);
-
-    //
-  }, [engineeringContact, exchange, disabled]);
 
   // ----------------------------------------------------
 
@@ -389,6 +338,39 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   ];
 
   const panelList_edit01: TpanelList = [
+    disabled
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            if (!userId) {
+              throw new Error('送審:userId is undefined');
+            }
+
+            const { destroy } = ReviewFlowSelector.open2({
+              userId,
+              onConfirm: (v) => {
+                const { purpose, reviewFlowId } = v;
+
+                if (!reviewFlowId) {
+                  return;
+                }
+
+                reqAddReview({
+                  review_id: reviewFlowId,
+                  document_id: '---',
+                  document_uuid: exchange?.id,
+                  document_type: '調貨單',
+                  user_id: userId,
+                  document_title: `調貨單-${purpose}`,
+                  query,
+                });
+                destroy();
+              },
+            });
+          },
+        }
+      : null,
     {
       type: 'myButton',
       label: '編輯',
@@ -424,7 +406,81 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   const panelList = !exchangeId ? panelList_add : disabled ? panelList_edit01 : panelList_edit02;
 
-  // ----------------------------------------------------
+  // ------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+      }
+
+      try {
+        await update_exchange();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得調(退)貨單失敗', content: err.message });
+      }
+
+      setIsLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId, exchangeId]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
+
+  useEffect(() => {
+    const { projectName, projectNumber } = engineeringContact ?? {};
+    const {
+      sheetNumber,
+      // projectName,
+      // projectNumber: engineeringNumber,
+      requirementsDate,
+      dispatchDate,
+      //
+      // accounting,
+      // warehouseEmployee,
+      // factoryEmployee,
+      // supervisor,
+      // formCompleter,
+    } = exchange ?? {};
+
+    setProfile({
+      sheetNumber: sheetNumber ?? '',
+      projectNumber: projectNumber ?? '',
+      projectName: projectName ?? '',
+      requirementsDate: requirementsDate ?? '',
+      dispatchDate: dispatchDate ?? '',
+    });
+
+    // const isNew = !exchangeId;
+
+    // const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+
+    // setSignature({
+    //   accounting,
+    //   warehouseEmployee,
+    //   factoryEmployee,
+    //   supervisor,
+    //   formCompleter: theFormCompleter,
+    // });
+
+    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
+    setTransferArr(recoreds);
+
+    //
+  }, [engineeringContact, exchange, disabled]);
+
+  // ------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_all={isLoading}>
@@ -451,6 +507,9 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
             }}
             updateTrigger={attachmentUpdateTrigger}
           />
+          <br />
+          <br />
+          <ReviewFlow className={'w-fit ml-4 gap-4'} />
           {/* <Signature controll={controll_signature} disabled={disabled} /> */}
         </div>
       </div>

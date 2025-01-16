@@ -89,7 +89,7 @@ interface TaddReivew {
   document_title: string; // ex:請購單20241024 // 任意字串
   // get被審核資料時用的query
   query: {
-    [key: string]: string | number;
+    [key: string]: string | number | undefined;
   };
 }
 
