@@ -20,6 +20,8 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { useReviewFlow } from '../review/reviewFlow';
+import ReviewFlowSelector from '../review/reviewFlowSelector';
 
 // options
 import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
@@ -122,9 +124,9 @@ const Selector_settleProduct = selectModalCreator_multi<['settleProduct']>({
   ],
 });
 
-const Selector_employee_memo = memo(Selector_employee, (preState, nextState) => {
-  return preState.showModal === nextState.showModal;
-});
+// const Selector_employee_memo = memo(Selector_employee, (preState, nextState) => {
+//   return preState.showModal === nextState.showModal;
+// });
 
 const Selector_settleProduct_memo = memo(Selector_settleProduct, (preState, nextState) => {
   return preState.showModal === nextState.showModal;
@@ -148,18 +150,22 @@ export default function Edit({
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { contractId, editCertifiedDocument, certifiedDocumentId } = query;
+  const {
+    // contractId, editCertifiedDocument,
+    certifiedDocumentId,
+  } = query;
   const isNew = !certifiedDocumentId;
   // ---------------------------------------------------------------------------
 
   const { userInfo } = useContext(AppContext);
+  const userId = userInfo?.employee?.id;
 
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(!isNew);
   const [isFetching, setIsFetching] = useState(false);
 
-  const [state_showSelector_employee, setState_showSelector_employee] = useState(false);
+  // const [state_showSelector_employee, setState_showSelector_employee] = useState(false);
   const [state_showSelector_settleProduct, setState_showSelector_settleProduct] = useState(false);
 
   // ---------------------------------------------------------------------------
@@ -183,9 +189,10 @@ export default function Edit({
 
   const {
     //
-    agentEmployee,
+    id,
+    // agentEmployee,
 
-    reviewGuarantorEmployee,
+    // reviewGuarantorEmployee,
     // guarantorReviewedAt,
 
     // reviewAccountingEmployee,
@@ -194,11 +201,13 @@ export default function Edit({
     // reviewAuditorEmployee,
     // auditorReviewedAt,
 
-    reviewManagerEmployee,
+    // reviewManagerEmployee,
     // managerReviewedAt,
 
     status,
   } = data_certifiedDocument ?? {};
+
+  const { ReviewFlow, reqAddReview } = useReviewFlow({ uuid: id });
 
   // isReviewer = checkReviewer(userInfo, data_certifiedDocument);
   isDoneReview = checkIsDoneReview(data_certifiedDocument);
@@ -304,7 +313,7 @@ export default function Edit({
       warrantyDate: warrantyDate ? warrantyDate.toISOString() : null,
       description: state_description,
       docStyle: state_docStyle,
-      status: '審核中',
+      // status: '編輯中',
       products,
       note: state_note,
     };
@@ -386,7 +395,7 @@ export default function Edit({
       warrantyDate: warrantyDate ? warrantyDate.toISOString() : null,
       description: state_description,
       docStyle: state_docStyle,
-      status: '審核中',
+      // status: '審核中',
       products,
       note: state_note,
       // snapShot
@@ -410,40 +419,40 @@ export default function Edit({
     update_contract,
   ]);
 
-  const reqPatchCertificatedDoc_submit = useCallback(
-    async (guarantor: TemployeeDto) => {
-      if (!certifiedDocumentId) {
-        return console.log('certifiedDocumentId為空');
-      }
+  // const reqPatchCertificatedDoc_submit = useCallback(
+  //   async (guarantor: TemployeeDto) => {
+  //     if (!certifiedDocumentId) {
+  //       return console.log('certifiedDocumentId為空');
+  //     }
 
-      // if (!state_guarantor) {
-      //   return myAlert.info({ title: '請選擇擔保人' });
-      // }
+  //     // if (!state_guarantor) {
+  //     //   return myAlert.info({ title: '請選擇擔保人' });
+  //     // }
 
-      setIsFetching(true);
-      await apiPatchCertificatedDoc_submit(certifiedDocumentId, {
-        reviewGuarantorEmployeeId: guarantor.id,
-      }).then(() => update_data_CertifiedDocument());
-      setIsFetching(false);
-    },
-    [certifiedDocumentId, update_data_CertifiedDocument]
-  );
+  //     setIsFetching(true);
+  //     await apiPatchCertificatedDoc_submit(certifiedDocumentId, {
+  //       reviewGuarantorEmployeeId: guarantor.id,
+  //     }).then(() => update_data_CertifiedDocument());
+  //     setIsFetching(false);
+  //   },
+  //   [certifiedDocumentId, update_data_CertifiedDocument]
+  // );
 
   // 審核
-  const reqPatchCertificatedDoc_review = useCallback(
-    async (reviewResult: boolean) => {
-      if (!certifiedDocumentId) {
-        return console.log('certifiedDocumentId為空');
-      }
+  // const reqPatchCertificatedDoc_review = useCallback(
+  //   async (reviewResult: boolean) => {
+  //     if (!certifiedDocumentId) {
+  //       return console.log('certifiedDocumentId為空');
+  //     }
 
-      setIsFetching(true);
-      await apiPatchCertificatedDoc_review(certifiedDocumentId, { reviewResult }).then(() =>
-        update_data_CertifiedDocument()
-      );
-      setIsFetching(false);
-    },
-    [certifiedDocumentId, update_data_CertifiedDocument]
-  );
+  //     setIsFetching(true);
+  //     await apiPatchCertificatedDoc_review(certifiedDocumentId, { reviewResult }).then(() =>
+  //       update_data_CertifiedDocument()
+  //     );
+  //     setIsFetching(false);
+  //   },
+  //   [certifiedDocumentId, update_data_CertifiedDocument]
+  // );
 
   const reqDeleteCertificatedDoc = useCallback(async () => {
     if (!certifiedDocumentId) {
@@ -457,6 +466,42 @@ export default function Edit({
     });
     setIsFetching(false);
   }, [certifiedDocumentId, router]);
+
+  // 送審
+
+  const handleSubmit = useCallback(() => {
+    if (!userId) {
+      throw new Error('handleSubmit: userId為空');
+    }
+
+    if (!id) {
+      throw new Error('handleSubmit: id為空');
+    }
+
+    const { destroy } = ReviewFlowSelector.open2({
+      userId: userId,
+      onConfirm: ({ reviewFlowId, purpose }) => {
+        if (!reviewFlowId) {
+          destroy();
+
+          return;
+        }
+
+        reqAddReview({
+          review_id: reviewFlowId,
+          document_id: '---',
+          document_uuid: id,
+          document_type: '證明文件',
+          user_id: userId,
+          document_title: purpose,
+          query: query,
+        });
+
+        destroy();
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, userId]);
 
   // ---------------------------------------------------------------------------
 
@@ -519,10 +564,11 @@ export default function Edit({
     query,
     router,
     setDisabled,
-    setState_showSelector_employee,
+    // setState_showSelector_employee,
     reqPostCertificatedDoc,
     reqPatchCertificatedDoc,
-    reqPatchCertificatedDoc_review,
+    // reqPatchCertificatedDoc_review,
+    handleSubmit,
     reqDeleteCertificatedDoc,
     // certificateId: certifiedDocumentId ?? '',
     // isReviewer,
@@ -746,6 +792,9 @@ export default function Edit({
             },
           }}
         />
+
+        <br />
+        <ReviewFlow />
 
         {/* <SignatureBar
           className="mt-10 w-fit"
@@ -1214,11 +1263,12 @@ const usePanelList = ({
   query,
   router,
   setDisabled,
-  setState_showSelector_employee: setState_showSelector,
+  // setState_showSelector_employee: setState_showSelector,
   reqPostCertificatedDoc,
   reqPatchCertificatedDoc,
-  reqPatchCertificatedDoc_review,
+  // reqPatchCertificatedDoc_review,
   reqDeleteCertificatedDoc,
+  handleSubmit,
   // isReviewer,
   isSealed,
   isDoneReview,
@@ -1229,11 +1279,12 @@ const usePanelList = ({
   query: Tquery;
   router: NextRouter;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  setState_showSelector_employee: React.Dispatch<React.SetStateAction<boolean>>;
+  // setState_showSelector_employee: React.Dispatch<React.SetStateAction<boolean>>;
   reqPostCertificatedDoc: () => void;
   reqPatchCertificatedDoc: () => void;
-  reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
+  // reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
   reqDeleteCertificatedDoc: () => void;
+  handleSubmit: () => void;
   // isReviewer: boolean;
   isSealed: boolean;
   isDoneReview: boolean | undefined;
@@ -1249,37 +1300,35 @@ const usePanelList = ({
     const btn_submit: TpanelList[number] = {
       type: 'redButton',
       label: '送審',
-      onClick: () => {
-        setState_showSelector(true);
-      },
+      onClick: handleSubmit,
     };
 
-    const btn_review: TpanelList[number] = {
-      type: 'redButton',
-      label: '審核',
-      onClick: () => {
-        const modal = myAlert.btnBar({
-          title: '是否通過審核',
-          btnPropsArr: [
-            {
-              label: '審核通過',
-              onClick: () => reqPatchCertificatedDoc_review(true),
-              theme: 'danger',
-            },
-            {
-              label: '審核不通過',
-              onClick: () => reqPatchCertificatedDoc_review(false),
-            },
-            {
-              label: '取消',
-              onClick: () => {
-                modal.destroy();
-              },
-            },
-          ],
-        });
-      },
-    };
+    // const btn_review: TpanelList[number] = {
+    //   type: 'redButton',
+    //   label: '審核',
+    //   onClick: () => {
+    //     const modal = myAlert.btnBar({
+    //       title: '是否通過審核',
+    //       btnPropsArr: [
+    //         {
+    //           label: '審核通過',
+    //           onClick: () => reqPatchCertificatedDoc_review(true),
+    //           theme: 'danger',
+    //         },
+    //         {
+    //           label: '審核不通過',
+    //           onClick: () => reqPatchCertificatedDoc_review(false),
+    //         },
+    //         {
+    //           label: '取消',
+    //           onClick: () => {
+    //             modal.destroy();
+    //           },
+    //         },
+    //       ],
+    //     });
+    //   },
+    // };
 
     const btn_edit: TpanelList[number] = {
       type: 'myButton',
@@ -1376,12 +1425,12 @@ const usePanelList = ({
     isNew,
     query,
     reqPatchCertificatedDoc,
-    reqPatchCertificatedDoc_review,
     reqPostCertificatedDoc,
     reqDeleteCertificatedDoc,
     router,
     setDisabled,
-    setState_showSelector,
+    // setState_showSelector,
+    handleSubmit,
     // isReviewer,
     isSealed,
     isDoneReview,
@@ -1542,66 +1591,66 @@ const checkProduct = (
   return true;
 };
 
-const checkReviewer = (userInfo: TuserDto | undefined, data_certifiedDocument: TcertificatedDocDto | undefined) => {
-  if (!userInfo || !userInfo.employee) {
-    return false;
-  }
+// const checkReviewer = (userInfo: TuserDto | undefined, data_certifiedDocument: TcertificatedDocDto | undefined) => {
+//   if (!userInfo || !userInfo.employee) {
+//     return false;
+//   }
 
-  const empId = userInfo.employee?.id;
+//   const empId = userInfo.employee?.id;
 
-  const {
-    reviewGuarantorEmployee,
-    guarantorReviewedAt,
+//   const {
+//     reviewGuarantorEmployee,
+//     guarantorReviewedAt,
 
-    reviewAccountingEmployee,
-    accountingReviewedAt,
+//     reviewAccountingEmployee,
+//     accountingReviewedAt,
 
-    reviewAuditorEmployee,
-    auditorReviewedAt,
+//     reviewAuditorEmployee,
+//     auditorReviewedAt,
 
-    reviewManagerEmployee,
-    managerReviewedAt,
-  } = data_certifiedDocument ?? {};
+//     reviewManagerEmployee,
+//     managerReviewedAt,
+//   } = data_certifiedDocument ?? {};
 
-  const checkObj = {
-    guarantor: {
-      reviewerId: reviewGuarantorEmployee?.id,
-      reviewedAt: guarantorReviewedAt,
-    },
-    accounting: {
-      reviewerId: reviewAccountingEmployee?.id,
-      reviewedAt: accountingReviewedAt,
-    },
-    auditor: {
-      reviewerId: reviewAuditorEmployee?.id,
-      reviewedAt: auditorReviewedAt,
-    },
-    manager: {
-      reviewerId: reviewManagerEmployee?.id,
-      reviewedAt: managerReviewedAt,
-    },
-  } as const;
+//   const checkObj = {
+//     guarantor: {
+//       reviewerId: reviewGuarantorEmployee?.id,
+//       reviewedAt: guarantorReviewedAt,
+//     },
+//     accounting: {
+//       reviewerId: reviewAccountingEmployee?.id,
+//       reviewedAt: accountingReviewedAt,
+//     },
+//     auditor: {
+//       reviewerId: reviewAuditorEmployee?.id,
+//       reviewedAt: auditorReviewedAt,
+//     },
+//     manager: {
+//       reviewerId: reviewManagerEmployee?.id,
+//       reviewedAt: managerReviewedAt,
+//     },
+//   } as const;
 
-  let isReviewer = false;
-  let stopChecking = false;
+//   let isReviewer = false;
+//   let stopChecking = false;
 
-  Object.entries(checkObj).forEach(([key, obj]) => {
-    if (stopChecking) {
-      return;
-    }
+//   Object.entries(checkObj).forEach(([key, obj]) => {
+//     if (stopChecking) {
+//       return;
+//     }
 
-    // 如果這筆未審核過，之後的不用再檢查
-    if (!obj.reviewedAt) {
-      stopChecking = true;
-    }
+//     // 如果這筆未審核過，之後的不用再檢查
+//     if (!obj.reviewedAt) {
+//       stopChecking = true;
+//     }
 
-    if (obj.reviewerId === empId) {
-      isReviewer = true;
-    }
-  });
+//     if (obj.reviewerId === empId) {
+//       isReviewer = true;
+//     }
+//   });
 
-  return isReviewer;
-};
+//   return isReviewer;
+// };
 
 const checkIsDoneReview = (data_certifiedDocument: TcertificatedDocDto | undefined) => {
   if (!data_certifiedDocument) {

@@ -5009,7 +5009,6 @@ export type TcreateMemorandumDto = {
 // =============================================================================
 
 // 證明文件
-
 export type TcertificatedDocDto = {
   id: string;
   createdAt: string;
@@ -5168,7 +5167,7 @@ export type TcreateCertificatedDocDto = Pick<
   | 'warrantyDate'
   | 'description'
   | 'docStyle'
-  | 'status'
+  // | 'status' // 不再可以由前端決定
   | 'note'
 > & {
   products: TcreateCertificatedProductDto[]; // 不可以是空陣列
