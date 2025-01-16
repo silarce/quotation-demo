@@ -31,6 +31,7 @@ import IncomeBillSorting, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // api
 import {
@@ -58,9 +59,6 @@ import scss from './index.module.scss';
 import { AxiosError } from 'axios';
 
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
-
-// hook
-// import { useProductList } from 'hooks/quotation/useProduct';
 
 // ========================================================================
 
@@ -134,7 +132,6 @@ export default function AccountReceivable({
 
   const { engineeringContact, accountReceivable, content } = contract ?? {};
 
-  // const { currency = 'currency', exchangeRate } = accountReceivable ?? {};
   const currency = cutCurrency(accountReceivable?.currency ?? ('TWD 新台幣' as Tcurrency));
 
   const {
@@ -163,38 +160,6 @@ export default function AccountReceivable({
   }, [accountReceivable?.incomeBillList]);
 
   const haveTax = !!content?.salesTax;
-
-  // const { productArr, latestQuotationDiscount } = useProdArr(contract);
-
-  // --------------------------------------------------------------------------
-
-  // const {
-  //   //
-  //   productList,
-  //   prodCellConfig,
-  //   prodKeyArr,
-  //   changeProdKeyArr,
-  //   //
-  //   othersKeyArr,
-  //   othersList,
-  //   othersCellConfig,
-  // } = useProductList({
-  //   productArr: productArr,
-  //   others: contract?.content.others ?? [],
-  //   averageDiscount: null,
-  //   resetTrigger: productArr,
-  //   quotationDiscount: Number(latestQuotationDiscount) || 100,
-  //   discount_fromData: Number(latestQuotationDiscount) || 100,
-  // });
-
-  // // 把金額隱藏
-  // const filteredProdKeyArr = prodKeyArr.filter((key) => {
-  //   if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
-  //     return false;
-  //   }
-
-  //   return true;
-  // });
 
   // --------------------------------------------------------------------------
 
@@ -585,6 +550,12 @@ export default function AccountReceivable({
       <div className={scss.main}>
         <Profile {...props_profile} />
 
+        <br />
+        <div className="w-[250px]">
+          <InputSel caption="保固日期" datePickerProps={{}} />
+        </div>
+        <br />
+
         {/* 總計算 */}
         <TotalCalc
           className="mt-10"
@@ -638,33 +609,6 @@ export default function AccountReceivable({
         <br />
         <br />
         <br />
-        {/* 主產品與其他設定 */}
-        {/* <Table_prod
-          disabled={true}
-          prodList={productList}
-          prodCellConfig={prodCellConfig}
-          prodKeyArr={filteredProdKeyArr}
-          changeProdKeyArr={changeProdKeyArr}
-          addProd={() => {}}
-          setTargetProd={() => {}}
-          // panelBox="easyBox"
-          panelBox="emptyBox"
-          emptyBlockWidth="40px"
-          rowHeight="h60"
-          isShowDndBtn={false}
-          discountRate={''} // 報價單總折數
-          changeDiscountRate={(v) => {}}
-        />
-        <Table_others
-          disabled={true}
-          list={othersList}
-          cellConfig={othersCellConfig}
-          keyArr={othersKeyArr}
-          changeKeyArr={() => {}}
-          add={() => {}}
-          isShowDndBtn={false}
-          isDisplayInPage="worksDepartment"
-        /> */}
       </div>
     </SubLayer>
   );
@@ -688,27 +632,3 @@ const EmptyMain = () => {
 };
 
 // ========================================================================
-
-// const useProdArr = (contract: TquotationContractDto | undefined) => {
-//   return useMemo(() => {
-//     const list: { [key: string]: TquotationProductDto } = {};
-
-//     const subContractArr = contract?.subContracts ?? [];
-//     const orderedSubContracts = _.sortBy(subContractArr, 'version');
-
-//     orderedSubContracts.forEach((contract) => {
-//       const prodArr = contract.content.products;
-
-//       prodArr.forEach((prod) => {
-//         list[prod.rootProductId] = prod;
-//       });
-//     });
-
-//     const productArr = Object.values(list);
-//     const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
-
-//     const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
-
-//     return { productArr, latestQuotationDiscount };
-//   }, [contract]);
-// };
