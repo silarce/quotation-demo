@@ -45,6 +45,7 @@ type Tquery = {
 };
 
 type Tstate_profile = {
+  idNumber: string;
   dispatchDate: string;
   workerEmployee: TemployeeDto[];
   projectName: string;
@@ -240,6 +241,7 @@ export default function EditDispatchList() {
     }
 
     const body: TcreateDispatchingDto = {
+      idNumber: state_profile.idNumber,
       contractId,
       dispatchDate: state_profile.dispatchDate,
       contractorContactPerson: state_profile.contractorContactPerson,
@@ -365,6 +367,7 @@ export default function EditDispatchList() {
     }
 
     const {
+      idNumber,
       dispatchDate,
       contractorContactPerson,
       workerEmployee,
@@ -409,6 +412,7 @@ export default function EditDispatchList() {
     }
 
     setState_profile({
+      idNumber: idNumber ?? '',
       dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
       projectName: contract?.content.projectName ?? '',
@@ -461,6 +465,11 @@ export default function EditDispatchList() {
     });
 
     const control_profile: Tcontrol_profile = {
+      idNumber: {
+        value: state_profile.idNumber,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('idNumber', e.target.value),
+      },
       dispatchDate: {
         value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
         disabled: theDiasbled,
@@ -700,6 +709,7 @@ export default function EditDispatchList() {
 // =====================================================================
 
 const emptyState_profile = (): Tstate_profile => ({
+  idNumber: '',
   dispatchDate: '',
   workerEmployee: [],
   projectName: '',

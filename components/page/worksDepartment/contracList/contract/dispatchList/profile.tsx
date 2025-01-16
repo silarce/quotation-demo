@@ -48,6 +48,7 @@ type TcontrolItem_option = {
 };
 
 type Tcontrol = {
+  idNumber: TcontrolItem;
   // 派工日期
   dispatchDate: TcontrolItem_moment;
   // 工務人員
@@ -98,8 +99,6 @@ const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment']>({
 
 // ============================================================================
 export default function Profile({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
-  // ------------------------------------------------
-
   const [showSelector, setShowSelector] = useState(false);
 
   // ------------------------------------------------
@@ -107,6 +106,17 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
   return (
     <div className={scss.profile}>
       <div className={scss.info}>
+        <InputSel
+          caption="派工單號"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.idNumber.value,
+              onChange: control.idNumber.onChange,
+            },
+          }}
+        />
         <InputSel
           caption="派工日期"
           disabled={disabled}
