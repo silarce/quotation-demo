@@ -1434,7 +1434,9 @@ export default function ReviewList() {
                       {reviewtype === '工作表' && (
                         <Worksheet key={theKey} userInfo={userInfo!} userErpFeature={erpFeature} isAdmin={false} />
                       )}
-                      {reviewtype === '調貨單' && <TransferOrder key={theKey} userInfo={userInfo!} forbidden={true} />}
+                      {reviewtype === '調貨單' && (
+                        <TransferOrder key={theKey} userInfo={userInfo!} isForbidden={true} />
+                      )}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示
