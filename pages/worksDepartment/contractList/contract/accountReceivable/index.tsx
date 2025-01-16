@@ -26,6 +26,7 @@ import DeductionDetail from 'components/page/worksDepartment/contracList/contrac
 import IncomeBillSorting, {
   Tstate_incomeBillSorting,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillSorting';
+import WarrantyDate from 'components/page/worksDepartment/contracList/contract/accountReceivable/warrantyDate';
 // import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
 
@@ -551,9 +552,10 @@ export default function AccountReceivable({
         <Profile {...props_profile} />
 
         <br />
-        <div className="w-[250px]">
+        <WarrantyDate accountReceivable={accountReceivable} reqPatchAccountReceivable={reqPatchAccountReceivable} />
+        {/* <div className="w-[250px]">
           <InputSel caption="保固日期" datePickerProps={{}} />
-        </div>
+        </div> */}
         <br />
 
         {/* 總計算 */}

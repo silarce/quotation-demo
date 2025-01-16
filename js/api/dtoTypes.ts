@@ -3156,6 +3156,8 @@ export type TdispatchingDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
+  // 派工單編號
+  idNumber: string;
   //  '派工日期'
   dispatchDate: string;
   //  '承包商聯絡人'
@@ -3208,6 +3210,7 @@ type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyD
 
 export type TcreateDispatchingDto = Pick<
   TcreateDispatchingDto_pre,
+  | 'idNumber'
   | 'dispatchDate'
   | 'contractorContactPerson'
   | 'constructionSiteContactNumber'
@@ -4169,6 +4172,8 @@ export type TaccountsReceivableDto = {
 
   //其他手續費總合計
   totalOtherFee: string;
+  //
+  warrantyDate: string | null; // 保固日期
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -4182,6 +4187,8 @@ export type TupdateAccountReceivableDto = Partial<
     | 'finalPayment'
     | 'paymentPending'
     | 'unpaidPayment'
+    //
+    | 'warrantyDate'
   >
 >;
 
