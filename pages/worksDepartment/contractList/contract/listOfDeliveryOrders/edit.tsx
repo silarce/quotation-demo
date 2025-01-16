@@ -77,10 +77,10 @@ type Ttransfer = {
 export default function Edit({
   //
   userInfo,
-  isForbidden,
+  isReadonly,
 }: {
   userInfo: TuserDto;
-  isForbidden?: boolean;
+  isReadonly?: boolean;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -492,11 +492,11 @@ export default function Edit({
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        returnBtn={isForbidden ? false : disabled}
-        panelList={isForbidden ? undefined : panelList}
+        returnBtn={isReadonly ? false : disabled}
+        panelList={isReadonly ? undefined : panelList}
         tagCallback={tagCallback}
         contractNumber={contract?.content.quotationNumber}
-        linkForbidden={isForbidden}
+        linkForbidden={isReadonly}
       />
 
       <div>

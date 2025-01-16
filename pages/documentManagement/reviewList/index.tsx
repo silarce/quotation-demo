@@ -1443,9 +1443,7 @@ export default function ReviewList() {
                       {reviewtype === '工作表' && (
                         <Worksheet key={theKey} userInfo={userInfo!} userErpFeature={erpFeature} isAdmin={false} />
                       )}
-                      {reviewtype === '調貨單' && (
-                        <TransferOrder key={theKey} userInfo={userInfo!} isForbidden={true} />
-                      )}
+                      {reviewtype === '調貨單' && <TransferOrder key={theKey} userInfo={userInfo!} isReadonly={true} />}
                       {reviewtype === '證明文件' && <CertifiedDocument key={theKey} />}
                     </div>
                   ) : (
