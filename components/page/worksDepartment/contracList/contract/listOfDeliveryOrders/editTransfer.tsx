@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -74,7 +76,10 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
             <CellWithBar key={rowIndex}>
               <div className={style.row}>
                 {/*  */}
-                <div className={style.deleteIcon} onClick={() => item.onDelete(rowIndex)}>
+                <div
+                  className={classNames(style.deleteIcon, disabled && 'invisible')}
+                  onClick={() => item.onDelete(rowIndex)}
+                >
                   <IconDelete01 />
                 </div>
                 <div className={style.indexNumber}>{rowIndex + 1}</div>
