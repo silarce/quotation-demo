@@ -103,10 +103,19 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['content.customer', 'engineeringContact'],
+    customPopulate: [
+      'content.customer',
+      'engineeringContact',
+      // 'accountReceivable'
+    ],
   });
 
-  const { engineeringContactId, engineeringContact } = contract ?? {};
+  const {
+    //
+    engineeringContactId,
+    engineeringContact,
+    // accountReceivable,
+  } = contract ?? {};
   // const { data: engineeringContact, update: update_engineeringContact } =
   //   useGetEngineeringContact(engineeringContactId);
 
@@ -390,6 +399,7 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson,
       projectSiteContactPersonNumber,
+      // warrantyDate,
     } = dispatching ?? {};
 
     // 如果dispatching不存在，也就是新增派工單
@@ -409,6 +419,8 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson = defaultPointContactPerson ?? '';
       projectSiteContactPersonNumber = defaultPointContactNumber ?? '';
+
+      // warrantyDate = accountReceivable?.warrantyDate ?? '';
     }
 
     setState_profile({
@@ -447,7 +459,13 @@ export default function EditDispatchList() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineeringContact, dispatching, disabled, todoForDispatch]);
+  }, [
+    engineeringContact,
+    dispatching,
+    disabled,
+    todoForDispatch,
+    // accountReceivable?.warrantyDate
+  ]);
 
   // ---------------------------------------------------------
 

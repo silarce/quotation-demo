@@ -16,6 +16,7 @@ import {
 } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 import type { Toption } from 'js/utils/options/options';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './profile.module.scss';
@@ -100,6 +101,9 @@ const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment']>({
 // ============================================================================
 export default function Profile({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
   const [showSelector, setShowSelector] = useState(false);
+
+  let warrantyDate = control.warrantyDate;
+  warrantyDate = (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '';
 
   // ------------------------------------------------
 
@@ -196,7 +200,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           inputProps={{
             props: {
               placeholder: '建立後系統自動設定',
-              defaultValue: control.warrantyDate,
+              defaultValue: warrantyDate,
             },
           }}
         />
