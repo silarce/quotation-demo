@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, Fragment } from 'react';
 import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -150,7 +150,7 @@ export default function ModalPdf({
               <Cell09>{data.warrantyPeriod}</Cell09>
             </Row>
 
-            <Row>
+            <Row className={scss.row_content}>
               <Cell00 className={scss.c00_center}>
                 <span>承</span>
                 <span>辦</span>
@@ -158,23 +158,25 @@ export default function ModalPdf({
                 <span>形</span>
               </Cell00>
               <Cell11 className={scss.c11_content}>{data.content}</Cell11>
-              <div className={scss['cell_12-8-9']}>
-                <Cell12>修理批價</Cell12>
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                {/* <Cell09 /> */}
-                <Cell09></Cell09>
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 className={scss.noPadding}>合計</Cell08>
-                <Cell09 />
+              <div className={scss['wrapper_cell_12-8-9']}>
+                <div className={scss['cell_12-8-9_head']}>
+                  <Cell12>修理批價</Cell12>
+                  {/* 最後一格 */}
+                  <Cell08 className={classNames(scss.noPadding, scss.latest)}>合計</Cell08>
+                  <Cell09 className={scss.latest} />
+                </div>
+                <div className={scss['cell_12-8-9']}>
+                  {Array(20)
+                    .fill('foo')
+                    .map((_, index) => {
+                      return (
+                        <Fragment key={index}>
+                          <Cell08 />
+                          <Cell09 />
+                        </Fragment>
+                      );
+                    })}
+                </div>
               </div>
             </Row>
 
@@ -244,8 +246,8 @@ export default function ModalPdf({
 
 // region COMPONENT
 
-const Row = ({ children }: { children?: React.ReactNode }) => {
-  return <div className={classNames(scss.row)}>{children}</div>;
+const Row = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+  return <div className={classNames(scss.row, className)}>{children}</div>;
 };
 
 const magnification = 1.2;
