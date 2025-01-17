@@ -53,6 +53,7 @@ export default function Table_prod({
   // avgDiscount,
   discountRate,
   changeDiscountRate,
+  hiddenQtyZero,
 }: {
   disabled: boolean;
   disabled_plus?: boolean;
@@ -79,6 +80,7 @@ export default function Table_prod({
   // avgDiscount?: number | string;
   discountRate?: string | number | undefined;
   changeDiscountRate?: (v: string) => void;
+  hiddenQtyZero?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -168,6 +170,7 @@ export default function Table_prod({
             </div>
 
             <Tbody
+              hiddenQtyZero={hiddenQtyZero}
               disabled={disabled}
               disabled_plus={disabled_plus}
               disabledExceptionArr={disabledExceptionArr}
