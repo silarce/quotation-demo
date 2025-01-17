@@ -192,7 +192,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           caption="完工聯絡人"
           disabled={disabled}
           {...config_inputSel}
@@ -202,12 +202,9 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               onChange: control.finalContactPerson.onChange,
             },
           }}
-        />
+        /> */}
 
-        {/* 佔位 */}
-        <div />
-
-        <InputSel
+        {/* <InputSel
           caption="工地現場聯絡人"
           disabled={disabled}
           {...config_inputSel}
@@ -223,9 +220,9 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               },
             },
           }}
-        />
+        /> */}
 
-        <InputSel
+        {/* <InputSel
           caption="工地現場聯絡人電話"
           disabled={disabled}
           {...config_inputSel}
@@ -235,8 +232,9 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               onChange: control.projectSiteContactPersonNumber.onChange,
             },
           }}
-        />
+        /> */}
 
+        <div />
         <InputSel
           caption="接洽人"
           disabled={disabled}
