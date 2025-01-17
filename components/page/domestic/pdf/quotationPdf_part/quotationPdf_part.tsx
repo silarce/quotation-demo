@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 
 // component
 import Header from './header';
@@ -16,6 +16,22 @@ import { dlPdf } from './dlPdf';
 
 import Decimal from 'decimal.js';
 import { Class_product } from 'hooks/quotation/useProduct';
+
+import { lookup_componentConfig } from 'config/product/lookup';
+
+import { calcAllPrice, calcPriceDiscount_percent } from '../../quotation_v2/hook/quotationProduct/method/calcProd';
+
+// type
+import type {
+  TquotationContentDto,
+  TquotationProductDto,
+  TquotationProductItemDto,
+  TquotationProductComponentDto,
+  TquotationProductAccessoryDto,
+} from 'js/api/dtoTypes';
+
+import type { TprodSource } from '../../quotation_v2/hook/quotationProduct/useQuotationProduct';
+
 // ===================================================================
 
 type TmainProduct = {
@@ -263,4 +279,240 @@ const extractPdfPartFromClassProduct = ({
   return pdfPartProps;
 };
 
-export { extractPdfPartFromClassProduct };
+const conponentToPart = ({
+  component,
+  priceDiscount_percent,
+  doorModelName,
+}: {
+  component: TquotationProductComponentDto;
+  priceDiscount_percent: number | `${number}`;
+  doorModelName: string;
+}): Tpart & {
+  totalPrice_num: number;
+} => {
+  const { type, material, price, quantity, desc } = component;
+
+  const lookup = lookup_componentConfig(doorModelName);
+  const { name, unit } = lookup[type];
+
+  const { unitPrice, totalPrice } = calcAllPrice({
+    price,
+    priceDiscount_percent,
+    quantity: quantity as `${number}`,
+  });
+
+  return {
+    partName: name,
+    material: material,
+    unit: unit,
+    unit_str: unit,
+    qty: new Decimal(quantity).toFixed(2),
+    desc: desc ?? '',
+    price: unitPrice.toLocaleString(),
+    totalPrice: totalPrice.toLocaleString(),
+    totalPrice_num: totalPrice,
+  };
+};
+
+const accessoryToPart = ({
+  accessory,
+}: {
+  accessory: TquotationProductAccessoryDto;
+}): Tpart & {
+  totalPrice_num: number;
+} => {
+  const { name, unit, quantity, unitPrice, totalPrice } = accessory;
+  let partName = name.replaceAll('60A', '');
+
+  if (partName === '氟碳烤漆' || partName === '粉體烤漆') {
+    partName = '烤漆';
+  }
+
+  return {
+    partName,
+    material: '',
+    unit: unit,
+    unit_str: unit,
+    qty: new Decimal(quantity).toFixed(2),
+    price: unitPrice.toLocaleString(),
+    desc: '',
+    totalPrice: totalPrice.toLocaleString(),
+    totalPrice_num: totalPrice,
+  };
+};
+
+const prodToPart = ({ product_item }: { product_item: TquotationProductItemDto }) => {
+  const {
+    distributionBoxUnitPrice,
+    distributionBoxQuantity,
+    distributionBoxTotalPrice,
+    installationFeeQuantity,
+    installationFeeUnitPrice,
+    installationFeeTotalPrice,
+  } = product_item;
+
+  const part_distributionBox: Tpart = {
+    partName: '配電箱及按鈕開關',
+    material: '',
+    unit: '組',
+    unit_str: '組',
+    qty: new Decimal(distributionBoxQuantity || 0).toFixed(2),
+    desc: '',
+    price: distributionBoxUnitPrice ? distributionBoxUnitPrice.toLocaleString() : '0',
+    totalPrice: distributionBoxTotalPrice ? distributionBoxTotalPrice.toLocaleString() : '0',
+  };
+
+  const part_installationFee: Tpart = {
+    partName: '按裝及製造費用',
+    material: '',
+    unit: '㎡',
+    unit_str: '㎡',
+    qty: new Decimal(installationFeeQuantity || 0).toFixed(2),
+    desc: '',
+    price: installationFeeUnitPrice ? installationFeeUnitPrice.toLocaleString() : '0',
+    totalPrice: installationFeeTotalPrice ? installationFeeTotalPrice.toLocaleString() : '0',
+  };
+
+  return {
+    part_distributionBox,
+    part_installationFee,
+  };
+};
+
+const productTomainProduct = ({
+  quotationNumber,
+  product_item,
+  quotationDiscount,
+}: {
+  quotationNumber: string;
+  product_item: TquotationProductItemDto;
+  quotationDiscount: number | `${number}`;
+}) => {
+  const {
+    doorModelName,
+    discount,
+    //
+    itemName,
+    materialName,
+    materialSurface,
+    //
+    fullWidth,
+    height,
+    boxB,
+    bounceDoorWidth,
+
+    //
+    accessories,
+    components: _components,
+    //
+  } = product_item;
+
+  const priceDiscount_percent = calcPriceDiscount_percent({
+    prodDiscount: discount as `${number}`,
+    quotationDiscount,
+  });
+
+  const components = [..._components];
+
+  const fullWidtn_cm = new Decimal(fullWidth || 0).div(10).toNumber();
+  const height_cm = new Decimal(height || 0).div(10).toNumber();
+  const boxB_cm = new Decimal(boxB || 0).div(10).toNumber();
+  const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).div(10).toNumber();
+  const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
+
+  const size = `${fullWidtn_cm}${bounceDoorWidth_formated} X ${height_cm} + ${boxB_cm}`;
+
+  const sidePlate = components.find(({ type }) => type === 'sidePlate');
+  const motorAccessories = components.find(({ type }) => type === 'motorAccessories');
+
+  if (sidePlate && sidePlate.price === 0) {
+    components.splice(components.indexOf(sidePlate), 1);
+  }
+
+  motorAccessories && components.splice(components.indexOf(motorAccessories), 1);
+
+  let totalPrice_d = new Decimal(0);
+
+  const part_component = components.map((component) => {
+    const part = conponentToPart({
+      component,
+      doorModelName,
+      priceDiscount_percent,
+    });
+
+    totalPrice_d = totalPrice_d.add(part.totalPrice_num);
+
+    return part;
+  });
+
+  const part_accessory = accessories.map((accessory) => {
+    const part = accessoryToPart({
+      accessory,
+    });
+
+    totalPrice_d = totalPrice_d.add(part.totalPrice_num);
+
+    return part;
+  });
+
+  const { distributionBoxTotalPrice, installationFeeTotalPrice } = product_item;
+
+  totalPrice_d = totalPrice_d.add(distributionBoxTotalPrice || 0).add(installationFeeTotalPrice || 0);
+
+  const { part_distributionBox, part_installationFee } = prodToPart({
+    product_item,
+  });
+
+  const mainProduct: TmainProduct = {
+    quotationNumber: quotationNumber,
+    category: itemName,
+    material: materialName,
+    surface: materialSurface ?? '',
+    doorType: doorModelName,
+    size: size,
+    part: [...part_component, ...part_accessory, part_distributionBox, part_installationFee],
+    priceTotal: totalPrice_d.toNumber().toLocaleString(),
+  };
+
+  return mainProduct;
+};
+
+const usePdfPart = ({
+  quotationContent,
+  prodArrForPDf,
+}: {
+  quotationContent: TquotationContentDto | undefined;
+  prodArrForPDf?: TprodSource[];
+}) => {
+  const [show_pdfPart, setShow_pdfPart] = useState(false);
+
+  const pdfPartProps = useMemo(() => {
+    const { quotationNumber, discount } = quotationContent ?? {};
+
+    const products: TprodSource[] | TquotationProductDto[] = prodArrForPDf
+      ? prodArrForPDf
+      : quotationContent?.products ?? [];
+
+    const pdfPartProps: TmainProduct[] = products.map((_prod) => {
+      const prod = _prod as TprodSource | TquotationProductDto;
+
+      const { items } = prod;
+
+      const addition = 'addition' in prod ? prod.addition : undefined;
+
+      const quotationDiscount = (addition?.quotationDiscount ?? discount ?? '0') as number | `${number}`;
+
+      return productTomainProduct({
+        quotationNumber: quotationNumber ?? '',
+        product_item: items[0],
+        quotationDiscount: quotationDiscount,
+      });
+    });
+
+    return pdfPartProps;
+  }, [quotationContent, prodArrForPDf]);
+
+  return { pdfPartProps, show_pdfPart, setShow_pdfPart };
+};
+
+export { extractPdfPartFromClassProduct, usePdfPart };
