@@ -105,27 +105,34 @@ $height_thead: 44px;
   }
 }
 
-.totalPriceWrapper {
+.noteSummary {
   position: sticky;
   // bottom: 20px;
   z-index: 1;
   left: 0;
   bottom: 0px;
   padding: 10px;
+
+  display: flex;
+  gap: 20px;
+
   text-align: center;
   background-color: #fff;
   border-top: solid 1px theme("colors.border");
   border-bottom: solid 1px theme("colors.border");
-  .totalPrice {
-    position: relative;
-    font-size: 20px;
-    font-weight: 700;
-    &::before {
-      content: "合計";
-      position: absolute;
-      left: -70px;
-    }
-  }
+
+  font-size: 20px;
+  font-weight: 700;
+  // .totalPrice {
+  //   position: relative;
+  //   font-size: 20px;
+  //   font-weight: 700;
+  //   &::before {
+  //     content: "合計";
+  //     position: absolute;
+  //     left: -70px;
+  //   }
+  // }
 }
 
 .cover_bottom {

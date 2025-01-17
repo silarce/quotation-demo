@@ -2382,7 +2382,7 @@ export default function PKingDetail() {
                                             className={scss.shortsquarebtn}
                                             onClick={() => {
                                                 myAlert.confirm({
-                                                    title: `確定要返回${pagename}單列表嗎?`,
+                                                    title: `確定要返回嗎?`,
                                                     content: <>
                                                         <h1>未儲存的資料將不會保留</h1>
                                                     </>,
@@ -3158,7 +3158,7 @@ export default function PKingDetail() {
                                                             }}
                                                         >
                                                             <img
-                                                                src={icon_tray_out.src}
+                                                                src={`${parseInt(_item.remaining_quantity) === 0 ? icon_tray_out_gray.src : icon_tray_out.src}`}
                                                                 alt="tray"
                                                                 style={{
                                                                     width: '20px',  // 根據按鈕大小調整圖片尺寸
@@ -3168,6 +3168,7 @@ export default function PKingDetail() {
                                                                     border: 'none'  // 確保圖片沒有邊框
                                                                 }}
                                                             />
+                                                            
                                                         </button>
 
 
