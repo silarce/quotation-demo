@@ -36,6 +36,8 @@ import scss from './edit.module.scss';
 // type
 import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // =====================================================================
 
 type Tquery = {
@@ -608,7 +610,7 @@ export default function EditDispatchList() {
       contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
-      warrantyPeriod: warrantyDate ?? '',
+      warrantyPeriod: (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '',
       content: tasks,
     };
 
