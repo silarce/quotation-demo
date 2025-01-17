@@ -4,6 +4,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type
 import type {
+  TdoorModel,
   // TdoorMaterialDto,
   TdoorModelInfoDto,
   // TdoorGeneralSpecsMotorBoxPropertyDto,
@@ -39,6 +40,7 @@ export type {
   TdoorGeneralSpecsDto,
   TpacParams,
   TdoorComponentListDto,
+  TpcdsPrams,
   TgenerateDoorProductBomDto_ComponentInfo,
   TgenerateDoorProductBomDto_DoorSpec,
   TgenerateDoorProductBomDto,
@@ -47,6 +49,7 @@ export type {
   TdoorAccessoryDto,
   TgetBoxDParams,
   Thp,
+  TgetBoxDParams_strict,
 };
 // =======================================================================
 
@@ -57,6 +60,12 @@ export const apiGetAssets = async (path: string) => {
     .get(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+export const createAssetUrl = (assetName: string) => {
+  const domain = axi.defaults.baseURL;
+
+  return `${domain}/products/assets/door-track/${assetName}`;
 };
 
 export const apiGetProdDoorModels = async () => {
@@ -256,12 +265,40 @@ export const apiGetProdAccessories = (params: { modelName: string }) => {
     .catch((err) => Promise.reject(err));
 };
 
+export const useGetProdAccessories = (modelName: string) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TdoorAccessoryDto[]>();
+
+  const update = async () => {
+    try {
+      setIsFetching(true);
+      const res = await apiGetProdAccessories({ modelName });
+      setRes(res);
+    } catch (error) {
+      setRes(undefined);
+      myAlert.err({ title: '取得選配列表失敗' });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
+
 type TgetBoxDParams = {
   modelName: string;
   rollerDiameter: number;
   sidePlateSizeB: number;
   hp: string;
-  motorVendor: string;
+  motorVendor: string; // 必須要送，但似乎任意字串都行
+};
+
+type TgetBoxDParams_strict = TgetBoxDParams & {
+  modelName: TdoorModel;
 };
 
 export const apiGetboxD = (params: TgetBoxDParams) => {
@@ -276,6 +313,7 @@ export const apiGetboxD = (params: TgetBoxDParams) => {
 // ========================================================================
 
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import axios from 'axios';
 
 const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
   return (

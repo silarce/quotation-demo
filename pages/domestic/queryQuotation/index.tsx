@@ -198,7 +198,8 @@ export default function Budget() {
         };
 
         const href_attachQuotation = {
-          pathname: '/domestic/quotationList/attachQuotation',
+          // pathname: '/domestic/quotationList/attachQuotation',
+          pathname: '/domestic/quotationList/quotation',
           query: {
             id: id,
             status: latestContent.status,
@@ -272,7 +273,8 @@ export default function Budget() {
             query,
           };
           const href_body_attach = {
-            pathname: '/domestic/quotationList/attachQuotation',
+            // pathname: '/domestic/quotationList/attachQuotation',
+            pathname: '/domestic/quotationList/quotation',
             query: {
               ...query,
             },

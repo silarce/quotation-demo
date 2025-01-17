@@ -214,9 +214,15 @@ const createDragableModal = (props?: Tprops_call) => {
   document.body.appendChild(container);
 
   const root = createRoot(container);
+  let isUnmounted = false; // 標誌是否已經卸載
 
   const unmountComponent = () => {
+    if (isUnmounted) {
+      return;
+    }
+
     root.unmount();
+    isUnmounted = true; // 設置標誌為已卸載
     // if (container) {
     // }
   };

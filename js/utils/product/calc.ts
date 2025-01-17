@@ -19,18 +19,27 @@ export const calcProductArea = ({
     .toFixed(2)
     .toString();
 
-  return area;
+  return area as `${number}`;
 };
 
 /**計算主產品才數 */
 export const calcProductVolume = (area: number) => {
-  return Decimal.mul(area, 10.89).toFixed(2).toString();
+  return Decimal.mul(area, 10.89).toFixed(2).toString() as `${number}`;
 };
 
 // warning 注意，變更fullWidth就意味著gapA與gapC也會變更
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算WG 單位為mm*/
-export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; gapA: number; gapC: number }) => {
+export const calcProductWG = ({
+  //
+  fullWidth,
+  gapA,
+  gapC,
+}: {
+  fullWidth: number | `${number}`;
+  gapA: number | `${number}`;
+  gapC: number | `${number}`;
+}) => {
   // const wg = new Decimal(fullWidth).sub(gapA).sub(gapC).toNumber();
   const wg = Number(new Decimal(fullWidth).sub(gapA).sub(gapC).toFixed(3));
 
@@ -55,7 +64,14 @@ export const calcProductFullWidth = ({ WG, gapA, gapC }: { WG: number; gapA: num
 // 例如這個api get https://sanjeou-erp-be.caprover.credot-web.com/products/door/models
 // G = guideRails.width
 // 注意要長度單位要一致
-export const calcW = ({ WG, G }: { WG: number; G: number }) => {
+export const calcW = ({
+  //
+  WG,
+  G,
+}: {
+  WG: number | `${number}`;
+  G: number | `${number}`;
+}) => {
   return new Decimal(WG).sub(G).sub(G).toNumber();
 };
 

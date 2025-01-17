@@ -1,0 +1,19 @@
+.doorSummary {
+  height: 200px;
+  max-width: 650px;
+  overflow: auto;
+  background-color: theme("colors.bgc01");
+}
+
+.li {
+  display: grid;
+  grid-template-columns: 120px 50px 200px;
+  gap: 10px;
+  > span {
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  > .qty {
+    text-align: right;
+  }
+}
