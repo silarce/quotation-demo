@@ -136,6 +136,12 @@
 .c11_content {
   display: block;
   white-space: pre-wrap;
+
+  line-height: unset;
+  font-size: 18px;
+  letter-spacing: 1px;
+  // font-size: 20px;
+  // letter-spacing: 2px;
 }
 
 .cell_time {
