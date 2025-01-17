@@ -64,6 +64,7 @@ type TcellConfig = {
 
 // ==========================================================
 export default function Tbody({
+  hiddenQtyZero,
   disabled,
   disabled_plus,
   disabledExceptionArr,
@@ -79,6 +80,7 @@ export default function Tbody({
   isDisplayInPage,
 }: // onVerticalKeyChange,
 {
+  hiddenQtyZero?: boolean;
   disabled: boolean;
   disabled_plus?: boolean;
   disabledExceptionArr?: string[];
@@ -152,6 +154,10 @@ export default function Tbody({
 
             if (!item) {
               return <NoItem key={key} id={key} isMoving={isMoving} />;
+            }
+
+            if (hiddenQtyZero && Number(item.quantity || 0) === 0) {
+              return null;
             }
 
             return (
