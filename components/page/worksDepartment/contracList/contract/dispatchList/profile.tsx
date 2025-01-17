@@ -132,26 +132,14 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
-        <InputSel
-          caption="工程名稱"
-          {...config_inputSel_readOnly}
-          disabled={true}
-          inputProps={{
-            props: {
-              placeholder: '工程名稱',
-              defaultValue: control.projectName,
-            },
-          }}
-        />
+        <InputSel caption="工程名稱" {...config_inputSel_readOnly} disabled={true} node={control.projectName} />
         <InputSel
           caption="工程編號"
           {...config_inputSel_readOnly}
-          inputProps={{
-            props: {
-              placeholder: '工程編號',
-              defaultValue: control.projectNumber,
-            },
+          nodeBoxProps={{
+            className: 'self-start',
           }}
+          node={control.projectNumber}
         />
         <InputSel
           caption="承包商"
