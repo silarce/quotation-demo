@@ -64,6 +64,11 @@ type Tstate_profile = {
 
   projectSiteContactPerson: string;
   projectSiteContactPersonNumber: string;
+
+  contactPersonArr: {
+    name: string;
+    phoneNumber: string;
+  }[];
 };
 
 type Tstate_pricingMethod = {
@@ -443,6 +448,8 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson: projectSiteContactPerson ?? '',
       projectSiteContactPersonNumber: projectSiteContactPersonNumber ?? '',
+
+      contactPersonArr: [],
     });
 
     setState_dispatch({
@@ -566,6 +573,9 @@ export default function EditDispatchList() {
         disabled: theDiasbled,
         onChange: (e) => changeProfile('projectSiteContactPersonNumber', e.target.value),
       },
+
+      addContactPerson: () => {},
+      contractPersonArr: [],
     };
 
     return control_profile;
@@ -744,4 +754,5 @@ const emptyState_profile = (): Tstate_profile => ({
   pointContactNumber: '',
   projectSiteContactPerson: '',
   projectSiteContactPersonNumber: '',
+  contactPersonArr: [],
 });

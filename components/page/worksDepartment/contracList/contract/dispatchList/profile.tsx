@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import { Moment } from 'moment';
 
 // global gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import AddressBar, {
-  TinputSelProps_noProps,
-  TaddressProps,
-} from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 
 import {
   selectModalCreator_multi,
@@ -20,6 +16,8 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './profile.module.scss';
+
+import { IconRemoveCircle, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // ============================================================================
 type TcontrolItem = {
@@ -46,6 +44,12 @@ type TcontrolItem_option = {
   value: string;
   disabled?: boolean;
   onChange: (e: Toption_pointContactPerson | null) => void;
+};
+
+type TcontractPerson = {
+  name: TcontrolItem_option;
+  phoneNumber: TcontrolItem;
+  remove: () => void;
 };
 
 type Tcontrol = {
@@ -82,6 +86,9 @@ type Tcontrol = {
 
   projectSiteContactPerson: TcontrolItem_option;
   projectSiteContactPersonNumber: TcontrolItem;
+  //
+  addContactPerson: () => void;
+  contractPersonArr: TcontractPerson[];
 };
 
 export type { Tcontrol as Tcontrol_profile };
@@ -109,7 +116,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
 
   return (
     <div className={scss.profile}>
-      <div className={scss.info}>
+      <div className={scss.left}>
         <InputSel
           caption="派工單號"
           disabled={disabled}
@@ -315,6 +322,46 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
+      </div>
+
+      <div className={scss.right}>
+        <IconAddCircle className={classNames(scss.iconBtn, 'mb-2')} />
+
+        <div className={scss.contractPersonList}>
+          <IconRemoveCircle className={scss.iconBtn} />
+          <InputSel
+            caption="接洽人"
+            disabled={disabled}
+            {...config_inputSel}
+            captionStyle={{ width: 60 }}
+            // wrapperStyle={{gap:""}}
+            selectProps={{
+              props: {
+                isSearchable: true,
+                options: control.pointContractPersonOptions,
+                value: control.pointContactPerson
+                  ? { label: control.pointContactPerson.value, value: control.pointContactPerson.value }
+                  : null,
+                onChange: (option) => {
+                  control.pointContactPerson.onChange(option as Toption_pointContactPerson | null);
+                },
+              },
+            }}
+          />
+
+          <InputSel
+            caption="接洽人電話"
+            disabled={disabled}
+            {...config_inputSel}
+            captionStyle={{ width: 100 }}
+            inputProps={{
+              props: {
+                value: control.pointContactNumber.value,
+                onChange: control.pointContactNumber.onChange,
+              },
+            }}
+          />
+        </div>
       </div>
 
       <SelectorGroup
