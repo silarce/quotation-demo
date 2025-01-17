@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import classNames from 'classnames';
 import { Moment } from 'moment';
 
 // global gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import Tip from 'components/global/myAntd/popover/tip';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 import {
   selectModalCreator_multi,
@@ -242,7 +244,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         /> */}
 
         <div />
-        <InputSel
+        {/* <InputSel
           caption="接洽人"
           disabled={disabled}
           {...config_inputSel}
@@ -258,9 +260,9 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               },
             },
           }}
-        />
+        /> */}
 
-        <InputSel
+        {/* <InputSel
           caption="接洽人電話"
           disabled={disabled}
           {...config_inputSel}
@@ -270,7 +272,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               onChange: control.pointContactNumber.onChange,
             },
           }}
-        />
+        /> */}
 
         {/*  */}
         <AddressBar
@@ -325,42 +327,56 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
       </div>
 
       <div className={scss.right}>
-        <IconAddCircle className={classNames(scss.iconBtn, 'mb-2')} />
+        <div className="flex gap-3 items-center mb-2">
+          <SquareBtn sharp="long" onClick={control.addContactPerson}>
+            新增接洽人
+          </SquareBtn>
+          <Tip content="接洽人可key in" />
+        </div>
 
         <div className={scss.contractPersonList}>
-          <IconRemoveCircle className={scss.iconBtn} />
-          <InputSel
-            caption="接洽人"
-            disabled={disabled}
-            {...config_inputSel}
-            captionStyle={{ width: 60 }}
-            // wrapperStyle={{gap:""}}
-            selectProps={{
-              props: {
-                isSearchable: true,
-                options: control.pointContractPersonOptions,
-                value: control.pointContactPerson
-                  ? { label: control.pointContactPerson.value, value: control.pointContactPerson.value }
-                  : null,
-                onChange: (option) => {
-                  control.pointContactPerson.onChange(option as Toption_pointContactPerson | null);
-                },
-              },
-            }}
-          />
+          {control.contractPersonArr.map((item, index) => {
+            const { name: _name, phoneNumber, remove } = item;
 
-          <InputSel
-            caption="接洽人電話"
-            disabled={disabled}
-            {...config_inputSel}
-            captionStyle={{ width: 100 }}
-            inputProps={{
-              props: {
-                value: control.pointContactNumber.value,
-                onChange: control.pointContactNumber.onChange,
-              },
-            }}
-          />
+            const name = _name.value ? { label: _name.value, value: _name.value } : null;
+
+            return (
+              <Fragment key={index}>
+                <IconRemoveCircle className={scss.iconBtn} onClick={remove} />
+                <InputSel
+                  caption="接洽人"
+                  disabled={disabled}
+                  {...config_inputSel}
+                  captionStyle={{ width: 60 }}
+                  selectProps={{
+                    props: {
+                      placeholder: '',
+                      isSearchable: true,
+                      options: control.pointContractPersonOptions,
+                      value: name,
+                      onChange: (option) => {
+                        _name.onChange(option as Toption_pointContactPerson | null);
+                      },
+                    },
+                  }}
+                />
+
+                <InputSel
+                  caption="接洽人電話"
+                  disabled={disabled}
+                  {...config_inputSel}
+                  captionStyle={{ width: 100 }}
+                  inputProps={{
+                    props: {
+                      placeholder: '',
+                      value: phoneNumber.value,
+                      onChange: phoneNumber.onChange,
+                    },
+                  }}
+                />
+              </Fragment>
+            );
+          })}
         </div>
       </div>
 

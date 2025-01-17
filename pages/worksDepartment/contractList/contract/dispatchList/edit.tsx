@@ -576,8 +576,75 @@ export default function EditDispatchList() {
         onChange: (e) => changeProfile('projectSiteContactPersonNumber', e.target.value),
       },
 
-      addContactPerson: () => {},
-      contractPersonArr: [],
+      addContactPerson: () => {
+        setState_profile((prev) => {
+          const copy = { ...prev };
+          const contactPersonArr = [...copy.contactPersonArr];
+          contactPersonArr.push({
+            name: '',
+            phoneNumber: '',
+          });
+
+          copy.contactPersonArr = contactPersonArr;
+
+          return copy;
+        });
+      },
+      // contractPersonArr: [],
+      contractPersonArr: state_profile.contactPersonArr.map((item, index) => {
+        const { name, phoneNumber } = item;
+
+        const setContact = ({ name, phoneNumber }: { name?: string; phoneNumber?: string }) => {
+          setState_profile((prev) => {
+            const copy = { ...prev };
+            const contactPersonArr = [...copy.contactPersonArr];
+            const contactPerson = { ...contactPersonArr[index] };
+
+            if (name !== undefined) {
+              contactPerson.name = name;
+            }
+
+            if (phoneNumber !== undefined) {
+              contactPerson.phoneNumber = phoneNumber;
+            }
+
+            contactPersonArr[index] = contactPerson;
+            copy.contactPersonArr = contactPersonArr;
+
+            return copy;
+          });
+        };
+
+        return {
+          name: {
+            value: name,
+            disabled: theDiasbled,
+            onChange: (option) => {
+              const { value, phoneNumber } = option ?? {};
+              setContact({ name: value, phoneNumber: '' });
+              phoneNumber !== undefined && setContact({ phoneNumber });
+            },
+          },
+          phoneNumber: {
+            value: phoneNumber,
+            disabled: theDiasbled,
+            onChange: (e) => {
+              setContact({ phoneNumber: e.target.value });
+            },
+          },
+          remove: () => {
+            setState_profile((prev) => {
+              const copy = { ...prev };
+              const contactPersonArr = [...copy.contactPersonArr];
+              contactPersonArr.splice(index, 1);
+
+              copy.contactPersonArr = contactPersonArr;
+
+              return copy;
+            });
+          },
+        };
+      }),
     };
 
     return control_profile;
