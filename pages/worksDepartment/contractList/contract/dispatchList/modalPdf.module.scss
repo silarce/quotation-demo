@@ -181,11 +181,19 @@
 }
 
 .c11_content {
-  display: block;
+  // display: block;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 16;
+  // overflow: hidden;
+
+
+
   white-space: pre-wrap;
 
   line-height: unset;
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: 1px;
   min-height: 310px;
   max-height: 532px;
