@@ -134,7 +134,7 @@ export const topPathList: TtopPathListConfig[] = [
                 type: 'Review',
             },
         },
-        erpFeature: [fac],
+        erpFeature: 'allPass',
     },
     {
         icon: icon_project,
