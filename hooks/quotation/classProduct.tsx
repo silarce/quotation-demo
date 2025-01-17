@@ -1252,7 +1252,7 @@ class Class_product {
       if (res) {
         const keyArr = Object.keys(res) as (keyof typeof res)[];
         keyArr.forEach((key) => {
-          const item = res[key];
+          const item = res[key]!;
           comList[key].codeNumber = item.number;
           comList[key].componentId = item.id;
           comList[key].price = item.unitPrice; // 這是牌價，不是單價

@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 import { TfileDto } from './dtoTypes';
 
-export const apiGetFileDownload_id = (id: string) => {
+const apiGetFileDownload_id = (id: string) => {
   const api = `/file/download/${id}`;
 
   return axi
@@ -14,3 +14,12 @@ export const apiGetFileDownload_id = (id: string) => {
     .then(({ data }) => data as string)
     .catch((err) => Promise.reject(err));
 };
+
+const createFileUrl = (fileId: string) => {
+  const baseUrl = axi.defaults.baseURL;
+  const api = `${baseUrl}/file/download/${fileId}`;
+
+  return api;
+};
+
+export { apiGetFileDownload_id, createFileUrl };

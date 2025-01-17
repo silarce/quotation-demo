@@ -290,6 +290,9 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
   // 按照reviewers的順序，假設user同時為sales與manager
   // 最後會是isSales:false isManager:true
   Object.entries(reviewers).forEach(([key, id]) => {
+    // console.log(id)
+    // console.log(userId)
+
     if (id === userId) {
       isReviewer = true;
 
@@ -337,4 +340,88 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
 
 // ============================================================================
 
-export { init_variable, calcNTDToForeignCurrency, checkIsReviewer };
+const parseQuotationContentSituation = ({
+  userId,
+  quotationContent,
+}: {
+  userId: string | undefined | null;
+  quotationContent: TquotationContentDto;
+}) => {
+  // console.log(userId)
+  // console.log(quotationContent)
+
+  const {
+    reviewSalesEmployee,
+    reviewWorkDirectorEmployee,
+    reviewCashierEmployee,
+    reviewSupervisorEmployee,
+    // reviewSalesManagerEmployee,
+    reviewManagerEmployee,
+
+    salesReviewedAt,
+    supervisorReviewedAt,
+    // salesManagerReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+
+    toSalesAt,
+    toSupervisorAt,
+    // toSalesManagerAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+    //
+    //
+    status,
+  } = quotationContent;
+
+  const salesEmployeeId = reviewSalesEmployee?.id || null;
+  const workDirectorEmployeeId = reviewWorkDirectorEmployee?.id || null;
+  const cashierEmployeeId = reviewCashierEmployee?.id || null;
+  const supervisorEmployeeId = reviewSupervisorEmployee?.id || null;
+  // const salesManagerEmployeeId = reviewSalesManagerEmployee || null;
+  const managerEmployeeId = reviewManagerEmployee?.id || null;
+
+  const isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+
+  const isSendToReview =
+    status === 'Pending'
+      ? isSendToReview_pending
+      : !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+
+  const {
+    isReviewer = null,
+    isSales = null,
+    isWorkDirector = null,
+    isCashier = null,
+    isSupervisor = null,
+    isManager = null,
+  } = !!userId
+    ? checkIsReviewer({
+        userId,
+        reviewSalesEmployeeId: salesEmployeeId || undefined,
+        reviewSupervisorEmployeeId: supervisorEmployeeId || undefined,
+        reviewWorkDirectorEmployeeId: workDirectorEmployeeId || undefined,
+        reviewCashierEmployeeId: cashierEmployeeId || undefined,
+        reviewManagerEmployeeId: managerEmployeeId || undefined,
+        ...quotationContent,
+      })
+    : {};
+
+  return {
+    isSendToReview,
+    isSendToReview_pending,
+    //
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+    isManager,
+  };
+}; // parseQuotationContentSituation
+
+// ============================================================================
+
+export { init_variable, calcNTDToForeignCurrency, checkIsReviewer, parseQuotationContentSituation };
