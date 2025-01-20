@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -67,9 +68,9 @@ type Tstate_profile = {
   projectSiteContactPerson: string;
   projectSiteContactPersonNumber: string;
 
-  contactPersonArr: {
+  pointContactArr: {
     name: string;
-    phoneNumber: string;
+    phone: string;
   }[];
 };
 
@@ -278,6 +279,9 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson: state_profile.projectSiteContactPerson,
       projectSiteContactPersonNumber: state_profile.projectSiteContactPersonNumber,
+
+      pointContact: state_profile.pointContactArr,
+      outsourcingId: [],
     };
 
     try {
@@ -407,6 +411,7 @@ export default function EditDispatchList() {
       projectSiteContactPerson,
       projectSiteContactPersonNumber,
       // warrantyDate,
+      pointContact,
     } = dispatching ?? {};
 
     // 如果dispatching不存在，也就是新增派工單
@@ -426,9 +431,19 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson = defaultPointContactPerson ?? '';
       projectSiteContactPersonNumber = defaultPointContactNumber ?? '';
+      pointContact = [];
 
       // warrantyDate = accountReceivable?.warrantyDate ?? '';
     }
+
+    const pointContactArr: Tstate_profile['pointContactArr'] = (pointContact ?? []).map((item) => {
+      const pointContacct: Tstate_profile['pointContactArr'][number] = {
+        name: item.name,
+        phone: item.phone,
+      };
+
+      return pointContacct;
+    });
 
     setState_profile({
       idNumber: idNumber ?? '',
@@ -451,7 +466,7 @@ export default function EditDispatchList() {
       projectSiteContactPerson: projectSiteContactPerson ?? '',
       projectSiteContactPersonNumber: projectSiteContactPersonNumber ?? '',
 
-      contactPersonArr: [],
+      pointContactArr: pointContactArr,
     });
 
     setState_dispatch({
@@ -576,40 +591,40 @@ export default function EditDispatchList() {
         onChange: (e) => changeProfile('projectSiteContactPersonNumber', e.target.value),
       },
 
-      addContactPerson: () => {
+      addPointContact: () => {
         setState_profile((prev) => {
           const copy = { ...prev };
-          const contactPersonArr = [...copy.contactPersonArr];
+          const contactPersonArr = [...copy.pointContactArr];
           contactPersonArr.push({
             name: '',
-            phoneNumber: '',
+            phone: '',
           });
 
-          copy.contactPersonArr = contactPersonArr;
+          copy.pointContactArr = contactPersonArr;
 
           return copy;
         });
       },
       // contractPersonArr: [],
-      contractPersonArr: state_profile.contactPersonArr.map((item, index) => {
-        const { name, phoneNumber } = item;
+      pointContactArr: state_profile.pointContactArr.map((item, index) => {
+        const { name, phone } = item;
 
-        const setContact = ({ name, phoneNumber }: { name?: string; phoneNumber?: string }) => {
+        const setContact = ({ name, phone: phoneNumber }: { name?: string; phone?: string }) => {
           setState_profile((prev) => {
             const copy = { ...prev };
-            const contactPersonArr = [...copy.contactPersonArr];
-            const contactPerson = { ...contactPersonArr[index] };
+            const pointContactArr = [...copy.pointContactArr];
+            const pointContact = { ...pointContactArr[index] };
 
             if (name !== undefined) {
-              contactPerson.name = name;
+              pointContact.name = name;
             }
 
             if (phoneNumber !== undefined) {
-              contactPerson.phoneNumber = phoneNumber;
+              pointContact.phone = phoneNumber;
             }
 
-            contactPersonArr[index] = contactPerson;
-            copy.contactPersonArr = contactPersonArr;
+            pointContactArr[index] = pointContact;
+            copy.pointContactArr = pointContactArr;
 
             return copy;
           });
@@ -621,24 +636,24 @@ export default function EditDispatchList() {
             disabled: theDiasbled,
             onChange: (option) => {
               const { value, phoneNumber } = option ?? {};
-              setContact({ name: value, phoneNumber: '' });
-              phoneNumber !== undefined && setContact({ phoneNumber });
+              setContact({ name: value, phone: '' });
+              phoneNumber !== undefined && setContact({ phone: phoneNumber });
             },
           },
-          phoneNumber: {
-            value: phoneNumber,
+          phone: {
+            value: phone,
             disabled: theDiasbled,
             onChange: (e) => {
-              setContact({ phoneNumber: e.target.value });
+              setContact({ phone: e.target.value });
             },
           },
           remove: () => {
             setState_profile((prev) => {
               const copy = { ...prev };
-              const contactPersonArr = [...copy.contactPersonArr];
+              const contactPersonArr = [...copy.pointContactArr];
               contactPersonArr.splice(index, 1);
 
-              copy.contactPersonArr = contactPersonArr;
+              copy.pointContactArr = contactPersonArr;
 
               return copy;
             });
@@ -824,5 +839,5 @@ const emptyState_profile = (): Tstate_profile => ({
   pointContactNumber: '',
   projectSiteContactPerson: '',
   projectSiteContactPersonNumber: '',
-  contactPersonArr: [],
+  pointContactArr: [],
 });

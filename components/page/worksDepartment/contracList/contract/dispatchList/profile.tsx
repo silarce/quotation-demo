@@ -48,9 +48,9 @@ type TcontrolItem_option = {
   onChange: (e: Toption_pointContactPerson | null) => void;
 };
 
-type TcontractPerson = {
+type TpointContact = {
   name: TcontrolItem_option;
-  phoneNumber: TcontrolItem;
+  phone: TcontrolItem;
   remove: () => void;
 };
 
@@ -89,8 +89,8 @@ type Tcontrol = {
   projectSiteContactPerson: TcontrolItem_option;
   projectSiteContactPersonNumber: TcontrolItem;
   //
-  addContactPerson: () => void;
-  contractPersonArr: TcontractPerson[];
+  addPointContact: () => void;
+  pointContactArr: TpointContact[];
 };
 
 export type { Tcontrol as Tcontrol_profile };
@@ -327,22 +327,22 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
       </div>
 
       <div className={scss.right}>
-        <div className="flex gap-3 items-center mb-2">
-          <SquareBtn sharp="long" onClick={control.addContactPerson}>
+        <div className={classNames('flex gap-3 items-center mb-2', disabled && 'invisible')}>
+          <SquareBtn sharp="long" onClick={control.addPointContact}>
             新增接洽人
           </SquareBtn>
           <Tip content="接洽人可key in" />
         </div>
 
         <div className={scss.contractPersonList}>
-          {control.contractPersonArr.map((item, index) => {
-            const { name: _name, phoneNumber, remove } = item;
+          {control.pointContactArr.map((item, index) => {
+            const { name: _name, phone: phoneNumber, remove } = item;
 
             const name = _name.value ? { label: _name.value, value: _name.value } : null;
 
             return (
               <Fragment key={index}>
-                <IconRemoveCircle className={scss.iconBtn} onClick={remove} />
+                <IconRemoveCircle className={classNames(scss.iconBtn, disabled && 'invisible')} onClick={remove} />
                 <InputSel
                   caption="接洽人"
                   disabled={disabled}

@@ -1,5 +1,7 @@
 // MARK: 說明
 
+import { SplitPathString } from 'react-hook-form/dist/types/path/common';
+
 // 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
 
 // ---------------------------------------------------------------------------
@@ -3204,13 +3206,22 @@ export type TdispatchingDto = {
 
   projectSiteContactPerson: string | null;
   projectSiteContactPersonNumber: string | null;
+
+  pointContact:
+    | {
+        name: string;
+        phone: string;
+      }[]
+    | null;
+
+  outsourcing: ToutsourcingDto[];
 };
 
 type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
 
 export type TcreateDispatchingDto = Pick<
   TcreateDispatchingDto_pre,
-  | 'idNumber'
+  // | 'idNumber'
   | 'dispatchDate'
   | 'contractorContactPerson'
   | 'constructionSiteContactNumber'
@@ -3229,9 +3240,12 @@ export type TcreateDispatchingDto = Pick<
   // | 'note'
   // | 'contractId'
   | 'isCompleted'
+  | 'pointContact'
 > & {
+  idNumber: string | null;
   contractId: string;
   note?: string | null;
+  outsourcingId: string[];
 };
 
 export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
