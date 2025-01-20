@@ -694,7 +694,20 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
       const res = await reqReview(body);
 
-      if (res?.status === 'Contract') {
+      if (
+        res?.status === 'Contract' // 沒有給status.....
+        // 可以這樣判斷是否已被審核完畢並轉為合約
+        // content?.status==="Pending" && !!res.managerReviewedAt
+        // 但是原本的錯誤一直都沒有被使用者反應，所以決定不修正
+      ) {
+        // res中沒有contract的id，無法導向到合約頁面
+        // router.replace({
+        //   pathname: '/domestic/contract/quotation',
+        //   query: {
+        //     id: res.id,
+        //     version: '1',
+        //   },
+        // });
         router.back();
       } else {
         update_quotation();
