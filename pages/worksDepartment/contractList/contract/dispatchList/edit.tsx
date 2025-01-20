@@ -35,7 +35,7 @@ import { TupdateTodoDto, apiPatchTodo } from 'js/api/api_todo';
 import scss from './edit.module.scss';
 
 // type
-import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
+import { TemployeeDto, TtodoDto, ToutsourcingDto } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -50,7 +50,10 @@ type Tquery = {
 type Tstate_profile = {
   idNumber: string;
   dispatchDate: string;
+
   workerEmployee: TemployeeDto[];
+  outsourcing: ToutsourcingDto[];
+
   projectName: string;
   projectNumber: string;
   contractor: string;
@@ -222,10 +225,12 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  // 有些多餘，之後要簡化
   const changeProfile = (key: keyof Omit<Tstate_profile, 'workerEmployee'>, v: string) => {
     setState_profile((state) => ({ ...state, [key]: v }));
   };
 
+  // 有些多餘，之後要簡化
   const changeProfile_workerEmployee = (v: TemployeeDto[]) => {
     setState_profile((state) => ({ ...state, workerEmployee: v }));
   };
@@ -281,7 +286,7 @@ export default function EditDispatchList() {
       projectSiteContactPersonNumber: state_profile.projectSiteContactPersonNumber,
 
       pointContact: state_profile.pointContactArr,
-      outsourcingId: [],
+      outsourcingId: state_profile.outsourcing.map((item) => item.id),
     };
 
     try {
@@ -397,6 +402,7 @@ export default function EditDispatchList() {
       note,
       warrantyDate,
       isCompleted,
+      outsourcing = [],
     } = dispatching ?? {};
 
     let {
@@ -467,6 +473,7 @@ export default function EditDispatchList() {
       projectSiteContactPersonNumber: projectSiteContactPersonNumber ?? '',
 
       pointContactArr: pointContactArr,
+      outsourcing,
     });
 
     setState_dispatch({
@@ -521,6 +528,14 @@ export default function EditDispatchList() {
         value: state_profile.workerEmployee,
         onChange: changeProfile_workerEmployee,
       },
+
+      workerOutsourcing: {
+        value: state_profile.outsourcing,
+        onChange: (v) => {
+          setState_profile((state) => ({ ...state, outsourcing: v }));
+        },
+      },
+
       projectName: state_profile.projectName,
       projectNumber: state_profile.projectNumber,
       contractor: state_profile.contractor,
@@ -840,4 +855,5 @@ const emptyState_profile = (): Tstate_profile => ({
   projectSiteContactPerson: '',
   projectSiteContactPersonNumber: '',
   pointContactArr: [],
+  outsourcing: [],
 });

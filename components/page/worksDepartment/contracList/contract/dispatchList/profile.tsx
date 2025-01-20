@@ -11,6 +11,7 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import {
   selectModalCreator_multi,
   TemployeeDto,
+  ToutsourcingDto,
 } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 import type { Toption } from 'js/utils/options/options';
@@ -58,11 +59,17 @@ type Tcontrol = {
   idNumber: TcontrolItem;
   // 派工日期
   dispatchDate: TcontrolItem_moment;
+
   // 工務人員
   workerEmployee: {
     value: TemployeeDto[];
     onChange: (arr: TemployeeDto[]) => void;
   };
+  workerOutsourcing: {
+    value: ToutsourcingDto[];
+    onChange: (arr: ToutsourcingDto[]) => void;
+  };
+
   projectName: string;
   projectNumber: string;
   // 承包商
@@ -97,12 +104,17 @@ export type { Tcontrol as Tcontrol_profile };
 
 // ============================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment']>({
+const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment', 'outsourcing']>({
   selectorArr: [
     {
       key: 'employee_worksDepartment',
       caption: '工務人員',
       tip: '只有列出工務部人員。複選',
+    },
+    {
+      key: 'outsourcing',
+      caption: '工務人員(外包)',
+      tip: '外包廠商。複選',
     },
   ],
 });
@@ -320,7 +332,15 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           onClick={() => !disabled && setShowSelector(true)}
           textareaProps={{
             props: {
-              value: control.workerEmployee.value.map((item) => item.chName || item.enName).join(', '),
+              // value: control.workerEmployee.value.map((item) => item.chName || item.enName).join(', '),
+              value: (() => {
+                const employeeNames = control.workerEmployee.value.map((item) => item.chName || item.enName).join(', ');
+                const outsourcingNames = control.workerOutsourcing.value.map((item) => item.name).join(', ');
+                let names = employeeNames;
+                outsourcingNames && (names += ', ' + outsourcingNames);
+
+                return names;
+              })(),
             },
           }}
         />
@@ -384,12 +404,14 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         showModal={showSelector}
         onConfirm={(arr) => {
           const employeeArr = arr[0];
+          const outsourcing = arr[1];
           control.workerEmployee.onChange(employeeArr);
+          control.workerOutsourcing.onChange(outsourcing);
         }}
         onCancel={() => {
           setShowSelector(false);
         }}
-        defaultSeletedDataArrArr={[control.workerEmployee.value]}
+        defaultSeletedDataArrArr={[control.workerEmployee.value, control.workerOutsourcing.value]}
       />
     </div>
   );
