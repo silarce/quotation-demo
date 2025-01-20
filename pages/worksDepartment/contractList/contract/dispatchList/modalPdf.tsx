@@ -80,7 +80,7 @@ export default function ModalPdf({
     // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
     doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-    doc.save(`派工單_${''}.pdf`);
+    doc.save(`派工單_${data.customerName}_${data.idNumber}.pdf`);
     showRootLoading(false);
   };
 
