@@ -225,7 +225,7 @@ const usePanel = ({
     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
     isOldQuotation && isReviewer ? panel_review : null,
     isOldQuotation ? panel_submit : null,
-    !isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+    isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
     status === 'Pending' ? null : panel_edit,
     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
     panel_return,
