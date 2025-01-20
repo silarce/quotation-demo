@@ -120,7 +120,7 @@ export default function ModalPdf({
               <Cell01 str="客戶" />
               <Cell05>{data.customerName}</Cell05>
               <Cell03>電話</Cell03>
-              <Cell06 className={scss.noPaddingY}>{data.phoneNumber}</Cell06>
+              <Cell06 className={classNames(scss.noPaddingY, scss.justifyStart)}>{data.phoneNumber}</Cell06>
               <div className={scss['cell_09-10']}>
                 <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
                 <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
