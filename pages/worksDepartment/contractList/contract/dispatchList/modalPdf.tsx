@@ -16,6 +16,7 @@ import scss from './modalPdf.module.scss';
 // ===============================================================================
 
 type Tdata = {
+  idNumber: string; // 派工單號，也就是序號
   customerName: string; // 其實是工地名稱
   phoneNumber: string; // 工地電話
   contactPerson: string; // 接洽人，自動帶工程聯絡單的聯絡人，但必須可以修改
@@ -108,7 +109,9 @@ export default function ModalPdf({
           </div>
           <div className={scss.dateAndIndex}>
             <div>{`通知　　年　　月　　日　　時　　分`}</div>
-            <div>序號 ＿＿＿＿＿＿</div>
+            <div>
+              序號 <span className={scss.idNumber}>{data.idNumber}</span>
+            </div>
           </div>
           {/*  */}
 

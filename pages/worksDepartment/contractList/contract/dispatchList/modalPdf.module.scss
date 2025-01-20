@@ -40,9 +40,15 @@
   justify-content: space-between;
   margin-top: 20px;
   font-size: 14px;
+  margin-bottom: 2px;
   > div {
     display: flex;
     gap: 10px;
+  }
+  .idNumber {
+    display: inline-block;
+    border-bottom: solid 1px black;
+    width: 100px;
   }
 }
 
@@ -187,8 +193,6 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 16;
   // overflow: hidden;
-
-
 
   white-space: pre-wrap;
 

@@ -672,6 +672,7 @@ export default function EditDispatchList() {
     const wholeAddress = `${county}${district}${address}`;
 
     const data_pdf: Tdata_pdf = {
+      idNumber: dispatching?.idNumber ?? '',
       customerName: contract?.content.projectName ?? '',
       phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
       contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
