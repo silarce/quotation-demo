@@ -69,6 +69,7 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import {
   TquotationDto,
   TquotationContentDto,
+  TquotationContractDto,
   // TcreateQuotationContentDto,
   // useGetQuotation_id,
   // useGetQuotation_id_2,
@@ -264,7 +265,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     iterativeContractProductArr,
 
     prodArrForPDf,
+
+    isQuotationExpired,
+    latestSubContract,
+    parentSubContract,
   } = useData();
+
+  // console.log(isQuotationExpired);
+
   isAttach = !!iterativeContractProductArr?.length;
 
   !quotationId && !contentId && (quotationType = 'new');
@@ -904,6 +912,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     showPdf,
     showPdf_noDiscount,
     showPdf_part: () => setShow_pdfPart(true),
+    //
+    isQuotationExpired,
+    quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
   });
 
   const history = useHistory({
@@ -1455,6 +1466,46 @@ const useData = () => {
     //
   }, [prodArr, iterativeContractProductArr]);
 
+  // 如果未來使用者表示過期報價單追減或變更的數值不對
+  // 那就同樣比較createdAt找出該報價單所屬的subContract，
+  // 然後將
+  const { isQuotationExpired, latestSubContract, parentSubContract } = useMemo(() => {
+    const result: {
+      isQuotationExpired: boolean;
+      latestSubContract: TquotationContractDto | undefined;
+      parentSubContract: TquotationContractDto | undefined;
+    } = {
+      isQuotationExpired: false,
+      latestSubContract: undefined,
+      parentSubContract: undefined,
+    };
+
+    if (!attachedToContract?.subContracts.length || !quotationData) {
+      return result;
+    }
+
+    const subContracts = _.orderBy(attachedToContract.subContracts ?? [], 'version');
+    const latestSubContract = subContracts[subContracts.length - 1];
+    const latestSubContractCreatedAt = new Date(latestSubContract.createdAt);
+    const quotationCreatedAt = new Date(quotationData.createdAt);
+
+    const subContractBelongedArr = subContracts.filter(({ createdAt }) => {
+      return quotationCreatedAt > new Date(createdAt);
+    });
+
+    const parentSubContract = subContractBelongedArr[subContractBelongedArr.length - 1];
+
+    if (latestSubContractCreatedAt > quotationCreatedAt) {
+      result.isQuotationExpired = true;
+      result.latestSubContract = latestSubContract;
+      result.parentSubContract = parentSubContract;
+
+      return result;
+    }
+
+    return result;
+  }, [quotationData, attachedToContract]);
+
   // ----------------------------------------------------------------------
 
   const contractProfile = useMemo(() => {
@@ -1507,6 +1558,10 @@ const useData = () => {
     iterativeContractProductArr,
     //
     prodArrForPDf,
+    //
+    isQuotationExpired,
+    latestSubContract,
+    parentSubContract,
   };
 };
 
