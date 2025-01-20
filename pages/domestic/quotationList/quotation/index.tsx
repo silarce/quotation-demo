@@ -350,6 +350,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     calcProductBody,
     doorModelSummery,
     doorModelSummery_reduceModified,
+    checkIsIterativeProdValid,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -552,6 +553,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新追加追減報價單
   const handlePatchModify = () => {
+    if (checkIsIterativeProdValid()) {
+      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+
+      return;
+    }
+
     const { destroy } = myAlert.input({
       isTextArea: true,
       title: '報價單註解',
@@ -675,6 +682,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: 審核
   const handleReview = async () => {
+    if (!checkIsIterativeProdValid()) {
+      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+
+      return;
+    }
+
     const callReq = async (isPass: boolean) => {
       if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
         myAlert.warning({ title: '請先送出合約審核表' });
