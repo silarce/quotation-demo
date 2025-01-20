@@ -1,4 +1,4 @@
-import { useState, useRef, Fragment } from 'react';
+import { useState, useRef, Fragment, forwardRef, useEffect } from 'react';
 import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -42,10 +42,31 @@ export default function ModalPdf({
   onCancel,
   data,
 }: ModalProps & { data: Tdata }) {
+  return (
+    <Modal visible={visible} onCancel={onCancel} width={'fit-content'} footer={null} destroyOnClose={true}>
+      <ModalPdf_pre data={data} />
+    </Modal>
+  );
+}
+
+function ModalPdf_pre({
+  //
+
+  data,
+}: {
+  data: Tdata;
+}) {
   const ref_pdf = useRef<HTMLDivElement>(null!);
+  const ref_contentWrapper = useRef<HTMLDivElement>(null!);
+  const ref_content = useRef<HTMLDivElement>(null!);
+
+  const [isContentOverflow, setIsContentOverflow] = useState(false);
+  const [showWarning, setShowWarning] = useState(true);
 
   const [renderCount, setRenderCount] = useState(0);
 
+  // 將isShowCellNumber設為true即可在畫面上看到格子的編號
+  // 方便開發時調整格子的樣式或排版
   const handleShowCellNumber = () => {
     isShowCellNumber = !isShowCellNumber;
     setRenderCount((state) => state + 1);
@@ -58,42 +79,54 @@ export default function ModalPdf({
       return;
     }
 
+    setShowWarning(false);
     showRootLoading(true, '正在處理PDF');
 
-    const doc = new jsPDF('p', 'px', 'b5');
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const func = async () => {
+      const doc = new jsPDF('p', 'px', 'b5');
+      const pageWidth = doc.internal.pageSize.getWidth();
 
-    const pageHeight = doc.internal.pageSize.getHeight();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
-    const image = await html2canvas(ref_pdf.current, {
-      scale: 5,
-      // useCORS: true,
-      // allowTaint: true,
-    }).then((canvas) => {
-      const image = canvas.toDataURL('image/JPEG');
+      const image = await html2canvas(ref_pdf.current, {
+        scale: 5,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
 
-      return image;
-    });
+        return image;
+      });
 
-    // 留作參考
-    // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-    // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-    doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-    doc.save(`派工單_${data.customerName}_${data.idNumber}.pdf`);
-    showRootLoading(false);
+      doc.save(`派工單_${data.customerName}_${data.idNumber}.pdf`);
+
+      showRootLoading(false);
+      setShowWarning(true);
+    };
+
+    setTimeout(func, 0);
   };
+
+  useEffect(() => {
+    const { height: _height_content } = window.getComputedStyle(ref_content.current);
+    const { height: _height_wrapper } = window.getComputedStyle(ref_contentWrapper.current);
+
+    const height_wrapper = parseFloat(_height_wrapper);
+    const height_content = parseFloat(_height_content);
+    const isOverflow = Number(height_wrapper) - Number(height_content) < -6;
+
+    isOverflow && setIsContentOverflow(true);
+  }, []);
 
   // ------------------------------------------------------------------------
   // region RENDER
   return (
-    <Modal
-      //
-      visible={visible}
-      onCancel={onCancel}
-      width={'fit-content'}
-      footer={null}
-    >
+    <>
       {/*  */}
       {/* 給開發者方便開發用的 */}
       {/* <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2> */}
@@ -160,7 +193,20 @@ export default function ModalPdf({
                 <span>情</span>
                 <span>形</span>
               </Cell00>
-              <Cell11 className={scss.c11_content}>{data.content}</Cell11>
+
+              <div
+                ref={ref_contentWrapper}
+                className={classNames(
+                  //
+                  scss.c11_content_wrapper,
+                  isContentOverflow && showWarning && scss.warning
+                )}
+              >
+                <Cell11 ref={ref_content} className={scss.c11_content}>
+                  {data.content}
+                </Cell11>
+              </div>
+
               <div className={scss['wrapper_cell_12-8-9']}>
                 <div className={scss['cell_12-8-9_head']}>
                   <Cell12>修理批價</Cell12>
@@ -237,7 +283,7 @@ export default function ModalPdf({
         </div>
         {/* body close */}
       </div>
-    </Modal>
+    </>
   );
 }
 
@@ -365,13 +411,24 @@ const Cell10 = ({ className, children }: { className?: string; children?: React.
   );
 };
 
-const Cell11 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+const Cell11_pre = (
+  {
+    className,
+    children,
+  }: {
+    className?: string;
+    children?: React.ReactNode;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
   return (
-    <div className={classNames(scss.cell, className)} style={{ width: c11 }}>
+    <div ref={ref} className={classNames(scss.cell, className)} style={{ width: c11 }}>
       {isShowCellNumber ? 'cell11' : children}
     </div>
   );
 };
+
+const Cell11 = forwardRef(Cell11_pre);
 
 const Cell12 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (

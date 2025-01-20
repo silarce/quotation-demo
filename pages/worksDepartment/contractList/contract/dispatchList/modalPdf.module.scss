@@ -186,12 +186,34 @@
   gap: 20px 0;
 }
 
+.c11_content_wrapper {
+  position: relative;
+  min-height: 310px;
+  max-height: 536px;
+  overflow: hidden;
+  border-bottom: solid 1px black;
+  &.warning {
+    &:before {
+      content: "內容超出顯示範圍";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: max-content;
+      color: red;
+      opacity: 0.3;
+      font-size: 50px;
+    }
+  }
+}
+
 .c11_content {
+  align-items: flex-start;
   // display: block;
 
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 16;
+  // display: -webkit-box;
+  // -webkit-box-orient: vertical;
+  // -webkit-line-clamp: 16;
   // overflow: hidden;
 
   white-space: pre-wrap;
@@ -199,9 +221,6 @@
   line-height: unset;
   font-size: 20px;
   letter-spacing: 1px;
-  min-height: 310px;
-  max-height: 532px;
-  overflow: hidden;
   // height:fit-content;
   // font-size: 20px;
   // letter-spacing: 2px;
