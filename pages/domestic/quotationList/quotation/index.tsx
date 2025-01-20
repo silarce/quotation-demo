@@ -949,15 +949,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             )
           }
         />
-
-        <InputSel
-          className={'ml-[50px]'}
-          caption={'門型彙總'}
-          showBaseline="invisible"
-          captionStyle={{ width: '120px' }}
-          wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-          node={<DoorSummary list={doorSummaryArr} />}
-        />
+        <div className={'ml-[50px]'}>
+          <InputSel
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px' }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary list={doorSummaryArr} />}
+          />
+        </div>
 
         {/* prod */}
         {/* prod */}
