@@ -2075,6 +2075,11 @@ class ClassProd {
   get rootProductName() {
     return this.state.rootProduct?.data_prod.itemName ?? '';
   }
+
+  // MARK:isQuantityValid
+  get isQuantityValid() {
+    return this.state.isQuantityValid;
+  }
 }
 // MARK: END
 
