@@ -837,6 +837,7 @@ function PreWorkContactDoc_component(
             isShowDndBtn={false}
             discountRate={''} // 報價單總折數
             changeDiscountRate={(v) => {}}
+            hiddenQtyZero={true}
           />
           <Table_others
             disabled={disabled}

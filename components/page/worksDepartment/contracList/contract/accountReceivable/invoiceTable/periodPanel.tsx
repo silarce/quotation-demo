@@ -1282,8 +1282,6 @@ const useDefaultState = ({
 }) => {
   const { customer, haveTax } = useContext(AccountReceivableContext);
 
-  console.log('fooo');
-
   const { defaultState, isNew } = useMemo(() => {
     const isNew = !data_period;
 

@@ -240,7 +240,7 @@ export default function AddQReqList() {
             label: '返回',
             onClick: () => {
                 myAlert.confirm({
-                    title: `確定要返回${pagename}單列表嗎?`,
+                    title: `確定要返回嗎?`,
                     content: <>
                         <h1>未儲存的資料將不會保留</h1>
                     </>,
@@ -1458,6 +1458,7 @@ export default function AddQReqList() {
     //#endregion
 
     //#region ===========【廠商篩選】
+    const [isFilterVisible, setIsFilterVisible] = useState(false);
     const [customerbar, setCustomerbar] = useState(false);
     const [countyOptions, setCountyOptions] = useState<string[]>([]);
     const [filteredData2, setFilteredData2] = useState<any[]>([]);
@@ -1466,6 +1467,10 @@ export default function AddQReqList() {
         name: '',
         contact: ''
     });
+
+    useEffect(() => {
+        setIsFilterVisible(true);
+    }, [suppliernamein])
 
     // 根據篩選條件更新資料
     useEffect(() => {
@@ -1648,6 +1653,19 @@ export default function AddQReqList() {
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商1統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin,
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商1名稱"
@@ -1657,7 +1675,18 @@ export default function AddQReqList() {
                                             inputProps={{
                                                 props: {
                                                     value: suppliernamein,
-                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                    // onChange: (e) => { setSuppliernamein(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(1);
+                                                        setSuppliernamein(value);
+                                                        setFilters({ ...filters, name: value });
+                                                        setFilteredData2(
+                                                            data.filter((item) =>
+                                                                item.name.toLowerCase().includes(value.toLowerCase())
+                                                            )
+                                                        );
+                                                    }
                                                 },
                                             }}
                                         />
@@ -1689,14 +1718,14 @@ export default function AddQReqList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商1統編"
+                                            caption="廠商1聯絡人"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplierfaxin,
+                                                    onChange: (e) => { setSupplierfaxin(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1724,7 +1753,7 @@ export default function AddQReqList() {
                                                 setCustomerbar(true);
                                             }}
                                         >
-                                            ⋯
+                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                         <InputSel
                                             {...inputSelProps}
@@ -1741,6 +1770,19 @@ export default function AddQReqList() {
                                         />
                                     </div>
                                     <div>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商2統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxid2in,
+                                                    onChange: (e) => { setSuppliertaxid2in(e.target.value) }
+                                                },
+                                            }}
+                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商2名稱"
@@ -1750,7 +1792,18 @@ export default function AddQReqList() {
                                             inputProps={{
                                                 props: {
                                                     value: suppliername2in,
-                                                    onChange: (e) => { setSuppliername2in(e.target.value) }
+                                                    // onChange: (e) => { setSuppliername2in(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(2);
+                                                        setSuppliername2in(value);
+                                                        setFilters({ ...filters, name: value });
+                                                        setFilteredData2(
+                                                            data.filter((item) =>
+                                                                item.name.toLowerCase().includes(value.toLowerCase())
+                                                            )
+                                                        );
+                                                    }
                                                 },
                                             }}
                                         />
@@ -1782,14 +1835,14 @@ export default function AddQReqList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商2統編"
+                                            caption="廠商2聯絡人"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxid2in,
-                                                    onChange: (e) => { setSuppliertaxid2in(e.target.value) }
+                                                    value: supplierfax2in,
+                                                    onChange: (e) => { setSupplierfax2in(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1817,10 +1870,23 @@ export default function AddQReqList() {
                                                 setCustomerbar(true);
                                             }}
                                         >
-                                            ⋯
+                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                     </div>
                                     <div>
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="廠商3統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxid3in,
+                                                    onChange: (e) => { setSuppliertaxid3in(e.target.value) }
+                                                },
+                                            }}
+                                        /> */}
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商3名稱"
@@ -1830,7 +1896,18 @@ export default function AddQReqList() {
                                             inputProps={{
                                                 props: {
                                                     value: suppliername3in,
-                                                    onChange: (e) => { setSuppliername3in(e.target.value) }
+                                                    // onChange: (e) => { setSuppliername3in(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(3);
+                                                        setSuppliername3in(value);
+                                                        setFilters({ ...filters, name: value });
+                                                        setFilteredData2(
+                                                            data.filter((item) =>
+                                                                item.name.toLowerCase().includes(value.toLowerCase())
+                                                            )
+                                                        );
+                                                    }
                                                 },
                                             }}
                                         />
@@ -1862,14 +1939,14 @@ export default function AddQReqList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商3統編"
+                                            caption="廠商3聯絡人"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxid3in,
-                                                    onChange: (e) => { setSuppliertaxid3in(e.target.value) }
+                                                    value: supplierfax3in,
+                                                    onChange: (e) => { setSupplierfax3in(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1897,11 +1974,94 @@ export default function AddQReqList() {
                                                 setCustomerbar(true);
                                             }}
                                         >
-                                            ⋯
+                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
 
 
                                     </div>
+                                </div>
+                                <div
+                                    style={{
+                                        position: 'relative',
+                                        width: '50%',
+                                        padding: '10px',
+                                        // border: '1px solid #ccc',
+                                        borderRadius: '4px',
+                                    }}
+                                >
+                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                        <div
+                                            style={{
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: 0,
+                                                width: '100%',
+                                                backgroundColor: 'white',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '4px',
+                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                                                zIndex: 1005,
+                                                maxHeight: '300px',
+                                                overflowY: 'auto',
+                                            }}
+                                        >
+                                            {filteredData2.map((_item, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => {
+
+                                                        const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
+
+                                                        if (currentsupplier === 1) {
+                                                            setSuppliernamein(safeValue(_item.name));
+                                                            setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                                            setSupplierphonein(safeValue(_item.phone));
+                                                            setSuppliertaxidin(safeValue(_item.tax_id));
+                                                            setSupplieridin(safeValue(_item.customer_number));
+                                                            setSupplierfaxin(safeValue(_item.fax));
+                                                            setSuppliercontactin(safeValue(_item.contact));
+                                                            setSupplieruuidin(safeValue(_item.id));
+                                                        } else if (currentsupplier === 2) {
+                                                            setSuppliername2in(safeValue(_item.name));
+                                                            setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                                            setSupplierphone2in(safeValue(_item.phone));
+                                                            setSuppliertaxid2in(safeValue(_item.tax_id));
+                                                            setSupplierid2in(safeValue(_item.customer_number));
+                                                            setSupplierfax2in(safeValue(_item.fax));
+                                                            setSuppliercontact2in(safeValue(_item.contact));
+                                                            setSupplieruuid2in(safeValue(_item.id));
+                                                        } else if (currentsupplier === 3) {
+                                                            setSuppliername3in(safeValue(_item.name));
+                                                            setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                                            setSupplierphone3in(safeValue(_item.phone));
+                                                            setSuppliertaxid3in(safeValue(_item.tax_id));
+                                                            setSupplierid3in(safeValue(_item.customer_number));
+                                                            setSupplierfax3in(safeValue(_item.fax));
+                                                            setSuppliercontact3in(safeValue(_item.contact));
+                                                            setSupplieruuid3in(safeValue(_item.id));
+                                                        }
+                                                        setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                    }}
+                                                    style={{
+                                                        padding: '10px',
+                                                        cursor: 'pointer',
+                                                        borderBottom: '1px solid #f0f0f0',
+                                                    }}
+                                                >
+                                                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                                                        {_item.name} {_item.conta}
+                                                    </div>
+                                                    <div style={{ fontSize: '16px', color: '#888' }}>
+                                                        {_item.county} {_item.district} {_item.address}
+                                                    </div>
+                                                    <div style={{ fontSize: '16px', color: '#555' }}>
+                                                        聯絡人: {_item.contact}
+                                                    </div>
+
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div>

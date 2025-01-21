@@ -54,7 +54,8 @@ import { Class_product } from 'hooks/quotation/useProduct';
 import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // css
-import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
+// import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
+import scss from './quotation.module.scss';
 
 import { useProductList } from 'hooks/quotation/useProduct';
 

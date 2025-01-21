@@ -16,7 +16,20 @@ export default function SidePatFactoryDepartment() {
                     label: '單據管理',
                     erpFeature: devPass,
                     list: [
-                       
+                        {
+                            label: '客戶列表',
+                            path: path + '/customerQueryList',
+                            // activeChecker: ({ router }) => {
+                            //     const { pathname, query } = router;
+
+                            //     if (pathname === '/domestic/customer') {
+                            //         return true;
+                            //     }
+
+                            //     return false;
+                            // },
+                            erpFeature: [fac],
+                        },
                         {
                             label: '新增請購',
                             path: path + '/addPurchaseRequisitionList',
@@ -117,6 +130,7 @@ export default function SidePatFactoryDepartment() {
                             },
                             erpFeature: [fac],
                         },
+
                     ],
                 },
                 {

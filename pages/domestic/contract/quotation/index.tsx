@@ -1346,8 +1346,14 @@ const usePanelList = ({
             return;
           }
 
+          // router.push({
+          //   pathname: '/domestic/contract/attachContract',
+          //   query: {
+          //     contractId: contract.id,
+          //   },
+          // });
           router.push({
-            pathname: '/domestic/contract/attachContract',
+            pathname: '/domestic/quotationList/quotation',
             query: {
               contractId: contract.id,
             },

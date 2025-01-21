@@ -49,6 +49,7 @@ import icon_export from 'public/image/icon/fc_export.svg';
 import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-align';
 import { title } from 'process';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
+import icon_tray_in_gray from 'public/image/icon/fc_tray_in_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -2213,7 +2214,7 @@ export default function PEntryDetail() {
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         myAlert.confirm({
-                                            title: `確定要返回${pagename}單列表嗎?`,
+                                            title: `確定要返回嗎?`,
                                             content: <>
                                                 <h1>未儲存的資料將不會保留</h1>
                                             </>,
@@ -2533,6 +2534,19 @@ export default function PEntryDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
+                                            caption="廠商統編"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: suppliertaxidin,
+                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
                                             caption="廠商名稱"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -2598,19 +2612,7 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商統編"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
-                                                },
-                                            }}
-                                        />
+
                                     </div>
                                     <div>
                                         <button
@@ -3079,38 +3081,38 @@ export default function PEntryDetail() {
                                                         {/* <button style={{ display: (statusin === "進貨中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
                                                             <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button> */}
-                                                    <button
-                                                        onClick={() => handleinbox(_item)}
-                                                        style={{
-                                                            width: '30px',  // 調整按鈕大小，與圖片更匹配
-                                                            height: '30px', // 調整按鈕大小，與圖片更匹配
-                                                            border: '1px solid #ccc',
-                                                            // backgroundColor: '#f0f0f0',
-                                                            display: 'flex',
-                                                            justifyContent: 'center',
-                                                            alignItems: 'center',
-                                                            cursor: 'pointer',
-                                                            borderRadius: '5px',
-                                                            // transition: 'background-color 0.3s'
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            (e.target as HTMLButtonElement).style.backgroundColor = '#e0e0e0';
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            (e.target as HTMLButtonElement).style.backgroundColor = '#f0f0f0';
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={icon_tray_in.src}
-                                                            alt="tray"
+                                                        <button
+                                                            onClick={() => handleinbox(_item)}
                                                             style={{
-                                                                width: '20px',  // 根據按鈕大小調整圖片尺寸
-                                                                height: '20px', // 根據按鈕大小調整圖片尺寸
-                                                                objectFit: 'contain',  // 確保圖片不會被拉伸
-                                                                // backgroundColor:'white'
+                                                                width: '30px',  // 調整按鈕大小，與圖片更匹配
+                                                                height: '30px', // 調整按鈕大小，與圖片更匹配
+                                                                border: '1px solid #ccc',
+                                                                display: `${!isEditing ? 'flex' : 'none'}`,  // 根據 isEditing 顯示或隱藏按鈕
+                                                                justifyContent: 'center',
+                                                                alignItems: 'center',
+                                                                cursor: 'pointer',
+                                                                borderRadius: '5px',
+                                                                transition: 'background-color 0.3s'  // 添加過渡效果
                                                             }}
-                                                        />
-                                                    </button>
+                                                            onMouseEnter={(e) => {
+                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={`${parseInt(_item.wantinquantity) === 0 ? icon_tray_in_gray.src : icon_tray_in.src}`}
+                                                                alt="tray"
+                                                                style={{
+                                                                    width: '20px',  // 根據按鈕大小調整圖片尺寸
+                                                                    height: '20px', // 根據按鈕大小調整圖片尺寸
+                                                                    objectFit: 'contain',  // 確保圖片不會被拉伸
+                                                                    backgroundColor: 'transparent',  // 圖片背景透明
+                                                                    border: 'none'  // 確保圖片沒有邊框
+                                                                }}
+                                                            />
+                                                        </button>
                                                     </span>
                                                     <span>{index + 1}</span>
                                                     <span>

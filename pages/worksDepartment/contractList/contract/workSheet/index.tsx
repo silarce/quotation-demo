@@ -540,12 +540,17 @@ export default function Worksheet({
     });
 
     sortedFinelProd.forEach((prod) => {
-      const prodQty = String(prod.items?.length ?? 0);
+      // const prodQty = String(prod.items?.length ?? 0);
+      const prodQty = String(prod.quantity ?? 0);
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
 
       const prodWorkSheetList: { [key: string]: TworksheetDto_addition } = {};
       const itemsNoWorksheet: TquotationProductItemDto[] = [];
+
+      if (prodQty === '0') {
+        return;
+      }
 
       // ----------------------------------------------
       prod.items?.forEach((item) => {

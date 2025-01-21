@@ -4,7 +4,8 @@ import type { Treview_status } from './api_netCore/_schemas';
 
 export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
 
-export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+// export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S' | 'W2';
+export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'W2';
 
 // 表面處理
 export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
@@ -293,6 +294,7 @@ export type TerpFeatureDto = {
   createdAt: string;
   updatedAt: string;
   name: string;
+  // 以下是有設populate才會給
   departments: TdepartmentDto_jobs[];
   employees: TemployeeDto[];
 };
@@ -935,7 +937,10 @@ export type TquotationProductAccessoryDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  codeName: string; //代號
+  // codeName之所以是TdoorAccessoryDto.id
+  // 是因為那時codeName被棄用了，於是就直接用codeName裝TdoorAccessoryDto.id了
+  // 反語意化的爛主意
+  codeName: string; //選配的id，也就是TdoorAccessoryDto.id
   name: string; //名稱
   unit: string; // 單位
   quantity: number; // 數量
@@ -946,11 +951,18 @@ export type TquotationProductAccessoryDto = {
   dualPrice: number; // 牌價複價
   order: number;
   referenceSpec: string | null;
+  // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+  // 前端用不到
+  // category: unknown;
+  // electronicSuppliesCode: unknown;
+  // isElectronicSupplies: unknown;
+  // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 };
 
 export type TcreateQuotationProductAccessoryDto = Omit<
   TquotationProductAccessoryDto,
   'id' | 'createdAt' | 'updatedAt'
+  // | 'category' | 'electronicSuppliesCode' | 'isElectronicSupplies'
 > & { id?: string };
 
 export type TupdateQuotationProductAccessoryDto = Partial<
@@ -1066,13 +1078,13 @@ export type TquotationProductDto = {
   isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
   headBoxThickness: string | null;
-  // 單價
+  /**單價 */
   unitPrice: number;
-  // 牌價
+  /**牌價 */
   price: number;
-  // 牌價複價
+  /**牌價複價 */
   dualPrice: number;
-  // 複價
+  /**複價 */
   totalPrice: number;
   // 防颱
   isAntiTyphoon: boolean | null;
@@ -2274,8 +2286,9 @@ export type TcreateQuotationContentDto = {
   siteManager?: string | null;
   // 工地主任電話
   siteManagerNumber?: string | null;
-  // 門型彙總
-  requiredDoorType?: string | null;
+
+  // 需求門型 棄用 有陣子被當作門型彙總來用
+  // requiredDoorType?: string | null;
   // 需求門型數量 // 可以用，但是棄用
   // requiredDoorQuantity?: number | null;
   // 預估折數 // 可以用，但是棄用
@@ -2564,23 +2577,23 @@ export type TdoorGeneralSpecsMotorBoxDto = {
 
 export type TdoorGeneralSpecsMotorDto = {
   box?: TdoorGeneralSpecsMotorBoxDto;
-  hp: string;
+  hp: string | 'N/A';
 };
 
 export type TdoorGeneralSpecsDto = {
   bearingHousingSize: number; // 軸承座寸法
   bearingHousingTotalLength: number; // 軸承座總長(=捲軸長度)
-  bearingInnerDiameter: string; // 軸承內徑
-  bearingName: string; // 軸承
+  bearingInnerDiameter: string | 'N/A'; // 軸承內徑
+  bearingName: string | 'N/A'; // 軸承
   defaultMotorIndex: number;
   density: number; // 密度
   diameter: number; // 捲軸直徑
   gapA: number;
   gapC: number;
   motors: TdoorGeneralSpecsMotorDto[];
-  gearNumber: string;
-  sprocketWheelModel: string;
-  sprocketWheelTeethNumber: string;
+  gearNumber: string | 'N/A';
+  sprocketWheelModel: string | 'N/A';
+  sprocketWheelTeethNumber: string | 'N/A';
   sprocketWheelChains: number;
   weight: number;
   slatLength: number; // 門片長度
@@ -2794,14 +2807,14 @@ export type TgenerateDoorProductBomDto = {
   slat: TgenerateDoorProductBomDto_ComponentInfo;
   bottomBar: TgenerateDoorProductBomDto_ComponentInfo;
   guideRail: TgenerateDoorProductBomDto_ComponentInfo;
-  sidePlate: TgenerateDoorProductBomDto_ComponentInfo;
-  roller: TgenerateDoorProductBomDto_ComponentInfo;
-  motor: TgenerateDoorProductBomDto_ComponentInfo;
-  motorAccessories: TgenerateDoorProductBomDto_ComponentInfo;
-  headBox: TgenerateDoorProductBomDto_ComponentInfo;
+  sidePlate?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  roller?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  motor?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  motorAccessories?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
+  headBox?: TgenerateDoorProductBomDto_ComponentInfo; // W2時可為undefined
   //
-  middlePillar?: TgenerateDoorProductBomDto_ComponentInfo;
-  backBone?: TgenerateDoorProductBomDto_ComponentInfo;
+  middlePillar?: TgenerateDoorProductBomDto_ComponentInfo; // W2時必須有
+  backBone?: TgenerateDoorProductBomDto_ComponentInfo; // W2時必須有
 };
 
 export type TdoorBomDto_Component = {
@@ -2821,6 +2834,9 @@ export type TdoorProductBomDto = {
   motor: TdoorBomDto_Component;
   motorAccessories: TdoorBomDto_Component;
   headBox: TdoorBomDto_Component;
+  //
+  backBone?: TdoorBomDto_Component;
+  middlePillar?: TdoorBomDto_Component;
 };
 
 export type TdoorAccessoryDto = {
@@ -5349,3 +5365,56 @@ export type TsettleBonusDto = {
 // };
 
 // type Tfoooooooooo = Tfooo<{ engineeringContact: true }>;
+
+// interface TrouterPermissionDict {
+//   home: {
+//     dailyReport: TerpFeatureDto[];
+//     reviewDailyReport: TerpFeatureDto[];
+//   };
+//   setting: {
+//     companyInfo: TerpFeatureDto[];
+//     employees: TerpFeatureDto[];
+//   };
+//   domestic: {
+//     quotation: TerpFeatureDto[];
+//     contract: TerpFeatureDto[];
+//     customer: TerpFeatureDto[];
+//     annotationList: TerpFeatureDto[];
+//   };
+//   worksDepartment: {
+//     foo: TerpFeatureDto[];
+//   };
+//   accounting: { foo: TerpFeatureDto[] };
+//   factoryDepartment: { foo: TerpFeatureDto[] };
+//   //
+//   documentManagement: {
+//     // 如果要提高辨識性使方便維護的話，或許可以多一層加進一個name
+//     // 前端也可以直接用name作為路由的label
+//     // 但若是要用i18n的話，那個這個name就會是單純給開發者辨識的字串而已
+//     reviewList: {
+//       name: '審核清單';
+//       erpFeatureArr: TerpFeatureDto[];
+//     };
+//   };
+// }
+
+// interface TrouterPermissionItem {
+//   name: string;
+//   // 若使用者沒有相應權限，則不開放
+//   // 若erpFeatures為空陣列，則代表沒有限制
+//   erpFeatures: TerpFeatureDto[];
+// }
+
+// interface TrouterPermissionDict {
+//   // 若為undefined，則不開放
+//   home_dailyReport?: TrouterPermissionItem;
+//   home_reviewDailyReport?: TrouterPermissionItem;
+
+//   setting_companyInfo?: TrouterPermissionItem;
+//   setting_employees?: TrouterPermissionItem;
+
+//   domestic_quotation?: TrouterPermissionItem;
+//   domestic_contract?: TrouterPermissionItem;
+//   domestic_customer?: TrouterPermissionItem;
+//   domestic_annotationList?: TrouterPermissionItem;
+// }

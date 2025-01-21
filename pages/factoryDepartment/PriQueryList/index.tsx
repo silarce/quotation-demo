@@ -66,6 +66,7 @@ import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function PriQueryList() {
     const [pagename, setPagename] = useState<string>("價格查詢")
+    const [autoRefreshOpen, setAutoRefreshOpen] = useState<boolean>(false)
     const [autoRefresh, setAutoRefresh] = useState<number>(1)//分鐘
     //#region ===========【路由參數】
     const router = useRouter();
@@ -170,13 +171,16 @@ export default function PriQueryList() {
 
     //#endregion ===========【自動更新】
     useEffect(() => {
-        // 定義一個 interval，每隔 5 分鐘執行一次 Get 函式
-        const intervalId = setInterval(() => {
-            Get();
-        }, autoRefresh * 60 * 1000); // 5 分鐘 = 5 * 60 * 1000 毫秒
+        if (autoRefreshOpen === true) {
 
-        // 清除 interval，避免記憶體洩漏
-        return () => clearInterval(intervalId);
+            // 定義一個 interval，每隔 5 分鐘執行一次 Get 函式
+            const intervalId = setInterval(() => {
+                Get();
+            }, autoRefresh * 60 * 1000); // 5 分鐘 = 5 * 60 * 1000 毫秒
+
+            // 清除 interval，避免記憶體洩漏
+            return () => clearInterval(intervalId);
+        }
     }, []); // 確保只在組件掛載時設定一次
     //#endregion
 
@@ -390,12 +394,12 @@ export default function PriQueryList() {
     const filterData = () => {
         const startDate = keywordstartdate;
         const endDate = keywordenddate;
-        const type = keyword5.trim();
-        const supplier = keyword1.trim();
-        const productid = keyword2.trim();
-        const name = keyword3.trim();
-        const spec = keyword4.trim();
-
+        const type = keyword5.trim().toLowerCase(); // 將條件轉為小寫
+        const supplier = keyword1.trim().toLowerCase();
+        const productid = keyword2.trim().toLowerCase();
+        const name = keyword3.trim().toLowerCase();
+        const spec = keyword4.trim().toLowerCase();
+    
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
@@ -407,7 +411,7 @@ export default function PriQueryList() {
             setSearchdata(data);
             return;
         }
-
+    
         // 過濾資料
         let filteredData = data.filter(item => {
             const createAt = moment(item.create_at);
@@ -416,43 +420,42 @@ export default function PriQueryList() {
                 : createAt.isBetween(startDate, endDate, 'days', '[]');
             return isDateInRange;
         });
-
-        // let filteredData = data;
-
+    
         // 模糊查詢價格類別(詢價/進價)
         if (type) {
             filteredData = filteredData.filter(item =>
-                item.detail_type.toString().includes(type)
+                item.detail_type?.toString().toLowerCase().includes(type) // 忽略大小寫
             );
         }
-
+    
         // 模糊查詢單據狀態
         if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.detail_suppliername.toString().includes(supplier)
+                item.detail_suppliername?.toString().toLowerCase().includes(supplier) // 忽略大小寫
             );
         }
-
+    
         if (productid) {
             filteredData = filteredData.filter(item =>
-                item.detail_productid.toString().includes(productid)
+                item.detail_productid?.toString().toLowerCase().includes(productid) // 忽略大小寫
             );
         }
-
+    
         if (name) {
             filteredData = filteredData.filter(item =>
-                item.detail_name.toString().includes(name)
+                item.detail_name?.toString().toLowerCase().includes(name) // 忽略大小寫
             );
         }
-
+    
         if (spec) {
             filteredData = filteredData.filter(item =>
-                item.detail_spec.toString().includes(spec)
+                item.detail_spec?.toString().toLowerCase().includes(spec) // 忽略大小寫
             );
         }
-
+    
         setSearchdata(filteredData);
     };
+    
 
     // 監聽條件變更
     useEffect(() => {

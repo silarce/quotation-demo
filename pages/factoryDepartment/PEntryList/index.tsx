@@ -65,8 +65,10 @@ import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function PEntryList() {
+    //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("入庫")
-
+    const [reviewopen, setReviewopen] = useState<boolean>(false)
+    //#endregion
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -91,6 +93,7 @@ export default function PEntryList() {
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [waitindata, setWaitInData] = useState<any[]>([]);
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -129,6 +132,7 @@ export default function PEntryList() {
     //#region ===========【頁面進入】
     useEffect(() => {
         Get();
+        GetDetailCount();
     }, []);
 
     //#endregion
@@ -207,6 +211,38 @@ export default function PEntryList() {
         }
     };
 
+    //取等待入庫的品項數目
+    const GetDetailCount = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                type: "入庫中的清單",
+                username: userInfo?.employee?.id.toString()
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdEntryIn?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responsedata = await response.json();
+            setWaitInData(responsedata);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error: any) {
+            // console.log(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
     //#endregion
 
     //#region ===========【審核】
@@ -499,17 +535,51 @@ export default function PEntryList() {
                 customeRight={[
                     <span style={{ fontSize: '18px', padding: '0px 10px' }}>
 
-                        <button
+                        {/* <button
                             className={scss.shortsquarebtn}
                             style={{
                             }}
+                            onClick={() => {
+                                router.push("/factoryDepartment/PEntryIn");
+                            }}
+                        >
+                            待入品項列表
+                        </button> */}
+                        <button
+                            className={scss.shortsquarebtn}
+                            style={{ position: "relative" }} // 確保按鈕是相對定位，方便放置紅色圈圈
                             onClick={() => {
                                 router.push("/factoryDepartment/PEntryIn");
                                 // setPrbar(!prbar);
                             }}
                         >
                             待入品項列表
+                            {/* 紅色圈圈 */}
+                            {waitindata.length !== 0 && (
+                                <>
+                                    <span
+                                        style={{
+                                            position: "absolute",
+                                            top: "-15px",
+                                            right: "-10px",
+                                            backgroundColor: "#ea1833",
+                                            color: "white",
+                                            borderRadius: "50%",
+                                            width: "30px",
+                                            height: "30px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            fontSize: "14px",
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        {waitindata.length}
+                                    </span>
+                                </>
+                            )}
                         </button>
+
                     </span>
                 ]}
 
@@ -568,117 +638,121 @@ export default function PEntryList() {
                                                         }} />
                                                     </span>
                                                 </div>
-                                                <div
-                                                    key={index}
-                                                    className={`${scss.row02}`}
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '20px',
-                                                        padding: '10px 20px',
-                                                        cursor: 'pointer',
-                                                    }} // 水平排列
-                                                >
-                                                    {_item.stages.length === 0 ? (
-                                                        <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
-                                                    ) : (
-                                                        _item.stages.map((item: any, index: number) => {
-                                                            // 判斷圈圈顏色
-                                                            let circleColor = 'gray'; // 預設為灰色
-                                                            let textColor = 'gray'; // 預設文字顏色為灰色
+                                                {reviewopen && (
+                                                    <>
 
-                                                            if (item.review_order === 1 || item.review_status === '核准') {
-                                                                circleColor = 'green';
-                                                                textColor = 'black'; // 綠色的時候文字變為黑色
+                                                        <div
+                                                            key={index}
+                                                            className={`${scss.row02}`}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '20px',
+                                                                padding: '10px 20px',
+                                                                cursor: 'pointer',
+                                                            }} // 水平排列
+                                                        >
+                                                            {_item.stages.length === 0 ? (
+                                                                <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
+                                                            ) : (
+                                                                _item.stages.map((item: any, index: number) => {
+                                                                    // 判斷圈圈顏色
+                                                                    let circleColor = 'gray'; // 預設為灰色
+                                                                    let textColor = 'gray'; // 預設文字顏色為灰色
 
-                                                                // 如果是核准且存在下一關，設定下一關為簽核中
-                                                                if (
-                                                                    index < _item.stages.length - 1 && // 確保不是最後一關
-                                                                    _item.stages[index + 1].review_status === '' // 下一關的狀態是空
-                                                                ) {
-                                                                    _item.stages[index + 1].review_status = '簽核中';
-                                                                }
-                                                            } else if (
-                                                                item.review_status === '簽核中' &&
-                                                                index > 0 &&
-                                                                _item.stages[index - 1].review_order + 1 === item.review_order
-                                                            ) {
-                                                                circleColor = 'red';
-                                                                textColor = 'black'; // 紅色的時候文字變為黑色
-                                                            }
+                                                                    if (item.review_order === 1 || item.review_status === '核准') {
+                                                                        circleColor = 'green';
+                                                                        textColor = 'black'; // 綠色的時候文字變為黑色
 
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                    style={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '10px',
-                                                                    }}
-                                                                >
-                                                                    {/* 灰色框框 */}
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            backgroundColor: "#f5f5f5",
-                                                                            borderRadius: '15px',
-                                                                            padding: '5px 10px',
-                                                                            gap: '10px',
-                                                                        }}
-                                                                    >
-                                                                        {/* 左邊的圈圈 */}
+                                                                        // 如果是核准且存在下一關，設定下一關為簽核中
+                                                                        if (
+                                                                            index < _item.stages.length - 1 && // 確保不是最後一關
+                                                                            _item.stages[index + 1].review_status === '' // 下一關的狀態是空
+                                                                        ) {
+                                                                            _item.stages[index + 1].review_status = '簽核中';
+                                                                        }
+                                                                    } else if (
+                                                                        item.review_status === '簽核中' &&
+                                                                        index > 0 &&
+                                                                        _item.stages[index - 1].review_order + 1 === item.review_order
+                                                                    ) {
+                                                                        circleColor = 'red';
+                                                                        textColor = 'black'; // 紅色的時候文字變為黑色
+                                                                    }
+
+                                                                    return (
                                                                         <div
+                                                                            key={index}
                                                                             style={{
-                                                                                width: '10px',
-                                                                                height: '10px',
-                                                                                borderRadius: '50%',
-                                                                                backgroundColor: circleColor,
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                gap: '10px',
                                                                             }}
-                                                                        ></div>
-                                                                        {/* 名稱 */}
-                                                                        <span style={{ color: textColor }}>
-                                                                            {item.review_status}&nbsp;
-                                                                            {item.review_person_name}
-                                                                        </span>
-                                                                    </div>
-
-                                                                    {/* 右邊的箭頭，最後一筆不顯示 */}
-                                                                    {index < _item.stages.length - 1 && (
-                                                                        <div style={{ fontSize: '20px', color: 'black' }}>
-                                                                            <svg
-                                                                                width="32"
-                                                                                height="11"
-                                                                                viewBox="0 0 32 11"
-                                                                                fill="none"
-                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                        >
+                                                                            {/* 灰色框框 */}
+                                                                            <div
+                                                                                style={{
+                                                                                    display: 'flex',
+                                                                                    alignItems: 'center',
+                                                                                    backgroundColor: "#f5f5f5",
+                                                                                    borderRadius: '15px',
+                                                                                    padding: '5px 10px',
+                                                                                    gap: '10px',
+                                                                                }}
                                                                             >
-                                                                                <line
-                                                                                    x1="0.5"
-                                                                                    y1="5.5"
-                                                                                    x2="30.5"
-                                                                                    y2="5.5"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></line>
-                                                                                <path
-                                                                                    d="M27 2L31 5.5L27 9"
-                                                                                    stroke="#404040"
-                                                                                    stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                ></path>
-                                                                            </svg>
+                                                                                {/* 左邊的圈圈 */}
+                                                                                <div
+                                                                                    style={{
+                                                                                        width: '10px',
+                                                                                        height: '10px',
+                                                                                        borderRadius: '50%',
+                                                                                        backgroundColor: circleColor,
+                                                                                    }}
+                                                                                ></div>
+                                                                                {/* 名稱 */}
+                                                                                <span style={{ color: textColor }}>
+                                                                                    {item.review_status}&nbsp;
+                                                                                    {item.review_person_name}
+                                                                                </span>
+                                                                            </div>
+
+                                                                            {/* 右邊的箭頭，最後一筆不顯示 */}
+                                                                            {index < _item.stages.length - 1 && (
+                                                                                <div style={{ fontSize: '20px', color: 'black' }}>
+                                                                                    <svg
+                                                                                        width="32"
+                                                                                        height="11"
+                                                                                        viewBox="0 0 32 11"
+                                                                                        fill="none"
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                    >
+                                                                                        <line
+                                                                                            x1="0.5"
+                                                                                            y1="5.5"
+                                                                                            x2="30.5"
+                                                                                            y2="5.5"
+                                                                                            stroke="#404040"
+                                                                                            stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                        ></line>
+                                                                                        <path
+                                                                                            d="M27 2L31 5.5L27 9"
+                                                                                            stroke="#404040"
+                                                                                            stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                        ></path>
+                                                                                    </svg>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })
+                                                                    );
+                                                                })
 
-                                                    )}
+                                                            )}
 
-                                                </div>
-
+                                                        </div>
+                                                    </>
+                                                )}
 
                                             </>
 
@@ -708,7 +782,7 @@ export default function PEntryList() {
                                                             <td style={{ width: '300px' }}>{detail.name}</td>
                                                             <td style={{ width: '400px' }}>{detail.spec}</td>
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                                                            <td style={{ width: '150px',color:'#ea1833' }}>{detail.entry_qty?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px', color: '#ea1833' }}>{detail.entry_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
                                                             <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
                                                             <td>{detail.totalprice?.toLocaleString()}</td>

@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -10,14 +9,12 @@ import BudgeList from 'components/page/domestic/budget/budgetList';
 
 // global gear
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
-import ContractSelector from 'components/global/gear/modal/contractSelector';
 
 // css
 import scss from './index.module.scss';
 
 // api
-import { Tparams, useGetQuotation_infinite, useGetQuotation_detail_infinite } from 'js/api/api_quotation';
+import { Tparams, useGetQuotation_detail_infinite } from 'js/api/api_quotation';
 
 // option lookup
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -39,7 +36,7 @@ type Tquery = {
 };
 
 // ===========================================================
-// const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
+
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 
@@ -57,8 +54,6 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   if (userGrade >= 14) {
     userId = undefined;
   }
-
-  // const [contractSelectShow, setContractSelectShow] = useState(false);
 
   // ----------------------------------------------------
   //
