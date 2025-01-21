@@ -69,6 +69,7 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import {
   TquotationDto,
   TquotationContentDto,
+  TquotationContractDto,
   // TcreateQuotationContentDto,
   // useGetQuotation_id,
   // useGetQuotation_id_2,
@@ -264,7 +265,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     iterativeContractProductArr,
 
     prodArrForPDf,
+
+    isQuotationExpired,
+    latestSubContract,
+    parentSubContract,
   } = useData();
+
+  // console.log(isQuotationExpired);
+
   isAttach = !!iterativeContractProductArr?.length;
 
   !quotationId && !contentId && (quotationType = 'new');
@@ -350,6 +358,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     calcProductBody,
     doorModelSummery,
     doorModelSummery_reduceModified,
+    checkIsIterativeProdValid,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -552,6 +561,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新追加追減報價單
   const handlePatchModify = () => {
+    if (checkIsIterativeProdValid()) {
+      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+
+      return;
+    }
+
     const { destroy } = myAlert.input({
       isTextArea: true,
       title: '報價單註解',
@@ -675,6 +690,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: 審核
   const handleReview = async () => {
+    if (!checkIsIterativeProdValid()) {
+      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+
+      return;
+    }
+
     const callReq = async (isPass: boolean) => {
       if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
         myAlert.warning({ title: '請先送出合約審核表' });
@@ -694,7 +715,20 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
       const res = await reqReview(body);
 
-      if (res?.status === 'Contract') {
+      if (
+        res?.status === 'Contract' // 沒有給status.....
+        // 可以這樣判斷是否已被審核完畢並轉為合約
+        // content?.status==="Pending" && !!res.managerReviewedAt
+        // 但是原本的錯誤一直都沒有被使用者反應，所以決定不修正
+      ) {
+        // res中沒有contract的id，無法導向到合約頁面
+        // router.replace({
+        //   pathname: '/domestic/contract/quotation',
+        //   query: {
+        //     id: res.id,
+        //     version: '1',
+        //   },
+        // });
         router.back();
       } else {
         update_quotation();
@@ -878,6 +912,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     showPdf,
     showPdf_noDiscount,
     showPdf_part: () => setShow_pdfPart(true),
+    //
+    isQuotationExpired,
+    quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
   });
 
   const history = useHistory({
@@ -949,15 +986,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             )
           }
         />
-
-        <InputSel
-          className={'ml-[50px]'}
-          caption={'門型彙總'}
-          showBaseline="invisible"
-          captionStyle={{ width: '120px' }}
-          wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-          node={<DoorSummary list={doorSummaryArr} />}
-        />
+        <div className={'ml-[50px]'}>
+          <InputSel
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px' }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary list={doorSummaryArr} />}
+          />
+        </div>
 
         {/* prod */}
         {/* prod */}
@@ -1262,10 +1299,50 @@ const useData = () => {
 
   const attachedToContract = quotationData?.attachedToContract || raw_contract;
 
-  // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
-  const iterativeContractProductDict = useIterativeContractProduct({ contract: attachedToContract });
-
   const content = quotationData?.designatedContent;
+
+  const { isQuotationExpired, latestSubContract, parentSubContract } = useMemo(() => {
+    const result: {
+      isQuotationExpired: boolean;
+      latestSubContract: TquotationContractDto | undefined;
+      parentSubContract: TquotationContractDto | undefined;
+    } = {
+      isQuotationExpired: false,
+      latestSubContract: undefined,
+      parentSubContract: undefined,
+    };
+
+    if (!attachedToContract?.subContracts.length || !quotationData) {
+      return result;
+    }
+
+    const subContracts = _.orderBy(attachedToContract.subContracts ?? [], 'version');
+    const latestSubContract = subContracts[subContracts.length - 1];
+    const latestSubContractCreatedAt = new Date(latestSubContract.createdAt);
+    const quotationCreatedAt = new Date(quotationData.createdAt);
+
+    const subContractBelongedArr = subContracts.filter(({ createdAt }) => {
+      return quotationCreatedAt > new Date(createdAt);
+    });
+
+    const parentSubContract = subContractBelongedArr[subContractBelongedArr.length - 1];
+
+    if (latestSubContractCreatedAt > quotationCreatedAt) {
+      result.isQuotationExpired = true;
+      result.latestSubContract = latestSubContract;
+      result.parentSubContract = parentSubContract;
+
+      return result;
+    }
+
+    return result;
+  }, [quotationData, attachedToContract]);
+
+  // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
+  const iterativeContractProductDict = useIterativeContractProduct({
+    contract: attachedToContract,
+    untilVersion: parentSubContract?.version,
+  });
 
   const { iterativeContractProductArr, prodArr } = useMemo(() => {
     const arr = Object.values(iterativeContractProductDict);
@@ -1386,7 +1463,6 @@ const useData = () => {
 
     return { iterativeContractProductArr, prodArr: parsedProdArr };
   }, [iterativeContractProductDict, content?.products]);
-
   //
 
   const prodArrForPDf = useMemo(() => {
@@ -1481,6 +1557,10 @@ const useData = () => {
     iterativeContractProductArr,
     //
     prodArrForPDf,
+    //
+    isQuotationExpired,
+    latestSubContract,
+    parentSubContract,
   };
 };
 

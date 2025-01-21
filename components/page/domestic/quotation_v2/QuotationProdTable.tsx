@@ -824,6 +824,8 @@ const QuotationRow_dealClass = ({
   return (
     <Spin spinning={classProd.isFetching}>
       <QuotationRow_dnd
+        className={classNames(scss.row, !classProd.isQuantityValid && scss.notValid)}
+        isActive={isActive}
         //
         // rerenderTrigger01={classProd.state}
         // rerenderTrigger02={disabled}
@@ -833,10 +835,9 @@ const QuotationRow_dealClass = ({
         id={prodKey}
         index={index}
         //
-        isActive={isActive}
+        dragHandleInvisible={disabled || isIterativeProd}
         left={left}
         right={right}
-        dragHandleInvisible={disabled || isIterativeProd}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);
@@ -845,7 +846,6 @@ const QuotationRow_dealClass = ({
           e.stopPropagation();
           choseActiveProd(classProd.state);
         }}
-        className="min-h-11"
       >
         {cellKeyArr.map((cellKey, cIndex) => {
           const { style, className, createNode } = classProd.nodeConfig[cellKey];
