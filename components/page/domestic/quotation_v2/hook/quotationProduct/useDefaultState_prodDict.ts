@@ -14,6 +14,10 @@ import type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData } 
 import type { TquotationProductDto_addition } from 'js/api/api_quotation';
 import { TprodSource } from './useQuotationProduct';
 
+import { calcQtyReduceModified } from './method/calcProd';
+
+// ===========================================================================
+
 interface TdefaultState {
   stateProdDict: TstateProdDict;
   prodKeyArr: string[];
@@ -103,6 +107,19 @@ const useDefaultState_prodDict = ({
         }
       }
 
+      const isQuantityValid = (() => {
+        const qty_reduceModified = calcQtyReduceModified({
+          stateProd: {
+            qty_reduce: `${qty_reduce || 0}`,
+            modifyedProduct,
+          },
+        });
+
+        const qty_prod = Number(data_prod.quantity || 0);
+
+        return qty_reduceModified <= qty_prod;
+      })();
+
       // 在這裡，generalSpecs與availableComponents必須是undefined
       // undefined視為未曾初始化
       const state: TstateProd & {
@@ -125,6 +142,7 @@ const useDefaultState_prodDict = ({
         deductedPrice,
         modifyedProduct: modifyedProduct,
         quotationDiscount_iterativeProd: quotationDiscount,
+        isQuantityValid,
 
         latestIterativeId: latestIterativeId,
 
@@ -132,6 +150,8 @@ const useDefaultState_prodDict = ({
 
         rootProduct,
       };
+
+      calcQtyReduceModified({ stateProd: state });
 
       dict[data_prod.id] = state;
     });
@@ -468,11 +488,10 @@ const createEmptyStateProd = () => {
     availableComponents: null,
 
     qty_reduce: '',
-    // qty_modify: 0,
     deductedPrice: 0,
-    // modifyedProductKeyArr: [],
     modifyedProduct: {},
-    // rootProductId: undefined,
+    isQuantityValid: true,
+
     latestIterativeId: undefined,
     action: '追加',
   };

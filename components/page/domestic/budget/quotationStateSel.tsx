@@ -96,6 +96,7 @@ export default function QuotationStateSel({
           className={scss.select03}
           showBaseline="invisible"
           selectProps={{
+            menuPortalTarget: 'undefined',
             value: quotationState,
             options: optionQuotationState,
             onChange: onChange,

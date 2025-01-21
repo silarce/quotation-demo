@@ -49,6 +49,9 @@ interface Tprops {
   showPdf: () => void;
   showPdf_noDiscount: () => void;
   showPdf_part: () => void;
+  //
+  isQuotationExpired: boolean;
+  quotationExpiredInfo: string;
 }
 
 // ================================================================================
@@ -89,6 +92,9 @@ const usePanel = ({
   handleSubmit,
   showVerifyForm,
   handleReqUnlock,
+
+  isQuotationExpired,
+  quotationExpiredInfo,
 }: Tprops) => {
   const router = useRouter();
 
@@ -100,7 +106,8 @@ const usePanel = ({
     isDesignatedContent ||
     quotationType === 'new' ||
     quotationType === 'newAttachment' ||
-    quotationType === 'oldAttachment';
+    quotationType === 'oldAttachment' ||
+    isQuotationExpired;
 
   // -----------------------------------------------------------------------
 
@@ -109,16 +116,6 @@ const usePanel = ({
 
     let btnUpdateOnClick = btnPatchOnClick;
 
-    // if (isNewQuotation) {
-    //   btnUpdateOnClick = btnPostOnClick;
-    //   label_update = '新建報價單';
-    // } else if (isNewAttachmentQuotation) {
-    //   btnUpdateOnClick = btnModifyOnClick;
-    //   label_update = '新建追加追減報價單';
-    // } else if (isAttachmentQuotation) {
-    //   btnUpdateOnClick = btnPatchModifyOnClick;
-    //   label_update = '更新追加追減報價單';
-    // }
     if (quotationType === 'new') {
       btnUpdateOnClick = btnPostOnClick;
       label_update = '新建報價單';
@@ -225,20 +222,11 @@ const usePanel = ({
     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
     isOldQuotation && isReviewer ? panel_review : null,
     isOldQuotation ? panel_submit : null,
-    !isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+    isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
     status === 'Pending' ? null : panel_edit,
     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
     panel_return,
   ];
-  // const panelList_disabled_quotation: TpanelList = [
-  //   isQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
-  //   isQuotation && isReviewer ? panel_review : null,
-  //   isQuotation ? panel_submit : null,
-  //   !isNewQuotation && status === 'Pending' ? panel_showVerifyForm : null,
-  //   status === 'Pending' ? null : panel_edit,
-  //   status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
-  //   panel_return,
-  // ];
 
   const panelList_disabled_content: TpanelList = [panel_edit, panel_return];
 
@@ -246,7 +234,19 @@ const usePanel = ({
     ? panelList_disabled_content
     : panelList_disabled_quotation;
 
-  const panelList = disabled ? panelList_disabled : panelList_abled;
+  const panelList_expired: TpanelList = [
+    {
+      type: 'redButton',
+      label: '報價單過期',
+      onClick: () => {
+        myAlert.info({ title: '報價單過期', content: quotationExpiredInfo });
+      },
+    },
+    panel_return,
+  ];
+
+  // const panelList = disabled ? panelList_disabled : panelList_abled;
+  const panelList = isQuotationExpired ? panelList_expired : disabled ? panelList_disabled : panelList_abled;
 
   return { panelList, customeRight };
 };

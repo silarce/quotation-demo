@@ -621,6 +621,14 @@ const useQuotationProduct = ({
     });
   };
 
+  const checkIsIterativeProdValid = () => {
+    const IsIterativeProdInvalid = Object.values(state_iterativeProdDict).some(
+      (stateProd) => !stateProd.isQuantityValid
+    );
+
+    return !IsIterativeProdInvalid;
+  };
+
   // const calcProductBody_2 = () => {
   //   const body_normal = _calcProductBody({
   //     prodKeyArr,
@@ -803,6 +811,7 @@ const useQuotationProduct = ({
     calcProductBody,
     doorModelSummery,
     doorModelSummery_reduceModified,
+    checkIsIterativeProdValid,
   };
 };
 

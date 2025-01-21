@@ -424,7 +424,13 @@ const calcQtyModify = ({ modifyedProduct }: { modifyedProduct: TstateProd['modif
   return qty;
 };
 
-const calcQtyReduceModified = ({ stateProd }: { stateProd: TstateProd }) => {
+// const calcQtyReduceModified = ({ stateProd }: { stateProd: TstateProd }) => {
+const calcQtyReduceModified = ({
+  //
+  stateProd,
+}: {
+  stateProd: Pick<TstateProd, 'qty_reduce' | 'modifyedProduct'>;
+}) => {
   const qty_reduce = Number(stateProd.qty_reduce || 0);
   const qty_modifyed = calcQtyModify({ modifyedProduct: stateProd.modifyedProduct });
   const qty_reduceModified = new Decimal(qty_reduce).add(qty_modifyed).toNumber();

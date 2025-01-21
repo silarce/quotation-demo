@@ -324,16 +324,16 @@ const checkIsReviewer = (props: Tprops_checkIsReviewer) => {
     }
   });
 
-  if (
-    props.status === 'Pending' &&
-    !Object.values(reviewerRole).includes(true) &&
-    userId === reviewManagerEmployeeId &&
-    (reviewManagerEmployeeId === reviewSalesEmployeeId || reviewManagerEmployeeId === reviewSupervisorEmployeeId)
-  ) {
-    isReviewer = true;
-    reviewerRole = _.cloneDeep(reviewerRole_ori);
-    reviewerRole.isManager = true;
-  }
+  // if (
+  //   props.status === 'Pending' &&
+  //   !Object.values(reviewerRole).includes(true) &&
+  //   userId === reviewManagerEmployeeId &&
+  //   (reviewManagerEmployeeId === reviewSalesEmployeeId || reviewManagerEmployeeId === reviewSupervisorEmployeeId)
+  // ) {
+  //   isReviewer = true;
+  //   reviewerRole = _.cloneDeep(reviewerRole_ori);
+  //   reviewerRole.isManager = true;
+  // }
 
   return { isReviewer, ...reviewerRole };
 };
