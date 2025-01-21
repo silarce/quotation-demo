@@ -52,10 +52,20 @@ const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
 
 const useReviewFlow = ({
   uuid,
+  document_id,
   autoUpdate = true,
+  reviewBackAnyStatus = false,
 }: {
   uuid?: string; // 資料的id
+  /**
+   * document_id不是真正的，用來辨識唯一資料的識別id，
+   * 也就是說，可能會有多筆資料有同樣的document_id
+   * 基本上會是serial_number，但不一定，也不是非serial_number不可
+   * 後端似乎通常稱為單號
+   */
+  document_id?: string;
   autoUpdate?: boolean;
+  reviewBackAnyStatus?: boolean;
 } = {}) => {
   const router = useRouter();
   const query = router.query as { id?: string | undefined }; // id為資料的id
@@ -65,11 +75,18 @@ const useReviewFlow = ({
     //  req_addReview,
     req_reviewBack,
     req_backThanAdd,
+    req_reviewBack_anyStatus,
+    req_backThanAdd_anyStatus,
   } = useGlobal_review();
 
   const [isFetching, setIsFetching] = useState(false);
 
-  const { raw, update, isFetching: isFetching_get, isFirstLoaded } = useGetReviewById(document_uuid, { autoUpdate });
+  const {
+    raw,
+    update,
+    isFetching: isFetching_get,
+    isFirstLoaded,
+  } = useGetReviewById(document_uuid, { document_id, autoUpdate });
 
   const ReviewFlow = useCallback((props: Omit<Tprops, 'raw'>) => <ReviewFlow_pre raw={raw} {...props} />, [raw]);
 
@@ -90,17 +107,13 @@ const useReviewFlow = ({
 
     setIsFetching(true);
 
-    return await req_backThanAdd(body)
+    const apiClient = reviewBackAnyStatus ? req_backThanAdd_anyStatus : req_backThanAdd;
+
+    return await apiClient(body)
       .then(async () => {
         await update();
       })
       .finally(() => setIsFetching(false));
-
-    // return await apiAddReview(body)
-    //   .then(async () => {
-    //     await update();
-    //   })
-    //   .finally(() => setIsFetching(false));
   };
 
   // 抽單
@@ -113,7 +126,9 @@ const useReviewFlow = ({
 
     setIsFetching(true);
 
-    return await req_reviewBack(document_uuid)
+    const apiClient = reviewBackAnyStatus ? req_reviewBack_anyStatus : req_reviewBack;
+
+    return await apiClient(document_uuid, { document_id })
       .then(async () => {
         await update();
       })
