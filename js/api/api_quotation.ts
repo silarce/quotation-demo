@@ -1,9 +1,10 @@
 // apiGetQuotationProducts
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import Decimal from 'decimal.js';
 
 import { axi, domain } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
@@ -64,6 +65,7 @@ export type {
   TquotationAccounting_modifyContract,
   TbonusDto,
 } from './dtoTypes';
+export type { TquotationProductDto_addition };
 
 type TgetQuotation = {
   data: TquotationDto[];
@@ -175,7 +177,7 @@ export const useGetQuotation_detail_infinite = createUseInfinite<TgetQuotation>(
   errTitle: '取得報價單失敗',
 });
 
-export const apiGetQuotation_Id = async (id: string, params?: Tparams) => {
+export const apiGetQuotation_old = async (id: string, params?: Tparams) => {
   const api = `/quotation/${id}`;
 
   params = {
@@ -222,7 +224,7 @@ export const useGetQuotation_id = (id: string | undefined, { params }: { params?
     }
 
     try {
-      const newRes = await apiGetQuotation_Id(id, params);
+      const newRes = await apiGetQuotation_old(id, params);
 
       if (newRes) {
         setRes(newRes);
@@ -241,7 +243,7 @@ export const useGetQuotation_id = (id: string | undefined, { params }: { params?
   };
 };
 
-export const apiGetQuotation_id_2 = async (id: string, params?: Tparams) => {
+export const apiGetQuotation_id = async (id: string, params?: Tparams) => {
   const api = `/quotation/${id}`;
 
   return axi
@@ -283,17 +285,18 @@ export const useGetQuotation_id_2 = (
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const res = await apiGetQuotation_id_2(id, theParams);
+      const res = await apiGetQuotation_id(id, theParams);
 
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-        await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
-          res.latestContent.products = wholeProdArr;
+        await getIterativeProductArr(prodIdArr).then((iterativeProdArr) => {
+          res.latestContent.products = iterativeProdArr;
         });
       }
 
-      setIsLoading(true);
       setRes(res);
 
       return res;
@@ -308,7 +311,7 @@ export const useGetQuotation_id_2 = (
     }
   };
 
-  const renewProd = (wholeProd: TquotationProductDto) => {
+  const renewProd = (iterativeProd: TquotationProductDto) => {
     setRes((res) => {
       if (!res) {
         return res;
@@ -316,8 +319,8 @@ export const useGetQuotation_id_2 = (
 
       const copy = { ...res };
 
-      const index = copy.latestContent.products.findIndex((prod) => wholeProd.id === prod.id);
-      copy.latestContent.products[index] = wholeProd;
+      const index = copy.latestContent.products.findIndex((prod) => iterativeProd.id === prod.id);
+      copy.latestContent.products[index] = iterativeProd;
 
       return copy;
     });
@@ -352,29 +355,29 @@ export const useGetQuotation_id_2 = (
       }
 
       const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-      await getWholeProductArr(prodIdArr).then((wholdProdArr) => {
+      await getIterativeProductArr(prodIdArr).then((wholdProdArr) => {
         res.latestContent.products = wholdProdArr;
       });
     };
 
-  const updateAllWholeProd_batch_noRender = async () =>
-    //   {
-    //   stopToken,
-    //   onBatchSuceess,
-    // }: {
-    //   stopToken: { stop: boolean };
-    //   onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
-    // }
-    {
-      if (!res) {
-        return;
-      }
+  // const updateAllWholeProd_batch_noRender = async () =>
+  //   //   {
+  //   //   stopToken,
+  //   //   onBatchSuceess,
+  //   // }: {
+  //   //   stopToken: { stop: boolean };
+  //   //   onBatchSuceess?: (wholdProdArr: TquotationProductDto[]) => void;
+  //   // }
+  //   {
+  //     if (!res) {
+  //       return;
+  //     }
 
-      const prodIdArr = res.latestContent.products.map((prod) => prod.id);
-      await getWholeProductArr(prodIdArr).then((wholeProdArr) => {
-        res.latestContent.products = wholeProdArr;
-      });
-    };
+  //     const prodIdArr = res.latestContent.products.map((prod) => prod.id);
+  //     await getInterativeProductArr(prodIdArr).then((wholeProdArr) => {
+  //       res.latestContent.products = wholeProdArr;
+  //     });
+  //   };
 
   return {
     data: res,
@@ -387,6 +390,8 @@ export const useGetQuotation_id_2 = (
     // updateAllWholeProd_batch_noRender,
   };
 };
+
+//
 
 //
 //
@@ -1185,8 +1190,8 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 
     return await apiGetContract_Id(id, params).then(async (res) => {
       const prodIdArr = res.content.products.map(({ id }) => id);
-      const wholeProdArr = await getWholeProductArr(prodIdArr);
-      res.content.products = wholeProdArr;
+      const iterativeProdArr = await getIterativeProductArr(prodIdArr);
+      res.content.products = iterativeProdArr;
 
       setRes(res);
 
@@ -1234,7 +1239,7 @@ export const useGetContract_id_contentProductItems = (
         // //     return await apiGetQuotationProducts(productId);
         // //   })
         // // );
-        const productArr = await getWholeProductArr(res.content.products.map(({ id }) => id));
+        const productArr = await getIterativeProductArr(res.content.products.map(({ id }) => id));
         res.content.products = productArr;
 
         const version_num = Number(version);
@@ -1256,7 +1261,7 @@ export const useGetContract_id_contentProductItems = (
             // // );
 
             const prodIdArr = theSubContract!.content.products.map(({ id }) => id) ?? [];
-            const productArr = await getWholeProductArr(prodIdArr);
+            const productArr = await getIterativeProductArr(prodIdArr);
 
             theSubContract!.content.products = productArr;
           }
@@ -1385,6 +1390,7 @@ export const apiPatchQuotation = (body: TcreateQuotationContentDto, id: string) 
 };
 
 // 設定報價單審核人員
+// body送{}似乎是不變更審核人員，僅重置審核狀態
 export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuationContentDto) => {
   const api = `/quotation/${id}/submit`;
 
@@ -1454,7 +1460,7 @@ export const apiGetQuotation_id_attachments = (id: string) => {
   const api = `/quotation/${id}/attachments`;
 
   return axi
-    .get(api)
+    .get<TfileDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1484,6 +1490,8 @@ export const useQuotation_id_attachments = (id: string | undefined) => {
 };
 
 /**上傳報價單附件 */
+// 似乎一次只能上傳一個檔案，也就是formData裡只能有一個file
+// 這個api收的是content的id
 export const apiPostQuotation_id_attachments = (id: string, body: FormData) => {
   const api = `/quotation/${id}/attachments`;
 
@@ -1494,6 +1502,8 @@ export const apiPostQuotation_id_attachments = (id: string, body: FormData) => {
 };
 
 /**移除報價單附件 */
+// 如果移除了，該版本報價單的附件是不是就沒了?
+// 這個api實際上似乎不該使用?
 export const apiDelQuotation_id_attachments = (id: string, fileId: string) => {
   const api = `/quotation/${id}/attachments/${fileId}`;
 
@@ -1509,7 +1519,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
   const api = `/quotation/${contractId}/modify`;
 
   return axi
-    .patch(api, body)
+    .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1783,11 +1793,12 @@ export const apiPatchQuotationToPending = ({ contentId }: { contentId: string })
 // };
 
 // 複製報價單
+// 僅會複製latest.cotent，不會複製contents
 export const apiPostCopyQuotation = (body: TcopyQuotationDto) => {
   const api = '/quotation/copy-quotation';
 
   return axi
-    .post(api, body)
+    .post<TquotationDto>(api, body)
     .then(({ data }) => data)
     .catch((error) => {
       const err = error as AxiosError;
@@ -1832,19 +1843,19 @@ export const apiPatchQuotationContent_id_progress = (contentId: string, body: Tp
 
 // region FUNCTION
 
-const getWholeProductArr = async (prodIdArr: string[]) => {
+const getIterativeProductArr = async (prodIdArr: string[]) => {
   const chunk = _.chunk(prodIdArr, 20); // api一次最多取20筆
-  const wholeProdArr: TquotationProductDto[] = [];
+  const iterativeProdArr: TquotationProductDto[] = [];
 
   for (const chunkIndex in chunk) {
     const idArr = chunk[chunkIndex];
 
     await apiGetQuotationMultiProducts(idArr).then((prodArr) => {
-      wholeProdArr.push(...prodArr);
+      iterativeProdArr.push(...prodArr);
     });
   }
 
-  return wholeProdArr;
+  return iterativeProdArr;
 };
 
 // ========================================================================
@@ -1948,8 +1959,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
     'latestContent.customer',
     'latestContent.designUnit',
     'latestContent.agentEmployee',
-    'latestContent.supervisorEmployee',
-    'latestContent.managerEmployee',
+
+    // 'latestContent.supervisorEmployee',
+    // 'latestContent.managerEmployee',
 
     'latestContent.reviewSalesEmployee',
     'latestContent.reviewSupervisorEmployee',
@@ -1979,3 +1991,715 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 }
 
 const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+
+// MARK:useGetQuotation_id_3
+
+type TquotationDto_addition = TquotationDto & {
+  designatedContent: TquotationContentDto;
+};
+
+export const useGetQuotation_id_3 = (
+  id: string | undefined | null,
+  {
+    designatedContentId,
+    params: _params,
+  }: {
+    designatedContentId?: string;
+    params?: Tparams;
+  }
+) => {
+  const { populate = [], ...restParams } = _params ?? {};
+
+  const populate_quotation = [
+    'latestContent.customer',
+    'latestContent.designUnit',
+    'latestContent.agentEmployee',
+
+    'latestContent.reviewSalesEmployee',
+    'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewSalesManagerEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewCashierEmployee',
+    'latestContent.reviewManagerEmployee',
+
+    'latestContent.products',
+    'latestContent.others',
+    'latestContent.verifyForm',
+
+    'attachedToContract.subContracts.content.products',
+  ];
+
+  const populate_content = populate_quotation.map((item) => item.replace('latestContent.', ''));
+
+  // const defaultPopulate = designatedContentId ? [] : populate_quotation;
+
+  const theParams = {
+    populate: [...populate_quotation, ...populate],
+    ...restParams,
+  };
+
+  // ------------------------------------------------------------------------
+
+  const [isFetching, setIsFetching] = useState(false);
+  const [raw, setRaw] = useState<TquotationDto_addition | null>();
+  const [attachmentArr, setAttachmentArr] = useState<TfileDto[] | null>();
+
+  // ------------------------------------------------------------------------
+
+  // const { attachedToContractId } = raw || {};
+  // const {} = raw?.latestContent || {};
+
+  // 是否為追加追減報價單
+  // const isAttached = attachedToContractId === undefined ? undefined : !!attachedToContractId;
+
+  // ------------------------------------------------------------------------
+
+  // 取得
+  const update = async () => {
+    if (isFetching) {
+      return;
+    } else if (!id) {
+      setRaw(null);
+      setAttachmentArr(null);
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    const quotation = await apiGetQuotation_id(id, theParams)
+      .then(async (quotation) => {
+        const quotation_addition: TquotationDto_addition = {
+          ...quotation,
+          designatedContent: quotation.latestContent,
+        };
+
+        if (designatedContentId) {
+          const content = await apiGetQuotationContent_Id_2(designatedContentId, { populate: populate_content });
+
+          if (content) {
+            quotation_addition.designatedContent = content;
+          }
+        }
+
+        return quotation_addition;
+      })
+      // .then(async (quotation) => {
+      //   const prodIdArr = quotation.latestContent.products.map((prod) => prod.id);
+      //   const wholeProdArr = await getWholeProductArr(prodIdArr);
+      //   quotation.latestContent.products = wholeProdArr;
+
+      //   return quotation;
+      // })
+      .then(async (quotation_addition) => {
+        const designatedContent = quotation_addition.designatedContent;
+
+        const prodIdArr = designatedContent.products.map((prod) => prod.id);
+        const iterativeProdArr = await getIterativeProductArr(prodIdArr);
+        designatedContent.products = iterativeProdArr;
+
+        return quotation_addition;
+      })
+      .catch(() => {
+        myAlert.notify.error({
+          message: '取得報價單資料失敗',
+        });
+
+        return null;
+      });
+
+    if (!quotation) {
+      setRaw(null);
+      setAttachmentArr(null);
+
+      return null;
+    }
+
+    const contentId = quotation.designatedContent.id;
+
+    const attachmentArr = await apiGetQuotation_id_attachments(contentId)
+      .then((attachmentArr) => {
+        return attachmentArr;
+      })
+      .catch(() => {
+        myAlert.notify.error({
+          message: '取得附件資料失敗',
+        });
+
+        return null;
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+
+    setRaw(quotation);
+    setAttachmentArr(attachmentArr);
+
+    return {
+      quotation,
+      attachmentArr,
+    };
+  }; // update
+
+  // ------------------------------------------------------------------------
+
+  // 新增
+  // post成功後不會自動更新
+  const reqPost = async ({
+    body,
+    attachmentArr,
+  }: // onPostSuccess,
+  {
+    body: TcreateQuotationContentDto;
+    attachmentArr: FormData[];
+    // onPostSuccess?: (newQuotation: TquotationDto) => void;
+  }) => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiPostQuotation(body).catch((err) => {
+        myAlert.err({ title: '新增報價單失敗' });
+        console.log(err);
+      });
+
+      if (!res) {
+        setIsFetching(false);
+
+        return {
+          newQuotation: undefined,
+          isUpdated: false,
+        };
+      }
+
+      const contentId = res.latestContent.id;
+      let isSomethingWrong = false;
+
+      for (const attachment of attachmentArr) {
+        await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+          isSomethingWrong = true;
+        });
+      }
+
+      isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+      return {
+        newQuotation: res,
+        isUpdated: true,
+      };
+    } catch (error) {
+      return {
+        newQuotation: undefined,
+        isUpdated: false,
+      };
+    } finally {
+      setIsFetching(false);
+    }
+
+    // return await apiPostQuotation(body)
+    //   .then(async (newQuotation) => {
+    //     const contentId = newQuotation.latestContent.id;
+    //     let isSomethingWrong = false;
+
+    //     for (const attachment of attachmentArr) {
+    //       await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+    //         isSomethingWrong = true;
+    //       });
+    //     }
+
+    //     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+    //     return newQuotation;
+    //   })
+    //   .then((newQuotation) => {
+    //     onPostSuccess && onPostSuccess(newQuotation);
+
+    //     return newQuotation;
+    //   })
+    //   .catch((err) => {
+    //     myAlert.err({ title: '新增報價單失敗' });
+    //     console.log(err);
+    //   })
+    //   .finally(() => {
+    //     setIsFetching(false);
+    //   });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 更新
+  const reqPatch = async ({ body, attachmentArr }: { body: TcreateQuotationContentDto; attachmentArr: FormData[] }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return {
+        newQuotation: undefined,
+        attachmentArr: undefined,
+        isUpdated: false,
+      };
+    }
+
+    let isUpdated = false;
+
+    setIsFetching(true);
+
+    const res = await apiPatchQuotation(body, raw.id).catch((err) => {
+      myAlert.err({ title: '更新報價單失敗' });
+      console.log(err);
+    });
+
+    if (!res) {
+      setIsFetching(false);
+
+      return {
+        newQuotation: undefined,
+        newAttachmentArr: undefined,
+        isUpdated,
+      };
+    }
+
+    const contentId = res.latestContent.id;
+    let isSomethingWrong = false;
+
+    for (const attachment of attachmentArr) {
+      await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+        isSomethingWrong = true;
+      });
+    }
+
+    isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+    const newQuotation = await update();
+    isUpdated = true;
+
+    setIsFetching(false);
+
+    return {
+      newQuotation: newQuotation?.quotation,
+      newAttachmentArr: newQuotation?.attachmentArr,
+      isUpdated,
+    };
+
+    // const newQuotation = await apiPatchQuotation(body, raw.id)
+    //   .then(async (newQuotation) => {
+    //     shouldUpdate = true;
+    //     const contentId = newQuotation.latestContent.id;
+    //     let isSomethingWrong = false;
+
+    //     for (const attachment of attachmentArr) {
+    //       await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
+    //         isSomethingWrong = true;
+    //       });
+    //     }
+
+    //     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
+
+    //     return newQuotation;
+    //   })
+    //   .catch((err) => {
+    //     myAlert.err({ title: '更新報價單失敗' });
+    //     console.log(err);
+    //   })
+    //   .finally(async () => {
+    //     if (shouldUpdate) {
+    //       await update();
+    //       isUpdated = true;
+    //     }
+
+    //     setIsFetching(false);
+    //   });
+
+    // return {
+    //   newQuotation: res,
+    //   isUpdated,
+    // };
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 送審
+  // body送{}似乎是不變更審核人員，僅重置審核狀態
+  const reqPatchReviewer = async ({
+    // quotationId,
+    body,
+  }: {
+    // quotationId: string;
+    body: TsubmitReviewQotuationContentDto;
+  }) => {
+    if (!raw) {
+      myAlert.warning({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiQuotationSubmitReview(raw.id, body)
+      .then(async (res) => {
+        myAlert.success({ title: '送審成功' });
+        await update();
+
+        return res;
+      })
+      .catch((error) => {
+        const err = error as Error;
+        myAlert.err({ title: '更新審核人員失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 審核
+  const reqReview = async (body: TreviewQuotationContentDto) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiQuotationReview({ id: raw.id, body })
+      .then(async (res) => {
+        myAlert.success({ title: '審核成功' });
+
+        return res;
+
+        // return await update();
+      })
+      .catch((err) => {
+        myAlert.err({ title: '審核失敗', content: err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 解鎖
+  const reqUnlock = async () => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiQuotationUnlock(raw.id)
+      .then(async () => {
+        myAlert.success({ title: '解除鎖定成功', content: '該報價單改為發包' });
+
+        return await update();
+      })
+      .catch((error) => {
+        const err = error as AxiosError<{ message: string }>;
+        myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 轉為準合約
+  const reqToPending = async (contentId: string) => {
+    setIsFetching(true);
+
+    return await apiPatchQuotationToPending({ contentId })
+      .then(async () => {
+        return await update();
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 複製報價單
+  // 僅會複製latest.cotent，不會複製contents
+  const reqCopyQuotation = async ({
+    customerId,
+    isRelationQuotation = false,
+  }: {
+    customerId: string;
+    isRelationQuotation?: boolean; // 是否關聯報價單
+  }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    setIsFetching(true);
+    const res = await apiPostCopyQuotation({
+      quotationId: raw.id,
+      customerId,
+      isRelationQuotation,
+    });
+    setIsFetching(false);
+
+    return res;
+  };
+
+  // ------------------------------------------------------------------------
+
+  // 編輯報價單追蹤狀態;
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    if (!raw) {
+      myAlert.info({ title: '還未取得報價單' });
+
+      return;
+    }
+
+    const contentId = raw.latestContent.id;
+
+    setIsFetching(true);
+
+    return await apiPatchQuotationContent_id_progress(contentId, {
+      trackProgress,
+      projectProgress,
+    })
+      .catch((err) => {
+        return null;
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  // ------------------------------------------------------------------------
+
+  return {
+    isFetching,
+    //
+    raw,
+    update,
+    // attachment
+    attachmentArr,
+    domain,
+    //
+    isDesignatedContent: !!designatedContentId,
+    // 是否為追加追減報價單
+    isAttachedQuotation: !!raw?.attachedToContractId,
+    //
+    reqPost,
+    reqPatch,
+    reqReview,
+    reqUnlock,
+    reqPatchReviewer,
+    reqCopyQuotation,
+    reqPatchQuotationContent_id_progress,
+    reqToPending,
+  };
+}; // useGetQuotation_id_3
+
+// ========================================================================
+
+type TquotationProductDto_addition = TquotationProductDto & {
+  // qty_reduce: number; // 追減數量 // 好像用不到...
+  // qty_modify: number; // 變更數量 // 好像用不到...
+  latestIterativeId: string;
+  // deductedPrice: number;
+  // modifyedProduct: Record<
+  //   string,
+  //   {
+  //     key: string;
+  //     quantity: number;
+  //   }
+  // >;
+  quotationDiscount: number | `${number}`;
+};
+
+export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
+
+export const useIterativeContractProduct = ({
+  contract,
+  untilVersion,
+}: {
+  contract: TquotationContractDto | undefined;
+  untilVersion?: number;
+}) => {
+  const [iterativeContractProduct, setIterativeContractProduct] = useState<TiterativeContractProduct>({});
+
+  const iterativeContractProduct_pre = useMemo(() => {
+    const dict: TiterativeContractProduct = {};
+    let somethingWrong = '';
+
+    if (!contract) {
+      return dict;
+    }
+
+    let subContracts = contract?.subContracts;
+    subContracts = _.sortBy(subContracts, 'version');
+
+    if (untilVersion) {
+      subContracts = subContracts.filter((contract) => contract.version <= untilVersion);
+    }
+
+    subContracts.forEach((contract) => {
+      const { id: contractId } = contract;
+      const quotationDiscount = contract.content.discount;
+
+      let products = contract.content.products;
+      products = _.sortBy(products, 'order');
+
+      products.forEach((prod) => {
+        const { id, attachedToProductId, rootProductId } = prod;
+
+        const action = parseProdAction({
+          quotationProduct: prod,
+          quotationProductArr: products,
+        });
+
+        if (!action) {
+          const content = `contractId:${contractId}，id:${id}，attachedToProductId:${attachedToProductId}，rootProductId:${rootProductId}`;
+          console.error('解析追加追減發生錯誤，預期外的組合');
+          console.error(prod);
+          console.error(content);
+          somethingWrong = '解析追加追減發生錯誤，預期外的組合。';
+
+          return;
+        }
+
+        if (action === '追加' || action === '變更追加') {
+          dict[rootProductId] = {
+            ...prod,
+            // qty_reduce: 0,
+            // qty_modify: 0,
+            // deductedPrice: 0,
+            latestIterativeId: rootProductId,
+            quotationDiscount: Number(quotationDiscount || 0),
+            // modifyedProduct: {},
+          };
+
+          return;
+        }
+
+        const rootProd = dict[rootProductId];
+
+        if (!rootProd) {
+          const content = `contractId:${contractId}，id:${id}，rootProductId:${rootProductId}`;
+          console.error('rootProd不存在');
+          console.error(content);
+          console.error(dict);
+          somethingWrong = somethingWrong + 'rootProd不存在。';
+
+          return;
+        }
+
+        if (action === '追減') {
+          // rootProd.qty_reduce = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          rootProd.quantity = prod.quantity;
+        } else if (action === '變更追減') {
+          // rootProd.qty_modify = new Decimal(rootProd.quantity).sub(prod.quantity).toNumber();
+          rootProd.quantity = prod.quantity;
+        }
+
+        rootProd.latestIterativeId = prod.id;
+      });
+
+      //
+    });
+
+    if (somethingWrong) {
+      myAlert.err({ title: somethingWrong });
+
+      return {};
+    }
+
+    return dict;
+    //
+  }, [contract, untilVersion]);
+
+  useEffect(() => {
+    const prodIdArr = Object.keys(iterativeContractProduct_pre);
+
+    if (prodIdArr.length === 0) {
+      return;
+    }
+
+    const getItemsAndRenew = async () => {
+      const iterativeProdArr = await getIterativeProductArr(prodIdArr);
+
+      iterativeProdArr.forEach((prod) => {
+        iterativeContractProduct_pre[prod.id] = {
+          ...iterativeContractProduct_pre[prod.id],
+          ...prod,
+          quantity: iterativeContractProduct_pre[prod.id].quantity,
+        };
+      });
+
+      setIterativeContractProduct(iterativeContractProduct_pre);
+    };
+
+    getItemsAndRenew();
+  }, [iterativeContractProduct_pre]);
+
+  return iterativeContractProduct;
+};
+
+export const parseProdAction = ({
+  quotationProduct,
+  quotationProductArr,
+}: {
+  quotationProduct: TquotationProductDto;
+  quotationProductArr: TquotationProductDto[];
+}) => {
+  const { id, attachedToProductId, rootProductId } = quotationProduct;
+
+  let attachType: '追加' | '追減' | '變更追減' | '變更追加' | undefined = undefined;
+
+  // 報價單中有變更追減就一定有變更追加
+  // 報價單中有變更追加就一定有變更追減
+
+  if (!attachedToProductId) {
+    attachType = '追加';
+  } else if (attachedToProductId && rootProductId === id) {
+    attachType = '變更追加';
+  } else if (attachedToProductId && rootProductId !== id) {
+    attachType = '追減';
+  }
+
+  if (attachType === '追減') {
+    const isExist = quotationProductArr.some((prod) => {
+      return prod.id !== id && prod.attachedToProductId === attachedToProductId;
+    });
+    isExist && (attachType = '變更追減');
+  }
+
+  return attachType;
+};
+
+export const apiPatchModifyQuotation = ({
+  quotationId,
+  body,
+}: {
+  quotationId: string;
+  body: TcreateModifyQuotationDto;
+}) => {
+  const api = `quotation/modify-quotation/${quotationId}`;
+
+  return axi
+    .patch<TquotationDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};

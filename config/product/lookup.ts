@@ -90,6 +90,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 30,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1/3HP': {
     HPValue: 0.3,
@@ -97,6 +98,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 40,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1/2HP': {
     HPValue: 0.5,
@@ -104,6 +106,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 50,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '3/4HP': {
     HPValue: 0.75,
@@ -111,6 +114,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 60,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1HP': {
     HPValue: 1,
@@ -118,6 +122,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 50,
     gapA: 70,
     gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '1 1/2HP': {
     HPValue: 1.5,
@@ -125,6 +130,15 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 70,
     gapC: 20,
+    distributionBoxPrice: 5940,
+  },
+  '1.5HP': {
+    HPValue: 1.5,
+    outputTooth: 9,
+    reelGear: 60,
+    gapA: 70,
+    gapC: 20,
+    distributionBoxPrice: 5940,
   },
   '2HP': {
     HPValue: 2,
@@ -132,6 +146,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 120,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '3HP': {
     HPValue: 3,
@@ -139,6 +154,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 150,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '5HP': {
     HPValue: 5,
@@ -146,6 +162,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 170,
     gapC: 20,
+    distributionBoxPrice: 12900,
   },
   '50Nm': {
     HPValue: 50,
@@ -153,6 +170,7 @@ export const lookup_hpToGapAGapC = {
     reelGear: 60,
     gapA: 40,
     gapC: 10,
+    distributionBoxPrice: undefined, // 價格不知道，
   },
 };
 
@@ -165,3 +183,50 @@ export const lookup_motorPhase_reverse = {
   單相: '1',
   三相: '3',
 } as const;
+
+export const lookup_componentConfig = (doorModelName: string) => {
+  const slat = doorModelName === 'W2' ? '門片' : '捲門片';
+
+  return {
+    slat: {
+      name: doorModelName === 'W2' ? '門片' : '捲門片',
+      unit: '㎡',
+    },
+    bottomBar: {
+      name: '底座',
+      unit: 'M',
+    },
+    guideRail: {
+      name: '門軌',
+      unit: 'M',
+    },
+    sidePlate: {
+      name: '支版',
+      unit: '組',
+    },
+    roller: {
+      name: '捲軸',
+      unit: 'M',
+    },
+    motor: {
+      name: '馬達機',
+      unit: '組',
+    },
+    motorAccessories: {
+      name: '馬達配件',
+      unit: '組',
+    },
+    headBox: {
+      name: '門箱',
+      unit: 'M',
+    },
+    middlePillar: {
+      name: '中柱',
+      unit: '支',
+    },
+    backBone: {
+      name: '背撐',
+      unit: '支',
+    },
+  };
+};

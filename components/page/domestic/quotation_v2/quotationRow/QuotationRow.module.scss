@@ -1,0 +1,93 @@
+$gap: 15px;
+
+.row {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  min-width: 100%;
+  width: fit-content;
+  // background-color: black;
+  // gap: $gap;
+  // border: solid 1px black;
+  background-color: white;
+  &.isDragging {
+    background-color: theme("colors.chosenBgc");
+    z-index: 1;
+  }
+  &.active {
+    background-color: theme("colors.chosenBgc");
+  }
+  &:hover {
+    background-color: theme("colors.hoverBgc");
+    &.active {
+      background-color: theme("colors.chosenBgc");
+    }
+  }
+
+  // z-index: 1;
+}
+
+.row_dndThead {
+  @extend .row;
+  background-color: theme("colors.bgc01");
+  border-bottom: solid 5px white;
+  // color: white;
+}
+
+.item {
+  display: flex;
+  gap: $gap;
+  align-items: flex-end;
+  flex: none;
+}
+
+.center {
+  @extend .item;
+  background-color: inherit;
+}
+.left {
+  @extend .item;
+  position: sticky;
+  left: 0;
+  padding-left: 10px;
+  background-color: inherit;
+  padding-right: $gap;
+  z-index: 1;
+}
+.right {
+  @extend .item;
+  position: sticky;
+  right: 0;
+  background-color: theme("colors.bgc01");
+  border-left: solid $gap white;
+}
+
+.cell {
+  flex: none;
+  border: solid 1px transparent;
+  background-color: inherit;
+  &.invisible {
+    visibility: hidden;
+  }
+}
+
+.cell_dnd {
+  @extend .cell;
+
+  border: solid 1px theme("colors.antdBlue.primary");
+  &.disabled {
+    border: solid 1px transparent;
+    cursor: auto;
+  }
+  &.isDragging {
+    z-index: 1;
+    background-color: theme("colors.chosenBgc");
+  }
+}
+
+.wrapper_row {
+  &.active {
+    z-index: 1;
+    background-color: theme("colors.chosenBgc");
+  }
+}

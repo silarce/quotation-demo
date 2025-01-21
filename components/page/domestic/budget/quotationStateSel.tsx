@@ -19,8 +19,6 @@ type TquotationStateHistory = {
 
 // =====================================================================
 
-const optionQuotationState = optionsCreator_quotationStatus({ need: 'editQuotation' });
-
 // =====================================================================
 // 報價/歷史狀態狀態
 export default function QuotationStateSel({
@@ -28,11 +26,13 @@ export default function QuotationStateSel({
   setQuotationState,
   history,
   isNew,
+  disabled,
 }: {
   quotationState: Toption;
   setQuotationState: (v: Toption) => void;
   history: TquotationStateHistory[];
   isNew?: boolean;
+  disabled?: boolean;
 }) {
   // -------------------------------------------------------------------------
 
@@ -41,12 +41,12 @@ export default function QuotationStateSel({
   // -------------------------------------------------------------------------
   // 報價狀態
   const [isFocus, setIsFocus] = useState('');
-  const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined);
+  // const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined);
 
   const onChange = (option: Toption | null) => {
     setQuotationState(option!);
     setIsFocus('');
-    setSelIsOpen(undefined);
+    // setSelIsOpen(undefined);
   };
 
   const onFocus = (e?: FocusEvent<HTMLInputElement>) => {
@@ -55,7 +55,7 @@ export default function QuotationStateSel({
 
   const onBlur = () => {
     setIsFocus('');
-    setSelIsOpen(undefined);
+    // setSelIsOpen(undefined);
   };
 
   // --------------------------------------------------------------
@@ -89,12 +89,14 @@ export default function QuotationStateSel({
   return (
     <div className={scss.quotationState}>
       <div className={`${scss.sel} ${isFocus}`} onClick={() => selRef.current.focus()}>
-        <span>報價狀態 : </span>
+        <span className="text-base">報價狀態 : </span>
 
         <InputSel
+          disabled={disabled}
           className={scss.select03}
           showBaseline="invisible"
           selectProps={{
+            menuPortalTarget: 'undefined',
             value: quotationState,
             options: optionQuotationState,
             onChange: onChange,
