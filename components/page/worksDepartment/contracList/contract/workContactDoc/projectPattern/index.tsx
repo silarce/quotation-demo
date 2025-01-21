@@ -398,8 +398,8 @@ export default function ProjectPattern({
 
   const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
-    // onRemoveClick: () => onRemoveClick('floor'),
-    onRemoveClick: floorManagerReviewedAt ? null : () => onRemoveClick('floor'),
+    onRemoveClick: () => onRemoveClick('floor'),
+    // onRemoveClick: floorManagerReviewedAt ? null : () => onRemoveClick('floor'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
     isUploading: isUploading.floor,
     isImage: checkFileIsImage_str(fileInfo_floor?.mime ?? ''),
@@ -407,8 +407,8 @@ export default function ProjectPattern({
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
-    // onRemoveClick: () => onRemoveClick('design'),
-    onRemoveClick: designManagerReviewedAt ? null : () => onRemoveClick('design'),
+    onRemoveClick: () => onRemoveClick('design'),
+    // onRemoveClick: designManagerReviewedAt ? null : () => onRemoveClick('design'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
     isUploading: isUploading.design,
     isImage: checkFileIsImage_str(fileInfo_design?.mime ?? ''),
@@ -416,8 +416,8 @@ export default function ProjectPattern({
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
-    // onRemoveClick: () => onRemoveClick('color'),
-    onRemoveClick: colorManagerReviewedAt ? null : () => onRemoveClick('color'),
+    onRemoveClick: () => onRemoveClick('color'),
+    // onRemoveClick: colorManagerReviewedAt ? null : () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
     isUploading: isUploading.color,
     isImage: checkFileIsImage_str(fileInfo_color?.mime ?? ''),
@@ -425,8 +425,8 @@ export default function ProjectPattern({
   };
   const props_construction: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.construction.src,
-    // onRemoveClick: () => onRemoveClick('construction'),
-    onRemoveClick: constructionManagerReviewedAt ? null : () => onRemoveClick('construction'),
+    onRemoveClick: () => onRemoveClick('construction'),
+    // onRemoveClick: constructionManagerReviewedAt ? null : () => onRemoveClick('construction'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'construction'),
     isUploading: isUploading.construction,
     isImage: checkFileIsImage_str(fileInfo_construction?.mime ?? ''),
@@ -434,8 +434,8 @@ export default function ProjectPattern({
   };
   const props_detail: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.detail.src,
-    // onRemoveClick: () => onRemoveClick('detail'),
-    onRemoveClick: detailManagerReviewedAt ? null : () => onRemoveClick('detail'),
+    onRemoveClick: () => onRemoveClick('detail'),
+    // onRemoveClick: detailManagerReviewedAt ? null : () => onRemoveClick('detail'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'detail'),
     isUploading: isUploading.detail,
     isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
