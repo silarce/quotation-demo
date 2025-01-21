@@ -487,6 +487,8 @@ export default function ProjectPattern({
               engineeringContactId={engineeringContactId}
               patternType={'detail'}
               props={props_detail}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
               // isDetailSubmit={!!controlList.isDetailSubmit}
               // isReviewer={controlList.isReviewer_detail}
               // statusArr={controlList.detail}
@@ -504,6 +506,8 @@ export default function ProjectPattern({
               engineeringContactId={engineeringContactId}
               patternType={'floor'}
               props={props_floor}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
               // isDetailSubmit={!!controlList.isFloorSubmit}
               // isReviewer={controlList.isReviewer_floor}
               // statusArr={controlList.floor}
@@ -521,6 +525,8 @@ export default function ProjectPattern({
               engineeringContactId={engineeringContactId}
               patternType={'design'}
               props={props_design}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
               // isDetailSubmit={!!controlList.isDesignSubmit}
               // isReviewer={controlList.isReviewer_design}
               // statusArr={controlList.design}
@@ -538,6 +544,8 @@ export default function ProjectPattern({
               engineeringContactId={engineeringContactId}
               patternType={'construction'}
               props={props_construction}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
               // isDetailSubmit={!!controlList.isConstructionSubmit}
               // isReviewer={controlList.isReviewer_construction}
               // statusArr={controlList.construction}
@@ -555,6 +563,8 @@ export default function ProjectPattern({
               engineeringContactId={engineeringContactId}
               patternType={'color'}
               props={props_color}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
               // isDetailSubmit={!!controlList.isColorSubmit}
               // isReviewer={controlList.isReviewer_color}
               // statusArr={controlList.color}

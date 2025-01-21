@@ -124,6 +124,8 @@ const Pattern = ({
   engineeringContactId,
   patternType,
   props,
+  onSubmiSuccess,
+  onDeleteSuccess,
 }: // isDetailSubmit,
 // statusArr,
 // isReviewer,
@@ -134,6 +136,8 @@ const Pattern = ({
   engineeringContactId?: string | null | undefined;
   patternType: TpatternType;
   props: Parameters<typeof ImageDragger>[0];
+  onSubmiSuccess: () => void;
+  onDeleteSuccess: () => void;
   // isDetailSubmit: boolean;
   // isReviewer: boolean;
   // confirmReqSubmitPattern: (patternType: TpatternType) => void;
@@ -178,6 +182,8 @@ const Pattern = ({
             document_uuid: engineeringContactId || undefined,
             document_id: patternType,
           },
+        }).then(() => {
+          onSubmiSuccess();
         });
 
         destroy();
@@ -199,8 +205,9 @@ const Pattern = ({
       ),
       props: {
         onOk: async () => {
-          await reqSentReviewStop();
-          await onRemoveClick?.();
+          await reqSentReviewStop()
+            .then(async () => await onRemoveClick?.())
+            .then(async () => onDeleteSuccess());
         },
       },
     });

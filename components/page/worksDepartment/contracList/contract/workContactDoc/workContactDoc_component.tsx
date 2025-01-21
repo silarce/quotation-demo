@@ -911,7 +911,7 @@ const checkStatus = ({
   review_status === '已審核' && (dotColor = 'green');
 
   return {
-    label: review_status || '未審核',
+    label: review_status || '編輯中',
     dotColor,
   };
 };
