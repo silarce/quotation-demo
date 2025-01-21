@@ -21,6 +21,7 @@ import type {
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
+  TfileDto,
 } from './dtoTypes';
 
 export type {
@@ -172,6 +173,15 @@ export const apiGetOutsourcingPayment_id = async (id: string, params?: Tparams) 
     .catch((err) => Promise.reject(err));
 };
 
+export const apiGetOutsourcingPaymentAttachments = async (id: string) => {
+  const api = `/outsourcing-payment/${id}/attachments`;
+
+  return axi
+    .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
 export const useGetOutsourcingPayment_id = (id?: string, customerParams?: Tparams) => {
   const [res, setRes] = useState<ToutsourcingPaymentDto>();
   const [isLoading, setIsLoading] = useState(false);
@@ -275,6 +285,64 @@ export const apiPatchOutsourcingPayment = async (
 
       return Promise.reject(err);
     });
+};
+
+export const useGetOutsourcingPayment_id_kit = (
+  //
+  id?: string,
+  {
+    customerParams,
+    autoUpdate = true,
+  }: {
+    customerParams?: Tparams;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [res, setRes] = useState<ToutsourcingPaymentDto | null>();
+  const [attachments, setAttachments] = useState<TfileDto[] | null>();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const params = {
+    populate: ['outsourcing'],
+    ...customerParams,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    await apiGetOutsourcingPayment_id(id, params)
+      .then(async (outsourcingPayment) => {
+        setRes(outsourcingPayment);
+        const attachments = await apiGetOutsourcingPaymentAttachments(id);
+        setAttachments(attachments);
+
+        return {
+          outsourcingPayment,
+          attachments,
+        };
+      })
+      .catch((err) => {
+        setRes(null);
+        setAttachments(null);
+
+        myAlert.err({
+          title: '取得外包計價失敗',
+        });
+        console.error(err);
+      });
+  };
+
+  const patch = () => {};
+
+  return {
+    data: res,
+    attachments,
+    update,
+    isLoading_outsourcingPayment: isLoading,
+  };
 };
 
 // 送審
