@@ -908,7 +908,7 @@ const checkStatus = ({
   let dotColor: TprojectPatternStatus['reviewStatus']['dotColor'] = 'gray';
 
   review_status === '審核中' && (dotColor = 'red');
-  review_status === '已審核' && (dotColor = 'green');
+  review_status === '已核准' && (dotColor = 'green');
 
   return {
     label: review_status || '編輯中',

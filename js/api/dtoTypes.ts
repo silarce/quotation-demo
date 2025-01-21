@@ -3049,15 +3049,20 @@ export type TengineeringContactDto = {
   shouldHasDesign: boolean | null; // 設計圖
 
   // 簽認圖
-  detailStatus: Treview_status | null;
+  // detailStatus: Treview_status | null;
+  detailStatus: '編輯中' | '審核中' | '已核准' | null;
   // 平面圖
-  floorStatus: Treview_status | null;
+  // floorStatus: Treview_status | null;
+  floorStatus: '編輯中' | '審核中' | '已核准' | null;
   // 設計圖
-  designStatus: Treview_status | null;
+  // designStatus: Treview_status | null;
+  designStatus: '編輯中' | '審核中' | '已核准' | null;
   // 施工圖
-  constructionStatus: Treview_status | null;
+  // constructionStatus: Treview_status | null;
+  constructionStatus: '編輯中' | '審核中' | '已核准' | null;
   // 色卡
-  colorStatus: Treview_status | null;
+  // colorStatus: Treview_status | null;
+  colorStatus: '編輯中' | '審核中' | '已核准' | null;
 
   // 工務 ID
   // reviewWorkerEmployeeId: string | null; // 棄用
