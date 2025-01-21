@@ -125,31 +125,31 @@ type TpatternReviewStatus = {
 export default function ProjectPattern({
   engineeringContactId,
   onPatternChange,
-  patternReviewStatus,
+  // patternReviewStatus,
   onSubmitSuccess,
   onReviewSuccess,
   onDeleteSuccess,
   shouldHasPattern,
-  isReviewer_worker,
-  isReviewer_manager,
-}: {
+}: // isReviewer_worker,
+// isReviewer_manager,
+{
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
-  patternReviewStatus: TpatternReviewStatus;
+  // patternReviewStatus: TpatternReviewStatus;
   onSubmitSuccess: () => void;
   onReviewSuccess: () => void;
   onDeleteSuccess: () => void;
   shouldHasPattern: TshouldHasPattern;
-  isReviewer_worker: boolean;
-  isReviewer_manager: boolean;
+  // isReviewer_worker: boolean;
+  // isReviewer_manager: boolean;
 }) {
-  const {
-    color: { colorManagerReviewedAt },
-    construction: { constructionManagerReviewedAt },
-    detail: { detailManagerReviewedAt },
-    floor: { floorManagerReviewedAt },
-    design: { designManagerReviewedAt },
-  } = patternReviewStatus.pattern;
+  // const {
+  //   color: { colorManagerReviewedAt },
+  //   construction: { constructionManagerReviewedAt },
+  //   detail: { detailManagerReviewedAt },
+  //   floor: { floorManagerReviewedAt },
+  //   design: { designManagerReviewedAt },
+  // } = patternReviewStatus.pattern;
 
   // -----------------------------------------------------------------------
   const [isUploading, setIsUploading] = useState<TisUploading>({
@@ -431,11 +431,11 @@ export default function ProjectPattern({
   };
   // -----------------------------------------------------------------------
 
-  const controlList = useControl_review({
-    patternReviewStatus: patternReviewStatus,
-    isReviewer_worker,
-    isReviewer_manager,
-  });
+  // const controlList = useControl_review({
+  //   patternReviewStatus: patternReviewStatus,
+  //   isReviewer_worker,
+  //   isReviewer_manager,
+  // });
 
   // -----------------------------------------------------------------------
 

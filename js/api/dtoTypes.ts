@@ -1,8 +1,4 @@
-// MARK: 說明
-
-import { SplitPathString } from 'react-hook-form/dist/types/path/common';
-
-// 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
+import type { Treview_status } from './api_netCore/_schemas';
 
 // ---------------------------------------------------------------------------
 
@@ -3028,6 +3024,7 @@ export type TengineeringContactDto = {
   quotationId?: string | null;
   quotation?: TquotationDto | null;
   //
+
   // 是否要應有該工程圖表
   shouldHasColor: boolean | null; // 色卡
   shouldHasConstruction: boolean | null; // 施工圖
@@ -3035,61 +3032,70 @@ export type TengineeringContactDto = {
   shouldHasFloor: boolean | null; // 平面圖
   shouldHasDesign: boolean | null; // 設計圖
 
-  // 20240329新增
+  // 簽認圖
+  detailStatus: Treview_status | null;
+  // 平面圖
+  floorStatus: Treview_status | null;
+  // 設計圖
+  designStatus: Treview_status | null;
+  // 施工圖
+  constructionStatus: Treview_status | null;
+  // 色卡
+  colorStatus: Treview_status | null;
 
   // 工務 ID
-  reviewWorkerEmployeeId: string | null;
+  // reviewWorkerEmployeeId: string | null; // 棄用
   // 工務
-  reviewWorkerEmployee?: TemployeeDto;
+  // reviewWorkerEmployee?: TemployeeDto; // 棄用
   // 總經理 ID
-  reviewManagerEmployeeId: string | null;
+  // reviewManagerEmployeeId: string | null; // 棄用
   // 總經理
-  reviewManagerEmployee?: TemployeeDto;
+  // reviewManagerEmployee?: TemployeeDto; // 棄用
 
   // 簽認圖送審給工務的時間
-  detailToWorkerAt: string | null;
+  // detailToWorkerAt: string | null; // 棄用
   // 工務審核簽認圖時間
-  detailWorkerReviewedAt: string | null;
+  // detailWorkerReviewedAt: string | null; // 棄用
   // 簽認送審給總經理的時間
-  detailToManagerAt: string | null;
+  // detailToManagerAt: string | null; // 棄用
   // 總經理審核簽認圖時間
-  detailManagerReviewedAt: string | null;
+  // detailManagerReviewedAt: string | null; // 棄用
 
   // 設計圖送審給工務的時間
-  designToWorkerAt: string | null;
+  // designToWorkerAt: string | null; // 棄用
   // 工務審核設計圖時間
-  designWorkerReviewedAt: string | null;
+  // designWorkerReviewedAt: string | null; // 棄用
   // 設計圖送審給總經理的時間
-  designToManagerAt: string | null;
+  // designToManagerAt: string | null; // 棄用
   // 總經理審核設計圖時間
-  designManagerReviewedAt: string | null;
+  // designManagerReviewedAt: string | null; // 棄用
 
   // 平面圖送審給工務的時間
-  floorToWorkerAt: string | null;
+  // floorToWorkerAt: string | null; // 棄用
   // 工務審核平面圖時間
-  floorWorkerReviewedAt: string | null;
+  // floorWorkerReviewedAt: string | null; // 棄用
   // 平面圖送審給總經理的時間
-  floorToManagerAt: string | null;
+  // floorToManagerAt: string | null; // 棄用
   // 總經理審核平面圖時間
-  floorManagerReviewedAt: string | null;
+  // floorManagerReviewedAt: string | null; // 棄用
 
   // 施工圖(工程圖)送審給工務的時間
-  constructionToWorkerAt: string | null;
+  // constructionToWorkerAt: string | null; // 棄用
   // 工務審核施工圖(工程圖)時間
-  constructionWorkerReviewedAt: string | null;
+  // constructionWorkerReviewedAt: string | null; // 棄用
   // 施工圖(工程圖)送審給總經理的時間
-  constructionToManagerAt: string | null;
+  // constructionToManagerAt: string | null; // 棄用
   // 總經理審核施工圖(工程圖)時間
-  constructionManagerReviewedAt: string | null;
+  // constructionManagerReviewedAt: string | null; // 棄用
 
   // 色卡送審給工務的時間
-  colorToWorkerAt: string | null;
+  // colorToWorkerAt: string | null; // 棄用
   // 工務審核色卡時間
-  colorWorkerReviewedAt: string | null;
+  // colorWorkerReviewedAt: string | null; // 棄用
   // 色卡送審給總經理的時間
-  colorToManagerAt: string | null;
+  // colorToManagerAt: string | null; // 棄用
   // 總經理審核色卡時間
-  colorManagerReviewedAt: string | null;
+  // colorManagerReviewedAt: string | null; // 棄用
 };
 
 export type TupdateEngineeringContactDto = {
@@ -3996,7 +4002,6 @@ export type TupdateAccountReceivableAccountantDto = {
   invoiceId: string;
   // accountantId: string[];
   incomeBillId: string[];
-  // temporary_separatePayment: number;
 }[];
 
 export type TincomeBillSerialSettlementFormDto = {
