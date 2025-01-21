@@ -910,39 +910,9 @@ const checkStatus = ({
   review_status === '已審核' && (dotColor = 'green');
 
   return {
-    label: null,
+    label: review_status || '未審核',
     dotColor,
   };
 };
-// const checkStatus = ({
-//   //
-//   workerName,
-//   managerName,
-//   toWorkerAt,
-//   workerReviewedAt,
-//   toManagerAt,
-//   managerReviewedAt,
-// }: {
-//   workerName: string;
-//   managerName: string;
-//   toWorkerAt: string | null | undefined;
-//   workerReviewedAt: string | null | undefined;
-//   toManagerAt: string | null | undefined;
-//   managerReviewedAt: string | null | undefined;
-// }) => {
-//   let label: TprojectPatternStatus['reviewStatus']['label'] = `未送審`;
-//   let dotColor: TprojectPatternStatus['reviewStatus']['dotColor'] = 'gray';
-
-//   if (toManagerAt) {
-//     label = label = `總經理 ${managerName}`;
-//   }
-
-//   dotColor = managerReviewedAt ? 'green' : toManagerAt ? 'red' : 'gray';
-
-//   return {
-//     label,
-//     dotColor,
-//   };
-// };
 
 export default WorkContactDoc_component;
