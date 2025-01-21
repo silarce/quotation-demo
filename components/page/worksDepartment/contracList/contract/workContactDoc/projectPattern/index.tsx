@@ -356,20 +356,8 @@ export default function ProjectPattern({
   };
 
   //
-  const onRemoveClick = (pattern: TpatternType) => {
-    myAlert.confirm({
-      title: '確定移除?',
-      content: (
-        <span>
-          移除後無法復原
-          <br />
-          重新上傳需要重新審核
-        </span>
-      ),
-      props: {
-        onOk: () => reqDeletePattern(pattern),
-      },
-    });
+  const onRemoveClick = async (pattern: TpatternType) => {
+    await reqDeletePattern(pattern);
   };
 
   // =======================================================================
@@ -496,14 +484,15 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasDetail && (
           <Panel header="簽認圖" key="detail" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'detail'}
               props={props_detail}
-              isDetailSubmit={!!controlList.isDetailSubmit}
-              isReviewer={controlList.isReviewer_detail}
-              statusArr={controlList.detail}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              // isDetailSubmit={!!controlList.isDetailSubmit}
+              // isReviewer={controlList.isReviewer_detail}
+              // statusArr={controlList.detail}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -512,14 +501,15 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasFloor && (
           <Panel header="平面圖" key="floor" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'floor'}
               props={props_floor}
-              isDetailSubmit={!!controlList.isFloorSubmit}
-              isReviewer={controlList.isReviewer_floor}
-              statusArr={controlList.floor}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              // isDetailSubmit={!!controlList.isFloorSubmit}
+              // isReviewer={controlList.isReviewer_floor}
+              // statusArr={controlList.floor}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -528,14 +518,15 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasDesign && (
           <Panel header="設計圖" key="design" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'design'}
               props={props_design}
-              isDetailSubmit={!!controlList.isDesignSubmit}
-              isReviewer={controlList.isReviewer_design}
-              statusArr={controlList.design}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              // isDetailSubmit={!!controlList.isDesignSubmit}
+              // isReviewer={controlList.isReviewer_design}
+              // statusArr={controlList.design}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -544,14 +535,15 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasConstruction && (
           <Panel header="施工圖" key="construction" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'construction'}
               props={props_construction}
-              isDetailSubmit={!!controlList.isConstructionSubmit}
-              isReviewer={controlList.isReviewer_construction}
-              statusArr={controlList.construction}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              // isDetailSubmit={!!controlList.isConstructionSubmit}
+              // isReviewer={controlList.isReviewer_construction}
+              // statusArr={controlList.construction}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -560,14 +552,15 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasColor && (
           <Panel header="色卡" key="color" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'color'}
               props={props_color}
-              isDetailSubmit={!!controlList.isColorSubmit}
-              isReviewer={controlList.isReviewer_color}
-              statusArr={controlList.color}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              // isDetailSubmit={!!controlList.isColorSubmit}
+              // isReviewer={controlList.isReviewer_color}
+              // statusArr={controlList.color}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
