@@ -551,32 +551,10 @@ export default function ReviewList() {
           undefined,
           { shallow: true }
         );
-      } else if (reviewtype === '工作表') {
-        const parsedQuery = JSON.parse(itemQuery.query);
-        const query = {
-          ...parsedQuery,
-          //   status,
-          viewtype: 'review',
-        };
-
-        router.replace({ query }, undefined, { shallow: true });
-      } else if (reviewtype === '調貨單') {
-        const parsedQuery = JSON.parse(itemQuery.query);
-        const query = {
-          ...parsedQuery,
-          viewtype: 'review',
-        };
-
-        router.replace({ query }, undefined, { shallow: true });
-      } else if (reviewtype === '證明文件') {
-        const parsedQuery = JSON.parse(itemQuery.query);
-        const query = {
-          ...parsedQuery,
-          viewtype: 'review',
-        };
-
-        router.replace({ query }, undefined, { shallow: true });
-      } else if (reviewtype === '工程圖表') {
+      } else if (
+        ['簽認圖', '平面圖', '設計圖', '施工圖', '色卡'].includes(reviewtype) ||
+        ['證明文件', '調貨單', '工作表'].includes(reviewtype)
+      ) {
         const parsedQuery = JSON.parse(itemQuery.query);
         const query = {
           ...parsedQuery,
@@ -1454,7 +1432,9 @@ export default function ReviewList() {
                       )}
                       {reviewtype === '調貨單' && <TransferOrder key={theKey} userInfo={userInfo!} isReadonly={true} />}
                       {reviewtype === '證明文件' && <CertifiedDocument key={theKey} />}
-                      {reviewtype === '工程圖表' && <Pattern_readonly key={theKey} />}
+                      {['簽認圖', '平面圖', '設計圖', '施工圖', '色卡'].includes(reviewtype) && (
+                        <Pattern_readonly key={theKey} />
+                      )}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示

@@ -144,6 +144,8 @@ const Pattern = ({
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
+  const { name: patternName } = lookup_pattern[patternType];
+
   const { ReviewFlow, reqAddReview, reqSentReviewStop, isAllReviewPass } = useReviewFlow({
     uuid: engineeringContactId,
     document_id: patternType,
@@ -166,7 +168,8 @@ const Pattern = ({
           review_id: reviewFlowId,
           // document_uuid: engineeringContactId,
           // document_id: patternType,
-          document_type: '工程圖表',
+          // document_type: '工程圖表',
+          document_type: patternName,
           user_id: userId,
           document_title: purpose,
           query: {
@@ -215,6 +218,7 @@ const Pattern = ({
   );
 };
 
+// MARK:Pattern_readonly
 const Pattern_readonly = () => {
   const router = useRouter();
   const { engineeringContactId, patternType } = router.query as Tquery;
@@ -281,5 +285,23 @@ const Pattern_readonly = () => {
     </div>
   );
 };
+
+const lookup_pattern = {
+  color: {
+    name: '色卡',
+  },
+  construction: {
+    name: '施工圖',
+  },
+  detail: {
+    name: '簽認圖',
+  },
+  floor: {
+    name: '平面圖',
+  },
+  design: {
+    name: '設計圖',
+  },
+} as const;
 
 export { ImageDragger, BtnBar, Pattern, Pattern_readonly };
