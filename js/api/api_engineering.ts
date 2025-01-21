@@ -933,7 +933,7 @@ export const useGetWorksheet_id = (
         const records = (res.records ?? []) as TworksheetRecordDto_addition[];
 
         for (const record of records) {
-          const reviewArr = await apiGetReviewById(record.id);
+          const reviewArr = await apiGetReviewById({ document_uuid: record.id });
           record.addition = {
             reviewArr,
           };

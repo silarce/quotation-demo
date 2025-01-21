@@ -138,7 +138,7 @@ const useGetCertificatedDoc_contractId = (contractId: string | undefined, params
 
         for (const data of dataArr) {
           const { id } = data;
-          const reviewArr = await apiGetReviewById(id);
+          const reviewArr = await apiGetReviewById({ document_uuid: id });
           dataArr_addition.push({ ...data, addition: { reviewArr } });
         }
 
