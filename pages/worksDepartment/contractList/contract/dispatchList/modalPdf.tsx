@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, Fragment, forwardRef, useEffect } from 'react';
 import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -16,6 +16,7 @@ import scss from './modalPdf.module.scss';
 // ===============================================================================
 
 type Tdata = {
+  idNumber: string; // 派工單號，也就是序號
   customerName: string; // 其實是工地名稱
   phoneNumber: string; // 工地電話
   contactPerson: string; // 接洽人，自動帶工程聯絡單的聯絡人，但必須可以修改
@@ -41,10 +42,31 @@ export default function ModalPdf({
   onCancel,
   data,
 }: ModalProps & { data: Tdata }) {
+  return (
+    <Modal visible={visible} onCancel={onCancel} width={'fit-content'} footer={null} destroyOnClose={true}>
+      <ModalPdf_pre data={data} />
+    </Modal>
+  );
+}
+
+function ModalPdf_pre({
+  //
+
+  data,
+}: {
+  data: Tdata;
+}) {
   const ref_pdf = useRef<HTMLDivElement>(null!);
+  const ref_contentWrapper = useRef<HTMLDivElement>(null!);
+  const ref_content = useRef<HTMLDivElement>(null!);
+
+  const [isContentOverflow, setIsContentOverflow] = useState(false);
+  const [showWarning, setShowWarning] = useState(true);
 
   const [renderCount, setRenderCount] = useState(0);
 
+  // 將isShowCellNumber設為true即可在畫面上看到格子的編號
+  // 方便開發時調整格子的樣式或排版
   const handleShowCellNumber = () => {
     isShowCellNumber = !isShowCellNumber;
     setRenderCount((state) => state + 1);
@@ -57,42 +79,54 @@ export default function ModalPdf({
       return;
     }
 
+    setShowWarning(false);
     showRootLoading(true, '正在處理PDF');
 
-    const doc = new jsPDF('p', 'px', 'b5');
-    const pageWidth = doc.internal.pageSize.getWidth();
+    const func = async () => {
+      const doc = new jsPDF('p', 'px', 'b5');
+      const pageWidth = doc.internal.pageSize.getWidth();
 
-    const pageHeight = doc.internal.pageSize.getHeight();
+      const pageHeight = doc.internal.pageSize.getHeight();
 
-    const image = await html2canvas(ref_pdf.current, {
-      scale: 5,
-      // useCORS: true,
-      // allowTaint: true,
-    }).then((canvas) => {
-      const image = canvas.toDataURL('image/JPEG');
+      const image = await html2canvas(ref_pdf.current, {
+        scale: 5,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
 
-      return image;
-    });
+        return image;
+      });
 
-    // 留作參考
-    // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-    // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-    doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
 
-    doc.save(`派工單_${''}.pdf`);
-    showRootLoading(false);
+      doc.save(`派工單_${data.customerName}_${data.idNumber}.pdf`);
+
+      showRootLoading(false);
+      setShowWarning(true);
+    };
+
+    setTimeout(func, 0);
   };
+
+  useEffect(() => {
+    const { height: _height_content } = window.getComputedStyle(ref_content.current);
+    const { height: _height_wrapper } = window.getComputedStyle(ref_contentWrapper.current);
+
+    const height_wrapper = parseFloat(_height_wrapper);
+    const height_content = parseFloat(_height_content);
+    const isOverflow = Number(height_wrapper) - Number(height_content) < -6;
+
+    isOverflow && setIsContentOverflow(true);
+  }, []);
 
   // ------------------------------------------------------------------------
   // region RENDER
   return (
-    <Modal
-      //
-      visible={visible}
-      onCancel={onCancel}
-      width={'fit-content'}
-      footer={null}
-    >
+    <>
       {/*  */}
       {/* 給開發者方便開發用的 */}
       {/* <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2> */}
@@ -108,7 +142,9 @@ export default function ModalPdf({
           </div>
           <div className={scss.dateAndIndex}>
             <div>{`通知　　年　　月　　日　　時　　分`}</div>
-            <div>序號 ＿＿＿＿＿＿</div>
+            <div>
+              序號 <span className={scss.idNumber}>{data.idNumber}</span>
+            </div>
           </div>
           {/*  */}
 
@@ -117,7 +153,7 @@ export default function ModalPdf({
               <Cell01 str="客戶" />
               <Cell05>{data.customerName}</Cell05>
               <Cell03>電話</Cell03>
-              <Cell06 className={scss.noPaddingY}>{data.phoneNumber}</Cell06>
+              <Cell06 className={classNames(scss.noPaddingY, scss.justifyStart)}>{data.phoneNumber}</Cell06>
               <div className={scss['cell_09-10']}>
                 <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
                 <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
@@ -150,31 +186,46 @@ export default function ModalPdf({
               <Cell09>{data.warrantyPeriod}</Cell09>
             </Row>
 
-            <Row>
+            <Row className={scss.row_content}>
               <Cell00 className={scss.c00_center}>
                 <span>承</span>
                 <span>辦</span>
                 <span>情</span>
                 <span>形</span>
               </Cell00>
-              <Cell11 className={scss.c11_content}>{data.content}</Cell11>
-              <div className={scss['cell_12-8-9']}>
-                <Cell12>修理批價</Cell12>
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                {/* <Cell09 /> */}
-                <Cell09></Cell09>
-                <Cell08 />
-                <Cell09 />
-                <Cell08 />
-                <Cell09 />
-                <Cell08 className={scss.noPadding}>合計</Cell08>
-                <Cell09 />
+
+              <div
+                ref={ref_contentWrapper}
+                className={classNames(
+                  //
+                  scss.c11_content_wrapper,
+                  isContentOverflow && showWarning && scss.warning
+                )}
+              >
+                <Cell11 ref={ref_content} className={scss.c11_content}>
+                  {data.content}
+                </Cell11>
+              </div>
+
+              <div className={scss['wrapper_cell_12-8-9']}>
+                <div className={scss['cell_12-8-9_head']}>
+                  <Cell12>修理批價</Cell12>
+                  {/* 最後一格 */}
+                  <Cell08 className={classNames(scss.noPadding, scss.latest)}>合計</Cell08>
+                  <Cell09 className={scss.latest} />
+                </div>
+                <div className={scss['cell_12-8-9']}>
+                  {Array(20)
+                    .fill('foo')
+                    .map((_, index) => {
+                      return (
+                        <Fragment key={index}>
+                          <Cell08 />
+                          <Cell09 />
+                        </Fragment>
+                      );
+                    })}
+                </div>
               </div>
             </Row>
 
@@ -232,7 +283,7 @@ export default function ModalPdf({
         </div>
         {/* body close */}
       </div>
-    </Modal>
+    </>
   );
 }
 
@@ -244,8 +295,8 @@ export default function ModalPdf({
 
 // region COMPONENT
 
-const Row = ({ children }: { children?: React.ReactNode }) => {
-  return <div className={classNames(scss.row)}>{children}</div>;
+const Row = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+  return <div className={classNames(scss.row, className)}>{children}</div>;
 };
 
 const magnification = 1.2;
@@ -360,13 +411,24 @@ const Cell10 = ({ className, children }: { className?: string; children?: React.
   );
 };
 
-const Cell11 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
+const Cell11_pre = (
+  {
+    className,
+    children,
+  }: {
+    className?: string;
+    children?: React.ReactNode;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
   return (
-    <div className={classNames(scss.cell, className)} style={{ width: c11 }}>
+    <div ref={ref} className={classNames(scss.cell, className)} style={{ width: c11 }}>
       {isShowCellNumber ? 'cell11' : children}
     </div>
   );
 };
+
+const Cell11 = forwardRef(Cell11_pre);
 
 const Cell12 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (

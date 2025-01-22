@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Image from 'next/image';
@@ -23,6 +23,12 @@ interface Tprops {
   className_stage?: string;
   raw: TgetReviewById[] | undefined;
 }
+
+type Tquery = {
+  id?: string;
+  document_uuid?: string;
+  document_id?: string;
+};
 
 // ======================================================================
 const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
@@ -52,33 +58,61 @@ const ReviewFlow_pre = ({ className, className_stage, raw }: Tprops) => {
 
 const useReviewFlow = ({
   uuid,
+  document_id: _document_id,
   autoUpdate = true,
+  reviewBackAnyStatus = false,
 }: {
-  uuid?: string;
+  uuid?: string | null; // 資料的id
+  /**
+   * document_id不是真正的，用來辨識唯一資料的識別id，
+   * 也就是說，可能會有多筆資料有同樣的document_id
+   * 基本上會是serial_number，但不一定，也不是非serial_number不可
+   * 後端似乎通常稱為單號
+   */
+  document_id?: string | null;
   autoUpdate?: boolean;
+  reviewBackAnyStatus?: boolean;
 } = {}) => {
   const router = useRouter();
-  const query = router.query as { id?: string | undefined };
-  const document_uuid = uuid || query.id;
+  const query = router.query as Tquery;
+
+  const document_uuid = uuid || query.document_uuid || query.id;
+  const document_id = _document_id || query.document_id;
 
   const {
     //  req_addReview,
     req_reviewBack,
     req_backThanAdd,
+    req_reviewBack_anyStatus,
+    req_backThanAdd_anyStatus,
   } = useGlobal_review();
 
   const [isFetching, setIsFetching] = useState(false);
 
-  const { raw, update, isFetching: isFetching_get, isFirstLoaded } = useGetReviewById(document_uuid, { autoUpdate });
+  const {
+    raw,
+    update,
+    isFetching: isFetching_get,
+    isFirstLoaded,
+  } = useGetReviewById(document_uuid, { document_id, autoUpdate });
+
+  const reviewFlow = raw?.[0];
 
   const ReviewFlow = useCallback((props: Omit<Tprops, 'raw'>) => <ReviewFlow_pre raw={raw} {...props} />, [raw]);
 
   // 送審
-  const reqAddReview = async (theBody: Omit<TaddReview, 'document_uuid'> & { document_uuid?: string }) => {
+  const reqAddReview = async (
+    theBody: Omit<TaddReview, 'document_uuid' | 'document_id'> & { document_uuid?: string; document_id?: string }
+  ) => {
     const documentUuid = theBody.document_uuid || document_uuid;
+    const doucmentId = theBody.document_id || document_id;
 
     if (!documentUuid) {
       myAlert.err({ title: '沒有document_uuid' });
+
+      return;
+    } else if (typeof doucmentId !== 'string') {
+      myAlert.err({ title: 'doucmentId不是string' });
 
       return;
     }
@@ -86,21 +120,18 @@ const useReviewFlow = ({
     const body: TaddReview = {
       ...theBody,
       document_uuid: documentUuid,
+      document_id: doucmentId,
     };
 
     setIsFetching(true);
 
-    return await req_backThanAdd(body)
+    const apiClient = reviewBackAnyStatus ? req_backThanAdd_anyStatus : req_backThanAdd;
+
+    return await apiClient(body)
       .then(async () => {
         await update();
       })
       .finally(() => setIsFetching(false));
-
-    // return await apiAddReview(body)
-    //   .then(async () => {
-    //     await update();
-    //   })
-    //   .finally(() => setIsFetching(false));
   };
 
   // 抽單
@@ -113,7 +144,9 @@ const useReviewFlow = ({
 
     setIsFetching(true);
 
-    return await req_reviewBack(document_uuid)
+    const apiClient = reviewBackAnyStatus ? req_reviewBack_anyStatus : req_reviewBack;
+
+    return await apiClient(document_uuid, { document_id })
       .then(async () => {
         await update();
       })
@@ -139,9 +172,23 @@ const useReviewFlow = ({
     });
   };
 
+  const isAllReviewPass = useMemo(() => {
+    if (!reviewFlow) {
+      return undefined;
+    }
+
+    const stages = reviewFlow.stages;
+
+    const isAllReivewPass = stages.every((stage) => {
+      return stage.review_status === '核准';
+    });
+
+    return isAllReivewPass;
+  }, [reviewFlow]);
+
   return {
     ReviewFlow,
-    reviewFlow: raw?.[0],
+    reviewFlow: reviewFlow,
     reviewFlowArr: raw,
     isFetching: isFetching || isFetching_get,
     isFirstLoaded,
@@ -149,6 +196,7 @@ const useReviewFlow = ({
     reqAddReview,
     reqSentReviewStop,
     sentReviewStop,
+    isAllReviewPass,
   };
 };
 

@@ -6,8 +6,6 @@ type Treview_status = '未審核' | '已審核' | '審核中';
 type Treview_status__stages = '核准' | '提出' | '簽核中' | '';
 type Tdocument_status = '審核中' | '駁回' | '核准' | '抽單';
 
-export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
-
 // ==============================================================================
 
 interface TnetCoreApiBody {
@@ -58,8 +56,13 @@ interface TgetReivewById {
   id: string;
   create_at: string;
   create_by: string;
-
   document_uuid: string;
+  /**
+   * document_id不是真正的，用來辨識唯一資料的識別id，
+   * 也就是說，可能會有多筆資料有同樣的document_id
+   * 基本上會是serial_number，但不一定，也不是非serial_number不可
+   * 後端似乎通常稱為單號
+   */
   document_id: string;
   current_stage: `${number}`;
   document_status: Tdocument_status;
@@ -81,7 +84,7 @@ interface TgetReivewById {
 
 interface TaddReivew {
   review_id: TgetReivewById['id']; // 審核流程id
-  document_id: string; // 單號 // 基本上會是serial_number，但不一定，也不是非serial_number不可
+  document_id: TgetReivewById['document_id'];
   document_uuid: string; // 唯一識別id // 被審核資料的唯一識別id
   document_type: string; // ex:請購單 // 任意字串
   // username: string;
@@ -89,14 +92,14 @@ interface TaddReivew {
   document_title: string; // ex:請購單20241024 // 任意字串
   // get被審核資料時用的query
   query: {
-    [key: string]: string | number;
+    [key: string]: string | number | undefined;
   };
 }
 
 interface TgetReview {
   id: string;
   document_type: string;
-  document_id: string;
+  document_id: TgetReivewById['document_id'];
   create_at: string;
   create_by: string;
   review_id: string;
@@ -443,3 +446,5 @@ export type {
   //
   Tprodreceipt_Dto,
 };
+
+export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };

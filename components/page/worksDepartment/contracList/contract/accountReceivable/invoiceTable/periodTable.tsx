@@ -458,16 +458,6 @@ export default function PeriodTable({
       <div className={scss.table}>
         <Left node_left={node_left} currency={currency} />
 
-        {isAddingNew && (
-          <PeriodPanel
-            ref={ref_newInvoicePanel}
-            finalProdArr={finalProdArr}
-            data_otherArr={data_otherArr}
-            currency={currency}
-            contractId={contractId}
-          />
-        )}
-
         {periodArr_sorted.map((data_invoice, index) => {
           return (
             <PeriodPanel
@@ -486,6 +476,16 @@ export default function PeriodTable({
             />
           );
         })}
+
+        {isAddingNew && (
+          <PeriodPanel
+            ref={ref_newInvoicePanel}
+            finalProdArr={finalProdArr}
+            data_otherArr={data_otherArr}
+            currency={currency}
+            contractId={contractId}
+          />
+        )}
 
         <PeriodPanel
           //
