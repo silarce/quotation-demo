@@ -210,15 +210,15 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 門型
     doorModelName: data_prod.doorModelName,
     // L(mm)全寬 // 單位為mm
-    fullWidth: new Decimal(data_prod.fullWidth).mul(1000).toNumber(),
+    fullWidth: new Decimal(data_prod.fullWidth || 0).mul(1000).toNumber(),
 
-    WG: new Decimal(data_prod.WG).mul(1000).toNumber(),
+    WG: new Decimal(data_prod.WG || 0).mul(1000).toNumber(),
     // h(mm) // 單位為mm
-    height: new Decimal(data_prod.height).mul(1000).toNumber(),
+    height: new Decimal(data_prod.height || 0).mul(1000).toNumber(),
     // B(mm) // 單位為mm
-    boxB: new Decimal(data_prod.boxB).mul(1000).toNumber(),
+    boxB: new Decimal(data_prod.boxB || 0).mul(1000).toNumber(),
     // D(mm) // 單位為mm
-    boxD: new Decimal(data_prod.boxD).mul(1000).toNumber(),
+    boxD: new Decimal(data_prod.boxD || 0).mul(1000).toNumber(),
     // 面積
     area: data_prod.area,
     // 才數

@@ -11,7 +11,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import iconUpload from 'public/image/icon/upload.svg';
 import iconRedLock from 'public/image/icon/redLock.svg';
 
-import type { TquotationType } from 'pages/domestic/quotationList/quotation';
+import type { TquotationType } from 'pages/domestic/quotationList/quotation_refactored';
 
 // ================================================================================
 interface Tprops {
