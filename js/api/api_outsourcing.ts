@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -23,6 +23,7 @@ import type {
   TcreateOutsourcingPaymentDetailItemDto,
   TfileDto,
 } from './dtoTypes';
+import { t } from 'i18next';
 
 export type {
   Tparams,
@@ -173,11 +174,29 @@ export const apiGetOutsourcingPayment_id = async (id: string, params?: Tparams) 
     .catch((err) => Promise.reject(err));
 };
 
-export const apiGetOutsourcingPaymentAttachments = async (id: string) => {
-  const api = `/outsourcing-payment/${id}/attachments`;
+export const apiGetOutsourcingPaymentAttachments = async (outsourcingPaymentId: string) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments`;
 
   return axi
     .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPostOutsourcingPaymentAttachments = async (outsourcingPaymentId: string, body: FormData) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments`;
+
+  return axi
+    .post<TfileDto[]>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiDeleteOutsourcingPaymentAttachments = async (outsourcingPaymentId: string, fileId: string) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments/${fileId}`;
+
+  return axi
+    .delete<TfileDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -288,7 +307,6 @@ export const apiPatchOutsourcingPayment = async (
 };
 
 export const useGetOutsourcingPayment_id_kit = (
-  //
   id?: string,
   {
     customerParams,
@@ -307,6 +325,8 @@ export const useGetOutsourcingPayment_id_kit = (
     populate: ['outsourcing'],
     ...customerParams,
   };
+
+  const { get, patch } = apiKit_outsourcingPayment(id, { params_get: params });
 
   const update = async () => {
     if (!id) {
@@ -335,8 +355,6 @@ export const useGetOutsourcingPayment_id_kit = (
       });
   };
 
-  const patch = () => {};
-
   return {
     data: res,
     attachments,
@@ -346,7 +364,10 @@ export const useGetOutsourcingPayment_id_kit = (
 };
 
 // 送審
-export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
+export const apiPatchOutsourcingPaymentSubmit = async (
+  id: string,
+  { showAlert = true }: { showAlert?: boolean } = {}
+) => {
   const api = `/outsourcing-payment/${id}/submit`;
 
   return axi
@@ -355,17 +376,22 @@ export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
     .catch((error) => {
       const err = error as AxiosError;
 
-      myAlert.err({
-        title: '送審外包計價單失敗',
-        content: err.message,
-      });
+      showAlert &&
+        myAlert.err({
+          title: '送審外包計價單失敗',
+          content: err.message,
+        });
 
       return Promise.reject(err);
     });
 };
 
 // 審核
-export const apiPatchOutsourcingPaymentReview = async (id: string, body: { reviewResult: boolean }) => {
+export const apiPatchOutsourcingPaymentReview = async (
+  id: string,
+  body: { reviewResult: boolean },
+  { showAlert = true }: { showAlert?: boolean } = {}
+) => {
   const api = `/outsourcing-payment/${id}/review`;
 
   return axi
@@ -373,10 +399,11 @@ export const apiPatchOutsourcingPaymentReview = async (id: string, body: { revie
     .then((res) => res.data)
     .catch((error) => {
       const err = error as AxiosError;
-      myAlert.err({
-        title: '審核外包計價單失敗',
-        content: err.message,
-      });
+      showAlert &&
+        myAlert.err({
+          title: '審核外包計價單失敗',
+          content: err.message,
+        });
 
       return Promise.reject(err);
     });
@@ -456,4 +483,107 @@ export const apiPatchOutsourcingPaymentDetail = async (
 
       return Promise.reject(err);
     });
+};
+
+// ===========================================================================
+
+const apiKit_outsourcingPayment = (
+  //
+  id?: string,
+  { params_get }: { params_get?: Tparams } = {}
+) => {
+  //
+  const get = async () => {
+    if (!id) {
+      return;
+    }
+
+    await apiGetOutsourcingPayment_id(id, params_get)
+      .then(async (outsourcingPayment) => {
+        const attachments = await apiGetOutsourcingPaymentAttachments(id);
+
+        return {
+          outsourcingPayment,
+          attachments,
+        };
+      })
+      .catch((err) => {
+        console.error(err);
+
+        return Promise.reject(err);
+      });
+  };
+
+  const patch = async ({
+    body,
+    attachmentArr,
+    attachmentIdArr_willDelete,
+  }: {
+    body: TupdateOutsourcingPaymentDto;
+    attachmentArr: FormData[];
+    attachmentIdArr_willDelete: string[];
+  }) => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    let isSomeAttachmentPostFail = false;
+    let isSomeAttachmentDeleteFail = false;
+
+    try {
+      const newOutsourcintPayment = await apiPatchOutsourcingPayment(id, body);
+
+      for (const formData of attachmentArr) {
+        await apiPostOutsourcingPaymentAttachments(id, formData).catch((err) => {
+          console.error(err);
+          isSomeAttachmentPostFail = true;
+        });
+      }
+
+      for (const fileId of attachmentIdArr_willDelete) {
+        await apiDeleteOutsourcingPaymentAttachments(id, fileId).catch((err) => {
+          console.error(err);
+          isSomeAttachmentDeleteFail = true;
+        });
+      }
+
+      return {
+        newOutsourcintPayment,
+        isSomeAttachmentPostFail,
+        isSomeAttachmentDeleteFail,
+      };
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    //
+  };
+
+  const submit = async () => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    return await apiPatchOutsourcingPaymentSubmit(id, { showAlert: false });
+  };
+
+  const review = async (body: { reviewResult: boolean }) => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    return await apiPatchOutsourcingPaymentReview(id, body);
+  };
+
+  return {
+    get,
+    patch,
+    submit,
+    review,
+  };
 };
