@@ -18,11 +18,13 @@ const getClassName = (props: SVGProps<SVGSVGElement>) => {
 };
 
 function IconDelete01(props: SVGProps<SVGSVGElement>) {
-  const className = getClassName(props);
+  const defaultClassName = getClassName(props);
+  const { className, ...rest } = props;
 
   return (
     <svg
-      {...{ ...props, className }}
+      className={classNames(defaultClassName, className)}
+      {...rest}
       width="20"
       height="20"
       viewBox="0 0 20 20"
@@ -38,12 +40,14 @@ function IconDelete01(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-function IconEdit(props: SVGProps<SVGSVGElement>) {
-  const className = getClassName(props);
+function IconEdit(props: SVGProps<SVGSVGElement> & { isActive?: boolean }) {
+  const defaultClassName = getClassName(props);
+  const { className, isActive, ...rest } = props;
 
   return (
     <svg
-      {...{ ...props, className }}
+      className={classNames(defaultClassName, isActive && style.active, className)}
+      {...rest}
       width="20"
       height="20"
       viewBox="0 0 20 20"

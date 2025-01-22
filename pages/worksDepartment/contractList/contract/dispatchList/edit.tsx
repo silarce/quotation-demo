@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -34,7 +35,9 @@ import { TupdateTodoDto, apiPatchTodo } from 'js/api/api_todo';
 import scss from './edit.module.scss';
 
 // type
-import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
+import { TemployeeDto, TtodoDto, ToutsourcingDto } from 'js/api/dtoTypes';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // =====================================================================
 
@@ -45,8 +48,12 @@ type Tquery = {
 };
 
 type Tstate_profile = {
+  idNumber: string;
   dispatchDate: string;
+
   workerEmployee: TemployeeDto[];
+  outsourcing: ToutsourcingDto[];
+
   projectName: string;
   projectNumber: string;
   contractor: string;
@@ -63,6 +70,11 @@ type Tstate_profile = {
 
   projectSiteContactPerson: string;
   projectSiteContactPersonNumber: string;
+
+  pointContactArr: {
+    name: string;
+    phone: string;
+  }[];
 };
 
 type Tstate_pricingMethod = {
@@ -102,10 +114,19 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['content.customer', 'engineeringContact'],
+    customPopulate: [
+      'content.customer',
+      'engineeringContact',
+      // 'accountReceivable'
+    ],
   });
 
-  const { engineeringContactId, engineeringContact } = contract ?? {};
+  const {
+    //
+    engineeringContactId,
+    engineeringContact,
+    // accountReceivable,
+  } = contract ?? {};
   // const { data: engineeringContact, update: update_engineeringContact } =
   //   useGetEngineeringContact(engineeringContactId);
 
@@ -204,10 +225,12 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  // 有些多餘，之後要簡化
   const changeProfile = (key: keyof Omit<Tstate_profile, 'workerEmployee'>, v: string) => {
     setState_profile((state) => ({ ...state, [key]: v }));
   };
 
+  // 有些多餘，之後要簡化
   const changeProfile_workerEmployee = (v: TemployeeDto[]) => {
     setState_profile((state) => ({ ...state, workerEmployee: v }));
   };
@@ -240,6 +263,7 @@ export default function EditDispatchList() {
     }
 
     const body: TcreateDispatchingDto = {
+      idNumber: state_profile.idNumber,
       contractId,
       dispatchDate: state_profile.dispatchDate,
       contractorContactPerson: state_profile.contractorContactPerson,
@@ -260,6 +284,9 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson: state_profile.projectSiteContactPerson,
       projectSiteContactPersonNumber: state_profile.projectSiteContactPersonNumber,
+
+      pointContact: state_profile.pointContactArr,
+      outsourcingId: state_profile.outsourcing.map((item) => item.id),
     };
 
     try {
@@ -365,6 +392,7 @@ export default function EditDispatchList() {
     }
 
     const {
+      idNumber,
       dispatchDate,
       contractorContactPerson,
       workerEmployee,
@@ -374,6 +402,7 @@ export default function EditDispatchList() {
       note,
       warrantyDate,
       isCompleted,
+      outsourcing = [],
     } = dispatching ?? {};
 
     let {
@@ -387,6 +416,8 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson,
       projectSiteContactPersonNumber,
+      // warrantyDate,
+      pointContact,
     } = dispatching ?? {};
 
     // 如果dispatching不存在，也就是新增派工單
@@ -406,9 +437,22 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson = defaultPointContactPerson ?? '';
       projectSiteContactPersonNumber = defaultPointContactNumber ?? '';
+      pointContact = [];
+
+      // warrantyDate = accountReceivable?.warrantyDate ?? '';
     }
 
+    const pointContactArr: Tstate_profile['pointContactArr'] = (pointContact ?? []).map((item) => {
+      const pointContacct: Tstate_profile['pointContactArr'][number] = {
+        name: item.name,
+        phone: item.phone,
+      };
+
+      return pointContacct;
+    });
+
     setState_profile({
+      idNumber: idNumber ?? '',
       dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
       projectName: contract?.content.projectName ?? '',
@@ -427,6 +471,9 @@ export default function EditDispatchList() {
 
       projectSiteContactPerson: projectSiteContactPerson ?? '',
       projectSiteContactPersonNumber: projectSiteContactPersonNumber ?? '',
+
+      pointContactArr: pointContactArr,
+      outsourcing,
     });
 
     setState_dispatch({
@@ -443,7 +490,13 @@ export default function EditDispatchList() {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineeringContact, dispatching, disabled, todoForDispatch]);
+  }, [
+    engineeringContact,
+    dispatching,
+    disabled,
+    todoForDispatch,
+    // accountReceivable?.warrantyDate
+  ]);
 
   // ---------------------------------------------------------
 
@@ -461,6 +514,11 @@ export default function EditDispatchList() {
     });
 
     const control_profile: Tcontrol_profile = {
+      idNumber: {
+        value: state_profile.idNumber,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('idNumber', e.target.value),
+      },
       dispatchDate: {
         value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
         disabled: theDiasbled,
@@ -470,6 +528,14 @@ export default function EditDispatchList() {
         value: state_profile.workerEmployee,
         onChange: changeProfile_workerEmployee,
       },
+
+      workerOutsourcing: {
+        value: state_profile.outsourcing,
+        onChange: (v) => {
+          setState_profile((state) => ({ ...state, outsourcing: v }));
+        },
+      },
+
       projectName: state_profile.projectName,
       projectNumber: state_profile.projectNumber,
       contractor: state_profile.contractor,
@@ -539,6 +605,76 @@ export default function EditDispatchList() {
         disabled: theDiasbled,
         onChange: (e) => changeProfile('projectSiteContactPersonNumber', e.target.value),
       },
+
+      addPointContact: () => {
+        setState_profile((prev) => {
+          const copy = { ...prev };
+          const contactPersonArr = [...copy.pointContactArr];
+          contactPersonArr.push({
+            name: '',
+            phone: '',
+          });
+
+          copy.pointContactArr = contactPersonArr;
+
+          return copy;
+        });
+      },
+      // contractPersonArr: [],
+      pointContactArr: state_profile.pointContactArr.map((item, index) => {
+        const { name, phone } = item;
+
+        const setContact = ({ name, phone: phoneNumber }: { name?: string; phone?: string }) => {
+          setState_profile((prev) => {
+            const copy = { ...prev };
+            const pointContactArr = [...copy.pointContactArr];
+            const pointContact = { ...pointContactArr[index] };
+
+            if (name !== undefined) {
+              pointContact.name = name;
+            }
+
+            if (phoneNumber !== undefined) {
+              pointContact.phone = phoneNumber;
+            }
+
+            pointContactArr[index] = pointContact;
+            copy.pointContactArr = pointContactArr;
+
+            return copy;
+          });
+        };
+
+        return {
+          name: {
+            value: name,
+            disabled: theDiasbled,
+            onChange: (option) => {
+              const { value, phoneNumber } = option ?? {};
+              setContact({ name: value, phone: '' });
+              phoneNumber !== undefined && setContact({ phone: phoneNumber });
+            },
+          },
+          phone: {
+            value: phone,
+            disabled: theDiasbled,
+            onChange: (e) => {
+              setContact({ phone: e.target.value });
+            },
+          },
+          remove: () => {
+            setState_profile((prev) => {
+              const copy = { ...prev };
+              const contactPersonArr = [...copy.pointContactArr];
+              contactPersonArr.splice(index, 1);
+
+              copy.pointContactArr = contactPersonArr;
+
+              return copy;
+            });
+          },
+        };
+      }),
     };
 
     return control_profile;
@@ -566,12 +702,13 @@ export default function EditDispatchList() {
     const wholeAddress = `${county}${district}${address}`;
 
     const data_pdf: Tdata_pdf = {
+      idNumber: dispatching?.idNumber ?? '',
       customerName: contract?.content.projectName ?? '',
       phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
       contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
-      warrantyPeriod: warrantyDate ?? '',
+      warrantyPeriod: (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '',
       content: tasks,
     };
 
@@ -700,6 +837,7 @@ export default function EditDispatchList() {
 // =====================================================================
 
 const emptyState_profile = (): Tstate_profile => ({
+  idNumber: '',
   dispatchDate: '',
   workerEmployee: [],
   projectName: '',
@@ -716,4 +854,6 @@ const emptyState_profile = (): Tstate_profile => ({
   pointContactNumber: '',
   projectSiteContactPerson: '',
   projectSiteContactPersonNumber: '',
+  pointContactArr: [],
+  outsourcing: [],
 });

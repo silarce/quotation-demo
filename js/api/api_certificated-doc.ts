@@ -5,6 +5,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { createUseInfinite } from './createUseInfinite';
 
+import { apiGetReviewById, TgetReviewById } from './api_netCore/api_review';
+
 import type {
   Tparams,
   TpageMetaDto,
@@ -39,6 +41,14 @@ export type {
   TreviewCertificatedDocDto,
   TcreateCertificatedDocSnapShotDto,
 };
+
+type TcertificatedDocDto_addition = TcertificatedDocDto & {
+  addition: {
+    reviewArr?: TgetReviewById[] | undefined;
+  };
+};
+
+export type { TcertificatedDocDto_addition };
 
 // ===========================================================================
 
@@ -93,8 +103,9 @@ const useGetCertificatedDoc = (params?: Tparams) => {
 };
 
 const useGetCertificatedDoc_contractId = (contractId: string | undefined, params: Tparams) => {
-  const [res, setRes] = useState<TpageResponse<TcertificatedDocDto> | undefined>(undefined);
   const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  const [res, setRes] = useState<TpageResponse<TcertificatedDocDto_addition> | undefined>(undefined);
 
   params = {
     pageSize: 99999,
@@ -120,12 +131,27 @@ const useGetCertificatedDoc_contractId = (contractId: string | undefined, params
 
     setIsFetching(true);
 
-    return await apiGetCertificatedDoc(params)
-      .then((res) => {
-        setRes(res);
+    const res = await apiGetCertificatedDoc(params)
+      .then(async (res) => {
+        const dataArr = res.data;
+        const dataArr_addition: TcertificatedDocDto_addition[] = [];
 
-        return res;
+        for (const data of dataArr) {
+          const { id } = data;
+          const reviewArr = await apiGetReviewById({ document_uuid: id });
+          dataArr_addition.push({ ...data, addition: { reviewArr } });
+        }
+
+        const result: TpageResponse<TcertificatedDocDto_addition> = {
+          data: dataArr_addition,
+          meta: res.meta,
+        };
+
+        setRes(result);
+
+        return result;
       })
+
       .catch((err: AxiosError) => {
         myAlert.err({ title: '取得證明文件列表失敗', content: err.message });
 
@@ -134,6 +160,8 @@ const useGetCertificatedDoc_contractId = (contractId: string | undefined, params
       .finally(() => {
         setIsFetching(false);
       });
+
+    return res;
   };
 
   return {

@@ -1,30 +1,21 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import Image from 'next/image';
-import Link from 'next/link';
 
 // antd
-import {
-  //
-  Select,
-  Collapse,
-  Upload,
-  Image as AntdImage,
-  Spin,
-} from 'antd';
+import { Select, Collapse } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
+
+import { ImageDragger, Pattern } from './component';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+import { Tcontrol_processChain } from 'components/global/gear/processChain';
 import MultButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
-import scss from './projectPattern.module.scss';
+import { useControl_review } from './useControl_review';
 
-// icon
-import iconGrayAddCircle from 'public/image/icon/grayAddCircle.svg';
-import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
+import scss from './projectPattern.module.scss';
 
 // api
 import {
@@ -43,7 +34,6 @@ import { Toption } from 'js/utils/options/options';
 
 // =======================================================================
 const { Panel } = Collapse;
-const { Dragger } = Upload;
 
 // =======================================================================
 
@@ -128,43 +118,38 @@ type TpatternReviewStatus = {
   };
 };
 
-export type {
-  //
-  ThasPattern,
-  TpatternReviewProcessGroup,
-  TpatternReviewProcess,
-  TpatternReviewStatus,
-};
-
 // =======================================================================
+
+// MARK:START
+
 export default function ProjectPattern({
   engineeringContactId,
   onPatternChange,
-  patternReviewStatus,
+  // patternReviewStatus,
   onSubmitSuccess,
   onReviewSuccess,
   onDeleteSuccess,
   shouldHasPattern,
-  isReviewer_worker,
-  isReviewer_manager,
-}: {
+}: // isReviewer_worker,
+// isReviewer_manager,
+{
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
-  patternReviewStatus: TpatternReviewStatus;
+  // patternReviewStatus: TpatternReviewStatus;
   onSubmitSuccess: () => void;
   onReviewSuccess: () => void;
   onDeleteSuccess: () => void;
   shouldHasPattern: TshouldHasPattern;
-  isReviewer_worker: boolean;
-  isReviewer_manager: boolean;
+  // isReviewer_worker: boolean;
+  // isReviewer_manager: boolean;
 }) {
-  const {
-    color: { colorManagerReviewedAt },
-    construction: { constructionManagerReviewedAt },
-    detail: { detailManagerReviewedAt },
-    floor: { floorManagerReviewedAt },
-    design: { designManagerReviewedAt },
-  } = patternReviewStatus.pattern;
+  // const {
+  //   color: { colorManagerReviewedAt },
+  //   construction: { constructionManagerReviewedAt },
+  //   detail: { detailManagerReviewedAt },
+  //   floor: { floorManagerReviewedAt },
+  //   design: { designManagerReviewedAt },
+  // } = patternReviewStatus.pattern;
 
   // -----------------------------------------------------------------------
   const [isUploading, setIsUploading] = useState<TisUploading>({
@@ -371,20 +356,8 @@ export default function ProjectPattern({
   };
 
   //
-  const onRemoveClick = (pattern: TpatternType) => {
-    myAlert.confirm({
-      title: '確定移除?',
-      content: (
-        <span>
-          移除後無法復原
-          <br />
-          重新上傳需要重新審核
-        </span>
-      ),
-      props: {
-        onOk: () => reqDeletePattern(pattern),
-      },
-    });
+  const onRemoveClick = async (pattern: TpatternType) => {
+    await reqDeletePattern(pattern);
   };
 
   // =======================================================================
@@ -413,8 +386,8 @@ export default function ProjectPattern({
 
   const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
-    // onRemoveClick: () => onRemoveClick('floor'),
-    onRemoveClick: floorManagerReviewedAt ? null : () => onRemoveClick('floor'),
+    onRemoveClick: () => onRemoveClick('floor'),
+    // onRemoveClick: floorManagerReviewedAt ? null : () => onRemoveClick('floor'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
     isUploading: isUploading.floor,
     isImage: checkFileIsImage_str(fileInfo_floor?.mime ?? ''),
@@ -422,8 +395,8 @@ export default function ProjectPattern({
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
-    // onRemoveClick: () => onRemoveClick('design'),
-    onRemoveClick: designManagerReviewedAt ? null : () => onRemoveClick('design'),
+    onRemoveClick: () => onRemoveClick('design'),
+    // onRemoveClick: designManagerReviewedAt ? null : () => onRemoveClick('design'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
     isUploading: isUploading.design,
     isImage: checkFileIsImage_str(fileInfo_design?.mime ?? ''),
@@ -431,8 +404,8 @@ export default function ProjectPattern({
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
-    // onRemoveClick: () => onRemoveClick('color'),
-    onRemoveClick: colorManagerReviewedAt ? null : () => onRemoveClick('color'),
+    onRemoveClick: () => onRemoveClick('color'),
+    // onRemoveClick: colorManagerReviewedAt ? null : () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
     isUploading: isUploading.color,
     isImage: checkFileIsImage_str(fileInfo_color?.mime ?? ''),
@@ -440,8 +413,8 @@ export default function ProjectPattern({
   };
   const props_construction: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.construction.src,
-    // onRemoveClick: () => onRemoveClick('construction'),
-    onRemoveClick: constructionManagerReviewedAt ? null : () => onRemoveClick('construction'),
+    onRemoveClick: () => onRemoveClick('construction'),
+    // onRemoveClick: constructionManagerReviewedAt ? null : () => onRemoveClick('construction'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'construction'),
     isUploading: isUploading.construction,
     isImage: checkFileIsImage_str(fileInfo_construction?.mime ?? ''),
@@ -449,8 +422,8 @@ export default function ProjectPattern({
   };
   const props_detail: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.detail.src,
-    // onRemoveClick: () => onRemoveClick('detail'),
-    onRemoveClick: detailManagerReviewedAt ? null : () => onRemoveClick('detail'),
+    onRemoveClick: () => onRemoveClick('detail'),
+    // onRemoveClick: detailManagerReviewedAt ? null : () => onRemoveClick('detail'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'detail'),
     isUploading: isUploading.detail,
     isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
@@ -458,13 +431,15 @@ export default function ProjectPattern({
   };
   // -----------------------------------------------------------------------
 
-  const controlList = useControl_review({
-    patternReviewStatus: patternReviewStatus,
-    isReviewer_worker,
-    isReviewer_manager,
-  });
+  // const controlList = useControl_review({
+  //   patternReviewStatus: patternReviewStatus,
+  //   isReviewer_worker,
+  //   isReviewer_manager,
+  // });
 
   // -----------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <div className={scss.container}>
@@ -509,14 +484,17 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasDetail && (
           <Panel header="簽認圖" key="detail" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'detail'}
               props={props_detail}
-              isDetailSubmit={!!controlList.isDetailSubmit}
-              isReviewer={controlList.isReviewer_detail}
-              statusArr={controlList.detail}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
+              // isDetailSubmit={!!controlList.isDetailSubmit}
+              // isReviewer={controlList.isReviewer_detail}
+              // statusArr={controlList.detail}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -525,14 +503,17 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasFloor && (
           <Panel header="平面圖" key="floor" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'floor'}
               props={props_floor}
-              isDetailSubmit={!!controlList.isFloorSubmit}
-              isReviewer={controlList.isReviewer_floor}
-              statusArr={controlList.floor}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
+              // isDetailSubmit={!!controlList.isFloorSubmit}
+              // isReviewer={controlList.isReviewer_floor}
+              // statusArr={controlList.floor}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -541,14 +522,17 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasDesign && (
           <Panel header="設計圖" key="design" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'design'}
               props={props_design}
-              isDetailSubmit={!!controlList.isDesignSubmit}
-              isReviewer={controlList.isReviewer_design}
-              statusArr={controlList.design}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
+              // isDetailSubmit={!!controlList.isDesignSubmit}
+              // isReviewer={controlList.isReviewer_design}
+              // statusArr={controlList.design}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -557,14 +541,17 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasConstruction && (
           <Panel header="施工圖" key="construction" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'construction'}
               props={props_construction}
-              isDetailSubmit={!!controlList.isConstructionSubmit}
-              isReviewer={controlList.isReviewer_construction}
-              statusArr={controlList.construction}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
+              // isDetailSubmit={!!controlList.isConstructionSubmit}
+              // isReviewer={controlList.isReviewer_construction}
+              // statusArr={controlList.construction}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -573,14 +560,17 @@ export default function ProjectPattern({
         {shouldHasPattern.shouldHasColor && (
           <Panel header="色卡" key="color" className={scss.panel}>
             <Pattern
+              engineeringContactId={engineeringContactId}
               patternType={'color'}
               props={props_color}
-              isDetailSubmit={!!controlList.isColorSubmit}
-              isReviewer={controlList.isReviewer_color}
-              statusArr={controlList.color}
-              confirmReqSubmitPattern={confirmReqSubmitPattern}
-              reqReviewPattern={reqReviewPattern}
-              setReviewConfirm={setReviewConfirm}
+              onSubmiSuccess={onSubmitSuccess}
+              onDeleteSuccess={onDeleteSuccess}
+              // isDetailSubmit={!!controlList.isColorSubmit}
+              // isReviewer={controlList.isReviewer_color}
+              // statusArr={controlList.color}
+              // confirmReqSubmitPattern={confirmReqSubmitPattern}
+              // reqReviewPattern={reqReviewPattern}
+              // setReviewConfirm={setReviewConfirm}
             />
           </Panel>
         )}
@@ -611,322 +601,13 @@ export default function ProjectPattern({
   ); // return
 }
 
-// ==================================================
-
-const ImageDragger = ({
-  fileSrc,
-  isImage,
-  onRemoveClick,
-  onDraggerChange,
-  isUploading,
-  fileName,
-}: {
-  fileSrc?: string | undefined;
-  isImage: boolean;
-  onRemoveClick: (() => void) | null;
-  onDraggerChange: (e: UploadChangeParam) => void;
-  isUploading: boolean;
-  fileName: string;
-}) => {
-  return (
-    <>
-      <div className={classNames('relative w-fit', !fileSrc && 'hidden')}>
-        {isImage && <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt={fileName} />}
-
-        {!isImage && <Link href={fileSrc ?? ''}>{fileName}</Link>}
-
-        {onRemoveClick && <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />}
-      </div>
-      <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
-        <Spin spinning={isUploading} size="large">
-          <Dragger
-            className={classNames(scss.antdDragger, scss.plus)}
-            onChange={(e) => {
-              onDraggerChange(e);
-            }}
-            fileList={[]}
-          >
-            <div className={scss.dragTip}>
-              <div>
-                <Image src={iconGrayAddCircle} alt="" />
-              </div>
-              <span>請選擇圖片</span>
-            </div>
-          </Dragger>
-        </Spin>
-      </div>
-    </>
-  );
-};
-
-// -----------------------------------------------------------------------
-
-const BtnBar = ({
-  //
-  onReviewClick,
-  onSubmitClick,
-  shouldRender = true,
-}: {
-  onReviewClick?: (() => void) | null;
-  onSubmitClick?: (() => void) | null;
-  shouldRender?: boolean;
-}) => {
-  if (!shouldRender) {
-    return null;
-  }
-
-  return (
-    <div className={scss.btnBar}>
-      {onReviewClick && <MyButton_v2 onClick={onReviewClick}>審核</MyButton_v2>}
-      {onSubmitClick && (
-        <MyButton_v2 onClick={onSubmitClick} theme="danger">
-          送審
-        </MyButton_v2>
-      )}
-    </div>
-  );
-};
-// -----------------------------------------------------------------------
-
-const Pattern = ({
-  //
-  patternType,
-  props,
-  isDetailSubmit,
-  statusArr,
-  isReviewer,
-  confirmReqSubmitPattern,
-  reqReviewPattern,
-  setReviewConfirm,
-}: {
-  patternType: TpatternType;
-  props: Parameters<typeof ImageDragger>[0];
-  isDetailSubmit: boolean;
-  isReviewer: boolean;
-  confirmReqSubmitPattern: (patternType: TpatternType) => void;
-  reqReviewPattern: (props: { attachmentType: string; isPass: boolean }) => void;
-  setReviewConfirm: (confirm: (isPass: boolean) => void) => void;
-  statusArr: TstatusLabelProps[];
-}) => {
-  return (
-    <div>
-      <BtnBar
-        shouldRender={!!props.fileSrc}
-        onSubmitClick={checkAndReturnMethod({
-          check: !isDetailSubmit,
-          method: () => confirmReqSubmitPattern(patternType),
-        })}
-        onReviewClick={checkAndReturnMethod({
-          check: isDetailSubmit && isReviewer,
-          method: () => {
-            const theReviewconfirm = (isPass: boolean) => {
-              reqReviewPattern({
-                attachmentType: patternType,
-                isPass,
-              });
-            };
-
-            setReviewConfirm(() => theReviewconfirm);
-          },
-        })}
-      />
-      <ImageDragger {...props} />
-
-      {isDetailSubmit && (
-        <ProcessChain
-          className="mt-5"
-          control={{
-            statusArr: statusArr,
-          }}
-        />
-      )}
-    </div>
-  );
-};
-
-// -----------------------------------------------------------------------
-
 // ======================================================================
 // ======================================================================
 // ======================================================================
 // ======================================================================
 // ======================================================================
 
-const useControl_review = ({
-  isReviewer_worker,
-  isReviewer_manager,
-  patternReviewStatus,
-}: {
-  patternReviewStatus: TpatternReviewStatus;
-  isReviewer_worker: boolean;
-  isReviewer_manager: boolean;
-}) => {
-  const controlList = useMemo(() => {
-    let isReviewer_design = false;
-    let isReviewer_color = false;
-    let isReviewer_construction = false;
-    let isReviewer_detail = false;
-    let isReviewer_floor = false;
-
-    const { salesName, workerName, managerName, pattern } = patternReviewStatus;
-
-    const {
-      color: { colorToWorkerAt, colorWorkerReviewedAt, colorToManagerAt, colorManagerReviewedAt },
-      construction: {
-        constructionToWorkerAt,
-        constructionWorkerReviewedAt,
-        constructionToManagerAt,
-        constructionManagerReviewedAt,
-      },
-      detail: { detailToWorkerAt, detailWorkerReviewedAt, detailToManagerAt, detailManagerReviewedAt },
-      floor: { floorToWorkerAt, floorWorkerReviewedAt, floorToManagerAt, floorManagerReviewedAt },
-      design: { designToWorkerAt, designWorkerReviewedAt, designToManagerAt, designManagerReviewedAt },
-    } = pattern;
-
-    const checkStatus = ({ toAt, reviewedAt }: { toAt: string | null; reviewedAt: string | null }) => {
-      if (reviewedAt) {
-        return 'green';
-      } else if (toAt) {
-        return 'red';
-      } else {
-        return 'gray';
-      }
-    };
-
-    //
-    const statusArr_design: TstatusLabelProps[] = [
-      {
-        label: `業務 ${salesName}`,
-        dotColor: 'green',
-      },
-      // 工務從缺，暫時拿掉
-      // {
-      //   label: `工務 ${workerName}`,
-      //   dotColor: checkStatus({
-      //     toAt: designToWorkerAt,
-      //     reviewedAt: designWorkerReviewedAt,
-      //   }),
-      // },
-      {
-        label: `總經理 ${managerName}`,
-        dotColor: checkStatus({
-          toAt: designToManagerAt,
-          reviewedAt: designManagerReviewedAt,
-        }),
-      },
-    ];
-
-    const statusArr_floor: TstatusLabelProps[] = [
-      { label: `業務 ${salesName}`, dotColor: 'green' },
-      // 工務從缺，暫時拿掉
-      // {
-      //   label: `工務 ${workerName}`,
-      //   dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
-      // },
-      {
-        label: `總經理 ${managerName}`,
-        dotColor: checkStatus({ toAt: floorToManagerAt, reviewedAt: floorManagerReviewedAt }),
-      },
-    ];
-
-    const statusArr_color: TstatusLabelProps[] = [
-      { label: `業務 ${salesName}`, dotColor: 'green' },
-      // 工務從缺，暫時拿掉
-      // {
-      //   label: `工務 ${workerName}`,
-      //   dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
-      // },
-      {
-        label: `總經理 ${managerName}`,
-        dotColor: checkStatus({ toAt: colorToManagerAt, reviewedAt: colorManagerReviewedAt }),
-      },
-    ];
-
-    const statusArr_construction: TstatusLabelProps[] = [
-      { label: `業務 ${salesName}`, dotColor: 'green' },
-      // 工務從缺，暫時拿掉
-      // {
-      //   label: `工務 ${workerName}`,
-      //   dotColor: checkStatus({
-      //     toAt: constructionToWorkerAt,
-      //     reviewedAt: constructionWorkerReviewedAt,
-      //   }),
-      // },
-      {
-        label: `總經理 ${managerName}`,
-        dotColor: checkStatus({
-          toAt: constructionToManagerAt,
-          reviewedAt: constructionManagerReviewedAt,
-        }),
-      },
-    ];
-
-    const statusArr_detail: TstatusLabelProps[] = [
-      { label: `業務 ${salesName}`, dotColor: 'green' },
-      // 工務從缺，暫時拿掉
-      // {
-      //   label: `工務 ${workerName}`,
-      //   dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
-      // },
-      {
-        label: `總經理 ${managerName}`,
-        dotColor: checkStatus({ toAt: detailToManagerAt, reviewedAt: detailManagerReviewedAt }),
-      },
-    ];
-    //
-
-    if ((designToManagerAt && isReviewer_manager) || (designToWorkerAt && isReviewer_worker)) {
-      isReviewer_design = true;
-    }
-
-    if ((colorToManagerAt && isReviewer_manager) || (colorToWorkerAt && isReviewer_worker)) {
-      isReviewer_color = true;
-    }
-
-    if ((constructionToManagerAt && isReviewer_manager) || (constructionToWorkerAt && isReviewer_worker)) {
-      isReviewer_construction = true;
-    }
-
-    if ((detailToManagerAt && isReviewer_manager) || (detailToWorkerAt && isReviewer_worker)) {
-      isReviewer_detail = true;
-    }
-
-    if ((floorToManagerAt && isReviewer_manager) || (floorToWorkerAt && isReviewer_worker)) {
-      isReviewer_floor = true;
-    }
-
-    return {
-      color: statusArr_color,
-      construction: statusArr_construction,
-      detail: statusArr_detail,
-      floor: statusArr_floor,
-      design: statusArr_design,
-
-      // isColorSubmit: !!colorToWorkerAt,
-      // isConstructionSubmit: !!constructionToWorkerAt,
-      // isDetailSubmit: !!detailToWorkerAt,
-      // isFloorSubmit: !!floorToWorkerAt,
-      // isDesignSubmit: !!designToWorkerAt,
-      isColorSubmit: !!colorToManagerAt,
-      isConstructionSubmit: !!constructionToManagerAt,
-      isDetailSubmit: !!detailToManagerAt,
-      isFloorSubmit: !!floorToManagerAt,
-      isDesignSubmit: !!designToManagerAt,
-
-      isReviewer_design,
-      isReviewer_color,
-      isReviewer_construction,
-      isReviewer_detail,
-      isReviewer_floor,
-    };
-
-    //
-  }, [patternReviewStatus]);
-
-  return controlList;
-};
-
-// ==================================================
+// MARK:FUNCTIONS
 
 const checkFileIsImage = (file: File) => {
   const imageReg = /^image/;
@@ -963,10 +644,14 @@ const createOptions = (shouldHasPattern: TshouldHasPattern) => {
   return options;
 };
 
-const checkAndReturnMethod = ({ check, method }: { check: boolean; method: () => void }) => {
-  if (check) {
-    return method;
-  } else {
-    return null;
-  }
+// =======================================================================
+export type {
+  TpatternType,
+  TpatternList,
+  TisUploading,
+  ThasPattern,
+  TshouldHasPattern,
+  TpatternReviewProcess,
+  TpatternReviewProcessGroup,
+  TpatternReviewStatus,
 };

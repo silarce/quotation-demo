@@ -42,11 +42,13 @@ export default function PageHeader({
   panelList = [],
   contractNumber = '未取得',
   returnBtn = true,
+  linkForbidden,
 }: {
   tagCallback?: (contractId: string) => string;
   panelList?: TpanelList;
   contractNumber?: string;
   returnBtn?: boolean;
+  linkForbidden?: boolean;
 }) {
   const { erpFeature } = useContext(AppContext);
   const history_contractList = useUrlHistory((state) => state.contractList);
@@ -234,17 +236,17 @@ export default function PageHeader({
         },
       },
     },
-    {
-      label: '修繕報價',
-      disabled: true,
-      href: {
-        pathname: `${pathHead}/undefined`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
+    // {
+    //   label: '修繕報價',
+    //   disabled: true,
+    //   href: {
+    //     pathname: `${pathHead}/undefined`,
+    //     query: {
+    //       contractId,
+    //       version,
+    //     },
+    //   },
+    // },
     // {
     //   label: '證明書/保固書',
     //   disabled: true,
@@ -285,7 +287,7 @@ export default function PageHeader({
       {/* 上面的 */}
       <PageHeader02 tag={tag} panelList={panelList} />
       {/* 下面的 */}
-      <PageHeaderFlex01 linkList={linkList} />
+      {!linkForbidden && <PageHeaderFlex01 linkList={linkList} />}
     </div>
   );
 }

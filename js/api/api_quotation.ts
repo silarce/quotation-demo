@@ -1059,7 +1059,7 @@ export const useGetContract_id = (
           }
 
           const latestRecord = ws.latestRecord;
-          const reviewArr = await apiGetReviewById(latestRecord.id);
+          const reviewArr = await apiGetReviewById({ document_uuid: latestRecord.id });
           latestRecord.addition = {
             reviewArr,
           };

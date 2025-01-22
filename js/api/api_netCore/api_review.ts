@@ -50,10 +50,11 @@ const apiGetReviewFlow = (user_id: string) => {
     });
 };
 
-const apiGetReviewById = (document_uuid: string) => {
+const apiGetReviewById = ({ document_uuid, document_id }: { document_uuid: string; document_id?: string }) => {
   const api = `${subRoot}/GetReviewById`;
   const params = {
     document_uuid,
+    document_id,
   };
 
   return axi2
@@ -88,15 +89,15 @@ const apiAddReview = (body: TaddReview) => {
 };
 
 // 抽單
-// 注意，已核准的文件，也就是TgetReivewById[document_status]==="核准"
-// 不應該抽單，會出問題(後端也沒有擋)
 const apiGetReviewBack = (
   document_uuid: string,
   {
+    document_id,
     showSuccess = true,
     showErr = true,
     returnReject = false,
   }: {
+    document_id?: string;
     showSuccess?: boolean;
     showErr?: boolean;
     returnReject?: boolean;
@@ -106,6 +107,45 @@ const apiGetReviewBack = (
 
   const body = {
     document_uuid,
+    document_id,
+  };
+
+  return axi2
+    .post(api, body)
+    .then(() => {
+      showSuccess && myAlert.success({ title: '抽單完成' });
+
+      return 'success';
+    })
+    .catch((err) => {
+      showErr && myAlert.err({ title: '抽單失敗', content: err.message });
+
+      if (returnReject) {
+        return Promise.reject(err);
+      }
+    });
+};
+
+// 抽單，無視狀態
+const apiGetReviewBackForAnyStatus = (
+  document_uuid: string,
+  {
+    document_id,
+    showSuccess = true,
+    showErr = true,
+    returnReject = false,
+  }: {
+    document_id?: string;
+    showSuccess?: boolean;
+    showErr?: boolean;
+    returnReject?: boolean;
+  } = {}
+) => {
+  const api = '/Review/GetReviewBackForAnyStatus';
+
+  const body = {
+    document_uuid,
+    document_id,
   };
 
   return axi2
@@ -235,8 +275,10 @@ const useGetFlow = (
 const useGetReviewById = (
   document_uuid: string | undefined,
   {
+    document_id,
     autoUpdate = true,
   }: {
+    document_id?: string;
     autoUpdate?: boolean;
   } = {}
 ) => {
@@ -252,7 +294,7 @@ const useGetReviewById = (
     }
 
     setIsFetching(true);
-    await apiGetReviewById(document_uuid)
+    await apiGetReviewById({ document_uuid, document_id })
       .then((res) => {
         setRaw(res);
       })
@@ -337,13 +379,13 @@ export {
   //
   useGetFlow,
   useGetReviewById,
+  useGetReviewHistory,
   apiAddReview,
   apiGetReviewBack,
-  useGetReviewHistory,
-  //
   apiGetReviewById,
   apiGetFlow,
   apiGetReview,
+  apiGetReviewBackForAnyStatus,
 };
 export type { TreviewFlow, TgetReviewById, TaddReview, TgetReview };
 

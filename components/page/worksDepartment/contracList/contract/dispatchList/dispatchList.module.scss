@@ -15,10 +15,11 @@
     align-content: center;
 
     > div {
-      span {
-        font-weight: 400;
-        font-size: 16px;
-      }
+      font-weight: 400;
+      font-size: 16px;
+      white-space: pre-wrap;
+      max-height: 150px;
+      overflow: auto;
     }
     .workerCell {
       display: grid;
