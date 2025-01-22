@@ -17,6 +17,7 @@ import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/proc
 import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // icon
 import { IconDetail, IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -48,6 +49,12 @@ import { TmyBtn } from 'components/global/gear/button/myButton_v2';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 //
+
+import { useAttachment } from 'hooks/attachment/useAttachment';
+
+// ======================================================================
+import type { UploadProps } from 'antd';
+import { Button, Upload } from 'antd';
 
 // ======================================================================
 
@@ -99,9 +106,26 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     data: data_payment,
     attachments,
     update: update_payment,
+    handlePatch: patchOutsourcingPayment,
   } = useGetOutsourcingPayment_id_kit(paymentId, {
     customerParams: params,
     autoUpdate: false,
+  });
+
+  const {
+    fileInfoArr,
+    willDeleteArr,
+    addFile,
+    removeFile,
+    createFileArr,
+    // removeFile_withConfirm,
+
+    // fileInfoKitArr,
+  } = useAttachment({
+    rawArr: attachments,
+    kitOption: {
+      removeWithConfirm: true,
+    },
   });
 
   const params_paymentDetail: Tparams = {
@@ -892,6 +916,9 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   const panelList: TpanelList = disabled ? panelList_disabled : panelList_enabled;
 
   // -------------------------------------------------------------------------
+
+  // MARK: RENDER
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag="外包計價" panelList={panelList} />
@@ -925,9 +952,30 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
+
+        <div className="w-fit m-auto ml-[275px] mt-[96px]">
+          <Upload
+            multiple={true}
+            fileList={fileInfoArr}
+            onChange={(e) => {
+              const file = e.file.originFileObj as File;
+              const isExist = fileInfoArr.some((file) => file.uid === file.uid);
+              !isExist && file && addFile(file);
+            }}
+            onRemove={(e) => {
+              const uid = e.uid;
+              removeFile(uid);
+            }}
+          >
+            <SquareBtn sharp="long">新增附件</SquareBtn>
+          </Upload>
+        </div>
+
+        {/*  */}
         <div className={classNames(!disabled && 'hidden')}>
           <ProcessChain control={control_processChain} className={classNames('w-[1250px] m-auto mt-[80px]')} />
         </div>
+
         <div className={classNames(disabled && 'hidden')}>
           <SignatureBar
             control={control_signatureBar}
