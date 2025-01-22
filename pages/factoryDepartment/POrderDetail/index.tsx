@@ -262,8 +262,8 @@ export default function POrderDetail() {
         setuuidin(parsedItem?.purchaseorderuuid);
         setidin(parsedItem?.purchaseorderid)
         GetDetailById(parsedItem?.purchaseorderuuid);
-        GetReviewById(parsedItem?.purchaseorderuuid);
-        GetReviewHistory(parsedItem?.purchaseorderuuid);
+        GetReviewById(parsedItem?.purchaseorderuuid, parsedItem?.purchaseorderid);
+        GetReviewHistory(parsedItem?.purchaseorderuuid, parsedItem?.purchaseorderid);
         GetTransById(parsedItem?.purchaseorderid);
         getPRequisition();
         setCreate_byin(parsedItem?.create_by);
@@ -983,14 +983,15 @@ export default function POrderDetail() {
     }
 
     //取單據的審核流程
-    const GetReviewById = async (document_uuid: any) => {
+    const GetReviewById = async (document_uuid: any, document_id: any) => {
         try {
             setReviewflowdata([]);
             setReviewflowdata2([]);
             // setIsLoading(true);
 
             const conditionModel = {
-                document_uuid: document_uuid
+                document_uuid: document_uuid,
+                document_id: document_id
             };
 
             const inputModel = {
@@ -1097,7 +1098,7 @@ export default function POrderDetail() {
             }
             const data = await response.json();
             setReviewflowdata([]);
-            GetReviewById(uuidin);
+            GetReviewById(uuidin, idin);
             update_2();
 
             await new Promise(resolve => setTimeout(resolve, 500));
@@ -1126,7 +1127,7 @@ export default function POrderDetail() {
             const data2 = await response2.json();
 
             GetDetailById(uuidin);
-            GetReviewById(uuidin)
+            GetReviewById(uuidin, idin)
             setStatusin("審核中");
             setReviewbar(false);
 
@@ -1159,6 +1160,7 @@ export default function POrderDetail() {
                         setIsLoading(true);
                         const conditionModel = {
                             document_uuid: uuidin,
+                            document_id: idin
                         };
 
                         var inputModel = {
@@ -1185,7 +1187,7 @@ export default function POrderDetail() {
                         setStatusin("編輯中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(uuidin);
+                        GetReviewHistory(uuidin, idin);
                         update_2();
                     } catch (error: any) {
                         console.log(error.message);
@@ -1198,10 +1200,11 @@ export default function POrderDetail() {
         });
     }
 
-    const GetReviewHistory = async (id: any) => {
+    const GetReviewHistory = async (uuid: any, id: any) => {
         try {
             const conditionModel = {
-                document_uuid: id
+                document_uuid: uuid,
+                document_id: id
             };
 
             var inputModel = {
