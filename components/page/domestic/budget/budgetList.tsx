@@ -69,8 +69,8 @@ export default function BudgetList({
           const linkProps = attachedToContract
             ? {
                 href: {
-                  // pathname: `/domestic/quotationList/attachQuotation`,
-                  pathname: `/domestic/quotationList/quotation`,
+                  pathname: `/domestic/quotationList/attachQuotation`,
+                  // pathname: `/domestic/quotationList/quotation`,
                   query: { id },
                 },
               }

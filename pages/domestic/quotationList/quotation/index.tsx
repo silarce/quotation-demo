@@ -1,13 +1,36 @@
-// 報價單
-import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/router';
+// 送了合約審核表就會被鎖定
 
+// 常用變數目錄
+
+// useProductList
+// reqUpdateQuotation
+// useGetQuotation_id
+// fileInfoArr
+// reqReview 審核
+// reqPatchReviewer 送審
+// 編輯審核人員
+
+// 業務與業務主管審核過後，status就會自動轉為Pending
+
+//只是送審，不會被後端鎖住
+//有人審核過了就會被後端鎖住
+//在Pending狀態會被後端鎖住
+
+// =============================================================
+// =============================================================
+// =============================================================
+
+// 報價單
+import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
+import { useRouter, NextRouter } from 'next/router';
+import moment, { Moment } from 'moment';
+import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
-
-// import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
@@ -25,41 +48,52 @@ import QuotationPdf, {
 import QuotationPdf_part, {
   TmainProduct,
   Tpart,
-  usePdfPart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import ContractReviewForm, {
   useDefaultPaymentRatio_quotationContent,
 } from 'components/composition/contractReviewForm/contractReviewForm';
-// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
-// import Summary, {
-//   TsummaryControl,
-//   TpayInfoControl,
-// } from 'components/page/domestic/quotation/quotation/summary/summary';
-// import DoorSummary from 'components/page/domestic/quotation/doorSummary';
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
+import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-// import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
-// import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
-// import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-// import CustomerSelector from 'components/global/gear/modal/customerSelector';
+import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
+
+import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-// import Dropdown from 'components/global/gear/dropdown/Dropdown';
+import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
+// icon
+import iconUpload from 'public/image/icon/upload.svg';
+import iconRedLock from 'public/image/icon/redLock.svg';
+
+// css
+import style from './quotation.module.scss';
+
+import { AppContext } from 'pages/_app';
+
+// ------------------------------------------------------------------
+
+// utils
+import { urlToFile } from 'js/utils/helpers/urlToFile';
 import {
   init_variable,
   calcNTDToForeignCurrency,
   checkIsReviewer,
-  parseQuotationContentSituation,
 } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
@@ -69,117 +103,38 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import {
   TquotationDto,
   TquotationContentDto,
-  TquotationContractDto,
-  // TcreateQuotationContentDto,
+  TcreateQuotationContentDto,
   // useGetQuotation_id,
-  // useGetQuotation_id_2,
-  useGetQuotation_id_3,
-  useGetContract_id_forAttach,
-  useIterativeContractProduct,
-  apiQuotationModify,
-  // apiPostQuotation,
-  // apiPatchQuotation,
-  // apiQuotationSubmitReview,
-  // apiQuotationReview,
-  // apiQuotationUnlock,
+  useGetQuotation_id_2,
+  apiPostQuotation,
+  apiPatchQuotation,
+  apiQuotationSubmitReview,
+  apiQuotationReview,
+  apiQuotationUnlock,
   //
-  // useQuotation_id_attachments,
-  // apiPostQuotation_id_attachments,
-  // apiDelQuotation_id_attachments,
+  useQuotation_id_attachments,
+  apiPostQuotation_id_attachments,
+  apiDelQuotation_id_attachments,
   //
-  // useGetQuotationContent_id,
+  useGetQuotationContent_id,
   //
-  // apiPatchQuotationToPending,
-  // apiPostCopyQuotation,
-  // apiPatchQuotationContent_id_progress,
-  // TquotationProductDto,
+  apiPatchQuotationToPending,
+  apiPostCopyQuotation,
+  apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
 
 // hook
-// import { useProductList } from 'hooks/quotation/useProduct';
-// import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
+import { useProductList } from 'hooks/quotation/useProduct';
+import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
 
 // type
+import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
-import { TuserDto } from 'js/api/dtoTypes';
+import { checkIsFloat } from 'js/utils/checkValue';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-
-// ======================================================================
-
-// region REFACTOR IMPORT
-
-import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
-
-import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
-import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
-import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
-
-import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
-
-import {
-  useProfile,
-  createProps_profileForm,
-  Traw_profile,
-} from 'components/page/domestic/quotation_v2/hook/useProfile';
-import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
-
-import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
-import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
-
-import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
-import QuotationAttachment from 'components/page/domestic/quotation_v2/QuotationAttachment';
-
-import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
-import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
-
-import {
-  useQuotationProduct,
-  TprodSource,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
-import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
-
-import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
-import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
-
-import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
-
-import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
-
-import { kit_req } from 'components/page/domestic/quotation_v2/method/kit_req';
-
-import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/versionLabel';
-
-// css
-import scss from './index.module.scss';
-
-import { parseProdAction } from 'js/api/api_quotation';
-
-import {
-  calcQtyModify,
-  calcProdRemain,
-  calcPriceDiscount_percent,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/calcProd';
-
-// ======================================================================
-// ======================================================================
-
-// region TYPE
-
-// 沒有id- 新增報價單
-// 有id，其他都沒有- 編輯報價單
-// 有id，有contentId- 編輯報價單，但是以指定content取代latestContent
-interface Tquery {
-  id?: string;
-  // 從查詢報價單的展開列表點進來的話query裡就會有contentId
-  contentId?: string;
-  contractId?: string;
-}
-// 三個資料來源 quotationId contentId contractId
-
-type TquotationType = 'new' | 'old' | 'newAttachment' | 'oldAttachment' | undefined;
-
-// ======================================================================
+// ------------------------------------------------------------------
 
 const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
   selectorArr: [
@@ -196,45 +151,112 @@ const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>
   ],
 });
 
-// ======================================================================
+// ------------------------------------------------------------------
 
-// MARK: START
-export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
+type Tprofile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+  isLost: boolean;
+
+  //
+  designatedBrand: string;
+  siteManager: string;
+  siteManagerNumber: string;
+  requiredDoorType: string;
+  requiredDoorQuantity: string;
+  estimatedDiscount: string; // number
+  scheduledProcurementOrBidDate: Moment | null;
+  type: string;
+};
+
+type Tquery = {
+  id: string | undefined;
+  // 從查詢報價單的展開列表點進來的話query裡就會有contentId
+  contentId: string | undefined;
+  isContract: string | undefined;
+};
+
+// type Tstate_summary = {
+//   discountRate: string;
+//   tuneTotal: string;
+//   subTotal: string;
+//   salesTax: string;
+//   total: string;
+//   deliveryLocation: string;
+//   deliveryDate: string;
+//   exchangeRate: string;
+//   usd: string;
+// };
+
+type TcustomerSelectorShow = {
+  show: boolean;
+  isRelationQuotation: boolean | undefined;
+};
+
+// ------------------------------------------------------------------
+
+const QuotationProfile_memo = memo(QuotationProfile);
+const Summary_memo = memo(Summary);
+
+// ------------------------------------------------------------------
+export default function Quotation() {
   const router = useRouter();
-  const query = router.query as Tquery;
-  const { id: quotationId, contentId, contractId } = query;
+  const isReady = router.isReady;
 
+  if (!isReady) {
+    return null;
+  }
+
+  return <TheQuotation router={router} />;
+}
+
+// =================================================================
+// =================================================================
+// =================================================================
+
+function TheQuotation({ router }: { router: NextRouter }) {
+  const {
+    id: quotationId, //報價單id //若為新增報價單則為undefined
+    // 從查詢報價單的展開列表點進來的話query裡就會有contentId
+    contentId,
+    isContract,
+  } = router.query as Tquery;
+  const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+  const isNewQuotation = !quotationId && !contentId;
 
-  let quotationType: TquotationType = undefined;
+  // -----------------------------------------------------
 
-  // const isNewQuotation = !quotationId && !contentId;
-  // const isQuotation = !!quotationId && !contentId;
-
-  // const isNewAttachmentQuotation = isNewQuotation && !!contractId;
-
-  // ----------------------------------------------------------------------
+  // region  判斷用的參數
 
   let {
-    // reviewSalesEmployeeId,
-    // reviewWorkDirectorEmployeeId,
-    // reviewCashierEmployeeId,
-    // reviewSupervisorEmployeeId,
-    // reviewSalesManagerEmployeeId,
-    // reviewManagerEmployeeId,
-    // isReviewer,
-    // isSales,
-    // isWorkDirector,
-    // isCashier,
-    // isSupervisor,
+    reviewSalesEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewSalesManagerEmployeeId,
+    reviewManagerEmployeeId,
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
     // eslint-disable-next-line prefer-const
-    // isSalesManagerEmployee,
-    // isManager,
-    // salesReviewedAt,
-    // supervisorReviewedAt,
-    // salesManagerReviewedAt,
-    // workDirectorReviewedAt,
-    // cashierReviewedAt,
+    isSalesManagerEmployee,
+    isManager,
+    salesReviewedAt,
+    supervisorReviewedAt,
+    salesManagerReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
     managerReviewedAt,
     toSalesAt,
     toSupervisorAt,
@@ -242,375 +264,674 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     toWorkDirectorAt,
     toCashierAt,
     toManagerAt,
-    // isSendToReview,
-    // isSendToReview_pending,
+    isSendToReview,
+    isSendToReview_pending,
     isAttach,
     isAllReviewedBeforePending,
-    // version,
-    // editNotes,
+    version,
+    editNotes,
   } = init_variable();
+
+  // -----------------------------------------------------
+
+  // region useState
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 是否可編輯
+  const [disabled, setDisabled] = useState(!isNewQuotation);
+
+  const [reviewFormShow, setReviewFormShow] = useState(false);
+  const [reviewModalShow, setReviewModalShow] = useState(false);
+  const [showEmployeSelector, setShowEmployeSelector] = useState(false);
+
+  // const [showPdf, setShowPdf] = useState(false);
+  const [showPdf_part, setShowPdf_part] = useState(false);
+
+  const [showMemoModal, setShowMemoModal] = useState(false);
+
+  // __________________________________________________________
+
+  const [taxRate, setTaxRate] = useState(0.05);
+
+  // 複製報價單之客戶狀態
+  const [customerSelectorShow, setCustomerSelectorShow] = useReducer(
+    (state: TcustomerSelectorShow, action: TcustomerSelectorShow | boolean) => {
+      let copy = { ...state };
+
+      if (action === false) {
+        copy = {
+          show: false,
+          isRelationQuotation: undefined,
+        };
+      } else if (action === true) {
+        copy = {
+          show: true,
+          isRelationQuotation: undefined,
+        };
+      } else {
+        copy = action;
+      }
+
+      return copy;
+    },
+    {
+      show: false,
+      isRelationQuotation: undefined,
+    }
+  );
+
+  const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
+
+  const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
+  const [designUnit, setDesignUnit] = useState<TcustomerDto | undefined | null>();
+
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  const [state_profile, setState_profile] = useState<Tprofile>(creEmptyProfile());
+
+  const [state_anno, setState_annotation] = useState<string[]>([]);
+  const [state_qr, setState_qr] = useState<string[]>([]);
+
+  const { state_summary, setState_summary, clearSummary } = useSummary();
+
+  const [state_paymentMethod, setState_PaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
+    []
+  );
+
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+
+  // -----------------------------------------------------
+  // region get Data
+
+  const {
+    data: quotationData,
+    update,
+    // updateSingleProd_noRender,
+    // updateAllWholeProd_batch_noRender,
+  } = useGetQuotation_id_2(quotationId as string, {
+    preBuiltPopulate: ['simple', 'attached'],
+    // getProductItems: false,
+  });
+  // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
+  const {
+    data: quotationContentData,
+    update: updateContent,
+    clearData: clearData_content,
+  } = useGetQuotationContent_id(contentId as string);
+
+  const latestContent = quotationData?.latestContent ?? quotationContentData;
+
+  const lastestContentId = latestContent?.id;
+  // const status = latestContent?.status;
+  const verifyForm = latestContent?.verifyForm;
+  const attachedToContract = quotationData?.attachedToContract;
+
+  // 是否為追加減報價單 // 其實在這邊用不到，會導到這個page的都會是一般報價單
+  // 追加減報價單會導到 pages/domestic/quotationList/attachQuotation/index.tsx
+  isAttach = attachedToContract ? true : undefined;
+
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
 
   // ----------------------------------------------------------------------
 
-  // region GET DATA
+  // region 身分判斷
 
-  const {
-    //
-    instatnce_getQuotationId3,
-    content,
-    attachedToContract,
-    contractProfile,
+  reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
+  reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  reviewCashierEmployeeId = latestContent?.reviewCashierEmployee?.id;
+  reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  reviewSalesManagerEmployeeId = latestContent?.reviewSalesManagerEmployee?.id;
+  reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
-    prodArr,
-    iterativeContractProductArr,
+  salesReviewedAt = latestContent?.salesReviewedAt;
+  supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  salesManagerReviewedAt = latestContent?.salesManagerReviewedAt;
+  workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  cashierReviewedAt = latestContent?.cashierReviewedAt;
+  managerReviewedAt = latestContent?.managerReviewedAt;
 
-    prodArrForPDf,
+  toSalesAt = latestContent?.toSalesAt;
+  toSupervisorAt = latestContent?.toSupervisorAt;
+  toSalesManagerAt = latestContent?.toSalesManagerAt;
+  toWorkDirectorAt = latestContent?.toWorkDirectorAt;
+  toCashierAt = latestContent?.toCashierAt;
+  toManagerAt = latestContent?.toManagerAt;
 
-    isQuotationExpired,
-    latestSubContract,
-    parentSubContract,
-  } = useData();
+  isSendToReview = !!(
+    toSalesAt ||
+    toSupervisorAt ||
+    // toSalesManagerAt ||
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
+  isSendToReview_pending = !!(
+    toSupervisorAt ||
+    // || toSalesManagerAt
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
 
-  // console.log(isQuotationExpired);
+  version = latestContent?.version;
+  editNotes = latestContent?.editNotes;
 
-  isAttach = !!iterativeContractProductArr?.length;
+  let agentEmployee: TemployeeDto | undefined | null;
 
-  !quotationId && !contentId && (quotationType = 'new');
-  quotationId && !contentId && (quotationType = 'old');
-  quotationType === 'new' && !!contractId && (quotationType = 'newAttachment');
-  quotationType === 'old' && !!iterativeContractProductArr?.length && (quotationType = 'oldAttachment');
+  if (!quotationId) {
+    agentEmployee = userInfo?.employee;
+  } else {
+    agentEmployee = latestContent?.agentEmployee;
+  }
 
-  const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
-
-  const {
-    isFetching: isFetching_update,
-    //
-    raw: quotationData,
-    update: update_quotation,
-    // attachment
-    attachmentArr,
-    // domain,
-    //
-    isDesignatedContent,
-    //
-    // reqPost,
-    // reqPatch,
-    reqReview,
-    reqUnlock,
-    reqPatchReviewer,
-    reqCopyQuotation,
-    reqPatchQuotationContent_id_progress,
-    reqToPending,
-  } = instatnce_getQuotationId3;
-
-  const haveVerifyForm = content?.verifyForm;
-
-  managerReviewedAt = content?.managerReviewedAt;
-  toSalesAt = content?.toSalesAt;
-  toSupervisorAt = content?.toSupervisorAt;
-  toSalesManagerAt = content?.toSalesManagerAt;
-  toWorkDirectorAt = content?.toWorkDirectorAt;
-  toCashierAt = content?.toCashierAt;
-  toManagerAt = content?.toManagerAt;
-
-  const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
-
-  const {
-    isSendToReview,
-    isSendToReview_pending,
-    //
-    isReviewer,
-    isSales,
-    isWorkDirector,
-    isCashier,
-    isSupervisor,
-    isManager,
-  } =
-    (content &&
-      parseQuotationContentSituation({
-        quotationContent: content,
-        userId,
-      })) ??
-    {};
-
-  if (content?.status === 'Budget' || content?.status === 'Bidding' || content?.status === 'Contracting') {
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+    // if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && managerReviewedAt) {
+    //   isAllReviewedBeforePending = true;
+    // }
     managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
-  // ----------------------------------------------------------------------
+  const checkReviewerResult = checkIsReviewer({
+    userId,
 
-  // region STATE MANAGEMENT
+    status,
 
-  const [disabled, setDisabled] = useState(!(quotationType === 'new' || quotationType === 'newAttachment'));
-  const [isFetching, setIsFetching] = useState(false);
-  const [state_status, setState_status] = useState<TquotationContentDto['status']>('Budget');
+    reviewSalesEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewManagerEmployeeId,
 
-  const [showEmployeSelector, setShowEmployeSelector] = useState(false);
+    salesReviewedAt,
+    supervisorReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
 
-  const [reviewFormShow, setReviewFormShow] = useState(false);
-
-  const {
-    instance: instance_quotationProduct,
-    instance_iterative,
-    allProdTotal,
-    allProdTotal_iterative,
-    theProductTotal,
-    calcProductBody,
-    doorModelSummery,
-    doorModelSummery_reduceModified,
-    checkIsIterativeProdValid,
-  } = useQuotationProduct({
-    raw_quotationProductArr: prodArr,
-    raw_quotationDiscount: content?.discount,
-    iterativeContractProductArr: iterativeContractProductArr,
-    disabled,
-    onProdAllTotalChange: (prodAllTotal) => {
-      handleSetQuotationPriceTotal({
-        prodPriceAllTotal: prodAllTotal,
-        otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
-      });
-    },
+    toSalesAt,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
   });
 
-  // const instance_iterativeContractProduct = useQuotationProduct({
-  //   raw_quotationProductArr: iterativeContractProductArr,
-  //   raw_quotationDiscount: undefined,
-  //   disabled,
-  //   onProdAllTotalChange: () => {},
-  // });
+  isReviewer = checkReviewerResult.isReviewer;
 
-  const instance_quotationPrice = useQuotationTotalPrice({
-    raw_quotationContent: content,
-    disabled,
-  });
+  isSales = checkReviewerResult.isSales;
+  isSupervisor = checkReviewerResult.isSupervisor;
+  isWorkDirector = checkReviewerResult.isWorkDirector;
+  isCashier = checkReviewerResult.isCashier;
+  isManager = checkReviewerResult.isManager;
 
-  const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
-    instance_quotationPrice;
+  // --------------------------------------------------------------------------
 
-  const { avgDiscount } = instance_quotationProduct;
+  // region function
 
-  const {
-    quotationDiscount: state_quotationDiscount, // 總折數
-  } = instance_quotationProduct;
+  const uploadAttachment = async (newContentId: string) => {
+    // 移除附件
+    const theFileInfoArr = fileInfoArr.filter((info) => {
+      const { fileId, willDelete, isNew } = info;
 
-  const { state_profile, setState_profile } = useProfile({
-    disabled,
-    profile: quotationType === 'newAttachment' ? contractProfile : content,
-  });
+      // 如果 fileId 存在、willDelete 為 true 且 isNew 為 false，則移除該元素
+      return !(fileId && willDelete && !isNew);
+    });
+    setFileInfoArr(theFileInfoArr);
 
-  const {
-    annoArr,
-    addAnno,
-    openSelector: openSelector_anno,
-  } = useAnnotations({
-    disabled: true,
-    raw_remarkArr: content?.annotations,
-  });
+    // 現在每個content都是獨立的，因此每次都必須重新上傳舊有的附件
+    // 因此以url取得File後上傳
+    // 上傳附件
+    for (const info of theFileInfoArr) {
+      const { fileId, willDelete, isNew, fileSrc } = info;
+      let file = info.file;
 
-  const {
-    quotationRangeArr,
-    addQuotationRange,
-    openSelector: openSelector_qr,
-  } = useQuotationRange({
-    disabled: true,
-    raw_remarkArr: content?.quotationRanges,
-  });
+      if (!file && fileSrc) {
+        file = await urlToFile({
+          url: fileSrc,
+          fileName: info.fileName,
+          mimeType: info.fileType,
+        });
+      }
 
-  const {
-    //
-    fileInfoKitArr,
-    addFile,
-    createFileArr, // 要呼叫patch時使用
-  } = useAttachment({
-    resetTrigger: disabled,
-    rawArr: attachmentArr,
-    kit: {
-      removeWithConfirm: false,
-    },
-  });
+      // if (fileId || !file || willDelete || !isNew) {
+      //   continue;
+      // }
+      if (!file) {
+        continue;
+      }
 
-  const { state: state_payInfo, kit: kit_payInfo } = usePayInfo({
-    disabled,
-    raw: content,
-  });
+      const formData = new FormData();
+      formData.append('file', file);
 
-  const instance_useQuotationOther = useQuotationOther({
-    disabled,
-    raw_contentOtherArr: content?.others,
-    onOtherPriceAllTotalChange(total) {
-      handleSetQuotationPriceTotal({
-        // prodPriceAllTotal: instance_quotationProduct.calcProdAllTotal(),
-        prodPriceAllTotal: theProductTotal,
-        otherPriceAllTotal: total,
-      });
-    },
-  });
+      try {
+        await apiPostQuotation_id_attachments(newContentId, formData);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
-  // ----------------------------------------------------------------------
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const changeProfile = (key: keyof Omit<Tprofile, 'isLost'>, value: string | boolean) => {
+    setState_profile((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const inputModalOnConfirm = (v: string) => {
+    if (!v) {
+      return myAlert.warning({ title: '請輸入註解' });
+    }
+
+    setShowMemoModal(false);
+    reqUpdateQuotation({ editNotes: v });
+  };
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // region REQUEST
-  //
-  //
-  //
-  //
-  //
 
-  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation, reqModifyQuotation, reqPatchModifiedQuotation } =
-    kit_req({
-      userId,
-      quotationId,
-      contractId,
-      instance_quotationProduct,
-      instance_quotationProduct_iterative: instance_iterative,
-      instance_useQuotationOther,
-      state_profile,
-      state_payInfo,
-      annoArr: annoArr.map((anno) => anno.value),
-      quotationRangeArr: quotationRangeArr.map((qr) => qr.value),
-      setIsFetching,
-      createFileArr,
-      update_quotation: async () => {
-        await update_quotation();
-      },
-      setDisabled,
-      state_quotationTotal,
-      instatnce_getQuotationId3,
-      status: state_status,
-      calcProductBody,
-    });
+  const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (!userId) {
+      return myAlert.warning({ title: '沒有使用者ID' });
+    }
 
-  // MARK:更新報價單
-  const handlePatch = () => {
-    const { destroy } = myAlert.input({
-      isTextArea: true,
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const { newQuotation } = await reqPatchQuotation({ editNote });
+    if (status === 'Pending') {
+      return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
+    }
 
-        if (newQuotation) {
-          const {
-            contentId,
-            // contractId,
-            ...rest
-          } = query;
-          router.replace({
-            query: {
-              ...rest,
-              status: newQuotation.latestContent.status,
-            },
-          });
+    setIsLoading(true);
+
+    // let isGetDetailSpecSuccess = true;
+
+    // for (const prod of Object.values(productList)) {
+    //   try {
+    //     await prod.reqGetDetailSpec();
+    //   } catch (error) {
+    //     const err = error as Error;
+    //     myAlert.err({ title: '取得細部規格失敗', content: err.message });
+    //     isGetDetailSpecSuccess = false;
+    //     setIsLoading(false);
+    //     break;
+    //   }
+    // }
+
+    // if (!isGetDetailSpecSuccess) {
+    //   setIsLoading(false);
+
+    //   return;
+    // }
+
+    // 總樘數
+    let prodQty = 0;
+    let isDoorModalNameEmpty = false;
+
+    // 材料配件有問題的主產品
+    let breakComponentProdIndex = '';
+
+    // prodVKeyArr 會在每一次垂直拖拉時更新
+    const prodArr: TcreateQuotationProductDto[] =
+      prodVKeyArr?.map((key, index) => {
+        const prod = productList[key];
+
+        if (!prod.isComponentOk) {
+          breakComponentProdIndex = breakComponentProdIndex + `${index + 1} `;
         }
-      },
-    });
-  };
 
-  // MARK:新增報價單
-  const handlePost = () => {
-    const { destroy } = myAlert.input({
-      isTextArea: true,
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const { newQuotation } = await reqPostQuotation({ editNote });
-
-        if (newQuotation) {
-          const {
-            contentId,
-            //  contractId,
-            ...rest
-          } = query;
-          router.replace({
-            query: {
-              ...rest,
-              id: newQuotation.id,
-              status: newQuotation.latestContent.status,
-            },
-          });
+        if (!prod.doorType) {
+          isDoorModalNameEmpty = true;
         }
-      },
-    });
-  };
 
-  // MARK:追加追減報價單
-  const handleModify = () => {
-    const { destroy } = myAlert.input({
-      isTextArea: true,
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const newQuotation = await reqModifyQuotation({ editNote });
+        const quantity = Number(prod.quantity);
+        // const originProd = prod.originProd;
 
-        if (newQuotation) {
-          const { contentId, contractId, ...rest } = query;
-          router.replace({
-            query: {
-              ...rest,
-              id: newQuotation.id,
-              status: newQuotation.latestContent.status,
-            },
-          });
-          setDisabled(true);
+        prodQty = prodQty + quantity;
+
+        const preBody = {
+          ...prod.body,
+          order: index,
+        };
+
+        // 不記得當初是為了解決什麼問題才寫這個，但是這個造成了問題了，isEqual似乎恆為true
+        // const isEqual = _.isEqual(originProd, preBody);
+        // if (!isEqual) {
+        //   preBody.id = undefined;
+        // }
+
+        // 後端收到id會400錯誤，所以id全部拿掉
+        preBody.id = undefined;
+
+        return preBody;
+      }) ?? [];
+
+    if (breakComponentProdIndex) {
+      setIsLoading(false);
+
+      return myAlert.warning({
+        title: '主產品材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex}項主產品是否正確`,
+      });
+    }
+
+    if (isDoorModalNameEmpty) {
+      setIsLoading(false);
+
+      return myAlert.warning({ title: '請確認所有主產品都有門型' });
+    }
+
+    if (!agentEmployee?.id) {
+      setIsLoading(false);
+
+      return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
+
+    const emptyBomList: { [key: string]: boolean } = {};
+    prodArr.forEach((prod, pIndex) => {
+      const componentArr = prod.components;
+      componentArr.forEach((com) => {
+        const bom = com.bom;
+
+        if (!bom) {
+          emptyBomList[pIndex + 1] = true;
         }
-      },
+      });
     });
-  };
+    const emptyBomKeyArr = Object.keys(emptyBomList);
 
-  // MARK:更新追加追減報價單
-  const handlePatchModify = () => {
-    if (checkIsIterativeProdValid()) {
-      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+    if (emptyBomKeyArr.length > 0) {
+      const str = emptyBomKeyArr.join('、');
+
+      myAlert.warning({ title: '上傳失敗', content: `請檢查第${str}項規格是否正確` });
+      setIsLoading(false);
 
       return;
     }
 
-    const { destroy } = myAlert.input({
-      isTextArea: true,
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const newQuotation = await reqPatchModifiedQuotation({ editNote });
+    const body: TcreateQuotationContentDto = {
+      // quotationDate: data_watch.quotationDate ?? '',
+      // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
+      quotationDate: new Date().toISOString(),
 
-        if (newQuotation) {
-          update_quotation();
-          setDisabled(true);
-        }
-      },
-    });
+      validityPeriod: state_profile.validityPeriod ?? '',
+      //
+      customerId: customer?.id ?? '',
+      //
+      projectName: state_profile.projectName ?? '',
+      county: state_profile.county ?? '',
+      district: state_profile.district ?? '',
+      address: state_profile.address ?? '',
+      contactPerson: state_profile.contactPerson ?? '',
+      contactNumber: state_profile.contactNumber ?? '',
+      faxNumber: state_profile.faxNumber ?? '',
+
+      designatedBrand: state_profile.designatedBrand ?? '',
+      siteManager: state_profile.siteManager ?? '',
+      siteManagerNumber: state_profile.siteManagerNumber ?? '',
+      // requiredDoorType: doorModelSummary || null,
+
+      // requiredDoorQuantity: state_profile.requiredDoorQuantity ? Number(state_profile.requiredDoorQuantity) : null,
+      // estimatedDiscount: state_profile.estimatedDiscount || null,
+      // scheduledProcurementOrBidDate:
+      //   state_profile.scheduledProcurementOrBidDate &&
+      //   moment(state_profile.scheduledProcurementOrBidDate).toISOString(),
+
+      type: state_profile.type ?? '',
+
+      quantity: prodQty ?? 0,
+      editNotes: editNotes ?? '',
+      status: status ?? 'Budget',
+      //
+      // agentId: agentEmployee?.id || '',
+      agentId: userId,
+      //
+      //
+      annotations: state_anno,
+      quotationRanges: state_qr,
+      //
+      //
+      // faxNumber: data_watch.customer?.fax ?? '',
+      trackProgress: state_profile.trackProgress ?? '',
+      projectProgress: state_profile.projectProgress ?? '',
+
+      discount: `${Number(state_summary.discountRate ?? 100)}`,
+      averageDiscount: avgDiscount_withQty || null,
+      tuneTotal: state_summary.tuneTotal || '0',
+      subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
+      salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
+      total: Number(state_summary.total.replaceAll(',', '')),
+      deliveryLocation: state_summary.deliveryLocation,
+      deliveryDate: state_summary.deliveryDate,
+      paymentMethods: state_paymentMethod,
+      exchangeRate: state_summary.exchangeRate || null,
+      foreignTotal: state_summary.foreignTotal.replaceAll(',', '') || null,
+      currency: state_summary.currency,
+
+      //
+      products: prodArr,
+      others: getOthersPostBodyArr(),
+      // productsOrder: null,
+      //
+      isLost: state_profile.isLost,
+      //
+      designUnitId: designUnit?.id ?? null,
+    };
+
+    if (!body.customerId) {
+      setIsLoading(false);
+
+      return myAlert.warning({ title: '請選擇客戶' });
+    }
+
+    if (!body.deliveryDate) {
+      body.deliveryDate = null;
+    }
+
+    try {
+      setIsLoading(true);
+
+      if (quotationId) {
+        const res = await apiPatchQuotation(body, quotationId);
+
+        await uploadAttachment(res.latestContent.id);
+
+        const query = { ...router.query };
+        delete query.contentId;
+
+        router.push({
+          query: {
+            ...query,
+            status: status,
+          },
+        });
+
+        await Promise.all([update(), updateAttachments()]);
+        clearData_content();
+      } else {
+        const res = await apiPostQuotation(body);
+
+        await uploadAttachment(res.latestContent.id);
+
+        router.push({
+          query: {
+            id: res.id,
+            // status: data_watch.status,
+          },
+        });
+      }
+
+      setDisabled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新報價單失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+      showRootLoading(false);
+    }
+  }; // reqUpdateQuotation
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const reqReview = async (isPass: boolean) => {
+    if (!quotationId || !isReviewer) {
+      return;
+    }
+
+    const body = {
+      reviewSalesEmployeeId: isSales ? userId : null,
+      reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+      reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
+      reviewCashierEmployeeId: isCashier ? userId : null,
+      reviewManagerEmployeeId: isManager ? userId : null,
+      reviewResult: isPass,
+    };
+
+    if (status === 'Pending' && !verifyForm) {
+      if (isPass) {
+        return myAlert.warning({ title: '請先送出合約審核表' });
+      }
+    }
+
+    // if (status === 'Pending') {
+    //   if (
+    //     !reviewSalesEmployeeId ||
+    //     !reviewWorkDirectorEmployeeId ||
+    //     !reviewCashierEmployeeId ||
+    //     !reviewSupervisorEmployeeId
+    //     // ||        !reviewSalesManagerEmployeeId
+    //   ) {
+    //     return myAlert.warning({ title: '請先設定所有審核人員' });
+    //   }
+    // }
+
+    try {
+      setIsLoading(true);
+      const res = await apiQuotationReview({ id: quotationId, body });
+
+      // res裡沒有status................竟然沒有
+      if (res.status === 'Contract') {
+        // router.push({
+        //   pathname: '/domestic/contract',
+        // });
+
+        router.back();
+      } else {
+        await update();
+      }
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '審核發生錯誤', content: err.message });
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+      setReviewModalShow(false);
+    }
   };
 
-  // MARK:複製報價單
-  const handleClone = async (isRelationQuotation?: boolean | undefined) => {
-    const { destroy } = myAlert.clear({
-      content: (
-        <SearchModal_customer
-          onRowClick={async (customer) => {
-            const customerId = customer.id;
-            destroy();
-            const res = await reqCloneQuotation({ customerId, isRelationQuotation });
-            setDisabled(true);
+  // ____________________________________________________________________
+  // ____________________________________________________________________
 
-            if (res) {
-              router.replace({
-                query: {
-                  id: res.id,
-                },
-              });
-            }
-          }}
-        />
-      ),
-      onCancel: () => destroy(),
-    });
+  const reqUnlock = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationUnlock(quotationId);
+      await update();
+      myAlert.success({ title: '解除鎖定成功', content: '該報價單改為發包' });
+      router.replace({
+        query: {
+          ...router.query,
+          status: 'Contracting',
+        },
+      });
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // MARK:轉為準合約
-  const handleReqToPending = async () => {
-    if (!content) {
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+  // 送審
+  const reqPatchReviewer = async ({
+    sales,
+    supervisor,
+  }: {
+    sales: TemployeeDto | undefined;
+    supervisor: TemployeeDto | undefined;
+  }) => {
+    if (!quotationId) {
+      return;
+    }
+
+    const reviewSalesEmployeeId = sales?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+    if (status === 'Pending' && !reviewSalesEmployeeId) {
+      return myAlert.err({ title: '沒有業務' });
+    }
+
+    if (status === 'TempPending') {
+      if (!reviewSalesEmployeeId) {
+        return myAlert.info({ title: '請選擇業務' });
+      }
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      return myAlert.info({ title: '請選擇所有審核人員' });
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(quotationId, {
+        reviewSalesEmployeeId,
+        reviewSupervisorEmployeeId,
+      });
+      await update();
+      // setDisabled_reviewer(true);
+      setShowEmployeSelector(false);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新審核人員失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reqPatchReviewer_pending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationSubmitReview(quotationId, {});
+      await update();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '送審失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 轉為準合約
+  const reqToPending = async () => {
+    if (!latestContent) {
       return;
     }
 
@@ -620,221 +941,163 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       return;
     }
 
-    if (content.status === 'Pending') {
+    if (status === 'Pending') {
       myAlert.info({ title: '此報價單已經是準合約' });
     }
 
-    if (content.status === 'Contract') {
+    if (status === 'Contract') {
       myAlert.info({ title: '此報價單已是合約' });
     }
 
-    const { quotation } = (await reqToPending(content.id)) ?? {};
-
-    router.replace({
-      query: {
-        ...query,
-        status: quotation?.latestContent.status,
-      },
-    });
-  };
-
-  // MARK: 送審
-  const handleSubmit = async ({
-    sales,
-    supervisor,
-  }: {
-    sales: TemployeeDto | undefined;
-    supervisor: TemployeeDto | undefined;
-  }) => {
-    if (!isOldQuotation) {
-      return;
-    }
-
-    const reviewSalesEmployeeId = sales?.id ?? null;
-    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
-
-    if (content?.status === 'Pending' && !reviewSalesEmployeeId) {
-      return myAlert.err({ title: '沒有業務' });
-    }
-
-    if (content?.status === 'TempPending') {
-      if (!reviewSalesEmployeeId) {
-        return myAlert.info({ title: '請選擇業務' });
-      }
-    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
-      return myAlert.info({ title: '請選擇所有審核人員' });
-    }
-
-    const body = { reviewSalesEmployeeId, reviewSupervisorEmployeeId };
-
-    reqPatchReviewer({
-      body,
-    });
-
-    setShowEmployeSelector(false);
-  };
-
-  const handleSubmit_pending = async () => {
-    if (!isOldQuotation) {
-      return;
-    }
-
-    const body = {};
-
-    reqPatchReviewer({
-      body,
-    });
-
-    setShowEmployeSelector(false);
-  };
-
-  // MARK: 審核
-  const handleReview = async () => {
-    if (!checkIsIterativeProdValid()) {
-      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
-
-      return;
-    }
-
-    const callReq = async (isPass: boolean) => {
-      if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
-        myAlert.warning({ title: '請先送出合約審核表' });
-
-        return;
-      }
-
-      const body = {
-        reviewSalesEmployeeId: isSales ? userId : null,
-        reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-        // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
-        reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
-        reviewCashierEmployeeId: isCashier ? userId : null,
-        reviewManagerEmployeeId: isManager ? userId : null,
-        reviewResult: isPass,
-      };
-
-      const res = await reqReview(body);
-
-      if (
-        res?.status === 'Contract' // 沒有給status.....
-        // 可以這樣判斷是否已被審核完畢並轉為合約
-        // content?.status==="Pending" && !!res.managerReviewedAt
-        // 但是原本的錯誤一直都沒有被使用者反應，所以決定不修正
-      ) {
-        // res中沒有contract的id，無法導向到合約頁面
-        // router.replace({
-        //   pathname: '/domestic/contract/quotation',
-        //   query: {
-        //     id: res.id,
-        //     version: '1',
-        //   },
-        // });
-        router.back();
-      } else {
-        update_quotation();
-      }
-    };
-
-    const { destroy } = myAlert.clear({
-      content: (
-        <AskRevier
-          //
-          onPass={async () => {
-            await callReq(true);
-            destroy();
-          }}
-          onNoPass={async () => {
-            await callReq(false);
-            destroy();
-          }}
-          onCancel={() => destroy()}
-        />
-      ),
-    });
-  };
-
-  // MARK: 解除鎖定
-  const handleReqUnlock = async () => {
-    myAlert.confirm({
-      title: '確定要解除鎖定?',
-      content: '此報價單將需要重新送審並回到發包狀態',
-      props: {
-        onOk: async () => {
-          const { quotation } = (await reqUnlock()) ?? {};
-
-          if (quotation) {
-            router.replace({
-              query: {
-                ...query,
-                status: quotation.latestContent.status,
-              },
-            });
-          }
-        },
-      },
-    });
-  };
-
-  // ----------------------------------------------------------------------
-
-  // region METHOD
-
-  function handleSetQuotationPriceTotal({
-    prodPriceAllTotal,
-    otherPriceAllTotal,
-  }: {
-    prodPriceAllTotal: number | `${number}`;
-    otherPriceAllTotal: number | `${number}`;
-  }) {
-    const quotationPriceTotal = new Decimal(prodPriceAllTotal).add(otherPriceAllTotal).toNumber();
-
-    setQuotationPriceTotal(quotationPriceTotal);
-  }
-
-  const preHandleSubmit = () => {
-    if (content?.status === 'Pending') {
-      if (!haveVerifyForm) {
-        myAlert.warning({ title: '請先送出合約審核表' });
-
-        return;
-      }
-
-      if (toCashierAt) {
-        myAlert.info({ title: '此報價單已經送審' });
-
-        return;
-      }
-
-      myAlert.confirm({
-        title: '送審後合約審核表將被鎖定',
-        content: '建議先確認合約審核表是否正確',
-        // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
-        props: {
-          width: 450,
-          onOk: () => {
-            if (!content?.toSupervisorAt) {
-              setShowEmployeSelector(true);
-            } else {
-              handleSubmit_pending();
-            }
-          },
-          okText: '確定送審',
-          cancelText: '取消',
+    try {
+      setIsLoading(true);
+      await apiPatchQuotationToPending({ contentId: latestContent.id });
+      await update();
+      router.replace({
+        query: {
+          ...router.query,
+          status: 'Pending',
         },
       });
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 複製報價單
+  const reqCopyQuotation = async ({ customerId }: { customerId: string | undefined }) => {
+    if (!quotationId) {
+      myAlert.info({ title: '無報價單編號' });
 
       return;
     }
 
-    if (toSalesAt || toSupervisorAt) {
-      myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
-    } else {
-      setShowEmployeSelector(true);
+    if (!customerId) {
+      myAlert.info({ title: '請選擇複製報價單之客戶' });
+
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiPostCopyQuotation({
+        quotationId,
+        customerId,
+        isRelationQuotation: customerSelectorShow.isRelationQuotation || false,
+      });
+
+      if (res) {
+        router.replace({
+          query: {
+            ...router.query,
+            id: res.id,
+          },
+        });
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ----------------------------------------------------------------------
-  // region PROPS
+  // apiPatchQuotationContent_id_Progress
+
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    const contentId = latestContent?.id;
+
+    if (!contentId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await apiPatchQuotationContent_id_progress(contentId, {
+        trackProgress,
+        projectProgress,
+      });
+
+      return res;
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+
+  // region use Hook
+  //
+  //
+  //
+  //
+
+  // region !!! useProductList !!!
+
+  const {
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    prodVKeyArr,
+    setProdVKeyArr,
+    addProd,
+    changeProdKeyArr,
+    //
+    comKeyArr,
+    comCellConfig,
+    changeComKeyArr,
+    comVKeyArr,
+    //
+    accessoriesKeyArr,
+    changeAccessoriesKeyArr,
+    accessoriesCellConfig,
+    //
+    othersKeyArr,
+    othersList,
+    othersCellConfig,
+    changeOthersKeyArr,
+    addOthers,
+    getOthersPostBodyArr,
+    //
+    subTotal: quotationProdSubTotal,
+    reset: resetClass,
+    //
+    calcSubTotalPrice,
+    // changeAllProdQuotationDiscount,
+    // changeAllProductDiscount,
+    // avgDiscount,
+    avgDiscount_withQty,
+    //
+    doorModelSummary,
+  } = useProductList({
+    // productArr: quotationData?.latestContent.products,
+    // others: quotationData?.latestContent.others,
+    productArr: latestContent?.products,
+    others: latestContent?.others,
+    averageDiscount: latestContent?.averageDiscount,
+    resetTrigger: quotationData ?? quotationContentData,
+    // onDoorTypeChange: onDoorTypeChange, // 棄用
+    discount_fromData: Number(latestContent?.discount ?? 0),
+    quotationDiscount: Number(state_summary.discountRate || '100'),
+  });
+
+  const targetProd = productList[targetProdKey];
+
+  const comList = useMemo(() => {
+    return { ...targetProd?.comList, ...targetProd?.subComList };
+  }, [targetProd?.comList, targetProd?.subComList]);
+
+  // __________________________________________________________________________
+  // __________________________________________________________________________
 
   const {
     visible: pdfModalVisible,
@@ -844,313 +1107,555 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     hidePdf,
     pdfData,
   } = useModalQuotationPdf({
-    quotationContent: content,
-    attachedProdArr: prodArrForPDf,
-    emptySomeProperty: state_status === 'Bidding',
+    quotationContent: latestContent,
+    emptySomeProperty: status === 'Bidding',
   });
 
-  const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
-    quotationContent: content,
-    prodArrForPDf,
-  });
+  // const {
+  //   visible: pdfModalVisible_noDiscount,
+  //   setVisible: setPdfModalVisible_noDiscount,
+  //   pdfData: pdfData_noDiscount,
+  // } = useModalQuotationPdf({
+  //   quotationContent: latestContent,
+  //   emptySomeProperty: status === 'Bidding',
+  //   noDiscount: true,
+  // });
 
-  const props_profileForm = createProps_profileForm({
-    state_profile,
-    setState_profile,
-    reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
-    allowEditClick: isSendToReview,
-  });
+  // --------------------------------------------------------------------------
 
-  const props_payInfo = createProps_payInfo({
-    instance_quotationPrice,
-    kit_payInfo,
-    state_quotationDiscount,
-    disabled,
-    avgDiscount,
-  });
+  // region props
 
-  // MARK:usePanel
-  const { panelList, customeRight } = usePanel({
-    disabled,
+  const control_anno: TsummaryControl = useMemo(() => {
+    const control_anno: TsummaryControl = {
+      stringArr: state_anno,
+      editString: (index, v) => {
+        setState_annotation((state) => {
+          const copy = [...state];
+          copy[index] = v;
 
-    // isQuotation,
-    // isAttachmentQuotation: isAttach,
-    // isNewQuotation,
-    // isNewAttachmentQuotation,
-    quotationType,
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_annotation((state) => {
+          const copy = [...state];
+          copy.push(v);
 
-    isReviewer,
-    status: content?.status ?? '',
-    isDesignatedContent,
-    //
-    isAllReviewedBeforePending,
-    //
-    btnEditOnClick: () => {
-      setDisabled(false);
-    },
-    btnCancelOnClick: () => {
-      setDisabled(true);
-    },
-    btnPatchOnClick: handlePatch,
-    btnPostOnClick: handlePost,
-    btnModifyOnClick: handleModify,
-    btnPatchModifyOnClick: handlePatchModify,
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_annotation((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
 
-    cloneQuotation: () => {
-      handleClone();
-    },
-    cloneQuotation_relation: () => {
-      handleClone(true);
-    },
-    handleReqToPending,
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_annotation((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
 
-    handleReview,
-    handleSubmit: preHandleSubmit,
-    showVerifyForm: () => setReviewFormShow(true),
-    handleReqUnlock,
-    //
-    showPdf,
-    showPdf_noDiscount,
-    showPdf_part: () => setShow_pdfPart(true),
-    //
-    isQuotationExpired,
-    quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
-  });
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_annotation(strArr);
+      },
+    };
 
-  const history = useHistory({
-    quotationData,
-  });
+    return control_anno;
+  }, [state_anno]);
 
-  const customeLeft: React.ReactNode[] = [
-    <VersionLabel
-      key="0"
-      version={content?.version}
-      subTotal={state_quotationTotal.subTotal}
-      salesTax={state_quotationTotal.salesTax}
-      total={state_quotationTotal.total}
-    />,
-  ];
+  const control_qr: TsummaryControl = useMemo(() => {
+    const control_qr: TsummaryControl = {
+      stringArr: state_qr,
+      editString: (index, v) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy[index] = v;
 
-  // MARK:control_signature
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(v);
 
-  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewrUi({
-    quotationData,
-    agentEmployee,
-    status: state_status,
-  });
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
 
-  let tag = `報價編號 ${content?.quotationNumber}`;
-  quotationType === 'new' && (tag = '新增報價單');
-  quotationType === 'newAttachment' && (tag = '新增追加追減報價單');
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
 
-  // const doorSummaryArr = Object.values(doorModelSummery).concat(doorModelSummery_reduceModified);
-  const doorSummaryArr = [...doorModelSummery_reduceModified, ...Object.values(doorModelSummery)];
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_qr(strArr);
+      },
+    };
 
-  // ----------------------------------------------------------------------
-  // region useEffect
-  useEffect(() => {
-    update_quotation();
-  }, [quotationId]);
+    return control_qr;
+  }, [state_qr]);
 
-  useEffect(() => {
-    const status = content?.status || 'Budget';
+  // ____________________________________________________________________
+  // ____________________________________________________________________
 
-    setState_status(status);
-  }, [content]);
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: latestContent?.quotationNumber ?? '',
+      quotationDate: latestContent?.quotationDate ?? '',
+      customer: {
+        value: customer,
+        onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
+          const contact = customer.contacts?.[0];
+          const name = contact?.name ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
+          const fax = customer.fax || '';
 
-  // ----------------------------------------------------------------------
+          setCustomer(customer);
+          changeProfile('contactPerson', `${name}`);
+          changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
+        },
+        onClear: () => {
+          setCustomer(null);
+          changeProfile('contactPerson', '');
+          changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
+        },
+      },
+      designUnit: {
+        value: designUnit,
+        onChange: (customer) => setDesignUnit(customer),
+        onClear: () => setDesignUnit(null),
+      },
 
-  // MARK: RENDER
-  return (
-    <SubLayer isLoading_all={isFetching_update || isFetching}>
-      <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
+      isLost: {
+        value: state_profile.isLost,
+        onChange: (bool) => {
+          setState_profile((state) => ({ ...state, isLost: bool }));
+        },
+      },
 
-      <div className="relative z-50">
-        <QuotationProfile
-          disabled={disabled}
-          form={props_profileForm}
-          quotationNumber={content?.quotationNumber ?? '---'}
-          editNotes={content?.editNotes}
-          additionRight={
-            quotationType === 'newAttachment' ? null : (
-              <QuotationStateSel
-                key="0"
-                quotationState={{ value: state_status, label: quotationStatusLookup[state_status] }}
-                setQuotationState={(option) => {
-                  setState_status(option.value as TquotationContentDto['status']);
-                }}
-                history={history}
-                isNew={!isOldQuotation}
-                disabled={disabled}
-              />
-            )
-          }
-        />
-        <div className={'ml-[50px]'}>
-          <InputSel
-            caption={'門型彙總'}
-            showBaseline="invisible"
-            captionStyle={{ width: '120px' }}
-            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-            node={<DoorSummary list={doorSummaryArr} />}
-          />
-        </div>
+      itemList: {
+        validityPeriod: {
+          value: state_profile.validityPeriod,
+          onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: state_profile.projectName,
+          onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: state_profile.county,
+          onChange: (v) => {
+            changeProfile('county', v);
+            changeProfile('district', '');
+          },
+        },
+        district: {
+          value: state_profile.district,
+          onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: state_profile.address,
+          onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: state_profile.contactPerson,
+          onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: state_profile.contactNumber,
+          onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: state_profile.faxNumber,
+          onChange: (v) => changeProfile('faxNumber', v),
+        },
 
-        {/* prod */}
-        {/* prod */}
-        {/* prod */}
-        <br />
-        <br />
-        {instance_iterative && (
-          <>
-            <div className={'px-[48px]'}>
-              <div className="border border-red-500">
-                <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
-                <QuotationProdTable
-                  disabled={true}
-                  disabled_iterativeProd={disabled}
-                  instance_useQuotationProductInstance={instance_iterative}
-                  showQuotationDiscount={false}
-                  // isIterativeProd={true}
-                  prodTotal={allProdTotal_iterative.toLocaleString()}
-                />
-              </div>
-            </div>
-            <br />
-            <br />
-          </>
-        )}
+        designatedBrand: {
+          value: state_profile.designatedBrand,
+          onChange: (v) => {
+            changeProfile('designatedBrand', v);
+          },
+        },
+        siteManager: {
+          value: state_profile.siteManager,
+          onChange: (v) => {
+            changeProfile('siteManager', v);
+          },
+        },
+        siteManagerNumber: {
+          value: state_profile.siteManagerNumber,
+          onChange: (v) => {
+            changeProfile('siteManagerNumber', v);
+          },
+        },
+        requiredDoorType: {
+          value: state_profile.requiredDoorType,
+          onChange: (v) => {
+            changeProfile('requiredDoorType', v);
+          },
+        },
+        requiredDoorQuantity: {
+          value: state_profile.requiredDoorQuantity,
+          onChange: (v) => {
+            changeProfile('requiredDoorQuantity', v);
+          },
+        },
+        estimatedDiscount: {
+          value: state_profile.estimatedDiscount,
+          onChange: (v) => {
+            changeProfile('estimatedDiscount', v);
+          },
+        },
+        type: {
+          value: state_profile.type,
+          onChange: (v) => {
+            changeProfile('type', v);
+          },
+        },
+        scheduledProcurementOrBidDate: {
+          value: state_profile.scheduledProcurementOrBidDate,
+          onChange: (v) => {
+            setState_profile((state) => ({ ...state, scheduledProcurementOrBidDate: v }));
+          },
+        },
 
-        <div className={'px-[50px]'}>
-          <QuotationProdTable
-            disabled={disabled}
-            instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
-            prodTotal={allProdTotal.toLocaleString()}
-            // isIterativeProdExist={!!iterativeContractProductArr?.length}
-          />
-          <br />
-          <br />
-          <br />
-          <QuotationOther disabled={isAttach || disabled} instance_useQuotationOther={instance_useQuotationOther} />
-        </div>
+        //
+        trackProgress: {
+          value: state_profile.trackProgress,
+          onChange: (v) => {
+            !disabled && changeProfile('trackProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('trackProgress', v);
+          //     },
 
-        {/* prod */}
-        {/* prod */}
-        {/* prod */}
-        <div className={scss.summary}>
-          <div className={scss.left}>
-            {/* 備註 */}
-            <QuotationRemark
-              label="備註"
-              disabled={disabled}
-              remarkArr={annoArr}
-              onUpponAddClick={openSelector_anno}
-              onAddClick={addAnno}
-            />
-            <QuotationRemark
-              label="報價範圍"
-              disabled={disabled}
-              remarkArr={quotationRangeArr}
-              onUpponAddClick={openSelector_qr}
-              onAddClick={addQuotationRange}
-            />
-            {/* 附件 */}
-            <QuotationAttachment disabled={disabled} fileArr={fileInfoKitArr} addFile={addFile} />
-          </div>
-          {/* 付款資訊 */}
-          <div className={scss.right}>
-            {/* <div className="w-[400px] border border-border">付款資訊</div> */}
-            <QuotationPayInfo disabled={disabled} disabled_taxAndCurrency={isAttach} form={props_payInfo} />
-          </div>
-        </div>
-        <SignatureBar
-          //
-          className={'mx-[50px] mt-[130px] mb-[40px]'}
-          control={control_signature}
-        />
-        {/*  */}
-        {/*  */}
-        {/*  */}
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  const modal = myAlert.input({
+                    title: '追蹤進度',
+                    placeholder: '追蹤進度',
+                    defaultValue: state_profile.trackProgress,
+                    isTextArea: true,
+                    width: 656,
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        trackProgress: v,
+                      });
 
-        <ContractReviewForm
-          showModal={reviewFormShow}
-          readOnly={state_status === 'Pending' && isSendToReview_pending}
-          onCancel={() => setReviewFormShow(false)}
-          contentId={content?.id}
-          // contractNumber={latestContent?.quotationNumber ?? ''}
-          // projectName={latestContent?.projectName ?? ''}
-          // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
-          // verifyForm={verifyForm}
-          onConfirm={update_quotation}
-          // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
-        />
-
-        <QuotationPdf
-          visible={pdfModalVisible}
-          pdfData={pdfData}
-          onCancel={hidePdf}
-          fileName={content?.quotationNumber ?? ''}
-        />
-
-        <QuotationPdf_part
-          isVisable={show_pdfPart}
-          onCancel={() => {
-            setShow_pdfPart(false);
-          }}
-          mainProductArr={pdfPartProps}
-          quotationId={content?.quotationNumber ?? ''}
-        />
-
-        <EmployeeSelectorGroup
-          showModal={showEmployeSelector}
-          caption="請選擇審核人員"
-          isCancelOnConfirm={false}
-          defaultSeletedDataArrArr={defaultSeletedDataArrArr}
-          dynaSelectorPropsList={dynaSelectorPropsList}
-          onConfirm={(arr) => {
-            // 在Pedding，sales的選擇器會被跳過不顯示，但是arr結構不會變
-            const sales = arr[0][0] as TemployeeDto | undefined;
-            const supervisor = arr[1][0] as TemployeeDto | undefined;
-
-            myAlert.confirm({
-              title: '確定送審',
-              props: {
-                onOk: () => {
-                  handleSubmit({
-                    sales,
-                    supervisor,
+                      if (res) {
+                        const trackProgress = res.trackProgress;
+                        changeProfile('trackProgress', trackProgress);
+                        modal.destroy();
+                      }
+                    },
                   });
                 },
-              },
+          disabled: isSendToReview ? false : undefined,
+        },
+        projectProgress: {
+          value: state_profile.projectProgress,
+
+          onChange: (v) => {
+            !disabled && changeProfile('projectProgress', v);
+          },
+          // onChange: isSendToReview
+          //   ? undefined
+          //   : (v) => {
+          //       !isSendToReview && changeProfile('projectProgress', v);
+          //     },
+          onClick:
+            !isSendToReview || !disabled
+              ? undefined
+              : () => {
+                  const modal = myAlert.input({
+                    title: '工程進度',
+                    placeholder: '工程進度',
+                    defaultValue: state_profile.projectProgress,
+                    isTextArea: true,
+                    width: 656,
+                    onConfirm: async (v) => {
+                      const res = await reqPatchQuotationContent_id_progress({
+                        projectProgress: v,
+                      });
+
+                      if (res) {
+                        const projectProgress = res.projectProgress;
+                        changeProfile('projectProgress', projectProgress);
+                        modal.destroy();
+                      }
+                    },
+                  });
+                },
+          disabled: isSendToReview ? false : undefined,
+        },
+      },
+    };
+
+    return control_profile;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state_profile, designUnit]);
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const appendixParams = useMemo(() => {
+    const removeFileInfo = (index: number) => {
+      fileInfoArr[index].willDelete = true;
+      setFileInfoArr([...fileInfoArr]);
+      // removeFile(index)
+    };
+
+    const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+      setFileInfoArr([...newImgInfoArr]);
+    };
+
+    return {
+      fileInfoArr,
+      removeFileInfo,
+      toSetFileInfo,
+    };
+  }, [fileInfoArr]);
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const payInfoControl: TpayInfoControl = useMemo(() => {
+    const payInfoControl: TpayInfoControl = {
+      payment: {
+        haveTax: {
+          value: !!taxRate,
+          onChange: (v) => {
+            if (quotationProdSubTotal === '') {
+              calcSubTotalPrice();
+            }
+
+            setTaxRate(v ? 0.05 : 0);
+          },
+        },
+
+        discountRate: {
+          inputAttr: {
+            // disabled: disabled,
+            disabled: true,
+            value: state_summary.discountRate,
+            onChange: (e) => {
+              // // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+              // // 所以必須先計算出quotationProdSubTotal
+              // if (quotationProdSubTotal === '') {
+              //   calcSubTotalPrice();
+              // }
+              // let v = e.target.value;
+              // if ((v as string) === '') {
+              //   v = '0';
+              // }
+              // if (Number(v) > 500) {
+              //   v = '500';
+              // }
+              // setSummary((state) => {
+              //   const copy = { ...state };
+              //   if (v.split('.')[1]?.length > 3) {
+              //     return copy;
+              //   }
+              //   copy.discountRate = v;
+              //   // changeAllProdQuotationDiscount(Number(v));
+              //   // changeAllProductDiscount(Number(v));
+              //   return copy;
+              // });
+            },
+          },
+        },
+        tuneTotal: {
+          inputAttr: {
+            disabled,
+            value: state_summary.tuneTotal,
+            placeholder: '範圍正負1000',
+            onChange: (e) => {
+              const value_num = Number(e.target.value);
+
+              if (Math.abs(value_num) > 1000) {
+                return;
+              }
+
+              setState_summary((state) => ({
+                ...state,
+                tuneTotal: e.target.value,
+              }));
+            },
+          },
+        },
+        subTotal: {
+          inputAttr: {
+            disabled: true,
+            value: state_summary.subTotal,
+          },
+        },
+        salesTax: {
+          inputAttr: {
+            disabled: true,
+            value: state_summary.salesTax,
+          },
+        },
+        total: {
+          inputAttr: {
+            disabled: true,
+            value: state_summary.total,
+          },
+        },
+      },
+
+      delivery: {
+        deliveryLocation: {
+          value: state_summary.deliveryLocation,
+          onChange: (v) => {
+            setState_summary((state) => {
+              const copy = { ...state };
+              copy.deliveryLocation = v;
+
+              return copy;
             });
-          }}
-          onCancel={() => {
-            setShowEmployeSelector(false);
-          }}
-        />
-        {/*  */}
-        {/*  */}
-        {/*  */}
-      </div>
-    </SubLayer>
-  );
-}
-// MARK: END
-//
-//
+          },
+        },
+        deliveryDate: {
+          value: state_summary.deliveryDate,
+          onChange: (v) => {
+            setState_summary((state) => {
+              const copy = { ...state };
+              copy.deliveryDate = v;
 
-// =============================================================================
+              return copy;
+            });
+          },
+        },
+      },
+      paymentMethod: {
+        arr: state_paymentMethod.map((item, index) => {
+          const { milestone, totalPaymentRatio } = item;
 
-// MARK:useReviewr
-const useReviewrUi = ({
-  quotationData,
-  agentEmployee,
-  status,
-}: {
-  quotationData: TquotationDto | undefined | null;
-  agentEmployee: TemployeeDto | undefined | null;
-  status: TquotationContentDto['status'];
-}) => {
+          const onChangeMilestone = (v: string) => {
+            setState_PaymentMethod((state) => {
+              const copy = [...state];
+              copy[index].milestone = v;
+
+              return copy;
+            });
+          };
+
+          const onChange = (v: string) => {
+            if (v === '') {
+              v = '0';
+            }
+
+            setState_PaymentMethod((state) => {
+              const copy = [...state];
+              copy[index].totalPaymentRatio = v;
+
+              return copy;
+            });
+          };
+
+          const delSelf = () => {
+            setState_PaymentMethod((state) => {
+              const copy = [...state];
+              copy.splice(index, 1);
+
+              return copy;
+            });
+          };
+
+          return {
+            label: milestone,
+            value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
+            onChange,
+            onChangeMilestone,
+            delSelf,
+          };
+          //
+        }),
+        addMethod: (v) => {
+          setState_PaymentMethod((state) => {
+            const copy = [...state];
+            copy.push({ milestone: v, totalPaymentRatio: '0' });
+
+            return copy;
+          });
+        },
+      },
+
+      exchangeRate: {
+        value: state_summary.exchangeRate,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.exchangeRate = v;
+
+            const total_num = copy.total.replaceAll(',', '') as `${number}`;
+
+            copy.foreignTotal = calcNTDToForeignCurrency({
+              NTD: total_num,
+              foreignCurrencyToNTD: (copy.exchangeRate || '0') as `${number}`,
+            }).toLocaleString();
+
+            return copy;
+          });
+        },
+      },
+      foreignTotal: {
+        value: state_summary.foreignTotal,
+      },
+      currency: {
+        value: state_summary.currency,
+        onChange: (v) => {
+          setState_summary((state) => {
+            const copy = { ...state };
+            copy.currency = v;
+
+            return copy;
+          });
+        },
+      },
+    };
+
+    return payInfoControl;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    calcSubTotalPrice,
+    state_paymentMethod,
+    quotationProdSubTotal,
+    // summary.deliveryDate,
+    // summary.deliveryLocation,
+    // summary.discountRate,
+    // summary.salesTax,
+    // summary.subTotal,
+    // summary.total,
+    state_summary,
+    taxRate,
+  ]);
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
   const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
     const latestContent = quotationData?.latestContent;
 
@@ -1242,326 +1747,1266 @@ const useReviewrUi = ({
       }
     }
 
-    return {
-      control_signature,
-      defaultSeletedDataArrArr,
-      dynaSelectorPropsList,
-    };
-  }, [agentEmployee?.chName, quotationData?.latestContent, status]);
+    return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, quotationData?.latestContent]);
 
-  return {
-    control_signature,
-    defaultSeletedDataArrArr,
-    dynaSelectorPropsList,
-  };
-};
+  // ____________________________________________________________________
+  // ____________________________________________________________________
 
-// ================================================================================
+  const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
+    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
+    const bounceDoorWidth = prod.bounceDoorWidth_cm;
+    const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
 
-const AskRevier = ({
-  onPass,
-  onNoPass,
-  onCancel,
-}: {
-  onPass: () => void;
-  onNoPass: () => void;
-  onCancel: () => void;
-}) => {
-  return (
-    <div className="p-10">
-      <p className="text-center text-2xl text-main mb-10">是否通過審核?</p>
-      <div className="flex justify-center gap-10 mt-4">
-        <MyButton_v2 onClick={onPass} theme="danger">
-          通過審核
-        </MyButton_v2>
-        <MyButton_v2 onClick={onNoPass}>不通過審核</MyButton_v2>
-        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
-      </div>
-    </div>
-  );
-};
+    const size = `${lw}${bounceDoorWidth_formated} X ${h} + ${b}`;
 
-// ================================================================================
+    const list_com = { ...prod.comList, ...prod.subComList };
 
-// MARK:useData
-const useData = () => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-  const { id: quotationId, contentId, contractId } = query;
-
-  const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
-    designatedContentId: contentId,
-  });
-
-  const { data: raw_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
-
-  const quotationData = instatnce_getQuotationId3.raw;
-
-  const attachedToContract = quotationData?.attachedToContract || raw_contract;
-
-  const content = quotationData?.designatedContent;
-
-  const { isQuotationExpired, latestSubContract, parentSubContract } = useMemo(() => {
-    const result: {
-      isQuotationExpired: boolean;
-      latestSubContract: TquotationContractDto | undefined;
-      parentSubContract: TquotationContractDto | undefined;
-    } = {
-      isQuotationExpired: false,
-      latestSubContract: undefined,
-      parentSubContract: undefined,
-    };
-
-    if (!attachedToContract?.subContracts.length || !quotationData) {
-      return result;
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
     }
 
-    const subContracts = _.orderBy(attachedToContract.subContracts ?? [], 'version');
-    const latestSubContract = subContracts[subContracts.length - 1];
-    const latestSubContractCreatedAt = new Date(latestSubContract.createdAt);
-    const quotationCreatedAt = new Date(quotationData.createdAt);
+    delete list_com['motorAccessories'];
 
-    const subContractBelongedArr = subContracts.filter(({ createdAt }) => {
-      return quotationCreatedAt > new Date(createdAt);
-    });
+    const list_acce = prod.accessoriesList;
 
-    const parentSubContract = subContractBelongedArr[subContractBelongedArr.length - 1];
+    const componentArr = Object.values(list_com ?? {});
 
-    if (latestSubContractCreatedAt > quotationCreatedAt) {
-      result.isQuotationExpired = true;
-      result.latestSubContract = latestSubContract;
-      result.parentSubContract = parentSubContract;
+    let totalPrice = 0;
 
-      return result;
-    }
+    const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
 
-    return result;
-  }, [quotationData, attachedToContract]);
+      let unit_str = '';
 
-  // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
-  const iterativeContractProductDict = useIterativeContractProduct({
-    contract: attachedToContract,
-    untilVersion: parentSubContract?.version,
-  });
-
-  const { iterativeContractProductArr, prodArr } = useMemo(() => {
-    const arr = Object.values(iterativeContractProductDict);
-    const prodArr = content?.products ? [...content.products] : [];
-
-    let parsedProdArr = prodArr.map((_prod) => {
-      const prod = { ..._prod, addition: {} } as TprodSource;
-
-      const action = parseProdAction({
-        quotationProduct: prod,
-        quotationProductArr: prodArr,
-      });
-
-      prod.addition.action = action;
-
-      // console.log(action);
-
-      return prod;
-    });
-
-    if (!arr.length) {
-      return {
-        iterativeContractProductArr: undefined,
-        prodArr: parsedProdArr,
-      };
-    }
-
-    const dict = Object.entries(iterativeContractProductDict).reduce((acc, [key, prod]) => {
-      const { discount, quotationDiscount } = prod;
-
-      const priceDiscount_percent = calcPriceDiscount_percent({
-        prodDiscount: Number(discount || 0),
-        quotationDiscount: quotationDiscount,
-      });
-
-      acc[key] = {
-        ...prod,
-        addition: {
-          qty_reduce: 0,
-          deductedPrice: 0,
-          latestIterativeId: prod.latestIterativeId,
-          modifyedProduct: {},
-          action: undefined,
-          quotationDiscount,
-          priceDiscount_percent,
-        },
-      };
-
-      return acc;
-    }, {} as Record<string, TprodSource>);
-
-    const parsedProdArr_modify = parsedProdArr.filter((prod) => prod.addition.action === '變更追加');
-    const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
-
-    parsedProdArr?.forEach((prod) => {
-      const action = prod.addition.action;
-
-      if (action === '追減') {
-        const rootProd = dict[prod.rootProductId];
-
-        const rootProdQty = rootProd.quantity;
-        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
-        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
-          .mul(rootProd.price)
-          .mul(-1)
-          .toNumber();
-      } else if (action === '變更追減') {
-        const attachedToProductId = prod.attachedToProductId;
-
-        const rootProd = dict[prod.rootProductId];
-        const rootProdQty = rootProd.quantity;
-
-        const modifyBelong = parsedProdArr_modify.filter((modifyedProd) => {
-          return modifyedProd.attachedToProductId === attachedToProductId;
-        });
-
-        const qty_modify = modifyBelong
-          .reduce((acc, prod) => {
-            acc = acc.add(prod.quantity || 0);
-
-            return acc;
-          }, new Decimal(0))
-          .toNumber();
-
-        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).sub(qty_modify).toNumber();
-        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
-          .add(qty_modify)
-          .mul(rootProd.price)
-          .mul(-1)
-          .toNumber();
-      } else if (action === '變更追加') {
-        const attachedToProductId = prod.attachedToProductId;
-        const prod_modifyReduce = parsedProdArr_modifyReduce.find(
-          (prod) => prod.attachedToProductId === attachedToProductId
-        );
-
-        if (!prod_modifyReduce) {
-          throw new Error('useData，變更追加找不到對應的變更追減');
-        }
-
-        const rootProductId = prod_modifyReduce.rootProductId;
-        const rootProd = dict[rootProductId];
-        rootProd.addition.modifyedProduct![prod.id] = {
-          key: prod.id,
-          quantity: prod.quantity,
-        };
-        prod.addition.rootRootProductKey = rootProductId;
-        // const rootProdQty = rootProd.quantity;
+      if (typeof com.unit === 'object') {
+        unit_str = 'm\u00B2'; // m2
+      } else {
+        unit_str = com.unit as string;
       }
-      //
+
+      let desc = com.desc ?? '';
+
+      if (com.comName === '門箱') {
+        desc = desc.replaceAll('捲+機', '');
+        desc = desc.replaceAll('方型捲箱', '');
+      }
+
+      return {
+        partName: com.comName,
+        material: com.material,
+        unit: com.unit,
+        unit_str,
+        qty: new Decimal(com.quantity || 0).toFixed(2),
+        desc,
+        price: com.unitPrice_locale,
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+      };
     });
 
-    parsedProdArr = parsedProdArr.filter(
-      (prod) => prod.addition.action !== '追減' && prod.addition.action !== '變更追減'
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
+      let unit_str = '';
+
+      if (typeof acce.unit === 'object') {
+        unit_str = 'm\u00B2'; // m2
+      } else {
+        unit_str = acce.unit as string;
+      }
+
+      let partName = acce.name.replaceAll('60A', '');
+
+      if (partName === '氟碳烤漆' || partName === '粉體烤漆') {
+        partName = '烤漆';
+      }
+
+      return {
+        partName,
+        material: '',
+        unit: acce.unit,
+        unit_str,
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        // qty: Number(acce.quantity).toFixed(2),
+        qty: new Decimal(acce.quantity || 0).toFixed(2),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
+      };
+    });
+
+    return {
+      quotationNumber: latestContent?.quotationNumber || '無報價編號',
+      category: prod.itemName,
+      material: prod.material,
+      surface: prod.surface,
+      doorType: prod.doorType,
+      size: size,
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: totalPrice.toLocaleString(),
+    };
+  });
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  // region layer props
+
+  const tagList: TtagList = [
+    {
+      label: quotationId ? `報價編號 ${latestContent?.quotationNumber || ''}` : '新報價單',
+      onClick: () => {},
+    },
+  ];
+
+  const VersionLabel = () => {
+    return (
+      <div className="ml-2 mb-1 mt-auto">
+        <div>版本 : {version}</div>
+        <div>
+          {/* 總計 : {latestContent?.total ? latestContent.total.toLocaleString() : ''} */}
+          小計 : {state_summary.subTotal}　 營業稅: {state_summary.salesTax}　 總計 : {state_summary.total}
+          {/*  */}
+        </div>
+      </div>
     );
+  };
 
-    const iterativeContractProductArr = Object.values(dict);
+  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
 
-    return { iterativeContractProductArr, prodArr: parsedProdArr };
-  }, [iterativeContractProductDict, content?.products]);
-  //
+  const history = useMemo(() => {
+    let content = quotationData?.contents ?? [];
 
-  const prodArrForPDf = useMemo(() => {
-    let iterativeContractProductArr_modifyed = (iterativeContractProductArr ?? []).filter((prod) => {
-      let pass = false;
-      const { qty_reduce, modifyedProduct } = prod.addition;
-      !!qty_reduce && (pass = true);
-      !!Object.keys(modifyedProduct ?? {}).length && (pass = true);
-
-      return pass;
-    });
-
-    iterativeContractProductArr_modifyed = _.cloneDeep(iterativeContractProductArr_modifyed);
-
-    iterativeContractProductArr_modifyed = iterativeContractProductArr_modifyed?.map((prod) => {
-      const modifyedProduct = prod.addition.modifyedProduct;
-
-      const qty_modify = calcQtyModify({ modifyedProduct: modifyedProduct ?? {} });
-      const qty_reduce = prod.addition.qty_reduce;
-      prod.quantity = new Decimal(qty_modify)
-        .add(qty_reduce || 0)
-        .mul(-1)
-        .toNumber();
-
-      prod.dualPrice = new Decimal(prod.quantity).mul(prod.price).toNumber();
-      // 其實addition.deductionPrice就等於算出來的prod.totalPrice了`，不一樣的話不正常
-      prod.totalPrice = new Decimal(prod.quantity).mul(prod.unitPrice).toNumber();
-
-      return prod;
-    });
-
-    let prodArrForPDf = [...iterativeContractProductArr_modifyed, ...prodArr];
-    prodArrForPDf = prodArrForPDf.map((prod, index) => {
-      prod.order = index;
-
-      return prod;
-    });
-
-    return prodArrForPDf;
-    //
-  }, [prodArr, iterativeContractProductArr]);
-
-  // ----------------------------------------------------------------------
-
-  const contractProfile = useMemo(() => {
-    if (!raw_contract) {
-      return undefined;
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
     }
 
-    const contractContent = raw_contract.content;
+    return content.map((item, index, arr) => {
+      const { status, quotationDate, createdAt } = item;
+      const preStatus = arr[index - 1]?.status;
 
-    const defaultProfile: Traw_profile = {
-      projectName: contractContent.projectName,
-      validityPeriod: contractContent.validityPeriod,
-      county: contractContent.county,
-      district: contractContent.district,
-      address: contractContent.address,
-      contactPerson: contractContent.contactPerson,
-      contactNumber: contractContent.contactNumber,
-      faxNumber: contractContent.faxNumber,
-      trackProgress: contractContent.trackProgress,
-      projectProgress: contractContent.projectProgress,
-      designatedBrand: contractContent.designatedBrand,
-      siteManager: contractContent.siteManager,
-      siteManagerNumber: contractContent.siteManagerNumber,
-      type: contractContent.type,
-      isLost: contractContent.isLost,
-      customer: contractContent.customer,
-      designUnit: contractContent.designUnit,
-    };
+      return {
+        state_from: quotationStatusLookup[preStatus] ?? '建立',
+        state_to: quotationStatusLookup[status] ?? '',
+        isoString: moment(createdAt).toISOString(),
+      };
+    });
+  }, [quotationData]);
 
-    return defaultProfile;
-  }, [raw_contract]);
+  const panel_editable: TpanelList = [
+    {
+      // 報價/歷史狀態狀態
+      custom: (
+        <QuotationStateSel
+          quotationState={{ value: status, label: quotationStatusLookup[status] }}
+          setQuotationState={(option) => {
+            setStatus(option.value as TquotationContentDto['status']);
+          }}
+          history={history}
+          isNew={isNewQuotation}
+        />
+      ),
+    },
+    { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+        resetClass();
+        setTargetProdKey('n');
+      },
+    },
+  ];
 
-  // ----------------------------------------------------------------------
+  const panel_noEditable: TpanelList = [
+    isAllReviewedBeforePending && quotationId
+      ? {
+          type: 'redButton',
+          label: '轉為準合約',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定轉為準合約',
+              props: {
+                onOk: () => {
+                  reqToPending();
+                },
+              },
+            });
+          },
+        }
+      : null,
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   // onClick: () => setShowPdf(true),
+
+    //   onClick: () => setPdfModalVisible(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '單價分析',
+    //   img: iconUpload.src,
+    //   onClick: () => {
+    //     setShowPdf_part(true);
+    //   },
+    // },
+
+    !contentId && isReviewer
+      ? {
+          type: 'myButton',
+          label: '審核',
+          onClick: () => setReviewModalShow(true),
+        }
+      : null,
+
+    !contentId && quotationId
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            if (status === 'Pending') {
+              if (!verifyForm) {
+                return myAlert.warning({ title: '請先送出合約審核表' });
+              }
+
+              if (toCashierAt) {
+                myAlert.info({ title: '此報價單已經送審' });
+
+                return;
+              }
+
+              myAlert.confirm({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+                props: {
+                  width: 450,
+                  onOk: () => {
+                    if (!latestContent.toSupervisorAt) {
+                      setShowEmployeSelector(true);
+                    } else {
+                      reqPatchReviewer_pending();
+                    }
+
+                    //
+                  },
+                  okText: '確定送審',
+                  cancelText: '取消',
+                },
+              });
+
+              return;
+            }
+
+            if (toSalesAt || toSupervisorAt) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+            } else {
+              setShowEmployeSelector(true);
+            }
+          }, // onClick close
+        }
+      : null,
+
+    !contentId && status === 'Pending'
+      ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
+      : null,
+
+    // !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    /*!isSendToReview && */ /*!contentId &&*/ !isContract && status !== 'Pending'
+      ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
+      : null,
+
+    // !contentId && status === 'Bidding'
+    // !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
+    //   ? {
+    //       type: 'myButton',
+    //       label: '複製報價單',
+    //       onClick: () => {
+    //         myAlert.confirm({
+    //           title: '確定複製報價單?',
+    //           props: {
+    //             onOk: () => {
+    //               setCustomerSelectorShow(true);
+    //             },
+    //           },
+    //         });
+    //       },
+    //     }
+    //   : null,
+
+    status === 'Pending' || status === 'TempPending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定並退回發包',
+          img: iconRedLock.src,
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定要解除鎖定?',
+              content: '此報價單將需要重新送審並回到發包狀態',
+              props: {
+                onOk: () => {
+                  reqUnlock();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        if (window.history.length === 1) {
+          router.push({
+            pathname: '/domestic/quotationList',
+            query: {
+              status: latestContent?.status,
+            },
+          });
+        } else {
+          router.back();
+        }
+      },
+    },
+  ];
+
+  // const panel_editReviewer: TpanelList = [
+  //   {
+  //     type: 'redButton',
+  //     label: '送審',
+  //     onClick: () => reqPatchReviewer(),
+  //   },
+  //   {
+  //     type: 'myButton',
+  //     label: '取消',
+  //     onClick: () => setDisabled_reviewer(true),
+  //   },
+  // ];
+
+  const panelList = (() => {
+    // if (!disabled_reviewer) {
+    //   return panel_editReviewer;
+    // }
+
+    if (disabled) {
+      return panel_noEditable;
+    } else {
+      return panel_editable;
+    }
+  })();
+
+  const customeRight = [
+    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
+      <Dropdown
+        key="0"
+        // placement="bottomRight"
+        itemArr={[
+          //
+          <MyButton_v2 key="1" onClick={() => setCustomerSelectorShow(true)}>
+            一般複製
+          </MyButton_v2>,
+          <MyButton_v2
+            key="2"
+            onClick={() =>
+              setCustomerSelectorShow({
+                show: true,
+                isRelationQuotation: true,
+              })
+            }
+          >
+            關聯報價
+          </MyButton_v2>,
+        ]}
+      >
+        複製報價單
+      </Dropdown>
+    ) : null,
+
+    <Dropdown
+      key="1"
+      // placement="bottomRight"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
+          匯出報價單
+        </MyButton_v2>,
+        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+          單價分析
+        </MyButton_v2>,
+        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+          {'匯出報價單(無折扣)'}
+        </MyButton_v2>,
+      ]}
+    >
+      匯出
+    </Dropdown>,
+  ];
+
+  // --------------------------------------------------------------------------
+
+  // region useEffect
 
   useEffect(() => {
-    // quotation如果並不歸屬於該contract會出問題
-    // 所以要確保若是能取得quotation就不取得contract
-    if (contractId && !quotationId && !contentId) {
-      update_contract();
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+      // const fileType = 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}/file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  useEffect(() => {
+    setStatus(latestContent?.status ?? 'Budget');
+    // setEditNotes(latestContent?.editNotes ?? '');
+
+    setCustomer(latestContent?.customer ?? null);
+    setDesignUnit(latestContent?.designUnit ?? null);
+
+    setState_profile({
+      validityPeriod: latestContent?.validityPeriod ?? '',
+      projectName: latestContent?.projectName ?? '',
+      county: latestContent?.county ?? '',
+      district: latestContent?.district ?? '',
+      address: latestContent?.address ?? '',
+      contactPerson: latestContent?.contactPerson ?? '',
+      contactNumber: latestContent?.contactNumber ?? '',
+      faxNumber: latestContent?.faxNumber ?? '',
+      trackProgress: latestContent?.trackProgress ?? '',
+      projectProgress: latestContent?.projectProgress ?? '',
+      isLost: latestContent?.isLost ?? false,
+
+      designatedBrand: latestContent?.designatedBrand ?? '',
+      siteManager: latestContent?.siteManager ?? '',
+      siteManagerNumber: latestContent?.siteManagerNumber ?? '',
+      requiredDoorType: latestContent?.requiredDoorType ?? '',
+      requiredDoorQuantity: String(latestContent?.requiredDoorQuantity ?? ''),
+      estimatedDiscount: latestContent?.estimatedDiscount ?? '',
+      scheduledProcurementOrBidDate: latestContent?.scheduledProcurementOrBidDate
+        ? moment(latestContent.scheduledProcurementOrBidDate)
+        : null,
+      type: latestContent?.type ?? '',
+    });
+  }, [quotationData, quotationContentData, disabled]);
+
+  useEffect(() => {
+    (async () => {
+      if (targetProd) {
+        // if (!targetProd.isComplete && targetProd.id) {
+        //   const wholeProd = await updateSingleProd_noRender(targetProd.id);
+
+        //   if (wholeProd) {
+        //     targetProd.renewWholeProd(targetProd.quotationProductToProd({ quotationProduct: wholeProd }));
+        //   }
+        // }
+
+        targetProd.callApiAndGetOptions();
+      }
+    })();
+  }, [targetProd]);
+
+  // 批次更新主產品資料，這個useEffect先不要刪，留著備用
+  // useEffect(() => {
+  //   const stopToken = { stop: false };
+
+  //   updateAllWholeProd_batch_noRender({
+  //     stopToken,
+  //     onBatchSuceess: (wholeProdArr) => {
+  //       wholeProdArr.forEach((wholeProd) => {
+  //         if (wholeProd.id in productList) {
+  //           const prod = productList[wholeProd.id];
+
+  //           if (prod.isComplete) {
+  //             return;
+  //           }
+
+  //           prod.renewWholeProd(prod.quotationProductToProd({ quotationProduct: wholeProd }));
+  //         }
+  //       });
+  //     },
+  //   });
+
+  //   return () => {
+  //     stopToken.stop = true;
+  //   };
+  // }, [quotationData, productList]);
+
+  useEffect(() => {
+    if (latestContent) {
+      const {
+        //
+        discount,
+        tuneTotal,
+        subTotal,
+        salesTax,
+        total,
+        deliveryLocation,
+        deliveryDate,
+        paymentMethods,
+        annotations,
+        quotationRanges,
+        //
+        exchangeRate,
+        foreignTotal,
+        currency,
+      } = latestContent;
+
+      const haveTax = !!salesTax;
+
+      setState_annotation(annotations ?? []);
+      setState_qr(quotationRanges ?? []);
+      setState_PaymentMethod(paymentMethods);
+
+      setState_summary({
+        discountRate: discount,
+        tuneTotal: tuneTotal ?? '',
+        subTotal: subTotal.toLocaleString(),
+        salesTax: salesTax.toLocaleString(),
+        total: total.toLocaleString(),
+        deliveryLocation,
+        deliveryDate,
+        exchangeRate: exchangeRate || '',
+        foreignTotal: foreignTotal || '',
+        currency: currency,
+      });
+
+      setTaxRate(haveTax ? 0.05 : 0);
+    } else {
+      setState_annotation([]);
+      setState_qr([]);
+      setState_PaymentMethod([
+        {
+          milestone: '訂製同時付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '門軌安裝完成付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '門扇安裝完成付總金額',
+          totalPaymentRatio: '0',
+        },
+        {
+          milestone: '驗收完成(保留款)付總金額',
+          totalPaymentRatio: '0',
+        },
+      ]);
+
+      // setState_summary({
+      //   discountRate: '100',
+      //   tuneTotal: '',
+      //   subTotal: '',
+      //   salesTax: '',
+      //   total: '',
+      //   deliveryLocation: '',
+      //   deliveryDate: '',
+      //   exchangeRate: '',
+      //   usd: '',
+      // });
+      clearSummary();
+
+      setTaxRate(0.05);
     }
-  }, [quotationId, contentId, contractId]);
+  }, [quotationData, quotationContentData, disabled]);
+
+  useEffect(() => {
+    // quotationProdSubTotal或為'' ，代表剛進入page，這時可以用summary.subTotal
+    const prodSubTotal =
+      quotationProdSubTotal || (latestContent?.subTotal ?? 0) - Number(latestContent?.tuneTotal || 0);
+
+    const { subTotal, salesTax, total } = countPayInfoValue({
+      tuneTotal: state_summary.tuneTotal,
+      prodSubTotal: prodSubTotal,
+      taxRate,
+    });
+
+    const foreignTotal = calcNTDToForeignCurrency({
+      NTD: total.replaceAll(',', '') as `${number}`,
+      foreignCurrencyToNTD: (state_summary.exchangeRate || '0') as `${number}`,
+    }).toLocaleString();
+
+    setState_summary((state) => {
+      return {
+        ...state,
+        subTotal,
+        salesTax,
+        total,
+        foreignTotal,
+      };
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // summary.discountRate,
+    // 現在summary.discountRate改變時就會改變quotationProdSubTotal
+    // 其實現在quotationProdSubTotal === ''也不會造成問題了
+    quotationProdSubTotal,
+    taxRate,
+    state_summary.tuneTotal,
+  ]);
+
+  // useEffect(() => {
+  //   setSummary((state) => {
+  //     return {
+  //       ...state,
+  //       discountRate: String(avgDiscount_withQty),
+  //     };
+  //   });
+  // }, [avgDiscount_withQty]);
+
+  useEffect(() => {
+    if (contentId) {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([
+            updateContent(),
+            //  updateAttachments()
+          ]);
+        } catch (error) {}
+
+        setIsLoading(false);
+      })();
+    } else {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([
+            update(),
+            // updateAttachments()
+          ]);
+        } catch (error) {}
+
+        setIsLoading(false);
+      })();
+    }
+  }, [quotationId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await updateAttachments();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得附件失敗', content: err.message });
+      }
+    })();
+  }, [lastestContentId]);
+
+  // --------------------------------------------------------------------------
+
+  // region RENDER
+
+  return (
+    <div className={classNames(style.container, 'relative')}>
+      <PageHeader02
+        //
+        tagList={tagList}
+        customeLeft={customeLeft}
+        customeRight={disabled ? customeRight : undefined}
+        panelList={panelList}
+      />
+
+      <div className={style.mainContainer}>
+        <div className={style.quotation}>
+          {/* 基本資料 */}
+          <QuotationProfile_memo disabled={disabled} control={control_profile} editNotes={editNotes} />
+          <InputSel
+            className={'ml-[50px]'}
+            caption={'門型彙總'}
+            showBaseline="invisible"
+            captionStyle={{ width: '120px', fontSize: '18px', fontWeight: 400 }}
+            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+            node={<DoorSummary doorModelSummary={DoorSummary.format(doorModelSummary)} />}
+          />
+          <div className={classNames(style.switchBar)}>
+            <div>報價項目</div>
+          </div>
+          <div className={style.tableWrapper}>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={isAttach ? true : disabled}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={addProd}
+              setTargetProd={setTargetProdKey}
+              // defalutVKeyArr={prodVKeyArr}
+              onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
+              rowHeight="h60"
+              isAttach={isAttach}
+              // changeAllProductDiscount={changeAllProductDiscount}
+              // avgDiscount={avgDiscount}
+              discountRate={state_summary.discountRate} // 報價單總折數
+              changeDiscountRate={(v) => {
+                // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+                // 所以必須先計算出quotationProdSubTotal
+                if (quotationProdSubTotal === '') {
+                  calcSubTotalPrice();
+                }
+
+                if (v === '') {
+                  v = '0';
+                }
+
+                if (Number(v) > 500) {
+                  v = '500';
+                }
+
+                const isValid = checkIsFloat(v, 3);
+
+                if (!isValid) {
+                  return;
+                }
+
+                setState_summary((state) => {
+                  // changeAllProdQuotationDiscount(Number(v));
+                  // changeAllProductDiscount(Number(v));
+                  return {
+                    ...state,
+                    discountRate: v,
+                  };
+                });
+              }}
+            />
+
+            {/* 材料配件設定 */}
+            <div className="relative mt-[14px]">
+              <Table_com
+                disabled={disabled}
+                // comList={targetProd?.comList}
+
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                // comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                comList={comList}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={() => {}}
+                // defalutVKeyArr={comVKeyArr}
+              />
+              <LoadingCover01 isLoading={!!targetProd?.isLoading} />
+            </div>
+          </div>
+          <div className={style.redWrapper}>
+            {/* 選配設定 */}
+            <Table_accessories
+              disabled={disabled}
+              list={targetProd?.accessoriesList}
+              cellConfig={accessoriesCellConfig}
+              keyArr={accessoriesKeyArr}
+              changeKeyArr={changeAccessoriesKeyArr}
+              // add={() => {
+              //   targetProd?.addAcce();
+              // }}
+              defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+              onVKeyChange={(keyArr) => {
+                if (targetProd) {
+                  targetProd.accessoriesVKeyArr = keyArr;
+                }
+              }}
+              doorModel={targetProd?.doorType}
+              onSelectorConfirm={(arr) => {
+                if (targetProd) {
+                  targetProd.addAcce(arr);
+                }
+              }}
+            />
+          </div>
+          <div className={style.tableWrapper}>
+            {/* 其他設定 */}
+            <Table_others
+              disabled={disabled}
+              list={othersList}
+              cellConfig={othersCellConfig}
+              keyArr={othersKeyArr}
+              changeKeyArr={changeOthersKeyArr}
+              add={addOthers}
+            />
+          </div>
+          {/* 備註/報價範圍/付款資訊 */}
+          <Summary_memo
+            disabled={disabled}
+            payInfoControl={payInfoControl}
+            control_anno={control_anno}
+            control_qr={control_qr}
+            appendixParams={appendixParams}
+            avgDiscount_withQty={avgDiscount_withQty}
+          />
+          {/* 簽名 */}
+          <SignatureBar className={'mx-[50px] mt-[130px] mb-[40px]'} control={control_signature} />
+        </div>
+      </div>
+      <LoadingCover01 isLoading={isLoading} />
+      <TextareaModal
+        visible={showMemoModal}
+        setVisible={setShowMemoModal}
+        title={'更新備註'}
+        placeholder={'請輸入備註'}
+        // tip="最多100字"
+        // textLength={100}
+        onConfirm={inputModalOnConfirm}
+        autoCloseOnConfirm={false}
+      />
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      金額為0時，不要顯示出來
+      */}
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      金額為0時，不要顯示出來
+      */}
+
+      {/* {latestContent && (
+        <QuotationPdf
+          isVisable={showPdf}
+          onCancel={() => {
+            setShowPdf(false);
+          }}
+          // productArr_f={Object.values(productList)}
+          // basicInfo={latestContent}
+          noteArr={state_anno}
+          qrArr={state_qr}
+          control_basicInfo={quotationContentToBasicInfo(latestContent)}
+          control_prodArr={quotationProdToTableProdList({
+            classProductArr: Object.values(productList ?? {}),
+            classOthersArr: Object.values(othersList ?? {}),
+          })}
+          isBidding={status === 'Bidding'}
+        />
+      )} */}
+
+      {latestContent && (
+        <QuotationPdf
+          visible={pdfModalVisible}
+          pdfData={pdfData}
+          onCancel={hidePdf}
+          fileName={latestContent.quotationNumber}
+        />
+      )}
+
+      {/* 
+      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
+      而是 主產品設定裡顯示的複價 * 右下方的總折數
+      另外在PDF裡面 "1 1/2HP"要改成1.5HP
+      有沒有更大的數?
+      
+      輸出PDF的部分
+      關於支板
+      金額為0時，不要顯示出來
+      */}
+
+      {/*  */}
+
+      <QuotationPdf_part
+        isVisable={showPdf_part}
+        onCancel={() => {
+          setShowPdf_part(false);
+        }}
+        mainProductArr={pdfPartProps}
+        quotationId={latestContent?.quotationNumber ?? ''}
+      />
+
+      {/*  */}
+      {/* 合約審核表 */}
+      <ContractReviewForm
+        showModal={reviewFormShow}
+        readOnly={status === 'Pending' && isSendToReview_pending}
+        onCancel={() => setReviewFormShow(false)}
+        contentId={lastestContentId}
+        // contractNumber={latestContent?.quotationNumber ?? ''}
+        // projectName={latestContent?.projectName ?? ''}
+        // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+        // verifyForm={verifyForm}
+        onConfirm={async () => {
+          setIsLoading(true);
+          await update();
+          setIsLoading(false);
+        }}
+        // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
+      />
+      <ThreeButtonModal
+        visible={reviewModalShow}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewModalShow(false)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reqReview(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reqReview(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewModalShow(false),
+          },
+        ]}
+      />
+      {/*  客戶選擇器 */}
+      <CustomerSelector
+        showModal={customerSelectorShow.show}
+        label="複製報價單之客戶"
+        onConfirm={(customerArr) => {
+          const customerId = customerArr[0]?.id;
+
+          reqCopyQuotation({ customerId });
+        }}
+        onCancel={() => {
+          setCustomerSelectorShow(false);
+        }}
+        selLimit={1}
+      />
+      {/*  */}
+
+      {/* 審核人員選擇器 */}
+      <EmployeeSelectorGroup
+        showModal={showEmployeSelector}
+        caption="請選擇審核人員"
+        isCancelOnConfirm={false}
+        defaultSeletedDataArrArr={defaultSeletedDataArrArr}
+        dynaSelectorPropsList={dynaSelectorPropsList}
+        onConfirm={(arr) => {
+          // 在Pedding，sales的選擇器會被跳過不顯示，但是arr結構不會變
+          const sales = arr[0][0] as TemployeeDto | undefined;
+          const supervisor = arr[1][0] as TemployeeDto | undefined;
+
+          myAlert.confirm({
+            title: '確定送審',
+            props: {
+              onOk: () => {
+                reqPatchReviewer({
+                  sales,
+                  supervisor,
+                });
+              },
+            },
+          });
+        }}
+        onCancel={() => {
+          setShowEmployeSelector(false);
+        }}
+      />
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+
+const countPayInfoValue = ({
+  // discount,
+  //
+  tuneTotal,
+  prodSubTotal,
+  taxRate,
+}: {
+  // discount: string | number;
+
+  tuneTotal: string | number;
+  prodSubTotal: string | number;
+  taxRate: number;
+}) => {
+  // const discountRate = new Decimal(discount || 0).div(100);
+
+  // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+
+  const subTotal = Number(prodSubTotal || 0) + Number(tuneTotal || 0);
+  const tax = Decimal.mul(subTotal || 0, taxRate);
+  const total = Decimal.add(subTotal || 0, tax || 0);
+
+  // const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
+  // const taxStr = Number(tax.toFixed(0)).toLocaleString();
+  // const totalStr = Number(total.toFixed(0)).toLocaleString();
+  const subTotalStr = Number(new Decimal(subTotal).toFixed(0)).toLocaleString();
+  const taxStr = Number(new Decimal(tax).toFixed(0)).toLocaleString();
+  const totalStr = Number(new Decimal(total).toFixed(0)).toLocaleString();
 
   return {
-    instatnce_getQuotationId3,
-    content,
-    attachedToContract,
-    contractProfile,
-    //
-    prodArr,
-    iterativeContractProductArr,
-    //
-    prodArrForPDf,
-    //
-    isQuotationExpired,
-    latestSubContract,
-    parentSubContract,
+    subTotal: subTotalStr,
+    salesTax: taxStr,
+    total: totalStr,
   };
 };
 
-export type { TquotationType };
+// =================================================================
+
+const creEmptyProfile = (): Tprofile => ({
+  validityPeriod: '',
+  projectName: '',
+  county: '',
+  district: '',
+  address: '',
+  contactPerson: '',
+  contactNumber: '',
+  faxNumber: '',
+  trackProgress: '',
+  projectProgress: '',
+  isLost: false,
+
+  designatedBrand: '',
+  siteManager: '',
+  siteManagerNumber: '',
+  requiredDoorType: '',
+  requiredDoorQuantity: '',
+  estimatedDiscount: '',
+  scheduledProcurementOrBidDate: null,
+  type: '',
+});
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// 2024-05-28
+// 備用或做參考，再兩個月後應該就能刪掉了
+// 這個寫得不好，若要恢復這個功能到時候直接重寫比較好
+// 功能是改變主產品的門型時，要取得對應的備註與報價範圍
+// const onDoorTypeChange = ({
+//   annoShouldRemove,
+//   annoArr,
+//   qrShouldRemove,
+//   qrArr,
+// }: {
+//   annoShouldRemove: string[] | undefined;
+//   annoArr: string[] | undefined;
+//   qrShouldRemove: string[] | undefined;
+//   qrArr: string[] | undefined;
+// }) => {
+//   setAnnotation((anno) => {
+//     let annoCopy = [...anno];
+
+//     // 把應該被移除拿掉
+//     if (annoShouldRemove) {
+//       annoShouldRemove.forEach((asmStr) => {
+//         const delIndex = annoCopy.findIndex((str) => asmStr === str);
+
+//         if (delIndex > -1) {
+//           annoCopy.splice(delIndex, 1);
+//         }
+//       });
+//     }
+
+//     // 把新的放進去，並拿掉重複的值
+//     if (annoArr) {
+//       annoCopy = [...annoCopy, ...annoArr];
+//       // annoCopy = [...new Set(annoCopy)];
+//       annoCopy = _.uniq(annoCopy);
+//     }
+
+//     return annoCopy;
+//   });
+
+//   setQr((qr) => {
+//     let qrCopy = [...qr];
+
+//     // 把應該被移除拿掉
+//     if (qrShouldRemove) {
+//       qrShouldRemove.forEach((asmStr) => {
+//         const delIndex = qrCopy.findIndex((str) => asmStr === str);
+
+//         if (delIndex > -1) {
+//           qrCopy.splice(delIndex, 1);
+//         }
+//       });
+//     }
+
+//     // 把新的放進去，並拿掉重複的值
+//     if (qrArr) {
+//       qrCopy = [...qrCopy, ...qrArr];
+//       // qrCopy = [...new Set(qrCopy)];
+//       qrCopy = _.uniq(qrCopy);
+//     }
+
+//     return qrCopy;
+//   });
+
+//   // setAnnotation(annoCopy);
+// };
+
+// ===================================================================
+
+// 2024-05-28
+// 再兩個月就可以考慮刪掉了
+
+// const payInfoControl_old: TpayInfoControl = {
+//   payment: {
+//     haveTax: {
+//       value: !!taxRate,
+//       onChange: (v) => {
+//         if (quotationProdSubTotal === '') {
+//           calcSubTotalPrice();
+//         }
+
+//         setTaxRate(v ? 0.05 : 0);
+//       },
+//     },
+
+//     discountRate: {
+//       inputAttr: {
+//         // disabled: disabled,
+//         disabled: true,
+//         value: summary.discountRate,
+//         onChange: (e) => {
+//           // // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+//           // // 所以必須先計算出quotationProdSubTotal
+//           // if (quotationProdSubTotal === '') {
+//           //   calcSubTotalPrice();
+//           // }
+//           // let v = e.target.value;
+//           // if ((v as string) === '') {
+//           //   v = '0';
+//           // }
+//           // if (Number(v) > 500) {
+//           //   v = '500';
+//           // }
+//           // setSummary((state) => {
+//           //   const copy = { ...state };
+//           //   if (v.split('.')[1]?.length > 3) {
+//           //     return copy;
+//           //   }
+//           //   copy.discountRate = v;
+//           //   // changeAllProdQuotationDiscount(Number(v));
+//           //   // changeAllProductDiscount(Number(v));
+//           //   return copy;
+//           // });
+//         },
+//       },
+//     },
+//     subTotal: {
+//       inputAttr: {
+//         disabled: true,
+//         value: summary.subTotal,
+//       },
+//     },
+//     salesTax: {
+//       inputAttr: {
+//         disabled: true,
+//         value: summary.salesTax,
+//       },
+//     },
+//     total: {
+//       inputAttr: {
+//         disabled: true,
+//         value: summary.total,
+//       },
+//     },
+//   },
+
+//   delivery: {
+//     deliveryLocation: {
+//       value: summary.deliveryLocation,
+//       onChange: (v) => {
+//         setSummary((state) => {
+//           const copy = { ...state };
+//           copy.deliveryLocation = v;
+
+//           return copy;
+//         });
+//       },
+//     },
+//     deliveryDate: {
+//       value: summary.deliveryDate,
+//       onChange: (v) => {
+//         setSummary((state) => {
+//           const copy = { ...state };
+//           copy.deliveryDate = v;
+
+//           return copy;
+//         });
+//       },
+//     },
+//   },
+//   paymentMethod: {
+//     arr: paymentMethod.map((item, index) => {
+//       const { milestone, totalPaymentRatio } = item;
+
+//       const onChangeMilestone = (v: string) => {
+//         setPaymentMethod((state) => {
+//           const copy = [...state];
+//           copy[index].milestone = v;
+
+//           return copy;
+//         });
+//       };
+
+//       const onChange = (v: string) => {
+//         if (v === '') {
+//           v = '0';
+//         }
+
+//         setPaymentMethod((state) => {
+//           const copy = [...state];
+//           copy[index].totalPaymentRatio = v;
+
+//           return copy;
+//         });
+//       };
+
+//       const delSelf = () => {
+//         setPaymentMethod((state) => {
+//           const copy = [...state];
+//           copy.splice(index, 1);
+
+//           return copy;
+//         });
+//       };
+
+//       return {
+//         label: milestone,
+//         value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
+//         onChange,
+//         onChangeMilestone,
+//         delSelf,
+//       };
+//       //
+//     }),
+//     addMethod: (v) => {
+//       setPaymentMethod((state) => {
+//         const copy = [...state];
+//         copy.push({ milestone: v, totalPaymentRatio: '' });
+
+//         return copy;
+//       });
+//     },
+//   },
+// };
