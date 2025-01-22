@@ -60,7 +60,8 @@ const useDefaultState_prodDict = ({
       };
     }
 
-    const prodSource_copy = _.cloneDeep(prodSourceArr);
+    let prodSource_copy = _.cloneDeep(prodSourceArr);
+    prodSource_copy = _.sortBy(prodSource_copy, 'order');
 
     const dict: TstateProdDict = {};
     const keyArr: string[] = [];
