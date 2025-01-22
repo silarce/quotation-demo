@@ -1,5 +1,8 @@
+import classNames from 'classnames';
+
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
@@ -74,7 +77,10 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
             <CellWithBar key={rowIndex}>
               <div className={style.row}>
                 {/*  */}
-                <div className={style.deleteIcon} onClick={() => item.onDelete(rowIndex)}>
+                <div
+                  className={classNames(style.deleteIcon, disabled && 'invisible')}
+                  onClick={() => item.onDelete(rowIndex)}
+                >
                   <IconDelete01 />
                 </div>
                 <div className={style.indexNumber}>{rowIndex + 1}</div>
@@ -101,38 +107,49 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
                     <div className={className} key={index} style={theStyle}>
                       {type === 'textarea' && (
                         <InputSel
-                          textareaProps={{
-                            value,
-                            onChange: onChangeInput,
-                            className: style.input,
-                          }}
-                          placeholder=""
                           disabled={disabled}
+                          textareaProps={{
+                            props: {
+                              placeholder: '',
+                              value,
+                              onChange: (e) => {
+                                onChangeInput(e.target.value);
+                              },
+                              className: style.input,
+                            },
+                          }}
                         />
                       )}
                       {type === 'input' && (
                         <InputSel
-                          inputProps={{
-                            value,
-                            onChange: onChangeInput,
-                            className: style.input,
-                            inputType: inputType,
-                          }}
-                          placeholder=""
                           disabled={disabled}
+                          inputProps={{
+                            props: {
+                              type: inputType,
+                              placeholder: '',
+                              value,
+                              onChange: (e) => {
+                                onChangeInput(e.target.value);
+                              },
+                              className: style.input,
+                            },
+                          }}
                         />
                       )}
                       {type === 'select' && (
                         <InputSel
+                          disabled={disabled}
+                          fontSize="16"
                           selectProps={{
-                            value,
-                            onChange: onChangeSel,
-                            options: options ?? [],
-                            fontSize: '16px',
+                            props: {
+                              isSearchable: true,
+                              placeholder: '',
+                              value: !value ? null : { value: value, label: value },
+                              onChange: onChangeSel,
+                              options: options ?? [],
+                            },
                             arrowType: 'black',
                           }}
-                          placeholder=""
-                          disabled={disabled}
                         />
                       )}
                     </div>

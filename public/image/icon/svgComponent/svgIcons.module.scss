@@ -6,6 +6,9 @@ $colorLightPink: #ffeeee;
 svg.svg {
   color: $colorMain;
   cursor: pointer;
+  &.active {
+    color: $colorActive01;
+  }
   &:hover {
     color: $colorActive01;
   }
@@ -14,7 +17,6 @@ svg.svg {
 .cursorAuto {
   cursor: auto;
 }
-
 
 .circle {
   stroke: $colorRed;

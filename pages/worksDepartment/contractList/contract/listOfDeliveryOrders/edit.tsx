@@ -24,6 +24,8 @@ import Profile, {
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
@@ -44,6 +46,9 @@ import {
 import { TuserDto } from 'js/api/dtoTypes';
 
 // -----------------------------------------------------------
+
+type Tquery = { contractId: string; exchangeId: string | undefined };
+
 type Tprofile = {
   sheetNumber: string;
   projectNumber: string;
@@ -52,13 +57,13 @@ type Tprofile = {
   dispatchDate: string;
 };
 
-type Tsignature = {
-  accounting: TemployeeDto | undefined;
-  warehouseEmployee: TemployeeDto | undefined;
-  factoryEmployee: TemployeeDto | undefined;
-  supervisor: TemployeeDto | undefined;
-  formCompleter: TemployeeDto | undefined;
-};
+// type Tsignature = {
+//   accounting: TemployeeDto | undefined;
+//   warehouseEmployee: TemployeeDto | undefined;
+//   factoryEmployee: TemployeeDto | undefined;
+//   supervisor: TemployeeDto | undefined;
+//   formCompleter: TemployeeDto | undefined;
+// };
 
 type Ttransfer = {
   id?: string;
@@ -69,13 +74,29 @@ type Ttransfer = {
 };
 
 // -----------------------------------------------------------
-export default function Edit({ userInfo }: { userInfo: TuserDto }) {
+export default function Edit({
+  //
+  userInfo,
+  isReadonly,
+}: {
+  userInfo: TuserDto;
+  isReadonly?: boolean;
+}) {
   const router = useRouter();
-  const { contractId, exchangeId } = router.query as { contractId: string; exchangeId: string | undefined };
+  const query = router.query as Tquery;
+  const { contractId, exchangeId } = query;
+
+  const userId = userInfo.employee?.id;
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(!!exchangeId);
   const [attachmentUpdateTrigger, setAttachmentUpdateTrigger] = useState(0);
+
+  const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
+  const [transferArr, setTransferArr] = useState<Ttransfer[]>([]);
+
+  const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
+  const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id(contractId);
@@ -85,33 +106,19 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(exchangeId);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await update_contract();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得合約失敗', content: err.message });
-      }
-
-      try {
-        await update_exchange();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得調(退)貨單失敗', content: err.message });
-      }
-
-      setIsLoading(false);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId, exchangeId]);
-  useEffect(() => {
-    update_engineeringContact();
-  }, [engineeringContactId]);
+  const {
+    ReviewFlow,
+    // reviewFlow,
+    // reviewFlowArr,
+    // isFetching,
+    // isFirstLoaded,
+    // update,
+    reqAddReview,
+    // reqSentReviewStop,
+    // sentReviewStop,
+  } = useReviewFlow({ uuid: exchange?.id });
 
   // ----------------------------------------------------
-  const [profile, setProfile] = useState<Tprofile>(emptyProfileOri());
 
   const changeProfile = (key: keyof Tprofile, v: string) => {
     setProfile((profile) => {
@@ -120,17 +127,15 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   };
 
   // ----------------------------------------------------
-  const [signature, setSignature] = useState<Tsignature>(emptySignature());
+  // const [signature, setSignature] = useState<Tsignature>(emptySignature());
 
-  const changeSignature = (key: keyof Tsignature, v: TemployeeDto) => {
-    setSignature((signature) => {
-      return { ...signature, [key]: v };
-    });
-  };
+  // const changeSignature = (key: keyof Tsignature, v: TemployeeDto) => {
+  //   setSignature((signature) => {
+  //     return { ...signature, [key]: v };
+  //   });
+  // };
 
   // ----------------------------------------------------
-
-  const [transferArr, setTransferArr] = useState<Ttransfer[]>([]);
 
   const addTransfer = () => {
     setTransferArr((transferList) => {
@@ -160,55 +165,6 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
       return newTransferList;
     });
   };
-
-  // ----------------------------------------------------
-
-  const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
-  const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
-
-  // ----------------------------------------------------
-
-  useEffect(() => {
-    const { projectName, projectNumber } = engineeringContact ?? {};
-    const {
-      sheetNumber,
-      // projectName,
-      // projectNumber: engineeringNumber,
-      requirementsDate,
-      dispatchDate,
-      //
-      accounting,
-      warehouseEmployee,
-      factoryEmployee,
-      supervisor,
-      formCompleter,
-    } = exchange ?? {};
-
-    setProfile({
-      sheetNumber: sheetNumber ?? '',
-      projectNumber: projectNumber ?? '',
-      projectName: projectName ?? '',
-      requirementsDate: requirementsDate ?? '',
-      dispatchDate: dispatchDate ?? '',
-    });
-
-    const isNew = !exchangeId;
-
-    const theFormCompleter = isNew ? userInfo.employee : formCompleter;
-
-    setSignature({
-      accounting,
-      warehouseEmployee,
-      factoryEmployee,
-      supervisor,
-      formCompleter: theFormCompleter,
-    });
-
-    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
-    setTransferArr(recoreds);
-
-    //
-  }, [engineeringContact, exchange, disabled]);
 
   // ----------------------------------------------------
 
@@ -243,29 +199,29 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   // ----------------------------------------------------
 
-  const controll_signature: Tcontroll_signature = {
-    accounting: {
-      employee: signature.accounting,
-      onChange: (v: TemployeeDto) => changeSignature('accounting', v),
-    },
-    warehouseEmployee: {
-      employee: signature.warehouseEmployee,
-      onChange: (v: TemployeeDto) => changeSignature('warehouseEmployee', v),
-    },
-    factoryEmployee: {
-      employee: signature.factoryEmployee,
-      onChange: (v: TemployeeDto) => changeSignature('factoryEmployee', v),
-    },
-    supervisor: {
-      employee: signature.supervisor,
-      onChange: (v: TemployeeDto) => changeSignature('supervisor', v),
-    },
-    formCompleter: {
-      employee: signature.formCompleter,
-      // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
-      forbidden: true,
-    },
-  };
+  // const controll_signature: Tcontroll_signature = {
+  //   accounting: {
+  //     employee: signature.accounting,
+  //     onChange: (v: TemployeeDto) => changeSignature('accounting', v),
+  //   },
+  //   warehouseEmployee: {
+  //     employee: signature.warehouseEmployee,
+  //     onChange: (v: TemployeeDto) => changeSignature('warehouseEmployee', v),
+  //   },
+  //   factoryEmployee: {
+  //     employee: signature.factoryEmployee,
+  //     onChange: (v: TemployeeDto) => changeSignature('factoryEmployee', v),
+  //   },
+  //   supervisor: {
+  //     employee: signature.supervisor,
+  //     onChange: (v: TemployeeDto) => changeSignature('supervisor', v),
+  //   },
+  //   formCompleter: {
+  //     employee: signature.formCompleter,
+  //     // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+  //     forbidden: true,
+  //   },
+  // };
 
   // ----------------------------------------------------
 
@@ -302,34 +258,34 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     const body: TcreateExchgangeDto = {
       ...profile,
       exchangeRecords: transferArr,
-      accountingId: signature.accounting?.id ?? '',
-      warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
-      factoryEmployeeId: signature.factoryEmployee?.id ?? '',
-      supervisorId: signature.supervisor?.id ?? '',
-      formCompleterId: signature.formCompleter?.id ?? '',
+      // accountingId: signature.accounting?.id ?? '',
+      // warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
+      // factoryEmployeeId: signature.factoryEmployee?.id ?? '',
+      // supervisorId: signature.supervisor?.id ?? '',
+      // formCompleterId: signature.formCompleter?.id ?? '',
       contractId: contractId,
     };
 
-    if (!body.accountingId) {
-      return myAlert.info({ title: '請選擇會計' });
-    } else if (!body.warehouseEmployeeId) {
-      return myAlert.info({ title: '請選擇倉庫人員' });
-    } else if (!body.factoryEmployeeId) {
-      return myAlert.info({ title: '請選擇廠務人員' });
-    } else if (!body.supervisorId) {
-      return myAlert.info({ title: '請選擇單位主管' });
-    } else if (!body.formCompleterId) {
-      return myAlert.info({ title: '請選擇填表人員' });
-    } else if (!body.dispatchDate) {
-      return myAlert.info({ title: '請選擇派工日期' });
-    } else if (!body.requirementsDate) {
-      return myAlert.info({ title: '請選擇需求日期' });
-    }
+    // if (!body.accountingId) {
+    //   return myAlert.info({ title: '請選擇會計' });
+    // } else if (!body.warehouseEmployeeId) {
+    //   return myAlert.info({ title: '請選擇倉庫人員' });
+    // } else if (!body.factoryEmployeeId) {
+    //   return myAlert.info({ title: '請選擇廠務人員' });
+    // } else if (!body.supervisorId) {
+    //   return myAlert.info({ title: '請選擇單位主管' });
+    // } else if (!body.formCompleterId) {
+    //   return myAlert.info({ title: '請選擇填表人員' });
+    // } else if (!body.dispatchDate) {
+    //   return myAlert.info({ title: '請選擇派工日期' });
+    // } else if (!body.requirementsDate) {
+    //   return myAlert.info({ title: '請選擇需求日期' });
+    // }
 
     try {
       setIsLoading(true);
 
-      const resId: string | undefined = undefined;
+      // const resId: string | undefined = undefined;
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
@@ -389,6 +345,39 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   ];
 
   const panelList_edit01: TpanelList = [
+    disabled
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            if (!userId) {
+              throw new Error('送審:userId is undefined');
+            }
+
+            const { destroy } = ReviewFlowSelector.open2({
+              userId,
+              onConfirm: (v) => {
+                const { purpose, reviewFlowId } = v;
+
+                if (!reviewFlowId) {
+                  return;
+                }
+
+                reqAddReview({
+                  review_id: reviewFlowId,
+                  document_id: '---',
+                  document_uuid: exchange?.id,
+                  document_type: '調貨單',
+                  user_id: userId,
+                  document_title: `調貨單-${purpose}`,
+                  query,
+                });
+                destroy();
+              },
+            });
+          },
+        }
+      : null,
     {
       type: 'myButton',
       label: '編輯',
@@ -424,15 +413,90 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   const panelList = !exchangeId ? panelList_add : disabled ? panelList_edit01 : panelList_edit02;
 
-  // ----------------------------------------------------
+  // ------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+      }
+
+      try {
+        await update_exchange();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得調(退)貨單失敗', content: err.message });
+      }
+
+      setIsLoading(false);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId, exchangeId]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
+
+  useEffect(() => {
+    const { projectName, projectNumber } = engineeringContact ?? {};
+    const {
+      sheetNumber,
+      // projectName,
+      // projectNumber: engineeringNumber,
+      requirementsDate,
+      dispatchDate,
+      //
+      // accounting,
+      // warehouseEmployee,
+      // factoryEmployee,
+      // supervisor,
+      // formCompleter,
+    } = exchange ?? {};
+
+    setProfile({
+      sheetNumber: sheetNumber ?? '',
+      projectNumber: projectNumber ?? '',
+      projectName: projectName ?? '',
+      requirementsDate: requirementsDate ?? '',
+      dispatchDate: dispatchDate ?? '',
+    });
+
+    // const isNew = !exchangeId;
+
+    // const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+
+    // setSignature({
+    //   accounting,
+    //   warehouseEmployee,
+    //   factoryEmployee,
+    //   supervisor,
+    //   formCompleter: theFormCompleter,
+    // });
+
+    const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
+    setTransferArr(recoreds);
+
+    //
+  }, [engineeringContact, exchange, disabled]);
+
+  // ------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        returnBtn={disabled}
-        panelList={panelList}
+        returnBtn={isReadonly ? false : disabled}
+        panelList={isReadonly ? undefined : panelList}
         tagCallback={tagCallback}
         contractNumber={contract?.content.quotationNumber}
+        linkForbidden={isReadonly}
       />
 
       <div>
@@ -451,7 +515,10 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
             }}
             updateTrigger={attachmentUpdateTrigger}
           />
-          <Signature controll={controll_signature} disabled={disabled} />
+          <br />
+          <br />
+          <ReviewFlow className={'w-fit ml-4 gap-4'} />
+          {/* <Signature controll={controll_signature} disabled={disabled} /> */}
         </div>
       </div>
     </SubLayer>
@@ -468,13 +535,13 @@ const emptyProfileOri = (): Tprofile => ({
   dispatchDate: '',
 });
 
-const emptySignature = () => ({
-  accounting: undefined,
-  warehouseEmployee: undefined,
-  factoryEmployee: undefined,
-  supervisor: undefined,
-  formCompleter: undefined,
-});
+// const emptySignature = () => ({
+//   accounting: undefined,
+//   warehouseEmployee: undefined,
+//   factoryEmployee: undefined,
+//   supervisor: undefined,
+//   formCompleter: undefined,
+// });
 
 const emptyTransferOri = (): Ttransfer => ({
   goodsName: '',

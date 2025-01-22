@@ -38,19 +38,15 @@ const customPopulate = [
 export default function CertifiedDocument({
   onPanelListChange,
   showDocType,
+  allowdAddDocType,
 }: {
   onPanelListChange?: (panelList: TpanelList | undefined) => void;
   showDocType?: TdocType[];
+  allowdAddDocType?: TdocType[];
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const {
-    //
-    // id: contractId,
-    documentType,
-    editCertifiedDocument,
-    certifiedDocumentId,
-  } = query;
+  const { documentType, editCertifiedDocument, certifiedDocumentId } = query;
 
   const contractId = query.id || query.contractId;
 
@@ -145,6 +141,7 @@ export default function CertifiedDocument({
           onPanelChange={setDynaPanelList}
           contract={data_contract}
           update_contract={update_contract}
+          allowdAddDocType={allowdAddDocType}
         />
       )}
       {!editCertifiedDocument && certifiedDocumentId && <Certificate onPanelChange={setDynaPanelList} />}

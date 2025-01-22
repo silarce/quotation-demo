@@ -7,6 +7,7 @@ import {
   TgetReview,
   apiAddReview,
   apiGetReviewBack,
+  apiGetReviewBackForAnyStatus,
 } from 'js/api/api_netCore/api_review';
 
 import { setting } from 'pages/factoryDepartment/wareHouseList/index';
@@ -26,6 +27,10 @@ interface Tglobal_review {
   req_addReview: (...params: Parameters<typeof apiAddReview>) => ReturnType<typeof apiAddReview>;
   req_reviewBack: (...params: Parameters<typeof apiGetReviewBack>) => ReturnType<typeof apiGetReviewBack>;
   req_backThanAdd: (...params: Parameters<typeof apiAddReview>) => Promise<'success' | void>;
+  req_reviewBack_anyStatus: (
+    ...params: Parameters<typeof apiGetReviewBackForAnyStatus>
+  ) => ReturnType<typeof apiGetReviewBackForAnyStatus>;
+  req_backThanAdd_anyStatus: (...params: Parameters<typeof apiAddReview>) => Promise<'success' | void>;
 }
 
 // ============================================================================
@@ -139,11 +144,39 @@ const useGlobal_review = create<Tglobal_review>()(
       });
     };
 
+    const reviewBack_anyStatus = async (...params: Parameters<typeof apiGetReviewBackForAnyStatus>) => {
+      return await apiGetReviewBackForAnyStatus(...params).then((res) => {
+        update();
+
+        return res;
+      });
+    };
+
     const backThanAdd = async (...params: Parameters<typeof apiAddReview>) => {
       const document_uuid = params[0].document_uuid;
+      const document_id = params[0].document_id;
       let callUpdate = false;
 
-      return await apiGetReviewBack(document_uuid, { showSuccess: false, returnReject: true })
+      return await apiGetReviewBack(document_uuid, { document_id, showSuccess: false, returnReject: true })
+        .then(() => {
+          callUpdate = true;
+
+          return apiAddReview(...params);
+        })
+        .then(() => {
+          return 'success' as const;
+        })
+        .finally(() => {
+          callUpdate && update();
+        });
+    };
+
+    const backThanAdd_anyStatus = async (...params: Parameters<typeof apiAddReview>) => {
+      const document_uuid = params[0].document_uuid;
+      const document_id = params[0].document_id;
+      let callUpdate = false;
+
+      return await reviewBack_anyStatus(document_uuid, { document_id, showSuccess: false, returnReject: true })
         .then(() => {
           callUpdate = true;
 
@@ -168,6 +201,8 @@ const useGlobal_review = create<Tglobal_review>()(
       req_addReview: addReview,
       req_reviewBack: reviewBack,
       req_backThanAdd: backThanAdd,
+      req_reviewBack_anyStatus: reviewBack_anyStatus,
+      req_backThanAdd_anyStatus: backThanAdd_anyStatus,
     };
   })
 );
