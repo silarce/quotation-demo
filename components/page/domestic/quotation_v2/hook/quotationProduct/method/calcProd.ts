@@ -378,16 +378,20 @@ const calcProdDistributionBoxAndInstallationFee = ({
 
   const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0)
     .mul(priceDiscount_percent)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
   const distributionBoxTotalPrice = new Decimal(distributionBoxUnitPrice)
     .mul(distributionBoxQuantity || 0)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
 
   const installationFeeUnitPrice = new Decimal(installationFeePrice || 0)
     .mul(priceDiscount_percent)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
   const installationFeeTotalPrice = new Decimal(installationFeeUnitPrice)
     .mul(installationFeeQuantity || 0)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
 
   return {
