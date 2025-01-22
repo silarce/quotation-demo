@@ -270,6 +270,8 @@ const Pattern_readonly = () => {
     pattern_detailArr,
   ]);
 
+  const name = patternType ? lookup_pattern[patternType].name : '';
+
   useEffect(() => {
     update_engineeringContact();
   }, [engineeringContactId]);
@@ -280,6 +282,7 @@ const Pattern_readonly = () => {
 
   return (
     <div>
+      <h1 className="text-3xl text-main">{name}</h1>
       <InputSel caption="工程名稱" wrapperStyle={{ width: 400 }} node={projectName} />
       <br />
       <InputSel caption="工程內容" wrapperStyle={{ width: 400 }} node={projectContent} />
