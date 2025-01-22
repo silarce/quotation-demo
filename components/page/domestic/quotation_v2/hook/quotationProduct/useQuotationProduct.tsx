@@ -567,16 +567,18 @@ const useQuotationProduct = ({
     removeProd(prodKey);
 
     if (!rootProduct) {
-      console.error('prodKey', prodKey);
-      console.error('state_prodDict', state_prodDict);
-
-      throw new Error('removeProd_withIterative，rootProduct不存在');
+      // console.error('prodKey', prodKey);
+      // console.error('state_prodDict', state_prodDict);
+      // throw new Error('removeProd_withIterative，rootProduct不存在');
     }
 
-    delete rootProduct.modifyedProduct[prodKey];
-    rootProduct.deductedPrice = calcProdDeductedPrice({ stateProd: rootProduct });
+    if (rootProduct) {
+      delete rootProduct.modifyedProduct[prodKey];
+      rootProduct.deductedPrice = calcProdDeductedPrice({ stateProd: rootProduct });
 
-    rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
+      rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
+    }
+
     setState_iterativeProdDict({ ...state_iterativeProdDict });
   };
 
