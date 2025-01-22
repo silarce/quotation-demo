@@ -216,8 +216,8 @@ export default function PRequisitionDetail() {
         setuuidin(parsedItem?.purchaserequisitionuuid);
         setidin(parsedItem?.purchaserequisitionid)
         GetDetailById(parsedItem?.purchaserequisitionuuid);
-        GetReviewById(parsedItem?.purchaserequisitionuuid);
-        GetReviewHistory(parsedItem?.purchaserequisitionuuid);
+        GetReviewById(parsedItem?.purchaserequisitionuuid, parsedItem?.purchaserequisitionid);
+        GetReviewHistory(parsedItem?.purchaserequisitionuuid, parsedItem?.purchaserequisitionid);
         setCreate_byin(parsedItem?.create_by);
         setCreate_atin(parsedItem?.create_at);
         setNeed_datein(parsedItem?.need_date);
@@ -689,14 +689,15 @@ export default function PRequisitionDetail() {
     }
 
     //取單據的審核流程
-    const GetReviewById = async (document_uuid: any) => {
+    const GetReviewById = async (document_uuid: any, document_id: any) => {
         try {
             setReviewflowdata([]);
             setReviewflowdata2([]);
             // setIsLoading(true);
 
             const conditionModel = {
-                document_uuid: document_uuid
+                document_uuid: document_uuid,
+                document_id: document_id
             };
 
             const inputModel = {
@@ -795,7 +796,7 @@ export default function PRequisitionDetail() {
             }
             const data = await response.json();
             setReviewflowdata([]);
-            GetReviewById(uuidin);
+            GetReviewById(uuidin, idin);
             update_2();
 
 
@@ -826,7 +827,7 @@ export default function PRequisitionDetail() {
             const data2 = await response2.json();
 
             GetDetailById(uuidin);
-            GetReviewById(uuidin)
+            GetReviewById(uuidin, idin)
             setStatusin("審核中");
             setReviewbar(false);
 
@@ -859,6 +860,7 @@ export default function PRequisitionDetail() {
                         setIsLoading(true);
                         const conditionModel = {
                             document_uuid: uuidin,
+                            document_id: idin
                         };
 
                         var inputModel = {
@@ -885,7 +887,7 @@ export default function PRequisitionDetail() {
                         setStatusin("編輯中");
                         setReview_flow("");
                         setValue(null);
-                        GetReviewHistory(uuidin);
+                        GetReviewHistory(uuidin, idin);
                         update_2();
 
                     } catch (error: any) {
@@ -899,12 +901,13 @@ export default function PRequisitionDetail() {
         });
     }
 
-    const GetReviewHistory = async (id: any) => {
+    const GetReviewHistory = async (uuid: any, id: any) => {
         try {
             // setIsLoading(true);
             // alert(purchaserequisitionidin);
             const conditionModel = {
-                document_uuid: id
+                document_uuid: uuid,
+                document_id: id
             };
 
             var inputModel = {
@@ -1796,7 +1799,7 @@ export default function PRequisitionDetail() {
                                                             }}
                                                         />
                                                     </span>
-                                                    
+
                                                     <span>
                                                         <input
                                                             ref={unitRefs.current[index]}
