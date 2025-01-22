@@ -226,12 +226,12 @@ export default function Certificate({
     update_data_CertifiedDocument,
   ]);
 
-  const reqSealCertificatedDoc = useCallback(async () => {
-    const body: TupdateCertificatedDocDto = {
-      status: '已用印',
-    };
-    await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
-  }, [certifiedDocumentId, update_data_CertifiedDocument]);
+  // const reqSealCertificatedDoc = useCallback(async () => {
+  //   const body: TupdateCertificatedDocDto = {
+  //     status: '已用印',
+  //   };
+  //   await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
+  // }, [certifiedDocumentId, update_data_CertifiedDocument]);
 
   // ---------------------------------------------------------------------
 
@@ -249,7 +249,7 @@ export default function Certificate({
     setDiasbled: setDisabled,
     // dlPdf,
     reqPatchCertificatedDoc,
-    reqSealCertificatedDoc,
+    // reqSealCertificatedDoc,
     setShowPdfPreview,
     isSealed,
   });
@@ -672,7 +672,7 @@ const usePanelList = ({
   disabled,
   setDiasbled,
   reqPatchCertificatedDoc,
-  reqSealCertificatedDoc,
+  // reqSealCertificatedDoc,
   setShowPdfPreview,
   isSealed,
 }: {
@@ -680,17 +680,17 @@ const usePanelList = ({
   disabled: boolean;
   setDiasbled: React.Dispatch<React.SetStateAction<boolean>>;
   reqPatchCertificatedDoc: () => void;
-  reqSealCertificatedDoc: () => void;
+  // reqSealCertificatedDoc: () => void;
   setShowPdfPreview: React.Dispatch<React.SetStateAction<boolean>>;
   isSealed: boolean;
 }) => {
   const panelList: TpanelList = useMemo(() => {
     //
-    const btn_toSeal: TpanelList[number] = {
-      type: 'redButton',
-      label: '用印',
-      onClick: reqSealCertificatedDoc,
-    };
+    // const btn_toSeal: TpanelList[number] = {
+    //   type: 'redButton',
+    //   label: '用印',
+    //   onClick: reqSealCertificatedDoc,
+    // };
 
     const btn_edit: TpanelList[number] = {
       type: 'myButton',
@@ -707,7 +707,7 @@ const usePanelList = ({
     };
 
     const panelList_disabled: TpanelList = [
-      !isSealed ? btn_toSeal : btn_isSealed,
+      !isSealed ? null : btn_isSealed,
       {
         type: 'redButton',
         label: '匯出',
@@ -751,7 +751,7 @@ const usePanelList = ({
     //
     disabled,
     reqPatchCertificatedDoc,
-    reqSealCertificatedDoc,
+    // reqSealCertificatedDoc,
     router.back,
     setDiasbled,
     setShowPdfPreview,

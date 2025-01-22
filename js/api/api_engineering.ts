@@ -317,7 +317,7 @@ export const useGetEngineeringDispatching_id = (id: string | undefined, customeP
   const [res, setRes] = useState<TdispatchingDto>();
 
   const params = {
-    populate: ['workerEmployee', 'todoList'],
+    populate: ['workerEmployee', 'todoList', 'outsourcing'],
     ...customeParams,
   };
 
@@ -933,7 +933,7 @@ export const useGetWorksheet_id = (
         const records = (res.records ?? []) as TworksheetRecordDto_addition[];
 
         for (const record of records) {
-          const reviewArr = await apiGetReviewById(record.id);
+          const reviewArr = await apiGetReviewById({ document_uuid: record.id });
           record.addition = {
             reviewArr,
           };

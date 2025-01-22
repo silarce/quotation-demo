@@ -369,6 +369,13 @@ class ClassProd {
 
     if (!isSurfaceValid) {
       this.data.materialSurface = this.options_surface?.[0].value ?? '';
+
+      if (this.doorModelName === 'SJ-303A' || this.doorModelName === 'SJ-303AS') {
+        const isPaintSpecifiedColorExist = this.options_surface?.some(
+          (item) => item.value === optionDict_surface.PaintSpecifiedColor.value
+        );
+        isPaintSpecifiedColorExist && (this.data.materialSurface = optionDict_surface.PaintSpecifiedColor.value);
+      }
     }
 
     this.render();
@@ -2067,6 +2074,11 @@ class ClassProd {
   // MARK:attachedToProductName
   get rootProductName() {
     return this.state.rootProduct?.data_prod.itemName ?? '';
+  }
+
+  // MARK:isQuantityValid
+  get isQuantityValid() {
+    return this.state.isQuantityValid;
   }
 }
 // MARK: END

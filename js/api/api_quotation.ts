@@ -1059,7 +1059,7 @@ export const useGetContract_id = (
           }
 
           const latestRecord = ws.latestRecord;
-          const reviewArr = await apiGetReviewById(latestRecord.id);
+          const reviewArr = await apiGetReviewById({ document_uuid: latestRecord.id });
           latestRecord.addition = {
             reviewArr,
           };
@@ -2531,7 +2531,13 @@ type TquotationProductDto_addition = TquotationProductDto & {
 
 export type TiterativeContractProduct = Record<string, TquotationProductDto_addition>;
 
-export const useIterativeContractProduct = ({ contract }: { contract: TquotationContractDto | undefined }) => {
+export const useIterativeContractProduct = ({
+  contract,
+  untilVersion,
+}: {
+  contract: TquotationContractDto | undefined;
+  untilVersion?: number;
+}) => {
   const [iterativeContractProduct, setIterativeContractProduct] = useState<TiterativeContractProduct>({});
 
   const iterativeContractProduct_pre = useMemo(() => {
@@ -2544,6 +2550,10 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
 
     let subContracts = contract?.subContracts;
     subContracts = _.sortBy(subContracts, 'version');
+
+    if (untilVersion) {
+      subContracts = subContracts.filter((contract) => contract.version <= untilVersion);
+    }
 
     subContracts.forEach((contract) => {
       const { id: contractId } = contract;
@@ -2618,7 +2628,7 @@ export const useIterativeContractProduct = ({ contract }: { contract: Tquotation
 
     return dict;
     //
-  }, [contract]);
+  }, [contract, untilVersion]);
 
   useEffect(() => {
     const prodIdArr = Object.keys(iterativeContractProduct_pre);

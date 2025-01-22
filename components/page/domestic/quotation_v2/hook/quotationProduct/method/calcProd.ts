@@ -378,16 +378,20 @@ const calcProdDistributionBoxAndInstallationFee = ({
 
   const distributionBoxUnitPrice = new Decimal(distributionBoxPrice || 0)
     .mul(priceDiscount_percent)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
   const distributionBoxTotalPrice = new Decimal(distributionBoxUnitPrice)
     .mul(distributionBoxQuantity || 0)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
 
   const installationFeeUnitPrice = new Decimal(installationFeePrice || 0)
     .mul(priceDiscount_percent)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
   const installationFeeTotalPrice = new Decimal(installationFeeUnitPrice)
     .mul(installationFeeQuantity || 0)
+    .toDecimalPlaces(0)
     .toString() as `${number}`;
 
   return {
@@ -424,7 +428,13 @@ const calcQtyModify = ({ modifyedProduct }: { modifyedProduct: TstateProd['modif
   return qty;
 };
 
-const calcQtyReduceModified = ({ stateProd }: { stateProd: TstateProd }) => {
+// const calcQtyReduceModified = ({ stateProd }: { stateProd: TstateProd }) => {
+const calcQtyReduceModified = ({
+  //
+  stateProd,
+}: {
+  stateProd: Pick<TstateProd, 'qty_reduce' | 'modifyedProduct'>;
+}) => {
   const qty_reduce = Number(stateProd.qty_reduce || 0);
   const qty_modifyed = calcQtyModify({ modifyedProduct: stateProd.modifyedProduct });
   const qty_reduceModified = new Decimal(qty_reduce).add(qty_modifyed).toNumber();

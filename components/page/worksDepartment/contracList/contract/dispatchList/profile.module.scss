@@ -1,10 +1,27 @@
 .profile {
+  display: grid;
+  grid-template-columns: 845px 500px;
+  justify-content: space-between;
 }
 
-.info {
+.left {
   display: grid;
   grid-template-columns: 350px 350px;
   gap: 20px;
   justify-content: space-between;
-  width: 845px;
+}
+.right {
+  padding: 10px;
+  background-color: theme("colors.bgc01");
+}
+.contractPersonList {
+  display: grid;
+  grid-template-columns: 20px 1fr 1.5fr;
+  gap: 10px 20px;
+  align-items: center;
+}
+
+.iconBtn {
+  width: 20px;
+  height: 20px;
 }

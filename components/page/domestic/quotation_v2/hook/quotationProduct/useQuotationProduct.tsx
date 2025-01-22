@@ -567,16 +567,18 @@ const useQuotationProduct = ({
     removeProd(prodKey);
 
     if (!rootProduct) {
-      console.error('prodKey', prodKey);
-      console.error('state_prodDict', state_prodDict);
-
-      throw new Error('removeProd_withIterative，rootProduct不存在');
+      // console.error('prodKey', prodKey);
+      // console.error('state_prodDict', state_prodDict);
+      // throw new Error('removeProd_withIterative，rootProduct不存在');
     }
 
-    delete rootProduct.modifyedProduct[prodKey];
-    rootProduct.deductedPrice = calcProdDeductedPrice({ stateProd: rootProduct });
+    if (rootProduct) {
+      delete rootProduct.modifyedProduct[prodKey];
+      rootProduct.deductedPrice = calcProdDeductedPrice({ stateProd: rootProduct });
 
-    rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
+      rootProduct.renderCount = (rootProduct.renderCount ?? 0) + 1;
+    }
+
     setState_iterativeProdDict({ ...state_iterativeProdDict });
   };
 
@@ -619,6 +621,14 @@ const useQuotationProduct = ({
       state_iterativeProdDict,
       createClassProd,
     });
+  };
+
+  const checkIsIterativeProdValid = () => {
+    const IsIterativeProdInvalid = Object.values(state_iterativeProdDict).some(
+      (stateProd) => !stateProd.isQuantityValid
+    );
+
+    return !IsIterativeProdInvalid;
   };
 
   // const calcProductBody_2 = () => {
@@ -803,6 +813,7 @@ const useQuotationProduct = ({
     calcProductBody,
     doorModelSummery,
     doorModelSummery_reduceModified,
+    checkIsIterativeProdValid,
   };
 };
 

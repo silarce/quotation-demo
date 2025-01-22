@@ -31,6 +31,11 @@ const useQuotationOther = ({
   const createSetOther = (index: number) => {
     const setOther: TsetOther = (key, value) => {
       setState((prev) => {
+        if (key === 'unitPrice') {
+          const value_num = Number(value);
+          value = isNaN(value_num) ? '' : `${Math.floor(value_num)}`;
+        }
+
         const copy = [...prev];
 
         const target = copy[index];
@@ -41,7 +46,7 @@ const useQuotationOther = ({
           const quantity = new Decimal(target.quantity || 0);
           const unitPrice = new Decimal(target.unitPrice || 0);
 
-          target.totalPrice = quantity.mul(unitPrice).toNumber().toString() as `${number}`;
+          target.totalPrice = quantity.mul(unitPrice).toDecimalPlaces(0).toString() as `${number}`;
         }
 
         copy[index] = { ...target };
@@ -61,7 +66,7 @@ const useQuotationOther = ({
     let allTotal_d = new Decimal(0);
 
     (newState ?? state).forEach((other) => {
-      allTotal_d = allTotal_d.add(other.totalPrice);
+      allTotal_d = allTotal_d.add(other.totalPrice || 0);
     });
 
     return allTotal_d.toNumber();
