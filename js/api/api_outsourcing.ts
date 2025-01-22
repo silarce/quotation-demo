@@ -333,10 +333,13 @@ export const useGetOutsourcingPayment_id_kit = (
       return;
     }
 
-    await apiGetOutsourcingPayment_id(id, params)
-      .then(async (outsourcingPayment) => {
+    setIsLoading(true);
+    await get()
+      .then(async (res) => {
+        const { outsourcingPayment, attachments } = res ?? {};
+        // const attachments = await apiGetOutsourcingPaymentAttachments(id);
+
         setRes(outsourcingPayment);
-        const attachments = await apiGetOutsourcingPaymentAttachments(id);
         setAttachments(attachments);
 
         return {
@@ -353,12 +356,24 @@ export const useGetOutsourcingPayment_id_kit = (
         });
         console.error(err);
       });
+    setIsLoading(false);
+  };
+
+  const handlePatch = async (...params: Parameters<typeof patch>) => {
+    return await patch(...params)
+      .then(() => {
+        autoUpdate && update();
+      })
+      .catch(() => {
+        myAlert.err({ title: '更新失敗' });
+      });
   };
 
   return {
     data: res,
     attachments,
     update,
+    handlePatch,
     isLoading_outsourcingPayment: isLoading,
   };
 };
@@ -498,7 +513,7 @@ const apiKit_outsourcingPayment = (
       return;
     }
 
-    await apiGetOutsourcingPayment_id(id, params_get)
+    return await apiGetOutsourcingPayment_id(id, params_get)
       .then(async (outsourcingPayment) => {
         const attachments = await apiGetOutsourcingPaymentAttachments(id);
 

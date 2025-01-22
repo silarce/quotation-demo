@@ -31,7 +31,8 @@ import {
   ToutsourcingPaymentDto,
   useGetOutsourcing,
   useGetOutsourcingPayment,
-  useGetOutsourcingPayment_id,
+  // useGetOutsourcingPayment_id,
+  useGetOutsourcingPayment_id_kit,
   useGetOutsourcingPaymentDetail,
   apiPatchOutsourcingPayment,
   TupdateOutsourcingPaymentDto,
@@ -94,7 +95,14 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     ],
   };
 
-  const { data: data_payment, update: update_payment } = useGetOutsourcingPayment_id(paymentId, params);
+  const {
+    data: data_payment,
+    attachments,
+    update: update_payment,
+  } = useGetOutsourcingPayment_id_kit(paymentId, {
+    customerParams: params,
+    autoUpdate: false,
+  });
 
   const params_paymentDetail: Tparams = {
     populate: ['engineeringContact'],
