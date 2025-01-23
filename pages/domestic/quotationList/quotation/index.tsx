@@ -2104,7 +2104,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   })();
 
   const customeRight = [
-    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
+    !contentId &&
+    (status === 'Budget' || status === 'Bidding' || status === 'Contracting' || 'Pending' || 'TempPending') ? (
       <Dropdown
         key="0"
         // placement="bottomRight"
