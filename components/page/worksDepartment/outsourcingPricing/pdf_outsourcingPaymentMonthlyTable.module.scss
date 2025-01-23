@@ -1,8 +1,28 @@
+.cell {
+  border-right: solid 1px black;
+  border-bottom: solid 1px black;
+}
+
+.borderTop {
+  border-top: solid 1px black;
+}
+
+.page {
+  border: solid 1px theme("colors.border");
+  padding: 100px 50px;
+  font-size: 16px;
+}
+.table {
+  // padding-bottom: 300px;
+  // overflow: hidden;
+  border: solid 1px black;
+}
+
 .top {
   display: flex;
   justify-content: space-between;
   padding: 0 30px;
-  font-size: 20px;
+
   .left {
     border-bottom: solid 1px black;
     > span {
@@ -17,6 +37,104 @@
       display: inline-block;
       min-width: 200px;
       text-align: center;
+    }
+  }
+}
+
+$indexNumber: 50px;
+$idNumber: 1fr;
+$projectName: 1fr;
+$installPrice: 1fr;
+$supplyPrice: 1fr;
+$subTotal: 1fr;
+$priceCheck: 1fr;
+
+.centeredCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.row {
+  display: grid;
+  grid-template-columns:
+    $indexNumber
+    $idNumber
+    $projectName
+    $installPrice
+    $supplyPrice
+    $subTotal
+    $priceCheck;
+  > .cell {
+    padding: 5px;
+    line-height: 16px;
+    @extend .cell;
+    &.indexNumber {
+      @extend .centeredCell;
+    }
+    &:last-child {
+      border-right: none;
+    }
+  }
+  &:last-of-type {
+    .cell {
+      border-bottom: none;
+    }
+  }
+  //
+  &.thead > .cell {
+    @extend .centeredCell;
+    font-weight: bold;
+  }
+}
+
+.total {
+  @extend .borderTop;
+  padding: 20px 10px;
+  > span {
+    display: inline-block;
+  }
+}
+
+.deductionTotal {
+  @extend .borderTop;
+  display: grid;
+  grid-template-columns: 50px repeat(6, 1fr);
+  grid-template-rows: 27px 25px 70px;
+
+  grid-template-areas:
+    "a b b b b g h"
+    "a c d e f g h"
+    "i j k l m n o";
+
+  .cell {
+    @extend .cell;
+    @extend .centeredCell;
+  }
+
+  @each $area in a, b, c, d, e, f, g, h, i, j, k, l, m, n, o {
+    :global(.#{$area}) {
+      grid-area: #{$area};
+    }
+  }
+}
+
+.actualAmountReceived {
+  padding: 5px 30px;
+}
+
+.review {
+  @extend .borderTop;
+  display: grid;
+  // grid-template-columns: 50px 1.6fr 0.4fr 1fr 0.4fr 1.6fr 0.4fr 1fr;
+  grid-template-columns: 50px 1.6fr 0.4fr 1fr 0.4fr 1.22fr 0.4fr 1fr;
+  height: 80px;
+
+  > .cell {
+    @extend .centeredCell;
+    border-bottom: none;
+    &.title {
+      writing-mode: vertical-rl;
     }
   }
 }
