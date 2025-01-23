@@ -1,0 +1,22 @@
+.top {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  font-size: 20px;
+  .left {
+    border-bottom: solid 1px black;
+    > span {
+      display: inline-block;
+      min-width: 50px;
+      text-align: center;
+    }
+  }
+  .right {
+    border-bottom: solid 1px black;
+    > span {
+      display: inline-block;
+      min-width: 200px;
+      text-align: center;
+    }
+  }
+}

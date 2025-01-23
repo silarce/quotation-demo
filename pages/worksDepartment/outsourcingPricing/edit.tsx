@@ -11,6 +11,7 @@ import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/Pag
 // component
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import Pdf_outsourcingPaymentMonthlyTable from 'components/page/worksDepartment/outsourcingPricing/pdf_outsourcingPaymentMonthlyTable';
 
 // antd
 import { Upload } from 'antd';
@@ -996,11 +997,14 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           btnPropsArr={reviewModalBtnArr}
           onCancel={() => setShowReiveModal(false)}
         />
+
+        <Pdf_outsourcingPaymentMonthlyTable visible={true} />
       </div>
     </SubLayer>
   );
 }
 
+// MARK: END
 // ======================================================================
 // ======================================================================
 // ======================================================================
