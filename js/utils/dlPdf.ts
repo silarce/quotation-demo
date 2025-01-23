@@ -1,5 +1,6 @@
 // import html2canvas, { Options } from 'html2canvas';
 import jsPDF from 'jspdf';
+import Decimal from 'decimal.js';
 
 import domtoimage from 'dom-to-image';
 // import domtoimage from 'dom-to-image-more';
@@ -95,9 +96,15 @@ const dlPdf = async ({
   showRootLoading(false);
 };
 
-const calcHeight_a4 = (width: number) => {
+const calcHeight_a4 = (width: number, { round = true }: { round?: boolean } = {}) => {
   // 210/297 這是width/height的比例
-  return Math.round(width / (210 / 297));
+
+  // const height = width / (210 / 297);
+  const height = new Decimal(width).div(210).times(297).toDecimalPlaces(4).toNumber();
+
+  return round ? Math.round(height) : height;
+
+  // return Math.round(width / (210 / 297));
 };
 
 export { dlPdf, calcHeight_a4 };
