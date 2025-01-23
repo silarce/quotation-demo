@@ -12,6 +12,9 @@ import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/Pag
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 
+// antd
+import { Upload } from 'antd';
+
 // gear
 import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar';
@@ -53,8 +56,6 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { useAttachment } from 'hooks/attachment/useAttachment';
 
 // ======================================================================
-import type { UploadProps } from 'antd';
-import { Button, Upload } from 'antd';
 
 // ======================================================================
 
@@ -88,8 +89,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
 
   // -------------------------------------------------------------------------
-
-  // -------------------------------------------------------------------------
   const params: Tparams = {
     populate: [
       'outsourcing',
@@ -117,9 +116,9 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     willDeleteArr,
     addFile,
     removeFile,
-    createFileArr,
+    // createFileArr,
+    getAttachmentFormData,
     // removeFile_withConfirm,
-
     // fileInfoKitArr,
   } = useAttachment({
     rawArr: attachments,
@@ -309,9 +308,13 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       reviewCashierEmployeeId: cashier?.id,
     };
 
+    const attachmentArr = await getAttachmentFormData();
+    const attachmentIdArr_willDelete = willDeleteArr.map((file) => file.uid);
+
     try {
       setIsLoading(true);
-      await apiPatchOutsourcingPayment(paymentId, body);
+      // await apiPatchOutsourcingPayment(paymentId, body);
+      await patchOutsourcingPayment({ body, attachmentArr, attachmentIdArr_willDelete });
       await update_payment();
       setDisabled(true);
     } catch (error) {

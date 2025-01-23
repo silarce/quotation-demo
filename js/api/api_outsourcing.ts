@@ -532,11 +532,11 @@ const apiKit_outsourcingPayment = (
   const patch = async ({
     body,
     attachmentArr,
-    attachmentIdArr_willDelete,
+    attachmentIdArr_willDelete = [],
   }: {
     body: TupdateOutsourcingPaymentDto;
     attachmentArr: FormData[];
-    attachmentIdArr_willDelete: string[];
+    attachmentIdArr_willDelete?: string[];
   }) => {
     if (!id) {
       myAlert.err({ title: '沒有id' });
