@@ -196,16 +196,16 @@ const useDefaultState = (rawArr: Traw[] | undefined | null) => {
   return defaultState;
 };
 
-const createAttachmentArr = (fileArr: File[]) => {
-  const attachmentArr: FormData[] = [];
+const createFromDataArr = (fileArr: File[]) => {
+  const formDataArr: FormData[] = [];
 
   for (const file of fileArr) {
     const formData = new FormData();
     formData.append('file', file);
-    attachmentArr.push(formData);
+    formDataArr.push(formData);
   }
 
-  return attachmentArr;
+  return formDataArr;
 };
 
 const createFileArr = async (fileInfoArr: TfileInfo[]) => {
@@ -234,7 +234,7 @@ const createFileArr = async (fileInfoArr: TfileInfo[]) => {
 const fileInfoToFormData = async (fileInfoArr: TfileInfo[]) => {
   const fileArr = await createFileArr(fileInfoArr);
 
-  const formDataArr = createAttachmentArr(fileArr);
+  const formDataArr = createFromDataArr(fileArr);
 
   return formDataArr;
 };
