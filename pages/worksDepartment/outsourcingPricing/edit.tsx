@@ -1008,8 +1008,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
         />
 
         <Pdf_outsourcingPaymentMonthlyTable
-          // visible={showPdfModal}
-          visible={true}
+          visible={showPdfModal}
           onCancel={() => setShowPdfModal(false)}
           rowArr={fakeRow}
         />
@@ -1475,7 +1474,7 @@ const fakeData = {
   projectName: 'Meow',
   installPrice: 'Meow',
   supplyPrice: 'Meow',
-  subTotal: 'Meow',
+  subTotal: 9999,
   priceCheck: 'Meow',
 };
 const fakeData_2 = {
@@ -1484,7 +1483,7 @@ const fakeData_2 = {
   projectName: 'MEOWMEOW MEOWMEOW MEOWMEOWMEOW MEOWMEOW',
   installPrice: 'Meow',
   supplyPrice: 'Meow',
-  subTotal: 'Meow',
+  subTotal: 9999,
   priceCheck: 'Meow',
 };
 const fakeData_3 = {
@@ -1493,7 +1492,7 @@ const fakeData_3 = {
   projectName: 'WoofWoof WoofWoof',
   installPrice: 'Meow',
   supplyPrice: 'Meow',
-  subTotal: 'Meow',
+  subTotal: 9999,
   priceCheck: 'Meow',
 };
 

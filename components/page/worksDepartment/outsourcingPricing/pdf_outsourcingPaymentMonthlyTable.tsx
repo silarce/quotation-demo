@@ -17,7 +17,8 @@ type Trow = {
   projectName: React.ReactNode;
   installPrice: React.ReactNode;
   supplyPrice: React.ReactNode;
-  subTotal: React.ReactNode;
+  // subTotal: React.ReactNode;
+  subTotal: number;
   priceCheck: React.ReactNode;
 };
 
@@ -28,6 +29,20 @@ interface Tprops_page {
 
 type Tprops = {
   rowArr: Trow[];
+  month: React.ReactNode;
+  day: React.ReactNode;
+  signer: React.ReactNode; //右上方的名字
+  latestPeriodRemain: number; // 上期保留
+  deduction_5percent: React.ReactNode; // 應扣明細 5%
+  deduction_10percent: React.ReactNode; // 應扣明細 保留10%
+  deduction_installationMaterials: React.ReactNode; // 應扣明細 按裝物料
+  deduction_laborInsuranceLoan: React.ReactNode; // 應扣明細 借支勞保
+  deduction_amount: React.ReactNode; // 應扣明細 核扣金額
+  actualAmountReceived: number; // 實領金額
+  managerName: React.ReactNode; // 核准
+  supervisorName: React.ReactNode; // 主管
+  checkerName: React.ReactNode; // 核對
+  agentName: React.ReactNode; // 經辦
 };
 
 // ======================================================================
@@ -105,6 +120,10 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
       <br />
       <br />
 
+      {/* 
+考慮修改UI?
+還是等有實際需求時再說吧
+*/}
       {chunkedRowArr.map((rowArr, index_p) => {
         return (
           <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
