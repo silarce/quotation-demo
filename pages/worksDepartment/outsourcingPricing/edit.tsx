@@ -74,6 +74,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   const [disabled, setDisabled] = useState<boolean>(true);
   // 審核modal
   const [showReiveModal, setShowReiveModal] = useState<boolean>(false);
+
+  const [showPdfModal, setShowPdfModal] = useState<boolean>(false);
   // -------------------------------------------------------------------------
   const [manager, setManager] = useState<TemployeeDto>();
   const [supervisor, setSupervisor] = useState<TemployeeDto>();
@@ -895,6 +897,13 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     // },
     {
       type: 'myButton',
+      label: '匯出',
+      onClick: () => {
+        setShowPdfModal(true);
+      },
+    },
+    {
+      type: 'myButton',
       label: '編輯',
       onClick: () => {
         setDisabled(false);
@@ -998,7 +1007,12 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           onCancel={() => setShowReiveModal(false)}
         />
 
-        <Pdf_outsourcingPaymentMonthlyTable visible={true} />
+        <Pdf_outsourcingPaymentMonthlyTable
+          // visible={showPdfModal}
+          visible={true}
+          onCancel={() => setShowPdfModal(false)}
+          rowArr={fakeRow}
+        />
       </div>
     </SubLayer>
   );
@@ -1453,4 +1467,72 @@ const create_emptyDeduction = (): TdeductionDto => ({
   type: '',
   itemName: '',
   price: 0,
+});
+
+const fakeData = {
+  indexNumber: 'put array index',
+  idNumber: 'Meow',
+  projectName: 'Meow',
+  installPrice: 'Meow',
+  supplyPrice: 'Meow',
+  subTotal: 'Meow',
+  priceCheck: 'Meow',
+};
+const fakeData_2 = {
+  indexNumber: 'put array index',
+  idNumber: 'Meow',
+  projectName: 'MEOWMEOW MEOWMEOW MEOWMEOWMEOW MEOWMEOW',
+  installPrice: 'Meow',
+  supplyPrice: 'Meow',
+  subTotal: 'Meow',
+  priceCheck: 'Meow',
+};
+const fakeData_3 = {
+  indexNumber: 'put array index',
+  idNumber: 'Meow',
+  projectName: 'WoofWoof WoofWoof',
+  installPrice: 'Meow',
+  supplyPrice: 'Meow',
+  subTotal: 'Meow',
+  priceCheck: 'Meow',
+};
+
+const fakeRow_pre = [
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData_2,
+  fakeData_3,
+  fakeData_3,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData_2,
+  fakeData_3,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+  fakeData,
+];
+
+// const fakeRow = Array.from({
+//   length: 15,
+// }).map((_, index) => {
+//   return {
+//     ...fakeData,
+//     indexNumber: index + 1,
+//   };
+// });
+const fakeRow = fakeRow_pre.map((item, index) => {
+  return {
+    ...item,
+    indexNumber: index + 1,
+  };
 });

@@ -1,9 +1,34 @@
+import { useState, forwardRef, useRef, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+
 import { Modal, ModalProps } from 'antd';
 
-import { calcHeight_a4 } from 'js/utils/dlPdf';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+
+import { calcHeight_a4, dlPdf } from 'js/utils/dlPdf';
 
 import scss from './pdf_outsourcingPaymentMonthlyTable.module.scss';
+
+// ======================================================================
+
+type Trow = {
+  indexNumber: React.ReactNode;
+  idNumber: React.ReactNode;
+  projectName: React.ReactNode;
+  installPrice: React.ReactNode;
+  supplyPrice: React.ReactNode;
+  subTotal: React.ReactNode;
+  priceCheck: React.ReactNode;
+};
+
+interface Tprops_page {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+type Tprops = {
+  rowArr: Trow[];
+};
 
 // ======================================================================
 const width = 20;
@@ -13,125 +38,162 @@ const style = {
   width: `${width}cm`,
   height: `${height}cm`,
 };
+
+// 這個值是在直接在控制台看rowContainer的高度而定義的
+// 基本上可以是任意高度，只要符合使用者需求就可以了
+const allowHeight = 323;
+
 // ======================================================================
 
 // 外包商當月計價總表
-export default function Pdf_outsourcingPaymentMonthlyTable({ ...modalProps }: ModalProps) {
+export default function Pdf_outsourcingPaymentMonthlyTable({
+  //
+  rowArr,
+  ...modalProps
+}: Tprops & ModalProps) {
+  const ref_pageArr = useRef<(HTMLDivElement | null)[]>([]);
+  const ref_rowArr = useRef<(HTMLDivElement | null)[]>([]);
+
+  const [isRowArrRendered, setIsRowArrRendered] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    const divElementArr = ref_pageArr.current;
+
+    await dlPdf({
+      divElementArr,
+      fileName: '外包商當月計價總表',
+    });
+  };
+
+  const chunkedRowArr = useMemo(() => {
+    const arr_container: Trow[][] = [];
+    let arr: Trow[] = [];
+    let accumulationHeight = 0;
+
+    ref_rowArr.current.forEach((element, index) => {
+      const height = element?.getBoundingClientRect().height ?? 0;
+
+      if (accumulationHeight + height > allowHeight) {
+        arr_container.push(arr);
+        arr = [];
+        accumulationHeight = 0;
+      }
+
+      accumulationHeight += height;
+      arr.push(rowArr[index]);
+
+      if (index === ref_rowArr.current.length - 1) {
+        arr_container.push(arr);
+      }
+    });
+
+    return arr_container;
+  }, [isRowArrRendered, rowArr]);
+
+  useEffect(() => {
+    if (!modalProps.visible) {
+      ref_pageArr.current = [];
+      ref_rowArr.current = [];
+      setIsRowArrRendered(false);
+    }
+  }, [modalProps.visible]);
+
   return (
-    <Modal {...modalProps} width="fit-content" footer={null} style={{ marginLeft: '20px' }}>
-      <Page />
+    <Modal {...modalProps} width="fit-content" footer={null} destroyOnClose={true}>
+      <SquareBtn onClick={handleDownloadPdf}>下載PDF</SquareBtn>
+
+      <br />
+      <br />
+
+      {chunkedRowArr.map((rowArr, index_p) => {
+        return (
+          <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
+            {rowArr.map((item, index) => {
+              const { indexNumber, idNumber, projectName, installPrice, supplyPrice, subTotal, priceCheck } = item;
+
+              return (
+                <Row
+                  key={index}
+                  ref={(ref) => {
+                    !isRowArrRendered && setIsRowArrRendered(true);
+
+                    ref_rowArr.current[index] = ref;
+                  }}
+                  indexNumber={indexNumber}
+                  idNumber={idNumber}
+                  projectName={projectName}
+                  installPrice={installPrice}
+                  supplyPrice={supplyPrice}
+                  subTotal={subTotal}
+                  priceCheck={priceCheck}
+                />
+              );
+            })}
+          </Page>
+        );
+      })}
+
+      {/* 模板page */}
+      <div className={scss.hiddenWrapper}>
+        <Page>
+          {rowArr.map((item, index) => {
+            const { indexNumber, idNumber, projectName, installPrice, supplyPrice, subTotal, priceCheck } = item;
+
+            return (
+              <Row
+                key={index}
+                ref={(ref) => {
+                  !isRowArrRendered && setIsRowArrRendered(true);
+
+                  ref_rowArr.current[index] = ref;
+                }}
+                indexNumber={indexNumber}
+                idNumber={idNumber}
+                projectName={projectName}
+                installPrice={installPrice}
+                supplyPrice={supplyPrice}
+                subTotal={subTotal}
+                priceCheck={priceCheck}
+              />
+            );
+          })}
+        </Page>
+      </div>
+
+      {/*  */}
     </Modal>
   );
 }
 
 // ======================================================================
 
-const Page = () => {
+const Row_forwardRef = (
+  props: {
+    className?: string;
+    indexNumber: React.ReactNode;
+    idNumber: React.ReactNode;
+    projectName: React.ReactNode;
+    installPrice: React.ReactNode;
+    supplyPrice: React.ReactNode;
+    subTotal: React.ReactNode;
+    priceCheck: React.ReactNode;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
+  const {
+    className,
+
+    indexNumber,
+    idNumber,
+    projectName,
+    installPrice,
+    supplyPrice,
+    subTotal,
+    priceCheck,
+  } = props;
+
   return (
-    <div className={scss.page} style={style}>
-      <div className={classNames(scss.top, 'mb-3')}>
-        <div className={scss.left}>
-          <span>{111}</span>年<span>{11}</span>月
-        </div>
-        <div className={scss.right}>
-          <span>{'王汪汪'}</span>按裝明細
-        </div>
-      </div>
-
-      <Table />
-    </div>
-  );
-};
-
-const Table = () => {
-  return (
-    <div className={scss.table}>
-      {/*  */}
-
-      <div className={scss.rowWrapper}>
-        <Row_thead />
-        {Array.from({ length: 12 }).map((_, i) => (
-          <Row
-            key={i}
-            indexNumber="121"
-            idNumber="meow"
-            projectName="meow"
-            installPrice="meow"
-            supplyPrice="meow"
-            subTotal="meow"
-            priceCheck="meow"
-          />
-        ))}
-      </div>
-      {/*  */}
-      <div className={scss.total}>
-        <span className="">請款合計:</span>
-        <span className="border-b border-black w-[120px] text-center">{9999}</span>
-        <span className="mx-2">＋</span>
-        <span className="">上期保留:</span>
-        <span className="border-b border-black w-[120px] text-center">{9999}</span>
-        <span className="mx-4">＝</span>
-        <span className="border-b border-black w-[160px] text-center">9999</span>
-      </div>
-      {/*  */}
-      <div className={scss.deductionTotal}>
-        <Cell className={classNames('a')}>減</Cell>
-        <Cell className={classNames('b')}>應扣明細</Cell>
-        <Cell className={classNames('c')}>5%</Cell>
-        <Cell className={classNames('d')}>保留　10%</Cell>
-        <Cell className={classNames('e')}>按裝物料</Cell>
-        <Cell className={classNames('f')}>借支勞保</Cell>
-        <Cell className={classNames('g')}>應扣明細</Cell>
-        <Cell className={classNames('h')}>核扣金額</Cell>
-        <Cell className={classNames('i')}>金額</Cell>
-        <Cell className={classNames('j')}>j</Cell>
-        <Cell className={classNames('k')}>k</Cell>
-        <Cell className={classNames('l')}>l</Cell>
-        <Cell className={classNames('m')}>m</Cell>
-        <Cell className={classNames('n')}>n</Cell>
-        <Cell className={classNames('o')}>o</Cell>
-      </div>
-      {/*  */}
-      <div className={scss.actualAmountReceived}>實　領　金　額</div>
-      {/*  */}
-      <div className={scss.review}>
-        <Cell className={scss.title}>核　准</Cell>
-        <Cell>2</Cell>
-        <Cell className={scss.title}>主　管</Cell>
-        <Cell>4</Cell>
-        <Cell className={scss.title}>核　對</Cell>
-        <Cell>6</Cell>
-        <Cell className={scss.title}>經　辦</Cell>
-        <Cell>8</Cell>
-      </div>
-      {/*  */}
-    </div>
-  );
-};
-
-const Row = ({
-  className,
-
-  indexNumber,
-  idNumber,
-  projectName,
-  installPrice,
-  supplyPrice,
-  subTotal,
-  priceCheck,
-}: {
-  className?: string;
-
-  indexNumber: React.ReactNode;
-  idNumber: React.ReactNode;
-  projectName: React.ReactNode;
-  installPrice: React.ReactNode;
-  supplyPrice: React.ReactNode;
-  subTotal: React.ReactNode;
-  priceCheck: React.ReactNode;
-}) => {
-  return (
-    <div className={classNames(scss.row, className)}>
+    <div ref={ref} className={classNames(scss.row, className)}>
       <Cell className={classNames(scss.indexNumber)}>{indexNumber}</Cell>
       <Cell>{idNumber}</Cell>
       <Cell>{projectName}</Cell>
@@ -142,6 +204,8 @@ const Row = ({
     </div>
   );
 };
+
+const Row = forwardRef(Row_forwardRef);
 
 const Row_thead = () => {
   return (
@@ -167,3 +231,81 @@ const Cell = (props: React.HTMLAttributes<HTMLDivElement>) => {
     </div>
   );
 };
+
+const Top = () => {
+  return (
+    <div className={classNames(scss.top, 'mb-3')}>
+      <div className={scss.left}>
+        <span>{111}</span>年<span>{11}</span>月
+      </div>
+      <div className={scss.right}>
+        <span>{'王汪汪'}</span>按裝明細
+      </div>
+    </div>
+  );
+};
+
+const Bottom = () => {
+  return (
+    <>
+      <div className={scss.total}>
+        <span className="">請款合計:</span>
+        <span className="border-b border-black w-[120px] text-center">{9999}</span>
+        <span className="mx-2">＋</span>
+        <span className="">上期保留:</span>
+        <span className="border-b border-black w-[120px] text-center">{9999}</span>
+        <span className="mx-4">＝</span>
+        <span className="border-b border-black w-[160px] text-center">9999</span>
+      </div>
+
+      <div className={scss.deductionTotal}>
+        <Cell className={classNames(scss.a)}>減</Cell>
+        <Cell className={classNames(scss.b)}>應扣明細</Cell>
+        <Cell className={classNames(scss.c)}>5%</Cell>
+        <Cell className={classNames(scss.d)}>保留　10%</Cell>
+        <Cell className={classNames(scss.e)}>按裝物料</Cell>
+        <Cell className={classNames(scss.f)}>借支勞保</Cell>
+        <Cell className={classNames(scss.g)}>應扣明細</Cell>
+        <Cell className={classNames(scss.h)}>核扣金額</Cell>
+        <Cell className={classNames(scss.i, scss.textVertical)}>金　額</Cell>
+        <Cell className={classNames(scss.j)}>j</Cell>
+        <Cell className={classNames(scss.k)}>k</Cell>
+        <Cell className={classNames(scss.l)}>l</Cell>
+        <Cell className={classNames(scss.m)}>m</Cell>
+        <Cell className={classNames(scss.n)}>n</Cell>
+        <Cell className={classNames(scss.o)}>o</Cell>
+      </div>
+
+      <div className={scss.actualAmountReceived}>實　領　金　額 :{9999}</div>
+
+      <div className={scss.review}>
+        <Cell className={scss.textVertical}>核　准</Cell>
+        <Cell>2</Cell>
+        <Cell className={scss.textVertical}>主　管</Cell>
+        <Cell>4</Cell>
+        <Cell className={scss.textVertical}>核　對</Cell>
+        <Cell>6</Cell>
+        <Cell className={scss.textVertical}>經　辦</Cell>
+        <Cell>8</Cell>
+      </div>
+    </>
+  );
+};
+
+const Page_forwardRef = ({ children, className }: Tprops_page, ref: React.Ref<HTMLDivElement>) => {
+  return (
+    <div ref={ref} className={classNames(scss.page, className)} style={style}>
+      <Top />
+
+      <div className={scss.table}>
+        <Row_thead />
+
+        <div className={scss.rowContainer}>{children}</div>
+
+        <Bottom />
+      </div>
+    </div>
+  );
+};
+
+const Page = forwardRef(Page_forwardRef);

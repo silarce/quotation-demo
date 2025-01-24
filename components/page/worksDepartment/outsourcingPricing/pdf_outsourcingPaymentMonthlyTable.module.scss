@@ -2,6 +2,9 @@
   border-right: solid 1px black;
   border-bottom: solid 1px black;
 }
+.textVertical {
+  writing-mode: vertical-rl;
+}
 
 .borderTop {
   border-top: solid 1px black;
@@ -68,6 +71,7 @@ $priceCheck: 1fr;
   > .cell {
     padding: 5px;
     line-height: 16px;
+    word-break: break-all;
     @extend .cell;
     &.indexNumber {
       @extend .centeredCell;
@@ -113,9 +117,13 @@ $priceCheck: 1fr;
   }
 
   @each $area in a, b, c, d, e, f, g, h, i, j, k, l, m, n, o {
-    :global(.#{$area}) {
+    .#{$area} {
       grid-area: #{$area};
     }
+  }
+  .h,
+  .o {
+    border-right: none;
   }
 }
 
@@ -126,15 +134,20 @@ $priceCheck: 1fr;
 .review {
   @extend .borderTop;
   display: grid;
-  // grid-template-columns: 50px 1.6fr 0.4fr 1fr 0.4fr 1.6fr 0.4fr 1fr;
   grid-template-columns: 50px 1.6fr 0.4fr 1fr 0.4fr 1.22fr 0.4fr 1fr;
   height: 80px;
 
   > .cell {
     @extend .centeredCell;
     border-bottom: none;
-    &.title {
-      writing-mode: vertical-rl;
+    &:nth-last-of-type(1) {
+      border-right: none;
     }
   }
+}
+
+.hiddenWrapper {
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
