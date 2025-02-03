@@ -906,10 +906,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // -------------------------------------------------------------------------
 
-  const foo = useMemo(() => {
-    console.log('data_payment', data_payment);
-    console.log('paymentDetail', paymentDetail);
-
+  const props_pdf = useMemo(() => {
     const rowArr: Tprop_pdf['rowArr'] = (paymentDetail ?? []).map((detail, index) => {
       const { outsourcingTotal, engineeringContact: { projectName, projectNumber } = {} } = detail;
 
@@ -926,7 +923,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       return row;
     });
 
-    const { date: paymentDate, priorPeriodRetainage } = data_payment ?? {};
+    const { date: paymentDate } = data_payment ?? {};
 
     const date = paymentDate ? moment(paymentDate) : null;
     const year = date && date.year() - 1911;
@@ -937,21 +934,36 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       year,
       month,
       signer: null,
-      latestPeriodRemain: priorPeriodRetainage ?? 0, // 上期保留
-      // tax:,
-      // deduction_10percent,
-      // deduction_installationMaterials,
-      // deduction_laborInsuranceLoan,
-      // deduction_amount,
-      // actualAmountReceived,
-      // managerName,
-      // supervisorName,
-      // checkerName,
-      // agentName,
+      subTotal_detail: subTotal_detail.toLocaleString(),
+      latestPeriodRemain: latestPeriodKeep.toLocaleString(), // 上期保留
+      subTotal_detailAddLatestPeriodRemain: new Decimal(subTotal_detail)
+        .add(latestPeriodKeep)
+        .toNumber()
+        .toLocaleString(),
+      tax: tax.toLocaleString(),
+      retainage: retainage.toLocaleString(),
+      deduction_installationMaterials: null,
+      deduction_laborInsuranceLoan: null,
+      subTotal_deduction: subTotal_deduction.toLocaleString(),
+      deduction_amount: null,
+      actualAmountReceived: actualAmountReceived.toLocaleString(),
+      managerName: null,
+      supervisorName: null,
+      checkerName: null,
+      agentName: null,
     };
 
     return props_pdf;
-  }, [paymentDetail, data_payment]);
+  }, [
+    data_payment,
+    subTotal_detail,
+    paymentDetail,
+    latestPeriodKeep,
+    tax,
+    retainage,
+    subTotal_deduction,
+    actualAmountReceived,
+  ]);
 
   // -------------------------------------------------------------------------
 
@@ -1100,7 +1112,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
         <Pdf_outsourcingPaymentMonthlyTable
           visible={showPdfModal}
           onCancel={() => setShowPdfModal(false)}
-          rowArr={fakeRow}
+          // rowArr={fakeRow}
+          {...props_pdf}
         />
       </div>
     </SubLayer>

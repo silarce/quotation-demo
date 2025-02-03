@@ -32,13 +32,16 @@ type Tprops = {
   year: React.ReactNode;
   month: React.ReactNode;
   signer: React.ReactNode; //右上方的名字
-  latestPeriodRemain: number; // 上期保留
+  subTotal_detail: React.ReactNode; // 請款合計
+  latestPeriodRemain: React.ReactNode; // 上期保留
+  subTotal_detailAddLatestPeriodRemain: React.ReactNode; // 請款合計 + 上期保留
   tax: React.ReactNode; // tax 5%
-  deduction_10percent: React.ReactNode; // 應扣明細 保留10%
+  retainage: React.ReactNode; // 應扣明細 保留10%
   deduction_installationMaterials: React.ReactNode; // 應扣明細 按裝物料
   deduction_laborInsuranceLoan: React.ReactNode; // 應扣明細 借支勞保
-  deduction_amount: React.ReactNode; // 應扣明細 核扣金額
-  actualAmountReceived: number; // 實領金額
+  subTotal_deduction: React.ReactNode; // 應扣明細
+  deduction_amount: React.ReactNode; // 核扣金額
+  actualAmountReceived: React.ReactNode; // 實領金額
   managerName: React.ReactNode; // 核准
   supervisorName: React.ReactNode; // 主管
   checkerName: React.ReactNode; // 核對
@@ -66,6 +69,23 @@ const allowHeight = 323;
 export default function Pdf_outsourcingPaymentMonthlyTable({
   //
   rowArr,
+  year,
+  month,
+  signer,
+  subTotal_detail,
+  latestPeriodRemain,
+  subTotal_detailAddLatestPeriodRemain,
+  tax,
+  retainage,
+  deduction_installationMaterials,
+  deduction_laborInsuranceLoan,
+  subTotal_deduction,
+  deduction_amount,
+  actualAmountReceived,
+  managerName,
+  supervisorName,
+  checkerName,
+  agentName,
   ...modalProps
 }: Tprops & ModalProps) {
   const ref_pageArr = useRef<(HTMLDivElement | null)[]>([]);
