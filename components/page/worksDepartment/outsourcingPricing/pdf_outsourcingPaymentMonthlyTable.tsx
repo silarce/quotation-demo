@@ -67,6 +67,9 @@ const Context = createContext<Tprops>(null!);
 
 // MARK:START
 
+// 有第二頁時，UI的呈現可能不符合需求，不過也沒有說需求是什麼
+// 等到實際提出需求時再改吧
+
 // 外包商當月計價總表
 export default function Pdf_outsourcingPaymentMonthlyTable({
   //
@@ -167,10 +170,6 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
           agentName,
         }}
       >
-        {/* 
-考慮修改UI?
-還是等有實際需求時再說吧
-*/}
         {chunkedRowArr.map((rowArr, index_p) => {
           return (
             <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">

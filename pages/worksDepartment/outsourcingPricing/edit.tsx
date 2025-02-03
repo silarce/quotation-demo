@@ -1564,62 +1564,62 @@ const create_emptyDeduction = (): TdeductionDto => ({
   price: 0,
 });
 
-const fakeData = {
-  indexNumber: 'put array index',
-  idNumber: 'Meow',
-  projectName: 'Meow',
-  installPrice: 'Meow',
-  supplyPrice: 'Meow',
-  subTotal: 9999,
-  priceCheck: 'Meow',
-};
-const fakeData_2 = {
-  indexNumber: 'put array index',
-  idNumber: 'Meow',
-  projectName: 'MEOWMEOW MEOWMEOW MEOWMEOWMEOW MEOWMEOW',
-  installPrice: 'Meow',
-  supplyPrice: 'Meow',
-  subTotal: 9999,
-  priceCheck: 'Meow',
-};
-const fakeData_3 = {
-  indexNumber: 'put array index',
-  idNumber: 'Meow',
-  projectName: 'WoofWoof WoofWoof',
-  installPrice: 'Meow',
-  supplyPrice: 'Meow',
-  subTotal: 9999,
-  priceCheck: 'Meow',
-};
+// const fakeData = {
+//   indexNumber: 'put array index',
+//   idNumber: 'Meow',
+//   projectName: 'Meow',
+//   installPrice: 'Meow',
+//   supplyPrice: 'Meow',
+//   subTotal: 9999,
+//   priceCheck: 'Meow',
+// };
+// const fakeData_2 = {
+//   indexNumber: 'put array index',
+//   idNumber: 'Meow',
+//   projectName: 'MEOWMEOW MEOWMEOW MEOWMEOWMEOW MEOWMEOW',
+//   installPrice: 'Meow',
+//   supplyPrice: 'Meow',
+//   subTotal: 9999,
+//   priceCheck: 'Meow',
+// };
+// const fakeData_3 = {
+//   indexNumber: 'put array index',
+//   idNumber: 'Meow',
+//   projectName: 'WoofWoof WoofWoof',
+//   installPrice: 'Meow',
+//   supplyPrice: 'Meow',
+//   subTotal: 9999,
+//   priceCheck: 'Meow',
+// };
 
-const fakeRow_pre = [
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData_2,
-  fakeData_3,
-  fakeData_3,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData_2,
-  fakeData_3,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-  fakeData,
-];
+// const fakeRow_pre = [
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData_2,
+//   fakeData_3,
+//   fakeData_3,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData_2,
+//   fakeData_3,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+// ];
 
-const fakeRow = fakeRow_pre.map((item, index) => {
-  return {
-    ...item,
-    indexNumber: index + 1,
-  };
-});
+// const fakeRow = fakeRow_pre.map((item, index) => {
+//   return {
+//     ...item,
+//     indexNumber: index + 1,
+//   };
+// });
