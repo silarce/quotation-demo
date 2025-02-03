@@ -22,8 +22,10 @@ import type {
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
   TfileDto,
+  TcreateOutsourcingPaymentDetailDto,
+  TitemDetail,
+  TsingleItemDetail,
 } from './dtoTypes';
-import { t } from 'i18next';
 
 export type {
   Tparams,
@@ -38,6 +40,9 @@ export type {
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
+  TcreateOutsourcingPaymentDetailDto,
+  TitemDetail,
+  TsingleItemDetail,
 };
 
 // /outsourcing
@@ -493,6 +498,29 @@ export const apiPatchOutsourcingPaymentDetail = async (
       callAlert &&
         myAlert.err({
           title: '更新外包計價明細失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+export const apiPostOutsourcingPaymentDetail = async (
+  outsourcingPaymentId: string,
+  body: TcreateOutsourcingPaymentDetailDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/detail`;
+
+  return axi
+    .post(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '新增外包計價明細失敗',
           content: err.message,
         });
 

@@ -4842,6 +4842,63 @@ export type ToutsourcingPaymentDetailItemDto = {
   quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
 };
 
+export type TcreateOutsourcingPaymentDetailDto = {
+  // @ApiProperty({ description: '工程聯絡單' })
+  // @IsString()
+  // @IsUUID()
+  // @IsOptional()
+  // @IsNullable()
+  engineeringContactId: string | null;
+
+  // @ApiProperty({ description: '工程編號' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectNumber: string | null;
+
+  // @ApiProperty({ description: '工程名稱' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectName: string | null;
+
+  // @ApiProperty({ description: '項目' })
+  // @IsArray()
+  // @ValidateNested()
+  // @Type(() => CreateOutsourcingPaymentDetailItemDto)
+  // @IsOptional()
+  // installItems?: TcreateOutsourcingPaymentDetailItemDto[];
+  installItems?: undefined; // 暫時棄用
+
+  // @ApiProperty({ description: '外包計價明細總計' })
+  // @IsNumber()
+  outsourcingTotal: number;
+
+  // @ApiProperty({ description: '外包計價明細總計' })
+  // @IsArray()
+  // @ValidateNested()
+  // @Type(() => ItemDetail)
+  // @IsOptional()
+  itemDetail: TitemDetail[] | null;
+};
+
+export type TitemDetail = {
+  floorNumber: string; //樓層編號
+  width: number; //寬
+  height: number; //高
+  talent: number; //才數
+  quantity: number; //樘數
+  unitPrice: number; //一才價格
+  singleItemDetail: TsingleItemDetail[];
+};
+
+export type TsingleItemDetail = {
+  floorNumber: string; //樓層編號
+  content: string; //內容
+  quantity: number; //數量
+  unitPrice: number; //單價
+};
+
 // ====================================================================
 
 // meeting-minutes
