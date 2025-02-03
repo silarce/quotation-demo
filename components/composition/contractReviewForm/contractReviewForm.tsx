@@ -912,10 +912,16 @@ function ReviewForm({
             <div>
               <span>確定請款比例</span>
               <InputBox disabled={true} inputAttr={{ className: 'pl-4', value: allPercentStr }} />
+              <IconAdd
+                attr={{
+                  className: classNames(disabled && 'hidden'),
+                  onClick: addMethod,
+                }}
+              />
             </div>
             <div className={scss.payMethodContainer}>
               {Object.values(payMethodList).map((item, index, arr) => {
-                let onDel = arr.length > 1 ? item.delSelf : undefined;
+                let onDel: typeof item.delSelf | undefined = item.delSelf;
 
                 if (disabled) {
                   onDel = undefined;
@@ -925,7 +931,6 @@ function ReviewForm({
                   <Row
                     key={index}
                     disabled={disabled}
-                    onAdd={disabled ? undefined : addMethod}
                     onDel={onDel}
                     serialNumber={index + 1}
                     title={{
@@ -1431,13 +1436,6 @@ const InputBox = ({
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      {/* {disabled && (
-        <span {...spanAttr} className={classNames(scss.pdfSpan, spanAttr?.className)}>
-          {inputAttr?.value || textareaProps?.value}
-        </span>
-      )}
-      {!disabled && inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
-      {!disabled && textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />} */}
 
       {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
       {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
@@ -1449,7 +1447,6 @@ const InputBox = ({
 const Row = ({
   disabled,
   serialNumber,
-  onAdd,
   onDel,
   title,
   percent,
@@ -1458,7 +1455,6 @@ const Row = ({
 }: {
   disabled?: boolean;
   serialNumber: number;
-  onAdd?: () => void;
   onDel?: () => void;
   title: {
     value: string;
@@ -1470,7 +1466,6 @@ const Row = ({
   };
   price: {
     value: string;
-    // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
   note: {
     value: string;
@@ -1483,14 +1478,7 @@ const Row = ({
         <InputBox
           prefix={`${serialNumber}.`}
           disabled={disabled}
-          // inputAttr={{
-          //   disabled: disabled,
-          //   value: title.value,
-          //   onChange: title.onChange,
-          //   placeholder: '請輸入標題',
-          // }}
           textareaProps={{
-            // disabled: disabled,
             value: title.value,
             onChange: title.onChange,
             placeholder: '',
@@ -1499,13 +1487,11 @@ const Row = ({
         <InputBox
           suffix="%"
           disabled={disabled}
-          // className={scss.percent}
           className={'self-end'}
           spanAttr={{
             className: 'text-center',
           }}
           inputAttr={{
-            // disabled: disabled,
             className: 'text-center',
             value: percent.value,
             onChange: percent.onChange,
@@ -1535,19 +1521,11 @@ const Row = ({
             onChange: note.onChange,
             placeholder: '',
           }}
-          // inputAttr={{
-          //   disabled: disabled,
-          //   value: note.value,
-          //   onChange: note.onChange,
-          //   placeholder: '請輸入備註',
-          // }}
         />
       </div>
 
-      <div>
-        <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
-        {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
-        {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />}
+      <div className={classNames(!onDel && scss.hidden, scss.plus, scss.plus2, scss.plus3)}>
+        <IconDel attr={{ onClick: onDel }} />
       </div>
     </div>
   );

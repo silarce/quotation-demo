@@ -31,7 +31,8 @@
     font-weight: 400;
   }
   input {
-    padding: 0 5px;
+    // padding: 0 5px;
+    padding: 0;
   }
 
   input,
@@ -154,7 +155,13 @@
   .item2 {
     > div:nth-of-type(1) {
       display: grid;
-      grid-template-columns: fit-content(100%) 1fr;
+      grid-template-columns: fit-content(100%) 1fr auto;
+      align-items: center;
+
+      > svg {
+        margin-left: 5px;
+        cursor: pointer;
+      }
     }
   }
 }
@@ -187,28 +194,21 @@
 
   .payMethod {
     display: grid;
-    grid-template-columns: auto fit-content(100%);
-    // align-items: center;
-
-    // .percent {
-    //   align-self: center;
-    // }
+    grid-template-columns: 1fr auto;
 
     > div:nth-of-type(1) {
       display: grid;
       grid-template-columns: auto 100px 140px 300px;
       gap: 16px;
-      margin-right: 6px;
+
       input {
         height: fit-content;
       }
     }
     > div:nth-of-type(2) {
       display: flex;
-      flex-wrap: nowrap;
-      gap: 6px;
-      width: 42px;
-      margin-top: 5px;
+      align-items: center;
+      margin-left: 5px;
       > svg {
         cursor: pointer;
       }
@@ -305,10 +305,6 @@
   }
 }
 
-.hidden {
-  visibility: hidden;
-}
-
 .noteWrapper {
   display: grid;
   grid-template-columns: max-content auto;
@@ -321,6 +317,13 @@
   width: 0;
   height: 0;
   overflow: hidden;
+}
+
+.hidden,
+.hidden.plus,
+.hidden.plus.plus2,
+.hidden.plus.plus2.plus3 {
+  display: none;
 }
 
 // =====================================================================
