@@ -231,7 +231,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     });
 
     // 本期保留10% // 本期保留款
-    const retainage = new Decimal(subTotal_detail_d).mul(0.1).toNumber();
+    const retainage = new Decimal(subTotal_detail_d).mul(0.1).toDecimalPlaces(0).toNumber();
 
     // 實領金額小計
     const subTotal_actualReceived = new Decimal(subTotal_detail_d)
