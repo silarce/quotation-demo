@@ -54,7 +54,7 @@ export default function Info() {
 
   return (
     <div className={scss.container}>
-      <Image src={iconMember} alt="頭像" className={scss.avatar} />
+      <Image src={iconMember} alt="頭像" className={scss.avatar} priority={true} />
 
       <div className={scss.name}>
         <p>{departmentName}</p>
