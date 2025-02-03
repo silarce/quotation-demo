@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -11,7 +12,9 @@ import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/Pag
 // component
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
-import Pdf_outsourcingPaymentMonthlyTable from 'components/page/worksDepartment/outsourcingPricing/pdf_outsourcingPaymentMonthlyTable';
+import Pdf_outsourcingPaymentMonthlyTable, {
+  Tprops as Tprop_pdf,
+} from 'components/page/worksDepartment/outsourcingPricing/pdf_outsourcingPaymentMonthlyTable';
 
 // antd
 import { Upload } from 'antd';
@@ -865,6 +868,55 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // -------------------------------------------------------------------------
 
+  // const foo = useMemo(() => {
+  //   console.log('data_payment', data_payment);
+  //   console.log('paymentDetail', paymentDetail);
+
+  //   const rowArr: Tprop_pdf['rowArr'] = (paymentDetail ?? []).map((detail, index) => {
+  //     const { outsourcingTotal, engineeringContact: { projectName, projectNumber } = {} } = detail;
+
+  //     const row: Tprop_pdf['rowArr'][number] = {
+  //       indexNumber: index + 1,
+  //       projectNumber: projectNumber,
+  //       projectName,
+  //       installPrice: null,
+  //       supplyPrice: null,
+  //       subTotal: outsourcingTotal,
+  //       priceCheck: null,
+  //     };
+
+  //     return row;
+  //   });
+
+  //   const { date: paymentDate, priorPeriodRetainage } = data_payment ?? {};
+
+  //   const date = paymentDate ? moment(paymentDate) : null;
+  //   const year = date && date.year() - 1911;
+  //   const month = date && date.month() + 1;
+
+  //   const props_pdf: Tprop_pdf = {
+  //     rowArr,
+  //     year,
+  //     month,
+  //     signer: null,
+  //     latestPeriodRemain: priorPeriodRetainage ?? 0,
+  //     // deduction_5percent,
+  //     // deduction_10percent,
+  //     // deduction_installationMaterials,
+  //     // deduction_laborInsuranceLoan,
+  //     // deduction_amount,
+  //     // actualAmountReceived,
+  //     // managerName,
+  //     // supervisorName,
+  //     // checkerName,
+  //     // agentName,
+  //   };
+
+  //   return props_pdf;
+  // }, [paymentDetail, data_payment]);
+
+  // -------------------------------------------------------------------------
+
   const panelList_disabled: TpanelList = [
     isReviewer
       ? {
@@ -1144,7 +1196,7 @@ const PaymentSelectSlideBar = ({
       return payment;
     });
 
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
+    const tabArr_date: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
       const twDate = getTaiwanDateStr(payment.date);
 
       if (payment.id === targetPaymentId) {
@@ -1160,7 +1212,7 @@ const PaymentSelectSlideBar = ({
       };
     });
 
-    return { tabArr_date: arr, defaultIndex_date };
+    return { tabArr_date, defaultIndex_date };
   }, [paymentArr]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {

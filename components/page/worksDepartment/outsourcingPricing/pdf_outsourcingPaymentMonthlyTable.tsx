@@ -13,7 +13,7 @@ import scss from './pdf_outsourcingPaymentMonthlyTable.module.scss';
 
 type Trow = {
   indexNumber: React.ReactNode;
-  idNumber: React.ReactNode;
+  projectNumber: React.ReactNode;
   projectName: React.ReactNode;
   installPrice: React.ReactNode;
   supplyPrice: React.ReactNode;
@@ -29,8 +29,8 @@ interface Tprops_page {
 
 type Tprops = {
   rowArr: Trow[];
+  year: React.ReactNode;
   month: React.ReactNode;
-  day: React.ReactNode;
   signer: React.ReactNode; //右上方的名字
   latestPeriodRemain: number; // 上期保留
   deduction_5percent: React.ReactNode; // 應扣明細 5%
@@ -128,7 +128,15 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
         return (
           <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
             {rowArr.map((item, index) => {
-              const { indexNumber, idNumber, projectName, installPrice, supplyPrice, subTotal, priceCheck } = item;
+              const {
+                indexNumber,
+                projectNumber: projectNumber,
+                projectName,
+                installPrice,
+                supplyPrice,
+                subTotal,
+                priceCheck,
+              } = item;
 
               return (
                 <Row
@@ -139,7 +147,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
                     ref_rowArr.current[index] = ref;
                   }}
                   indexNumber={indexNumber}
-                  idNumber={idNumber}
+                  projectNumber={projectNumber}
                   projectName={projectName}
                   installPrice={installPrice}
                   supplyPrice={supplyPrice}
@@ -156,7 +164,15 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
       <div className={scss.hiddenWrapper}>
         <Page>
           {rowArr.map((item, index) => {
-            const { indexNumber, idNumber, projectName, installPrice, supplyPrice, subTotal, priceCheck } = item;
+            const {
+              indexNumber,
+              projectNumber: projectNumber,
+              projectName,
+              installPrice,
+              supplyPrice,
+              subTotal,
+              priceCheck,
+            } = item;
 
             return (
               <Row
@@ -167,7 +183,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
                   ref_rowArr.current[index] = ref;
                 }}
                 indexNumber={indexNumber}
-                idNumber={idNumber}
+                projectNumber={projectNumber}
                 projectName={projectName}
                 installPrice={installPrice}
                 supplyPrice={supplyPrice}
@@ -190,7 +206,7 @@ const Row_forwardRef = (
   props: {
     className?: string;
     indexNumber: React.ReactNode;
-    idNumber: React.ReactNode;
+    projectNumber: React.ReactNode;
     projectName: React.ReactNode;
     installPrice: React.ReactNode;
     supplyPrice: React.ReactNode;
@@ -203,7 +219,7 @@ const Row_forwardRef = (
     className,
 
     indexNumber,
-    idNumber,
+    projectNumber: projectNumber,
     projectName,
     installPrice,
     supplyPrice,
@@ -214,7 +230,7 @@ const Row_forwardRef = (
   return (
     <div ref={ref} className={classNames(scss.row, className)}>
       <Cell className={classNames(scss.indexNumber)}>{indexNumber}</Cell>
-      <Cell>{idNumber}</Cell>
+      <Cell>{projectNumber}</Cell>
       <Cell>{projectName}</Cell>
       <Cell>{installPrice}</Cell>
       <Cell>{supplyPrice}</Cell>
@@ -231,7 +247,7 @@ const Row_thead = () => {
     <Row
       className={scss.thead}
       indexNumber="序號"
-      idNumber="工程編號"
+      projectNumber="工程編號"
       projectName="工程名稱"
       installPrice="按　裝　費"
       supplyPrice="補　　貼"
@@ -328,3 +344,5 @@ const Page_forwardRef = ({ children, className }: Tprops_page, ref: React.Ref<HT
 };
 
 const Page = forwardRef(Page_forwardRef);
+
+export type { Tprops };
