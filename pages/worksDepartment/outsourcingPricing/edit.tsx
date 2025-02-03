@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 import moment from 'moment';
+import Link from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -469,7 +470,11 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_projectTable.subTotal_invoice.tbody,
           },
           {
-            children: <IconDetail onClick={() => router.push(href)} />,
+            children: (
+              <Link href={href}>
+                <IconDetail />
+              </Link>
+            ),
             ...config_projectTable.btn_info.tbody,
           },
         ];
