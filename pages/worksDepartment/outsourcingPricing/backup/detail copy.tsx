@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
-import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -31,7 +30,6 @@ import scss from './detail.module.scss';
 
 // api
 import {
-  ToutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailDto,
@@ -58,17 +56,6 @@ type Tquery = {
   isNew: string | undefined;
 };
 
-type Tstate_profile = {
-  outsourcingName: string;
-  projectNumber: string | null;
-  projectDate: Moment | null;
-  installer: string | null;
-  projectName: string | null;
-  county: string;
-  district: string;
-  address: string;
-};
-
 type Tstate_otherWorkItem = {
   installItemId: string | undefined;
   // installItemName: string;
@@ -87,29 +74,13 @@ type Tstate_installItem = {
   firstDeliveryStatusId: string;
 };
 
-// type Tstate = {
-//   outsourcingName: string;
-//   projectNumber: string | null;
-//   projectDate: Moment | null;
-//   projectName: string | null;
-//   installer: string | null;
-//   county: string;
-//   district: string;
-//   address: string;
-//   otherWorkItems: Tstate_otherWorkItem[];
-//   installItems: Tstate_installItem[];
-// };
-
 // =======================================================================
 
 // MARK: START
 
 export default function OutsourcingPricingDetail() {
   const router = useRouter();
-  const query = router.query as Tquery;
-  // const { paymentDetailId } = query;
-  const isNew = query.isNew === 'true';
-  const paymentDetailId = isNew ? undefined : query.paymentDetailId;
+  const { paymentDetailId } = router.query as Tquery;
 
   // ---------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
@@ -364,13 +335,13 @@ export default function OutsourcingPricingDetail() {
           />
           <AddressBar
             inputSelProps={{
-              caption: '工程地址',
               className: 'col-span-2',
               disabled: disabled,
               showBaseline: 'auto',
             }}
             addressProps={{
               county: {
+                easyValue: engineeringContact?.county ?? '',
                 props: {
                   isDisabled: true,
                   value: { value: '', label: engineeringContact?.county ?? '' },
@@ -421,51 +392,6 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 // ===========================================================================
 
-// MARK: useProfile
-const useDetail = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {};
-
-const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
-  const defaultState = useMemo(() => {
-    if (!paymentDetail) {
-      const emptyState_profile: Tstate_profile = {
-        outsourcingName: '',
-        projectNumber: null,
-        projectDate: null,
-        installer: null,
-        projectName: null,
-        county: '',
-        district: '',
-        address: '',
-      };
-
-      return {
-        defaultState_profile: emptyState_profile,
-        defaultState_otherWorkItem: [] as Tstate_otherWorkItem[],
-        defaultState_installItems: [] as Tstate_installItem[],
-      };
-    }
-
-    const { engineeringContact, outsourcingPayment } = paymentDetail ?? {};
-
-    const { projectNumber = '', projectName = '', county = '', district = '', address = '' } = engineeringContact ?? {};
-    const { outsourcing: { name = '' } = {}, date } = outsourcingPayment ?? {};
-
-    const defaultState_profile: Tstate_profile = {
-      outsourcingName: name,
-      projectNumber: projectNumber,
-      projectDate: date ? moment(date) : null,
-      installer: name,
-      projectName: projectName,
-      county: county,
-      district: district,
-      address: address,
-    };
-
-    //
-  }, [paymentDetail]);
-};
-
-// MARK:useTable01
 const useTable01 = ({
   //
   installItems,
@@ -640,7 +566,6 @@ const useTable01 = ({
 
 // ===========================================================================
 
-// MARK:useTable02
 const useTable02 = ({
   //
   installItems,
@@ -719,6 +644,18 @@ const useTable02 = ({
         });
       }
 
+      // const otherWorkItems = firstDeliveryStatus?.otherWorkItems || [];
+      // otherWorkItems.forEach((owi) => {
+      //   arr.push({
+      //     installItemId: item.id,
+      //     // installItemName: item.itemName,
+      //     otherInstallation: owi.otherInstallation ?? '',
+      //     otherQuantity: String(owi.otherQuantity || 0),
+      //     otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //     otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //     quotationItemStatusId: owi.quotationItemStatusId,
+      //   });
+      // });
       const otherWorkItems = firstDeliveryStatus?.otherWorkItems;
 
       if (otherWorkItems) {
@@ -732,6 +669,33 @@ const useTable02 = ({
           quotationItemStatusId: otherWorkItems.quotationItemStatusId,
         });
       }
+
+      // otherWorkItems.forEach((owi) => {
+      //   arr.push({
+      //     installItemId: item.id,
+      //     // installItemName: item.itemName,
+      //     otherInstallation: owi.otherInstallation ?? '',
+      //     otherQuantity: String(owi.otherQuantity || 0),
+      //     otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //     otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //     quotationItemStatusId: owi.quotationItemStatusId,
+      //   });
+      // });
+
+      // deliveryStatusArr?.forEach((ds) => {
+      //   const otherWorkItems = ds.otherWorkItems || [];
+      //   otherWorkItems.forEach((owi) => {
+      //     arr.push({
+      //       installItemId: item.id,
+      //       // installItemName: item.itemName,
+      //       otherInstallation: owi.otherInstallation ?? '',
+      //       otherQuantity: String(owi.otherQuantity || 0),
+      //       otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //       otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //       quotationItemStatusId: owi.quotationItemStatusId,
+      //     });
+      //   });
+      // });
 
       //
     });
