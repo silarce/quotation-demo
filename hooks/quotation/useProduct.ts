@@ -1117,7 +1117,7 @@ const useClassProdList = ({
 
     const copy = _.cloneDeep(list[copyKey]);
     copy.replaceId(copyKey);
-    // copy.rootProductId = undefined;
+    copy.clearRootProductId();
 
     copy.delSelf = () => {
       delSelf_prod(list, newKey);

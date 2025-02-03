@@ -2679,6 +2679,9 @@ class Class_product {
   replaceId(id: string) {
     this._prodData.id = id;
   }
+  clearRootProductId() {
+    this._prodData.rootProductId = undefined;
+  }
 
   get itemName() {
     return this._prodData.itemName;
