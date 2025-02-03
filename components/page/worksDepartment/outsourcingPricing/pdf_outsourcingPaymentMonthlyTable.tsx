@@ -1,4 +1,4 @@
-import { useState, forwardRef, useRef, useEffect, useMemo } from 'react';
+import { useState, forwardRef, useRef, useEffect, useMemo, createContext, useContext } from 'react';
 import classNames from 'classnames';
 
 import { Modal, ModalProps } from 'antd';
@@ -60,6 +60,8 @@ const style = {
 // 這個值是在直接在控制台看rowContainer的高度而定義的
 // 基本上可以是任意高度，只要符合使用者需求就可以了
 const allowHeight = 323;
+
+const Context = createContext<Tprops>(null!);
 
 // ======================================================================
 
@@ -143,14 +145,71 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 
       <br />
       <br />
-
-      {/* 
+      <Context.Provider
+        value={{
+          rowArr,
+          year,
+          month,
+          signer,
+          subTotal_detail,
+          latestPeriodRemain,
+          subTotal_detailAddLatestPeriodRemain,
+          tax,
+          retainage,
+          deduction_installationMaterials,
+          deduction_laborInsuranceLoan,
+          subTotal_deduction,
+          deduction_amount,
+          actualAmountReceived,
+          managerName,
+          supervisorName,
+          checkerName,
+          agentName,
+        }}
+      >
+        {/* 
 考慮修改UI?
 還是等有實際需求時再說吧
 */}
-      {chunkedRowArr.map((rowArr, index_p) => {
-        return (
-          <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
+        {chunkedRowArr.map((rowArr, index_p) => {
+          return (
+            <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
+              {rowArr.map((item, index) => {
+                const {
+                  indexNumber,
+                  projectNumber: projectNumber,
+                  projectName,
+                  installPrice,
+                  supplyPrice,
+                  subTotal,
+                  priceCheck,
+                } = item;
+
+                return (
+                  <Row
+                    key={index}
+                    ref={(ref) => {
+                      !isRowArrRendered && setIsRowArrRendered(true);
+
+                      ref_rowArr.current[index] = ref;
+                    }}
+                    indexNumber={indexNumber}
+                    projectNumber={projectNumber}
+                    projectName={projectName}
+                    installPrice={installPrice}
+                    supplyPrice={supplyPrice}
+                    subTotal={subTotal}
+                    priceCheck={priceCheck}
+                  />
+                );
+              })}
+            </Page>
+          );
+        })}
+
+        {/* 模板page */}
+        <div className={scss.hiddenWrapper}>
+          <Page>
             {rowArr.map((item, index) => {
               const {
                 indexNumber,
@@ -181,43 +240,8 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
               );
             })}
           </Page>
-        );
-      })}
-
-      {/* 模板page */}
-      <div className={scss.hiddenWrapper}>
-        <Page>
-          {rowArr.map((item, index) => {
-            const {
-              indexNumber,
-              projectNumber: projectNumber,
-              projectName,
-              installPrice,
-              supplyPrice,
-              subTotal,
-              priceCheck,
-            } = item;
-
-            return (
-              <Row
-                key={index}
-                ref={(ref) => {
-                  !isRowArrRendered && setIsRowArrRendered(true);
-
-                  ref_rowArr.current[index] = ref;
-                }}
-                indexNumber={indexNumber}
-                projectNumber={projectNumber}
-                projectName={projectName}
-                installPrice={installPrice}
-                supplyPrice={supplyPrice}
-                subTotal={subTotal}
-                priceCheck={priceCheck}
-              />
-            );
-          })}
-        </Page>
-      </div>
+        </div>
+      </Context.Provider>
 
       {/*  */}
     </Modal>
@@ -227,6 +251,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 // MARK:END
 // ======================================================================
 
+// MARK:Row_forwardRef
 const Row_forwardRef = (
   props: {
     className?: string;
@@ -292,30 +317,50 @@ const Cell = (props: React.HTMLAttributes<HTMLDivElement>) => {
   );
 };
 
+// MARK:Top
 const Top = () => {
+  const { year, month, signer } = useContext(Context);
+
   return (
     <div className={classNames(scss.top, 'mb-3')}>
       <div className={scss.left}>
-        <span>{111}</span>年<span>{11}</span>月
+        <span>{year}</span>年<span>{month}</span>月
       </div>
       <div className={scss.right}>
-        <span>{'王汪汪'}</span>按裝明細
+        <span>{signer}</span>按裝明細
       </div>
     </div>
   );
 };
 
 const Bottom = () => {
+  const {
+    subTotal_detail,
+    latestPeriodRemain,
+    subTotal_detailAddLatestPeriodRemain,
+    tax,
+    retainage,
+    deduction_installationMaterials,
+    deduction_laborInsuranceLoan,
+    subTotal_deduction,
+    deduction_amount,
+    actualAmountReceived,
+    managerName,
+    supervisorName,
+    checkerName,
+    agentName,
+  } = useContext(Context);
+
   return (
     <>
       <div className={scss.total}>
         <span className="">請款合計:</span>
-        <span className="border-b border-black w-[120px] text-center">{9999}</span>
+        <span className="border-b border-black w-[120px] text-center">{subTotal_detail}</span>
         <span className="mx-2">＋</span>
         <span className="">上期保留:</span>
-        <span className="border-b border-black w-[120px] text-center">{9999}</span>
+        <span className="border-b border-black w-[120px] text-center">{latestPeriodRemain}</span>
         <span className="mx-4">＝</span>
-        <span className="border-b border-black w-[160px] text-center">9999</span>
+        <span className="border-b border-black w-[160px] text-center">{subTotal_detailAddLatestPeriodRemain}</span>
       </div>
 
       <div className={scss.deductionTotal}>
@@ -328,25 +373,25 @@ const Bottom = () => {
         <Cell className={classNames(scss.g)}>應扣明細</Cell>
         <Cell className={classNames(scss.h)}>核扣金額</Cell>
         <Cell className={classNames(scss.i, scss.textVertical)}>金　額</Cell>
-        <Cell className={classNames(scss.j)}>j</Cell>
-        <Cell className={classNames(scss.k)}>k</Cell>
-        <Cell className={classNames(scss.l)}>l</Cell>
-        <Cell className={classNames(scss.m)}>m</Cell>
-        <Cell className={classNames(scss.n)}>n</Cell>
-        <Cell className={classNames(scss.o)}>o</Cell>
+        <Cell className={classNames(scss.j)}>{tax}</Cell>
+        <Cell className={classNames(scss.k)}>{retainage}</Cell>
+        <Cell className={classNames(scss.l)}>{deduction_installationMaterials}</Cell>
+        <Cell className={classNames(scss.m)}>{deduction_laborInsuranceLoan}</Cell>
+        <Cell className={classNames(scss.n)}>{subTotal_deduction}</Cell>
+        <Cell className={classNames(scss.o)}>{deduction_amount}</Cell>
       </div>
 
-      <div className={scss.actualAmountReceived}>實　領　金　額 :{9999}</div>
+      <div className={scss.actualAmountReceived}>實　領　金　額 :{actualAmountReceived}</div>
 
       <div className={scss.review}>
         <Cell className={scss.textVertical}>核　准</Cell>
-        <Cell>2</Cell>
+        <Cell>{managerName}</Cell>
         <Cell className={scss.textVertical}>主　管</Cell>
-        <Cell>4</Cell>
+        <Cell>{supervisorName}</Cell>
         <Cell className={scss.textVertical}>核　對</Cell>
-        <Cell>6</Cell>
+        <Cell>{checkerName}</Cell>
         <Cell className={scss.textVertical}>經　辦</Cell>
-        <Cell>8</Cell>
+        <Cell>{agentName}</Cell>
       </div>
     </>
   );
