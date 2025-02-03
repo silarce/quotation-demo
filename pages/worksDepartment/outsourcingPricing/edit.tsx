@@ -7,7 +7,7 @@ import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
@@ -35,14 +35,10 @@ import scss from './edit.module.scss';
 // api
 import {
   Tparams,
-  ToutsourcingDto,
-  ToutsourcingPaymentDto,
   useGetOutsourcing,
   useGetOutsourcingPayment,
-  // useGetOutsourcingPayment_id,
   useGetOutsourcingPayment_id_kit,
   useGetOutsourcingPaymentDetail,
-  apiPatchOutsourcingPayment,
   TupdateOutsourcingPaymentDto,
   apiPatchOutsourcingPaymentSubmit,
   apiPatchOutsourcingPaymentReview,
@@ -54,8 +50,6 @@ import { TmyBtn } from 'components/global/gear/button/myButton_v2';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-//
 
 import { useAttachment } from 'hooks/attachment/useAttachment';
 
@@ -365,7 +359,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
     try {
       setIsLoading(true);
-      // await apiPatchOutsourcingPayment(paymentId, body);
+
       await patchOutsourcingPayment({ body, attachmentArr, attachmentIdArr_willDelete });
       await update_payment();
       setDisabled(true);
@@ -561,7 +555,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
               editDeduction({ index, key: 'price', value: e.target.value });
             }}
             type={disabled ? 'text' : 'number'}
-            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            className={classNames(scss.inputInTable, scss.textRight, !disabled && scss.enabled)}
             style={{ width: inputWidth_price }}
             readOnly={disabled}
           />
@@ -614,7 +608,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_projectTable.label_subTotal.tbody,
           },
           {
-            // children: decimal_subTotal.toNumber().toLocaleString(),
             children: subTotal_deduction.toLocaleString(),
             ...config_projectTable.subtotal.tbody,
           },
@@ -1449,7 +1442,7 @@ const thead_projectTable: Ttable['thead'] = {
       ...config_projectTable.projectName,
     },
     {
-      children: '請款小計',
+      children: '請款',
       ...config_projectTable.subTotal_invoice,
     },
   ],
@@ -1507,7 +1500,7 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
       ...config_deduction.itemName,
     },
     {
-      children: '請款小計',
+      children: '應扣額',
       ...config_deduction.price,
     },
   ],
@@ -1624,14 +1617,6 @@ const fakeRow_pre = [
   fakeData,
 ];
 
-// const fakeRow = Array.from({
-//   length: 15,
-// }).map((_, index) => {
-//   return {
-//     ...fakeData,
-//     indexNumber: index + 1,
-//   };
-// });
 const fakeRow = fakeRow_pre.map((item, index) => {
   return {
     ...item,
