@@ -206,7 +206,53 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     };
   }, [data_payment]);
 
-  // _______________________________________________________________________
+  // '上期保留10%' // 上期保留款
+  const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
+
+  const {
+    subTotal_detail,
+    subTotal_deduction,
+
+    retainage,
+    subTotal_actualReceived,
+    tax,
+    actualAmountReceived,
+  } = useMemo(() => {
+    let subTotal_detail_d = new Decimal(0); // 請款的小計，不是「請款小計」
+    let subTotal_deduction_d = new Decimal(0); // 應扣明細的小計
+
+    paymentDetail?.forEach((detail) => {
+      const { outsourcingTotal } = detail;
+      subTotal_detail_d = subTotal_detail_d.add(outsourcingTotal);
+    });
+
+    payment.deduction?.forEach((deduction) => {
+      subTotal_deduction_d = subTotal_deduction_d.add(deduction.price);
+    });
+
+    // 本期保留10% // 本期保留款
+    const retainage = new Decimal(subTotal_detail_d).mul(0.1).toNumber();
+
+    // 實領金額小計
+    const subTotal_actualReceived = new Decimal(subTotal_detail_d)
+      .sub(retainage)
+      .add(latestPeriodKeep)
+      .sub(subTotal_deduction_d)
+      .toNumber();
+
+    const tax = new Decimal(subTotal_actualReceived).mul(0.05).toDecimalPlaces(0).toNumber();
+    const actualAmountReceived = new Decimal(subTotal_actualReceived).add(tax).toNumber();
+
+    return {
+      subTotal_detail: subTotal_detail_d.toNumber(),
+      subTotal_deduction: subTotal_deduction_d.toNumber(),
+      retainage,
+      subTotal_actualReceived,
+      tax,
+      actualAmountReceived,
+    };
+  }, [paymentDetail, payment, data_payment]);
+
   // -------------------------------------------------------------------------
 
   useEffect(() => {
@@ -301,7 +347,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
     const body = {
       date: new Date().toISOString(),
-      paymentSubTotal: subTotal_project,
+      paymentSubTotal: subTotal_detail,
       deduction: payment.deduction ?? [],
       deductionTotal: subTotal_deduction,
       retainage: result.retainage,
@@ -397,15 +443,12 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
-  const { control_table_project, subTotal_project } = useMemo(() => {
-    let decimal_subTotal = new Decimal(0);
+  const { control_table_project } = useMemo(() => {
     const control_tbody: Ttable['tbody'] = (() => {
       const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
         const { outsourcingTotal, engineeringContact } = data;
 
         const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
-
-        decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
 
         const href = {
           pathname: './detail',
@@ -449,7 +492,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_projectTable.label_subTotal.tbody,
           },
           {
-            children: decimal_subTotal.toNumber().toLocaleString(),
+            children: subTotal_detail.toLocaleString(),
             ...config_projectTable.subtotal.tbody,
           },
         ],
@@ -466,21 +509,22 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       haveBorder: true,
     };
 
-    return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
-  }, [paymentDetail]);
+    return {
+      //
+      control_table_project: control_table,
+    };
+  }, [paymentDetail, subTotal_detail]);
 
-  // -------------------------------------------------------------------------
+  // ------------------------------11-------------------------------------------
 
-  const { control_table_deduction, subTotal_deduction } = useMemo(() => {
+  const { control_table_deduction } = useMemo(() => {
     //
-    let decimal_subTotal = new Decimal(0);
+
     //
     const control_tbody: Ttable['tbody'] = (() => {
       //
       const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
         const { type, itemName, price } = data;
-
-        decimal_subTotal = decimal_subTotal.add(price);
 
         const inputWidth_type = config_deduction.type.inputWidth;
         const inputWidth_item = config_deduction.itemName.inputWidth;
@@ -570,7 +614,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_projectTable.label_subTotal.tbody,
           },
           {
-            children: decimal_subTotal.toNumber().toLocaleString(),
+            // children: decimal_subTotal.toNumber().toLocaleString(),
+            children: subTotal_deduction.toLocaleString(),
             ...config_projectTable.subtotal.tbody,
           },
         ],
@@ -589,32 +634,17 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
     return {
       control_table_deduction: control_table,
-      subTotal_deduction: decimal_subTotal.toNumber(),
     };
-  }, [payment.deduction, disabled]);
+  }, [payment.deduction, subTotal_deduction, disabled]);
 
   // -------------------------------------------------------------------------
 
   const { control_table_actualAmountReceived, result } = useMemo(() => {
     //
 
-    // 本期保留10% // 本期保留款
-    const retainage = new Decimal(subTotal_project).mul(0.1).toNumber();
-    // '上期保留10%' // 上期保留款
-    const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
-
-    const subTotal = new Decimal(subTotal_project)
-      .sub(retainage)
-      .add(latestPeriodKeep)
-      .sub(subTotal_deduction)
-      .toNumber();
-
-    const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
-    const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
-
     const result = {
       retainage: retainage, // 本期保留款項
-      subTotal: subTotal,
+      subTotal: subTotal_actualReceived,
       salesTax: tax,
       total: actualAmountReceived, // 實領總計
     };
@@ -629,7 +659,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_actualAmountReceived.caption,
           },
           {
-            children: subTotal_project.toLocaleString(),
+            children: subTotal_detail.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
           },
         ],
@@ -684,7 +714,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_actualAmountReceived.caption.tbody,
           },
           {
-            children: subTotal.toLocaleString(),
+            children: subTotal_actualReceived.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
           },
         ],
@@ -731,7 +761,15 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       result,
     };
     //
-  }, [subTotal_project, subTotal_deduction, payment]);
+  }, [
+    subTotal_detail,
+    subTotal_deduction,
+    latestPeriodKeep,
+    retainage,
+    subTotal_actualReceived,
+    tax,
+    actualAmountReceived,
+  ]);
 
   // -------------------------------------------------------------------------
 
@@ -868,52 +906,52 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // -------------------------------------------------------------------------
 
-  // const foo = useMemo(() => {
-  //   console.log('data_payment', data_payment);
-  //   console.log('paymentDetail', paymentDetail);
+  const foo = useMemo(() => {
+    console.log('data_payment', data_payment);
+    console.log('paymentDetail', paymentDetail);
 
-  //   const rowArr: Tprop_pdf['rowArr'] = (paymentDetail ?? []).map((detail, index) => {
-  //     const { outsourcingTotal, engineeringContact: { projectName, projectNumber } = {} } = detail;
+    const rowArr: Tprop_pdf['rowArr'] = (paymentDetail ?? []).map((detail, index) => {
+      const { outsourcingTotal, engineeringContact: { projectName, projectNumber } = {} } = detail;
 
-  //     const row: Tprop_pdf['rowArr'][number] = {
-  //       indexNumber: index + 1,
-  //       projectNumber: projectNumber,
-  //       projectName,
-  //       installPrice: null,
-  //       supplyPrice: null,
-  //       subTotal: outsourcingTotal,
-  //       priceCheck: null,
-  //     };
+      const row: Tprop_pdf['rowArr'][number] = {
+        indexNumber: index + 1,
+        projectNumber: projectNumber,
+        projectName,
+        installPrice: null,
+        supplyPrice: null,
+        subTotal: outsourcingTotal,
+        priceCheck: null,
+      };
 
-  //     return row;
-  //   });
+      return row;
+    });
 
-  //   const { date: paymentDate, priorPeriodRetainage } = data_payment ?? {};
+    const { date: paymentDate, priorPeriodRetainage } = data_payment ?? {};
 
-  //   const date = paymentDate ? moment(paymentDate) : null;
-  //   const year = date && date.year() - 1911;
-  //   const month = date && date.month() + 1;
+    const date = paymentDate ? moment(paymentDate) : null;
+    const year = date && date.year() - 1911;
+    const month = date && date.month() + 1;
 
-  //   const props_pdf: Tprop_pdf = {
-  //     rowArr,
-  //     year,
-  //     month,
-  //     signer: null,
-  //     latestPeriodRemain: priorPeriodRetainage ?? 0,
-  //     // deduction_5percent,
-  //     // deduction_10percent,
-  //     // deduction_installationMaterials,
-  //     // deduction_laborInsuranceLoan,
-  //     // deduction_amount,
-  //     // actualAmountReceived,
-  //     // managerName,
-  //     // supervisorName,
-  //     // checkerName,
-  //     // agentName,
-  //   };
+    const props_pdf: Tprop_pdf = {
+      rowArr,
+      year,
+      month,
+      signer: null,
+      latestPeriodRemain: priorPeriodRetainage ?? 0, // 上期保留
+      // tax:,
+      // deduction_10percent,
+      // deduction_installationMaterials,
+      // deduction_laborInsuranceLoan,
+      // deduction_amount,
+      // actualAmountReceived,
+      // managerName,
+      // supervisorName,
+      // checkerName,
+      // agentName,
+    };
 
-  //   return props_pdf;
-  // }, [paymentDetail, data_payment]);
+    return props_pdf;
+  }, [paymentDetail, data_payment]);
 
   // -------------------------------------------------------------------------
 

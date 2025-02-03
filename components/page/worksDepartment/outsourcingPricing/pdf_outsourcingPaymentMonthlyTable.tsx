@@ -33,7 +33,7 @@ type Tprops = {
   month: React.ReactNode;
   signer: React.ReactNode; //右上方的名字
   latestPeriodRemain: number; // 上期保留
-  deduction_5percent: React.ReactNode; // 應扣明細 5%
+  tax: React.ReactNode; // tax 5%
   deduction_10percent: React.ReactNode; // 應扣明細 保留10%
   deduction_installationMaterials: React.ReactNode; // 應扣明細 按裝物料
   deduction_laborInsuranceLoan: React.ReactNode; // 應扣明細 借支勞保
@@ -59,6 +59,8 @@ const style = {
 const allowHeight = 323;
 
 // ======================================================================
+
+// MARK:START
 
 // 外包商當月計價總表
 export default function Pdf_outsourcingPaymentMonthlyTable({
@@ -112,6 +114,8 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
       setIsRowArrRendered(false);
     }
   }, [modalProps.visible]);
+
+  // MARK: RENDER
 
   return (
     <Modal {...modalProps} width="fit-content" footer={null} destroyOnClose={true}>
@@ -200,6 +204,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   );
 }
 
+// MARK:END
 // ======================================================================
 
 const Row_forwardRef = (
