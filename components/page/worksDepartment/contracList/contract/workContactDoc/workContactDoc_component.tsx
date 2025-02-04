@@ -49,7 +49,7 @@ import scss from './workContactDoc.module.scss';
 // type
 import { TgetAnnotation } from 'js/api/api_workSheet';
 
-import { AppContext } from 'pages/_app';
+import { doorModelDict } from 'js/utils/options/productOptions';
 
 // ============================================================================
 type Tquery = {
@@ -188,6 +188,28 @@ function PreWorkContactDoc_component(
 
     return { productArr, latestQuotationDiscount };
   }, [contract]);
+
+  const productArr_forPdf = useMemo(() => {
+    doorModelDict;
+    const arr = productArr.map((prod) => {
+      const doorModelInfo = doorModelDict[prod.doorModelName as keyof typeof doorModelDict] as
+        | (typeof doorModelDict)[keyof typeof doorModelDict]
+        | undefined;
+
+      let doorModelName = '';
+
+      if (doorModelInfo) {
+        doorModelName = doorModelInfo.value + '\n' + doorModelInfo.name;
+      }
+
+      return {
+        ...prod,
+        doorModelName,
+      } as typeof prod;
+    });
+
+    return arr;
+  }, [productArr]);
 
   const {
     //
@@ -807,7 +829,7 @@ function PreWorkContactDoc_component(
         visible={pdfModalVisible}
         onCancel={() => setPdfModalVisible(false)}
         engineeringContact={engineeringContact}
-        productArr={productArr}
+        productArr={productArr_forPdf}
         hasPattern={hasPattern}
       />
 
