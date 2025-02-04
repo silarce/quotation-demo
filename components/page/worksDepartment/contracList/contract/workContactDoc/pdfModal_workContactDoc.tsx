@@ -372,7 +372,7 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
           >
             <div>{itemName}</div>
             <div>{size}</div>
-            <div>{doorModelName}</div>
+            <div className="whitespace-pre-wrap">{doorModelName}</div>
             <div>{materialName}</div>
             <div>{thickness}</div>
             <div>{materialSurface}</div>
