@@ -57,20 +57,19 @@ const style = {
   height: `${height}cm`,
 };
 
-// 這個值是在直接在控制台看rowContainer的高度而定義的
-// 基本上可以是任意高度，只要符合使用者需求就可以了
-const allowHeight_wholePage = 323;
-const allowHeight_table = 867;
+// 以下的高度值都是在直接在控制台看元素的高度而定義的
+const height_page = 867;
+const height_top = 38;
+const height_bottom = 304 + 200; // 加200是因為下方要留白
+const height_thead = 27;
+// const allowHeight_wholePage = 323;
+const allowHeight_table = height_page - height_thead;
 
 const Context = createContext<Tprops>(null!);
 
 // ======================================================================
 
 // MARK:START
-
-// 有第二頁時，UI的呈現可能不符合需求，不過也沒有說需求是什麼
-// 等到實際提出需求時再改吧
-
 // 外包商當月計價總表
 export default function Pdf_outsourcingPaymentMonthlyTable({
   //
@@ -99,6 +98,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 
   const [isRowArrRendered, setIsRowArrRendered] = useState(false);
 
+  // 版本1
   // const chunkedRowArr = useMemo(() => {
   //   const arr_container: Trow[][] = [];
   //   let arr: Trow[] = [];
@@ -124,24 +124,58 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   //   return arr_container;
   // }, [isRowArrRendered, rowArr]);
 
-  const { chunkedRowArr_table, isOverflow } = useMemo(() => {
-    let isOverflow = false;
+  // 版本2
+  // const { chunkedRowArr_table, isOverflow } = useMemo(() => {
+  //   let isOverflow = false;
 
+  //   const arr_container: Trow[][] = [];
+  //   let arr: Trow[] = [];
+  //   let accumulationHeight = 0;
+
+  //   ref_rowArr.current.forEach((element, index) => {
+  //     const height = element?.getBoundingClientRect().height ?? 0;
+
+  //     if (accumulationHeight + height > allowHeight_wholePage) {
+  //       isOverflow = true;
+  //     }
+
+  //     if (accumulationHeight + height > allowHeight_table) {
+  //       arr_container.push(arr);
+  //       arr = [];
+  //       accumulationHeight = 0;
+  //     }
+
+  //     accumulationHeight += height;
+  //     arr.push(rowArr[index]);
+
+  //     if (index === ref_rowArr.current.length - 1) {
+  //       arr_container.push(arr);
+  //     }
+  //   });
+
+  //   return {
+  //     chunkedRowArr_table: arr_container,
+  //     isOverflow,
+  //   };
+  // }, [isRowArrRendered, rowArr]);
+
+  // 版本3
+  const { chunkedRowArr_table, isBottomOverflow } = useMemo(() => {
     const arr_container: Trow[][] = [];
     let arr: Trow[] = [];
     let accumulationHeight = 0;
 
+    let heightTop = height_top;
+    let isBottomOverflow = false;
+
     ref_rowArr.current.forEach((element, index) => {
       const height = element?.getBoundingClientRect().height ?? 0;
 
-      if (accumulationHeight + height > allowHeight_wholePage) {
-        isOverflow = true;
-      }
-
-      if (accumulationHeight + height > allowHeight_table) {
+      if (accumulationHeight + height + heightTop > allowHeight_table) {
         arr_container.push(arr);
         arr = [];
         accumulationHeight = 0;
+        heightTop = 0;
       }
 
       accumulationHeight += height;
@@ -149,12 +183,16 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 
       if (index === ref_rowArr.current.length - 1) {
         arr_container.push(arr);
+
+        if (accumulationHeight + height + heightTop + height_bottom > allowHeight_table) {
+          isBottomOverflow = true;
+        }
       }
     });
 
     return {
       chunkedRowArr_table: arr_container,
-      isOverflow,
+      isBottomOverflow,
     };
   }, [isRowArrRendered, rowArr]);
 
@@ -184,7 +222,6 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   return (
     <Modal {...modalProps} width="fit-content" footer={null} destroyOnClose={true}>
       <SquareBtn onClick={handleDownloadPdf}>下載PDF</SquareBtn>
-
       <br />
       <br />
       <Context.Provider
@@ -209,27 +246,29 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
           agentName,
         }}
       >
-        {!isOverflow && (
-          <Page ref={(ref) => (ref_pageArr.current[0] = ref)}>
-            <Table2 rowArr={chunkedRowArr_table[0] ?? []} className={scss.noBorderBottom} />
-          </Page>
-        )}
-
-        {isOverflow && (
-          <>
-            <Page className="mb-5" ref={(ref) => (ref_pageArr.current[0] = ref)} />
-            {chunkedRowArr_table.map((item, index) => {
-              return (
-                <PageEmpty key={index} className="mb-5" ref={(ref) => (ref_pageArr.current[index + 1] = ref)}>
-                  <Table2 rowArr={item} />
-                </PageEmpty>
-              );
-            })}
-          </>
+        {chunkedRowArr_table.map((item, index) => {
+          return (
+            <div key={index} className={classNames(scss.pageWrapper, 'mb-5')}>
+              <PageEmpty ref={(ref) => (ref_pageArr.current[index] = ref)}>
+                {index === 0 && <Top />}
+                <Table2 rowArr={item} />
+                {index === chunkedRowArr_table.length - 1 && !isBottomOverflow && (
+                  <Bottom className={scss.noBorderTop} />
+                )}
+              </PageEmpty>
+            </div>
+          );
+        })}
+        {isBottomOverflow && (
+          <div className={classNames(scss.pageWrapper, 'mb-5')}>
+            <PageEmpty ref={(ref) => (ref_pageArr.current[chunkedRowArr_table.length] = ref)}>
+              <Bottom />
+            </PageEmpty>
+          </div>
         )}
 
         {/*  */}
-        {/* 模板page */}
+        {/* 模板page 用來取得元素的height*/}
         <div className={scss.hiddenWrapper}>
           <PageEmpty>
             <Table>
@@ -267,7 +306,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
         </div>
 
         {/*  */}
-        {/* 另一個版本，每一頁都有Top跟Bottom，備用，刪掉無妨 */}
+        {/* 版本1，每一頁都有Top跟Bottom，備用，刪掉無妨 */}
         {/* {chunkedRowArr.map((rowArr, index_p) => {
           return (
             <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
@@ -305,6 +344,26 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
             </Page>
           );
         })} */}
+        {/*  */}
+        {/* 版本2 */}
+        {/* {!isOverflow && (
+          <Page ref={(ref) => (ref_pageArr.current[0] = ref)}>
+            <Table2 rowArr={chunkedRowArr_table[0] ?? []} className={scss.noBorderBottom} />
+          </Page>
+        )}
+
+        {isOverflow && (
+          <>
+            <Page className="mb-5" ref={(ref) => (ref_pageArr.current[0] = ref)} />
+            {chunkedRowArr_table.map((item, index) => {
+              return (
+                <PageEmpty key={index} className="mb-5" ref={(ref) => (ref_pageArr.current[index + 1] = ref)}>
+                  <Table2 rowArr={item} />
+                </PageEmpty>
+              );
+            })}
+          </>
+        )} */}
         {/*  */}
       </Context.Provider>
 
@@ -402,7 +461,7 @@ const Top = () => {
 };
 
 // MARK:Bottom
-const Bottom = () => {
+const Bottom = ({ className }: { className?: string }) => {
   const {
     subTotal_detail,
     latestPeriodRemain,
@@ -421,7 +480,7 @@ const Bottom = () => {
   } = useContext(Context);
 
   return (
-    <div className={scss.bottom}>
+    <div className={classNames(scss.bottom, className)}>
       <div className={scss.total}>
         <span className="">請款合計:</span>
         <span className="border-b border-black w-[120px] text-center">{subTotal_detail}</span>
