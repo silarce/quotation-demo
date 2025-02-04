@@ -4862,13 +4862,37 @@ export type TcreateOutsourcingPaymentDetailDto = {
   // @IsNullable()
   projectName: string | null;
 
+  // @ApiProperty({ description: '工程地址(縣市)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectCounty: string | null;
+
+  // @ApiProperty({ description: '工程地址(區)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectDistrict: string | null;
+
+  // @ApiProperty({ description: '工程地址(詳細地址)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectAddress: string | null;
+
+  // @ApiProperty({ description: '工程日期' })
+  // @IsDate()
+  // @Type(() => Date)
+  // @IsOptional()
+  // @IsNullable()
+  projectDate: Date | null;
+
   // @ApiProperty({ description: '項目' })
   // @IsArray()
   // @ValidateNested()
   // @Type(() => CreateOutsourcingPaymentDetailItemDto)
   // @IsOptional()
-  // installItems?: TcreateOutsourcingPaymentDetailItemDto[];
-  installItems?: undefined; // 暫時棄用
+  installItems: TcreateOutsourcingPaymentDetailItemDto[];
 
   // @ApiProperty({ description: '外包計價明細總計' })
   // @IsNumber()
