@@ -1110,8 +1110,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
         <Pdf_outsourcingPaymentMonthlyTable
           visible={showPdfModal}
           onCancel={() => setShowPdfModal(false)}
-          // rowArr={fakeRow}
           {...props_pdf}
+          // rowArr={fakeRow}
         />
       </div>
     </SubLayer>
@@ -1614,6 +1614,13 @@ const create_emptyDeduction = (): TdeductionDto => ({
 //   fakeData,
 //   fakeData_2,
 //   fakeData_3,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData,
+//   fakeData_3,
+//   fakeData_3,
+//   fakeData,
 //   fakeData,
 //   fakeData,
 //   fakeData,

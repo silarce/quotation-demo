@@ -92,8 +92,12 @@ $priceCheck: 1fr;
   }
 }
 
+.bottom {
+  border: solid 1px black;
+  // border-top: 0;
+}
+
 .total {
-  @extend .borderTop;
   padding: 20px 10px;
   > span {
     display: inline-block;
@@ -150,4 +154,8 @@ $priceCheck: 1fr;
   width: 0;
   height: 0;
   overflow: hidden;
+}
+
+.noBorderBottom {
+  border-bottom: 0;
 }

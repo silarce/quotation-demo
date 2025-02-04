@@ -1,4 +1,4 @@
-import { useState, forwardRef, useRef, useEffect, useMemo, createContext, useContext } from 'react';
+import React, { useState, forwardRef, useRef, useEffect, useMemo, createContext, useContext } from 'react';
 import classNames from 'classnames';
 
 import { Modal, ModalProps } from 'antd';
@@ -59,7 +59,8 @@ const style = {
 
 // 這個值是在直接在控制台看rowContainer的高度而定義的
 // 基本上可以是任意高度，只要符合使用者需求就可以了
-const allowHeight = 323;
+const allowHeight_wholePage = 323;
+const allowHeight_table = 867;
 
 const Context = createContext<Tprops>(null!);
 
@@ -98,16 +99,34 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 
   const [isRowArrRendered, setIsRowArrRendered] = useState(false);
 
-  const handleDownloadPdf = async () => {
-    const divElementArr = ref_pageArr.current;
+  // const chunkedRowArr = useMemo(() => {
+  //   const arr_container: Trow[][] = [];
+  //   let arr: Trow[] = [];
+  //   let accumulationHeight = 0;
 
-    await dlPdf({
-      divElementArr,
-      fileName: '外包商當月計價總表',
-    });
-  };
+  //   ref_rowArr.current.forEach((element, index) => {
+  //     const height = element?.getBoundingClientRect().height ?? 0;
 
-  const chunkedRowArr = useMemo(() => {
+  //     if (accumulationHeight + height > allowHeight_wholePage) {
+  //       arr_container.push(arr);
+  //       arr = [];
+  //       accumulationHeight = 0;
+  //     }
+
+  //     accumulationHeight += height;
+  //     arr.push(rowArr[index]);
+
+  //     if (index === ref_rowArr.current.length - 1) {
+  //       arr_container.push(arr);
+  //     }
+  //   });
+
+  //   return arr_container;
+  // }, [isRowArrRendered, rowArr]);
+
+  const { chunkedRowArr_table, isOverflow } = useMemo(() => {
+    let isOverflow = false;
+
     const arr_container: Trow[][] = [];
     let arr: Trow[] = [];
     let accumulationHeight = 0;
@@ -115,7 +134,11 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
     ref_rowArr.current.forEach((element, index) => {
       const height = element?.getBoundingClientRect().height ?? 0;
 
-      if (accumulationHeight + height > allowHeight) {
+      if (accumulationHeight + height > allowHeight_wholePage) {
+        isOverflow = true;
+      }
+
+      if (accumulationHeight + height > allowHeight_table) {
         arr_container.push(arr);
         arr = [];
         accumulationHeight = 0;
@@ -129,8 +152,24 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
       }
     });
 
-    return arr_container;
+    return {
+      chunkedRowArr_table: arr_container,
+      isOverflow,
+    };
   }, [isRowArrRendered, rowArr]);
+
+  // ----------------------------------------------------------------------------
+
+  const handleDownloadPdf = async () => {
+    const divElementArr = ref_pageArr.current;
+
+    await dlPdf({
+      divElementArr,
+      fileName: '外包商當月計價總表',
+    });
+  };
+
+  // ----------------------------------------------------------------------------
 
   useEffect(() => {
     if (!modalProps.visible) {
@@ -170,9 +209,30 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
           agentName,
         }}
       >
-        {chunkedRowArr.map((rowArr, index_p) => {
-          return (
-            <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
+        {!isOverflow && (
+          <Page ref={(ref) => (ref_pageArr.current[0] = ref)}>
+            <Table2 rowArr={chunkedRowArr_table[0] ?? []} className={scss.noBorderBottom} />
+          </Page>
+        )}
+
+        {isOverflow && (
+          <>
+            <Page className="mb-5" ref={(ref) => (ref_pageArr.current[0] = ref)} />
+            {chunkedRowArr_table.map((item, index) => {
+              return (
+                <PageEmpty key={index} className="mb-5" ref={(ref) => (ref_pageArr.current[index + 1] = ref)}>
+                  <Table2 rowArr={item} />
+                </PageEmpty>
+              );
+            })}
+          </>
+        )}
+
+        {/*  */}
+        {/* 模板page */}
+        <div className={scss.hiddenWrapper}>
+          <PageEmpty>
+            <Table>
               {rowArr.map((item, index) => {
                 const {
                   indexNumber,
@@ -202,44 +262,50 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
                   />
                 );
               })}
+            </Table>
+          </PageEmpty>
+        </div>
+
+        {/*  */}
+        {/* 另一個版本，每一頁都有Top跟Bottom，備用，刪掉無妨 */}
+        {/* {chunkedRowArr.map((rowArr, index_p) => {
+          return (
+            <Page key={index_p} ref={(ref) => (ref_pageArr.current[index_p] = ref)} className="mb-5">
+              <Table className={scss.noBorderBottom}>
+                {rowArr.map((item, index) => {
+                  const {
+                    indexNumber,
+                    projectNumber: projectNumber,
+                    projectName,
+                    installPrice,
+                    supplyPrice,
+                    subTotal,
+                    priceCheck,
+                  } = item;
+
+                  return (
+                    <Row
+                      key={index}
+                      ref={(ref) => {
+                        !isRowArrRendered && setIsRowArrRendered(true);
+
+                        ref_rowArr.current[index] = ref;
+                      }}
+                      indexNumber={indexNumber}
+                      projectNumber={projectNumber}
+                      projectName={projectName}
+                      installPrice={installPrice}
+                      supplyPrice={supplyPrice}
+                      subTotal={subTotal}
+                      priceCheck={priceCheck}
+                    />
+                  );
+                })}
+              </Table>
             </Page>
           );
-        })}
-
-        {/* 模板page */}
-        <div className={scss.hiddenWrapper}>
-          <Page>
-            {rowArr.map((item, index) => {
-              const {
-                indexNumber,
-                projectNumber: projectNumber,
-                projectName,
-                installPrice,
-                supplyPrice,
-                subTotal,
-                priceCheck,
-              } = item;
-
-              return (
-                <Row
-                  key={index}
-                  ref={(ref) => {
-                    !isRowArrRendered && setIsRowArrRendered(true);
-
-                    ref_rowArr.current[index] = ref;
-                  }}
-                  indexNumber={indexNumber}
-                  projectNumber={projectNumber}
-                  projectName={projectName}
-                  installPrice={installPrice}
-                  supplyPrice={supplyPrice}
-                  subTotal={subTotal}
-                  priceCheck={priceCheck}
-                />
-              );
-            })}
-          </Page>
-        </div>
+        })} */}
+        {/*  */}
       </Context.Provider>
 
       {/*  */}
@@ -248,6 +314,9 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
 }
 
 // MARK:END
+
+// ======================================================================
+// ======================================================================
 // ======================================================================
 
 // MARK:Row_forwardRef
@@ -332,6 +401,7 @@ const Top = () => {
   );
 };
 
+// MARK:Bottom
 const Bottom = () => {
   const {
     subTotal_detail,
@@ -351,7 +421,7 @@ const Bottom = () => {
   } = useContext(Context);
 
   return (
-    <>
+    <div className={scss.bottom}>
       <div className={scss.total}>
         <span className="">請款合計:</span>
         <span className="border-b border-black w-[120px] text-center">{subTotal_detail}</span>
@@ -392,26 +462,75 @@ const Bottom = () => {
         <Cell className={scss.textVertical}>經　辦</Cell>
         <Cell>{agentName}</Cell>
       </div>
-    </>
+    </div>
   );
 };
 
-const Page_forwardRef = ({ children, className }: Tprops_page, ref: React.Ref<HTMLDivElement>) => {
+// MARK:Table
+const Table = ({ children, className }: { children: React.ReactNode; className?: string }) => {
   return (
-    <div ref={ref} className={classNames(scss.page, className)} style={style}>
-      <Top />
+    <div className={classNames(scss.table, className)}>
+      <Row_thead />
+      <div className={scss.rowContainer}>{children}</div>
+    </div>
+  );
+};
 
-      <div className={scss.table}>
-        <Row_thead />
+// MARK:Table2
+const Table2 = ({ rowArr, className }: { rowArr: Trow[]; className?: string }) => {
+  return (
+    <div className={classNames(scss.table, className)}>
+      <Row_thead />
+      <div className={scss.rowContainer}>
+        {rowArr.map((item, index) => {
+          const {
+            indexNumber,
+            projectNumber: projectNumber,
+            projectName,
+            installPrice,
+            supplyPrice,
+            subTotal,
+            priceCheck,
+          } = item;
 
-        <div className={scss.rowContainer}>{children}</div>
-
-        <Bottom />
+          return (
+            <Row
+              key={index}
+              indexNumber={indexNumber}
+              projectNumber={projectNumber}
+              projectName={projectName}
+              installPrice={installPrice}
+              supplyPrice={supplyPrice}
+              subTotal={subTotal}
+              priceCheck={priceCheck}
+            />
+          );
+        })}
       </div>
     </div>
   );
 };
 
+// MARK:Page
+const Page_forwardRef = ({ children, className }: Tprops_page, ref: React.Ref<HTMLDivElement>) => {
+  return (
+    <div ref={ref} className={classNames(scss.page, className)} style={style}>
+      <Top />
+      {children}
+      <Bottom />
+    </div>
+  );
+};
+
+const PageEmpty_forwardRef = ({ children, className }: Tprops_page, ref: React.Ref<HTMLDivElement>) => {
+  return (
+    <div ref={ref} className={classNames(scss.page, className)} style={style}>
+      {children}
+    </div>
+  );
+};
+
 const Page = forwardRef(Page_forwardRef);
+const PageEmpty = forwardRef(PageEmpty_forwardRef);
 
 export type { Tprops };
