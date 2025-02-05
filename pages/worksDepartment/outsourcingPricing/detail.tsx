@@ -427,7 +427,7 @@ export default function OutsourcingPricingDetail() {
             }}
             addressProps={{
               county: {
-                wrapperStyle: { zIndex: 3 },
+                wrapperClassName: scss.select,
                 props: {
                   menuPortalTarget: undefined,
                   placeholder: '',
@@ -445,7 +445,7 @@ export default function OutsourcingPricingDetail() {
                 },
               },
               district: {
-                wrapperStyle: { zIndex: 3 },
+                wrapperClassName: scss.select,
                 props: {
                   menuPortalTarget: undefined,
                   placeholder: '',
