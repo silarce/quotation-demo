@@ -1414,7 +1414,7 @@ export type TengineeringDeliveryStatusDto = {
   unitPrice: number | null;
   // 其他特殊工作項目
   // otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
-  otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
+  otherWorkItems: ToutsourcingPaymentDetailItemDto | ToutsourcingPaymentDetailItemDto[] | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
   // 安裝項目
@@ -4809,6 +4809,14 @@ export type ToutsourcingPaymentDetailDto = {
   outsourcingPaymentId: string | null;
   // 外包計價單
   outsourcingPayment?: ToutsourcingPaymentDto;
+  //
+  projectNumber: string | null;
+  projectName: string | null;
+  projectCounty: string | null;
+  projectDistrict: string | null;
+  projectAddress: string | null;
+  projectDate: string | null;
+  itemDetail: TitemDetail[] | null;
 };
 
 export type TcreateOutsourcingPaymentDetailItemDto = {
@@ -4885,7 +4893,7 @@ export type TcreateOutsourcingPaymentDetailDto = {
   // @Type(() => Date)
   // @IsOptional()
   // @IsNullable()
-  projectDate: Date | null;
+  projectDate: string | null;
 
   // @ApiProperty({ description: '項目' })
   // @IsArray()
@@ -4898,7 +4906,7 @@ export type TcreateOutsourcingPaymentDetailDto = {
   // @IsNumber()
   outsourcingTotal: number;
 
-  // @ApiProperty({ description: '外包計價明細總計' })
+  // @ApiProperty({ description: '外包計價明細總計' })  // 後端給的description顯然錯了
   // @IsArray()
   // @ValidateNested()
   // @Type(() => ItemDetail)
