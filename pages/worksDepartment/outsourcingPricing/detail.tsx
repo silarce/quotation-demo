@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 import moment, { Moment } from 'moment';
+import { nanoid } from 'nanoid';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -60,16 +61,47 @@ type Tquery = {
 
 type Tstate_profile = {
   outsourcingName: string;
-  projectNumber: string | null;
+  projectNumber: string;
   projectDate: Moment | null;
-  installer: string | null;
-  projectName: string | null;
+  installer: string;
+  projectName: string;
   county: string;
   district: string;
   address: string;
 };
 
+// 上面的
+type Tstate_installItem = {
+  id?: string;
+  deliveryStatusId?: string;
+
+  floorNumber: string; //樓層編號
+  width: `${number}` | ''; //寬
+  height: `${number}` | ''; //高
+  talent: `${number}` | ''; //才數
+  quantity: `${number}` | ''; //樘數
+  unitPrice: `${number}` | ''; //一才價格
+
+  totalPrice: number;
+};
+
+type Tstate_installItemDict = Record<string, Tstate_installItem>;
+
+// 下面的
 type Tstate_otherWorkItem = {
+  installItemKey: string;
+
+  floorNumber: string; //樓層編號
+  content: string; //內容
+  quantity: `${number}` | ''; //數量
+  unitPrice: `${number}` | ''; //單價
+
+  totalPrice: number; //小計
+};
+
+type Tstate_otherWorkItemArr = Tstate_otherWorkItem[];
+
+type Tstate_otherWorkItem_old = {
   installItemId: string | undefined;
   // installItemName: string;
 
@@ -81,7 +113,7 @@ type Tstate_otherWorkItem = {
   // quotationItemStatusId: string;
 };
 
-type Tstate_installItem = {
+type Tstate_installItem_old = {
   itemId: string;
   itemPrice: number;
   firstDeliveryStatusId: string;
@@ -422,17 +454,19 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 
 // MARK: useProfile
-const useDetail = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {};
+const useDetail = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
+  const defaultState = useDetail_default({ paymentDetail });
+};
 
 const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
   const defaultState = useMemo(() => {
     if (!paymentDetail) {
       const emptyState_profile: Tstate_profile = {
         outsourcingName: '',
-        projectNumber: null,
+        projectNumber: '',
         projectDate: null,
-        installer: null,
-        projectName: null,
+        installer: '',
+        projectName: '',
         county: '',
         district: '',
         address: '',
@@ -440,29 +474,163 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
 
       return {
         defaultState_profile: emptyState_profile,
-        defaultState_otherWorkItem: [] as Tstate_otherWorkItem[],
-        defaultState_installItems: [] as Tstate_installItem[],
+        defaultState_installItemDict: {},
+        defaultState_otherWorkItemArr: [],
       };
     }
 
-    const { engineeringContact, outsourcingPayment } = paymentDetail ?? {};
+    const { engineeringContact, outsourcingPayment, installItems, itemDetail } = paymentDetail ?? {};
 
-    const { projectNumber = '', projectName = '', county = '', district = '', address = '' } = engineeringContact ?? {};
-    const { outsourcing: { name = '' } = {}, date } = outsourcingPayment ?? {};
+    let {
+      //
+      projectNumber,
+      projectName,
+      projectCounty,
+      projectDistrict,
+      projectAddress,
+      projectDate,
+    } = paymentDetail ?? {};
+
+    let outsourcingName = '無property';
+    let installer = '無property';
+
+    if (engineeringContact) {
+      projectNumber = engineeringContact.projectNumber;
+      projectName = engineeringContact?.projectName ?? '';
+      projectCounty = engineeringContact.county;
+      projectDistrict = engineeringContact.district;
+      projectAddress = engineeringContact.address;
+      projectDate = outsourcingPayment?.date || null;
+      outsourcingName = outsourcingPayment?.outsourcing?.name ?? '';
+      installer = outsourcingPayment?.outsourcing?.name ?? '';
+    }
 
     const defaultState_profile: Tstate_profile = {
-      outsourcingName: name,
-      projectNumber: projectNumber,
-      projectDate: date ? moment(date) : null,
-      installer: name,
-      projectName: projectName,
-      county: county,
-      district: district,
-      address: address,
+      outsourcingName,
+      projectNumber: projectNumber ?? '',
+      projectDate: projectDate ? moment(projectDate) : null,
+      installer,
+      projectName: projectName ?? '',
+      county: projectCounty ?? '',
+      district: projectDistrict ?? '',
+      address: projectAddress ?? '',
     };
 
+    const defaultState_installItemDict: Tstate_installItemDict = {};
+    const defaultState_otherWorkItemArr: Tstate_otherWorkItemArr = [];
+
+    if (engineeringContact) {
+      (installItems ?? []).forEach((item) => {
+        const {
+          id,
+          itemName,
+          itemPrice,
+
+          fullWidth,
+          height,
+          volume,
+
+          deliveryStatus,
+        } = item;
+
+        const firstDeliveryStatus = deliveryStatus[0];
+
+        const otherWorkItemArr = (() => {
+          const { otherWorkItems } = firstDeliveryStatus;
+
+          if (!otherWorkItems) {
+            return [];
+          } else if (Array.isArray(otherWorkItems)) {
+            return otherWorkItems;
+          } else {
+            return [otherWorkItems];
+          }
+        })();
+
+        const key = id;
+
+        const state_installItem: Tstate_installItem = {
+          id: id,
+          deliveryStatusId: firstDeliveryStatus.id,
+          floorNumber: itemName, // 沒有放錯，itemName要放進floorNumber
+          width: `${fullWidth}`,
+          height: `${height}`,
+          talent: `${volume || 0}` as `${number}`,
+          quantity: '1', // 不知道為什麼是'1'
+          unitPrice: `${itemPrice || 0}`,
+          totalPrice: -1,
+        };
+        state_installItem.totalPrice = new Decimal(state_installItem.talent)
+          .mul(state_installItem.quantity)
+          .mul(state_installItem.unitPrice)
+          .toNumber();
+
+        otherWorkItemArr.forEach((item) => {
+          const { otherQuantity, otherUnitPrice } = item;
+          const totalPrice = new Decimal(otherQuantity || 0).mul(otherUnitPrice || 0).toNumber();
+
+          const state_otherWorkItem: Tstate_otherWorkItem = {
+            installItemKey: key,
+
+            floorNumber: state_installItem.floorNumber,
+            content: item.otherInstallation || '',
+            quantity: `${item.otherQuantity || 0}`,
+            unitPrice: `${item.otherUnitPrice}`,
+
+            totalPrice,
+          };
+
+          defaultState_otherWorkItemArr.push(state_otherWorkItem);
+        });
+
+        defaultState_installItemDict[key] = state_installItem;
+      });
+    } else {
+      (itemDetail ?? []).forEach((item) => {
+        const key = nanoid();
+
+        const { talent, quantity, unitPrice, singleItemDetail } = item;
+        const totalPrice = new Decimal(talent).mul(quantity).mul(unitPrice).toNumber();
+        const state_installItem: Tstate_installItem = {
+          floorNumber: item.floorNumber,
+          width: `${item.width}`,
+          height: `${item.height}`,
+          talent: `${talent}`,
+          quantity: `${quantity}`,
+          unitPrice: `${unitPrice}`,
+          totalPrice,
+        };
+
+        defaultState_installItemDict[key] = state_installItem;
+
+        singleItemDetail.forEach((item) => {
+          const { floorNumber, content, quantity, unitPrice } = item;
+
+          const totalPrice = new Decimal(quantity).mul(unitPrice).toNumber();
+
+          const state_otherWorkItem: Tstate_otherWorkItem = {
+            installItemKey: key,
+            floorNumber: floorNumber,
+            content,
+            quantity: `${quantity}`,
+            unitPrice: `${unitPrice}`,
+            totalPrice,
+          };
+
+          defaultState_otherWorkItemArr.push(state_otherWorkItem);
+        });
+      });
+    }
+
     //
+    return {
+      defaultState_profile,
+      defaultState_installItemDict,
+      defaultState_otherWorkItemArr,
+    };
   }, [paymentDetail]);
+
+  return defaultState;
 };
 
 // MARK:useTable01
@@ -474,14 +642,14 @@ const useTable01 = ({
   installItems: TquotationProductItemDto[];
   disabled?: boolean;
 }) => {
-  const [state_installItem, setState_installItem] = useState<Tstate_installItem[]>([]);
+  const [state_installItem, setState_installItem] = useState<Tstate_installItem_old[]>([]);
 
   useEffect(() => {
     if (!disabled) {
       return;
     }
 
-    const newState_installItem: Tstate_installItem[] = installItems.map((item) => {
+    const newState_installItem: Tstate_installItem_old[] = installItems.map((item) => {
       return {
         itemId: item.id,
         itemPrice: item.itemPrice || 0,
@@ -655,9 +823,9 @@ const useTable02 = ({
 
   const [itemNameOptionArr, setItemNameOptionArr] = useState<Toption[]>([]);
 
-  const [state_otherWorkItem, setState_otherWorkItem] = useState<Tstate_otherWorkItem[]>([]);
+  const [state_otherWorkItem, setState_otherWorkItem] = useState<Tstate_otherWorkItem_old[]>([]);
 
-  const editState_otherWorkItem = (index: number, key: keyof Tstate_otherWorkItem, value: string) => {
+  const editState_otherWorkItem = (index: number, key: keyof Tstate_otherWorkItem_old, value: string) => {
     setState_otherWorkItem((prev) => {
       const copy = [...prev];
       const item = copy[index];
@@ -695,7 +863,7 @@ const useTable02 = ({
       return;
     }
 
-    const arr: Tstate_otherWorkItem[] = [];
+    const arr: Tstate_otherWorkItem_old[] = [];
     const otherWorkItemsOptionArr: Toption[] = [];
 
     installItems.forEach((item) => {
@@ -719,19 +887,28 @@ const useTable02 = ({
         });
       }
 
-      const otherWorkItems = firstDeliveryStatus?.otherWorkItems;
+      // const otherWorkItems = firstDeliveryStatus?.otherWorkItems;
+      const otherWorkItemArr = (() => {
+        if (!firstDeliveryStatus?.otherWorkItems) {
+          return [];
+        } else if (Array.isArray(firstDeliveryStatus.otherWorkItems)) {
+          return firstDeliveryStatus.otherWorkItems;
+        } else {
+          return [firstDeliveryStatus.otherWorkItems];
+        }
+      })();
 
-      if (otherWorkItems) {
+      otherWorkItemArr.forEach((item) => {
         arr.push({
-          installItemId: item.id,
+          installItemId: id,
           // installItemName: item.itemName,
-          otherInstallation: otherWorkItems.otherInstallation ?? '',
-          otherQuantity: String(otherWorkItems.otherQuantity || 0),
-          otherUnitPrice: String(otherWorkItems.otherUnitPrice || 0),
-          otherSubTotalPrice: String(otherWorkItems.otherSubTotalPrice || 0),
-          quotationItemStatusId: otherWorkItems.quotationItemStatusId,
+          otherInstallation: item.otherInstallation ?? '',
+          otherQuantity: String(item.otherQuantity || 0),
+          otherUnitPrice: String(item.otherUnitPrice || 0),
+          otherSubTotalPrice: String(item.otherSubTotalPrice || 0),
+          quotationItemStatusId: item.quotationItemStatusId,
         });
-      }
+      });
 
       //
     });
