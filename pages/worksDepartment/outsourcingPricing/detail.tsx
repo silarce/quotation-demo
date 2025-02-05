@@ -41,6 +41,7 @@ import {
   useGetOutsourcingPaymentDetail_id,
   apiPatchOutsourcingPaymentDetail,
   apiPostOutsourcingPaymentDetail,
+  useGetOutsourcing_id,
 } from 'js/api/api_outsourcing';
 
 // utils
@@ -56,6 +57,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 type Tquery = {
   paymentDetailId: string | undefined;
+  outsourcingId: string | undefined;
   isNew: string | undefined;
 };
 
@@ -143,7 +145,6 @@ type Tstate_installItem_old = {
 export default function OutsourcingPricingDetail() {
   const router = useRouter();
   const query = router.query as Tquery;
-  // const { paymentDetailId } = query;
   const isNew = query.isNew === 'true';
   const paymentDetailId = isNew ? undefined : query.paymentDetailId;
 
@@ -151,6 +152,10 @@ export default function OutsourcingPricingDetail() {
   const [disabled, setDisabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   // ---------------------------------------------------------------------
+
+  const { data: outsourcing_forNew, update: update_outsourcing } = useGetOutsourcing_id(
+    isNew ? query.outsourcingId : undefined
+  );
 
   const {
     data: paymentDetail,
@@ -166,8 +171,13 @@ export default function OutsourcingPricingDetail() {
     installItems = [],
   } = paymentDetail ?? {};
 
-  const { outsourcing, date } = outsourcingPayment ?? {};
+  const {
+    // outsourcing=outsourcing_forNew,
+    date,
+  } = outsourcingPayment ?? {};
   const twDateStr = date ? getTaiwanDateStr(date) : '';
+
+  const outsourcing = isNew ? outsourcing_forNew : outsourcingPayment?.outsourcing;
   const outsourcingId = outsourcing?.id;
 
   // ---------------------------------------------------------------------
@@ -324,6 +334,10 @@ export default function OutsourcingPricingDetail() {
   useEffect(() => {
     update();
   }, [paymentDetailId]);
+
+  useEffect(() => {
+    update_outsourcing();
+  }, [isNew, query.outsourcingId]);
 
   // endregion useEffect
 
@@ -620,19 +634,8 @@ const useDetail = ({
 const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
   const defaultState = useMemo(() => {
     if (!paymentDetail) {
-      const emptyState_profile: Tstate_profile = {
-        outsourcingName: '',
-        projectNumber: '',
-        projectDate: null,
-        installer: '',
-        projectName: '',
-        county: '',
-        district: '',
-        address: '',
-      };
-
       return {
-        defaultState_profile: emptyState_profile,
+        defaultState_profile: emptyState_profile(),
         defaultState_installItemDict: {},
         defaultState_otherWorkItemArr: [],
         defaultState_outsourcingTotal: 0,
@@ -1376,6 +1379,21 @@ const config_useTable02: Tconfig = {
 };
 
 // ===========================================================================
+
+const emptyState_profile = () => {
+  const state_profile: Tstate_profile = {
+    outsourcingName: '',
+    projectNumber: '',
+    projectDate: null,
+    installer: '',
+    projectName: '',
+    county: '',
+    district: '',
+    address: '',
+  };
+
+  return state_profile;
+};
 
 const emptyState_installItem = (key: string) => {
   const state_installItem: Tstate_installItem = {

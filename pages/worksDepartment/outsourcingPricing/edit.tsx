@@ -111,6 +111,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     customerParams: params,
     autoUpdate: false,
   });
+  const outsourcingId = data_payment?.outsourcing.id;
 
   const {
     fileInfoArr,
@@ -449,6 +450,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           pathname: './detail',
           query: {
             paymentDetailId: data.id,
+            outsourcingId,
           },
         };
 
@@ -512,7 +514,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       //
       control_table_project: control_table,
     };
-  }, [paymentDetail, subTotal_detail]);
+  }, [paymentDetail, subTotal_detail, outsourcingId]);
 
   // ------------------------------11-------------------------------------------
 
