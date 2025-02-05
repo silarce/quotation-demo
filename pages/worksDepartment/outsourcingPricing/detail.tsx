@@ -62,10 +62,10 @@ type Tquery = {
 };
 
 type Tstate_profile = {
-  outsourcingName: string;
+  // outsourcingName: string;
   projectNumber: string;
   projectDate: Moment | null;
-  installer: string;
+  // installer: string;
   projectName: string;
   county: string;
   district: string;
@@ -183,6 +183,27 @@ export default function OutsourcingPricingDetail() {
   const outsourcingId = outsourcing?.id;
 
   // ---------------------------------------------------------------------
+
+  const {
+    state_profile,
+    state_installItemDict,
+    state_otherWorkItemArr,
+    state_outsourcingTotal,
+
+    options_installItem,
+
+    setState_profile,
+
+    createEditState_installItem,
+    createEditState_otherWorkItem,
+    addInstallItem,
+    addOtherWorkItem,
+    deleteInstallItem,
+    deleteOtherWorkItem,
+  } = useDetail({
+    paymentDetail,
+    disabled,
+  });
 
   const {
     //
@@ -353,64 +374,47 @@ export default function OutsourcingPricingDetail() {
       <div className={scss.main}>
         {/*  */}
         <div className={scss.profile}>
+          <InputSel caption={'外包廠商'} showBaseline="invisible" node={outsourcing?.name} />
           <InputSel
-            //
-            caption={'外包廠商'}
-            disabled={disabled}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                value: outsourcing?.name ?? '',
-                placeholder: '',
-              },
-            }}
-          />
-          <InputSel
-            //
             caption={'工程編號'}
-            disabled={disabled}
+            disabled={isNew ? disabled : true}
             showBaseline="auto"
             inputProps={{
               props: {
-                value: engineeringContact?.projectNumber ?? '',
                 placeholder: '',
+                value: state_profile.projectNumber,
+                onChange: (e) => {
+                  setState_profile((prev) => ({ ...prev, projectNumber: e.target.value }));
+                },
               },
             }}
           />
           <InputSel
-            //
             caption={'工程日期'}
-            disabled={disabled}
+            disabled={isNew ? disabled : true}
             showBaseline="auto"
-            inputProps={{
+            datePickerProps={{
               props: {
-                value: twDateStr ?? '',
-                placeholder: '',
+                value: state_profile.projectDate,
+                onChange: (date) => {
+                  setState_profile((prev) => ({ ...prev, projectDate: date }));
+                },
               },
             }}
           />
+          <InputSel caption={'安裝人員'} showBaseline="invisible" node={outsourcing?.name} />
           <InputSel
-            //
-            caption={'安裝人員'}
-            disabled={disabled}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                value: outsourcing?.name ?? '',
-                placeholder: '',
-              },
-            }}
-          />
-          <InputSel
-            //
             caption={'工程名稱'}
             className="col-span-2"
-            disabled={disabled}
+            disabled={isNew ? disabled : true}
             showBaseline="auto"
             inputProps={{
               props: {
-                value: engineeringContact?.projectName,
                 placeholder: '',
+                value: state_profile.projectName,
+                onChange: (e) => {
+                  setState_profile((prev) => ({ ...prev, projectName: e.target.value }));
+                },
               },
             }}
           />
@@ -418,29 +422,50 @@ export default function OutsourcingPricingDetail() {
             inputSelProps={{
               caption: '工程地址',
               className: 'col-span-2',
-              disabled: disabled,
+              disabled: isNew ? disabled : true,
               showBaseline: 'auto',
             }}
             addressProps={{
               county: {
                 props: {
-                  isDisabled: true,
-                  value: { value: '', label: engineeringContact?.county ?? '' },
+                  // menuPortalTarget: undefined,
                   placeholder: '',
+                  isDisabled: isNew ? disabled : true,
+                  value: { value: state_profile.county, label: state_profile.county },
+                  onChange: (option) => {
+                    const value = option?.value ?? '';
+
+                    setState_profile((prev) => ({
+                      ...prev,
+                      county: value,
+                      district: '',
+                    }));
+                  },
                 },
               },
               district: {
                 props: {
-                  isDisabled: true,
-                  value: { value: '', label: engineeringContact?.district ?? '' },
                   placeholder: '',
+                  isDisabled: isNew ? disabled : true,
+                  value: { value: state_profile.district, label: state_profile.district },
+                  onChange: (option) => {
+                    const value = option?.value ?? '';
+
+                    setState_profile((prev) => ({
+                      ...prev,
+                      district: value,
+                    }));
+                  },
                 },
               },
               address: {
                 props: {
-                  readOnly: true,
-                  value: engineeringContact?.address ?? '',
                   placeholder: '',
+                  readOnly: isNew ? disabled : true,
+                  value: state_profile.address,
+                  onChange: (e) => {
+                    setState_profile((prev) => ({ ...prev, address: e.target.value }));
+                  },
                 },
               },
             }}
@@ -622,6 +647,8 @@ const useDetail = ({
 
     options_installItem,
 
+    setState_profile,
+
     createEditState_installItem,
     createEditState_otherWorkItem,
     addInstallItem,
@@ -656,8 +683,8 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
       projectDate,
     } = paymentDetail ?? {};
 
-    let outsourcingName = '無property';
-    let installer = '無property';
+    // let outsourcingName = '無property';
+    // let installer = '無property';
 
     if (engineeringContact) {
       projectNumber = engineeringContact.projectNumber;
@@ -666,15 +693,15 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
       projectDistrict = engineeringContact.district;
       projectAddress = engineeringContact.address;
       projectDate = outsourcingPayment?.date || null;
-      outsourcingName = outsourcingPayment?.outsourcing?.name ?? '';
-      installer = outsourcingPayment?.outsourcing?.name ?? '';
+      // outsourcingName = outsourcingPayment?.outsourcing?.name ?? '';
+      // installer = outsourcingPayment?.outsourcing?.name ?? '';
     }
 
     const defaultState_profile: Tstate_profile = {
-      outsourcingName,
+      // outsourcingName,
       projectNumber: projectNumber ?? '',
       projectDate: projectDate ? moment(projectDate) : null,
-      installer,
+      // installer,
       projectName: projectName ?? '',
       county: projectCounty ?? '',
       district: projectDistrict ?? '',
@@ -1388,10 +1415,10 @@ const config_useTable02: Tconfig = {
 
 const emptyState_profile = () => {
   const state_profile: Tstate_profile = {
-    outsourcingName: '',
+    // outsourcingName: '',
     projectNumber: '',
     projectDate: null,
-    installer: '',
+    // installer: '',
     projectName: '',
     county: '',
     district: '',
