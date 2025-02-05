@@ -427,8 +427,9 @@ export default function OutsourcingPricingDetail() {
             }}
             addressProps={{
               county: {
+                wrapperStyle: { zIndex: 3 },
                 props: {
-                  // menuPortalTarget: undefined,
+                  menuPortalTarget: undefined,
                   placeholder: '',
                   isDisabled: isNew ? disabled : true,
                   value: { value: state_profile.county, label: state_profile.county },
@@ -444,7 +445,9 @@ export default function OutsourcingPricingDetail() {
                 },
               },
               district: {
+                wrapperStyle: { zIndex: 3 },
                 props: {
+                  menuPortalTarget: undefined,
                   placeholder: '',
                   isDisabled: isNew ? disabled : true,
                   value: { value: state_profile.district, label: state_profile.district },
