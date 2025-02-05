@@ -148,6 +148,8 @@ export default function OutsourcingPricingDetail() {
   const isNew = query.isNew === 'true';
   const paymentDetailId = isNew ? undefined : query.paymentDetailId;
 
+  // console.log(paymentDetailId);
+
   // ---------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -168,7 +170,7 @@ export default function OutsourcingPricingDetail() {
     engineeringContact,
     outsourcingPayment,
     outsourcingTotal,
-    installItems = [],
+    installItems,
   } = paymentDetail ?? {};
 
   const {
@@ -808,9 +810,13 @@ const useTable01 = ({
   installItems,
   disabled,
 }: {
-  installItems: TquotationProductItemDto[];
+  installItems: TquotationProductItemDto[] | undefined;
   disabled?: boolean;
 }) => {
+  const thInstallItems = useMemo(() => {
+    return installItems ?? [];
+  }, [installItems]);
+
   const [state_installItem, setState_installItem] = useState<Tstate_installItem_old[]>([]);
 
   useEffect(() => {
@@ -818,7 +824,7 @@ const useTable01 = ({
       return;
     }
 
-    const newState_installItem: Tstate_installItem_old[] = installItems.map((item) => {
+    const newState_installItem: Tstate_installItem_old[] = thInstallItems.map((item) => {
       return {
         itemId: item.id,
         itemPrice: item.itemPrice || 0,
@@ -827,7 +833,7 @@ const useTable01 = ({
     });
 
     setState_installItem(newState_installItem);
-  }, [installItems, disabled]);
+  }, [thInstallItems, disabled]);
 
   //
   const { control_table, subTotal } = useMemo(() => {
@@ -868,7 +874,7 @@ const useTable01 = ({
     let decimal_subTotal = new Decimal(0);
 
     const rowArr: Ttable['tbody']['rowArr'] = state_installItem.map((_, index) => {
-      const item = installItems[index];
+      const item = thInstallItems[index];
       const { itemName, fullWidth, height, volume } = item;
 
       const itemPrice = state_installItem[index].itemPrice;
@@ -984,7 +990,7 @@ const useTable02 = ({
   disabled,
   outsourcingId,
 }: {
-  installItems: TquotationProductItemDto[];
+  installItems: TquotationProductItemDto[] | undefined;
   disabled?: boolean;
   outsourcingId: string | undefined;
 }) => {
@@ -1035,7 +1041,7 @@ const useTable02 = ({
     const arr: Tstate_otherWorkItem_old[] = [];
     const otherWorkItemsOptionArr: Toption[] = [];
 
-    installItems.forEach((item) => {
+    installItems?.forEach((item) => {
       const { deliveryStatus, id, itemName } = item;
 
       let deliveryStatusArr = (deliveryStatus ?? []).filter((item) => {
