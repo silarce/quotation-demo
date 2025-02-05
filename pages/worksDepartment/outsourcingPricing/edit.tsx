@@ -450,7 +450,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           pathname: './detail',
           query: {
             paymentDetailId: data.id,
-            outsourcingId,
+            // outsourcingId,
           },
         };
 
@@ -1053,7 +1053,24 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           />
         )}
         <Table
-          caption="工程列表"
+          caption={
+            <>
+              工程列表{' '}
+              <Link
+                href={{
+                  pathname: './detail',
+                  query: {
+                    outsourcingId,
+                    isNew: 'true',
+                  },
+                }}
+              >
+                <SquareBtn sharp="mini" className="ml-3">
+                  新建明細
+                </SquareBtn>
+              </Link>
+            </>
+          }
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_project}
@@ -1346,7 +1363,7 @@ const Table = ({
   onAddClick,
   disabled,
 }: {
-  caption: string;
+  caption: React.ReactNode;
   control: Ttable;
   className?: string;
   onAddClick?: () => void;
