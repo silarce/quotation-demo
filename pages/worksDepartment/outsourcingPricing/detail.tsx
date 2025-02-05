@@ -72,6 +72,8 @@ type Tstate_profile = {
 
 // 上面的
 type Tstate_installItem = {
+  key: string;
+
   id?: string;
   deliveryStatusId?: string;
 
@@ -100,6 +102,8 @@ type Tstate_otherWorkItem = {
 };
 
 type Tstate_otherWorkItemArr = Tstate_otherWorkItem[];
+
+type Tstate_outsourcingTotal = number;
 
 type Tstate_otherWorkItem_old = {
   installItemId: string | undefined;
@@ -453,11 +457,166 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 // ===========================================================================
 
-// MARK: useProfile
-const useDetail = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
+// MARK: useDetail
+const useDetail = ({
+  paymentDetail,
+  disabled,
+}: {
+  paymentDetail: ToutsourcingPaymentDetailDto | undefined;
+  disabled: boolean;
+}) => {
   const defaultState = useDetail_default({ paymentDetail });
+
+  const [state_profile, setState_profile] = useState<Tstate_profile>(defaultState.defaultState_profile);
+  const [state_installItemDict, setState_installItemDict] = useState<Tstate_installItemDict>(
+    defaultState.defaultState_installItemDict
+  );
+  const [state_otherWorkItemArr, setState_otherWorkItemArr] = useState<Tstate_otherWorkItemArr>(
+    defaultState.defaultState_otherWorkItemArr
+  );
+  const [state_outsourcingTotal, setState_outsourcingTotal] = useState<Tstate_outsourcingTotal>(
+    defaultState.defaultState_outsourcingTotal
+  );
+
+  // ------------------------------------------------------------------------
+  const options_installItem = useMemo(() => {
+    const options: Toption[] = Object.entries(state_installItemDict).map(([key, item]) => {
+      return {
+        value: key,
+        label: item.floorNumber,
+        floorNumber: item.floorNumber,
+      };
+    });
+
+    return options;
+  }, [state_installItemDict]);
+
+  // ------------------------------------------------------------------------
+
+  const calcOutsourcingTotal = () => {
+    let total_d = new Decimal(0);
+    Object.values(state_installItemDict).forEach((item) => {
+      total_d = total_d.add(item.totalPrice);
+    });
+
+    state_otherWorkItemArr.forEach((item) => {
+      total_d = total_d.add(item.totalPrice);
+    });
+
+    return total_d.toNumber();
+  };
+
+  const addInstallItem = () => {
+    const key = nanoid();
+    setState_installItemDict((prev) => {
+      const copy = { ...prev };
+      copy[key] = emptyState_installItem(key);
+
+      return copy;
+    });
+    calcOutsourcingTotal();
+  };
+
+  const addOtherWorkItem = (state_installItem: Tstate_installItem) => {
+    setState_otherWorkItemArr((prev) => {
+      return [
+        ...prev,
+        emptyState_otherWorkItem({
+          installItemKey: state_installItem.key,
+          floorNumber: state_installItem.floorNumber,
+        }),
+      ];
+    });
+    calcOutsourcingTotal();
+  };
+
+  const deleteInstallItem = (key: string) => {
+    setState_installItemDict((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+
+      return copy;
+    });
+
+    setState_otherWorkItemArr((prev) => {
+      return prev.filter((item) => item.installItemKey !== key);
+    });
+    calcOutsourcingTotal();
+  };
+
+  const deleteOtherWorkItem = (index: number) => {
+    setState_otherWorkItemArr((prev) => {
+      const copy = [...prev];
+      copy.splice(index, 1);
+
+      return copy;
+    });
+    calcOutsourcingTotal();
+  };
+
+  const createEditState_installItem = (key: string) => {
+    return (setState: React.SetStateAction<Tstate_installItem>) => {
+      setState_installItemDict((prev) => {
+        const copy = { ...prev };
+        const targetItem = copy[key];
+
+        if (typeof setState === 'function') {
+          copy[key] = setState(targetItem);
+        } else {
+          copy[key] = setState;
+        }
+
+        return copy;
+      });
+    };
+  };
+
+  const createEditState_otherWorkItem = (index: number) => {
+    return (setState: React.SetStateAction<Tstate_otherWorkItem>) => {
+      setState_otherWorkItemArr((prev) => {
+        const copy = [...prev];
+        const targetItem = copy[index];
+
+        if (typeof setState === 'function') {
+          copy[index] = setState(targetItem);
+        } else {
+          copy[index] = setState;
+        }
+
+        return copy;
+      });
+    };
+  };
+
+  // ------------------------------------------------------------------------
+  useEffect(() => {
+    setState_profile(defaultState.defaultState_profile);
+    setState_installItemDict(defaultState.defaultState_installItemDict);
+    setState_otherWorkItemArr(defaultState.defaultState_otherWorkItemArr);
+    setState_outsourcingTotal(defaultState.defaultState_outsourcingTotal);
+  }, [defaultState, disabled]);
+
+  //
+
+  return {
+    state_profile,
+    state_installItemDict,
+    state_otherWorkItemArr,
+    state_outsourcingTotal,
+
+    options_installItem,
+
+    createEditState_installItem,
+    createEditState_otherWorkItem,
+    addInstallItem,
+    addOtherWorkItem,
+    deleteInstallItem,
+    deleteOtherWorkItem,
+  };
+  //
 };
 
+// MARK:useDetail_default
 const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
   const defaultState = useMemo(() => {
     if (!paymentDetail) {
@@ -476,6 +635,7 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
         defaultState_profile: emptyState_profile,
         defaultState_installItemDict: {},
         defaultState_otherWorkItemArr: [],
+        defaultState_outsourcingTotal: 0,
       };
     }
 
@@ -550,6 +710,7 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
         const key = id;
 
         const state_installItem: Tstate_installItem = {
+          key,
           id: id,
           deliveryStatusId: firstDeliveryStatus.id,
           floorNumber: itemName, // 沒有放錯，itemName要放進floorNumber
@@ -592,6 +753,7 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
         const { talent, quantity, unitPrice, singleItemDetail } = item;
         const totalPrice = new Decimal(talent).mul(quantity).mul(unitPrice).toNumber();
         const state_installItem: Tstate_installItem = {
+          key,
           floorNumber: item.floorNumber,
           width: `${item.width}`,
           height: `${item.height}`,
@@ -623,10 +785,14 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
     }
 
     //
+    const defaultState_outsourcingTotal: Tstate_outsourcingTotal = paymentDetail.outsourcingTotal;
+
+    //
     return {
       defaultState_profile,
       defaultState_installItemDict,
       defaultState_otherWorkItemArr,
+      defaultState_outsourcingTotal,
     };
   }, [paymentDetail]);
 
@@ -1210,3 +1376,31 @@ const config_useTable02: Tconfig = {
 };
 
 // ===========================================================================
+
+const emptyState_installItem = (key: string) => {
+  const state_installItem: Tstate_installItem = {
+    key,
+    floorNumber: '',
+    width: '',
+    height: '',
+    talent: '',
+    quantity: '',
+    unitPrice: '',
+    totalPrice: 0,
+  };
+
+  return state_installItem;
+};
+
+const emptyState_otherWorkItem = ({ installItemKey, floorNumber }: { installItemKey: string; floorNumber: string }) => {
+  const state_otherWorkItem: Tstate_otherWorkItem = {
+    installItemKey,
+    floorNumber,
+    content: '',
+    quantity: '',
+    unitPrice: '',
+    totalPrice: 0,
+  };
+
+  return state_otherWorkItem;
+};
