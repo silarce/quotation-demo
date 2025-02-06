@@ -229,27 +229,8 @@ export default function OutsourcingPricingDetail() {
   } = useDetail({
     paymentDetail,
     disabled,
+    outsourcingId,
   });
-
-  // const {
-  //   //
-  //   control_table01,
-  //   subTotal01,
-  //   state_installItem,
-  // } = useTable01({ installItems, disabled });
-
-  // const {
-  //   //
-  //   control_table02,
-  //   subTotal02,
-  //   addState_otherWorkItem,
-  //   state_otherWorkItem,
-  // } = useTable02({
-  //   installItems,
-  //   disabled,
-  //   outsourcingId,
-  // });
-  // const control_table_total = useTable_total_old({ subTotal01, subTotal02 });
 
   // ---------------------------------------------------------------------
   // region REQUEST
@@ -705,11 +686,13 @@ export default function OutsourcingPricingDetail() {
 const useDetail = ({
   paymentDetail,
   disabled,
+  outsourcingId,
 }: {
   paymentDetail: ToutsourcingPaymentDetailDto | undefined;
   disabled: boolean;
+  outsourcingId: string | undefined;
 }) => {
-  const defaultState = useDetail_default({ paymentDetail });
+  const defaultState = useDetail_default({ paymentDetail, outsourcingId });
 
   const isItemEdited = useRef(false);
 
@@ -932,9 +915,15 @@ const useDetail = ({
 };
 
 // MARK:useDetail_default
-const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
+const useDetail_default = ({
+  paymentDetail,
+  outsourcingId,
+}: {
+  paymentDetail: ToutsourcingPaymentDetailDto | undefined;
+  outsourcingId: string | undefined;
+}) => {
   const defaultState = useMemo(() => {
-    if (!paymentDetail) {
+    if (!paymentDetail || !outsourcingId) {
       return {
         defaultState_profile: emptyState_profile(),
         defaultState_installItemDict: {},
@@ -994,7 +983,12 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
           deliveryStatus,
         } = item;
 
-        const firstDeliveryStatus = deliveryStatus[0];
+        let theDeliveryStatus = deliveryStatus.filter((item) => {
+          return item.installerOutsourcingId === outsourcingId;
+        });
+        theDeliveryStatus = _.sortBy(theDeliveryStatus, 'createdAt');
+
+        const firstDeliveryStatus = theDeliveryStatus[0];
 
         const otherWorkItemArr = (() => {
           const { otherWorkItems } = firstDeliveryStatus;
