@@ -315,7 +315,13 @@ export default function OutsourcingPricingDetail() {
     };
 
     await apiPostOutsourcingPaymentDetail(paymentId, body)
-      .then((res) => {})
+      .then((res) => {
+        router.replace({
+          query: {
+            paymentDetailId: res.id,
+          },
+        });
+      })
       .catch();
   };
 
