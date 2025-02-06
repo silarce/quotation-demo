@@ -345,7 +345,10 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             //
             disabled={disabled}
             classState={State}
-            onInovoiceBtnClick={handleSelectInvoice}
+            // onInovoiceBtnClick={handleSelectInvoice}
+            changeInvoice={(invoiceNumber) => {
+              State.changeInvoice({ invoiceNumber });
+            }}
             invoiceBtn={{
               onSelectClick: handleSelectInvoice,
               onClearClick: handleClearInvoice,

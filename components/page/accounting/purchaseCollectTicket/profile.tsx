@@ -16,12 +16,14 @@ const Profile = ({
   //
   disabled,
   classState,
-  onInovoiceBtnClick,
+  // onInovoiceBtnClick,
+  changeInvoice,
   invoiceBtn,
 }: {
   disabled: boolean;
   classState: Interface_classState;
-  onInovoiceBtnClick: () => void;
+  // onInovoiceBtnClick: () => void;
+  changeInvoice: (invoiceNumber: string) => void;
   invoiceBtn: {
     onSelectClick: () => void;
     onClearClick: () => void;
@@ -51,7 +53,7 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption={t('serial_number')}
+        caption={t('applicant_department')}
         showBaseline="auto"
         disabled={disabled}
         selectProps={{
@@ -124,12 +126,16 @@ const Profile = ({
 
       <InputSel
         caption={t('invoice_number')}
-        showBaseline="invisible"
+        showBaseline="auto"
+        disabled={disabled}
         inputProps={{
           props: {
-            value: classState.invoice_number,
             placeholder: '請選擇發票',
-            readOnly: true,
+            value: classState.invoice_number,
+            onChange: (e) => {
+              changeInvoice(e.target.value);
+            },
+            // readOnly: disabled,
           },
         }}
         suffix={
