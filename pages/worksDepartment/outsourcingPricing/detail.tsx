@@ -992,7 +992,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.floorNumber.width }}
+              style={{ width: config_useTable01.floorNumber.style?.width }}
               disabled={isNew ? disabled : true}
               inputProps={{
                 value: floorNumber,
@@ -1013,7 +1013,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.width.width }}
+              style={{ width: config_useTable01.width.style?.width }}
               disabled={isNew ? disabled : true}
               inputProps={{
                 type: 'number',
@@ -1042,7 +1042,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.height.width }}
+              style={{ width: config_useTable01.height.style?.width }}
               disabled={isNew ? disabled : true}
               inputProps={{
                 type: 'number',
@@ -1071,7 +1071,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.volume.width }}
+              style={{ width: config_useTable01.volume.style?.width }}
               disabled={isNew ? disabled : true}
               inputProps={{
                 type: 'number',
@@ -1103,7 +1103,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.qty.width }}
+              style={{ width: config_useTable01.qty.style?.width }}
               disabled={isNew ? disabled : true}
               inputProps={{
                 type: 'number',
@@ -1135,7 +1135,7 @@ const useTable_installItem = ({
         {
           children: (
             <CellInput
-              style={{ width: config_useTable01.unitPrice.width }}
+              style={{ width: config_useTable01.unitPrice.style?.width }}
               disabled={disabled}
               inputProps={{
                 type: 'number',
@@ -1277,7 +1277,7 @@ const useTable_otherWorkItem = ({
             <CellSelect
               //
               disabled={disabled}
-              style={{ width: config_useTable02.floorNumber.width }}
+              style={{ width: config_useTable02.floorNumber.style?.width }}
               selectProps={{
                 value: installItemKey,
                 placeholder: '',
@@ -1304,7 +1304,7 @@ const useTable_otherWorkItem = ({
           children: (
             <CellSelect
               disabled={disabled}
-              style={{ width: config_useTable02.workContent.width }}
+              style={{ width: config_useTable02.workContent.style?.width }}
               selectProps={{
                 value: content,
                 placeholder: '工作內容...',
@@ -1321,7 +1321,7 @@ const useTable_otherWorkItem = ({
           children: (
             <CellInput
               disabled={disabled}
-              style={{ width: config_useTable02.qty.width }}
+              style={{ width: config_useTable02.qty.style?.width }}
               inputProps={{
                 type: 'number',
                 min: 0,
@@ -1341,7 +1341,7 @@ const useTable_otherWorkItem = ({
           children: (
             <CellInput
               disabled={disabled}
-              style={{ width: config_useTable02.unitPrice.width }}
+              style={{ width: config_useTable02.unitPrice.style?.width }}
               inputProps={{
                 type: 'number',
                 min: 0,
@@ -1898,47 +1898,47 @@ const useTable02 = ({
   };
 };
 
-const useTable_total_old = ({ subTotal01, subTotal02 }: { subTotal01: number; subTotal02: number }) => {
-  const control_table: Ttable = useMemo(() => {
-    const total = new Decimal(subTotal01).add(subTotal02).toNumber();
+// const useTable_total_old = ({ subTotal01, subTotal02 }: { subTotal01: number; subTotal02: number }) => {
+//   const control_table: Ttable = useMemo(() => {
+//     const total = new Decimal(subTotal01).add(subTotal02).toNumber();
 
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        {
-          children: '總計',
-          flex: 'auto',
-          width: '100%',
-        },
-      ],
-    };
+//     const thead: Ttable['thead'] = {
+//       cellArr: [
+//         {
+//           children: '總計',
+//           flex: 'auto',
+//           width: '100%',
+//         },
+//       ],
+//     };
 
-    const rowArr: Ttable['tbody']['rowArr'] = [
-      {
-        cellArr: [
-          {
-            children: '總計',
-            ...confit_public.left,
-          },
-          {
-            children: total.toLocaleString(),
-            ...confit_public.right,
-          },
-        ],
-      },
-    ];
+//     const rowArr: Ttable['tbody']['rowArr'] = [
+//       {
+//         cellArr: [
+//           {
+//             children: '總計',
+//             ...confit_public.left,
+//           },
+//           {
+//             children: total.toLocaleString(),
+//             ...confit_public.right,
+//           },
+//         ],
+//       },
+//     ];
 
-    const tbody = {
-      rowArr,
-    };
+//     const tbody = {
+//       rowArr,
+//     };
 
-    return {
-      thead,
-      tbody,
-    };
-  }, [subTotal01, subTotal02]);
+//     return {
+//       thead,
+//       tbody,
+//     };
+//   }, [subTotal01, subTotal02]);
 
-  return control_table;
-};
+//   return control_table;
+// };
 
 // ===========================================================================
 
@@ -1960,78 +1960,106 @@ const confit_public: Tconfig = {
 const config_useTable01: Tconfig = {
   btn: {
     label: '',
-    width: 40,
-    justifyContent: 'center',
+    style: {
+      width: 40,
+      justifyContent: 'center',
+    },
   },
   floorNumber: {
     label: '樓層編號',
-    // width:230
-    flex: 'auto',
-    justifyContent: 'center',
+    style: {
+      // width:230
+      flex: 'auto',
+      justifyContent: 'center',
+    },
   },
   width: {
     label: '寬',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   height: {
     label: '高',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   volume: {
     label: '才數',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   qty: {
     label: '樘數',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   unitPrice: {
     label: '價格/才',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   dualPrice: {
     label: '小計',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
 };
 
 const config_useTable02: Tconfig = {
   btn: {
     label: '',
-    width: 40,
-    justifyContent: 'center',
+    style: {
+      width: 40,
+      justifyContent: 'center',
+    },
   },
   floorNumber: {
     label: '樓層編號',
-    width: 230,
-    justifyContent: 'center',
+    style: {
+      width: 158,
+      justifyContent: 'center',
+    },
   },
   workContent: {
     label: '工作內容',
-    flex: 'auto',
-    width: '418px',
-    justifyContent: 'center',
+    style: {
+      flex: 'auto',
+      width: '418px',
+      justifyContent: 'center',
+    },
   },
   qty: {
     label: '數量',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   unitPrice: {
     label: '單價',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
   dualPrice: {
     label: '小計',
-    width: 150,
-    justifyContent: 'center',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
   },
 };
 
