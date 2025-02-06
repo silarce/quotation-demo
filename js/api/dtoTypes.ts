@@ -4900,7 +4900,7 @@ export type TcreateOutsourcingPaymentDetailDto = {
   // @ValidateNested()
   // @Type(() => CreateOutsourcingPaymentDetailItemDto)
   // @IsOptional()
-  installItems: TcreateOutsourcingPaymentDetailItemDto[];
+  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 後端說不使用
 
   // @ApiProperty({ description: '外包計價明細總計' })
   // @IsNumber()

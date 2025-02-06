@@ -1061,6 +1061,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
                   pathname: './detail',
                   query: {
                     outsourcingId,
+                    paymentId,
                     isNew: 'true',
                   },
                 }}

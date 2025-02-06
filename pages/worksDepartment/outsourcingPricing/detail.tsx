@@ -62,6 +62,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 type Tquery = {
   paymentDetailId: string | undefined;
   outsourcingId: string | undefined;
+  paymentId: string | undefined;
   isNew: string | undefined;
 };
 
@@ -165,13 +166,14 @@ type TcreateSetState_otherWorkItem = (index: number) => TsetState_otherWorkItem;
 export default function OutsourcingPricingDetail() {
   const router = useRouter();
   const query = router.query as Tquery;
+  const { paymentId } = query;
   const isNew = query.isNew === 'true';
   const paymentDetailId = isNew ? undefined : query.paymentDetailId;
 
   // console.log(paymentDetailId);
 
   // ---------------------------------------------------------------------
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(!isNew);
   const [isLoading, setIsLoading] = useState(false);
   // ---------------------------------------------------------------------
 
@@ -321,6 +323,79 @@ export default function OutsourcingPricingDetail() {
     }
   };
 
+  const reqPost = async () => {
+    if (!paymentId) {
+      myAlert.warning({
+        title: '外包計價單錯誤',
+        content: '沒有paymentId',
+      });
+
+      return;
+    }
+
+    if (!checkOtherWorkItemArr()) {
+      myAlert.warning({
+        title: '特殊工作項目錯誤',
+        content: '樓層編號不得為空白',
+      });
+
+      return;
+    }
+
+    const otherWorkItemGroup = groupOtherWorkItem();
+
+    const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
+      const { key, floorNumber, width, height, talent, quantity, unitPrice } = state_installItem;
+
+      const singleItemDetailArr = Object.values(otherWorkItemGroup[key]).map((state_otherWorkItem) => {
+        const { floorNumber, content, quantity, unitPrice } = state_otherWorkItem;
+
+        const singleItemDetail: TsingleItemDetail = {
+          floorNumber,
+          content,
+          quantity: Number(quantity || 0),
+          unitPrice: Number(unitPrice || 0),
+        };
+
+        return singleItemDetail;
+      });
+
+      const itemDetail: TitemDetail = {
+        floorNumber,
+        width: Number(width || 0),
+        height: Number(height || 0),
+        talent: Number(talent || 0),
+        quantity: Number(quantity || 0),
+        unitPrice: Number(unitPrice || 0),
+        singleItemDetail: singleItemDetailArr,
+      };
+
+      return itemDetail;
+
+      //
+    });
+
+    const body: TcreateOutsourcingPaymentDetailDto = {
+      engineeringContactId: null,
+
+      projectNumber: state_profile.projectNumber,
+      projectName: state_profile.projectName,
+      projectCounty: state_profile.county,
+      projectDistrict: state_profile.district,
+      projectAddress: state_profile.address,
+      projectDate: state_profile.projectDate?.toISOString() || null,
+      installItems: [],
+      outsourcingTotal: state_outsourcingTotal,
+      itemDetail: itemDetailArr,
+    };
+
+    await apiPostOutsourcingPaymentDetail(paymentId, body)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch();
+  };
+
   // const reqPatchOutsourcingPaymentDetail = async () => {
   //   if (!paymentDetailId || !engineeringContact?.id) {
   //     return;
@@ -452,13 +527,14 @@ export default function OutsourcingPricingDetail() {
     {
       type: 'redButton',
       label: '確認',
-      onClick: reqPatchOutsourcingPaymentDetail,
+      // onClick: reqPatchOutsourcingPaymentDetail,
+      onClick: isNew ? reqPost : reqPatchOutsourcingPaymentDetail,
     },
     {
       type: 'myButton',
       label: '取消',
       onClick: () => {
-        setDisabled(true);
+        isNew ? router.back() : setDisabled(true);
       },
     },
   ];
