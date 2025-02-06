@@ -227,6 +227,7 @@ export default function OutsourcingPricingDetail() {
     subTotal01,
     state_installItem,
   } = useTable01({ installItems, disabled });
+
   const {
     //
     control_table02,
@@ -643,7 +644,16 @@ const useDetail = ({
     });
 
     setState_otherWorkItemArr((prev) => {
-      return prev.filter((item) => item.installItemKey !== key);
+      let copy = [...prev];
+      copy = copy.map((item) => {
+        if (item.installItemKey === key) {
+          item.installItemKey = '';
+        }
+
+        return item;
+      });
+
+      return copy;
     });
   };
 
@@ -1373,6 +1383,7 @@ const useTable_otherWorkItem = ({
       ];
 
       return {
+        className: classNames(!installItemKey && scss.inValid),
         cellArr,
       };
     });

@@ -12,3 +12,7 @@
 .select {
   z-index: 3;
 }
+
+.inValid {
+  background-color: theme("colors.warning") !important;
+}
