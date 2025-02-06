@@ -25,7 +25,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 
 // icon
-import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './detail.module.scss';
@@ -940,6 +940,10 @@ const useTable_installItem = ({
     const thead: Ttable['thead'] = {
       cellArr: [
         {
+          children: config_useTable01.btn.label,
+          ...config_useTable01.btn,
+        },
+        {
           children: config_useTable01.floorNumber.label,
           ...config_useTable01.floorNumber,
         },
@@ -982,6 +986,10 @@ const useTable_installItem = ({
 
       const cellArr: Tcell[] = [
         {
+          children: <IconDelete01 onClick={() => deleteInstallItem(key)} />,
+          ...config_useTable01.btn,
+        },
+        {
           children: (
             <CellInput
               style={{ width: config_useTable01.floorNumber.width }}
@@ -1013,6 +1021,7 @@ const useTable_installItem = ({
                 readOnly: disabled,
                 min: 0,
                 step: 0,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   if (!e.target.validity.valid) {
                     return;
@@ -1041,6 +1050,7 @@ const useTable_installItem = ({
                 readOnly: disabled,
                 min: 0,
                 step: 0,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   if (!e.target.validity.valid) {
                     return;
@@ -1069,6 +1079,7 @@ const useTable_installItem = ({
                 readOnly: disabled,
                 min: 0,
                 step: 'any',
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   if (!e.target.validity.valid) {
                     return;
@@ -1100,6 +1111,7 @@ const useTable_installItem = ({
                 readOnly: disabled,
                 min: 0,
                 step: 0,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   if (!e.target.validity.valid) {
                     return;
@@ -1131,6 +1143,7 @@ const useTable_installItem = ({
                 step: 0,
                 value: unitPrice,
                 readOnly: disabled,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   e.target.validity.valid &&
                     setState_installItem(
@@ -1211,6 +1224,10 @@ const useTable_otherWorkItem = ({
     const thead: Ttable['thead'] = {
       cellArr: [
         {
+          children: config_useTable02.btn.label,
+          ...config_useTable02.btn,
+        },
+        {
           children: config_useTable02.floorNumber.label,
           ...config_useTable02.floorNumber,
         },
@@ -1251,6 +1268,10 @@ const useTable_otherWorkItem = ({
       decimal_subTotal = decimal_subTotal.add(totalPrice);
 
       const cellArr: Tcell[] = [
+        {
+          children: <IconDelete01 onClick={() => deleteOtherWorkItem(index)} />,
+          ...config_useTable02.btn,
+        },
         {
           children: (
             <CellSelect
@@ -1306,6 +1327,7 @@ const useTable_otherWorkItem = ({
                 min: 0,
                 step: 0,
                 value: quantity,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   const value = e.target.value as `${number}`;
                   setState_otherWorkItem((prev) => ({ ...prev, quantity: value }), { calcTotalPrice: true });
@@ -1325,6 +1347,7 @@ const useTable_otherWorkItem = ({
                 min: 0,
                 step: 0,
                 value: unitPrice,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   const value = e.target.value as `${number}`;
                   setState_otherWorkItem((prev) => ({ ...prev, unitPrice: value }), { calcTotalPrice: true });
@@ -1540,6 +1563,7 @@ const useTable01 = ({
                 type: 'number',
                 value: state_installItem[index].itemPrice ?? '',
                 readOnly: disabled,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   setState_installItem((prev) => {
                     const copy = [...prev];
@@ -1798,11 +1822,12 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.qty.width }}
               inputProps={{
+                type: 'number',
                 value: otherQuantity,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   editState_otherWorkItem(index, 'otherQuantity', e.target.value);
                 },
-                type: 'number',
               }}
             />
           ),
@@ -1814,11 +1839,12 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.unitPrice.width }}
               inputProps={{
+                type: 'number',
                 value: otherUnitPrice,
+                onWheel: (e) => e.currentTarget.blur(),
                 onChange: (e) => {
                   editState_otherWorkItem(index, 'otherUnitPrice', e.target.value);
                 },
-                type: 'number',
               }}
             />
           ),
@@ -1932,6 +1958,11 @@ const confit_public: Tconfig = {
 };
 
 const config_useTable01: Tconfig = {
+  btn: {
+    label: '',
+    width: 40,
+    justifyContent: 'center',
+  },
   floorNumber: {
     label: '樓層編號',
     // width:230
@@ -1971,6 +2002,11 @@ const config_useTable01: Tconfig = {
 };
 
 const config_useTable02: Tconfig = {
+  btn: {
+    label: '',
+    width: 40,
+    justifyContent: 'center',
+  },
   floorNumber: {
     label: '樓層編號',
     width: 230,
