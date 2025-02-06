@@ -139,13 +139,20 @@ type Tstate_installItem_old = {
 // };
 
 type TsetState_installItem = (
-  setState: React.SetStateAction<Tstate_installItem>,
+  setStateActopm: React.SetStateAction<Tstate_installItem>,
   option?: {
     calcTotalPrice?: boolean;
   }
 ) => void;
-
 type TcreateSetState_installItem = (key: string) => TsetState_installItem;
+
+type TsetState_otherWorkItem = (
+  setStateActopm: React.SetStateAction<Tstate_otherWorkItem>,
+  option?: {
+    calcTotalPrice?: boolean;
+  }
+) => void;
+type TcreateSetState_otherWorkItem = (index: number) => TsetState_otherWorkItem;
 
 // =======================================================================
 
@@ -231,7 +238,7 @@ export default function OutsourcingPricingDetail() {
     disabled,
     outsourcingId,
   });
-  const control_table_total = useTable_total({ subTotal01, subTotal02 });
+  // const control_table_total = useTable_total_old({ subTotal01, subTotal02 });
 
   // ---------------------------------------------------------------------
   // region REQUEST
@@ -320,12 +327,25 @@ export default function OutsourcingPricingDetail() {
 
   // region PROPS
 
-  const { control_installItem, subTotal_installItem } = useTable_installItem({
+  const { control_installItem } = useTable_installItem({
     state_installItemDict,
     createEditState_installItem,
     deleteInstallItem,
     disabled,
     isNew,
+  });
+
+  const { control_otherWorkItem } = useTable_otherWorkItem({
+    state_otherWorkItemArr,
+    options_installItem,
+    createEditState_otherWorkItem,
+    addOtherWorkItem,
+    deleteOtherWorkItem,
+    disabled,
+  });
+
+  const control_detailTotal = useTable_total({
+    detailTotal: state_outsourcingTotal,
   });
 
   const panelList_disabled: TpanelList = [
@@ -506,12 +526,12 @@ export default function OutsourcingPricingDetail() {
           <IconAddCircle
             className={classNames('mb-2', disabled && 'invisible')}
             onClick={() => {
-              !disabled && addState_otherWorkItem();
+              !disabled && addOtherWorkItem();
             }}
           />
-          <Table01 {...control_table02} />
+          <Table01 {...control_otherWorkItem} />
         </div>
-        <Table01 className="mt-20" {...control_table_total} />
+        <Table01 className="mt-20" {...control_detailTotal} />
         {/*  */}
       </div>
     </SubLayer>
@@ -607,15 +627,9 @@ const useDetail = ({
     });
   };
 
-  const addOtherWorkItem = (state_installItem: Tstate_installItem) => {
+  const addOtherWorkItem = () => {
     setState_otherWorkItemArr((prev) => {
-      return [
-        ...prev,
-        emptyState_otherWorkItem({
-          installItemKey: state_installItem.key,
-          floorNumber: state_installItem.floorNumber,
-        }),
-      ];
+      return [...prev, emptyState_otherWorkItem()];
     });
   };
 
@@ -642,15 +656,15 @@ const useDetail = ({
   };
 
   const createEditState_installItem: TcreateSetState_installItem = (key: string) => {
-    const setState_installItem: TsetState_installItem = (setState, { calcTotalPrice: _calcTotalPrice } = {}) => {
+    const setState_installItem: TsetState_installItem = (setStateAction, { calcTotalPrice: _calcTotalPrice } = {}) => {
       setState_installItemDict((prev) => {
         const copy = { ...prev };
         const targetItem = copy[key];
 
-        if (typeof setState === 'function') {
-          copy[key] = setState(targetItem);
+        if (typeof setStateAction === 'function') {
+          copy[key] = setStateAction(targetItem);
         } else {
-          copy[key] = setState;
+          copy[key] = setStateAction;
         }
 
         if (_calcTotalPrice) {
@@ -668,21 +682,34 @@ const useDetail = ({
     return setState_installItem;
   };
 
-  const createEditState_otherWorkItem = (index: number) => {
-    return (setState: React.SetStateAction<Tstate_otherWorkItem>) => {
+  const createEditState_otherWorkItem: TcreateSetState_otherWorkItem = (index: number) => {
+    const setState_otherWorkItem: TsetState_otherWorkItem = (
+      //
+      setStateAction: React.SetStateAction<Tstate_otherWorkItem>,
+      { calcTotalPrice: _calcTotalPrice } = {}
+    ) => {
       setState_otherWorkItemArr((prev) => {
         const copy = [...prev];
         const targetItem = copy[index];
 
-        if (typeof setState === 'function') {
-          copy[index] = setState(targetItem);
+        if (typeof setStateAction === 'function') {
+          copy[index] = setStateAction(targetItem);
         } else {
-          copy[index] = setState;
+          copy[index] = setStateAction;
+        }
+
+        if (_calcTotalPrice) {
+          copy[index].totalPrice = calcTotalPrice({
+            quantity: copy[index].quantity || 0,
+            unitPrice: copy[index].unitPrice || 0,
+          });
         }
 
         return copy;
       });
     };
+
+    return setState_otherWorkItem;
   };
 
   // ------------------------------------------------------------------------
@@ -747,9 +774,6 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
       projectAddress,
       projectDate,
     } = paymentDetail ?? {};
-
-    // let outsourcingName = '無property';
-    // let installer = '無property';
 
     if (engineeringContact) {
       projectNumber = engineeringContact.projectNumber;
@@ -1165,6 +1189,234 @@ const useTable_installItem = ({
   }, [state_installItemDict, disabled]); // useMemo
 
   return { control_installItem, subTotal_installItem };
+};
+
+// MARK:useTable_otherWorkItem
+const useTable_otherWorkItem = ({
+  state_otherWorkItemArr,
+  options_installItem,
+  createEditState_otherWorkItem,
+  addOtherWorkItem,
+  deleteOtherWorkItem,
+  disabled,
+}: {
+  state_otherWorkItemArr: Tstate_otherWorkItemArr;
+  options_installItem: Toption[];
+  createEditState_otherWorkItem: TcreateSetState_otherWorkItem;
+  addOtherWorkItem: (state_installItem: Tstate_installItem) => void;
+  deleteOtherWorkItem: (index: number) => void;
+  disabled: boolean;
+}) => {
+  const { control_otherWorkItem, subTotal_otherWorkItem } = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: config_useTable02.floorNumber.label,
+          ...config_useTable02.floorNumber,
+        },
+        {
+          children: config_useTable02.workContent.label,
+          ...config_useTable02.workContent,
+        },
+        {
+          children: config_useTable02.qty.label,
+          ...config_useTable02.qty,
+        },
+        {
+          children: config_useTable02.unitPrice.label,
+          ...config_useTable02.unitPrice,
+        },
+        {
+          children: config_useTable02.dualPrice.label,
+          ...config_useTable02.dualPrice,
+        },
+      ],
+    };
+
+    let decimal_subTotal = new Decimal(0);
+
+    const rowArr: Ttable['tbody']['rowArr'] = state_otherWorkItemArr.map((item, index) => {
+      const {
+        //
+        installItemKey,
+        // floorNumber,
+        content,
+        quantity,
+        unitPrice,
+        totalPrice,
+      } = item;
+
+      const setState_otherWorkItem = createEditState_otherWorkItem(index);
+
+      decimal_subTotal = decimal_subTotal.add(totalPrice);
+
+      const cellArr: Tcell[] = [
+        {
+          children: (
+            <CellSelect
+              //
+              disabled={disabled}
+              style={{ width: config_useTable02.floorNumber.width }}
+              selectProps={{
+                value: installItemKey,
+                placeholder: '',
+                options: options_installItem,
+                onChange: (_, option) => {
+                  const theOption = option as Toption;
+
+                  const { value, label, floorNumber } = theOption ?? {};
+
+                  setState_otherWorkItem((prev) => {
+                    const copy = { ...prev };
+                    copy.installItemKey = value;
+                    copy.floorNumber = floorNumber as string;
+
+                    return copy;
+                  });
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.floorNumber,
+        },
+        {
+          children: (
+            <CellSelect
+              disabled={disabled}
+              style={{ width: config_useTable02.workContent.width }}
+              selectProps={{
+                value: content,
+                placeholder: '工作內容...',
+                options: optionsCreator_otherWorkItems(),
+                onChange: (str) => {
+                  setState_otherWorkItem((prev) => ({ ...prev, content: str }));
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.workContent,
+        },
+        {
+          children: (
+            <CellInput
+              disabled={disabled}
+              style={{ width: config_useTable02.qty.width }}
+              inputProps={{
+                type: 'number',
+                min: 0,
+                step: 0,
+                value: quantity,
+                onChange: (e) => {
+                  const value = e.target.value as `${number}`;
+                  setState_otherWorkItem((prev) => ({ ...prev, quantity: value }), { calcTotalPrice: true });
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.qty,
+        },
+        {
+          children: (
+            <CellInput
+              disabled={disabled}
+              style={{ width: config_useTable02.unitPrice.width }}
+              inputProps={{
+                type: 'number',
+                min: 0,
+                step: 0,
+                value: unitPrice,
+                onChange: (e) => {
+                  const value = e.target.value as `${number}`;
+                  setState_otherWorkItem((prev) => ({ ...prev, unitPrice: value }), { calcTotalPrice: true });
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.unitPrice,
+        },
+        {
+          children: totalPrice,
+          ...config_useTable02.dualPrice,
+        },
+      ];
+
+      return {
+        cellArr,
+      };
+    });
+
+    rowArr.push({
+      cellArr: [
+        {
+          children: '合計',
+          ...confit_public.left,
+        },
+        {
+          children: decimal_subTotal.toNumber().toLocaleString(),
+          ...confit_public.right,
+        },
+      ],
+    });
+
+    const tbody = {
+      rowArr,
+    };
+
+    const control_otherWorkItem = {
+      thead,
+      tbody,
+    };
+
+    return {
+      control_otherWorkItem,
+      subTotal_otherWorkItem: decimal_subTotal.toNumber(),
+    };
+  }, [state_otherWorkItemArr, disabled, options_installItem]); // useMemo
+
+  return {
+    control_otherWorkItem,
+    subTotal_otherWorkItem,
+  };
+};
+
+const useTable_total = ({ detailTotal }: { detailTotal: number }) => {
+  const control_detailTotal: Ttable = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: '總計',
+          flex: 'auto',
+          width: '100%',
+        },
+      ],
+    };
+
+    const rowArr: Ttable['tbody']['rowArr'] = [
+      {
+        cellArr: [
+          {
+            children: '總計',
+            ...confit_public.left,
+          },
+          {
+            children: detailTotal.toLocaleString(),
+            ...confit_public.right,
+          },
+        ],
+      },
+    ];
+
+    const tbody = {
+      rowArr,
+    };
+
+    return {
+      thead,
+      tbody,
+    };
+  }, [detailTotal]);
+
+  return control_detailTotal;
 };
 
 // MARK:useTable01
@@ -1620,7 +1872,7 @@ const useTable02 = ({
   };
 };
 
-const useTable_total = ({ subTotal01, subTotal02 }: { subTotal01: number; subTotal02: number }) => {
+const useTable_total_old = ({ subTotal01, subTotal02 }: { subTotal01: number; subTotal02: number }) => {
   const control_table: Ttable = useMemo(() => {
     const total = new Decimal(subTotal01).add(subTotal02).toNumber();
 
@@ -1779,10 +2031,10 @@ const emptyState_installItem = (key: string) => {
   return state_installItem;
 };
 
-const emptyState_otherWorkItem = ({ installItemKey, floorNumber }: { installItemKey: string; floorNumber: string }) => {
+const emptyState_otherWorkItem = () => {
   const state_otherWorkItem: Tstate_otherWorkItem = {
-    installItemKey,
-    floorNumber,
+    installItemKey: '',
+    floorNumber: '',
     content: '',
     quantity: '',
     unitPrice: '',
@@ -1793,13 +2045,13 @@ const emptyState_otherWorkItem = ({ installItemKey, floorNumber }: { installItem
 };
 
 const calcTotalPrice = ({
-  talent,
+  talent = 1,
   quantity,
   unitPrice,
 }: {
-  talent: `${number}` | number;
+  talent?: `${number}` | number;
   quantity: `${number}` | number;
   unitPrice: `${number}` | number;
 }) => {
-  return new Decimal(talent).mul(quantity).mul(unitPrice).toNumber();
+  return new Decimal(talent).mul(quantity).mul(unitPrice).toDecimalPlaces(0).toNumber();
 };
