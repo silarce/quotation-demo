@@ -18,7 +18,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 // components
 import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
-import type { Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import type { Tcell, TcellArr, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -940,10 +940,12 @@ const useTable_installItem = ({
   const { control_installItem, subTotal_installItem } = useMemo(() => {
     const thead: Ttable['thead'] = {
       cellArr: [
-        {
-          children: config_useTable01.btn.label,
-          ...config_useTable01.btn,
-        },
+        isNew
+          ? {
+              children: config_useTable01.btn.label,
+              ...config_useTable01.btn,
+            }
+          : null,
         {
           children: config_useTable01.floorNumber.label,
           ...config_useTable01.floorNumber,
@@ -985,11 +987,15 @@ const useTable_installItem = ({
 
       decimal_subTotal = decimal_subTotal.add(totalPrice);
 
-      const cellArr: Tcell[] = [
-        {
-          children: <IconDelete01 onClick={() => deleteInstallItem(key)} />,
-          ...config_useTable01.btn,
-        },
+      const cellArr: TcellArr = [
+        isNew
+          ? {
+              children: (
+                <IconDelete01 onClick={() => deleteInstallItem(key)} className={classNames(disabled && 'invisible')} />
+              ),
+              ...config_useTable01.btn,
+            }
+          : null,
         {
           children: (
             <CellInput
@@ -1270,7 +1276,9 @@ const useTable_otherWorkItem = ({
 
       const cellArr: Tcell[] = [
         {
-          children: <IconDelete01 onClick={() => deleteOtherWorkItem(index)} />,
+          children: (
+            <IconDelete01 onClick={() => deleteOtherWorkItem(index)} className={classNames(disabled && 'invisible')} />
+          ),
           ...config_useTable02.btn,
         },
         {
