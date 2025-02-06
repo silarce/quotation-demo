@@ -4,7 +4,7 @@
 // paymentDetail.installItems.deliveryStatus.otherWorkItemTotal仍是null，
 // paymentDetail.outsourcingTotal仍是0
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -137,6 +137,15 @@ type Tstate_installItem_old = {
 //   otherWorkItems: Tstate_otherWorkItem[];
 //   installItems: Tstate_installItem[];
 // };
+
+type TsetState_installItem = (
+  setState: React.SetStateAction<Tstate_installItem>,
+  option?: {
+    calcTotalPrice?: boolean;
+  }
+) => void;
+
+type TcreateSetState_installItem = (key: string) => TsetState_installItem;
 
 // =======================================================================
 
@@ -311,6 +320,14 @@ export default function OutsourcingPricingDetail() {
 
   // region PROPS
 
+  const { control_installItem, subTotal_installItem } = useTable_installItem({
+    state_installItemDict,
+    createEditState_installItem,
+    deleteInstallItem,
+    disabled,
+    isNew,
+  });
+
   const panelList_disabled: TpanelList = [
     {
       type: 'redButton',
@@ -475,8 +492,17 @@ export default function OutsourcingPricingDetail() {
           />
         </div>
         {/*  */}
-        <Table01 className="mt-20" {...control_table01} />
-        <div className="mt-20">
+
+        <div className="mt-10">
+          <IconAddCircle
+            className={classNames('mb-2', (disabled || !isNew) && 'invisible')}
+            onClick={() => {
+              !disabled && addInstallItem();
+            }}
+          />
+          <Table01 {...control_installItem} />
+        </div>
+        <div className="mt-10">
           <IconAddCircle
             className={classNames('mb-2', disabled && 'invisible')}
             onClick={() => {
@@ -511,16 +537,32 @@ const useDetail = ({
 }) => {
   const defaultState = useDetail_default({ paymentDetail });
 
+  const isItemEdited = useRef(false);
+
   const [state_profile, setState_profile] = useState<Tstate_profile>(defaultState.defaultState_profile);
-  const [state_installItemDict, setState_installItemDict] = useState<Tstate_installItemDict>(
+  const [state_installItemDict, _setState_installItemDict] = useState<Tstate_installItemDict>(
     defaultState.defaultState_installItemDict
   );
-  const [state_otherWorkItemArr, setState_otherWorkItemArr] = useState<Tstate_otherWorkItemArr>(
+  const [state_otherWorkItemArr, _setState_otherWorkItemArr] = useState<Tstate_otherWorkItemArr>(
     defaultState.defaultState_otherWorkItemArr
   );
   const [state_outsourcingTotal, setState_outsourcingTotal] = useState<Tstate_outsourcingTotal>(
     defaultState.defaultState_outsourcingTotal
   );
+
+  const setState_installItemDict: React.Dispatch<React.SetStateAction<Tstate_installItemDict>> = (
+    setStateAction: React.SetStateAction<Tstate_installItemDict>
+  ) => {
+    isItemEdited.current = true;
+    _setState_installItemDict(setStateAction);
+  };
+
+  const setState_otherWorkItemArr: React.Dispatch<React.SetStateAction<Tstate_otherWorkItemArr>> = (
+    setStateAction: React.SetStateAction<Tstate_otherWorkItemArr>
+  ) => {
+    isItemEdited.current = true;
+    _setState_otherWorkItemArr(setStateAction);
+  };
 
   // ------------------------------------------------------------------------
   const options_installItem = useMemo(() => {
@@ -535,20 +577,25 @@ const useDetail = ({
     return options;
   }, [state_installItemDict]);
 
-  // ------------------------------------------------------------------------
-
-  const calcOutsourcingTotal = () => {
+  const total_installItem = useMemo(() => {
     let total_d = new Decimal(0);
     Object.values(state_installItemDict).forEach((item) => {
       total_d = total_d.add(item.totalPrice);
     });
 
+    return total_d.toNumber();
+  }, [state_installItemDict]);
+
+  const total_otherWorkItem = useMemo(() => {
+    let total_d = new Decimal(0);
     state_otherWorkItemArr.forEach((item) => {
       total_d = total_d.add(item.totalPrice);
     });
 
     return total_d.toNumber();
-  };
+  }, [state_otherWorkItemArr]);
+
+  // ------------------------------------------------------------------------
 
   const addInstallItem = () => {
     const key = nanoid();
@@ -558,7 +605,6 @@ const useDetail = ({
 
       return copy;
     });
-    calcOutsourcingTotal();
   };
 
   const addOtherWorkItem = (state_installItem: Tstate_installItem) => {
@@ -571,7 +617,6 @@ const useDetail = ({
         }),
       ];
     });
-    calcOutsourcingTotal();
   };
 
   const deleteInstallItem = (key: string) => {
@@ -585,7 +630,6 @@ const useDetail = ({
     setState_otherWorkItemArr((prev) => {
       return prev.filter((item) => item.installItemKey !== key);
     });
-    calcOutsourcingTotal();
   };
 
   const deleteOtherWorkItem = (index: number) => {
@@ -595,11 +639,10 @@ const useDetail = ({
 
       return copy;
     });
-    calcOutsourcingTotal();
   };
 
-  const createEditState_installItem = (key: string) => {
-    return (setState: React.SetStateAction<Tstate_installItem>) => {
+  const createEditState_installItem: TcreateSetState_installItem = (key: string) => {
+    const setState_installItem: TsetState_installItem = (setState, { calcTotalPrice: _calcTotalPrice } = {}) => {
       setState_installItemDict((prev) => {
         const copy = { ...prev };
         const targetItem = copy[key];
@@ -610,9 +653,19 @@ const useDetail = ({
           copy[key] = setState;
         }
 
+        if (_calcTotalPrice) {
+          copy[key].totalPrice = calcTotalPrice({
+            talent: copy[key].talent || 0,
+            quantity: copy[key].quantity || 0,
+            unitPrice: copy[key].unitPrice || 0,
+          });
+        }
+
         return copy;
       });
     };
+
+    return setState_installItem;
   };
 
   const createEditState_otherWorkItem = (index: number) => {
@@ -639,6 +692,15 @@ const useDetail = ({
     setState_otherWorkItemArr(defaultState.defaultState_otherWorkItemArr);
     setState_outsourcingTotal(defaultState.defaultState_outsourcingTotal);
   }, [defaultState, disabled]);
+
+  useEffect(() => {
+    if (!isItemEdited.current) {
+      return;
+    }
+
+    const total = new Decimal(total_installItem).add(total_otherWorkItem).toNumber();
+    setState_outsourcingTotal(total);
+  }, [total_installItem, total_otherWorkItem]);
 
   //
 
@@ -756,10 +818,12 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
           unitPrice: `${itemPrice || 0}`,
           totalPrice: -1,
         };
-        state_installItem.totalPrice = new Decimal(state_installItem.talent)
-          .mul(state_installItem.quantity)
-          .mul(state_installItem.unitPrice)
-          .toNumber();
+
+        state_installItem.totalPrice = calcTotalPrice({
+          talent: state_installItem.talent || 0,
+          quantity: state_installItem.quantity || 0,
+          unitPrice: state_installItem.unitPrice || 0,
+        });
 
         otherWorkItemArr.forEach((item) => {
           const { otherQuantity, otherUnitPrice } = item;
@@ -832,6 +896,275 @@ const useDetail_default = ({ paymentDetail }: { paymentDetail: ToutsourcingPayme
   }, [paymentDetail]);
 
   return defaultState;
+};
+
+// MARK:useTable_installItem
+const useTable_installItem = ({
+  state_installItemDict,
+  createEditState_installItem,
+  deleteInstallItem,
+  disabled,
+  isNew,
+}: {
+  state_installItemDict: Tstate_installItemDict;
+  createEditState_installItem: TcreateSetState_installItem;
+  deleteInstallItem: (key: string) => void;
+  disabled: boolean;
+  isNew: boolean;
+}) => {
+  const { control_installItem, subTotal_installItem } = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: config_useTable01.floorNumber.label,
+          ...config_useTable01.floorNumber,
+        },
+        {
+          children: config_useTable01.width.label,
+          ...config_useTable01.width,
+        },
+        {
+          children: config_useTable01.height.label,
+          ...config_useTable01.height,
+        },
+        {
+          children: config_useTable01.volume.label,
+          ...config_useTable01.volume,
+        },
+        {
+          children: config_useTable01.qty.label,
+          ...config_useTable01.qty,
+        },
+        {
+          children: config_useTable01.unitPrice.label,
+          ...config_useTable01.unitPrice,
+        },
+        {
+          children: config_useTable01.dualPrice.label,
+          ...config_useTable01.dualPrice,
+        },
+      ],
+    };
+    //
+
+    let decimal_subTotal = new Decimal(0);
+
+    const rowArr: Ttable['tbody']['rowArr'] = Object.values(state_installItemDict).map((state_installItem, index) => {
+      const { key, floorNumber, width, height, talent, quantity, unitPrice, totalPrice } = state_installItem;
+
+      const setState_installItem = createEditState_installItem(key);
+
+      decimal_subTotal = decimal_subTotal.add(totalPrice);
+
+      const cellArr: Tcell[] = [
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.floorNumber.width }}
+              disabled={isNew ? disabled : true}
+              inputProps={{
+                value: floorNumber,
+                readOnly: disabled,
+                onChange: (e) => {
+                  setState_installItem((prev) => {
+                    const copy = { ...prev };
+                    copy.floorNumber = e.target.value as `${number}`;
+
+                    return copy;
+                  });
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.floorNumber,
+        },
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.width.width }}
+              disabled={isNew ? disabled : true}
+              inputProps={{
+                type: 'number',
+                value: width,
+                readOnly: disabled,
+                min: 0,
+                step: 0,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  setState_installItem((prev) => {
+                    const copy = { ...prev };
+                    copy.width = e.target.value as `${number}`;
+
+                    return copy;
+                  });
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.width,
+        },
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.height.width }}
+              disabled={isNew ? disabled : true}
+              inputProps={{
+                type: 'number',
+                value: height,
+                readOnly: disabled,
+                min: 0,
+                step: 0,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  setState_installItem((prev) => {
+                    const copy = { ...prev };
+                    copy.height = e.target.value as `${number}`;
+
+                    return copy;
+                  });
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.height,
+        },
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.volume.width }}
+              disabled={isNew ? disabled : true}
+              inputProps={{
+                type: 'number',
+                value: talent,
+                readOnly: disabled,
+                min: 0,
+                step: 'any',
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  setState_installItem(
+                    (prev) => {
+                      const copy = { ...prev };
+                      copy.talent = e.target.value as `${number}`;
+
+                      return copy;
+                    },
+                    { calcTotalPrice: true }
+                  );
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.volume,
+        },
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.qty.width }}
+              disabled={isNew ? disabled : true}
+              inputProps={{
+                type: 'number',
+                value: quantity,
+                readOnly: disabled,
+                min: 0,
+                step: 0,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  setState_installItem(
+                    (prev) => {
+                      const copy = { ...prev };
+                      copy.quantity = e.target.value as `${number}`;
+
+                      return copy;
+                    },
+                    { calcTotalPrice: true }
+                  );
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.qty,
+        },
+        {
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.unitPrice.width }}
+              disabled={disabled}
+              inputProps={{
+                type: 'number',
+                min: 0,
+                step: 0,
+                value: unitPrice,
+                readOnly: disabled,
+                onChange: (e) => {
+                  e.target.validity.valid &&
+                    setState_installItem(
+                      (prev) => {
+                        const copy = { ...prev };
+                        copy.unitPrice = e.target.value as `${number}`;
+
+                        return copy;
+                      },
+                      { calcTotalPrice: true }
+                    );
+                },
+              }}
+            />
+          ),
+          ...config_useTable01.unitPrice,
+        },
+        {
+          children: totalPrice,
+          ...config_useTable01.dualPrice,
+        },
+      ];
+
+      return {
+        cellArr,
+      };
+    });
+
+    rowArr.push({
+      cellArr: [
+        {
+          children: '合計',
+          ...confit_public.left,
+        },
+        {
+          children: decimal_subTotal.toNumber().toLocaleString(),
+          ...confit_public.right,
+        },
+      ],
+    });
+
+    const tbody = {
+      rowArr,
+    };
+
+    const control_table = {
+      thead,
+      tbody,
+    };
+
+    return {
+      control_installItem: control_table,
+      subTotal_installItem: decimal_subTotal.toNumber(),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state_installItemDict, disabled]); // useMemo
+
+  return { control_installItem, subTotal_installItem };
 };
 
 // MARK:useTable01
@@ -1457,4 +1790,16 @@ const emptyState_otherWorkItem = ({ installItemKey, floorNumber }: { installItem
   };
 
   return state_otherWorkItem;
+};
+
+const calcTotalPrice = ({
+  talent,
+  quantity,
+  unitPrice,
+}: {
+  talent: `${number}` | number;
+  quantity: `${number}` | number;
+  unitPrice: `${number}` | number;
+}) => {
+  return new Decimal(talent).mul(quantity).mul(unitPrice).toNumber();
 };
