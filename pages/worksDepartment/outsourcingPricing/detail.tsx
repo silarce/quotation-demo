@@ -586,13 +586,14 @@ const useDetail = ({
 
   // ------------------------------------------------------------------------
   const options_installItem = useMemo(() => {
-    const options: Toption[] = Object.entries(state_installItemDict).map(([key, item]) => {
+    let options: Toption[] = Object.entries(state_installItemDict).map(([key, item]) => {
       return {
         value: key,
         label: item.floorNumber,
         floorNumber: item.floorNumber,
       };
     });
+    options = options.filter((item) => !!item.label);
 
     return options;
   }, [state_installItemDict]);
