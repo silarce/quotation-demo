@@ -569,7 +569,8 @@ const useCustomerFilter_forDetail = (State: Interface_classState) => {
         key: 'invoice',
         type: 'input',
         defaultValue: State.invoice_number,
-        disabled: !!State.invoice_number,
+        // disabled: !!State.invoice_number,
+        freeze: !!State.invoice_number,
         placeholder: '',
       },
     ];
