@@ -404,6 +404,31 @@ interface Tprodreceipt_Dto extends Tbase {
   entry_status: string;
   note: string;
   batchid: string;
+
+  detail: Tprodreceiptdetail_Dto[];
+}
+
+interface Tprodreceiptdetail_Dto {
+  id: string;
+  batchid: string;
+
+  productuuid: string | null;
+  productid: string | null;
+
+  prodreceiptid: string | null;
+  prodreceiptuuid: string | null;
+
+  purchaseorderdetailuuid: string | null;
+
+  quantity: number | null;
+  totalprice: number | null;
+  note: string | null;
+  purchaseorderid: string | null;
+  unitprice: number | null;
+  purchaseorderuuid: string | null;
+  name: string | null;
+  spec: string | null;
+  unit: string | null;
 }
 
 // ==============================================================================
