@@ -278,14 +278,19 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           }}
           onConfirm={(dict) => {
             let invoiceNumber = '';
+
             const arr = Object.values(dict).map((prodreceipt) => {
               const { id, prodreceiptid, note, invoice } = prodreceipt;
-              invoiceNumber = invoice; // 沒差錯的話所有prodreceipt.invoice都一樣
 
-              if (invoiceNumber && invoiceNumber !== invoice) {
-                console.log('invoice number is not the same', dict);
+              // 預期所有prodreceipt.invoice都一樣或是空字串
+              if (invoiceNumber && invoice && invoiceNumber !== invoice) {
+                console.error('invoice number is not the same', dict);
 
-                throw new Error('invoice number is not the same');
+                throw new Error('進貨單的發票號碼不一致');
+              }
+
+              if (!invoiceNumber) {
+                invoiceNumber = invoice;
               }
 
               const state_detail: Tstate_detail = {
