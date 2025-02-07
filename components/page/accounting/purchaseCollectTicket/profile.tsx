@@ -130,14 +130,14 @@ const Profile = ({
           wrapperStyle={{ width: 450 }}
           caption={t('invoice_number')}
           showBaseline="auto"
-          disabled={disabled}
+          disabled={true}
           inputProps={{
             props: {
               placeholder: '請選擇發票',
               value: classState.invoice_number,
-              onChange: (e) => {
-                changeInvoice(e.target.value);
-              },
+              // onChange: (e) => {
+              //   changeInvoice(e.target.value);
+              // },
               // readOnly: disabled,
             },
           }}
