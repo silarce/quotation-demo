@@ -420,6 +420,8 @@ interface Tprodreceiptdetail_Dto {
 
   purchaseorderdetailuuid: string | null;
 
+  invoice: string | null;
+
   quantity: number | null;
   totalprice: number | null;
   note: string | null;
@@ -470,6 +472,7 @@ export type {
   Taccount_payable_statistics_detail,
   //
   Tprodreceipt_Dto,
+  Tprodreceiptdetail_Dto,
 };
 
 export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
