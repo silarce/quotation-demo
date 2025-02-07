@@ -125,61 +125,47 @@ const Profile = ({
       <div />
       {/*  */}
 
-      <InputSel
-        className="col-span-2"
-        wrapperStyle={{ width: 750 }}
-        caption={t('invoice_number')}
-        showBaseline="auto"
-        disabled={disabled}
-        inputProps={{
-          props: {
-            placeholder: '請選擇發票',
-            value: classState.invoice_number,
-            onChange: (e) => {
-              changeInvoice(e.target.value);
+      <div className="col-span-2">
+        <InputSel
+          wrapperStyle={{ width: 450 }}
+          caption={t('invoice_number')}
+          showBaseline="auto"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              placeholder: '請選擇發票',
+              value: classState.invoice_number,
+              onChange: (e) => {
+                changeInvoice(e.target.value);
+              },
+              // readOnly: disabled,
             },
-            // readOnly: disabled,
-          },
-        }}
-        suffix={
-          <div className="flex gap-2">
-            <SquareBtn
-              className={classNames(disabled && 'invisible')}
-              label={t_common('input')}
-              sharp="mini"
-              onClick={invoiceBtn.onInputClick}
-            />
-            <SquareBtn
-              className={classNames(disabled && 'invisible')}
-              label={t('selectInvoice')}
-              sharp="mini"
-              onClick={invoiceBtn.onSelectClick}
-            />
-            <SquareBtn
-              className={classNames(disabled && 'invisible')}
-              label={t_common('clear')}
-              sharp="mini"
-              onClick={invoiceBtn.onClearClick}
-            />
-            <span className="text-sm text-danger self-end">編輯發票號碼將會清除明細資料</span>
-
-            {/* <SquareBtn
-              className={classNames(disabled && 'invisible', 'ml-2')}
-              label={invoiceBtn.status === 'selected' ? t_common('clear') : t('selectInvoice')}
-              sharp="mini"
-              onClick={() => {
-                const { onSelectClick, onClearClick, status } = invoiceBtn;
-
-                if (status === 'selected') {
-                  onClearClick();
-                } else {
-                  onSelectClick();
-                }
-              }}
-            /> */}
-          </div>
-        }
-      />
+          }}
+          suffix={
+            <div className="flex gap-2">
+              <SquareBtn
+                className={classNames(disabled && 'invisible')}
+                label={t_common('input')}
+                sharp="mini"
+                onClick={invoiceBtn.onInputClick}
+              />
+              <SquareBtn
+                className={classNames(disabled && 'invisible')}
+                label={t('selectInvoice')}
+                sharp="mini"
+                onClick={invoiceBtn.onSelectClick}
+              />
+              <SquareBtn
+                className={classNames(disabled && 'invisible')}
+                label={t_common('clear')}
+                sharp="mini"
+                onClick={invoiceBtn.onClearClick}
+              />
+            </div>
+          }
+        />
+        <span className="text-sm text-danger self-end">編輯發票號碼將會清除所有明細資料</span>
+      </div>
 
       <div />
       <div />
