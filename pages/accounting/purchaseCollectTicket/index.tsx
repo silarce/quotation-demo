@@ -318,7 +318,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
                 quantity: `${prodreceiptDetail.quantity ?? 0}`,
                 unit: prodreceiptDetail.unit ?? '',
                 unit_price: `${prodreceiptDetail.unitprice ?? 0}`,
-                amount: '',
+                amount: `${prodreceiptDetail.totalprice ?? 0}`,
                 note: prodreceiptDetail.note ?? '',
                 goods_spec: prodreceiptDetail.spec ?? '',
               };
@@ -335,84 +335,6 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
-  // const handleSelectDetail = () => {
-  //   const { unmount } = DragableModal.create({
-  //     // 選擇明細資料
-  //     handleText: t('selectDetail'),
-  //     children: (
-  //       <SearchModal_prodreceipt
-  //         options={{
-  //           coverFilter: customerFilter_forDetail,
-  //           // dontShotNoInvoiceData: false,
-  //           removeNoInvoiceData: false,
-  //         }}
-  //         checkForbbiden={({ dto, dtoDirc }) => {
-  //           if (!dto.invoice) {
-  //             return false;
-  //           }
-
-  //           if (State.invoice_number && State.invoice_number !== dto.invoice) {
-  //             return true;
-  //           }
-
-  //           const invoiceNumberArr = Object.values(dtoDirc).map((prodreceipt) => prodreceipt.invoice);
-
-  //           if (invoiceNumberArr.length === 0) {
-  //             return false;
-  //           }
-
-  //           // 預期只會有一個item是有值的
-  //           const validInvoiceNumber = invoiceNumberArr.find((item) => !!item);
-
-  //           if (validInvoiceNumber && dto.invoice && validInvoiceNumber !== dto.invoice) {
-  //             return true;
-  //           }
-  //         }}
-  //         onConfirm={(dict) => {
-  //           let invoiceNumber = '';
-
-  //           const arr = Object.values(dict).map((prodreceipt) => {
-  //             const { id, prodreceiptid, note, invoice } = prodreceipt;
-
-  //             // 預期所有prodreceipt.invoice都一樣或是空字串
-  //             if (invoiceNumber && invoice && invoiceNumber !== invoice) {
-  //               console.error('invoice number is not the same', dict);
-
-  //               throw new Error('進貨單的發票號碼不一致');
-  //             }
-
-  //             if (!invoiceNumber) {
-  //               invoiceNumber = invoice;
-  //             }
-
-  //             const state_detail: Tstate_detail = {
-  //               updateCount: 0,
-  //               id: undefined,
-  //               identifyId: nanoid(),
-  //               item: '',
-  //               prodreceipt_uuid: id,
-  //               prodreceipt_number: prodreceiptid,
-  //               transaction_date: null,
-  //               quantity: '',
-  //               unit: '',
-  //               unit_price: '',
-  //               amount: '',
-  //               note,
-  //               goods_spec: '',
-  //             };
-
-  //             return state_detail;
-  //           });
-
-  //           State.addDetail(arr);
-  //           State.invoice_number = invoiceNumber;
-  //           unmount();
-  //         }}
-  //       />
-  //     ),
-  //   });
-  // };
-
   // MARK: handelConfirm
   const handelConfirm = () => {
     if (raw_purchaseCollectTicket) {
@@ -421,19 +343,6 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
       reqNewPurchaseCollectTicket();
     }
   };
-
-  // ------------------------------------------------------------
-
-  // if (!isAdmin) {
-  //   return (
-  //     <SubLayer bodyPreStyle="style01">
-  //       <PageHeader02 tag={t('purchaseCollectTicket')} />
-  //       <div>
-  //         <h1 className="text-5xl">施工中</h1>
-  //       </div>
-  //     </SubLayer>
-  //   );
-  // }
 
   // ------------------------------------------------------------
   // MARK: RENDER
