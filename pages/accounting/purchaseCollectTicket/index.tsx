@@ -200,6 +200,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             State.changeInvoice({
               invoiceNumber: prodreceipt.invoice,
             });
+            State.clearDetail();
             unmount();
           }}
           checkForbbiden={({ dto }) => {
@@ -215,7 +216,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             customKeyArr: ['indexNumber', 'invoice'],
             coverFilter: customerFilter,
             uniqInvoice: true,
-            dontShotNoInvoiceData: true,
+            removeNoInvoiceData: true,
           }}
         />
       ),
@@ -227,6 +228,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
       title: '發票號碼',
       onConfirm: (value) => {
         State.invoice_number = value;
+        State.clearDetail();
         destroy();
       },
     });
@@ -256,9 +258,14 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
         <SearchModal_prodreceipt
           options={{
             coverFilter: customerFilter_forDetail,
-            dontShotNoInvoiceData: false,
+            // dontShotNoInvoiceData: false,
+            removeNoInvoiceData: false,
           }}
           checkForbbiden={({ dto, dtoDirc }) => {
+            if (!dto.invoice) {
+              return false;
+            }
+
             if (State.invoice_number && State.invoice_number !== dto.invoice) {
               return true;
             }
