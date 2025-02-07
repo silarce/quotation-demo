@@ -18,6 +18,7 @@ interface Toptions {
   coverFilter?: Tconfig_filter;
   customKeyArr?: string[];
   uniqInvoice?: boolean;
+  dontShotNoInvoiceData?: boolean;
 }
 
 // =====================================================================================
@@ -35,7 +36,10 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
-  const { dataArr, viewRef, isLoading, qty } = useData(filter, options?.uniqInvoice);
+  const { dataArr, viewRef, isLoading, qty } = useData(filter, {
+    uniqInvoice: options?.uniqInvoice,
+    dontShotNoInvoiceData: options?.dontShotNoInvoiceData,
+  });
 
   return {
     inputSelPropsArr,
@@ -55,7 +59,17 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 // =============================================================================
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
-const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): TmodalData<Tprodreceipt_Dto> => {
+const useData = (
+  //
+  filter: Tstate_filter | undefined,
+  {
+    uniqInvoice,
+    dontShotNoInvoiceData,
+  }: {
+    uniqInvoice?: boolean;
+    dontShotNoInvoiceData?: boolean;
+  } = {}
+): TmodalData<Tprodreceipt_Dto> => {
   const invoice = filter?.invoice?.trim();
   // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
   const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
@@ -71,7 +85,9 @@ const useData = (filter: Tstate_filter | undefined, uniqInvoice?: boolean): Tmod
       }
 
       // 沒有發票資料的去除
-      !data.invoice && (pass = false);
+      if (dontShotNoInvoiceData) {
+        !data.invoice && (pass = false);
+      }
 
       return pass;
     });
