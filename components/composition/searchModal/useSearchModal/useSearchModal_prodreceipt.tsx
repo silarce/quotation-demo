@@ -18,7 +18,7 @@ interface Toptions {
   coverFilter?: Tconfig_filter;
   customKeyArr?: string[];
   uniqInvoice?: boolean;
-  dontShotNoInvoiceData?: boolean;
+  removeNoInvoiceData?: boolean;
 }
 
 // =====================================================================================
@@ -38,7 +38,7 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
   const { dataArr, viewRef, isLoading, qty } = useData(filter, {
     uniqInvoice: options?.uniqInvoice,
-    dontShotNoInvoiceData: options?.dontShotNoInvoiceData,
+    removeNoInvoiceData: options?.removeNoInvoiceData,
   });
 
   return {
@@ -64,15 +64,17 @@ const useData = (
   filter: Tstate_filter | undefined,
   {
     uniqInvoice,
-    dontShotNoInvoiceData,
+    removeNoInvoiceData = false,
   }: {
     uniqInvoice?: boolean;
-    dontShotNoInvoiceData?: boolean;
+    removeNoInvoiceData?: boolean;
   } = {}
 ): TmodalData<Tprodreceipt_Dto> => {
-  const invoice = filter?.invoice?.trim();
   // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
-  const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
+  // const invoice = filter?.invoice?.trim();
+  // const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
+
+  const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(undefined, { autoUpdate: false });
 
   const dataArr = useMemo(() => {
     let dataArr = res ?? [];
@@ -80,19 +82,22 @@ const useData = (
     dataArr = dataArr.filter((data) => {
       let pass = true;
 
+      if (filter?.invoice?.trim()) {
+        !!data.invoice && data.invoice !== filter.invoice.trim() && (pass = false);
+      }
+
       if (filter?.prodreceiptid) {
         !String(data.prodreceiptid).includes(filter.prodreceiptid.trim()) && (pass = false);
       }
 
-      // 沒有發票資料的去除
-      if (dontShotNoInvoiceData) {
+      if (removeNoInvoiceData) {
         !data.invoice && (pass = false);
       }
 
       return pass;
     });
 
-    // 將重複的資料去除
+    // 將重複發票的資料去除
     uniqInvoice && (dataArr = _.uniqBy(dataArr, 'invoice'));
 
     return dataArr;
