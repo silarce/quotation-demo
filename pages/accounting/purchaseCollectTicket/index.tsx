@@ -215,6 +215,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             customKeyArr: ['indexNumber', 'invoice'],
             coverFilter: customerFilter,
             uniqInvoice: true,
+            dontShotNoInvoiceData: true,
           }}
         />
       ),
@@ -255,13 +256,10 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
         <SearchModal_prodreceipt
           options={{
             coverFilter: customerFilter_forDetail,
+            dontShotNoInvoiceData: false,
           }}
           checkForbbiden={({ dto, dtoDirc }) => {
-            if (
-              //
-              !dto.invoice ||
-              (State.invoice_number && State.invoice_number !== dto.invoice)
-            ) {
+            if (State.invoice_number && State.invoice_number !== dto.invoice) {
               return true;
             }
 
@@ -271,7 +269,10 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return false;
             }
 
-            if (!invoiceNumberArr.includes(dto.invoice)) {
+            // 預期只會有一個item是有值的
+            const validInvoiceNumber = invoiceNumberArr.find((item) => !!item);
+
+            if (validInvoiceNumber && dto.invoice && validInvoiceNumber !== dto.invoice) {
               return true;
             }
           }}
