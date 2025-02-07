@@ -42,5 +42,7 @@
   "customer": "Customer",
   "form": "Form",
   "selectCustomer": "選擇客戶",
-  "selectSupplier": "Select Supplier"
+  "selectSupplier": "Select Supplier",
+  "input": "Input",
+  "invoice": "Invoice"
 }

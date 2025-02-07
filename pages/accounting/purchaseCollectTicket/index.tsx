@@ -207,9 +207,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return true;
             }
 
-            if (State.invoice_number && State.invoice_number !== dto.invoice) {
-              return true;
-            }
+            // if (State.invoice_number && State.invoice_number !== dto.invoice) {
+            //   return true;
+            // }
           }}
           options={{
             customKeyArr: ['indexNumber', 'invoice'],
@@ -221,17 +221,29 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
     });
   };
 
-  // MARK:handleClearInvoice
-  const handleClearInvoice = () => {
-    myAlert.confirm({
-      title: t('clearInvoiceWarning'),
-      props: {
-        onOk: () => {
-          State.invoice_number = '';
-          State.clearDetail();
-        },
+  const handleInputInvoice = () => {
+    const { destroy } = myAlert.input({
+      title: '發票號碼',
+      onConfirm: (value) => {
+        State.invoice_number = value;
+        destroy();
       },
     });
+  };
+
+  // MARK:handleClearInvoice
+  const handleClearInvoice = () => {
+    State.invoice_number = '';
+    State.clearDetail();
+    // myAlert.confirm({
+    //   title: t('clearInvoiceWarning'),
+    //   props: {
+    //     onOk: () => {
+    //       State.invoice_number = '';
+    //       State.clearDetail();
+    //     },
+    //   },
+    // });
   };
 
   // MARK: handleSelectDetail
@@ -351,6 +363,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             }}
             invoiceBtn={{
               onSelectClick: handleSelectInvoice,
+              onInputClick: handleInputInvoice,
               onClearClick: handleClearInvoice,
               status: State.invoice_number ? 'selected' : 'unselected',
             }}
@@ -358,6 +371,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           <div className="mt-2 ">
             <div>
               <span className="text-xl text-main mr-5">{t('detail')}</span>
+
               {!disabled && (
                 <SquareBtn className={classNames()} label={t('addDetail')} sharp="mini" onClick={handleSelectDetail} />
               )}
