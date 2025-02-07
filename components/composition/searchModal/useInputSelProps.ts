@@ -37,7 +37,9 @@ const createInputSel = ({
   state: Tstate_filter | undefined;
   setState: React.Dispatch<React.SetStateAction<Tstate_filter | undefined>>;
 }) => {
-  const { caption, key, type, selectOptions, disabled, placeholder } = config;
+  const { caption, key, type, selectOptions, placeholder, freeze } = config;
+  let disabled = config.disabled;
+  freeze && (disabled = true);
 
   const inputSelProps: TinputSelProps = {
     disabled,
