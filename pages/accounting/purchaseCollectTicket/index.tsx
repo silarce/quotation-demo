@@ -60,6 +60,7 @@ const Detail_memo = memo(Detail, (prevProps, nextProps) => {
   if (
     prevProps.classState.updateCount !== nextProps.classState.updateCount ||
     prevProps.classState.identifyId !== nextProps.classState.identifyId ||
+    prevProps.disabled !== nextProps.disabled ||
     prevProps.indexNumber !== nextProps.indexNumber
   ) {
     return false;
