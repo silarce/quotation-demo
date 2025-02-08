@@ -31,7 +31,7 @@
     "applicant_department": "申請單位",
     "ticket_method": "開票方式",
     "tax_deduction_category": "扣稅類別",
-    "journal_method": "立帳方式",
+    "arrc_method": "立帳方式",
     "invoice_number": "發票號碼",
     "invoice_price": "發票金額",
     "note": "摘要說明",
