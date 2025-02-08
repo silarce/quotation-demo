@@ -3,7 +3,6 @@ import Decimal from 'decimal.js';
 import { Tstate, Tstate_detail, Interface_classState, Interface_classState_detail } from '../type';
 import { TcreatePurchaseCollectTicket_Dto, TupdatePurchaseCollectTicket_Dto } from 'js/api/api_netCore/api_accountant';
 import { TemployeeDto } from 'js/api/dtoTypes';
-import { XOR } from 'ts-essentials';
 
 class ClassState implements Interface_classState {
   private readonly state;

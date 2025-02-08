@@ -148,33 +148,33 @@ const useConfig_data = (customKeyArr?: string[]) => {
         },
       },
       name: {
-        label: '名稱',
+        label: t_common('name'),
         style: {
           width: 200,
           justifyContent: 'flex-start',
         },
       },
       spec: {
-        label: '規格',
+        label: t_common('spec'),
         style: {
           width: 200,
           justifyContent: 'flex-start',
         },
       },
       quantity: {
-        label: '數量',
+        label: t_common('quantity'),
         style: {
           width: '60px',
         },
       },
       unit: {
-        label: '單位',
+        label: t_common('unit'),
         style: {
           width: '60px',
         },
       },
       unitprice: {
-        label: '單價',
+        label: t_common('unitprice'),
         style: {
           width: '80px',
           justifyContent: 'flex-end',
@@ -184,7 +184,7 @@ const useConfig_data = (customKeyArr?: string[]) => {
         },
       },
       totalprice: {
-        label: '總價',
+        label: t_common('totalPrice'),
         style: {
           width: '100px',
           justifyContent: 'flex-end',
@@ -194,7 +194,7 @@ const useConfig_data = (customKeyArr?: string[]) => {
         },
       },
       note: {
-        label: '備註',
+        label: t_common('note'),
         style: {
           width: '200px',
           justifyContent: 'flex-start',

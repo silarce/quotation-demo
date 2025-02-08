@@ -44,5 +44,11 @@
   "selectCustomer": "選擇客戶",
   "selectSupplier": "Select Supplier",
   "input": "Input",
-  "invoice": "Invoice"
+  "invoice": "Invoice",
+  "spec": "Spec",
+  "quantity": "Quantity",
+  "unit": "Unit",
+  "unitprice": "Unit Price",
+  "totalPrice": "Total Price",
+  "note": "Note"
 }

@@ -44,5 +44,11 @@
   "selectCustomer": "選擇客戶",
   "selectSupplier": "選擇廠商",
   "input": "輸入",
-  "invoice": "發票"
+  "invoice": "發票",
+  "spec": "規格",
+  "quantity": "數量",
+  "unit": "單位",
+  "unitprice": "單價",
+  "totalPrice": "總價",
+  "note": "備註"
 }

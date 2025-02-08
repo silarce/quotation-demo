@@ -48,7 +48,9 @@
     "selectDetail": "Select Detail",
     "selectInvoice": "Select Invoice",
     "clearInvoiceWarning": "Clear Invoice will also clear the detail",
-    "unclosedInvoices": "Unclosed Invoices"
+    "unclosedInvoices": "Unclosed Invoices",
+    "supplier_name": "Supplier Name",
+    "editInvoiceWarning": "Editing the invoice number will clear all details"
   },
   "prodreceipt": {
     "prodreceiptid": "Prodreceipt ID",

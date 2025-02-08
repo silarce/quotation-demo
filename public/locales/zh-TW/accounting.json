@@ -48,7 +48,9 @@
     "selectDetail": "選擇明細資料",
     "selectInvoice": "選擇發票",
     "clearInvoiceWarning": "清除發票將一併清除明細資料",
-    "unclosedInvoices": "未結案發票"
+    "unclosedInvoices": "未結案發票",
+    "supplier_name": "供應商",
+    "editInvoiceWarning": "編輯發票號碼將會清除所有明細資料"
   },
   "prodreceipt": {
     "prodreceiptid": "進貨單號",
