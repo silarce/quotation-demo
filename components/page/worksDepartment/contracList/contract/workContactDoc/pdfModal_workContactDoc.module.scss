@@ -7,14 +7,14 @@ $color: theme("colors.text");
 
 $itemName: 100px;
 $size: 200px;
-$doorModelName: 150px;
-$material: 100px;
-$thickness: 100px;
-$surface: 100px;
+$doorModelName: 200px;
+$material: 130px;
+$thickness: 75px;
+$surface: 75px;
 $doorTrack: 100px;
-$closeType: 145px;
+$closeType: 125px;
 $horsePower: 100px;
-$qty: 100px;
+$qty: 75px;
 $note: auto;
 
 $infoLeftWidth: calc($itemName + $size + $doorModelName + $material + $thickness + $surface);
