@@ -36,7 +36,7 @@
     "invoice_price": "Invoice Price",
     "note": "Note",
     "item": "Item",
-    "prodreceipt_number": "Source Number",
+    "prodreceipt_number": "Prodreceipt Number",
     "transaction_date": "Transaction Date",
     "quantity": "Quantity",
     "unit": "Unit",
