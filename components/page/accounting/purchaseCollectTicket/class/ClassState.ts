@@ -72,13 +72,13 @@ class ClassState implements Interface_classState {
       tax_deduction_category: category,
     }));
   }
-  get arrc_method() {
-    return this.state.arrc_method;
+  get acct_method() {
+    return this.state.acct_method;
   }
-  set arrc_method(method: string) {
+  set acct_method(method: string) {
     this.setState((state) => ({
       ...state,
-      arrc_method: method,
+      acct_method: method,
     }));
   }
   get invoice_number() {
@@ -123,35 +123,38 @@ class ClassState implements Interface_classState {
       applicant_department,
       ticket_method,
       tax_deduction_category,
-      arrc_method,
+      acct_method,
       invoice_number,
       invoice_price,
       note,
     } = this.state;
 
-    const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
-      purchase_collect_ticket_uuid: id,
-      applicant_department: applicant_department,
-      agent_employee_id: agent_employee?.id || '',
-      ticket_method: ticket_method,
-      tax_deduction_category: tax_deduction_category,
-      acct_method: arrc_method,
-      invoice_number: invoice_number,
-      invoice_price: Number(invoice_price),
-      note: note,
-      data: this.detailArr.map((classDetail) => classDetail.reqBody),
-    };
+    // const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
+    //   purchase_collect_ticket_uuid: id,
+    //   applicant_department: applicant_department,
+    //   agent_employee_id: agent_employee?.id || '',
+    //   ticket_method: ticket_method,
+    //   tax_deduction_category: tax_deduction_category,
+    //   acct_method,
+    //   invoice_number: invoice_number,
+    //   invoice_price: Number(invoice_price),
+    //   note: note,
+    //   data: this.detailArr.map((classDetail) => classDetail.reqBody),
+    // };
 
     const body_create: TcreatePurchaseCollectTicket_Dto = {
       applicant_department: applicant_department,
       agent_employee_id: agent_employee?.id || '',
       ticket_method: ticket_method,
       tax_deduction_category: tax_deduction_category,
-      acct_method: arrc_method,
+      acct_method: acct_method,
       invoice_number: invoice_number,
       invoice_price: Number(invoice_price),
       note: note,
       data: this.detailArr.map((classDetail) => classDetail.reqBody),
+
+      supplier_name: this.state.supplier_name,
+      supplier_uuid: this.state.supplier_uuid,
     };
 
     const body_update: TupdatePurchaseCollectTicket_Dto | null = id
@@ -161,11 +164,14 @@ class ClassState implements Interface_classState {
           agent_employee_id: agent_employee?.id || '',
           ticket_method: ticket_method,
           tax_deduction_category: tax_deduction_category,
-          acct_method: arrc_method,
+          acct_method: acct_method,
           invoice_number: invoice_number,
           invoice_price: Number(invoice_price),
           note: note,
           data: this.detailArr.map((classDetail) => classDetail.reqBody),
+
+          supplier_name: this.state.supplier_name,
+          supplier_uuid: this.state.supplier_uuid,
         }
       : null;
 
@@ -186,7 +192,7 @@ class ClassState implements Interface_classState {
     supplier_name,
     supplier_uuid,
     tax_deduction_category,
-    arrc_method,
+    acct_method,
   }: Parameters<Interface_classState['editCustomer']>[0]) {
     this.setState((state) => {
       const copy = { ...state };
@@ -198,7 +204,7 @@ class ClassState implements Interface_classState {
         copy.supplier_name = supplier_name;
         copy.supplier_uuid = supplier_uuid;
         copy.tax_deduction_category = tax_deduction_category;
-        copy.arrc_method = arrc_method;
+        copy.acct_method = acct_method;
       }
 
       return copy;

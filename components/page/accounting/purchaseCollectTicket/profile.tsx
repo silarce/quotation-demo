@@ -5,12 +5,14 @@ import classNames from 'classnames';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
-// api
-import { useDepartments } from 'js/api/api_department';
-
 import { Interface_classState } from './type';
 
 import { useTranslation } from 'react-i18next';
+
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
+
+// api
+import { useDepartments } from 'js/api/api_department';
 
 const Profile = ({
   //
@@ -108,14 +110,14 @@ const Profile = ({
         }}
       />
       <InputSel
-        caption={t('journal_method')}
+        caption={t('acct_method')}
         showBaseline="auto"
         disabled={disabled}
         inputProps={{
           props: {
-            value: classState.journal_method,
+            value: classState.acct_method,
             onChange: (e) => {
-              classState.journal_method = e.target.value;
+              classState.acct_method = e.target.value;
             },
             readOnly: disabled,
             disabled: false,
@@ -124,6 +126,42 @@ const Profile = ({
       />
       <div />
       {/*  */}
+
+      <InputSel
+        wrapperStyle={{
+          height: 'fit-content',
+        }}
+        caption={'廠商'}
+        showBaseline="auto"
+        disabled={disabled}
+        node={<div>{classState.supplier_name}</div>}
+        htmlFor={'nothing'}
+        suffix={
+          <div>
+            <SquareBtn
+              className={classNames(disabled && 'invisible')}
+              label={'選擇'}
+              sharp="mini"
+              onClick={() => {
+                const { unmount } = SearchModal_customer.open({
+                  onRowClick: (dto) => {
+                    const { id, name, taxDeductionCategory, acctMethod } = dto;
+
+                    classState.editCustomer({
+                      supplierSource: 'customer',
+                      supplier_uuid: id,
+                      supplier_name: name,
+                      tax_deduction_category: taxDeductionCategory,
+                      acct_method: acctMethod ?? '',
+                    });
+                    unmount();
+                  },
+                });
+              }}
+            />
+          </div>
+        }
+      />
 
       <div className="col-span-2">
         <InputSel
@@ -167,7 +205,6 @@ const Profile = ({
         <span className="text-sm text-danger self-end">編輯發票號碼將會清除所有明細資料</span>
       </div>
 
-      <div />
       <div />
       {/*  */}
       <InputSel
