@@ -171,7 +171,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   // MARK:handleSelectTicket
   const handleSelectTicket = () => {
-    DragableModal.create({
+    const { unmount } = DragableModal.create({
       // 進貨收票單
       handleText: t('purchaseCollectTicket'),
       children: (
@@ -184,6 +184,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
                 purchaseCollectTicketId: purchaseCollectTicket.id,
               },
             });
+            unmount();
           }}
         />
       ),
