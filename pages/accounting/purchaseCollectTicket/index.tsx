@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
@@ -82,6 +82,20 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   const [disabled, setDisabled] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
+  // ------------------------------------------------------------
+
+  const ref_selectTicketUnmount = useRef<() => void>();
+  const ref_selectInvoiceUnmount = useRef<() => void>();
+  const ref_selectDetailUnmount = useRef<() => void>();
+
+  useEffect(() => {
+    return () => {
+      ref_selectTicketUnmount.current && ref_selectTicketUnmount.current();
+      ref_selectInvoiceUnmount.current && ref_selectInvoiceUnmount.current();
+      ref_selectDetailUnmount.current && ref_selectDetailUnmount.current();
+    };
+  }, []);
+
   // ------------------------------------------------------------
 
   const {
@@ -171,9 +185,14 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   // MARK:handleSelectTicket
   const handleSelectTicket = () => {
+    if (ref_selectTicketUnmount.current) {
+      return;
+    }
+
     const { unmount } = DragableModal.create({
       // 進貨收票單
       handleText: t('purchaseCollectTicket'),
+      onCrossClick: () => (ref_selectTicketUnmount.current = undefined),
       children: (
         <SearchModal_purchaseCollectTicket
           limit={1}
@@ -185,17 +204,27 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               },
             });
             unmount();
+            ref_selectTicketUnmount.current = undefined;
           }}
         />
       ),
     });
+
+    ref_selectTicketUnmount.current = unmount;
   };
 
   // MARK:handleSelectInvoice
   const handleSelectInvoice = () => {
+    if (ref_selectInvoiceUnmount.current) {
+      return;
+    }
+
     const { unmount } = DragableModal.create({
       // handleText: '未結案發票',
       handleText: t('unclosedInvoices'),
+      onCrossClick: () => {
+        ref_selectInvoiceUnmount.current = undefined;
+      },
       children: (
         <SearchModal_prodreceipt
           limit={1}
@@ -204,6 +233,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               invoiceNumber: prodreceipt.invoice,
             });
             State.clearDetail();
+            ref_selectInvoiceUnmount.current = undefined;
             unmount();
           }}
           checkForbbiden={({ dto }) => {
@@ -224,6 +254,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
         />
       ),
     });
+    ref_selectInvoiceUnmount.current = unmount;
   };
 
   const handleInputInvoice = () => {
@@ -254,7 +285,12 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   // MARK: handleSelectDetail
   const handleSelectDetail = () => {
+    if (ref_selectDetailUnmount.current) {
+      return;
+    }
+
     const { unmount } = DragableModal.create({
+      onCrossClick: () => (ref_selectDetailUnmount.current = undefined),
       // 選擇明細資料
       handleText: t('selectDetail'),
       children: (
@@ -330,10 +366,12 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             State.addDetail(arr);
             State.invoice_number = invoiceNumber;
             unmount();
+            ref_selectDetailUnmount.current = undefined;
           }}
         />
       ),
     });
+    ref_selectDetailUnmount.current = unmount;
   };
 
   // MARK: handelConfirm
