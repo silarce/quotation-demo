@@ -512,12 +512,16 @@ const useDefaultState = (
         serial_number: rawData.serial_number,
         applicant_department: rawData.applicant_department || '',
         ticket_method: rawData.ticket_method || '',
-        tax_deduction_category: rawData.tax_deduction_category || '',
-        journal_method: rawData.journal_method || '',
         invoice_number: rawData.invoice_number || '',
         invoice_price: String(rawData.invoice_price || '') as Tstate['invoice_price'],
         note: rawData.note || '',
         detailArr: detailArr,
+
+        supplier_name: rawData.supplier_name || '',
+        supplier_uuid: rawData.supplier_uuid,
+
+        tax_deduction_category: rawData.tax_deduction_category || '',
+        arrc_method: rawData.acct_method || '',
       };
 
       return state;
@@ -534,12 +538,16 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
   serial_number: undefined,
   applicant_department: '',
   ticket_method: '',
-  tax_deduction_category: '',
-  journal_method: '',
   invoice_number: '',
   invoice_price: '',
   note: '',
   detailArr: [],
+
+  supplier_name: '',
+  supplier_uuid: null,
+
+  tax_deduction_category: '',
+  arrc_method: '',
 });
 
 // =============================================================================

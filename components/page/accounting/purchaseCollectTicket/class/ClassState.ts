@@ -3,14 +3,14 @@ import Decimal from 'decimal.js';
 import { Tstate, Tstate_detail, Interface_classState, Interface_classState_detail } from '../type';
 import { TcreatePurchaseCollectTicket_Dto, TupdatePurchaseCollectTicket_Dto } from 'js/api/api_netCore/api_accountant';
 import { TemployeeDto } from 'js/api/dtoTypes';
+import { XOR } from 'ts-essentials';
 
 class ClassState implements Interface_classState {
   private readonly state;
   private readonly setState;
   readonly detailArr: Interface_classState_detail[] = [];
-  //
+
   constructor(
-    //
     state: Tstate,
     setState: React.Dispatch<React.SetStateAction<Tstate>>,
     ClassDetail: new (
@@ -72,13 +72,13 @@ class ClassState implements Interface_classState {
       tax_deduction_category: category,
     }));
   }
-  get journal_method() {
-    return this.state.journal_method;
+  get arrc_method() {
+    return this.state.arrc_method;
   }
-  set journal_method(method: string) {
+  set arrc_method(method: string) {
     this.setState((state) => ({
       ...state,
-      journal_method: method,
+      arrc_method: method,
     }));
   }
   get invoice_number() {
@@ -103,6 +103,10 @@ class ClassState implements Interface_classState {
     }));
   }
 
+  get supplier_name() {
+    return this.state.supplier_name;
+  }
+
   get detailAmountTotal() {
     let total = new Decimal(0);
     this.detailArr.forEach(({ amount }) => {
@@ -119,7 +123,7 @@ class ClassState implements Interface_classState {
       applicant_department,
       ticket_method,
       tax_deduction_category,
-      journal_method,
+      arrc_method,
       invoice_number,
       invoice_price,
       note,
@@ -131,7 +135,7 @@ class ClassState implements Interface_classState {
       agent_employee_id: agent_employee?.id || '',
       ticket_method: ticket_method,
       tax_deduction_category: tax_deduction_category,
-      journal_method: journal_method,
+      acct_method: arrc_method,
       invoice_number: invoice_number,
       invoice_price: Number(invoice_price),
       note: note,
@@ -143,7 +147,7 @@ class ClassState implements Interface_classState {
       agent_employee_id: agent_employee?.id || '',
       ticket_method: ticket_method,
       tax_deduction_category: tax_deduction_category,
-      journal_method: journal_method,
+      acct_method: arrc_method,
       invoice_number: invoice_number,
       invoice_price: Number(invoice_price),
       note: note,
@@ -157,7 +161,7 @@ class ClassState implements Interface_classState {
           agent_employee_id: agent_employee?.id || '',
           ticket_method: ticket_method,
           tax_deduction_category: tax_deduction_category,
-          journal_method: journal_method,
+          acct_method: arrc_method,
           invoice_number: invoice_number,
           invoice_price: Number(invoice_price),
           note: note,
@@ -176,6 +180,31 @@ class ClassState implements Interface_classState {
   }
 
   // ------------------------------------------------------------
+
+  editCustomer({
+    supplierSource,
+    supplier_name,
+    supplier_uuid,
+    tax_deduction_category,
+    arrc_method,
+  }: Parameters<Interface_classState['editCustomer']>[0]) {
+    this.setState((state) => {
+      const copy = { ...state };
+
+      if (supplierSource === 'prodreceipt') {
+        copy.supplier_name = supplier_name;
+        copy.supplier_uuid = supplier_uuid;
+      } else if (supplierSource === 'customer') {
+        copy.supplier_name = supplier_name;
+        copy.supplier_uuid = supplier_uuid;
+        copy.tax_deduction_category = tax_deduction_category;
+        copy.arrc_method = arrc_method;
+      }
+
+      return copy;
+    });
+  }
+
   chagneAgent(agent: TemployeeDto) {
     this.setState((state) => ({
       ...state,

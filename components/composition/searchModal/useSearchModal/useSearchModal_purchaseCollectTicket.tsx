@@ -65,7 +65,7 @@ const useData = (state_filter: Tstate_filter | undefined): TmodalData<TpurchaseC
         // agent_employee_id,
         // ticket_method,
         // tax_deduction_category,
-        // journal_method,
+        // arrc_method,
         invoice_number,
         // invoice_price,
         // note,
@@ -147,8 +147,8 @@ const useConfig_data = () => {
           width: '100px',
         },
       },
-      journal_method: {
-        label: t('journal_method'),
+      arrc_method: {
+        label: t('arrc_method'),
         style: {
           width: '100px',
         },
@@ -172,7 +172,7 @@ const useConfig_data = () => {
     'invoice_price',
     'ticket_method',
     'tax_deduction_category',
-    'journal_method',
+    'arrc_method',
     'note',
   ];
 
