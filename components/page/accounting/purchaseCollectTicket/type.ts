@@ -27,7 +27,7 @@ interface Tstate {
   note: string; // 備註
 
   tax_deduction_category: string; //  扣稅類別
-  arrc_method: string; // 立帳方式
+  acct_method: string; // 立帳方式
 
   supplier_name: string; // 供應商名稱
   supplier_uuid: string | null; // 供應商id
@@ -63,10 +63,11 @@ type Interface_classState = Pick<
   | 'applicant_department'
   | 'ticket_method'
   | 'tax_deduction_category'
-  | 'arrc_method'
+  | 'acct_method'
   | 'invoice_number'
   // | 'invoice_price'
   | 'note'
+  | 'supplier_name'
 > & {
   agentName: string;
   invoice_price: string;
@@ -90,7 +91,7 @@ type Interface_classState = Pick<
         supplier_name: string; // 供應商名稱
         supplier_uuid: string; // 供應商id
         tax_deduction_category: string; //  扣稅類別
-        arrc_method: string; // 立帳方式
+        acct_method: string; // 立帳方式
       }
     >
   ) => void;

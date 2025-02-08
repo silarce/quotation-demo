@@ -31,7 +31,7 @@
     "applicant_department": "Applicant Department",
     "ticket_method": "Ticket Method",
     "tax_deduction_category": "Tax Deduction Category",
-    "arrc_method": "Arrc Method",
+    "acct_method": "Acct Method",
     "invoice_number": "Invoice Number",
     "invoice_price": "Invoice Price",
     "note": "Note",

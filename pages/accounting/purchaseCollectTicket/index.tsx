@@ -521,7 +521,7 @@ const useDefaultState = (
         supplier_uuid: rawData.supplier_uuid,
 
         tax_deduction_category: rawData.tax_deduction_category || '',
-        arrc_method: rawData.acct_method || '',
+        acct_method: rawData.acct_method || '',
       };
 
       return state;
@@ -547,7 +547,7 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
   supplier_uuid: null,
 
   tax_deduction_category: '',
-  arrc_method: '',
+  acct_method: '',
 });
 
 // =============================================================================
