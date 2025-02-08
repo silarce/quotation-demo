@@ -69,7 +69,7 @@ const createInputSel = ({
     case 'select':
       inputSelProps.selectProps = {
         props: {
-          menuPortalTarget: undefined,
+          // menuPortalTarget: undefined,
           classNames: {
             menuPortal: () => classNames(scss.select_menuPortal, scss.plus),
           },
@@ -89,6 +89,7 @@ const createInputSel = ({
         },
       };
       placeholder !== undefined && (inputSelProps.selectProps.props!.placeholder = placeholder);
+
       break;
 
     case 'date':
