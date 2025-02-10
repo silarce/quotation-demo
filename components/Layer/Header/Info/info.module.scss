@@ -3,16 +3,27 @@
 .container {
   display: flex;
   flex-wrap: nowrap;
+  align-items: center;
   // grid-template-columns: auto auto auto auto;
   // grid-template-columns: auto auto auto 65px;
-  grid-gap: 19px;
+  // grid-gap: 19px;
+  gap: 20px;
   height: 100%;
-  padding: 0 23px 0 33px;
+  // padding: 0 23px 0 33px;
+  padding: 0 20px;
   margin: auto;
   background-color: $bgc01;
-  > * {
-    margin: auto;
-  }
+  // > * {
+  //   margin: auto;
+  // }
+}
+
+.left,
+.right {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  align-items: center;
 }
 
 .avatar {
@@ -145,4 +156,9 @@
     font-size: 16px;
     color: $colorMain;
   }
+}
+
+.gear {
+  // width: 80px;
+  padding: 0;
 }
