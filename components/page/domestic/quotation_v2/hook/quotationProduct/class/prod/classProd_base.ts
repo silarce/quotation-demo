@@ -609,7 +609,7 @@ class ClassProd_base implements Interface_ClassProd_base {
       return undefined;
     }
 
-    return createAssetUrl(this.data.guideRail);
+    return createAssetUrl('door-track', this.data.guideRail);
   }
 
   get guideRailThickness() {
