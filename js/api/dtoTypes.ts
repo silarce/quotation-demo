@@ -1729,6 +1729,25 @@ export type TquotationProductItemDto = {
   floor: string | null;
   // 區域位置
   locationArea: string | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱前遮' })
+  headBoxCover: string | null;
+  // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
+  headBoxTopCover: boolean | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeX' })
+  headBoxSizeX: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeY' })
+  headBoxSizeY: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeM' })
+  headBoxSizeM: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeN' })
+  headBoxSizeN: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeO' })
+  headBoxSizeO: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeP' })
+  headBoxSizeP: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
+  headBoxSizeQ: `${number}` | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3797,6 +3816,60 @@ export type TupdateContractProductItemDto = {
   guideRailG?: number | null;
   // 國外認證防火規範
   isULGuideRail?: boolean | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱前遮' })
+  // @IsString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxCover?: string | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
+  // @IsBoolean()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxTopCover?: boolean | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeX' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeX?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeY' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeY?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeM' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeM?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeN' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeN?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeO' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeO?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeP' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeP?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeQ?: `${number}` | null;
 
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;
