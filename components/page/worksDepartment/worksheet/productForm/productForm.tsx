@@ -755,7 +755,16 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           }}
         />
 
-        <br />
+        <InputSel
+          {...basicConfig}
+          caption="檔輪"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_前遮,
+            },
+          }}
+        />
 
         <InputSel
           {...basicConfig}

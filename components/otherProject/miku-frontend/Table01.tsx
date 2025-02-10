@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import classNames from 'classnames';
 
 import * as C from 'components/otherProject/miku-frontend/index';
 
@@ -83,6 +84,8 @@ type Tcontrol = {
 };
 
 export type { Tcontrol as Tcontrol_table01 };
+
+const imgHeight = 'h-[16px]';
 
 export default function Miku_frontend_table01({ control }: { control: Tcontrol }) {
   const {
@@ -171,7 +174,11 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
 
         <C.TableHeader2 title={`捲箱細節`} className="col-span-2 border-l-4 border-r-4" />
         <section className="border-l-4 border-r-2 border-black">
-          <C.TableContent2 label={<span className="inline-block h-[4px]"></span>} height="auto" />
+          <C.TableContent2
+            //
+            label={<span className={classNames('inline-block', imgHeight)}></span>}
+            height="auto"
+          />
           <C.TableContent2
             className="border-t-0"
             height="auto"
@@ -186,10 +193,11 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2
             className="border-t-0"
             height="auto"
-            label={<span className="inline-block h-[4px]"></span>}
+            label={<span className={classNames('inline-block', imgHeight)}></span>}
           />
         </section>
         <section className="border-l-0 border-r-4  border-black">
+          <C.TableContent2 label="檔輪" value={'有'} />
           <C.TableContent2 label="前遮" value={'半遮'} />
           <C.TableContent2 label="上蓋" value={'有'} />
           <C.TableContent2 label="sizeB" value={'sizeB'} />
