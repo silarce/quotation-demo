@@ -1750,6 +1750,8 @@ export type TquotationProductItemDto = {
   headBoxSizeP: `${number}` | null;
   // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
   headBoxSizeQ: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
+  hasWheel: boolean | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3872,6 +3874,12 @@ export type TupdateContractProductItemDto = {
   // @IsNullable()
   // @IsOptional()
   headBoxSizeQ?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
+  // @IsBoolean()
+  // @IsNullable()
+  // @IsOptional()
+  hasWheel?: boolean | null;
 
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;
