@@ -780,16 +780,16 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
 
         <div className="grid grid-cols-2 grid-rows-2">
           <div className="border-r-2 border-b-2">
-            <Image src={img_husky} alt="" className="max-h-full" />
+            <Image src={img_husky} alt="" />
           </div>
           <div className="border-b-2">
-            <Image src={img_husky} alt="" className="max-h-full " />
+            <Image src={img_husky} alt="" />
           </div>
           <div className="border-r-2">
-            <Image src={img_husky} alt="" className="max-h-full " />
+            <Image src={img_husky} alt="" />
           </div>
           <div className="">
-            <Image src={img_husky} alt="" className="max-h-full " />
+            <Image src={img_husky} alt="" />
           </div>
         </div>
 
