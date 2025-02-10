@@ -733,7 +733,10 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           }}
         />
 
-        <div />
+        <br />
+
+        <br />
+        <br />
 
         <InputSel
           {...basicConfig}
@@ -751,27 +754,56 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
+
+        <br />
+
         <InputSel
           {...basicConfig}
-          caption="新欄位"
+          caption="前遮"
           disabled={disabled}
           selectProps={{
             props: {
-              options: options_fake,
+              options: options_前遮,
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="上蓋"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_上蓋,
             },
           }}
         />
 
-        <div className="row-span-6" style={{ height: 294 }}>
-          <Image src={img_husky} alt="" className="max-h-full" />
+        <div className="grid grid-cols-2 grid-rows-2">
+          <div className="border-r-2 border-b-2">
+            <Image src={img_husky} alt="" className="max-h-full" />
+          </div>
+          <div className="border-b-2">
+            <Image src={img_husky} alt="" className="max-h-full " />
+          </div>
+          <div className="border-r-2">
+            <Image src={img_husky} alt="" className="max-h-full " />
+          </div>
+          <div className="">
+            <Image src={img_husky} alt="" className="max-h-full " />
+          </div>
         </div>
 
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
-        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <div className="grid gap-[25px] content-start">
+          <InputSel {...basicConfig} caption="SizeB" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeD" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeX" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeY" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeM" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeN" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeO" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeP" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeQ" disabled={disabled} inputProps={{}} />
+        </div>
       </div>
     </div>
   );
@@ -1670,6 +1702,30 @@ const options_fake = [
   {
     value: '4',
     label: '4',
+  },
+];
+const options_前遮 = [
+  {
+    value: 'none',
+    label: '無',
+  },
+  {
+    value: 'half',
+    label: '半遮',
+  },
+  {
+    value: 'whole',
+    label: '全遮',
+  },
+];
+const options_上蓋 = [
+  {
+    value: 'true',
+    label: '有',
+  },
+  {
+    value: 'false',
+    label: '無',
   },
 ];
 
