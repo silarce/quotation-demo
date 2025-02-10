@@ -1733,9 +1733,12 @@ export type TquotationProductItemDto = {
   locationArea: string | null;
 
   // @ApiProperty({ nullable: true, description: '捲箱前遮' })
-  headBoxCover: string | null;
+  // headBoxCover: string | null;
+  headBoxCover: TupdateContractProductItemDto['headBoxCover'] | null;
   // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
   headBoxTopCover: boolean | null;
+  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
+  hasWheel: boolean | null;
   // @ApiProperty({ nullable: true, description: '捲箱sizeX' })
   headBoxSizeX: `${number}` | null;
   // @ApiProperty({ nullable: true, description: '捲箱sizeY' })
@@ -1750,8 +1753,6 @@ export type TquotationProductItemDto = {
   headBoxSizeP: `${number}` | null;
   // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
   headBoxSizeQ: `${number}` | null;
-  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
-  hasWheel: boolean | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3825,7 +3826,9 @@ export type TupdateContractProductItemDto = {
   // @IsString()
   // @IsNullable()
   // @IsOptional()
-  headBoxCover?: string | null;
+  // headBoxCover?: string | null;
+  // 為下拉式選單，後端沒有設enum，所以在前端設定固定字串
+  headBoxCover?: 'none' | 'half' | 'whole' | null;
 
   // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
   // @IsBoolean()

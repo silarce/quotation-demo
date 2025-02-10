@@ -15,7 +15,7 @@ import scss from './productForm.module.scss';
 import { TdoorModelInfoDto } from 'js/api/dtoTypes';
 
 // zustand
-import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { useWorksheet, Tworksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
@@ -607,6 +607,24 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     isIntegratedHeadBox,
     getOptions_headBoxThickness,
     isSpecialProd,
+
+    headBoxCover,
+    headBoxTopCover,
+    hasWheel,
+    headBoxSizeX,
+    headBoxSizeY,
+    headBoxSizeM,
+    headBoxSizeN,
+    headBoxSizeO,
+    headBoxSizeP,
+    headBoxSizeQ,
+    setHeadBoxCover,
+    setBoxTopCover,
+    setHasWheel,
+    setBoxXYMNOPQ,
+
+    boxB,
+    boxD,
   } = useWorksheet(
     useShallow((state) => ({
       headBox: state.headBox,
@@ -616,6 +634,24 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
       isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+
+      headBoxCover: state.headBox.headBoxCover,
+      headBoxTopCover: state.headBox.headBoxTopCover,
+      hasWheel: state.headBox.hasWheel,
+      headBoxSizeX: state.headBox.headBoxSizeX,
+      headBoxSizeY: state.headBox.headBoxSizeY,
+      headBoxSizeM: state.headBox.headBoxSizeM,
+      headBoxSizeN: state.headBox.headBoxSizeN,
+      headBoxSizeO: state.headBox.headBoxSizeO,
+      headBoxSizeP: state.headBox.headBoxSizeP,
+      headBoxSizeQ: state.headBox.headBoxSizeQ,
+      setHeadBoxCover: state.headBox.setHeadBoxCover,
+      setBoxTopCover: state.headBox.setBoxTopCover,
+      setHasWheel: state.headBox.setHasWheel,
+      setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
+
+      boxB: state.ABCD.boxB,
+      boxD: state.ABCD.boxD,
     }))
   );
 
@@ -761,7 +797,15 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              options: options_前遮,
+              options: options_boolean,
+              value: findOption({
+                options: options_boolean,
+                value: hasWheel,
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'false') as 'true' | 'false';
+                setHasWheel(value);
+              },
             },
           }}
         />
@@ -773,6 +817,14 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: options_前遮,
+              value: findOption({
+                options: options_前遮,
+                value: headBoxCover ?? '',
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'none') as Tworksheet['headBox']['headBoxCover'];
+                setHeadBoxCover(value);
+              },
             },
           }}
         />
@@ -782,7 +834,15 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              options: options_上蓋,
+              options: options_boolean,
+              value: findOption({
+                options: options_boolean,
+                value: headBoxTopCover,
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'false') as 'true' | 'false';
+                setBoxTopCover(value);
+              },
             },
           }}
         />
@@ -803,15 +863,141 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
         </div>
 
         <div className="grid gap-[25px] content-start">
-          <InputSel {...basicConfig} caption="SizeB" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeD" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeX" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeY" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeM" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeN" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeO" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeP" disabled={disabled} inputProps={{}} />
-          <InputSel {...basicConfig} caption="SizeQ" disabled={disabled} inputProps={{}} />
+          <InputSel {...basicConfig} caption="SizeB" disabled={true} showBaseline="invisible" node={boxB} />
+          <InputSel {...basicConfig} caption="SizeD" disabled={true} showBaseline="invisible" node={boxD} />
+          <InputSel
+            {...basicConfig}
+            caption="SizeX"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeX,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeX', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeY"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeY,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeY', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeM"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeM,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeM', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeN"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeN,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeN', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeO"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeO,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeO', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeP"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeP,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeP', value: value });
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeQ"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeQ,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    return;
+                  }
+
+                  const value = e.target.value as `${number}`;
+                  setBoxXYMNOPQ({ key: 'headBoxSizeQ', value: value });
+                },
+              },
+            }}
+          />
         </div>
       </div>
     </div>
@@ -1693,26 +1879,25 @@ const basicConfig: TinputSelProps = {
   hrClassName: classNames(scss.inputSel_hr, scss.plus),
 };
 
+const inputNumberProps = {
+  type: 'number',
+  min: 0,
+  step: 0,
+};
+
 // ======================================================================
 
-const options_fake = [
+const options_boolean = [
   {
-    value: '1',
-    label: '決定SVG的新欄位',
+    value: 'false',
+    label: '無',
   },
   {
-    value: '2',
-    label: '2',
-  },
-  {
-    value: '3',
-    label: '3',
-  },
-  {
-    value: '4',
-    label: '4',
+    value: 'true',
+    label: '有',
   },
 ];
+
 const options_前遮 = [
   {
     value: 'none',
@@ -1725,16 +1910,6 @@ const options_前遮 = [
   {
     value: 'whole',
     label: '全遮',
-  },
-];
-const options_上蓋 = [
-  {
-    value: 'true',
-    label: '有',
-  },
-  {
-    value: 'false',
-    label: '無',
   },
 ];
 

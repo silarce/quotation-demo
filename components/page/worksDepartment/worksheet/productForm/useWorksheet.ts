@@ -249,6 +249,28 @@ type Tworksheet = {
     headBoxProtruding: string;
     isIntegratedHeadBox: boolean;
     headBoxAngleIronQuantity: string;
+
+    // 捲箱前遮
+    headBoxCover: NonNullable<TquotationProductItemDto_old['headBoxCover']>;
+    // 捲箱上蓋
+    headBoxTopCover: 'true' | 'false';
+    // 是否有檔輪
+    hasWheel: 'true' | 'false';
+    // 捲箱sizeX
+    headBoxSizeX: `${number}` | '';
+    // 捲箱sizeY
+    headBoxSizeY: `${number}` | '';
+    // 捲箱sizeM
+    headBoxSizeM: `${number}` | '';
+    // 捲箱sizeN
+    headBoxSizeN: `${number}` | '';
+    // 捲箱sizeO
+    headBoxSizeO: `${number}` | '';
+    // 捲箱sizeP
+    headBoxSizeP: `${number}` | '';
+    // 捲箱sizeQ
+    headBoxSizeQ: `${number}` | '';
+
     getIsIntegratedHeadBox: () => string;
     setHeadBox_str: (props: {
       key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
@@ -256,6 +278,21 @@ type Tworksheet = {
     }) => void;
 
     setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
+
+    setHeadBoxCover: (value: Tworksheet['headBox']['headBoxCover']) => void;
+    setBoxTopCover: (value: 'true' | 'false') => void;
+    setHasWheel: (value: 'true' | 'false') => void;
+    setBoxXYMNOPQ: (props: {
+      key:
+        | 'headBoxSizeX'
+        | 'headBoxSizeY'
+        | 'headBoxSizeM'
+        | 'headBoxSizeN'
+        | 'headBoxSizeO'
+        | 'headBoxSizeP'
+        | 'headBoxSizeQ';
+      value: `${number}` | '';
+    }) => void;
   };
 
   roller: {
@@ -702,6 +739,18 @@ const useWorksheet = create<Tworksheet>(
       headBoxProtruding: '',
       isIntegratedHeadBox: false,
       headBoxAngleIronQuantity: '0',
+
+      headBoxCover: '無' as Tworksheet['headBox']['headBoxCover'],
+      headBoxTopCover: 'false',
+      hasWheel: 'false',
+      headBoxSizeX: '',
+      headBoxSizeY: '',
+      headBoxSizeM: '',
+      headBoxSizeN: '',
+      headBoxSizeO: '',
+      headBoxSizeP: '',
+      headBoxSizeQ: '',
+
       getIsIntegratedHeadBox: () => {
         const isIntegratedHeadBox = get().headBox.isIntegratedHeadBox;
 
@@ -721,6 +770,38 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.headBox[key] = value;
             state.shouldCalcData2 = true;
+          })
+        );
+      },
+
+      setHeadBoxCover: (value) => {
+        set(
+          produce((state) => {
+            state.headBox.headBoxCover = value;
+          })
+        );
+      },
+
+      setBoxTopCover: (value) => {
+        set(
+          produce((state) => {
+            state.headBox.headBoxTopCover = value;
+          })
+        );
+      },
+
+      setHasWheel: (value) => {
+        set(
+          produce((state) => {
+            state.headBox.hasWheel = value;
+          })
+        );
+      },
+
+      setBoxXYMNOPQ: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.headBox[key] = value;
           })
         );
       },
@@ -1014,6 +1095,18 @@ const useWorksheet = create<Tworksheet>(
             isIntegratedHeadBox: !!contractProductItem?.isIntegratedHeadBox,
             headBoxAngleIronQuantity: String(contractProductItem?.headBoxAngleIronQuantity ?? '0'),
             getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
+
+            headBoxCover: contractProductItem?.headBoxCover ?? ('無' as Tworksheet['headBox']['headBoxCover']),
+            headBoxTopCover: !!contractProductItem?.headBoxTopCover ? 'true' : 'false',
+            hasWheel: !!contractProductItem?.hasWheel ? 'true' : 'false',
+
+            headBoxSizeX: `${contractProductItem?.headBoxSizeX || 0}`,
+            headBoxSizeY: `${contractProductItem?.headBoxSizeY || 0}`,
+            headBoxSizeM: `${contractProductItem?.headBoxSizeM || 0}`,
+            headBoxSizeN: `${contractProductItem?.headBoxSizeN || 0}`,
+            headBoxSizeO: `${contractProductItem?.headBoxSizeO || 0}`,
+            headBoxSizeP: `${contractProductItem?.headBoxSizeP || 0}`,
+            headBoxSizeQ: `${contractProductItem?.headBoxSizeQ || 0}`,
           };
 
           state.roller = {
@@ -2591,6 +2684,7 @@ const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', 
 export { useWorksheet };
 
 export type {
+  Tworksheet,
   TdoorComponentType_old,
   TupdateQuotationProductComponentDto_old,
   TquotationProductComponentDto_old,
