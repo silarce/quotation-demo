@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import Image from 'next/image';
 
 // antd
 import { Checkbox, Radio } from 'antd';
@@ -41,6 +42,8 @@ import {
 
 // utils
 import { findOption } from 'js/utils/options/findOption';
+
+import img_husky from 'public/image/test/husky.svg';
 
 // =====================================================================
 
@@ -714,6 +717,24 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         /> */}
+
+        <InputSel
+          {...basicConfig}
+          caption="角鐵數量"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: headBox.headBoxAngleIronQuantity,
+              type: 'number',
+              onChange: (e) => {
+                headBox.setHeadBox_str({ key: 'headBoxAngleIronQuantity', value: e.target.value });
+              },
+            },
+          }}
+        />
+
+        <div />
+
         <InputSel
           {...basicConfig}
           caption="形式"
@@ -732,18 +753,25 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
         />
         <InputSel
           {...basicConfig}
-          caption="角鐵數量"
+          caption="新欄位"
           disabled={disabled}
-          inputProps={{
+          selectProps={{
             props: {
-              value: headBox.headBoxAngleIronQuantity,
-              type: 'number',
-              onChange: (e) => {
-                headBox.setHeadBox_str({ key: 'headBoxAngleIronQuantity', value: e.target.value });
-              },
+              options: options_fake,
             },
           }}
         />
+
+        <div className="row-span-6" style={{ height: 294 }}>
+          <Image src={img_husky} alt="" className="max-h-full" />
+        </div>
+
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
+        <InputSel {...basicConfig} caption="新欄位" disabled={disabled} inputProps={{}} />
       </div>
     </div>
   );
@@ -1615,7 +1643,7 @@ const Table_bottomBar = () => {
 
 // MARK:basicConfig
 const basicConfig: TinputSelProps = {
-  wrapperStyle: { gap: '10px' },
+  wrapperStyle: { gap: '10px', height: 'fit-content' },
   captionStyle: { width: '100px' },
   captionSize: '18',
   captionColor: 'main',
@@ -1623,6 +1651,27 @@ const basicConfig: TinputSelProps = {
   showBaseline: 'always',
   hrClassName: classNames(scss.inputSel_hr, scss.plus),
 };
+
+// ======================================================================
+
+const options_fake = [
+  {
+    value: '1',
+    label: '決定SVG的新欄位',
+  },
+  {
+    value: '2',
+    label: '2',
+  },
+  {
+    value: '3',
+    label: '3',
+  },
+  {
+    value: '4',
+    label: '4',
+  },
+];
 
 // ======================================================================
 
