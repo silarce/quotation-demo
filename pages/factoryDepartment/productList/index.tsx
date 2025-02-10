@@ -36,6 +36,7 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
 import icon_search2 from 'public/image/icon/search.svg';
+import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -91,6 +92,7 @@ export default function ProductList() {
     const [componentdata, setComponentdata] = useState<any[]>([]);
     const [materialdata, setMaterialdata] = useState<any[]>([]);
     const [surfacedata, setSurfacedata] = useState<any[]>([]);
+    const [subproductdata, setSubProductdata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -128,6 +130,8 @@ export default function ProductList() {
     const [materialin, setMaterialin] = useState<string>("");
     const [surfacein, setSurfacein] = useState<string>("");
     const [oldproductid, setOldProductid] = useState<string>("");
+    const [subproduct, setSubProduct] = useState<string>("");
+
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -152,6 +156,8 @@ export default function ProductList() {
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
     const [editmain, setEditmain] = useState<boolean>(false);
+    const [editlaser, setEditlaser] = useState<boolean>(false);
+
 
 
     const [totalprice, setTotalPrice] = useState<string>("");
@@ -166,6 +172,7 @@ export default function ProductList() {
     const [originalmaterialin, setOriginalmaterialin] = useState(materialin);
     const [originalsurfacein, setOriginalsurfacein] = useState(surfacein);
     const [originaloldproductid, setOriginaloldproductid] = useState(surfacein);
+    const [originalsubproductdata, setOriginalsubproductdata] = useState<any[]>([]);
 
     //新增物料
     // const [addproductid, setAddProductid] = useState<string>("SJ");
@@ -325,16 +332,28 @@ export default function ProductList() {
             setFilteredData(data);
             console.log(data);
 
-            setProductidin(data[0].productid);
-            setProductnamein(data[0].name);
-            setProductspecin(data[0].spec);
-            setProductquantityin(data[0].count);
-            setCreate_atin(data[0].create_at);
-            setUpdate_atin(data[0].create_at);
-            setCreate_byin(data[0].create_by);
-            setUnitin(data[0].unit);
-            setMaterialin(data[0].material);
-            setSurfacein(data[0].surface);
+            // setProductidin(data[0].productid);
+            // setProductnamein(data[0].name);
+            // setProductspecin(data[0].spec);
+            // setProductquantityin(data[0].count);
+            // setCreate_atin(data[0].create_at);
+            // setUpdate_atin(data[0].create_at);
+            // setCreate_byin(data[0].create_by);
+            // setUnitin(data[0].unit);
+            // setMaterialin(data[0].material);
+            // setSurfacein(data[0].surface);
+            // setSubProduct(data[0].subproduct);
+            // 確保 subproduct 是 JSON 陣列字串，然後解析成陣列
+            let subProductArray = [];
+            try {
+                subProductArray = data[0].subproduct ? JSON.parse(data[0].subproduct) : [];
+            } catch (error) {
+                console.error("解析 subproduct 時發生錯誤:", error);
+                subProductArray = [];
+            }
+
+            // 存入狀態
+            setSubProductdata(subProductArray);
 
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -688,6 +707,13 @@ export default function ProductList() {
         setEditmain(true);
     };
 
+    const handleEditLaser = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalsubproductdata(subproductdata);
+        setEditlaser(true);
+    };
+
+
     const handleCancel = () => {
         // 取消編輯時恢復原始值
         myAlert.confirm({
@@ -710,6 +736,23 @@ export default function ProductList() {
         });
     };
 
+    const handleCancelEditLaser = () => {
+        // 取消編輯時恢復原始值
+        myAlert.confirm({
+            title: '確定要取消編輯嗎?',
+            content: <>
+                <h1>未儲存的資料將不會保存</h1>
+            </>,
+            props: {
+                onOk: () => {
+                    setSubProductdata(originalsubproductdata);
+                    setEditlaser(false);
+                }
+            }
+        });
+    };
+
+
     const handleSave = async () => {
         if ((productidin === "" || productidin === undefined) ||
             (productnamein === "" || productnamein === undefined)) {
@@ -731,7 +774,13 @@ export default function ProductList() {
                             productunit: unitin,
                             productmaterial: materialin,
                             productsurface: surfacein,
-                            oldproductid: oldproductid
+                            oldproductid: oldproductid,
+                            // subproduct: JSON.stringify(subproductdata)
+                            subproduct: JSON.stringify(subproductdata.map((item: any) => ({
+                                product: item.product,
+                                quantity: item.quantity
+                            })))
+                            
                         }
                         // console.log(data);
 
@@ -774,6 +823,7 @@ export default function ProductList() {
                         // 顯示成功提示
                         myAlert.success({ title: '更新成功' })
                         setEditmain(false);
+                        setEditlaser(false);
                         getProduct();
 
                         // 更新狀態或執行其他操作
@@ -903,28 +953,71 @@ export default function ProductList() {
 
 
     const editProduct = (item: any) => {
-        handleRowClick(item.productid);
-        console.log(item);
-        setProductnamein(item.name);
-        setProductidin(item.productid);
-        setProductspecin(item.spec);
-        setProductquantityin(item.count);
-        setCreate_atin(item.create_at);
-        setUpdate_atin(item.update_at);
-        setCreate_byin(item.create_by);
-        setUnitin(item.unit);
-        setMaterialin(item.material);
-        setSurfacein(item.surface);
-        setOldProductid(item.oldcode);
-        setAddProductid(item.productid);
-        setAddProductname(item.name);
-        setAddProductspec(item.spec);
-        setAddProductunit(item.unit);
-        setAddProductmaterial(item.material);
-        setAddProductsurface(item.surface);
-        setAddOldProductid(item.oldcode);
-    }
+        if (editlaser) {
+            // 新增一筆資料到 subProductdata
+            setSubProductdata((prev) => [
+                ...prev,
+                {
+                    product: item.id,
+                    name: item.name,
+                    quantity: 0,
+                },
+            ]);
+        } else {
 
+
+            handleRowClick(item.productid);
+            console.log(item);
+
+            setProductnamein(item.name);
+            setProductidin(item.productid);
+            setProductspecin(item.spec);
+            setProductquantityin(item.count);
+            setCreate_atin(item.create_at);
+            setUpdate_atin(item.update_at);
+            setCreate_byin(item.create_by);
+            setUnitin(item.unit);
+            setMaterialin(item.material);
+            setSurfacein(item.surface);
+            setOldProductid(item.oldcode);
+            setSubProduct(item.subproduct);
+
+            // 確保 subproduct 是 JSON 陣列字串，然後解析成陣列
+            let subProductArray = [];
+            try {
+                subProductArray = item.subproduct ? JSON.parse(item.subproduct) : [];
+            } catch (error) {
+                console.error("解析 subproduct 時發生錯誤:", error);
+                subProductArray = [];
+            }
+
+            // 比對 product 欄位與 data 陣列的 id，並取出對應的 name
+            const enrichedSubProduct = subProductArray.map((sub: any) => {
+                const matchedProduct = data.find((d) => d.id === sub.product);
+                return {
+                    ...sub,
+                    productid: matchedProduct ? matchedProduct.productid : "未知料號", // 找不到則顯示"未知料號"
+                    name: matchedProduct ? matchedProduct.name : "未知產品", // 找不到則顯示"未知產品"
+                };
+            });
+
+            // 存入狀態
+            setSubProductdata(enrichedSubProduct);
+
+            setAddProductid(item.productid);
+            setAddProductname(item.name);
+            setAddProductspec(item.spec);
+            setAddProductunit(item.unit);
+            setAddProductmaterial(item.material);
+            setAddProductsurface(item.surface);
+            setAddOldProductid(item.oldcode);
+        }
+    };
+
+
+    useEffect(() => {
+        console.log(subproductdata);
+    }, [subproductdata]);
 
 
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -1183,10 +1276,10 @@ export default function ProductList() {
 
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAddProductid(e.target.value);    
+        setAddProductid(e.target.value);
         const inputValue = e.target.value;
         const newValue = inputValue.slice(2);
-        setAddProductid("SJ" + newValue);    
+        setAddProductid("SJ" + newValue);
         if (addproductid === "SJ") {
 
             setType1SelectedOption('');
@@ -1446,6 +1539,25 @@ export default function ProductList() {
         });
     }
 
+    const handleStringChange = (index: number, key: string, value: string) => {
+        const updatedData = [...subproductdata];  // 使用淺拷貝
+        updatedData[index] = { ...updatedData[index], [key]: value };  // 確保更改的只是副本
+        setSubProductdata(updatedData);  // 更新data2
+    };
+
+    // 從明細移除
+    const handleRemoveDetail = (index: number, item: any) => {
+        myAlert.confirm({
+            title: '確定移除?',
+            props: {
+                onOk: () => {
+                    const updatedData = subproductdata.filter((_, i) => i !== index);
+                    setSubProductdata(updatedData);
+                }
+            }
+        });
+    };
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'物料維護'} panelList={panelList}
@@ -1644,20 +1756,37 @@ export default function ProductList() {
                         <div >
 
                             <div style={{ display: `${tabshow === "編輯" ? '' : 'none'}` }}>
-                                <br />
-                                <span style={{ padding: '0px 20px' }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
+                                <div className={scss.foot_head0}>
+                                    <div>
+                                        <span style={{ padding: '0px 20px' }}>
+                                            <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                                編輯
+                                            </button>
 
-                                    <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                        儲存
-                                    </button>
-                                    &nbsp;
-                                    <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                        取消
-                                    </button>
-                                </span>
+                                            <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                                儲存
+                                            </button>
+                                            &nbsp;
+                                            <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                                取消
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span style={{ padding: '0px 10px', display: `${editmain ? '' : 'none'}` }}>
+                                            <button style={{ display: `${editlaser ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEditLaser}>
+                                                編輯
+                                            </button>
+                                            <button style={{ display: `${editlaser ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                                儲存
+                                            </button>
+                                            &nbsp;
+                                            <button style={{ display: `${editlaser ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancelEditLaser}>
+                                                取消
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
                                     <div>
                                         <InputSel
@@ -1672,21 +1801,11 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: '',
-                                                },
-                                            }}
-                                        />
 
+                                        <span style={{ fontSize: '18px', color: '#14256A' }}>
+                                            雷射切割設定
+                                        </span>
                                     </div>
-                                    <div></div>
-                                    <div></div>
                                 </div>
                                 <div className={scss.foot_head2}>
                                     <div>
@@ -1766,49 +1885,74 @@ export default function ProductList() {
                                                 },
                                             }}
                                         />
+                                        {/* <InputSel
+                                            {...inputSelProps}
+                                            caption="雷射切割"
+                                            disabled={!editmain}
+                                            inputProps={{
+                                                props: {
+                                                    value: subproduct || '',
+                                                    onChange: (e) => { setSubProduct(e.target.value) }
+                                                },
+                                            }}
+                                        /> */}
                                     </div>
-                                    <div style={{ borderLeft: '1px solid #c1c1c1', backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="更新時間"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(update_atin) || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="更新人員"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: create_byin || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="建立時間"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: getTaiwanDateStr(create_atin) || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="建立人員"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: create_byin || ' ',
-                                                },
-                                            }}
-                                        />
+                                    <div style={{ borderLeft: '1px solid rgb(114, 101, 101)' }}>
+                                        <div className={scss.head15}>
+                                            <span></span>
+                                            <span>序</span>
+                                            <span>料號</span>
+                                            <span>品名</span>
+                                            <span>數量</span>
+                                            <span></span>
+                                        </div>
+                                        <div style={{ overflowY: 'auto', height: '200px' }}>
+                                            {subproductdata && (
+                                                subproductdata.map((_item, index) => {
+
+                                                    return (
+                                                        <CellWithBar key={index} className={scss.panelHeader20}>
+                                                            <div className={scss.row01}>
+                                                                <span>
+                                                                    <button style={{ display: (editlaser) ? '' : 'none' }} onClick={() => {
+                                                                        handleRemoveDetail(index, _item)
+
+                                                                    }}>
+                                                                        {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                                        <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                                    </button>
+                                                                </span>
+                                                                <span>{index + 1}</span>
+                                                                <span>{_item.productid}</span>
+                                                                <span>{_item.name}</span>
+                                                                {/* <span>{_item.product}</span> */}
+                                                                <span>
+                                                                    <input
+                                                                        ref={quantityRefs.current[index]}
+                                                                        style={{
+                                                                            backgroundColor: 'transparent',
+                                                                            borderBottom: editlaser ? "1px solid black" : "",
+                                                                            width: '95%',
+                                                                        }}
+                                                                        type={editlaser ? 'number' : 'text'}
+                                                                        // value={Number(_item.quantity)}
+                                                                        // value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                                        value={editlaser ? _item.quantity : Number(_item.quantity).toLocaleString()}
+                                                                        readOnly={!editlaser}
+                                                                        onChange={(e) => {
+                                                                            handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
+                                                                        }}
+                                                                    />
+                                                                </span>
+                                                            </div>
+                                                        </CellWithBar>
+                                                    );
+
+                                                })
+                                            )}
+                                        </div>
                                     </div>
+
                                 </div>
                                 <br />
                             </div>
@@ -1829,18 +1973,18 @@ export default function ProductList() {
                                     </button>
                                 </span>
                                 <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div style={{display:'none'}}>
+                                    <div style={{ display: 'none' }}>
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
                                             onChange={(e) => { handelSetProductid("type1", e) }}>
                                             <option value=''>選擇類別</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'classification') 
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
+                                                .filter(item => item.type === 'classification')
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name))
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
-                                                        {`(${item.code_name}) ${item.name}`}  
+                                                        {`(${item.code_name}) ${item.name}`}
                                                     </option>
                                                 ))}
                                         </select>
@@ -1850,8 +1994,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type2", e) }}>
                                             <option value=''>選擇細分</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'component') 
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
+                                                .filter(item => item.type === 'component')
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name))
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}) {item.name}
@@ -1867,8 +2011,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type4", e) }}>
                                             <option value=''>選擇材質</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'material') 
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
+                                                .filter(item => item.type === 'material')
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name))
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}) {item.name}
@@ -1882,8 +2026,8 @@ export default function ProductList() {
                                             onChange={(e) => { handelSetProductid("type5", e) }}>
                                             <option value=''>選擇表面</option>
                                             {producttypedata
-                                                .filter(item => item.type === 'surface') 
-                                                .sort((a, b) => a.code_name.localeCompare(b.code_name)) 
+                                                .filter(item => item.type === 'surface')
+                                                .sort((a, b) => a.code_name.localeCompare(b.code_name))
                                                 .map(item => (
                                                     <option key={item.id} value={item.code_name}>
                                                         ({item.code_name}){item.name}
@@ -1903,10 +2047,10 @@ export default function ProductList() {
                                             inputProps={{
                                                 props: {
                                                     value: addproductid,
-                                                    onChange: (e) => { 
+                                                    onChange: (e) => {
                                                         // handleProductidChange(e)
                                                         setAddProductid(e.target.value)
-                                                     },
+                                                    },
                                                 },
                                             }}
                                         />
@@ -2021,7 +2165,7 @@ export default function ProductList() {
                                 <br />
                             </div>
                             <div style={{ display: `${tabshow === "編碼" ? '' : 'none'}` }}>
-                                <div className={scss.foot_head3} style={{ borderTop: '1px solid #c1c1c1' }}>
+                                <div className={scss.foot_head3}>
                                     <div style={{ width: '100%' }}>
                                         <input
                                             type="text"

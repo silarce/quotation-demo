@@ -136,6 +136,12 @@ export default function PReceiptDetail() {
     const [purchaseorderid, setPurchaseorderid] = useState<string>("");
     const [batchidin, setBatchidin] = useState<string>("");
 
+    //for 進貨頁面使用的 如果都付款完成和已轉成入庫狀態才可以按下結案
+    const [allPaid, setAllPaid] = useState<boolean>(false);
+    //判斷如果transCount>0則為false，代表還沒全部轉為入庫
+    const [allTrans, setAllTrans] = useState<boolean>(false);
+    const [transCount, setTransCount] = useState<number>(0);
+
     //編輯時保留原始資料
     const [originalsuppliername, setOriginalsuppliername] = useState<string>("");
     const [originalsupplierphone, setOriginalsupplierphone] = useState<string>("");
@@ -274,13 +280,11 @@ export default function PReceiptDetail() {
     //以ID取單據
     const GetDetailById = async (id: any) => {
         try {
-            // setIsLoading(true);
             const conditionModel = {
                 prodreceiptuuid: id as string | undefined,
             };
 
-
-            var inputModel = {
+            const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
@@ -289,24 +293,35 @@ export default function PReceiptDetail() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdReceiptDetailById?${queryParams}`);
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
+
             const responsedata = await response.json();
-            // setData1(data);
-
             console.log(responsedata);
+
+            // 計算 transCount
+            let totalTransCount = 0;
+            let isAllPaid = true; // 預設為 true，檢查時若有 false 則改為 false
+
+            responsedata.forEach((item: { quantity: number; alreadyinquantity: number; paid: boolean }) => {
+                totalTransCount += item.quantity - item.alreadyinquantity;
+                if (!item.paid) {
+                    isAllPaid = false; // 如果有任何一筆 `paid` 為 false，就設為 false
+                }
+            });
+
+            setTransCount(totalTransCount);
+            setAllTrans(totalTransCount === 0); // 如果 totalTransCount 為 0，則代表全部入庫
+            setAllPaid(isAllPaid); // 若所有 `paid` 為 true，則代表已全部付款
+
             setData2(responsedata);
-            // return responsedata
-
-
         } catch (error: any) {
             setError(error.message);
         }
-        finally {
-            // setIsLoading(false);
-        }
     };
+
 
     //更新單據
     const Update = async () => {
@@ -332,7 +347,8 @@ export default function PReceiptDetail() {
                 need_date: need_datein,
                 note: notein,
                 batchid: batchidin,
-                data2: data2
+                data2: data2,
+                invoice: invoicein
             };
 
             var inputModel = {
@@ -862,6 +878,38 @@ export default function PReceiptDetail() {
         }
     };
 
+    //單據結案
+    const Close = async (type: any) => {
+        try {
+            const conditionModel = {
+                prodreceiptuuid: uuidin,
+                type: type,
+                username: userInfo?.employee?.id.toString(),
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/sentPREToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setStatusin("已結案");
+
+        } catch (error: any) {
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+
     //#endregion
 
     //#region ===========【審核】
@@ -1248,7 +1296,7 @@ export default function PReceiptDetail() {
         setIsTrans(true);
     }
 
-    //新增進貨
+    //新增轉換的單據
     const handleAddTrans = async () => {
         await Trans(); // 確保 Trans 完成
         setIsTrans(false);
@@ -1256,6 +1304,10 @@ export default function PReceiptDetail() {
         GetTransById(idin);//轉換紀錄
     };
 
+    //結案
+    const handleClose = async () => {
+        Close("結案");
+    }
 
     //列印單據
     const handlePrint = () => {
@@ -1565,6 +1617,7 @@ export default function PReceiptDetail() {
                         >
                             複製
                         </button> */}
+
                         {statusin === "進貨中" && isTrans && (
                             <>
                                 <button
@@ -1617,6 +1670,22 @@ export default function PReceiptDetail() {
                                     title="刪除單據"
                                 >
                                     刪除
+                                </button>
+                                <button
+                                    className={scss.shortredsquarebtn}
+                                    onClick={() => {
+                                        myAlert.confirm({
+                                            title: '確定結案嗎?',
+                                            props: {
+                                                onOk: () => {
+                                                    handleClose();
+                                                }
+                                            }
+                                        })
+                                    }}
+                                    title="單據結案"
+                                >
+                                    結案
                                 </button>
                                 <button
                                     className={scss.shortsquarebtn}
@@ -1689,7 +1758,6 @@ export default function PReceiptDetail() {
                                 <button
                                     className={scss.shortredsquarebtn}
                                     onClick={() => {
-                                        console.log(data2);
                                         // return;
                                         setIsEditing(false); // 儲存後結束編輯模式
                                         Update()
@@ -1733,7 +1801,8 @@ export default function PReceiptDetail() {
                             {/* {statusin === "進貨中" && !isEditing && ( */}
 
                             <>
-
+                                {/* 入庫狀態：{allTrans ? "已入庫" : "未完成"}<br />
+                                付款狀態：{allPaid ? "已付款" : "未完成"}<br /> */}
                                 {printopen && (
                                     <button
                                         className={scss.shortsquarebtn}
@@ -3103,7 +3172,7 @@ export default function PReceiptDetail() {
                                         <div className={scss.head_content1}>
                                             <InputSel
                                                 {...inputSelProps}
-                                                caption="進貨次數"
+                                                caption={`${transtitle}次數`}
                                                 disabled={true}
                                                 inputProps={{
                                                     props: {
