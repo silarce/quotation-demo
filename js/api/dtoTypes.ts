@@ -203,6 +203,8 @@ export type TcustomerDto = {
   invoiceCounty: string;
   invoiceDistrict: string;
   invoiceAddress: string;
+  acctMethod: string | null;
+
   contacts?: Tcontact[];
   types: {
     //客戶類型

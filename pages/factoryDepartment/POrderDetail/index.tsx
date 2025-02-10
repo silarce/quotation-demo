@@ -346,7 +346,8 @@ export default function POrderDetail() {
                 need_date: need_datein,
                 note: notein,
                 data2: data2,
-                originaldata2: originaldata2
+                originaldata2: originaldata2,
+                invoice: invoicein
             };
 
             var inputModel = {
@@ -1321,7 +1322,7 @@ export default function POrderDetail() {
         setIsTrans(true);
     }
 
-    //新增進貨
+    //新增轉換的單據
     const handleAddTrans = async () => {
         await Trans(); // 確保 Trans 完成
         setIsTrans(false);
@@ -3078,7 +3079,7 @@ export default function POrderDetail() {
                                         <div className={scss.head_content1}>
                                             <InputSel
                                                 {...inputSelProps}
-                                                caption="進貨次數"
+                                                caption={`${transtitle}次數`}
                                                 disabled={true}
                                                 inputProps={{
                                                     props: {

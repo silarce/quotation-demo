@@ -247,11 +247,26 @@
         }
     }
 }
+.foot_head0 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    // margin-left: 20px;
+    margin-right: 20px;
+
+    // margin-bottom: 5px;
+    // border-top:1px solid #c1c1c1;
+    div {
+        margin-right: 20px;
+    }
+}
 
 .foot_head1 {
     display: grid;
-    grid-template-columns: 1000px 1fr;
-    // gap: 15px;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
     width: auto;
     margin-top: 5px;
     margin-left: 20px;
@@ -287,7 +302,7 @@
     width: auto;
     // margin-top: 5px;
     margin-left: 20px;
-    margin-right: 20px;
+    // margin-right: 20px;
     margin-bottom: 5px;
 
     div {
@@ -302,7 +317,7 @@
     width: auto;
     // margin-top: 5px;
     margin-left: 20px;
-    margin-right: 20px;
+    // margin-right: 20px;
     margin-bottom: 5px;
 
 
@@ -859,3 +874,61 @@ div.panelHeader21 {
 }
 
 //#endregion
+
+
+//#region 新入庫單
+.head15 {
+    position: -webkit-sticky; // 為兼容性增加前綴
+    position: sticky;
+    top: 0;
+    z-index: 1000; // 確保元素位於其他內容的上層
+    display: grid;
+    grid-template-columns: 40px 30px 150px 300px 50px 50px;
+    // gap: 10px; // 與 panelHeader15 的 row01 保持一致
+    height: 40px;
+    padding: 0px 20px;
+    background-color: $bgc01;
+    // width: 1860px;
+  
+    >* {
+      margin: auto;
+      margin-left: 0;
+  
+      &:nth-last-of-type(1) {
+        margin-left: auto;
+      }
+    }
+  
+    >span {
+      font-weight: 400;
+      font-size: 16px;
+      color: #979797;
+    }
+  }
+  
+  //#endregion
+
+  //新增請購單明細
+div.panelHeader20 {
+    // padding-left: 15px;
+    padding: 10px 20px;
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        span {
+            font-weight: 400;
+            font-size: 16px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns: 40px 30px 150px 300px 50px 50px;
+    }
+}
