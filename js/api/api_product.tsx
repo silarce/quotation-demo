@@ -53,6 +53,14 @@ export type {
 };
 // =======================================================================
 
+export const createAssetUrl = (catalogue: 'door-track' | 'head-box', assetName: string) => {
+  const domain = axi.defaults.baseURL;
+
+  return `${domain}/products/assets/${catalogue}/${assetName}`;
+};
+
+// =======================================================================
+
 export const apiGetAssets = async (path: string) => {
   const api = `/products/assets/door-track/${path}`;
 
@@ -60,12 +68,6 @@ export const apiGetAssets = async (path: string) => {
     .get(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
-};
-
-export const createAssetUrl = (assetName: string) => {
-  const domain = axi.defaults.baseURL;
-
-  return `${domain}/products/assets/door-track/${assetName}`;
 };
 
 export const apiGetProdDoorModels = async () => {
