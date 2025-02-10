@@ -710,7 +710,7 @@ export default function AddPurchaseRequisitionList() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: userInfo?.employee?.jobs[0].department.name
+                                                    value: userInfo?.employee?.jobs[0]?.department?.name
                                                 },
                                             }}
                                         />
