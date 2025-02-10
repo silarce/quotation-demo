@@ -503,7 +503,7 @@ const nodeConfig_origin: TnodeConfig = {
         ? {
             value: v,
             label: v,
-            icon: createAssetUrl(v),
+            icon: createAssetUrl('door-track', v),
           }
         : null;
 

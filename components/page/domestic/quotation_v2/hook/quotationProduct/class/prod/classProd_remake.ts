@@ -1304,7 +1304,7 @@ class ClassProd {
       return {
         value: imgSrc,
         label: imgSrc,
-        icon: createAssetUrl(imgSrc),
+        icon: createAssetUrl('door-track', imgSrc),
       };
     });
 
@@ -1740,7 +1740,7 @@ class ClassProd {
       return undefined;
     }
 
-    return createAssetUrl(this.data.guideRail);
+    return createAssetUrl('door-track', this.data.guideRail);
   }
   // MARK:guideRailThickness
   get guideRailThickness() {
