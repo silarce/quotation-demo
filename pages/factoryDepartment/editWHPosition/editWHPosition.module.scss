@@ -30,7 +30,7 @@
 //     }
 
 // }
-
+@use "styles/theme01" as *;
 
 .top {
     @extend .grid;
@@ -193,4 +193,32 @@
     border: none;
     background-color: white;
 
+}
+
+.shortsquarebtn {
+    display: inline-flex; // 確保內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 避免過短導致內容擠壓
+    padding: 0 12px; // 適量的左右間距
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 包括 padding 在內計算寬高
+    transform: translateY(0px);
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c;
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
 }
