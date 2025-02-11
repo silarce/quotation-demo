@@ -1,12 +1,13 @@
-import Image from 'next/image';
+// import Image from 'next/image';
 import classNames from 'classnames';
 
 import * as C from 'components/otherProject/miku-frontend/index';
+import scss from './table01.module.scss';
 
 // ===========================================
 
-const headBoxImageWidth = 121.5;
-const headBoxImageHeight = 121.5;
+// const headBoxImageWidth = 121.5;
+// const headBoxImageHeight = 121.5;
 
 // ===========================================
 
@@ -49,10 +50,16 @@ type Tcontrol = {
     headBoxSizeP: React.ReactNode;
     headBoxSizeQ: React.ReactNode;
     hasWheel: React.ReactNode;
-    imgUrl1: string | null;
-    imgUrl2: string | null;
-    imgUrl3: string | null;
-    imgUrl4: string | null;
+
+    // imgUrl1: string | null;
+    // imgUrl2: string | null;
+    // imgUrl3: string | null;
+    // imgUrl4: string | null;
+
+    svgString1: string | null;
+    svgString2: string | null;
+    svgString3: string | null;
+    svgString4: string | null;
   };
   doorPiece: {
     material: string;
@@ -200,13 +207,17 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2
             className="border-t-0"
             height="auto"
-            label={<HeadBoxImg url={headBox.imgUrl1} />}
-            value={<HeadBoxImg url={headBox.imgUrl2} />}
+            // label={<HeadBoxImg url={headBox.imgUrl1} />}
+            // value={<HeadBoxImg url={headBox.imgUrl2} />}
+            label={<HeadBoxSvg svgString={headBox.svgString1 ?? ''} />}
+            value={<HeadBoxSvg svgString={headBox.svgString2 ?? ''} />}
           />
           <C.TableContent2
             height="auto"
-            label={<HeadBoxImg url={headBox.imgUrl3} />}
-            value={<HeadBoxImg url={headBox.imgUrl4} />}
+            // label={<HeadBoxImg url={headBox.imgUrl3} />}
+            // value={<HeadBoxImg url={headBox.imgUrl4} />}
+            label={<HeadBoxSvg svgString={headBox.svgString3 ?? ''} />}
+            value={<HeadBoxSvg svgString={headBox.svgString4 ?? ''} />}
           />
           <C.TableContent2
             className="border-t-0"
@@ -241,35 +252,39 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
         </div>
       </section>
 
-      <section className="border-l-4 border-r-4 border-b-4 border-black h-28">
+      <section className="border-l-4 border-r-4 border-b-4 border-black h-24">
         <div className="px-1"></div>
       </section>
     </div>
   );
 }
 
-const HeadBoxImg = ({ url }: { url: string | null | undefined }) => {
-  if (url) {
-    return (
-      <Image
-        src={url}
-        alt="圖片錯誤"
-        width={headBoxImageWidth}
-        height={headBoxImageHeight}
-        style={{
-          width: headBoxImageWidth,
-          height: headBoxImageHeight,
-        }}
-      />
-    );
-  } else {
-    return (
-      <div
-        style={{
-          width: headBoxImageWidth,
-          height: headBoxImageHeight,
-        }}
-      />
-    );
-  }
+// const HeadBoxImg = ({ url }: { url: string | null | undefined }) => {
+//   if (url) {
+//     return (
+//       <Image
+//         src={url}
+//         alt="圖片錯誤"
+//         width={headBoxImageWidth}
+//         height={headBoxImageHeight}
+//         style={{
+//           width: headBoxImageWidth,
+//           height: headBoxImageHeight,
+//         }}
+//       />
+//     );
+//   } else {
+//     return (
+//       <div
+//         style={{
+//           width: headBoxImageWidth,
+//           height: headBoxImageHeight,
+//         }}
+//       />
+//     );
+//   }
+// };
+
+const HeadBoxSvg = ({ svgString }: { svgString: string }) => {
+  return <div className={scss.svgContainer} dangerouslySetInnerHTML={{ __html: svgString }} />;
 };

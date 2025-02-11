@@ -1,4 +1,4 @@
-import { createAssetUrl } from 'js/api/api_product';
+import { TassetPath, createAssetUrl } from 'js/api/api_product';
 import type { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 type TpariBD = {
@@ -235,58 +235,73 @@ export const lookup_componentConfig = (doorModelName: string) => {
 };
 
 const getSvgUrl_headBox1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+  let url: null | TassetPath = null;
+  let name: null | string = null;
 
   if (isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '一體式有檔輪.svg');
+    name = '一體式有檔輪.svg';
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '一體式無檔輪.svg');
+    name = '一體式無檔輪.svg';
   } else if (!isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+    name = '機加捲有檔輪.svg';
   } else if (!isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+    name = '機加捲無檔輪.svg';
   }
 
-  return url as string;
+  return { url, name };
 };
 
 const getSvgUrl_headBox2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+  let url: null | TassetPath = null;
+  let name: null | string = null;
 
   // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
   if (isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱.svg';
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱.svg';
   } else if (!isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱.svg';
   } else if (!isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱.svg';
   }
 
-  return url as string;
+  return { url, name };
 };
 
 const getSvgUrl_headBoxTopCover = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
-  let url: null | string = null;
+  let url: null | TassetPath = null;
+  let name: null | string = null;
 
   if (headBoxTopCover) {
     url = createAssetUrl('head-box', '上蓋.svg');
+    name = '上蓋.svg';
   }
 
-  return url;
+  return { url, name };
 };
 
 const getSvgUrl_headBoxCover = ({ headBoxCover }: { headBoxCover: TquotationProductItemDto['headBoxCover'] }) => {
-  let url: null | string = null;
+  let url: null | TassetPath = null;
+  let name: null | string = null;
 
   if (headBoxCover === 'half') {
     url = createAssetUrl('head-box', '前遮半.svg');
+    name = '前遮半.svg';
   } else if (headBoxCover === 'full') {
     url = createAssetUrl('head-box', '前遮全.svg');
+    name = '前遮全.svg';
   }
 
-  return url;
+  return { url, name };
 };
 
 const getProductHeadBoxImgUrl = ({
@@ -301,10 +316,10 @@ const getProductHeadBoxImgUrl = ({
   headBoxCover: TquotationProductItemDto['headBoxCover'];
 }) => {
   return {
-    url_headBox1: getSvgUrl_headBox1({ isIntegratedHeadBox, hasWheel }),
-    url_headBox2: getSvgUrl_headBox2({ isIntegratedHeadBox, hasWheel }),
-    url_headBoxTopCover: getSvgUrl_headBoxTopCover({ headBoxTopCover }),
-    url_headBoxCover: getSvgUrl_headBoxCover({ headBoxCover }),
+    headBox1: getSvgUrl_headBox1({ isIntegratedHeadBox, hasWheel }),
+    headBox2: getSvgUrl_headBox2({ isIntegratedHeadBox, hasWheel }),
+    headBoxTopCover: getSvgUrl_headBoxTopCover({ headBoxTopCover }),
+    headBoxCover: getSvgUrl_headBoxCover({ headBoxCover }),
   };
 };
 

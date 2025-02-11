@@ -1,0 +1,13 @@
+$width: 121.5px;
+$height: 121.5px;
+
+.svgContainer {
+  width: $width;
+    height: $height;
+  // 包裝成svg的png.....為什麼不直接給png就好了拉
+  // 這樣用svg有什麼意思拉，生氣氣!
+  image {
+    width: $width;
+    height: $height;
+  }
+}

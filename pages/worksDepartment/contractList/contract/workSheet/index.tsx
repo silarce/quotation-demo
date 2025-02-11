@@ -82,7 +82,7 @@ import {
   // apiPatchWorksheetRecordReview,
 } from 'js/api/api_engineering';
 
-import { useApiGetProdDoorModels } from 'js/api/api_product';
+import { useApiGetProdDoorModels, useGetAssetDict, apiGetAsset } from 'js/api/api_product';
 
 // import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
@@ -1129,6 +1129,11 @@ const useControl_pdf = ({
   control_profile: Tcontrol_profile;
   latestRecordArr: TworksheetRecordDto[];
 }) => {
+  // useGetAssetDict
+
+  const { assetDict, updatePath } = useGetAssetDict<string>();
+  console.log(assetDict);
+
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
     const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
 
@@ -1171,7 +1176,12 @@ const useControl_pdf = ({
         }
       })();
 
-      const { url_headBox1, url_headBox2, url_headBoxTopCover, url_headBoxCover } = getProductHeadBoxImgUrl({
+      const {
+        headBox1: url_headBox1,
+        headBox2: url_headBox2,
+        headBoxTopCover: url_headBoxTopCover,
+        headBoxCover: url_headBoxCover,
+      } = getProductHeadBoxImgUrl({
         isIntegratedHeadBox: !!item.isIntegratedHeadBox,
         hasWheel: !!item.hasWheel,
         headBoxTopCover: !!item.headBoxTopCover,
@@ -1224,10 +1234,15 @@ const useControl_pdf = ({
           headBoxSizeO: item.headBoxSizeO,
           headBoxSizeP: item.headBoxSizeP,
           headBoxSizeQ: item.headBoxSizeQ,
-          imgUrl1: url_headBox1,
-          imgUrl2: url_headBox2,
-          imgUrl3: url_headBoxTopCover,
-          imgUrl4: url_headBoxCover,
+          // imgUrl1: url_headBox1.url,
+          // imgUrl2: url_headBox2.url,
+          // imgUrl3: url_headBoxTopCover.url,
+          // imgUrl4: url_headBoxCover.url,
+
+          svgString1: assetDict[url_headBox1.name || 'null'] || null,
+          svgString2: assetDict[url_headBox2.name || 'null'] || null,
+          svgString3: assetDict[url_headBoxTopCover.name || 'null'] || null,
+          svgString4: assetDict[url_headBoxCover.name || 'null'] || null,
         },
         doorPiece: {
           material: material,
@@ -1255,6 +1270,7 @@ const useControl_pdf = ({
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
           surface: componentList.guideRail?.materialSurface ?? '',
+          dangerSvg: assetDict[item?.guideRail || 'null'] || undefined,
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1315,7 +1331,42 @@ const useControl_pdf = ({
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractNumber, customerName, contactPerson, control_profile, latestRecordArr]);
+  }, [
+    //
+    contractNumber,
+    customerName,
+    contactPerson,
+    control_profile,
+    latestRecordArr,
+    assetDict,
+  ]);
+
+  useEffect(() => {
+    latestRecordArr.forEach((record) => {
+      if (!record.contractProductItems) {
+        return;
+      }
+
+      const item = record.contractProductItems[0];
+
+      const { headBox1, headBox2, headBoxTopCover, headBoxCover } = getProductHeadBoxImgUrl({
+        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
+        hasWheel: !!item.hasWheel,
+        headBoxTopCover: !!item.headBoxTopCover,
+        headBoxCover: item.headBoxCover,
+      });
+
+      const parameter: Parameters<typeof updatePath>[0] = {};
+      headBox1.url && headBox1.name && (parameter[headBox1.name] = headBox1.url);
+      headBox2.url && headBox2.name && (parameter[headBox2.name] = headBox2.url);
+      headBoxTopCover.url && headBoxTopCover.name && (parameter[headBoxTopCover.name] = headBoxTopCover.url);
+      headBoxCover.url && headBoxCover.name && (parameter[headBoxCover.name] = headBoxCover.url);
+
+      item.guideRail && (parameter[item.guideRail] = `door-track/${item.guideRail}`);
+
+      updatePath(parameter);
+    });
+  }, [latestRecordArr]);
 
   return {
     control_workSheetPDF_01,
