@@ -3,7 +3,10 @@ import classNames from 'classnames';
 
 import * as C from 'components/otherProject/miku-frontend/index';
 
-import img_husky from 'public/image/test/husky.svg';
+// ===========================================
+
+const headBoxImageWidth = 121.5;
+const headBoxImageHeight = 121.5;
 
 // ===========================================
 
@@ -35,6 +38,21 @@ type Tcontrol = {
     angleIronSize: string;
     form: string;
     surface: string;
+
+    headBoxCover: React.ReactNode;
+    headBoxTopCover: React.ReactNode;
+    headBoxSizeX: React.ReactNode;
+    headBoxSizeY: React.ReactNode;
+    headBoxSizeM: React.ReactNode;
+    headBoxSizeN: React.ReactNode;
+    headBoxSizeO: React.ReactNode;
+    headBoxSizeP: React.ReactNode;
+    headBoxSizeQ: React.ReactNode;
+    hasWheel: React.ReactNode;
+    imgUrl1: string | null;
+    imgUrl2: string | null;
+    imgUrl3: string | null;
+    imgUrl4: string | null;
   };
   doorPiece: {
     material: string;
@@ -182,13 +200,13 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2
             className="border-t-0"
             height="auto"
-            label={<Image src={img_husky} alt="" />}
-            value={<Image src={img_husky} alt="" />}
+            label={<HeadBoxImg url={headBox.imgUrl1} />}
+            value={<HeadBoxImg url={headBox.imgUrl2} />}
           />
           <C.TableContent2
             height="auto"
-            label={<Image src={img_husky} alt="" />}
-            value={<Image src={img_husky} alt="" />}
+            label={<HeadBoxImg url={headBox.imgUrl3} />}
+            value={<HeadBoxImg url={headBox.imgUrl4} />}
           />
           <C.TableContent2
             className="border-t-0"
@@ -197,9 +215,9 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           />
         </section>
         <section className="border-l-0 border-r-4  border-black">
-          <C.TableContent2 label="檔輪" value={'有'} />
-          <C.TableContent2 label="前遮" value={'半遮'} />
-          <C.TableContent2 label="上蓋" value={'有'} />
+          <C.TableContent2 label="檔輪" value={headBox.hasWheel} />
+          <C.TableContent2 label="前遮" value={headBox.headBoxCover} />
+          <C.TableContent2 label="上蓋" value={headBox.headBoxTopCover} />
           <C.TableContent2 label="sizeB" value={'sizeB'} />
           <C.TableContent2 label="sizeD" value={'sizeD'} />
           <C.TableContent2 label="sizeX" value={'sizeX'} />
@@ -229,3 +247,29 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
     </div>
   );
 }
+
+const HeadBoxImg = ({ url }: { url: string | null | undefined }) => {
+  if (url) {
+    return (
+      <Image
+        src={url}
+        alt="圖片錯誤"
+        width={headBoxImageWidth}
+        height={headBoxImageHeight}
+        style={{
+          width: headBoxImageWidth,
+          height: headBoxImageHeight,
+        }}
+      />
+    );
+  } else {
+    return (
+      <div
+        style={{
+          width: headBoxImageWidth,
+          height: headBoxImageHeight,
+        }}
+      />
+    );
+  }
+};

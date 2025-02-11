@@ -2045,6 +2045,17 @@ const useWorksheet = create<Tworksheet>(
         thickness: generalSpec.thickness || null,
         //
         isULGuideRail: other.isULGuideRail,
+        //
+        headBoxCover: headBox.headBoxCover,
+        headBoxTopCover: headBox.headBoxTopCover === 'true',
+        hasWheel: headBox.hasWheel === 'true',
+        headBoxSizeX: headBox.headBoxSizeX || null,
+        headBoxSizeY: headBox.headBoxSizeY || null,
+        headBoxSizeM: headBox.headBoxSizeM || null,
+        headBoxSizeN: headBox.headBoxSizeN || null,
+        headBoxSizeO: headBox.headBoxSizeO || null,
+        headBoxSizeP: headBox.headBoxSizeP || null,
+        headBoxSizeQ: headBox.headBoxSizeQ || null,
       };
 
       updateWorkSheetItem.components = Object.values(componentList_copy ?? {});

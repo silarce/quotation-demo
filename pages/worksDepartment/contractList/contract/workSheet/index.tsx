@@ -100,7 +100,7 @@ import { downloadExcel } from 'components/page/worksDepartment/contracList/contr
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 // import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
-import { lookup_motorPhase } from 'config/product/lookup';
+import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
 
 // css
 import scss from './workSheet.module.scss';
@@ -1171,6 +1171,13 @@ const useControl_pdf = ({
         }
       })();
 
+      const { url_headBox1, url_headBox2, url_headBoxTopCover, url_headBoxCover } = getProductHeadBoxImgUrl({
+        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
+        hasWheel: !!item.hasWheel,
+        headBoxTopCover: !!item.headBoxTopCover,
+        headBoxCover: item.headBoxCover,
+      });
+
       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
         itemName: item.itemName,
         size: {
@@ -1206,6 +1213,21 @@ const useControl_pdf = ({
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
           surface: componentList.headBox?.materialSurface ?? '',
+
+          headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
+          headBoxTopCover: item.headBoxTopCover ? '有' : '無',
+          hasWheel: item.hasWheel ? '有' : '無',
+          headBoxSizeX: item.headBoxSizeX,
+          headBoxSizeY: item.headBoxSizeY,
+          headBoxSizeM: item.headBoxSizeM,
+          headBoxSizeN: item.headBoxSizeN,
+          headBoxSizeO: item.headBoxSizeO,
+          headBoxSizeP: item.headBoxSizeP,
+          headBoxSizeQ: item.headBoxSizeQ,
+          imgUrl1: url_headBox1,
+          imgUrl2: url_headBox2,
+          imgUrl3: url_headBoxTopCover,
+          imgUrl4: url_headBoxCover,
         },
         doorPiece: {
           material: material,
