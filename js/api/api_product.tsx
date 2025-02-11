@@ -52,12 +52,79 @@ export type {
   TgetBoxDParams_strict,
 };
 // =======================================================================
+// 未來若路徑太多種，乾脆設string就好了
+export type TassetPath = `${'http'}${string}` | `${'door-track' | 'head-box'}/${string}`;
 
 export const createAssetUrl = (catalogue: 'door-track' | 'head-box', assetName: string) => {
   const domain = axi.defaults.baseURL;
 
-  return `${domain}/products/assets/${catalogue}/${assetName}`;
+  return `${domain}/products/assets/${catalogue}/${assetName}` as TassetPath;
 };
+
+export const apiGetAsset = async (path: TassetPath) => {
+  const api = path.startsWith('http') ? path : `/products/assets/${path}`;
+
+  return axi
+    .get(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 因為html2canvas或其他類似功能的套件，在以url取得圖片時(例如 <img src="http://...">)
+// 請求不會帶cookie而被401，所以需要另外取得圖片再送進PDF模板中
+// 所以建立useGetAssetDict來取得圖片或其他asset
+export function useGetAssetDict<ASSET = unknown>(
+  pathDict: Record<string, TassetPath> = {},
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) {
+  const [state_pathDict, setState_pathDict] = useState(pathDict);
+  // diff的value並不會用到，只用到key
+  const [state_diff, setState_diff] = useState<Record<string, string>>(pathDict);
+
+  const [assetDict, setAssetDict] = useState<Record<string, ASSET>>({});
+
+  const updatePath = (pathDict: Record<string, TassetPath>) => {
+    const diff: Record<string, string> = {};
+
+    Object.entries(pathDict).forEach(([key, path]) => {
+      if (state_pathDict[key] !== path) {
+        diff[key] = key;
+        setState_pathDict((prev) => ({ ...prev, [key]: path }));
+      }
+    });
+
+    setState_diff((prev) => ({ ...prev, ...diff }));
+  };
+
+  const update = async () => {
+    const copy = { ...assetDict };
+
+    for (const key in state_pathDict) {
+      if (!state_diff[key]) {
+        return;
+      }
+
+      const path = state_pathDict[key];
+
+      const asset = await apiGetAsset(path).catch(() => null);
+
+      copy[key] = asset;
+    }
+
+    setAssetDict(copy);
+    setState_diff({});
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [state_pathDict]);
+
+  return { assetDict, updatePath, update };
+}
 
 // =======================================================================
 
