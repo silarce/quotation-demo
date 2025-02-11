@@ -10,6 +10,12 @@ const useFilter = ({ config_filter }: { config_filter: Tconfig_filter }) => {
       const copy = { ...state };
 
       Object.keys(copy).forEach((key) => {
+        const isFreeze = config_filter.find((item) => item.key === key)?.freeze;
+
+        if (isFreeze) {
+          return;
+        }
+
         copy[key] = '';
       });
 

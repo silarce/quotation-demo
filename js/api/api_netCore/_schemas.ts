@@ -221,11 +221,15 @@ interface TpurchaseCollectTicket_Dto extends Tbase {
   applicant_department: string | null; // 申請單位
   agent_employee_id: string; // 經辦人id
   ticket_method: string | null; // 開票方式
-  tax_deduction_category: string | null; //  扣稅類別
-  journal_method: string | null; // 立帳方式
   invoice_number: string | null; // 發票號碼
   invoice_price: number | null; // 發票金額
   note: string | null; // 備註
+
+  acct_method: string | null; // 立帳方式
+  tax_deduction_category: string | null; //  扣稅類別
+
+  supplier_name: string | null;
+  supplier_uuid: string | null;
 }
 
 type TcreatePurchaseCollectTicket_Dto = Pick<
@@ -233,11 +237,13 @@ type TcreatePurchaseCollectTicket_Dto = Pick<
   | 'applicant_department'
   | 'agent_employee_id'
   | 'ticket_method'
-  | 'tax_deduction_category'
-  | 'journal_method'
   | 'invoice_number'
   | 'invoice_price'
   | 'note'
+  | 'acct_method'
+  | 'tax_deduction_category'
+  | 'supplier_name'
+  | 'supplier_uuid'
 > & {
   data: TcreatePurchaseCollectTicketDetail_Dto[];
 };
@@ -404,6 +410,34 @@ interface Tprodreceipt_Dto extends Tbase {
   entry_status: string;
   note: string;
   batchid: string;
+
+  detail: Tprodreceiptdetail_Dto[];
+}
+
+interface Tprodreceiptdetail_Dto {
+  id: string;
+  batchid: string;
+
+  productuuid: string | null;
+  productid: string | null;
+
+  prodreceiptid: string | null;
+  prodreceiptuuid: string | null;
+
+  purchaseorderid: string | null;
+  purchaseorderuuid: string | null;
+
+  purchaseorderdetailuuid: string | null;
+
+  invoice: string | null;
+
+  quantity: number | null;
+  totalprice: number | null;
+  note: string | null;
+  unitprice: number | null;
+  name: string | null;
+  spec: string | null;
+  unit: string | null;
 }
 
 // ==============================================================================
@@ -445,6 +479,7 @@ export type {
   Taccount_payable_statistics_detail,
   //
   Tprodreceipt_Dto,
+  Tprodreceiptdetail_Dto,
 };
 
 export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
