@@ -18,7 +18,7 @@
 
 .container {
     display: flex;
-    overflow-y: hidden;
+    overflow-y: auto;
     // height: 712px;
 }
 
@@ -90,7 +90,7 @@
 
 .content {
     width: 100%;
-    overflow-y: auto;
+    // overflow-y: auto;
     top: 0;
 }
 
@@ -213,9 +213,9 @@
     grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
-    // margin-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-top: 5px;
+    // margin-left: 20px;
+    // margin-right: 20px;
     padding-right: 20px;
     // background-color: gray;
     border-bottom: 1px solid #ccc;
@@ -247,23 +247,8 @@
         }
     }
 }
+
 .foot_head0 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    // margin-left: 20px;
-    margin-right: 20px;
-
-    // margin-bottom: 5px;
-    // border-top:1px solid #c1c1c1;
-    div {
-        margin-right: 20px;
-    }
-}
-
-.foot_head1 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
@@ -274,9 +259,26 @@
 
     // margin-bottom: 5px;
     // border-top:1px solid #c1c1c1;
+    // div {
+    //     margin-right: 20px;
+    // }
+}
+
+.foot_head1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    // gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+
     div {
-        margin-right: 20px;
+        padding-right: 10px;
     }
+
+    // margin-bottom: 5px;
+    // border-top:1px solid #c1c1c1;
 }
 
 .foot_head1_1 {
@@ -302,12 +304,14 @@
     width: auto;
     // margin-top: 5px;
     margin-left: 20px;
-    // margin-right: 20px;
+    margin-right: 20px;
     margin-bottom: 5px;
 
     div {
-        margin-right: 20px;
+        padding-right: 10px;
     }
+
+
 }
 
 .foot_head3 {
@@ -885,30 +889,30 @@ div.panelHeader21 {
     display: grid;
     grid-template-columns: 40px 30px 150px 300px 50px 50px;
     // gap: 10px; // 與 panelHeader15 的 row01 保持一致
-    height: 40px;
+    height: 30px;
     padding: 0px 20px;
     background-color: $bgc01;
     // width: 1860px;
-  
-    >* {
-      margin: auto;
-      margin-left: 0;
-  
-      &:nth-last-of-type(1) {
-        margin-left: auto;
-      }
-    }
-  
-    >span {
-      font-weight: 400;
-      font-size: 16px;
-      color: #979797;
-    }
-  }
-  
-  //#endregion
 
-  //新增請購單明細
+    >* {
+        margin: auto;
+        margin-left: 0;
+
+        &:nth-last-of-type(1) {
+            margin-left: auto;
+        }
+    }
+
+    >span {
+        font-weight: 400;
+        font-size: 16px;
+        color: #979797;
+    }
+}
+
+//#endregion
+
+//新增請購單明細
 div.panelHeader20 {
     // padding-left: 15px;
     padding: 10px 20px;
