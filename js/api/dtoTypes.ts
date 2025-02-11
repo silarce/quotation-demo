@@ -3828,7 +3828,7 @@ export type TupdateContractProductItemDto = {
   // @IsOptional()
   // headBoxCover?: string | null;
   // 為下拉式選單，後端沒有設enum，所以在前端設定固定字串
-  headBoxCover?: 'none' | 'half' | 'whole' | null;
+  headBoxCover?: 'none' | 'half' | 'full' | null;
 
   // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
   // @IsBoolean()

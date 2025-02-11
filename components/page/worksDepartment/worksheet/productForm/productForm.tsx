@@ -622,6 +622,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     setBoxTopCover,
     setHasWheel,
     setBoxXYMNOPQ,
+    getHeadBoxImage,
 
     boxB,
     boxD,
@@ -649,11 +650,14 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
       setBoxTopCover: state.headBox.setBoxTopCover,
       setHasWheel: state.headBox.setHasWheel,
       setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
+      getHeadBoxImage: state.headBox.getHeadBoxImage,
 
       boxB: state.ABCD.boxB,
       boxD: state.ABCD.boxD,
     }))
   );
+
+  const { url1, url2, url3, url4 } = getHeadBoxImage();
 
   return (
     <div>
@@ -847,19 +851,15 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           }}
         />
 
-        <div className="grid grid-cols-2 grid-rows-2">
-          <div className="border-r-2 border-b-2">
-            <Image src={img_husky} alt="" />
-          </div>
-          <div className="border-b-2">
-            <Image src={img_husky} alt="" />
-          </div>
-          <div className="border-r-2">
-            <Image src={img_husky} alt="" />
-          </div>
-          <div className="">
-            <Image src={img_husky} alt="" />
-          </div>
+        <div className={scss.headBoxImgContainer}>
+          <div>{url1 && <Image src={url1} alt="" width={243} height={243} />}</div>
+          <div>{url2 && <Image src={url2} alt="" width={243} height={243} />}</div>
+          <div>{url3 && <Image src={url3} alt="上蓋" width={243} height={243} />}</div>
+          <div>{url4 && <Image src={url4} alt="前遮" width={243} height={243} />}</div>
+          {/* <div className="">{url1 && <Image src={img_husky} alt="" />}</div>
+          <div className="">{url2 && <Image src={img_husky} alt="" />}</div>
+          <div className="">{url3 && <Image src={img_husky} alt="上蓋" />}</div>
+          <div>{url4 && <Image src={img_husky} alt="前遮" />}</div> */}
         </div>
 
         <div className="grid gap-[25px] content-start">
@@ -1908,7 +1908,7 @@ const options_前遮 = [
     label: '半遮',
   },
   {
-    value: 'whole',
+    value: 'full',
     label: '全遮',
   },
 ];
