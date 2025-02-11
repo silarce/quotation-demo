@@ -5,8 +5,32 @@ import _ from 'lodash';
 import { Tcontact } from 'js/api/dtoTypes';
 import { TpostCustomer, TcustomerDto_TC } from 'js/api/api_customer';
 
+// ====================================================================
+
+type Tstate_customer = {
+  customerNumber: string;
+  name: string;
+  nickname: string;
+  principal: string;
+  taxDeductionCategory: string;
+  taxId: string;
+  phone: string;
+  fax: string;
+  county: string;
+  district: string;
+  address: string;
+  invoiceCounty: string;
+  invoiceDistrict: string;
+  invoiceAddress: string;
+  // acctMethod: null,
+  contacts: TcustomerDto_TC['contacts'];
+  types: TcustomerDto_TC['types'];
+};
+
+// ====================================================================
+
 class Class_customer {
-  constructor(reRender: () => void, customerOri: TcustomerDto_TC) {
+  constructor(reRender: () => void, customerOri: Tstate_customer) {
     this._reRender = reRender;
     this._customerData = _.cloneDeep(customerOri);
 
@@ -203,7 +227,7 @@ class Class_customerContact {
   }
 } // Class_customerContacts
 
-const useClassCustomer = (customerData?: TcustomerDto_TC | undefined) => {
+const useClassCustomer = (customerData?: Tstate_customer | undefined) => {
   const [render, setRender] = useState(0);
   const reRender = () => setRender((state) => state + 1);
   const [classCustomer, setClassCustomer] = useState(new Class_customer(reRender, emptyCustomer()));
@@ -219,10 +243,10 @@ const useClassCustomer = (customerData?: TcustomerDto_TC | undefined) => {
 export { useClassCustomer, Class_customer };
 export type { TcustomerDto_TC, Tcontact, TpostCustomer };
 
-const emptyCustomer = (): TcustomerDto_TC => ({
-  id: '',
-  createdAt: '',
-  updatedAt: '',
+const emptyCustomer = (): Tstate_customer => ({
+  // id: '',
+  // createdAt: '',
+  // updatedAt: '',
   customerNumber: '',
   name: '',
   nickname: '',
@@ -237,6 +261,7 @@ const emptyCustomer = (): TcustomerDto_TC => ({
   invoiceCounty: '',
   invoiceDistrict: '',
   invoiceAddress: '',
+  // acctMethod: null,
   contacts: [],
   types: [],
 });

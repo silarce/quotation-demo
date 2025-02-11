@@ -3257,6 +3257,14 @@ class Class_product {
 
     if (!isSurfaceExist) {
       this.surface = this.options_surface?.[0].value ?? '';
+
+      if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+        const index = this.options_surface?.findIndex((item) => item.value === '烤漆指定色');
+
+        if (index !== undefined && index > -1) {
+          this.surface = this.options_surface![index].value;
+        }
+      }
     }
 
     // label為鐵材烤漆，value為黑鐵

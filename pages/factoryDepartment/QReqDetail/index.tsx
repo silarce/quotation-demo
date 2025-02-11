@@ -3377,7 +3377,7 @@ export default function QReqDetail() {
                     <div className={scss.thead21}>
                         <span>名稱</span>
                         <span>地址</span>
-                        <span>統編</span>
+                        <span>聯絡人</span>
                         <span></span>
                     </div>
                     {filteredData2 && (

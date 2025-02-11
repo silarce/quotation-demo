@@ -31,8 +31,8 @@
     // gap: 15px;
     width: auto;
     margin-top: 5px;
-      margin-left: 20px;
-      margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     padding-bottom: 5px;
     // border-bottom: 1px solid rgb(214, 214, 214);
 
@@ -45,7 +45,7 @@
 
 .head_foot2 {
     display: grid;
-    grid-template-columns:30px 200px 350px 350px 60px 1fr 1fr;
+    grid-template-columns: 30px 200px 350px 350px 60px 1fr 1fr;
     // gap: 15px;
     width: auto;
     //   margin-top: 5px;
@@ -71,9 +71,9 @@
     grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
-    // margin-top: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-top: 5px;
+    // margin-left: 20px;
+    // margin-right: 20px;
     padding-right: 20px;
     // background-color: gray;
     border-bottom: 1px solid #ccc;
@@ -88,11 +88,11 @@
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 5px;
-
+    padding: 0px 10px;
     // div {
     //     margin-right: 20px;
     // }
-  }
+}
 
 //#endregion
 
@@ -110,8 +110,9 @@
     font-size: 16px;
     color: #14256a;
     transform: translateY(2px);
-    width:100px;
+    width: 100px;
 }
+
 //#endregion
 
 //#region 手key 區塊
@@ -122,40 +123,41 @@
     display: grid;
     // grid-template-columns: 45px 150px 415px 415px 65px 50px 300px 65px 70px ;
     grid-template-columns: 60px 30px 150px 410px 415px 100px 100px 30px 50px 100px 100px 200px 70px;
-                                 //  150px 410px 414px 100px 100px 30px 50px 100px 100px 30px;
+    //  150px 410px 414px 100px 100px 30px 50px 100px 100px 30px;
     gap: 5px;
     // padding-left: 15px;
-    padding:10px 20px;
+    padding: 10px 20px;
     width: auto;
     // margin: 5px 20px;
     // height: 41px;
-  
+
     div {
-      // border-bottom: 1px solid gray;
-      text-align: right;
-      display: flex;
-      align-items: center;
-      // width: 150px;
-  
-      input {
-        // height: 32px;
-        font-size: 16px;
-        width: 100%;
-        // border:1px solid #c1c1c1;
-      }
-  
-      button {
-        background: none;
-        border: none;
-        cursor: pointer;
-      }
-  
-      img {
-        width: 30px;
-        height: 20px;
-      }
+        // border-bottom: 1px solid gray;
+        text-align: right;
+        display: flex;
+        align-items: center;
+        // width: 150px;
+
+        input {
+            // height: 32px;
+            font-size: 16px;
+            width: 100%;
+            // border:1px solid #c1c1c1;
+        }
+
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        img {
+            width: 30px;
+            height: 20px;
+        }
     }
-  }
+}
+
 //#endregion
 
 
@@ -203,7 +205,7 @@ div.panelHeader21 {
 
 div.panelHeader11 {
     // padding-left: 15px;
-    padding:10px 20px;
+    padding: 10px 20px;
     border-bottom: solid 1px $colorBorder01;
 
     .row01,

@@ -37,7 +37,9 @@ const createInputSel = ({
   state: Tstate_filter | undefined;
   setState: React.Dispatch<React.SetStateAction<Tstate_filter | undefined>>;
 }) => {
-  const { caption, key, type, selectOptions, disabled, placeholder } = config;
+  const { caption, key, type, selectOptions, placeholder, freeze } = config;
+  let disabled = config.disabled;
+  freeze && (disabled = true);
 
   const inputSelProps: TinputSelProps = {
     disabled,
@@ -67,7 +69,7 @@ const createInputSel = ({
     case 'select':
       inputSelProps.selectProps = {
         props: {
-          menuPortalTarget: undefined,
+          // menuPortalTarget: undefined,
           classNames: {
             menuPortal: () => classNames(scss.select_menuPortal, scss.plus),
           },
@@ -87,6 +89,7 @@ const createInputSel = ({
         },
       };
       placeholder !== undefined && (inputSelProps.selectProps.props!.placeholder = placeholder);
+
       break;
 
     case 'date':

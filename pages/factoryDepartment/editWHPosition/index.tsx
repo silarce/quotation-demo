@@ -17,7 +17,7 @@ import { display } from 'html2canvas/dist/types/css/property-descriptors/display
 import { setting } from '../wareHouseList/index';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import { AppContext } from 'pages/_app';
-
+import icon_search from 'public/image/icon/fc_search.svg';
 
 
 
@@ -91,6 +91,14 @@ export default function EditWHPosition() {
 
 
     const [editstatus, setEditstatus] = useState<string>("");
+    const [searchbar, setSearchbar] = useState(false);
+
+    const [searchProductId, setSearchProductId] = useState('');
+    const [searchName, setSearchName] = useState('');
+    const [searchSpec, setSearchSpec] = useState('');
+
+
+
 
     //#region 右側功能按鈕區塊
     // const panelList: TpanelList = [
@@ -177,9 +185,6 @@ export default function EditWHPosition() {
                     // } else {
                     myAlert.confirm({
                         title: '確定修改?',
-                        content: <>
-                            <h1>修改後無法再編輯</h1>
-                        </>,
                         props: {
                             onOk: () => {
                                 setDisabled(true);
@@ -364,7 +369,7 @@ export default function EditWHPosition() {
             try {
                 setIsLoading(true);
 
-                const conditionModel= {
+                const conditionModel = {
                     username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };
@@ -413,7 +418,7 @@ export default function EditWHPosition() {
             try {
                 setIsLoading(true);
 
-                const conditionModel= {
+                const conditionModel = {
                     username: userInfo?.employee?.chName.toString(),
                     data: updatedData
                 };
@@ -837,62 +842,62 @@ export default function EditWHPosition() {
     useEffect(() => {
         if (isSelectingRef.current) return;
 
-        let filtered = productdata;
-        const { productid, productname, productspec } = data1;
+        const filteredData = productdata.filter((item) => {
+            const matchesKeyword5 = searchProductId ? item.productid?.includes(searchProductId) : true;
+            const matchesKeyword6 = searchName ? item.name?.includes(searchName) : true;
+            const matchesKeyword7 = searchSpec ? item.spec?.includes(searchSpec) : true;
 
-        // 根據條件過濾數據
-        if (productid) {
-            filtered = productdata.filter(item =>
-                item.productid.includes(productid)
-            );
-        }
+            return matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+        });
 
-        if (productname) {
-            filtered = productdata.filter(item =>
-                item.name.includes(productname)
-            );
-        }
 
-        if (productspec) {
-            filtered = productdata.filter(item =>
-                item.spec && item.spec.includes(productspec)
-            );
-        }
+        setFilteredData(filteredData);
 
-        // 更新過濾後的數據
-        setFilteredData(filtered);
+        // // 只有當有過濾條件且有匹配結果時才顯示建議框
+        // const shouldShowSuggestions = filtered.length > 0 && (searchProductId || searchName || searchSpec);
+        // setShowSuggestions(Boolean(shouldShowSuggestions));
 
-        // 當有過濾條件且有匹配結果時才顯示建議框
-        const shouldShowSuggestions = filtered.length > 0 && (productid || productname || productspec) && canedit === true;
-        setShowSuggestions(Boolean(shouldShowSuggestions));
-    }, [data1.productid, data1.productname, data1.productspec, productdata]);
+    }, [searchProductId, searchName, searchSpec, productdata]);
 
 
 
-    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        handleChange('productid', e.target.value);
-    };
 
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        handleChange('productname', e.target.value);
-    };
 
-    const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        isSelectingRef.current = false;
-        handleChange('productspec', e.target.value);
-    };
+
+    // const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     isSelectingRef.current = false;
+    //     handleChange('productid', e.target.value);
+    // };
+
+    // const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     isSelectingRef.current = false;
+    //     handleChange('productname', e.target.value);
+    // };
+
+    // const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     isSelectingRef.current = false;
+    //     handleChange('productspec', e.target.value);
+    // };
 
 
     const handleSelect = (item: DataItem) => {
-        // alert(item.id);
+        if (data1.quantity !== 0) {
+            myAlert.warning({ title: '尚有庫存，無法更改' });
+            return;
+        }
         isSelectingRef.current = true;
-        // setHandinputproductuuid(item.id);
+
+        // 修改 data1
         data1.productid = item.productid;
         data1.productname = item.name;
         data1.productspec = item.spec || '';
         data1.unit = item.unit;
+
+        // 透過 setState 來強制 re-render
+        setSearchProductId(item.productid); // 讓 useEffect 偵測到變更
+        setSearchName(item.name);
+        setSearchSpec(item.spec || '');
+
         setShowSuggestions(false);
     };
 
@@ -900,8 +905,9 @@ export default function EditWHPosition() {
 
 
 
+
     const [dragging, setDragging] = useState(false);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [position, setPosition] = useState({ x: 500, y: 100 });
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
 
@@ -944,21 +950,57 @@ export default function EditWHPosition() {
     return (
         <SubLayer isLoading_subLayer={false}>
             {/* <> */}
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + "｜托盤名稱：" + trayname} panelList={panelList} />
-            {/* 左側區塊 */}
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + "｜托盤名稱：" + trayname} panelList={panelList}
+                customeLeft={[
+                    <>
+                        {/* <span style={{ fontSize: '18px', padding: '0px 10px' }}>
 
-            {/* <div style={{ display: !disabled ? 'block' : 'none', position: 'absolute', top: '0', left: '1%', transform: 'translateX(0%)', zIndex: '999' }}>編輯中....</div> */}
-            {/* {hoverInfo && <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
-
-            {/* 所在倉庫:{data1.whname}<br />
-            托盤名稱:{trayname}<br />
-            是否有托盤呼叫中:{traycalledin === true ? 'true' : 'false'}<br />
-            倉庫名稱:{whnamecalledin}<br />
-            呼叫中的托盤名稱:{traycallednamein}<br /> */}
-
+                            <button
+                                className={scss.shortsquarebtn}
+                                style={{
+                                }}
+                                onClick={() => {
+                                    // setPrbar(!prbar);
+                                }}
+                            >
+                                <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
+                                    ☰
+                                </span>
+                                品項查詢
+                            </button>
+                        </span> */}
+                    </>
+                ]}
+            />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
+                        <button
+                            style={{
+                                display: `${editstatus ? '' : 'none'}`,
+                                width: '39px',
+                                backgroundColor: '#f5f5f5',
+                                border: '1px solid #c1c1c1',
+                                borderRadius: '3px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                fontWeight: 'bolder'
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                                e.currentTarget.style.borderColor = '#a1a1a1';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                e.currentTarget.style.borderColor = '#c1c1c1';
+                            }}
+                            onClick={() => {
+                                // setCustomerbar(true);
+                                setSearchbar(true);
+                            }}
+                        >
+                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                        </button>
                         {/* <div> */}
                         <InputSel
                             {...inputSelProps}
@@ -968,99 +1010,11 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.productid,
-                                    onChange: handleProductidChange,
+                                    onChange: (e) => handleChange('productid', e.target.value),
+                                    // onChange: handleProductidChange,
                                 },
                             }}
                         />
-                        {showSuggestions && (
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    zIndex: 1001,
-                                    backgroundColor: 'white',
-                                    border: '1px solid #ccc',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                                    width: '750px',
-                                    maxHeight: '300px', // 擴大整個容器的高度
-                                    overflow: 'hidden', // 隱藏整個容器的滾動條
-                                    fontSize: '16px',
-                                    left: `${position.x}px`,
-                                    top: `${position.y}px`,
-                                    cursor: 'default',
-                                }}
-                                onMouseDown={handleMouseDown}
-                            >
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        padding: '8px',
-                                        borderBottom: '1px solid #ccc',
-                                        backgroundColor: '#f5f5f5', // 標題列的背景色
-                                        cursor: 'move', // 讓用戶知道可以拖動
-                                    }}
-                                >
-                                    <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
-                                    <button
-                                        onClick={() => setShowSuggestions(false)}
-                                        style={{
-                                            background: 'transparent',
-                                            border: 'none',
-                                            fontSize: '16px',
-                                            cursor: 'pointer',
-                                            fontWeight: 'bold',
-                                            color: '#555',
-                                            outline: 'none',
-                                            transition: 'color 0.3s ease',
-                                        }}
-                                        onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
-                                        onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                                <div
-                                    style={{
-                                        maxHeight: '350px', // 限制table區域的最大高度
-                                        overflowY: 'auto', // 允許垂直滾動
-                                    }}
-                                >
-                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                        {filteredData.length > 0 ? (
-                                            filteredData.map((item, index) => (
-                                                <tr
-                                                    key={index}
-                                                    onClick={() => handleSelect(item)}
-                                                    style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
-                                                    onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                                                >
-                                                    <td style={{ padding: '8px', width: '150px' }}>
-                                                        {item.productid}
-                                                    </td>
-                                                    <td style={{ padding: '8px', width: '250px' }}>
-                                                        {item.name}
-                                                    </td>
-                                                    <td style={{ padding: '8px', width: '350px' }}>
-                                                        {item.spec}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                    沒有匹配的結果
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </table>
-                                </div>
-                            </div>
-                        )}
-
 
                         {/* <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail> */}
                         <InputSel
@@ -1071,11 +1025,12 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.productname,
-                                    // onChange: (e) => handleChange('whpname', e.target.value),
-                                    onChange: handleNameChange,
+                                    onChange: (e) => handleChange('productname', e.target.value),
+                                    // onChange: handleNameChange,
                                 },
                             }}
                         />
+
 
                         <InputSel
                             {...inputSelProps}
@@ -1085,8 +1040,8 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.productspec,
-                                    // onChange: (e) => handleChange('spec', e.target.value),
-                                    onChange: handleSpecChange,
+                                    onChange: (e) => handleChange('productspec', e.target.value),
+                                    // onChange: handleSpecChange,
                                 },
                             }}
                         />
@@ -1108,14 +1063,17 @@ export default function EditWHPosition() {
                             disabled={disabled}
                             inputProps={{
                                 props: {
-                                    value: data1.quantity,
+                                    value: data1.quantity === 0 ? 0 : data1.quantity, // 讓 0 顯示為空
                                     onChange: (e) => {
-                                        const inputValue = e.target.value;
-                                        handleChange('quantity', inputValue === '' ? 0 : parseInt(inputValue, 10));
+                                        const inputValue = e.target.value.trim(); // 去除首尾空格
+                                        const parsedValue = parseInt(inputValue, 10);
+
+                                        handleChange('quantity', isNaN(parsedValue) ? 0 : parsedValue);
                                     },
                                 },
                             }}
                         />
+
 
                         <InputSel
                             {...inputSelProps}
@@ -1212,6 +1170,147 @@ export default function EditWHPosition() {
                     </div>
                 </div >
             </div >
+
+            <div
+                style={{
+                    position: 'absolute',
+                    zIndex: 1000,
+                    backgroundColor: 'white',
+                    border: '1px solid #ccc',
+                    // borderRadius: '8px',
+                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                    width: '1000px',
+                    maxHeight: '500px', // 擴大整個容器的高度
+                    overflow: 'hidden', // 隱藏整個容器的滾動條
+                    fontSize: '16px',
+                    left: `${position.x}px`,
+                    top: `${position.y}px`,
+                    cursor: 'default',
+                    display: `${searchbar ? '' : 'none'}`
+                }}
+                onMouseDown={handleMouseDown}
+            >
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '8px',
+                        borderBottom: '1px solid #ccc',
+                        backgroundColor: '#f5f5f5', // 標題列的背景色
+                        cursor: 'move', // 讓用戶知道可以拖動
+                    }}
+                >
+                    <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
+                    <button
+                        onClick={() => {
+                            setSearchbar(false);
+                            setSearchProductId('');
+                            setSearchName('');
+                            setSearchSpec('');
+                        }}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            fontSize: '16px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            color: '#555',
+                            outline: 'none',
+                            transition: 'color 0.3s ease',
+                        }}
+                        onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
+                        onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+                    >
+                        ×
+                    </button>
+                </div>
+                {/* 搜尋輸入框 */}
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '8px',
+                        padding: '8px',
+                        borderBottom: '1px solid #ccc',
+                        backgroundColor: '#fff',
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder="輸入料號"
+                        value={searchProductId}
+                        onChange={(e) => setSearchProductId(e.target.value)}
+                        style={{
+                            flex: 1,
+                            padding: '6px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                        }}
+                    />
+                    <input
+                        type="text"
+                        placeholder="輸入名稱"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        style={{
+                            flex: 1,
+                            padding: '6px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                        }}
+                    />
+                    <input
+                        type="text"
+                        placeholder="輸入規格"
+                        value={searchSpec}
+                        onChange={(e) => setSearchSpec(e.target.value)}
+                        style={{
+                            flex: 1,
+                            padding: '6px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                        }}
+                    />
+                </div>
+                <div
+                    style={{
+                        maxHeight: '350px', // 限制table區域的最大高度
+                        overflowY: 'auto', // 允許垂直滾動
+                    }}
+                >
+
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        {filteredData.length > 0 ? (
+                            filteredData.map((item, index) => (
+                                <tr
+                                    key={index}
+                                    onClick={() => handleSelect(item)}
+                                    style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
+                                    onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
+                                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                                >
+                                    <td style={{ padding: '8px', width: '150px' }}>
+                                        {item.productid}
+                                    </td>
+                                    <td style={{ padding: '8px', width: '250px' }}>
+                                        {item.name}
+                                    </td>
+                                    <td style={{ padding: '8px', width: '350px' }}>
+                                        {item.spec}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                    沒有匹配的結果
+                                </td>
+                            </tr>
+                        )}
+                    </table>
+                </div>
+            </div>
         </SubLayer >
     )
 }
