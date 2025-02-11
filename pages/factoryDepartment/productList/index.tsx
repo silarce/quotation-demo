@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
@@ -30,7 +30,7 @@ import icon_search from 'public/image/icon/fc_search.svg';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
-import { Modal } from 'antd';
+import { Modal, Pagination } from 'antd';
 import icon_export from 'public/image/icon/fc_export.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import icon_add2 from 'public/image/icon/fc_add2.svg';
@@ -780,7 +780,7 @@ export default function ProductList() {
                                 product: item.product,
                                 quantity: item.quantity
                             })))
-                            
+
                         }
                         // console.log(data);
 
@@ -889,6 +889,7 @@ export default function ProductList() {
 
         // setSearchdata(filteredData);
         setFilteredData(filteredData);
+        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
     };
 
 
@@ -1263,7 +1264,7 @@ export default function ProductList() {
     }
     useEffect(() => {
         // 更新 addproductid，基於最新的 state
-        setAddProductid("SJ" + type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
+        setAddProductid(type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
         // setAddProductid(type1selectedvalue + type2selectedvalue + type3inputedvalue + type4selectedvalue + type5selectedvalue);
 
     }, [type1selectedvalue, type2selectedvalue, type3inputedvalue, type4selectedvalue, type5selectedvalue]);
@@ -1558,6 +1559,25 @@ export default function ProductList() {
         });
     };
 
+    //#region ===========【分頁處理】
+    // 頁數相關狀態
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+
+    // 計算當前頁顯示的資料
+    const currentItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredData.slice(startIndex, endIndex);
+    }, [itemsPerPage, currentPage, filteredData]);
+
+    // 分頁切換處理函數
+    const handlePageChange = (page: any) => {
+        setCurrentPage(page);
+    };
+    //#endregion
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'物料維護'} panelList={panelList}
@@ -1596,7 +1616,7 @@ export default function ProductList() {
                 ]}
                 customeLeft={[
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                        {/* <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                             <p style={{ color: '#14256a', fontSize: '16px' }}>
                                 符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
                             </p>
@@ -1605,11 +1625,12 @@ export default function ProductList() {
                             <p style={{ color: '#14256a', fontSize: '16px' }}>
                                 物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
                             </p>
-                        </div>
+                        </div> */}
                     </div>
 
 
                 ]} />
+
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
@@ -1631,65 +1652,43 @@ export default function ProductList() {
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <div className={scss.content} style={{ overflowY: 'hidden' }}>
+
+                    <div className={scss.content} style={{ overflowY: 'auto' }}>
                         <div
-                            style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-                            <div className={scss.head_head1}>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                                <div></div>
-                            </div>
-                            <div className={scss.head_foot2}>
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                                </div>
-                                <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='請輸入料號'
-                                        value={keyword2}
-                                        style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                        onChange={(e) => setKeyword2(e.target.value)}
-                                    /> */}
-                                </div>
-                                <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='請輸入名稱'
-                                        value={keyword3}
-                                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                        onChange={(e) => setKeyword3(e.target.value)}
-                                    /> */}
-                                </div>
-                                <div>
-                                    {/* <input
-                                        type="text"
-                                        placeholder='請輸入規格'
-                                        value={keyword4}
-                                        style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
-                                        onChange={(e) => setKeyword4(e.target.value)}
-                                    /> */}
-                                </div>
-                                <div>
-                                    {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
-                                        <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    </button> */}
-                                </div>
-                                <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                    {/* <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p> */}
-                                </div>
-                                <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                    {/* <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p> */}
-                                </div>
-                            </div>
+                            style={{ paddingBottom: '18px' }}
+                        >
+                            <span
+                                style={{
+                                    height: '50px',
+                                    backgroundColor: '#f5f5f5',
+                                    display: 'flex',
+                                    justifyContent: 'center', // 水平置中
+                                    alignItems: 'center',     // 垂直置中
+                                    fontSize: '18px'
+                                }}
+                            >
+                                物料清單
+                            </span>
+                        </div>
+                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="物料筆數"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        type: "number",
+                                        value: filteredData.length,
+                                    },
+                                }}
+                            />
                             <Thead01 type={'ProductList'} />
                         </div>
                         <div className={scss.body_content1} style={{ height: '300px', border: '1px solid #c1c1c1' }}>
                             <span>
-                                {filteredData && (
-                                    filteredData.slice(0, 100).map((_item: any, index: number) => (
+                                {currentItems && currentItems.map((_item: any, index: number) => {
+
+                                    return (
                                         <CellWithBar key={index} className={scss.panelHeader21}>
                                             <div
                                                 key={index}
@@ -1713,9 +1712,22 @@ export default function ProductList() {
                                                 </span>
                                             </div>
                                         </CellWithBar>
-                                    ))
-                                )}
+                                    );
+                                })
+                                }
                             </span>
+                        </div>
+                        <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                            {/* 分頁控制 */}
+                            <Pagination
+                                current={currentPage} // 當前頁碼
+                                total={filteredData.length} // 總數據量
+                                pageSize={itemsPerPage} // 每頁顯示的數量
+                                onChange={handlePageChange} // 處理頁面切換
+                                showSizeChanger // 顯示頁數選擇器
+                                pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                                onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                            />
                         </div>
 
                         <div className={scss.body_foot1}>
@@ -1741,8 +1753,8 @@ export default function ProductList() {
                                 <span>
                                     <button
                                         className={scss.minitabbtn}
-                                        onClick={() => tabChosed('編碼')}
-                                        style={getButtonStyle('編碼')}
+                                        onClick={() => tabChosed('編碼維護')}
+                                        style={getButtonStyle('編碼維護')}
                                     >
                                         編碼維護
                                     </button>
@@ -1754,11 +1766,26 @@ export default function ProductList() {
                             <div></div>
                         </div>
                         <div >
-
+                            <div
+                                style={{ paddingBottom: '18px' }}
+                            >
+                                <span
+                                    style={{
+                                        height: '50px',
+                                        backgroundColor: '#f5f5f5',
+                                        display: 'flex',
+                                        justifyContent: 'center', // 水平置中
+                                        alignItems: 'center',     // 垂直置中
+                                        fontSize: '18px'
+                                    }}
+                                >
+                                    {tabshow}
+                                </span>
+                            </div>
                             <div style={{ display: `${tabshow === "編輯" ? '' : 'none'}` }}>
                                 <div className={scss.foot_head0}>
                                     <div>
-                                        <span style={{ padding: '0px 20px' }}>
+                                        <span style={{ padding: '0px 0px' }}>
                                             <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
                                                 編輯
                                             </button>
@@ -1773,7 +1800,7 @@ export default function ProductList() {
                                         </span>
                                     </div>
                                     <div>
-                                        <span style={{ padding: '0px 10px', display: `${editmain ? '' : 'none'}` }}>
+                                        <span style={{ padding: '0px 0px', display: `${editmain ? '' : 'none'}` }}>
                                             <button style={{ display: `${editlaser ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEditLaser}>
                                                 編輯
                                             </button>
@@ -1787,31 +1814,49 @@ export default function ProductList() {
                                         </span>
                                     </div>
                                 </div>
-                                <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="料號"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: productidin || '',
-                                                }
-                                            }}
-                                        />
+
+                                <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1', borderLeft: '1px solid #c1c1c1', borderRight: '1px solid #c1c1c1' }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                        <span>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="料號"
+                                                captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: productidin || '',
+                                                    }
+                                                }}
+                                            />
+                                        </span>
+                                        <span style={{ marginLeft: "auto" }}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="庫存數量"
+                                                captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 15px' }}
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: productquantityin || 0,
+                                                    },
+                                                }}
+                                            />
+                                        </span>
                                     </div>
                                     <div>
 
-                                        <span style={{ fontSize: '18px', color: '#14256A' }}>
+                                        <span style={{ fontSize: '18px', color: '#14256A', backgroundColor: '#f5f5f5', padding: '0px 15px' }}>
                                             雷射切割設定
                                         </span>
                                     </div>
                                 </div>
-                                <div className={scss.foot_head2}>
+                                <div className={scss.foot_head2} style={{ borderLeft: '1px solid #c1c1c1', borderBottom: '1px solid #c1c1c1' }}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
                                             caption="名稱"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1823,6 +1868,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="規格"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1834,6 +1880,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="單位"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1845,6 +1892,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="材質"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1856,6 +1904,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="表面"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1866,17 +1915,8 @@ export default function ProductList() {
                                         />
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="庫存數量"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: productquantityin || 0,
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
                                             caption="舊料號"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 16px' }}
                                             disabled={!editmain}
                                             inputProps={{
                                                 props: {
@@ -1897,7 +1937,7 @@ export default function ProductList() {
                                             }}
                                         /> */}
                                     </div>
-                                    <div style={{ borderLeft: '1px solid rgb(114, 101, 101)' }}>
+                                    <div style={{ borderLeft: '1px solid rgb(114, 101, 101)', borderRight: '1px solid #c1c1c1' }}>
                                         <div className={scss.head15}>
                                             <span></span>
                                             <span>序</span>
@@ -1906,7 +1946,7 @@ export default function ProductList() {
                                             <span>數量</span>
                                             <span></span>
                                         </div>
-                                        <div style={{ overflowY: 'auto', height: '200px' }}>
+                                        <div style={{ overflowY: 'auto', height: '130px' }}>
                                             {subproductdata && (
                                                 subproductdata.map((_item, index) => {
 
@@ -1957,23 +1997,28 @@ export default function ProductList() {
                                 <br />
                             </div>
                             <div style={{ display: `${tabshow === "新增" ? '' : 'none'}` }}>
-                                <br />
-                                <span style={{ padding: '0px 20px' }}>
-                                    {/* <span >
+                                <div className={scss.foot_head0}>
+                                    <div>
+
+                                        <span style={{ padding: '0px 0px' }}>
+                                            {/* <span >
                                             <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                                編輯
+                                            編輯
                                             </button>
                                             </span> */}
-                                    <button className={scss.miniredbtn} onClick={() => { handleAddProduct() }}>
-                                        新增
-                                    </button>
-                                    &nbsp;&nbsp;&nbsp;
-                                    <button className={scss.minibtn} onClick={() => { handleAddProductClear() }} style={{ display: `${(addproductid != '' || addproductname != '' || addproductspec != '' || addproductunit != '' || addproductmaterial != '' || addproductsurface != '') ? '' : 'none'}` }}>
-                                        清除
-                                    </button>
-                                </span>
-                                <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1' }}>
-                                    <div style={{ display: 'none' }}>
+                                            <button className={scss.miniredbtn} onClick={() => { handleAddProduct() }}>
+                                                新增
+                                            </button>
+                                            &nbsp;&nbsp;&nbsp;
+                                            <button className={scss.minibtn} onClick={() => { handleAddProductClear() }} style={{ display: `${(addproductid != '' || addproductname != '' || addproductspec != '' || addproductunit != '' || addproductmaterial != '' || addproductsurface != '') ? '' : 'none'}` }}>
+                                                清除
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1', display: 'none' }}>
+                                    <div >
                                         <select
                                             value={type1selectedOption}
                                             style={{ borderBottom: '1px solid #c1c1c1', fontSize: '16px' }}
@@ -2038,11 +2083,12 @@ export default function ProductList() {
                                     </div>
                                     <div></div>
                                 </div>
-                                <div className={scss.foot_head1_1}>
-                                    <div >
+                                <div className={scss.foot_head1} style={{ borderTop: '1px solid #c1c1c1', borderLeft: '1px solid #c1c1c1', borderRight: '1px solid #c1c1c1' }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <InputSel
                                             {...inputSelProps}
                                             caption="料號"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2056,15 +2102,17 @@ export default function ProductList() {
                                         />
                                     </div>
                                     <div>
-                                        {/* {isDuplicate && <p style={{ fontSize: '16px', color: 'red' }}>料號已存在！</p>}
-                                        {addproductid.length < 14 && <p style={{ fontSize: '16px', color: 'red' }}>料號不符編碼原則！</p>} */}
+                                        <span style={{ fontSize: '18px', color: '#14256A', backgroundColor: '#f5f5f5', padding: '0px 15px' }}>
+                                            編碼範例
+                                        </span>
                                     </div>
                                 </div>
-                                <div className={scss.foot_head2}>
+                                <div className={scss.foot_head2} style={{ borderLeft: '1px solid #c1c1c1', borderBottom: '1px solid #c1c1c1' }}>
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
                                             caption="名稱"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2076,6 +2124,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="規格"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2087,6 +2136,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="單位"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2098,6 +2148,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="材質"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2109,6 +2160,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="表面"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 25px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2120,6 +2172,7 @@ export default function ProductList() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="舊料號"
+                                            captionStyle={{ backgroundColor: '#f5f5f5', padding: '0px 16px' }}
                                             disabled={false}
                                             inputProps={{
                                                 props: {
@@ -2129,10 +2182,9 @@ export default function ProductList() {
                                             }}
                                         />
                                     </div>
-                                    <div style={{ borderLeft: '1px solid #c1c1c1', padding: '0px 10px' }}>
-                                        <span style={{ color: "#14256a", fontSize: '16px', fontWeight: 'bolder' }}>※編碼範例</span>
+                                    <div style={{ borderLeft: '1px solid #c1c1c1', borderRight: '1px solid #c1c1c1' }}>
                                         <table style={{ width: '100%', textAlign: 'left' }}>
-                                            <thead>
+                                            <thead style={{ backgroundColor: '#f5f5f5' }}>
                                                 <tr>
                                                     <th>公司別</th>
                                                     <th>類別</th>
@@ -2164,7 +2216,7 @@ export default function ProductList() {
                                 </div>
                                 <br />
                             </div>
-                            <div style={{ display: `${tabshow === "編碼" ? '' : 'none'}` }}>
+                            <div style={{ display: `${tabshow === "編碼維護" ? '' : 'none'}` }}>
                                 <div className={scss.foot_head3}>
                                     <div style={{ width: '100%' }}>
                                         <input
