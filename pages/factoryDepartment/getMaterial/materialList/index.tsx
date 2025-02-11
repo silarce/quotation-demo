@@ -1,206 +1,103 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext } from 'react';
-import { useRouter } from 'next/router';
-import classNames from 'classnames';
-import moment from 'moment';
-import _ from 'lodash';
-
-import scss from './materialList.module.scss';
-import Thead01 from '../../ui/table/thead01';
-import Tbody01 from '../../ui/table/tbody01';
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { quotationStatusLookup } from 'config/lookupTable';
-import { TquotationStatus } from 'js/api/dtoTypes';
-import { setting } from '../../wareHouseList/index';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { AppContext } from 'pages/_app';
-
-
-
-
-
-type Tquery = {
-    wareHouseId: string | undefined;
-};
-
-
+import { useState } from "react";
+import { Tree } from "antd";
+import SubLayer from "components/Layer/SubLayer/SubLayer";
+import PageHeader02 from "components/PageHeader/PageHeader02/PageHeader02";
 
 export default function MaterialList() {
-    const router = useRouter();
-    const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    // 存儲選中的 BOM 節點
+    const [selectedNode, setSelectedNode] = useState<any>(null);
 
-    const { userInfo } = useContext(AppContext);
-
-    const [data, setData] = useState<any[]>([]);
-    const [data1, setData1] = useState<any[]>([]);
-    const [error, setError] = useState<string | null>(null);
-
-    const status = router.query.status as TquotationStatus;
-    const { wareHouseId } = router.query as Tquery;
-    const [isLoading, setIsLoading] = useState(false);
-
-    // wareHouseList/index.js
-
-
-    const searchTargetList = [
+    const bomData = [
         {
-            placeholder: '物料名稱',
-        },
-        {
-            placeholder: '物料編號',
-        },
-        {
-            placeholder: '物料規格',
-        },
+            id: "3BAF0324-A5B3-4CD0-A5DD-A065B5852A23",
+            productid: "SJCDP000020201",
+            name: "302防颱型門片組",
+            spec: "",
+            quantity: 1,
+            key: "01",
+            children: [
+                {
+                    id: "E6834ED5-EE40-40C5-8ECE-6B47AA928BF4",
+                    productid: "SJSDP000010201",
+                    name: "SJ-302門片 SST#304",
+                    spec: "寬110",
+                    quantity: 1,
+                    key: "0-0",
+                    children: [
+                        {
+                            id: "D456",
+                            productid: "SJCDP000020203",
+                            name: "零件 D",
+                            spec: "D 規格",
+                            quantity: 5,
+                            key: "0-0-0"
+                        },
+                        {
+                            id: "E789",
+                            productid: "SJCDP000020204",
+                            name: "零件 E",
+                            spec: "E 規格",
+                            quantity: 3,
+                            key: "0-0-1"
+                        }
+                    ]
+                },
+                {
+                    id: "EF140535-7EA3-4EEB-9067-8BA4F62FF16B",
+                    productid: "A102-X045000001",
+                    name: "不鏽鋼防颱鉤",
+                    spec: "4.5MM",
+                    quantity: 1,
+                    key: "0-1",
+                    children: [
+                        {
+                            id: "F567",
+                            productid: "SJCDP000020206",
+                            name: "零件 F",
+                            spec: "F 規格",
+                            quantity: 4,
+                            key: "0-1-0"
+                        }
+                    ]
+                }
+            ]
+        }
     ];
 
-    const doSearch = (valueArr: (string | Toption | null)[]) => {
-        const keywordWhpname = valueArr[0] as string;
-        const keywordMaterialnumber = valueArr[1] as string;
-        const keywordSpec = valueArr[2] as string;
-
-        // alert(keywordWhpname + "-" + keywordMaterialnumber + "-" + keywordSpec);
-
-
-        // alert(keywordWhpname==='');
-
-        // if (keywordWhpname === '' || keywordWhpname === undefined &&
-        //     keywordMaterialnumber === '' || keywordMaterialnumber === undefined &&
-        //     keywordSpec === '' || keywordSpec === undefined) {
-        //     fetchData();
-        // } else {
-        searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
-        // }
+    // 點擊節點時，更新選中的節點資訊
+    const handleSelect = (selectedKeys: any, { node }: any) => {
+        setSelectedNode(node);
     };
-
-
-
-
-    const searchGroup = {
-        searchTargetList,
-        doSearch,
-    };
-
-
-    const panelList: TpanelList = [
-        { searchGroup },
-        // status === 'Contracting' ? attatchBtn : null,
-        // {
-        //     type: 'addButton',
-        //     label: '新增倉庫',
-        //     onClick: () => {
-        //         router.push({
-        //             pathname: `/factoryDepartment/addWareHouse`,
-        //             query: {
-        //                 status,
-        //             },
-        //         });
-        //     },
-        // },
-    ];
-
-
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-
-
-    //call api
-    const fetchData = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel: { keyword: string | undefined; } = {
-                keyword: "search" as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            //erpAPI
-            const response = await fetch(`${setting.apipath}GetMaterial?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            let data = await response.json();
-            setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
-        try {
-            // keywordSpec
-            const conditionModel: { keywordWhpname: string | undefined, keywordMaterialnumber: string | undefined, keywordSpec: string | undefined } = {
-                keywordWhpname: keywordWhpname as string | undefined,
-                keywordMaterialnumber: keywordMaterialnumber as string | undefined,
-                keywordSpec: keywordSpec as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            //erpAPI
-            const response = await fetch(`${setting.apipath}SearchMaterialById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            let data = await response.json();
-            setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
-
 
     return (
-
-
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '物料查詢'} panelList={panelList} />
-            <div className={scss.main}>
-                <div className={scss.left}>
-                    {/* <div className={scss.top}> */}
-                    <div>
-                        <Thead01 type={'materialList'} />
-                        <Tbody01 type={'materialList'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
-                        {/* </div> */}
-                    </div>
+            <PageHeader02 tag={"物料查詢"} panelList={undefined} />
+            <div style={{ display: "flex", gap: "20px" }}>
+                {/* 左半邊：BOM 樹狀結構 */}
+                <div style={{ width: "50%" }}>
+                    <Tree
+                        treeData={bomData}
+                        defaultExpandAll
+                        fieldNames={{ title: "name", key: "key", children: "children" }}
+                        onSelect={handleSelect} // 當點擊節點時觸發
+                    />
                 </div>
-                <div className={scss.right}>
-                    <div className={scss.content}>
-                        <Thead01 type={'GetMatWarehouseList'} />
-                        <Tbody01 type={'GetMatWarehouseList'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
-                    </div>
+
+                {/* 右半邊：顯示選中的 BOM 節點資訊 */}
+                <div style={{ width: "50%", border: "1px solid #ddd", padding: "10px" }}>
+                    <h3>選中的項目</h3>
+                    {selectedNode ? (
+                        <div>
+                            <p><strong>名稱：</strong> {selectedNode.name}</p>
+                            <p><strong>產品編號：</strong> {selectedNode.productid}</p>
+                            <p><strong>規格：</strong> {selectedNode.spec || "無"}</p>
+                            <p><strong>數量：</strong> {selectedNode.quantity}</p>
+                        </div>
+                    ) : (
+                        <p>請點擊左側樹狀圖選擇一個物料</p>
+                    )}
                 </div>
             </div>
         </SubLayer>
-
-    )
-
+    );
 }
