@@ -5,7 +5,12 @@ import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, Tmo
 
 import { useTranslation } from 'react-i18next';
 
-import { useGetUnpaidProdreceiptByInvoiceNumber, Tprodreceipt_Dto } from 'js/api/api_netCore/api_accountant';
+import {
+  useGetUnpaidProdreceiptByInvoiceNumber,
+  Tprodreceipt_Dto,
+  // Tprodreceiptdetail_Dto,
+} from 'js/api/api_netCore/api_accountant';
+import type { Tprodreceiptdetail_Dto } from 'js/api/api_netCore/_schemas';
 
 import { useFilter } from '../useFilter';
 import { useInputSelProps } from '../useInputSelProps';
@@ -17,8 +22,11 @@ import SearchModal, { Tprops_refine } from '..';
 interface Toptions {
   coverFilter?: Tconfig_filter;
   customKeyArr?: string[];
-  uniqInvoice?: boolean;
-  removeNoInvoiceData?: boolean;
+  removeData_noProdreceipt?: boolean;
+}
+
+interface Tprodreceiptdetail_Dto_addition extends Tprodreceiptdetail_Dto {
+  invoice: Tprodreceipt_Dto['invoice'];
 }
 
 // =====================================================================================
@@ -30,16 +38,14 @@ interface Toptions {
 // useInputSelProps: 將config_filter與狀態送入，建立inputSelProps
 // useData: 將filter送進去，取得資料
 
-const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodreceipt_Dto> => {
+const useSearchModal_prodreceiptDetail = (options?: Toptions): TuseSearchModal<Tprodreceiptdetail_Dto_addition> => {
+  const { removeData_noProdreceipt = true } = options ?? {};
   const config_filter = useConfig_filter(options?.coverFilter);
   const { dataConfig, dataKeyArr } = useConfig_data(options?.customKeyArr);
 
   const { state, setState, clearState, filter, confirmFilter } = useFilter({ config_filter });
   const inputSelPropsArr = useInputSelProps({ config_filter, state, setState });
-  const { dataArr, viewRef, isLoading, qty } = useData(filter, {
-    uniqInvoice: options?.uniqInvoice,
-    removeNoInvoiceData: options?.removeNoInvoiceData,
-  });
+  const { dataArr, viewRef, isLoading, qty } = useData(filter, { removeData_noProdreceipt });
 
   return {
     inputSelPropsArr,
@@ -60,20 +66,9 @@ const useSearchModal_prodreceipt = (options?: Toptions): TuseSearchModal<Tprodre
 // 將filter送進來，給取得資料的api hook
 // useData(或是要叫其他名字也無所謂)，的輸入與細節怎樣都無所謂，但必須輸出TmodalData
 const useData = (
-  //
   filter: Tstate_filter | undefined,
-  {
-    uniqInvoice,
-    removeNoInvoiceData = false,
-  }: {
-    uniqInvoice?: boolean;
-    removeNoInvoiceData?: boolean;
-  } = {}
-): TmodalData<Tprodreceipt_Dto> => {
-  // 以發票號碼取得未結案之進貨單 (未提供發票號碼則提供所有未結案之進貨單)
-  // const invoice = filter?.invoice?.trim();
-  // const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(invoice, { autoUpdate: false });
-
+  { removeData_noProdreceipt }: { removeData_noProdreceipt?: boolean } = {}
+): TmodalData<Tprodreceiptdetail_Dto_addition> => {
   const { res, setRes, update, isFetching } = useGetUnpaidProdreceiptByInvoiceNumber(undefined, { autoUpdate: false });
 
   const dataArr = useMemo(() => {
@@ -90,17 +85,25 @@ const useData = (
         !String(data.prodreceiptid).includes(filter.prodreceiptid.trim()) && (pass = false);
       }
 
-      if (removeNoInvoiceData) {
-        !data.invoice && (pass = false);
-      }
-
       return pass;
     });
 
-    // 將重複發票的資料去除
-    uniqInvoice && (dataArr = _.uniqBy(dataArr, 'invoice'));
+    let datailArr = dataArr.flatMap((data) => {
+      return data.detail.map((detail) => {
+        return {
+          ...detail,
+          invoice: data.invoice,
+        };
+      });
+    });
 
-    return dataArr;
+    if (removeData_noProdreceipt) {
+      datailArr = datailArr.filter((data) => {
+        return data.prodreceiptuuid;
+      });
+    }
+
+    return datailArr;
   }, [res, filter]);
 
   useEffect(() => {
@@ -122,7 +125,7 @@ const useConfig_data = (customKeyArr?: string[]) => {
   const { t, i18n } = useTranslation('accounting', { keyPrefix: 'prodreceipt' });
 
   const dataConfig = useMemo(() => {
-    const config: Tconfig<Tprodreceipt_Dto> = {
+    const config: Tconfig<Tprodreceiptdetail_Dto_addition> = {
       indexNumber: {
         label: t_common('indexNumber02'),
         style: {
@@ -135,52 +138,69 @@ const useConfig_data = (customKeyArr?: string[]) => {
       prodreceiptid: {
         label: t('prodreceiptid'),
         style: {
-          width: '150px',
+          width: '120px',
         },
       },
       invoice: {
         label: t('invoice'),
         style: {
-          width: '150px',
+          width: '120px',
         },
       },
-      status: {
-        label: t('status'),
+      name: {
+        label: t_common('name'),
         style: {
-          width: 100,
+          width: 200,
+          justifyContent: 'flex-start',
         },
       },
-      pay_status: {
-        label: t('pay_status'),
+      spec: {
+        label: t_common('spec'),
         style: {
-          width: 100,
+          width: 200,
+          justifyContent: 'flex-start',
         },
       },
-      tax: {
-        label: t('tax'),
+      quantity: {
+        label: t_common('quantity'),
         style: {
-          width: 100,
+          width: '60px',
+        },
+      },
+      unit: {
+        label: t_common('unit'),
+        style: {
+          width: '60px',
+        },
+      },
+      unitprice: {
+        label: t_common('unitprice'),
+        style: {
+          width: '80px',
           justifyContent: 'flex-end',
         },
-        reducer: (data) => {
-          const tax = typeof data.tax === 'number' ? (data.tax ?? 0).toLocaleString() : data.tax;
-
-          return tax;
+        reducer(data) {
+          return data.unitprice?.toLocaleString() || 0;
         },
       },
       totalprice: {
-        label: t('totalprice'),
+        label: t_common('totalPrice'),
         style: {
-          width: 150,
+          width: '100px',
           justifyContent: 'flex-end',
         },
-        reducer: (data) => {
-          const totalprice =
-            typeof data.totalprice === 'number' ? (data.totalprice ?? 0).toLocaleString() : data.totalprice;
-
-          return totalprice;
+        reducer(data) {
+          return data.totalprice?.toLocaleString() || 0;
         },
       },
+      note: {
+        label: t_common('note'),
+        style: {
+          width: '200px',
+          justifyContent: 'flex-start',
+        },
+      },
+      //
     };
 
     return config;
@@ -191,10 +211,13 @@ const useConfig_data = (customKeyArr?: string[]) => {
     'indexNumber',
     'prodreceiptid',
     'invoice',
-    'status',
-    'pay_status',
-    'tax',
+    'name',
+    'spec',
+    'quantity',
+    'unit',
+    'unitprice',
     'totalprice',
+    'note',
   ];
 
   return { dataConfig, dataKeyArr };
@@ -226,14 +249,14 @@ const useConfig_filter = (customerFilterConfig?: Tconfig_filter) => {
 
 // ============================================================================
 
-const SearchModal_prodreceipt = (
-  props: Tprops_refine<Tprodreceipt_Dto> & {
+const SearchModal_prodreceiptDetail = (
+  props: Tprops_refine<Tprodreceiptdetail_Dto_addition> & {
     options?: Toptions;
   }
 ) => {
   const { options, ...rest } = props;
 
-  const instance = useSearchModal_prodreceipt(options);
+  const instance = useSearchModal_prodreceiptDetail(options);
 
   return <SearchModal {...rest} useSearchModal={() => instance} />;
 };
@@ -241,5 +264,5 @@ const SearchModal_prodreceipt = (
 // ============================================================================
 
 // 進貨單
-export { useSearchModal_prodreceipt, SearchModal_prodreceipt };
-export type { Tprodreceipt_Dto, Tconfig_filter };
+export { useSearchModal_prodreceiptDetail, SearchModal_prodreceiptDetail };
+export type { Tprodreceiptdetail_Dto_addition, Tconfig_filter };

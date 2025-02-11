@@ -146,7 +146,7 @@ const config: Tconfig = {
     label: 'item',
     i18nKey: 'item',
     style: {
-      width: 100,
+      width: 250,
       justifyContent: 'flex-start',
     },
     createProps: ({ disabled, classState }) => {
@@ -171,7 +171,7 @@ const config: Tconfig = {
     label: 'prodreceipt_number',
     i18nKey: 'prodreceipt_number',
     style: {
-      width: 100,
+      width: 120,
       justifyContent: 'flex-start',
     },
     createProps: ({ disabled, classState }) => {
@@ -208,7 +208,7 @@ const config: Tconfig = {
     label: 'quantity',
     i18nKey: 'quantity',
     style: {
-      width: 100,
+      width: 60,
       justifyContent: 'flex-end',
     },
     createProps: ({ disabled, classState }) => {
@@ -237,7 +237,7 @@ const config: Tconfig = {
     label: 'unit',
     i18nKey: 'unit',
     style: {
-      width: 100,
+      width: 60,
       justifyContent: 'flex-start',
     },
     createProps: ({ disabled, classState }) => {
@@ -320,7 +320,7 @@ const config: Tconfig = {
     label: 'note',
     i18nKey: 'note',
     style: {
-      width: 200,
+      width: 250,
       justifyContent: 'flex-start',
     },
     createProps: ({ disabled, classState }) => {
@@ -346,7 +346,7 @@ const config: Tconfig = {
     label: 'goods_spec',
     i18nKey: 'goods_spec',
     style: {
-      width: 100,
+      width: 200,
       justifyContent: 'flex-start',
     },
     createProps: ({ disabled, classState }) => {

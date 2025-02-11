@@ -16,6 +16,8 @@ import SearchModal, { Tprops_refine } from '..';
 
 import { customerTypesLookup } from 'js/api/api_customer';
 
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+
 // =====================================================================================
 
 // 由五個部分組成
@@ -188,6 +190,15 @@ const useConfig_filter = () => {
 
 const SearchModal_customer = (props: Tprops_refine<TcustomerDto>) => {
   return <SearchModal {...props} useSearchModal={useSearchModal_customer} />;
+};
+
+// ============================================================================
+
+SearchModal_customer.open = (props: Tprops_refine<TcustomerDto>) => {
+  return DragableModal.create({
+    handleText: '選擇客戶',
+    children: <SearchModal_customer {...props} />,
+  });
 };
 
 // ============================================================================
