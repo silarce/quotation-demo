@@ -584,8 +584,8 @@ export default function PKingList() {
                                                         <th style={{ width: '150px' }}>數量</th>
                                                         <th style={{ width: '150px' }}>已領</th>
                                                         <th style={{ width: '80px' }}>單位</th>
-                                                        <th style={{ width: '150px' }}>單價</th>
-                                                        <th>金額</th>
+                                                        <th style={{ width: '150px' }}>領料人員</th>
+                                                        <th></th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>
@@ -599,8 +599,8 @@ export default function PKingList() {
                                                             <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
                                                             <td style={{ width: '150px', color: '#ea1833' }}>{detail.picking_qty?.toLocaleString()}</td>
                                                             <td style={{ width: '80px' }}>{detail.unit}</td>
-                                                            <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
-                                                            <td>{detail.totalprice?.toLocaleString()}</td>
+                                                            <td style={{ width: '150px' }}>{detail.picking_by}</td>
+                                                            <td></td>
                                                         </tr>
                                                     ))}
                                                 </tbody>

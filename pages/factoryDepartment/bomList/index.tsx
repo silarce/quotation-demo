@@ -1,7 +1,7 @@
 import SubLayer from "components/Layer/SubLayer/SubLayer";
 import PageHeader02, { Toption, TpanelList } from "components/PageHeader/PageHeader02/PageHeader02";
 import scss from './bomList.module.scss';
-import { createRef, useContext, useEffect, useRef, useState } from "react";
+import { createRef, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { setting } from '../wareHouseList/index';
 import { useRouter } from "next/router";
 import { content } from "html2canvas/dist/types/css/property-descriptors/content";
@@ -24,6 +24,8 @@ import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_edit from 'public/image/icon/fc_edit.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
+import { Pagination } from "antd";
+import icon_search2 from 'public/image/icon/search.svg';
 
 
 
@@ -649,6 +651,7 @@ export default function BomList() {
 
 
         setFilteredData(filteredData);
+        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
     }, [keyword2, keyword3, keyword4]);
     //#endregion
 
@@ -675,6 +678,26 @@ export default function BomList() {
     //#endregion
 
 
+    //#endregion
+
+
+
+    //#region ===========【分頁處理】
+    // 頁數相關狀態
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+
+    // 計算當前頁顯示的資料
+    const currentItems = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return filteredData.slice(startIndex, endIndex);
+    }, [itemsPerPage, currentPage, filteredData]);
+
+    // 分頁切換處理函數
+    const handlePageChange = (page: any) => {
+        setCurrentPage(page);
+    };
     //#endregion
 
     return (
@@ -709,11 +732,14 @@ export default function BomList() {
                                 style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
                                 onChange={(e) => setKeyword4(e.target.value)}
                             />
+                            <span style={{ borderBottom: '1px solid #c1c1c1', padding: '6px 12px' }}>
+                                <img src={icon_search2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                            </span>
                         </div>
                     ]}
                 customeLeft={[
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
+                        {/* <div style={{ padding: '4px 5px', textAlign: 'right' }}>
                             <p style={{ color: '#14256a', fontSize: '16px' }}>
                                 符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span>
                             </p>
@@ -722,78 +748,59 @@ export default function BomList() {
                             <p style={{ color: '#14256a', fontSize: '16px' }}>
                                 物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span>
                             </p>
-                        </div>
+                        </div> */}
                     </div>
 
 
                 ]}
             />
+            <div
+                style={{ paddingBottom: '18px' }}
+            >
+                <span
+                    style={{
+                        height: '50px',
+                        backgroundColor: '#f5f5f5',
+                        display: 'flex',
+                        justifyContent: 'center', // 水平置中
+                        alignItems: 'center',     // 垂直置中
+                        fontSize: '18px'
+                    }}
+                >
+                    物料清單
+                </span>
+            </div>
             <div className={scss.body}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
-                        <div className={scss.head_head1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot2}>
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                {/* <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
-                            </div>
-
-                            <div>
-                                {/* <input
-                                    type="text"
-                                    placeholder='請輸入料號'
-                                    value={keyword2}
-                                    style={{ padding: '4px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword2(e.target.value)}
-                                /> */}
-                            </div>
-                            <div>
-                                {/* <input
-                                    type="text"
-                                    placeholder='請輸入名稱'
-                                    value={keyword3}
-                                    style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                /> */}
-                            </div>
-                            <div>
-                                {/* <input
-                                    type="text"
-                                    placeholder='請輸入規格'
-                                    value={keyword4}
-                                    style={{ padding: '4px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
-                                    onChange={(e) => setKeyword4(e.target.value)}
-                                /> */}
-                            </div>
-                            <div>
-                                {/* <button style={{ display: `${keyword2 != '' || keyword3 != '' || keyword4 != '' ? '' : 'none'}` }} onClick={() => { handleClear() }} title='清除條件'>
-                                    <img src={icon_clear.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button> */}
-                            </div>
-                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                {/* <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p> */}
-                            </div>
-                            <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                                {/* <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數：<span style={{ color: 'gray' }}>{searchdata.length}</span></p> */}
-                            </div>
-                        </div>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料筆數"
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    type: "number",
+                                    value: filteredData.length,
+                                },
+                            }}
+                        />
+                        {/* <InputSel
+                            {...inputSelProps}
+                            caption="物料數量"
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    type: "number",
+                                    value: searchdata.length,
+                                },
+                            }}
+                        /> */}
                         <Thead01 type={'ProductList'} />
                     </div>
                     <div className={scss.body_content1} style={{ height: '300px', border: '1px solid #c1c1c1' }}>
                         <span>
-                            {filteredData && (
-                                filteredData.slice(0, 100).map((_item: any, index: number) => (
+                            {currentItems && currentItems.map((_item: any, index: number) => {
+                                return (
                                     <CellWithBar key={index} className={scss.panelHeader21}>
                                         <div
                                             key={index}
@@ -813,9 +820,22 @@ export default function BomList() {
                                             <span></span>
                                         </div>
                                     </CellWithBar>
-                                ))
-                            )}
+                                );
+                            })
+                            }
                         </span>
+                    </div>
+                    <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                        {/* 分頁控制 */}
+                        <Pagination
+                            current={currentPage} // 當前頁碼
+                            total={filteredData.length} // 總數據量
+                            pageSize={itemsPerPage} // 每頁顯示的數量
+                            onChange={handlePageChange} // 處理頁面切換
+                            showSizeChanger // 顯示頁數選擇器
+                            pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                            onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                        />
                     </div>
                     <div className={scss.body_foot1}>
                         <div>
@@ -841,91 +861,172 @@ export default function BomList() {
                         <div></div>
                         <div></div>
                     </div>
-                    <div className={scss.foot_head1}>
+                    {/* <div className={scss.foot_head1}>
                         <div>
                             <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>品項</span>
                         </div>
                         <div></div>
                         <div></div>
                         <div></div>
+                    </div> */}
+                    <div
+                        style={{ paddingBottom: '18px' }}
+                    >
+                        <span
+                            style={{
+                                height: '50px',
+                                backgroundColor: '#f5f5f5',
+                                display: 'flex',
+                                justifyContent: 'center', // 水平置中
+                                alignItems: 'center',     // 垂直置中
+                                fontSize: '18px'
+                            }}
+                        >
+                            品項
+                        </span>
                     </div>
-                    <div className={scss.foot_head1}>
+                    <div className={scss.foot_head1} >
                         <div>
                             {/* {parent_product} */}
+                            <label
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                    display: 'block',
+                                    color: "#14256a"
+                                }}
+                            >
+                                料號
+                            </label>
                             <InputSel
                                 {...inputSelProps}
-                                caption="料號"
+
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: productid
+                                        value: productid || ' '
                                     },
                                 }}
                             />
                         </div>
                         <div>
+                            <label
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                    display: 'block',
+                                    color: "#14256a"
+                                }}
+                            >
+                                名稱
+                            </label>
                             <InputSel
                                 {...inputSelProps}
-                                caption="名稱"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: productname
+                                        value: productname || ' '
                                     },
                                 }}
                             />
                         </div>
                         <div>
+                            <label
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                    display: 'block',
+                                    color: "#14256a"
+                                }}
+                            >
+                                規格
+                            </label>
                             <InputSel
                                 {...inputSelProps}
-                                caption="規格"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: productspec
+                                        value: productspec || ' '
                                     },
                                 }}
                             />
                         </div>
                         <div>
+                            <label
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                    display: 'block',
+                                    color: "#14256a"
+                                }}
+                            >
+                                材質
+                            </label>
                             <InputSel
                                 {...inputSelProps}
-                                caption="材質"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: productmaterial
+                                        value: productmaterial || ' '
                                     },
                                 }}
                             />
                         </div>
                         <div>
+                            <label
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    marginRight: "10px",
+                                    display: 'block',
+                                    color: "#14256a"
+                                }}
+                            >
+                                表面
+                            </label>
                             <InputSel
                                 {...inputSelProps}
-                                caption="表面"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: productsurface
+                                        value: productsurface || ' '
                                     },
                                 }}
                             />
                         </div>
                     </div>
-                    <div className={scss.foot_head1}>
-                        <div>
-                            <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>組件</span>
-                        </div>
-                        <div>
-                            {/* {(edithandkey).toString()} */}
-                        </div>
-                        <div></div>
-                        <div></div>
-                        <div style={{ padding: '4px 5px', textAlign: 'right' }}>
-                            <p style={{ color: '#14256a', fontSize: '16px' }}>組件總數：<span style={{ color: 'gray' }}>{bomdata.length}</span></p>
-                        </div>
+                    <div
+                        style={{ paddingBottom: '18px' }}
+                    >
+                        <span
+                            style={{
+                                height: '50px',
+                                backgroundColor: '#f5f5f5',
+                                display: 'flex',
+                                justifyContent: 'center', // 水平置中
+                                alignItems: 'center',     // 垂直置中
+                                fontSize: '18px'
+                            }}
+                        >
+                            組件
+                        </span>
                     </div>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="組件數量"
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    type: "number",
+                                    value: bomdata.length,
+                                },
+                            }}
+                        />
                     </div>
                     <div>
                         <div className={scss.body_content1} style={{ border: '1px solid #c1c1c1', overflowX: 'auto' }}>
