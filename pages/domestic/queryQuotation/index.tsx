@@ -346,7 +346,7 @@ export default function Budget() {
     const prodMaterial = prodMaterialOption.value;
     const doorModel = doorModelOption.value;
 
-    router.push({
+    router.replace({
       query: clearEmptyProperty({
         ...query,
         contactPerson,
@@ -426,7 +426,7 @@ const usePopFormListCreator = () => {
         onConfirm: (list) => {
           const { projectNumber } = list;
 
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, projectNumber: projectNumber }),
           });
         },
@@ -453,7 +453,7 @@ const usePopFormListCreator = () => {
             isLost: isLost === 'undefined' ? undefined : isLost,
             reviewStatus: reviewStatus === 'undefined' ? undefined : reviewStatus,
           });
-          router.push({
+          router.replace({
             query: theQuery,
           });
         },
@@ -510,7 +510,7 @@ const usePopFormListCreator = () => {
       quoteDate: {
         onConfirm: (list) => {
           const { dateStart, dateEnd, order } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({
               ...query,
               dateStart: dateStart,
@@ -559,7 +559,7 @@ const usePopFormListCreator = () => {
       county: {
         onConfirm: (list) => {
           const { county } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, county: county }),
           });
         },
@@ -580,7 +580,7 @@ const usePopFormListCreator = () => {
       projectName: {
         onConfirm: (list) => {
           const { projectName } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, projectName: projectName }),
           });
         },
@@ -599,7 +599,7 @@ const usePopFormListCreator = () => {
       customerName: {
         onConfirm: (list) => {
           const { customerName } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, customerName: customerName }),
           });
         },
