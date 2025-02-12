@@ -695,9 +695,6 @@ export default function AddProdReceiptList() {
         contact: ''
     });
 
-    useEffect(() => {
-        setIsFilterVisible(true);
-    }, [suppliernamein])
 
     // 根據篩選條件更新資料
     useEffect(() => {
@@ -708,6 +705,16 @@ export default function AddProdReceiptList() {
         );
         setFilteredData2(filtered);
     }, [filters]);
+
+    useEffect(() => {
+        setFilteredData2(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
     //#endregion
 
@@ -811,7 +818,7 @@ export default function AddProdReceiptList() {
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
-                    <div className={scss.content}>
+                    <div className={scss.content} style={{ height: `${windowSize.height - 198}px` }}>
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.head_content0}>
@@ -937,7 +944,11 @@ export default function AddProdReceiptList() {
                                             inputProps={{
                                                 props: {
                                                     value: supplieridin,
-                                                    onChange: (e) => { setSupplieridin(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setSupplieridin(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -953,14 +964,9 @@ export default function AddProdReceiptList() {
                                                     // onChange: (e) => { setSuppliernamein(e.target.value) }
                                                     onChange: (e) => {
                                                         const value = e.target.value;
-                                                        setSuppliernamein(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliernamein(value); // 僅更新 suppliernamein
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1084,7 +1090,7 @@ export default function AddProdReceiptList() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin) && filteredData2.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -1117,6 +1123,7 @@ export default function AddProdReceiptList() {
                                                         setSuppliercontactin(_item.contact || '');
                                                         setSupplieruuidin(_item.id || '');
                                                         setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                        setIsFilterVisible(false);
                                                     }}
                                                     style={{
                                                         padding: '10px',

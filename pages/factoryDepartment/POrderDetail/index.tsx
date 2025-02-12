@@ -1260,7 +1260,7 @@ export default function POrderDetail() {
         setOriginalsupplierfax(supplierfaxin);
         setOriginalsuppliercontact(suppliercontactin);
         setOriginalsupplierid(supplieridin);
-        setIsFilterVisible(true);  // 隱藏篩選區域
+        // setIsFilterVisible(true);  // 隱藏篩選區域
         setIsEditing(true) // 進入編輯模式
 
     };
@@ -1570,7 +1570,8 @@ export default function POrderDetail() {
     const [filters, setFilters] = useState({
         county: '',
         name: '',
-        contact: ''
+        contact: '',
+        customer_number: ''
     });
 
     // 根據篩選條件更新資料
@@ -1582,6 +1583,16 @@ export default function POrderDetail() {
         );
         setFilteredData2(filtered);
     }, [filters]);
+
+    useEffect(() => {
+        setFilteredData2(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
     //#endregion
 
@@ -2093,6 +2104,7 @@ export default function POrderDetail() {
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
+
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商編號"
@@ -2102,10 +2114,15 @@ export default function POrderDetail() {
                                             inputProps={{
                                                 props: {
                                                     value: supplieridin,
-                                                    onChange: (e) => { setSupplieridin(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setSupplieridin(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
+
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商名稱"
@@ -2115,17 +2132,11 @@ export default function POrderDetail() {
                                             inputProps={{
                                                 props: {
                                                     value: suppliernamein,
-                                                    // onChange: (e) => { setSuppliernamein(e.target.value) }
                                                     onChange: (e) => {
                                                         const value = e.target.value;
-                                                        setSuppliernamein(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliernamein(value); // 僅更新 suppliernamein
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -2250,7 +2261,7 @@ export default function POrderDetail() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin) && filteredData2.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -2283,6 +2294,7 @@ export default function POrderDetail() {
                                                         setSuppliercontactin(_item.contact || '');
                                                         setSupplieruuidin(_item.id || '');
                                                         setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                        setIsFilterVisible(false);
                                                     }}
                                                     style={{
                                                         padding: '10px',
