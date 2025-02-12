@@ -51,6 +51,7 @@ type Tquery = {
   dateStart?: string | undefined;
   dateEnd?: string | undefined;
   projectName?: string | undefined;
+  contractNumber?: string | undefined;
   quotationNumber?: string | undefined;
   //
   order?: 'ASC' | 'DESC' | undefined;
@@ -84,6 +85,7 @@ export default function Budget() {
     dateEnd,
     projectName,
     quotationNumber,
+    contractNumber,
     order,
     isLost: isLost_str,
     agentName,
@@ -133,7 +135,11 @@ export default function Budget() {
       // 工程名稱
       'latestContent.projectName': { $contains: projectName },
       // 報價編號
-      'latestContent.quotationNumber': { $contains: quotationNumber },
+      $or: {
+        'latestContent.quotationNumber': { $contains: quotationNumber },
+        'latestContent.contract.contractNumber': { $contains: contractNumber },
+      },
+
       // 失件
       'latestContent.isLost': { $eq: isLost },
 
@@ -211,7 +217,7 @@ export default function Budget() {
         const latestCustomer = sortedContent[0].customer;
 
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
-          quotationNumber: latestContent.quotationNumber,
+          quotationNumber: latestContent.contract?.contractNumber ?? latestContent.quotationNumber,
           status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
           quoteDate: moment(convertDate_reduce1911(latestContent.quotationDate)).format('yy-MM-DD'),
           county: latestContent.county,
@@ -410,6 +416,7 @@ const usePopFormListCreator = () => {
     dateStart,
     dateEnd,
     quotationNumber,
+    contractNumber,
     order,
     isLost,
     reviewStatus,
@@ -424,10 +431,10 @@ const usePopFormListCreator = () => {
     const popFormList: Thead_popFormList = {
       quotationNumber: {
         onConfirm: (list) => {
-          const { quotationNumber } = list;
+          const { quotationNumber, contractNumber } = list;
 
           router.replace({
-            query: clearEmptyProperty({ ...query, quotationNumber }),
+            query: clearEmptyProperty({ ...query, quotationNumber, contractNumber }),
           });
         },
         inputSelArr: [
@@ -437,6 +444,19 @@ const usePopFormListCreator = () => {
             inputProps: {
               props: {
                 defaultValue: quotationNumber,
+              },
+            },
+          },
+          {
+            showBaseline: 'invisible',
+            node: <div className="text-center">OR</div>,
+          },
+          {
+            caption: '合約編號',
+            name: 'contractNumber',
+            inputProps: {
+              props: {
+                defaultValue: contractNumber,
               },
             },
           },
