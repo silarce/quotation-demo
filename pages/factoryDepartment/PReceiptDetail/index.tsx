@@ -1237,7 +1237,7 @@ export default function PReceiptDetail() {
         setOriginalsupplierfax(supplierfaxin);
         setOriginalsuppliercontact(suppliercontactin);
         setOriginalsupplierid(supplieridin);
-        setIsFilterVisible(true);  // 隱藏篩選區域
+        // setIsFilterVisible(true);  // 隱藏篩選區域
         setIsEditing(true) // 進入編輯模式
     };
 
@@ -1558,6 +1558,16 @@ export default function PReceiptDetail() {
         );
         setFilteredData2(filtered);
     }, [filters]);
+
+    useEffect(() => {
+        setFilteredData2(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
     //#endregion
 
@@ -2068,7 +2078,12 @@ export default function PReceiptDetail() {
                                             inputProps={{
                                                 props: {
                                                     value: supplieridin,
-                                                    onChange: (e) => { setSupplieridin(e.target.value) }
+                                                    // onChange: (e) => { setSupplieridin(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setSupplieridin(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -2084,14 +2099,9 @@ export default function PReceiptDetail() {
                                                     // onChange: (e) => { setSuppliernamein(e.target.value) }
                                                     onChange: (e) => {
                                                         const value = e.target.value;
-                                                        setSuppliernamein(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliernamein(value); // 僅更新 suppliernamein
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -2229,7 +2239,7 @@ export default function PReceiptDetail() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin) && filteredData2.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -2262,6 +2272,7 @@ export default function PReceiptDetail() {
                                                         setSuppliercontactin(_item.contact || '');
                                                         setSupplieruuidin(_item.id || '');
                                                         setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                        setIsFilterVisible(false);
                                                     }}
                                                     style={{
                                                         padding: '10px',
