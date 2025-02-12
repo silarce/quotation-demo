@@ -51,7 +51,7 @@ type Tquery = {
   dateStart?: string | undefined;
   dateEnd?: string | undefined;
   projectName?: string | undefined;
-  projectNumber?: string | undefined;
+  quotationNumber?: string | undefined;
   //
   order?: 'ASC' | 'DESC' | undefined;
   isLost?: 'true' | 'false' | undefined;
@@ -83,7 +83,7 @@ export default function Budget() {
     dateStart,
     dateEnd,
     projectName,
-    projectNumber,
+    quotationNumber,
     order,
     isLost: isLost_str,
     agentName,
@@ -133,7 +133,7 @@ export default function Budget() {
       // 工程名稱
       'latestContent.projectName': { $contains: projectName },
       // 報價編號
-      'latestContent.quotationNumber': { $contains: projectNumber },
+      'latestContent.quotationNumber': { $contains: quotationNumber },
       // 失件
       'latestContent.isLost': { $eq: isLost },
 
@@ -409,7 +409,7 @@ const usePopFormListCreator = () => {
     projectName,
     dateStart,
     dateEnd,
-    projectNumber,
+    quotationNumber,
     order,
     isLost,
     reviewStatus,
@@ -424,19 +424,19 @@ const usePopFormListCreator = () => {
     const popFormList: Thead_popFormList = {
       quotationNumber: {
         onConfirm: (list) => {
-          const { projectNumber } = list;
+          const { quotationNumber } = list;
 
           router.replace({
-            query: clearEmptyProperty({ ...query, projectNumber: projectNumber }),
+            query: clearEmptyProperty({ ...query, quotationNumber }),
           });
         },
         inputSelArr: [
           {
             caption: '報價編號',
-            name: 'projectNumber',
+            name: 'quotationNumber',
             inputProps: {
               props: {
-                defaultValue: projectNumber,
+                defaultValue: quotationNumber,
               },
             },
           },
