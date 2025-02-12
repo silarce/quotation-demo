@@ -927,14 +927,14 @@ export default function AddPurchaseOrderList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             // disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplieridin,
+                                                    onChange: (e) => { setSupplieridin(e.target.value) }
                                                 },
                                             }}
                                         />

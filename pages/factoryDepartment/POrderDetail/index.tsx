@@ -152,6 +152,7 @@ export default function POrderDetail() {
     const [originaldata2, setOriginaldata2] = useState<any[]>([]);
     const [originalsupplierfax, setOriginalsupplierfax] = useState<string>("");
     const [originalsuppliercontact, setOriginalsuppliercontact] = useState<string>("");
+    const [originalsupplierid, setOriginalsupplierid] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -279,6 +280,7 @@ export default function POrderDetail() {
         setInvoicein(parsedItem?.invoice);
         setSupplierfaxin(parsedItem?.supplierfax);
         setSuppliercontactin(parsedItem?.suppliercontact);
+        setSupplieridin(parsedItem?.supplierid);
 
     }, [item]);
     //#endregion
@@ -1257,6 +1259,7 @@ export default function POrderDetail() {
         setOriginalshippingaddress(shippingaddressin);
         setOriginalsupplierfax(supplierfaxin);
         setOriginalsuppliercontact(suppliercontactin);
+        setOriginalsupplierid(supplieridin);
         setIsFilterVisible(true);  // 隱藏篩選區域
         setIsEditing(true) // 進入編輯模式
 
@@ -1275,6 +1278,7 @@ export default function POrderDetail() {
         setShippingaddressin(originalshippingaddress);
         setSupplierfaxin(originalsupplierfax);
         setSuppliercontactin(originalsuppliercontact);
+        setSupplieridin(originalsupplierid);
 
         setIsEditing(false);  // 結束編輯模式
 
@@ -2091,14 +2095,14 @@ export default function POrderDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplieridin,
+                                                    onChange: (e) => { setSupplieridin(e.target.value) }
                                                 },
                                             }}
                                         />
