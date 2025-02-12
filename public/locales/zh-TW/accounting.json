@@ -31,14 +31,14 @@
     "applicant_department": "申請單位",
     "ticket_method": "開票方式",
     "tax_deduction_category": "扣稅類別",
-    "journal_method": "立帳方式",
+    "acct_method": "立帳方式",
     "invoice_number": "發票號碼",
     "invoice_price": "發票金額",
     "note": "摘要說明",
     "item": "貨品名稱",
-    "prodreceipt_number": "來源單號",
+    "prodreceipt_number": "進貨單號",
     "transaction_date": "交易日期",
-    "quantity": "本次數量",
+    "quantity": "數量",
     "unit": "單位",
     "unit_price": "單價",
     "amount": "應開金額",
@@ -48,7 +48,9 @@
     "selectDetail": "選擇明細資料",
     "selectInvoice": "選擇發票",
     "clearInvoiceWarning": "清除發票將一併清除明細資料",
-    "unclosedInvoices": "未結案發票"
+    "unclosedInvoices": "未結案發票",
+    "supplier_name": "供應商",
+    "editInvoiceWarning": "編輯發票號碼將會清除所有明細資料"
   },
   "prodreceipt": {
     "prodreceiptid": "進貨單號",
