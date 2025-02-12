@@ -8,9 +8,8 @@ class ClassState implements Interface_classState {
   private readonly state;
   private readonly setState;
   readonly detailArr: Interface_classState_detail[] = [];
-  //
+
   constructor(
-    //
     state: Tstate,
     setState: React.Dispatch<React.SetStateAction<Tstate>>,
     ClassDetail: new (
@@ -72,13 +71,13 @@ class ClassState implements Interface_classState {
       tax_deduction_category: category,
     }));
   }
-  get journal_method() {
-    return this.state.journal_method;
+  get acct_method() {
+    return this.state.acct_method;
   }
-  set journal_method(method: string) {
+  set acct_method(method: string) {
     this.setState((state) => ({
       ...state,
-      journal_method: method,
+      acct_method: method,
     }));
   }
   get invoice_number() {
@@ -103,6 +102,10 @@ class ClassState implements Interface_classState {
     }));
   }
 
+  get supplier_name() {
+    return this.state.supplier_name;
+  }
+
   get detailAmountTotal() {
     let total = new Decimal(0);
     this.detailArr.forEach(({ amount }) => {
@@ -119,35 +122,38 @@ class ClassState implements Interface_classState {
       applicant_department,
       ticket_method,
       tax_deduction_category,
-      journal_method,
+      acct_method,
       invoice_number,
       invoice_price,
       note,
     } = this.state;
 
-    const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
-      purchase_collect_ticket_uuid: id,
-      applicant_department: applicant_department,
-      agent_employee_id: agent_employee?.id || '',
-      ticket_method: ticket_method,
-      tax_deduction_category: tax_deduction_category,
-      journal_method: journal_method,
-      invoice_number: invoice_number,
-      invoice_price: Number(invoice_price),
-      note: note,
-      data: this.detailArr.map((classDetail) => classDetail.reqBody),
-    };
+    // const body: TcreatePurchaseCollectTicket_Dto | TupdatePurchaseCollectTicket_Dto = {
+    //   purchase_collect_ticket_uuid: id,
+    //   applicant_department: applicant_department,
+    //   agent_employee_id: agent_employee?.id || '',
+    //   ticket_method: ticket_method,
+    //   tax_deduction_category: tax_deduction_category,
+    //   acct_method,
+    //   invoice_number: invoice_number,
+    //   invoice_price: Number(invoice_price),
+    //   note: note,
+    //   data: this.detailArr.map((classDetail) => classDetail.reqBody),
+    // };
 
     const body_create: TcreatePurchaseCollectTicket_Dto = {
       applicant_department: applicant_department,
       agent_employee_id: agent_employee?.id || '',
       ticket_method: ticket_method,
       tax_deduction_category: tax_deduction_category,
-      journal_method: journal_method,
+      acct_method: acct_method,
       invoice_number: invoice_number,
       invoice_price: Number(invoice_price),
       note: note,
       data: this.detailArr.map((classDetail) => classDetail.reqBody),
+
+      supplier_name: this.state.supplier_name,
+      supplier_uuid: this.state.supplier_uuid,
     };
 
     const body_update: TupdatePurchaseCollectTicket_Dto | null = id
@@ -157,11 +163,14 @@ class ClassState implements Interface_classState {
           agent_employee_id: agent_employee?.id || '',
           ticket_method: ticket_method,
           tax_deduction_category: tax_deduction_category,
-          journal_method: journal_method,
+          acct_method: acct_method,
           invoice_number: invoice_number,
           invoice_price: Number(invoice_price),
           note: note,
           data: this.detailArr.map((classDetail) => classDetail.reqBody),
+
+          supplier_name: this.state.supplier_name,
+          supplier_uuid: this.state.supplier_uuid,
         }
       : null;
 
@@ -176,6 +185,31 @@ class ClassState implements Interface_classState {
   }
 
   // ------------------------------------------------------------
+
+  editCustomer({
+    supplierSource,
+    supplier_name,
+    supplier_uuid,
+    tax_deduction_category,
+    acct_method,
+  }: Parameters<Interface_classState['editCustomer']>[0]) {
+    this.setState((state) => {
+      const copy = { ...state };
+
+      if (supplierSource === 'prodreceipt') {
+        copy.supplier_name = supplier_name;
+        copy.supplier_uuid = supplier_uuid;
+      } else if (supplierSource === 'customer') {
+        copy.supplier_name = supplier_name;
+        copy.supplier_uuid = supplier_uuid;
+        copy.tax_deduction_category = tax_deduction_category;
+        copy.acct_method = acct_method;
+      }
+
+      return copy;
+    });
+  }
+
   chagneAgent(agent: TemployeeDto) {
     this.setState((state) => ({
       ...state,

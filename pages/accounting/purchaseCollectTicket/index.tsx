@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
@@ -8,13 +8,15 @@ import moment from 'moment';
 import { Spin } from 'antd';
 
 // components
+import { Profile } from 'components/page/accounting/purchaseCollectTicket/profile';
 import { Detail, Detail_thead, Detail_tfoot } from 'components/page/accounting/purchaseCollectTicket/detail';
 import {
   SearchModal_prodreceipt,
   Tconfig_filter,
 } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceipt';
 import { SearchModal_purchaseCollectTicket } from 'components/composition/searchModal/useSearchModal/useSearchModal_purchaseCollectTicket';
-import { Profile } from 'components/page/accounting/purchaseCollectTicket/profile';
+import { SearchModal_prodreceiptDetail } from 'components/composition/searchModal/useSearchModal/useSearchModal_prodreceiptDetail';
+
 // class
 import { ClassState } from 'components/page/accounting/purchaseCollectTicket/class/ClassState';
 import { ClassState_detail } from 'components/page/accounting/purchaseCollectTicket/class/ClassState_detail';
@@ -58,6 +60,7 @@ const Detail_memo = memo(Detail, (prevProps, nextProps) => {
   if (
     prevProps.classState.updateCount !== nextProps.classState.updateCount ||
     prevProps.classState.identifyId !== nextProps.classState.identifyId ||
+    prevProps.disabled !== nextProps.disabled ||
     prevProps.indexNumber !== nextProps.indexNumber
   ) {
     return false;
@@ -80,6 +83,20 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   const [disabled, setDisabled] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
+  // ------------------------------------------------------------
+
+  const ref_selectTicketUnmount = useRef<() => void>();
+  const ref_selectInvoiceUnmount = useRef<() => void>();
+  const ref_selectDetailUnmount = useRef<() => void>();
+
+  useEffect(() => {
+    return () => {
+      ref_selectTicketUnmount.current && ref_selectTicketUnmount.current();
+      ref_selectInvoiceUnmount.current && ref_selectInvoiceUnmount.current();
+      ref_selectDetailUnmount.current && ref_selectDetailUnmount.current();
+    };
+  }, []);
+
   // ------------------------------------------------------------
 
   const {
@@ -169,9 +186,14 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
 
   // MARK:handleSelectTicket
   const handleSelectTicket = () => {
-    DragableModal.create({
+    if (ref_selectTicketUnmount.current) {
+      return;
+    }
+
+    const { unmount } = DragableModal.create({
       // 進貨收票單
       handleText: t('purchaseCollectTicket'),
+      onCrossClick: () => (ref_selectTicketUnmount.current = undefined),
       children: (
         <SearchModal_purchaseCollectTicket
           limit={1}
@@ -182,17 +204,28 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
                 purchaseCollectTicketId: purchaseCollectTicket.id,
               },
             });
+            unmount();
+            ref_selectTicketUnmount.current = undefined;
           }}
         />
       ),
     });
+
+    ref_selectTicketUnmount.current = unmount;
   };
 
   // MARK:handleSelectInvoice
   const handleSelectInvoice = () => {
+    if (ref_selectInvoiceUnmount.current) {
+      return;
+    }
+
     const { unmount } = DragableModal.create({
       // handleText: '未結案發票',
       handleText: t('unclosedInvoices'),
+      onCrossClick: () => {
+        ref_selectInvoiceUnmount.current = undefined;
+      },
       children: (
         <SearchModal_prodreceipt
           limit={1}
@@ -200,6 +233,8 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             State.changeInvoice({
               invoiceNumber: prodreceipt.invoice,
             });
+            State.clearDetail();
+            ref_selectInvoiceUnmount.current = undefined;
             unmount();
           }}
           checkForbbiden={({ dto }) => {
@@ -207,49 +242,69 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return true;
             }
 
-            if (State.invoice_number && State.invoice_number !== dto.invoice) {
-              return true;
-            }
+            // if (State.invoice_number && State.invoice_number !== dto.invoice) {
+            //   return true;
+            // }
           }}
           options={{
             customKeyArr: ['indexNumber', 'invoice'],
             coverFilter: customerFilter,
             uniqInvoice: true,
+            removeNoInvoiceData: true,
           }}
         />
       ),
+    });
+    ref_selectInvoiceUnmount.current = unmount;
+  };
+
+  const handleInputInvoice = () => {
+    const { destroy } = myAlert.input({
+      title: '發票號碼',
+      onConfirm: (value) => {
+        State.invoice_number = value;
+        State.clearDetail();
+        destroy();
+      },
     });
   };
 
   // MARK:handleClearInvoice
   const handleClearInvoice = () => {
-    myAlert.confirm({
-      title: t('clearInvoiceWarning'),
-      props: {
-        onOk: () => {
-          State.invoice_number = '';
-          State.clearDetail();
-        },
-      },
-    });
+    State.invoice_number = '';
+    State.clearDetail();
+    // myAlert.confirm({
+    //   title: t('clearInvoiceWarning'),
+    //   props: {
+    //     onOk: () => {
+    //       State.invoice_number = '';
+    //       State.clearDetail();
+    //     },
+    //   },
+    // });
   };
 
   // MARK: handleSelectDetail
   const handleSelectDetail = () => {
+    if (ref_selectDetailUnmount.current) {
+      return;
+    }
+
     const { unmount } = DragableModal.create({
+      onCrossClick: () => (ref_selectDetailUnmount.current = undefined),
       // 選擇明細資料
       handleText: t('selectDetail'),
       children: (
-        <SearchModal_prodreceipt
+        <SearchModal_prodreceiptDetail
           options={{
             coverFilter: customerFilter_forDetail,
           }}
           checkForbbiden={({ dto, dtoDirc }) => {
-            if (
-              //
-              !dto.invoice ||
-              (State.invoice_number && State.invoice_number !== dto.invoice)
-            ) {
+            if (!dto.invoice) {
+              return false;
+            }
+
+            if (State.invoice_number && State.invoice_number !== dto.invoice) {
               return true;
             }
 
@@ -259,36 +314,51 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
               return false;
             }
 
-            if (!invoiceNumberArr.includes(dto.invoice)) {
+            // 預期只會有一個item是有值的
+            const validInvoiceNumber = invoiceNumberArr.find((item) => !!item);
+
+            if (validInvoiceNumber && dto.invoice && validInvoiceNumber !== dto.invoice) {
               return true;
             }
           }}
           onConfirm={(dict) => {
             let invoiceNumber = '';
-            const arr = Object.values(dict).map((prodreceipt) => {
-              const { id, prodreceiptid, note, invoice } = prodreceipt;
-              invoiceNumber = invoice; // 沒差錯的話所有prodreceipt.invoice都一樣
 
-              if (invoiceNumber && invoiceNumber !== invoice) {
-                console.log('invoice number is not the same', dict);
+            const arr = Object.values(dict).map((prodreceiptDetail) => {
+              const { invoice } = prodreceiptDetail;
 
-                throw new Error('invoice number is not the same');
+              // 預期所有prodreceipt.invoice都一樣或是空字串
+              if (invoiceNumber && invoice && invoiceNumber !== invoice) {
+                console.error('invoice number is not the same', dict);
+
+                throw new Error('進貨單的發票號碼不一致');
+              }
+
+              if (!invoiceNumber) {
+                invoiceNumber = invoice;
+              }
+
+              if (!prodreceiptDetail.prodreceiptuuid) {
+                console.error('prodreceiptuuid is not exist', prodreceiptDetail);
+                console.error('prodreceiptuuid is not exist', dict);
+
+                throw new Error('進貨單的uuid不存在');
               }
 
               const state_detail: Tstate_detail = {
                 updateCount: 0,
                 id: undefined,
                 identifyId: nanoid(),
-                item: '',
-                prodreceipt_uuid: id,
-                prodreceipt_number: prodreceiptid,
+                item: prodreceiptDetail.name ?? '',
+                prodreceipt_uuid: prodreceiptDetail.prodreceiptuuid,
+                prodreceipt_number: prodreceiptDetail.prodreceiptid ?? '',
                 transaction_date: null,
-                quantity: '',
-                unit: '',
-                unit_price: '',
-                amount: '',
-                note,
-                goods_spec: '',
+                quantity: `${prodreceiptDetail.quantity ?? 0}`,
+                unit: prodreceiptDetail.unit ?? '',
+                unit_price: `${prodreceiptDetail.unitprice ?? 0}`,
+                amount: `${prodreceiptDetail.totalprice ?? 0}`,
+                note: prodreceiptDetail.note ?? '',
+                goods_spec: prodreceiptDetail.spec ?? '',
               };
 
               return state_detail;
@@ -297,10 +367,12 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             State.addDetail(arr);
             State.invoice_number = invoiceNumber;
             unmount();
+            ref_selectDetailUnmount.current = undefined;
           }}
         />
       ),
     });
+    ref_selectDetailUnmount.current = unmount;
   };
 
   // MARK: handelConfirm
@@ -311,19 +383,6 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
       reqNewPurchaseCollectTicket();
     }
   };
-
-  // ------------------------------------------------------------
-
-  // if (!isAdmin) {
-  //   return (
-  //     <SubLayer bodyPreStyle="style01">
-  //       <PageHeader02 tag={t('purchaseCollectTicket')} />
-  //       <div>
-  //         <h1 className="text-5xl">施工中</h1>
-  //       </div>
-  //     </SubLayer>
-  //   );
-  // }
 
   // ------------------------------------------------------------
   // MARK: RENDER
@@ -345,9 +404,13 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
             //
             disabled={disabled}
             classState={State}
-            onInovoiceBtnClick={handleSelectInvoice}
+            // onInovoiceBtnClick={handleSelectInvoice}
+            changeInvoice={(invoiceNumber) => {
+              State.changeInvoice({ invoiceNumber });
+            }}
             invoiceBtn={{
               onSelectClick: handleSelectInvoice,
+              onInputClick: handleInputInvoice,
               onClearClick: handleClearInvoice,
               status: State.invoice_number ? 'selected' : 'unselected',
             }}
@@ -355,6 +418,7 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
           <div className="mt-2 ">
             <div>
               <span className="text-xl text-main mr-5">{t('detail')}</span>
+
               {!disabled && (
                 <SquareBtn className={classNames()} label={t('addDetail')} sharp="mini" onClick={handleSelectDetail} />
               )}
@@ -488,12 +552,16 @@ const useDefaultState = (
         serial_number: rawData.serial_number,
         applicant_department: rawData.applicant_department || '',
         ticket_method: rawData.ticket_method || '',
-        tax_deduction_category: rawData.tax_deduction_category || '',
-        journal_method: rawData.journal_method || '',
         invoice_number: rawData.invoice_number || '',
         invoice_price: String(rawData.invoice_price || '') as Tstate['invoice_price'],
         note: rawData.note || '',
         detailArr: detailArr,
+
+        supplier_name: rawData.supplier_name || '',
+        supplier_uuid: rawData.supplier_uuid,
+
+        tax_deduction_category: rawData.tax_deduction_category || '',
+        acct_method: rawData.acct_method || '',
       };
 
       return state;
@@ -510,12 +578,16 @@ const emptyState = (agent_employee: TemployeeDto | undefined): Tstate => ({
   serial_number: undefined,
   applicant_department: '',
   ticket_method: '',
-  tax_deduction_category: '',
-  journal_method: '',
   invoice_number: '',
   invoice_price: '',
   note: '',
   detailArr: [],
+
+  supplier_name: '',
+  supplier_uuid: null,
+
+  tax_deduction_category: '',
+  acct_method: '',
 });
 
 // =============================================================================
@@ -552,7 +624,8 @@ const useCustomerFilter_forDetail = (State: Interface_classState) => {
         key: 'invoice',
         type: 'input',
         defaultValue: State.invoice_number,
-        disabled: !!State.invoice_number,
+        // disabled: !!State.invoice_number,
+        freeze: !!State.invoice_number,
         placeholder: '',
       },
     ];

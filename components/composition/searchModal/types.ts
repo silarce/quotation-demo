@@ -24,6 +24,7 @@ type Tconfig_filter = {
   defaultValue?: string;
   disabled?: boolean;
   placeholder?: string;
+  freeze?: boolean;
 }[];
 
 type Tdto = {
