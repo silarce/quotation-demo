@@ -613,7 +613,7 @@ export default function AddPurchaseRequisitionList() {
                     ]} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
-                    <div className={scss.content}>
+                    <div className={scss.content} style={{ height: `${windowSize.height - 198}px` }}>
                         <div className={scss.head_body}>
                             <div>
                                 <div className={scss.head_content1}>
