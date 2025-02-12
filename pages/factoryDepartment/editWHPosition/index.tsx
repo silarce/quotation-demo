@@ -1513,7 +1513,7 @@ export default function EditWHPosition() {
                 </div>
             </div >
 
-            <div className={scss.main}>
+            <div className={scss.main} style={{ display: 'none' }}>
 
                 <div className={scss.left}>
 
