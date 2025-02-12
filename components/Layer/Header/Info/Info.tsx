@@ -6,6 +6,7 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 
 // img
 import iconMember from 'public/image/icon/member.svg';
+import iconGear from 'public/image/icon/gear.svg';
 
 // icon
 import logout from 'public/image/icon/logout.svg';
@@ -54,40 +55,49 @@ export default function Info() {
 
   return (
     <div className={scss.container}>
-      <Image src={iconMember} alt="頭像" className={scss.avatar} priority={true} />
+      <div className={scss.left}>
+        {/* <Image src={iconMember} alt="頭像" className={scss.avatar} priority={true} /> */}
 
-      <div className={scss.name}>
-        <p>{departmentName}</p>
-        <p>{userName}</p>
-      </div>
-      <div className={scss.language}>
-        <Dropdown
-          className={scss.dropdown}
-          props_menu={{
-            itemArr: [
-              //
-              <span key="01" onClick={() => changeLanguage('zh-TW')}>
-                繁體中文
-              </span>,
-              <span key="02" onClick={() => changeLanguage('en')}>
-                English
-              </span>,
-            ],
-          }}
-        >
-          <span>{t('languageName')}</span>
-        </Dropdown>
-      </div>
-
-      <div className={scss.changePw} onClick={openPwModal}>
-        <span>變更密碼</span>
+        <div className={scss.name}>
+          <p>{departmentName}</p>
+          <p>{userName}</p>
+        </div>
       </div>
 
       <div className={scss.line} />
 
-      <div className={scss.logout} onClick={reqLogout}>
-        <Image src={logout} alt="登出" />
-        <span>登出</span>
+      <div className={scss.right}>
+        <div className={scss.language}>
+          <Dropdown
+            className={scss.dropdown}
+            props_menu={{
+              itemArr: [
+                //
+                <span key="01" onClick={() => changeLanguage('zh-TW')}>
+                  繁體中文
+                </span>,
+                <span key="02" onClick={() => changeLanguage('en')}>
+                  English
+                </span>,
+              ],
+            }}
+          >
+            <span>{t('languageName')}</span>
+          </Dropdown>
+        </div>
+
+        <div className={scss.changePw} onClick={openPwModal}>
+          <span>變更密碼</span>
+        </div>
+
+        <div className={scss.logout} onClick={reqLogout}>
+          <Image src={logout} alt="登出" />
+          <span>登出</span>
+        </div>
+
+        <Dropdown className={scss.gear} props_menu={{}}>
+          <Image className="h-5 w-5" src={iconGear} alt="設定" priority={true} />
+        </Dropdown>
       </div>
 
       <ChangePwPanel visible={showPwModal} onCancel={onCancel} />
