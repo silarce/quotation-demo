@@ -155,6 +155,7 @@ export default function PReceiptDetail() {
     const [originaldata2, setOriginaldata2] = useState<any[]>([]);
     const [originalsupplierfax, setOriginalsupplierfax] = useState<string>("");
     const [originalsuppliercontact, setOriginalsuppliercontact] = useState<string>("");
+    const [originalsupplierid, setOriginalsupplierid] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -271,6 +272,7 @@ export default function PReceiptDetail() {
         setBatchidin(parsedItem?.batchid);
         setSupplierfaxin(parsedItem?.supplierfax);
         setSuppliercontactin(parsedItem?.suppliercontact);
+        setSupplieridin(parsedItem?.supplierid);
 
     }, [item]);
     //#endregion
@@ -1234,6 +1236,7 @@ export default function PReceiptDetail() {
         setOriginalshippingaddress(shippingaddressin);
         setOriginalsupplierfax(supplierfaxin);
         setOriginalsuppliercontact(suppliercontactin);
+        setOriginalsupplierid(supplieridin);
         setIsFilterVisible(true);  // 隱藏篩選區域
         setIsEditing(true) // 進入編輯模式
     };
@@ -1251,6 +1254,8 @@ export default function PReceiptDetail() {
         setShippingaddressin(originalshippingaddress);
         setSupplierfaxin(originalsupplierfax);
         setSuppliercontactin(originalsuppliercontact);
+        setSupplieridin(originalsupplierid);
+
         setIsEditing(false);  // 結束編輯模式
 
         setIsTrans(false);  //結束進貨模式
@@ -2056,14 +2061,14 @@ export default function PReceiptDetail() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplieridin,
+                                                    onChange: (e) => { setSupplieridin(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -2100,6 +2105,19 @@ export default function PReceiptDetail() {
                                                 props: {
                                                     value: supplieraddressin,
                                                     onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                                },
+                                            }}
+                                        />
+                                        <InputSel
+                                            {...inputSelProps}
+                                            caption="收貨地址"
+                                            captionStyle={{ fontSize: '18px' }}
+                                            wrapperStyle={{ marginBottom: '10px' }}
+                                            disabled={!isEditing}
+                                            inputProps={{
+                                                props: {
+                                                    value: shippingaddressin,
+                                                    onChange: (e) => { setShippingaddressin(e.target.value) }
                                                 },
                                             }}
                                         />
