@@ -25,6 +25,8 @@ import { AppContext } from 'pages/_app';
 
 import { TquotationStatus } from 'js/api/dtoTypes';
 
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
 // ===========================================================
 
 type Tquery = {
@@ -54,6 +56,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   if (userGrade >= 14) {
     userId = undefined;
   }
+
+  const optionalConfig = useGlobal_OptionalConfig();
+  const { isRefactoredQuotaion } = optionalConfig;
 
   // ----------------------------------------------------
   //
@@ -188,7 +193,8 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       label: '新增報價單',
       onClick: () => {
         router.push({
-          pathname: `/domestic/quotationList/quotation`,
+          // pathname: `/domestic/quotationList/quotation`,
+          pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
           query: {
             status,
           },
