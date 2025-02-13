@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
 import moment from 'moment';
 
 // layer
@@ -10,17 +9,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
-import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import { Ttable, Tcell } from 'components/global/gear/table/table01';
 
 // gear
-import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
-import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // icon
-import { IconDetail, IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDetail, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './edit.module.scss';
@@ -28,25 +23,16 @@ import scss from './edit.module.scss';
 // api
 import {
   Tparams,
-  ToutsourcingDto,
   ToutsourcingPaymentDto,
-  useGetOutsourcing,
-  useGetOutsourcingPayment,
   useGetOutsourcingPayment_id,
   useGetOutsourcingPaymentDetail,
   apiPatchOutsourcingPayment,
   TupdateOutsourcingPaymentDto,
-  apiPatchOutsourcingPaymentSubmit,
-  apiPatchOutsourcingPaymentReview,
   apiClearDebt,
 } from 'js/api/api_outsourcing';
 
 // type
-import { TuserDto, TemployeeDto, TdeductionDto, ToutsourcingPaymentDetailDto } from 'js/api/dtoTypes';
-import { TmyBtn } from 'components/global/gear/button/myButton_v2';
-
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { TuserDto, TdeductionDto, ToutsourcingPaymentDetailDto } from 'js/api/dtoTypes';
 
 import { useReviewFlow } from 'components/composition/review/reviewFlow';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
@@ -75,16 +61,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   // -------------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(true);
-  // 審核modal
-  const [showReiveModal, setShowReiveModal] = useState<boolean>(false);
-  // -------------------------------------------------------------------------
-  const [manager, setManager] = useState<TemployeeDto>();
-  const [supervisor, setSupervisor] = useState<TemployeeDto>();
-  const [accounting, setAccounting] = useState<TemployeeDto>();
-  const [checker, setChecker] = useState<TemployeeDto>();
-  const [cashier, setCashier] = useState<TemployeeDto>();
-
-  // -------------------------------------------------------------------------
 
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
   const [targetPaymentId, setTargetPaymentId] = useState<string>();
@@ -124,72 +100,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   const isReviewing = !!reviewFlow;
 
-  const {
-    paymentOri,
-    // reviewStatus_checker,
-    // reviewStatus_accounting,
-    // reviewStatus_cashier,
-    // reviewStatus_supervisor,
-    // reviewStatus_manager,
-    // isReviewer,
-    // isReviewing,
-    // isReviewDone,
-  } = useMemo(() => {
-    const payment = data_payment;
-
-    const {
-      checkerReviewedAt,
-      supervisorReviewedAt,
-      managerReviewedAt,
-      accountingReviewedAt,
-      cashierReviewedAt,
-
-      toReviewCheckerAt,
-      toReviewSupervisorAt,
-      toManagerAt,
-      toAccountingAt,
-      toCashierAt,
-
-      reviewCheckerEmployee,
-      reviewSupervisorEmployee,
-      reviewManagerEmployee,
-      reviewAccountingEmployee,
-      reviewCashierEmployee,
-    } = payment ?? {};
-
-    // type TdotColor = Tcontrol_processChain['statusArr'][number]['dotColor'];
-
-    // const reviewStatus_checker: TdotColor = !toReviewCheckerAt ? 'gray' : checkerReviewedAt ? 'green' : 'red';
-    // const reviewStatus_accounting: TdotColor = !toAccountingAt ? 'gray' : accountingReviewedAt ? 'green' : 'red';
-    // const reviewStatus_cashier: TdotColor = !toCashierAt ? 'gray' : cashierReviewedAt ? 'green' : 'red';
-    // const reviewStatus_supervisor: TdotColor = !toReviewSupervisorAt ? 'gray' : supervisorReviewedAt ? 'green' : 'red';
-    // const reviewStatus_manager: TdotColor = !toManagerAt ? 'gray' : managerReviewedAt ? 'green' : 'red';
-
-    // const isReviewing = toReviewCheckerAt || toReviewSupervisorAt || toManagerAt || toAccountingAt || toCashierAt;
-
-    // 影響到送審按鈕是否出現
-    const isReviewer =
-      (userId === reviewCheckerEmployee?.id && toReviewCheckerAt) ||
-      (userId === reviewSupervisorEmployee?.id && toReviewSupervisorAt) ||
-      (userId === reviewManagerEmployee?.id && toManagerAt) ||
-      (userId === reviewAccountingEmployee?.id && toAccountingAt) ||
-      (userId === reviewCashierEmployee?.id && toCashierAt);
-
-    const isReviewDone =
-      checkerReviewedAt && supervisorReviewedAt && managerReviewedAt && accountingReviewedAt && cashierReviewedAt;
-
-    return {
-      paymentOri: payment,
-      // reviewStatus_checker,
-      // reviewStatus_accounting,
-      // reviewStatus_cashier,
-      // reviewStatus_supervisor,
-      // reviewStatus_manager,
-      // isReviewer,
-      // isReviewing,
-      // isReviewDone,
-    };
-  }, [data_payment]);
+  const paymentOri = data_payment;
 
   // -------------------------------------------------------------------------
 
@@ -246,10 +157,10 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       subTotal: result.subTotal,
       salesTax: result.salesTax,
       total: result.total,
-      reviewCheckerEmployeeId: checker?.id,
-      reviewSupervisorEmployeeId: supervisor?.id,
-      reviewAccountingEmployeeId: accounting?.id,
-      reviewCashierEmployeeId: cashier?.id,
+      reviewCheckerEmployeeId: undefined,
+      reviewSupervisorEmployeeId: undefined,
+      reviewAccountingEmployeeId: undefined,
+      reviewCashierEmployeeId: undefined,
     };
 
     try {
@@ -262,66 +173,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       setIsLoading(false);
     }
   };
-
-  // const reqPatchOutsourcingPaymentSubmit = async () => {
-  //   if (!paymentId || isLoading) {
-  //     return;
-  //   }
-
-  //   const reviewCheckerEmployeeId = checker?.id;
-  //   const reviewSupervisorEmployeeId = supervisor?.id;
-  //   const reviewAccountingEmployeeId = accounting?.id;
-  //   const reviewCashierEmployeeId = cashier?.id;
-
-  //   if (
-  //     !reviewCheckerEmployeeId ||
-  //     !reviewSupervisorEmployeeId ||
-  //     !reviewAccountingEmployeeId ||
-  //     !reviewCashierEmployeeId
-  //   ) {
-  //     myAlert.info({
-  //       title: '請填寫完整審核人員',
-  //     });
-
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsLoading(true);
-  //     await apiPatchOutsourcingPaymentSubmit(paymentId);
-  //     myAlert.success({ title: '送審完成' });
-  //     await update_payment();
-  //     setDisabled(true);
-  //   } catch (error) {
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // 審核
-  // const reqPatchOutsourcingPaymentReview = async (reviewResult: boolean) => {
-  //   if (!paymentId || isLoading) {
-  //     return;
-  //   }
-
-  //   const text = reviewResult ? '通過' : '不通過';
-
-  //   const body = {
-  //     reviewResult,
-  //   };
-
-  //   try {
-  //     setIsLoading(true);
-  //     await apiPatchOutsourcingPaymentReview(paymentId, body);
-  //     myAlert.success({ title: `審核${text}` });
-  //     await update_payment();
-  //     setDisabled(true);
-  //     setShowReiveModal(false);
-  //   } catch (error) {
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   // -------------------------------------------------------------------------
 
@@ -341,25 +192,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     data_payment,
     subTotal_deduction,
   });
-
-  // const reviewModalBtnArr: TmyBtn[] = [
-  //   {
-  //     label: '通過',
-  //     theme: 'danger',
-  //     onClick: () => reqPatchOutsourcingPaymentReview(true),
-  //     isLoading,
-  //   },
-  //   {
-  //     label: '不通過',
-  //     onClick: () => reqPatchOutsourcingPaymentReview(false),
-  //     isLoading,
-  //   },
-  //   {
-  //     label: '取消',
-  //     onClick: () => setShowReiveModal(false),
-  //     isLoading,
-  //   },
-  // ];
 
   const panelList_disabled: TpanelList = [
     !isAllReviewPass
@@ -444,26 +276,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   // MARK: useEffect
 
   useEffect(() => {
-    if (!paymentOri) {
-      return;
-    }
-
-    const {
-      reviewCheckerEmployee, //  '核對人員'
-      reviewSupervisorEmployee, //  '審核主管'
-      reviewManagerEmployee, //  '總經理'
-      reviewAccountingEmployee, //  '會計'
-      reviewCashierEmployee, //  '出納'
-    } = paymentOri;
-
-    setManager(reviewManagerEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setAccounting(reviewAccountingEmployee);
-    setChecker(reviewCheckerEmployee);
-    setCashier(reviewCashierEmployee);
-  }, [paymentOri, disabled]);
-
-  useEffect(() => {
     setPayment(paymentOri ?? create_emptyPayment());
   }, [paymentOri, disabled]);
 
@@ -523,31 +335,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           onAddClick={addAnmountToBeDeducted}
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
-        {/*  */}
-        {/* <div className={classNames(!disabled && 'hidden')}>
-          <ProcessChain control={control_processChain} className={classNames('w-[1250px] m-auto mt-[80px]')} />
-        </div>
-        <div className={classNames(disabled && 'hidden')}>
-          <SignatureBar
-            control={control_signatureBar}
-            disabled={disabled}
-            className={classNames('w-[1100px] m-auto mt-[100px]')}
-          />
-        </div> */}
-        {/*  */}
 
         <ReviewFlow className="w-3/4 m-auto mt-5" />
-
-        {/*  */}
-        <br />
-
-        {/* <ThreeButtonModal
-          visible={showReiveModal}
-          text={'是否通過審核?'}
-          modalWidth={620}
-          btnPropsArr={reviewModalBtnArr}
-          onCancel={() => setShowReiveModal(false)}
-        /> */}
       </div>
     </SubLayer>
   );
