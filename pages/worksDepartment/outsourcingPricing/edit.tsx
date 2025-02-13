@@ -334,6 +334,12 @@ export default function OutsourcingPricingEdit({
             targetOutsourcingId={targetOutsourcingId}
             onTabClick_outsourcing={(id) => {
               setTargetOutsourcingId(id);
+              router.replace({
+                query: {
+                  ...query,
+                  paymentId: undefined,
+                },
+              });
             }}
             targetPaymentId={query.paymentId}
             onTabClick_date={(id) => {

@@ -99,10 +99,14 @@ export default function PaymentSelectSlideBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outsourcingArr]);
 
-  const control_tabCarousel_api: Tcontrol_tabCarousel = {
-    activeIndex: outsourcingArr.findIndex((data) => data.id === targetOutsourcingId),
-    tabArr: tabArr_api,
-  };
+  const control_tabCarousel_api: Tcontrol_tabCarousel = useMemo(() => {
+    const control_tabCarousel_api: Tcontrol_tabCarousel = {
+      activeIndex: outsourcingArr.findIndex((data) => data.id === targetOutsourcingId),
+      tabArr: tabArr_api,
+    };
+
+    return control_tabCarousel_api;
+  }, [outsourcingArr, tabArr_api, targetOutsourcingId]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -132,10 +136,14 @@ export default function PaymentSelectSlideBar({
     return { tabArr_date: arr, defaultIndex_date };
   }, [paymentArr, targetPaymentId]);
 
-  const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: paymentArr.findIndex((payment) => payment.id === targetPaymentId),
-    tabArr: tabArr_date,
-  };
+  const control_tabCarousel: Tcontrol_tabCarousel = useMemo(() => {
+    const control_tabCarousel: Tcontrol_tabCarousel = {
+      activeIndex: paymentArr.findIndex((payment) => payment.id === targetPaymentId),
+      tabArr: tabArr_date,
+    };
+
+    return control_tabCarousel;
+  }, [paymentArr, tabArr_date, targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
@@ -145,7 +153,6 @@ export default function PaymentSelectSlideBar({
 
   useEffect(() => {
     reset_payment();
-    onTabClick_date(undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targetOutsourcingId]);
 
