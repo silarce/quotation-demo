@@ -37,6 +37,7 @@ import {
   TupdateOutsourcingPaymentDto,
   apiPatchOutsourcingPaymentSubmit,
   apiPatchOutsourcingPaymentReview,
+  apiClearDebt,
 } from 'js/api/api_outsourcing';
 
 // type
@@ -857,13 +858,36 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     //   label: '新增工程',
     //   onClick: () => {},
     // },
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: () => {
-        setDisabled(false);
-      },
-    },
+    isReviewing && !data_payment?.isPaymentCleared
+      ? {
+          type: 'myButton',
+          label: '結清',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定結清?',
+              content: '結清後無法復原',
+              props: {
+                onOk: () => {
+                  if (!paymentId) {
+                    myAlert.err({ title: '沒有外包計價單id' });
+                  } else {
+                    apiClearDebt(paymentId);
+                  }
+                },
+              },
+            });
+          },
+        }
+      : null,
+    !data_payment?.isPaymentCleared
+      ? {
+          type: 'myButton',
+          label: '編輯',
+          onClick: () => {
+            setDisabled(false);
+          },
+        }
+      : null,
   ];
 
   const panelList_enabled: TpanelList = [
