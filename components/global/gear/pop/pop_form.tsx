@@ -88,7 +88,7 @@ const PopContent = ({
           const target = e.currentTarget[name];
 
           // 目前已知 text checkbox radio hidden // 可能還有 textarea
-          const targetType: 'text' | 'checkbox' | 'radio' | 'hidden' | undefined = target?.type ?? target[0].type;
+          const targetType: 'text' | 'checkbox' | 'radio' | 'hidden' | undefined = target?.type ?? target?.[0].type;
           const isNodeList = target instanceof NodeList;
 
           let value: string | string[] = '';
