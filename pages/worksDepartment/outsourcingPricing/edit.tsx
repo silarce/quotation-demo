@@ -70,7 +70,7 @@ export default function OutsourcingPricingEdit({
   const [disabled, setDisabled] = useState<boolean>(true);
 
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
-  const [targetPaymentId, setTargetPaymentId] = useState<string>();
+  // const [targetPaymentId, setTargetPaymentId] = useState<string>();
 
   // -------------------------------------------------------------------------
   const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
@@ -302,18 +302,18 @@ export default function OutsourcingPricingEdit({
   useEffect(() => {
     if (data_payment) {
       setTargetOutsourcingId(data_payment.outsourcing.id);
-      setTargetPaymentId(data_payment.id);
+      // setTargetPaymentId(data_payment.id);
     }
   }, [!!data_payment]);
 
-  useEffect(() => {
-    !readOnly &&
-      router.replace({
-        query: {
-          paymentId: targetPaymentId,
-        },
-      });
-  }, [targetPaymentId]);
+  // useEffect(() => {
+  //   !readOnly &&
+  //     router.replace({
+  //       query: {
+  //         paymentId: targetPaymentId,
+  //       },
+  //     });
+  // }, [targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
@@ -335,8 +335,15 @@ export default function OutsourcingPricingEdit({
             onTabClick_outsourcing={(id) => {
               setTargetOutsourcingId(id);
             }}
-            targetPaymentId={targetPaymentId}
-            onTabClick_date={setTargetPaymentId}
+            targetPaymentId={query.paymentId}
+            onTabClick_date={(id) => {
+              router.replace({
+                query: {
+                  ...query,
+                  paymentId: id,
+                },
+              });
+            }}
           />
         )}
         <Table

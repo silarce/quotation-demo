@@ -1,9 +1,12 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
 
 // gear
-import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import TabCarousel02, {
+  Tcontrol_tabCarousel,
+  TimperativeHandle,
+} from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 
 import { Tparams, useGetOutsourcing, useGetOutsourcingPayment } from 'js/api/api_outsourcing';
 
@@ -25,16 +28,12 @@ export default function PaymentSelectSlideBar({
 }) {
   // -------------------------------------------------------------------------
 
-  const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
-  const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
-
-  const [slideToIndex, setSlideToIndex] = useState<number>();
-  const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
+  const ref_slider = useRef<TimperativeHandle>(null!);
+  const ref_slider_date = useRef<TimperativeHandle>(null!);
 
   // -------------------------------------------------------------------------
 
   const params: Tparams = {
-    // filter,
     sort: 'createdAt',
     order: 'DESC',
   };
@@ -87,11 +86,8 @@ export default function PaymentSelectSlideBar({
       return {
         label: data.name,
         viewRef,
-        // isActive: targetOutsourcingId === data.id,
         onClick: () => {
           onTabClick_outsourcing(data.id);
-          setActiveIndex_outsourcing(index);
-          setActiveIndex_id(-1);
         },
       };
     });
@@ -104,7 +100,7 @@ export default function PaymentSelectSlideBar({
   }, [outsourcingArr]);
 
   const control_tabCarousel_api: Tcontrol_tabCarousel = {
-    activeIndex: activeIndex_outsourcing,
+    activeIndex: outsourcingArr.findIndex((data) => data.id === targetOutsourcingId),
     tabArr: tabArr_api,
   };
 
@@ -115,9 +111,7 @@ export default function PaymentSelectSlideBar({
   const { tabArr_date, defaultIndex_date } = useMemo(() => {
     let defaultIndex_date = -1;
 
-    const dateArr = paymentArr.map((payment) => {
-      return payment;
-    });
+    const dateArr = paymentArr;
 
     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
       const twDate = getTaiwanDateStr(payment.date);
@@ -136,10 +130,10 @@ export default function PaymentSelectSlideBar({
     });
 
     return { tabArr_date: arr, defaultIndex_date };
-  }, [paymentArr]);
+  }, [paymentArr, targetPaymentId]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeIndex_id,
+    activeIndex: paymentArr.findIndex((payment) => payment.id === targetPaymentId),
     tabArr: tabArr_date,
   };
 
@@ -163,19 +157,16 @@ export default function PaymentSelectSlideBar({
     if (defaultActiveIndex === -1) {
       nextPage();
     } else {
-      setActiveIndex_outsourcing(defaultActiveIndex);
-      setSlideToIndex(defaultActiveIndex);
+      ref_slider.current.slideToIndex(defaultActiveIndex);
     }
   }, [isLoading, defaultActiveIndex === -1]);
 
   useEffect(() => {
     if (defaultIndex_date !== -1) {
-      setActiveIndex_id(defaultIndex_date);
-      setSlideToIndex_date(defaultIndex_date);
+      ref_slider_date.current.slideToIndex(defaultIndex_date);
     } else {
       if (!targetPaymentId) {
         onTabClick_date(paymentArr[0]?.id);
-        setActiveIndex_id(0);
       }
     }
     //
@@ -185,26 +176,15 @@ export default function PaymentSelectSlideBar({
 
   return (
     <div className={classNames(className)}>
+      <TabCarousel02 ref={ref_slider} className={'mb-2'} control={control_tabCarousel_api} />
       <TabCarousel02
-        className={'mb-2'}
-        control={control_tabCarousel_api}
-        //
-        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
-        // 藉以移動到在OutsourcingList選中的廠商
-        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
-        // onMount={({ ref_slider }) => {
-        //   ref_slider.current.slickGoTo(activeIndex);
-        // }}
-        slideToIndex={slideToIndex}
-      />
-      <TabCarousel02
+        ref={ref_slider_date}
         className="min-h-[56px]"
         control={control_tabCarousel}
         theme="dashed"
         props={{
           arrows: false,
         }}
-        slideToIndex={slideToIndex_date}
       />
     </div>
   );
