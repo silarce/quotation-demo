@@ -872,11 +872,12 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
               title: '確定結清?',
               content: '結清後無法復原',
               props: {
-                onOk: () => {
+                onOk: async () => {
                   if (!paymentId) {
                     myAlert.err({ title: '沒有外包計價單id' });
                   } else {
-                    apiClearDebt(paymentId);
+                    await apiClearDebt(paymentId);
+                    await update_payment();
                   }
                 },
               },
