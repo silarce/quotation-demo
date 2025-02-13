@@ -97,7 +97,7 @@ ReviewFlowSelector.open = (props: Parameters<typeof ReviewFlowSelector>[0]) => {
   const instance = DragableModal.create({
     children: <ReviewFlowSelector {...props} />,
     handleText: '選擇審核流程',
-    style: { zIndex: '1001', width: '820px' },
+    style: { zIndex: '1001', width: '1020px' },
   });
 
   return instance;
@@ -105,7 +105,7 @@ ReviewFlowSelector.open = (props: Parameters<typeof ReviewFlowSelector>[0]) => {
 
 ReviewFlowSelector.open2 = (props: Parameters<typeof ReviewFlowSelector>[0]) => {
   const instance = myAlert.clear({
-    width: '820px',
+    width: '1020px',
     content: (
       <div>
         <ReviewFlowSelector {...props} />

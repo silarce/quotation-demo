@@ -71,15 +71,25 @@ export default function Nav() {
 
         if (isDocumentManagement) {
           return (
-            <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
-              <Badge key={index} count={reviewQty} offset={[10, -7]}>
-                <Image src={icon} alt={label + subLabel} />
-                <span>{label}</span>
-                {subLabel && <span>{subLabel}</span>}
-              </Badge>
+            <Link className={`${styled.link} ${active} relative`} href={theHref} key={index}>
+              <Image src={icon} alt={label + subLabel} />
+              <span>{label}</span>
+              {subLabel && <span>{subLabel}</span>}
+              <Badge key={index} className={styled.badge} count={reviewQty} offset={[10, -7]}></Badge>
             </Link>
           );
         }
+        // if (isDocumentManagement) {
+        //   return (
+        //     <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
+        //       <Badge key={index} count={reviewQty} offset={[10, -7]}>
+        //         <Image src={icon} alt={label + subLabel} />
+        //         <span>{label}</span>
+        //         {subLabel && <span>{subLabel}</span>}
+        //       </Badge>
+        //     </Link>
+        //   );
+        // }
 
         return (
           <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
