@@ -271,6 +271,14 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   const panelList: TpanelList = disabled ? panelList_disabled : panelList_enabled;
 
+  const customerRight = [
+    data_payment?.isPaymentCleared ? (
+      <span key="0" className="text-red-500 text-base">
+        已結清
+      </span>
+    ) : null,
+  ];
+
   // -------------------------------------------------------------------------
 
   // MARK: useEffect
@@ -305,7 +313,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader02 tag="外包計價" panelList={panelList} />
+      <PageHeader02 tag="外包計價" panelList={panelList} customeRight={customerRight} />
 
       <div className={classNames(!data_payment && 'hidden')}>
         {targetOutsourcingId && (
