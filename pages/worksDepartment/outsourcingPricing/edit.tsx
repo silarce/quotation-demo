@@ -116,6 +116,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     reviewStatus_manager,
     isReviewer,
     isReviewing,
+    isReviewDone,
   } = useMemo(() => {
     const payment = data_payment;
 
@@ -158,6 +159,9 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       (userId === reviewAccountingEmployee?.id && toAccountingAt) ||
       (userId === reviewCashierEmployee?.id && toCashierAt);
 
+    const isReviewDone =
+      checkerReviewedAt && supervisorReviewedAt && managerReviewedAt && accountingReviewedAt && cashierReviewedAt;
+
     return {
       paymentOri: payment,
       reviewStatus_checker,
@@ -167,6 +171,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       reviewStatus_manager,
       isReviewer,
       isReviewing,
+      isReviewDone,
     };
   }, [data_payment]);
 
@@ -858,7 +863,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     //   label: '新增工程',
     //   onClick: () => {},
     // },
-    isReviewing && !data_payment?.isPaymentCleared
+    !data_payment?.isPaymentCleared && isReviewDone
       ? {
           type: 'myButton',
           label: '結清',
@@ -879,7 +884,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           },
         }
       : null,
-    !data_payment?.isPaymentCleared
+    !(isReviewing || data_payment?.isPaymentCleared || isReviewDone)
       ? {
           type: 'myButton',
           label: '編輯',
