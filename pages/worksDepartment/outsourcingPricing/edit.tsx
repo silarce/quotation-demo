@@ -41,7 +41,7 @@ import {
 } from 'js/api/api_outsourcing';
 
 // type
-import { TuserDto, TemployeeDto, TdeductionDto } from 'js/api/dtoTypes';
+import { TuserDto, TemployeeDto, TdeductionDto, ToutsourcingPaymentDetailDto } from 'js/api/dtoTypes';
 import { TmyBtn } from 'components/global/gear/button/myButton_v2';
 
 // utils
@@ -316,337 +316,20 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // MARK: PROPS
 
-  const { control_table_project, subTotal_project } = useMemo(() => {
-    let decimal_subTotal = new Decimal(0);
-    const control_tbody: Ttable['tbody'] = (() => {
-      const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
-        const { outsourcingTotal, engineeringContact } = data;
+  const { control_table_project, subTotal_project } = useProject({ paymentDetail });
 
-        const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
+  const { control_table_deduction, subTotal_deduction } = useDeduction({
+    disabled,
+    payment,
+    editDeduction,
+    deleteAnmountToBeDeducted,
+  });
 
-        decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
-
-        const href = {
-          pathname: './detail',
-          query: {
-            paymentDetailId: data.id,
-          },
-        };
-
-        const cellArr: Tcell[] = [
-          {
-            children: index + 1,
-            ...config_projectTable.indexNumber,
-          },
-          {
-            children: projectNumber,
-            ...config_projectTable.projectNumber,
-          },
-          {
-            children: projectName,
-            ...config_projectTable.projectName,
-          },
-          {
-            children: outsourcingTotal.toLocaleString(),
-            ...config_projectTable.subTotal_invoice.tbody,
-          },
-          {
-            children: <IconDetail onClick={() => router.push(href)} />,
-            ...config_projectTable.btn_info.tbody,
-          },
-        ];
-
-        return {
-          cellArr,
-        };
-      });
-
-      rowArr.push({
-        cellArr: [
-          {
-            children: '小計',
-            ...config_projectTable.label_subTotal.tbody,
-          },
-          {
-            children: decimal_subTotal.toNumber().toLocaleString(),
-            ...config_projectTable.subtotal.tbody,
-          },
-        ],
-      });
-
-      return {
-        rowArr,
-      };
-    })();
-
-    const control_table: Ttable = {
-      thead: thead_projectTable,
-      tbody: control_tbody,
-      haveBorder: true,
-    };
-
-    return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
-  }, [paymentDetail]);
-
-  const { control_table_deduction, subTotal_deduction } = useMemo(() => {
-    //
-    let decimal_subTotal = new Decimal(0);
-    //
-    const control_tbody: Ttable['tbody'] = (() => {
-      //
-      const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
-        const { type, itemName, price } = data;
-
-        decimal_subTotal = decimal_subTotal.add(price);
-
-        const inputWidth_type = config_deduction.type.inputWidth;
-        const inputWidth_item = config_deduction.itemName.inputWidth;
-        const inputWidth_price = config_deduction.price_enabled.inputWidth;
-
-        const typeChildren = (
-          <input
-            value={type}
-            onChange={(e) => {
-              editDeduction({ index, key: 'type', value: e.target.value });
-            }}
-            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-            style={{ width: inputWidth_type }}
-            readOnly={disabled}
-          />
-        );
-
-        const itemChildren = (
-          <input
-            value={itemName}
-            onChange={(e) => {
-              editDeduction({ index, key: 'itemName', value: e.target.value });
-            }}
-            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-            style={{ width: inputWidth_item }}
-            readOnly={disabled}
-          />
-        );
-
-        const subTotal_invoiceChildren = (
-          <input
-            value={disabled ? price.toLocaleString() : price}
-            onChange={(e) => {
-              editDeduction({ index, key: 'price', value: e.target.value });
-            }}
-            type={disabled ? 'text' : 'number'}
-            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-            style={{ width: inputWidth_price }}
-            readOnly={disabled}
-          />
-        );
-
-        const cellArr: Tcell[] = [
-          {
-            children: typeChildren,
-            ...config_deduction.type,
-          },
-          {
-            children: itemChildren,
-            ...config_deduction.itemName,
-          },
-          {
-            children: subTotal_invoiceChildren,
-            ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
-          },
-        ];
-
-        if (!disabled) {
-          cellArr.push({
-            children: (
-              <IconDelete01
-                onClick={() => {
-                  myAlert.confirm({
-                    title: '確定要刪除嗎?',
-                    props: {
-                      onOk: () => {
-                        deleteAnmountToBeDeducted(index);
-                      },
-                    },
-                  });
-                }}
-              />
-            ),
-            ...config_deduction.btn_delete.tbody,
-          });
-        }
-
-        return {
-          cellArr,
-        };
-      });
-
-      rowArr.push({
-        cellArr: [
-          {
-            children: '小計',
-            ...config_projectTable.label_subTotal.tbody,
-          },
-          {
-            children: decimal_subTotal.toNumber().toLocaleString(),
-            ...config_projectTable.subtotal.tbody,
-          },
-        ],
-      });
-
-      return {
-        rowArr,
-      };
-    })();
-
-    const control_table: Ttable = {
-      thead: thead_amountToBeDeducted,
-      tbody: control_tbody,
-      haveBorder: true,
-    };
-
-    return {
-      control_table_deduction: control_table,
-      subTotal_deduction: decimal_subTotal.toNumber(),
-    };
-  }, [payment.deduction, disabled]);
-
-  const { control_table_actualAmountReceived, result } = useMemo(() => {
-    //
-
-    // 本期保留10% // 本期保留款
-    const retainage = new Decimal(subTotal_project).mul(0.1).toNumber();
-    // '上期保留10%' // 上期保留款
-    const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
-
-    const subTotal = new Decimal(subTotal_project)
-      .sub(retainage)
-      .add(latestPeriodKeep)
-      .sub(subTotal_deduction)
-      .toNumber();
-
-    const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
-    const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
-
-    const result = {
-      retainage: retainage, // 本期保留款項
-      subTotal: subTotal,
-      salesTax: tax,
-      total: actualAmountReceived, // 實領總計
-    };
-
-    //
-    const rowArr: Ttable['tbody']['rowArr'] = [
-      //
-      {
-        cellArr: [
-          {
-            children: '請款合計',
-            ...config_actualAmountReceived.caption,
-          },
-          {
-            children: subTotal_project.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-          },
-        ],
-      },
-      //
-      {
-        cellArr: [
-          {
-            children: '本期保留10%',
-            ...config_actualAmountReceived.caption,
-          },
-          {
-            children: retainage.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-            className: scss.textRed,
-          },
-        ],
-      },
-      //
-      {
-        cellArr: [
-          {
-            children: '上期保留10%',
-            ...config_actualAmountReceived.caption,
-          },
-          {
-            children: latestPeriodKeep.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-            className: scss.textGreen,
-          },
-        ],
-      },
-      //
-      {
-        cellArr: [
-          {
-            children: '應扣明細',
-            ...config_actualAmountReceived.caption,
-          },
-          {
-            children: subTotal_deduction.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-            className: scss.textRed,
-          },
-        ],
-      },
-      //
-      {
-        cellArr: [
-          {
-            children: '小計',
-            ...config_actualAmountReceived.caption.tbody,
-          },
-          {
-            children: subTotal.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-          },
-        ],
-      },
-      {
-        cellArr: [
-          {
-            children: '稅額5%',
-            ...config_actualAmountReceived.caption.tbody,
-          },
-          {
-            children: tax.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-          },
-        ],
-      },
-      {
-        cellArr: [
-          {
-            children: '實領金額',
-            ...config_actualAmountReceived.caption.tbody,
-          },
-          {
-            children: actualAmountReceived.toLocaleString(),
-            ...config_actualAmountReceived.subTotal_invoice.tbody,
-            className: scss.textBold,
-          },
-        ],
-      },
-    ]; // rowArr
-
-    const tbody = {
-      rowArr,
-    };
-
-    const control_table: Ttable = {
-      thead: thead_actualAmountReceived,
-      tbody,
-      haveBorder: true,
-    };
-
-    return {
-      control_table_actualAmountReceived: control_table,
-      result,
-    };
-    //
-  }, [subTotal_project, subTotal_deduction, payment]);
+  const { control_table_actualAmountReceived, result } = useTable({
+    subTotal_project,
+    data_payment,
+    subTotal_deduction,
+  });
 
   const control_processChain: Tcontrol_processChain = {
     statusArr: [
@@ -953,257 +636,11 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   );
 }
 
-// END
+// MARK: END
+//
+//
+//
 
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-
-// const PaymentSelectSlideBar = ({
-//   //
-//   className,
-//   targetOutsourcingId,
-//   onTabClick_outsourcing,
-//   targetPaymentId,
-//   onTabClick_date,
-// }: {
-//   className?: string;
-//   targetOutsourcingId: string;
-//   onTabClick_outsourcing: (id: string) => void;
-//   targetPaymentId: string | undefined;
-//   onTabClick_date: (date: string | undefined) => void;
-// }) => {
-//   // -------------------------------------------------------------------------
-
-//   const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
-//   const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
-
-//   const [slideToIndex, setSlideToIndex] = useState<number>();
-//   const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
-
-//   // -------------------------------------------------------------------------
-
-//   const params: Tparams = {
-//     // filter,
-//     sort: 'createdAt',
-//     order: 'DESC',
-//   };
-
-//   const {
-//     dataList: outsourcingList,
-//     viewRef_bottom,
-//     reset,
-//     nextPage,
-//     isLoading,
-//   } = useGetOutsourcing({ customParams: params });
-
-//   const outsourcingArr = useMemo(() => {
-//     return _.flatten(Object.values(outsourcingList)) as (typeof outsourcingList)[`${number}`];
-//   }, [outsourcingList]);
-
-//   // _______________________________________________________________
-
-//   const params_payment: Tparams = {
-//     filter: {
-//       outsourcingId: { $eq: targetOutsourcingId },
-//     },
-//     pageSize: 99999,
-//     sort: 'date',
-//     order: 'ASC',
-//   };
-
-//   const {
-//     //
-//     dataList: dataList_payment,
-//     reset: reset_payment,
-//   } = useGetOutsourcingPayment({ customParams: params_payment });
-
-//   const paymentArr = useMemo(() => {
-//     return _.flatten(Object.values(dataList_payment)) as (typeof dataList_payment)[`${number}`];
-//   }, [dataList_payment]);
-
-//   // -------------------------------------------------------------------------
-
-//   const { tabArr: tabArr_api, defaultActiveIndex } = useMemo(() => {
-//     let defaultActiveIndex = -1;
-
-//     const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
-//       const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
-
-//       if (data.id === targetOutsourcingId) {
-//         defaultActiveIndex = index;
-//       }
-
-//       return {
-//         label: data.name,
-//         viewRef,
-//         // isActive: targetOutsourcingId === data.id,
-//         onClick: () => {
-//           onTabClick_outsourcing(data.id);
-//           setActiveIndex_outsourcing(index);
-//           setActiveIndex_id(-1);
-//         },
-//       };
-//     });
-
-//     return {
-//       tabArr: arr,
-//       defaultActiveIndex,
-//     };
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [outsourcingArr]);
-
-//   const control_tabCarousel_api: Tcontrol_tabCarousel = {
-//     activeIndex: activeIndex_outsourcing,
-//     tabArr: tabArr_api,
-//   };
-
-//   // -------------------------------------------------------------------------
-//   // -------------------------------------------------------------------------
-//   // -------------------------------------------------------------------------
-
-//   const { tabArr_date, defaultIndex_date } = useMemo(() => {
-//     let defaultIndex_date = -1;
-
-//     const dateArr = paymentArr.map((payment) => {
-//       return payment;
-//     });
-
-//     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
-//       const twDate = getTaiwanDateStr(payment.date);
-
-//       if (payment.id === targetPaymentId) {
-//         defaultIndex_date = index;
-//       }
-
-//       return {
-//         label: twDate ?? '',
-//         onClick: ({ ref_slider }) => {
-//           ref_slider.current.slickGoTo(index);
-//           onTabClick_date(payment.id);
-//         },
-//       };
-//     });
-
-//     return { tabArr_date: arr, defaultIndex_date };
-//   }, [paymentArr]);
-
-//   const control_tabCarousel: Tcontrol_tabCarousel = {
-//     activeIndex: activeIndex_id,
-//     tabArr: tabArr_date,
-//   };
-
-//   // -------------------------------------------------------------------------
-
-//   useEffect(() => {
-//     reset();
-//   }, []);
-
-//   useEffect(() => {
-//     reset_payment();
-//     onTabClick_date(undefined);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [targetOutsourcingId]);
-
-//   useEffect(() => {
-//     if (isLoading) {
-//       return;
-//     }
-
-//     if (defaultActiveIndex === -1) {
-//       nextPage();
-//     } else {
-//       setActiveIndex_outsourcing(defaultActiveIndex);
-//       setSlideToIndex(defaultActiveIndex);
-//     }
-//   }, [isLoading, defaultActiveIndex === -1]);
-
-//   useEffect(() => {
-//     if (defaultIndex_date !== -1) {
-//       setActiveIndex_id(defaultIndex_date);
-//       setSlideToIndex_date(defaultIndex_date);
-//     } else {
-//       if (!targetPaymentId) {
-//         onTabClick_date(paymentArr[0]?.id);
-//         setActiveIndex_id(0);
-//       }
-//     }
-//     //
-//   }, [paymentArr, defaultIndex_date === -1, targetPaymentId]);
-
-//   // -------------------------------------------------------------------------
-
-//   return (
-//     <div className={classNames(className)}>
-//       <TabCarousel02
-//         className={'mb-2'}
-//         control={control_tabCarousel_api}
-//         //
-//         // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
-//         // 藉以移動到在OutsourcingList選中的廠商
-//         // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
-//         // onMount={({ ref_slider }) => {
-//         //   ref_slider.current.slickGoTo(activeIndex);
-//         // }}
-//         slideToIndex={slideToIndex}
-//       />
-//       <TabCarousel02
-//         className="min-h-[56px]"
-//         control={control_tabCarousel}
-//         theme="dashed"
-//         props={{
-//           arrows: false,
-//         }}
-//         slideToIndex={slideToIndex_date}
-//       />
-//     </div>
-//   );
-// };
-
-// ======================================================================
-// const Table = ({
-//   caption,
-//   control,
-//   className,
-//   onAddClick,
-//   disabled,
-// }: {
-//   caption: string;
-//   control: Ttable;
-//   className?: string;
-//   onAddClick?: () => void;
-//   disabled?: boolean;
-// }) => {
-//   return (
-//     <div className={classNames(className)}>
-//       <div className={scss.captionBar}>
-//         <p className={scss.tableCaption}>{caption}</p>
-//         <IconAddCircle onClick={onAddClick} className={classNames((!onAddClick || disabled) && 'invisible')} />
-//       </div>
-//       <Table01 {...control} />
-//     </div>
-//   );
-// };
-
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
-// ======================================================================
 type Tconfig<keys extends string = string> = {
   [key in keys]: {
     width?: React.CSSProperties['width'];
@@ -1382,6 +819,368 @@ const thead_actualAmountReceived: Ttable['thead'] = {
 };
 
 // ======================================================================
+
+// MARK: useProject
+const useProject = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto[] | undefined }) => {
+  const router = useRouter();
+
+  return useMemo(() => {
+    let decimal_subTotal = new Decimal(0);
+    const control_tbody: Ttable['tbody'] = (() => {
+      const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
+        const { outsourcingTotal, engineeringContact } = data;
+
+        const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
+
+        decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
+
+        const href = {
+          pathname: './detail',
+          query: {
+            paymentDetailId: data.id,
+          },
+        };
+
+        const cellArr: Tcell[] = [
+          {
+            children: index + 1,
+            ...config_projectTable.indexNumber,
+          },
+          {
+            children: projectNumber,
+            ...config_projectTable.projectNumber,
+          },
+          {
+            children: projectName,
+            ...config_projectTable.projectName,
+          },
+          {
+            children: outsourcingTotal.toLocaleString(),
+            ...config_projectTable.subTotal_invoice.tbody,
+          },
+          {
+            children: <IconDetail onClick={() => router.push(href)} />,
+            ...config_projectTable.btn_info.tbody,
+          },
+        ];
+
+        return {
+          cellArr,
+        };
+      });
+
+      rowArr.push({
+        cellArr: [
+          {
+            children: '小計',
+            ...config_projectTable.label_subTotal.tbody,
+          },
+          {
+            children: decimal_subTotal.toNumber().toLocaleString(),
+            ...config_projectTable.subtotal.tbody,
+          },
+        ],
+      });
+
+      return {
+        rowArr,
+      };
+    })();
+
+    const control_table: Ttable = {
+      thead: thead_projectTable,
+      tbody: control_tbody,
+      haveBorder: true,
+    };
+
+    return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
+  }, [paymentDetail]);
+};
+
+// MARK:useDeduction
+const useDeduction = ({
+  disabled,
+  payment,
+  editDeduction,
+  deleteAnmountToBeDeducted,
+}: {
+  disabled: boolean;
+  payment: TupdateOutsourcingPaymentDto;
+  editDeduction: ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => void;
+  deleteAnmountToBeDeducted: (index: number) => void;
+}) => {
+  return useMemo(() => {
+    //
+    let decimal_subTotal = new Decimal(0);
+    //
+    const control_tbody: Ttable['tbody'] = (() => {
+      //
+      const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
+        const { type, itemName, price } = data;
+
+        decimal_subTotal = decimal_subTotal.add(price);
+
+        const inputWidth_type = config_deduction.type.inputWidth;
+        const inputWidth_item = config_deduction.itemName.inputWidth;
+        const inputWidth_price = config_deduction.price_enabled.inputWidth;
+
+        const typeChildren = (
+          <input
+            value={type}
+            onChange={(e) => {
+              editDeduction({ index, key: 'type', value: e.target.value });
+            }}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_type }}
+            readOnly={disabled}
+          />
+        );
+
+        const itemChildren = (
+          <input
+            value={itemName}
+            onChange={(e) => {
+              editDeduction({ index, key: 'itemName', value: e.target.value });
+            }}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_item }}
+            readOnly={disabled}
+          />
+        );
+
+        const subTotal_invoiceChildren = (
+          <input
+            value={disabled ? price.toLocaleString() : price}
+            onChange={(e) => {
+              editDeduction({ index, key: 'price', value: e.target.value });
+            }}
+            type={disabled ? 'text' : 'number'}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_price }}
+            readOnly={disabled}
+          />
+        );
+
+        const cellArr: Tcell[] = [
+          {
+            children: typeChildren,
+            ...config_deduction.type,
+          },
+          {
+            children: itemChildren,
+            ...config_deduction.itemName,
+          },
+          {
+            children: subTotal_invoiceChildren,
+            ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
+          },
+        ];
+
+        if (!disabled) {
+          cellArr.push({
+            children: (
+              <IconDelete01
+                onClick={() => {
+                  myAlert.confirm({
+                    title: '確定要刪除嗎?',
+                    props: {
+                      onOk: () => {
+                        deleteAnmountToBeDeducted(index);
+                      },
+                    },
+                  });
+                }}
+              />
+            ),
+            ...config_deduction.btn_delete.tbody,
+          });
+        }
+
+        return {
+          cellArr,
+        };
+      });
+
+      rowArr.push({
+        cellArr: [
+          {
+            children: '小計',
+            ...config_projectTable.label_subTotal.tbody,
+          },
+          {
+            children: decimal_subTotal.toNumber().toLocaleString(),
+            ...config_projectTable.subtotal.tbody,
+          },
+        ],
+      });
+
+      return {
+        rowArr,
+      };
+    })();
+
+    const control_table: Ttable = {
+      thead: thead_amountToBeDeducted,
+      tbody: control_tbody,
+      haveBorder: true,
+    };
+
+    return {
+      control_table_deduction: control_table,
+      subTotal_deduction: decimal_subTotal.toNumber(),
+    };
+  }, [payment.deduction, disabled]);
+};
+
+// MARK: useTable
+const useTable = ({
+  subTotal_project,
+  data_payment,
+  subTotal_deduction,
+}: {
+  subTotal_project: number;
+  data_payment: ToutsourcingPaymentDto | undefined;
+  subTotal_deduction: number;
+}) => {
+  return useMemo(() => {
+    //
+
+    // 本期保留10% // 本期保留款
+    const retainage = new Decimal(subTotal_project).mul(0.1).toNumber();
+    // '上期保留10%' // 上期保留款
+    const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
+
+    const subTotal = new Decimal(subTotal_project)
+      .sub(retainage)
+      .add(latestPeriodKeep)
+      .sub(subTotal_deduction)
+      .toNumber();
+
+    const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
+    const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
+
+    const result = {
+      retainage: retainage, // 本期保留款項
+      subTotal: subTotal,
+      salesTax: tax,
+      total: actualAmountReceived, // 實領總計
+    };
+
+    //
+    const rowArr: Ttable['tbody']['rowArr'] = [
+      //
+      {
+        cellArr: [
+          {
+            children: '請款合計',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: subTotal_project.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '本期保留10%',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: retainage.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textRed,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '上期保留10%',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: latestPeriodKeep.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textGreen,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '應扣明細',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: subTotal_deduction.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textRed,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '小計',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: subTotal.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      {
+        cellArr: [
+          {
+            children: '稅額5%',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: tax.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      {
+        cellArr: [
+          {
+            children: '實領金額',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: actualAmountReceived.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textBold,
+          },
+        ],
+      },
+    ]; // rowArr
+
+    const tbody = {
+      rowArr,
+    };
+
+    const control_table: Ttable = {
+      thead: thead_actualAmountReceived,
+      tbody,
+      haveBorder: true,
+    };
+
+    return {
+      control_table_actualAmountReceived: control_table,
+      result,
+    };
+    //
+  }, [subTotal_project, subTotal_deduction, data_payment?.priorPeriodRetainage]);
+};
+
 // ======================================================================
 // ======================================================================
 // ======================================================================
