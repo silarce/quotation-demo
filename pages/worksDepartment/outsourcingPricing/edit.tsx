@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
@@ -47,7 +47,11 @@ import { TmyBtn } from 'components/global/gear/button/myButton_v2';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-//
+import { useReviewFlow } from 'components/composition/review/reviewFlow';
+import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
+
+import PaymentSelectSlideBar from 'components/page/worksDepartment/outsourcingPricing/edti/paymentSelectSlideBar';
+import Table from 'components/page/worksDepartment/outsourcingPricing/edti/table';
 
 // ======================================================================
 
@@ -56,6 +60,9 @@ type Tquery = {
 };
 
 // ======================================================================
+
+// MARK: START
+
 export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDto | undefined }) {
   const router = useRouter();
   const { paymentId } = router.query as Tquery;
@@ -79,8 +86,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // -------------------------------------------------------------------------
   const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
-
-  // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
   const params: Tparams = {
@@ -175,53 +180,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     };
   }, [data_payment]);
 
-  // _______________________________________________________________________
-  // -------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (!paymentOri) {
-      return;
-    }
-
-    const {
-      reviewCheckerEmployee, //  '核對人員'
-      reviewSupervisorEmployee, //  '審核主管'
-      reviewManagerEmployee, //  '總經理'
-      reviewAccountingEmployee, //  '會計'
-      reviewCashierEmployee, //  '出納'
-    } = paymentOri;
-
-    setManager(reviewManagerEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setAccounting(reviewAccountingEmployee);
-    setChecker(reviewCheckerEmployee);
-    setCashier(reviewCashierEmployee);
-  }, [paymentOri, disabled]);
-
-  useEffect(() => {
-    setPayment(paymentOri ?? create_emptyPayment());
-  }, [paymentOri, disabled]);
-
-  useEffect(() => {
-    update_payment();
-    update_detail();
-  }, [paymentId]);
-
-  useEffect(() => {
-    if (data_payment) {
-      setTargetOutsourcingId(data_payment.outsourcing.id);
-      setTargetPaymentId(data_payment.id);
-    }
-  }, [!!data_payment]);
-
-  useEffect(() => {
-    router.push({
-      query: {
-        paymentId: targetPaymentId,
-      },
-    });
-  }, [targetPaymentId]);
-
   // -------------------------------------------------------------------------
 
   const addAnmountToBeDeducted = () => {
@@ -261,7 +219,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   // -------------------------------------------------------------------------
 
-  // _req
+  // MARK API
   // 確認
   const reqPatchOutsourcingPayment = async () => {
     if (!paymentId || isLoading) {
@@ -355,12 +313,8 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   };
 
   // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
+
+  // MARK: PROPS
 
   const { control_table_project, subTotal_project } = useMemo(() => {
     let decimal_subTotal = new Decimal(0);
@@ -433,8 +387,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
     return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
   }, [paymentDetail]);
-
-  // -------------------------------------------------------------------------
 
   const { control_table_deduction, subTotal_deduction } = useMemo(() => {
     //
@@ -557,8 +509,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       subTotal_deduction: decimal_subTotal.toNumber(),
     };
   }, [payment.deduction, disabled]);
-
-  // -------------------------------------------------------------------------
 
   const { control_table_actualAmountReceived, result } = useMemo(() => {
     //
@@ -698,8 +648,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     //
   }, [subTotal_project, subTotal_deduction, payment]);
 
-  // -------------------------------------------------------------------------
-
   const control_processChain: Tcontrol_processChain = {
     statusArr: [
       {
@@ -759,8 +707,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     ],
   };
 
-  // -------------------------------------------------------------------------
-
   const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
     {
       label: '出納',
@@ -810,8 +756,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   const control_signatureBar: Tcontrol_signatureBar = { signatureArr };
 
-  // -------------------------------------------------------------------------
-
   const reviewModalBtnArr: TmyBtn[] = [
     {
       label: '通過',
@@ -831,8 +775,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     },
   ];
 
-  // -------------------------------------------------------------------------
-
   const panelList_disabled: TpanelList = [
     isReviewer
       ? {
@@ -850,19 +792,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           onClick: reqPatchOutsourcingPaymentSubmit,
         }
       : null,
-    // {
-    //   type: 'myButton',
-    //   label: '編輯審核人員',
-    //   onClick: () => {
-    //     setDisabled__reviewer(false);
-    //     setDisabled(true);
-    //   },
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '新增工程',
-    //   onClick: () => {},
-    // },
+
     !data_payment?.isPaymentCleared && isReviewDone
       ? {
           type: 'myButton',
@@ -914,6 +844,57 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   const panelList: TpanelList = disabled ? panelList_disabled : panelList_enabled;
 
   // -------------------------------------------------------------------------
+
+  // MARK: useEffect
+
+  useEffect(() => {
+    if (!paymentOri) {
+      return;
+    }
+
+    const {
+      reviewCheckerEmployee, //  '核對人員'
+      reviewSupervisorEmployee, //  '審核主管'
+      reviewManagerEmployee, //  '總經理'
+      reviewAccountingEmployee, //  '會計'
+      reviewCashierEmployee, //  '出納'
+    } = paymentOri;
+
+    setManager(reviewManagerEmployee);
+    setSupervisor(reviewSupervisorEmployee);
+    setAccounting(reviewAccountingEmployee);
+    setChecker(reviewCheckerEmployee);
+    setCashier(reviewCashierEmployee);
+  }, [paymentOri, disabled]);
+
+  useEffect(() => {
+    setPayment(paymentOri ?? create_emptyPayment());
+  }, [paymentOri, disabled]);
+
+  useEffect(() => {
+    update_payment();
+    update_detail();
+  }, [paymentId]);
+
+  useEffect(() => {
+    if (data_payment) {
+      setTargetOutsourcingId(data_payment.outsourcing.id);
+      setTargetPaymentId(data_payment.id);
+    }
+  }, [!!data_payment]);
+
+  useEffect(() => {
+    router.push({
+      query: {
+        paymentId: targetPaymentId,
+      },
+    });
+  }, [targetPaymentId]);
+
+  // -------------------------------------------------------------------------
+
+  // MARK: RENDER
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag="外包計價" panelList={panelList} />
@@ -972,6 +953,9 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   );
 }
 
+// END
+
+// ======================================================================
 // ======================================================================
 // ======================================================================
 // ======================================================================
@@ -986,233 +970,232 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 // ======================================================================
 // ======================================================================
 // ======================================================================
+
+// const PaymentSelectSlideBar = ({
+//   //
+//   className,
+//   targetOutsourcingId,
+//   onTabClick_outsourcing,
+//   targetPaymentId,
+//   onTabClick_date,
+// }: {
+//   className?: string;
+//   targetOutsourcingId: string;
+//   onTabClick_outsourcing: (id: string) => void;
+//   targetPaymentId: string | undefined;
+//   onTabClick_date: (date: string | undefined) => void;
+// }) => {
+//   // -------------------------------------------------------------------------
+
+//   const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
+//   const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
+
+//   const [slideToIndex, setSlideToIndex] = useState<number>();
+//   const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
+
+//   // -------------------------------------------------------------------------
+
+//   const params: Tparams = {
+//     // filter,
+//     sort: 'createdAt',
+//     order: 'DESC',
+//   };
+
+//   const {
+//     dataList: outsourcingList,
+//     viewRef_bottom,
+//     reset,
+//     nextPage,
+//     isLoading,
+//   } = useGetOutsourcing({ customParams: params });
+
+//   const outsourcingArr = useMemo(() => {
+//     return _.flatten(Object.values(outsourcingList)) as (typeof outsourcingList)[`${number}`];
+//   }, [outsourcingList]);
+
+//   // _______________________________________________________________
+
+//   const params_payment: Tparams = {
+//     filter: {
+//       outsourcingId: { $eq: targetOutsourcingId },
+//     },
+//     pageSize: 99999,
+//     sort: 'date',
+//     order: 'ASC',
+//   };
+
+//   const {
+//     //
+//     dataList: dataList_payment,
+//     reset: reset_payment,
+//   } = useGetOutsourcingPayment({ customParams: params_payment });
+
+//   const paymentArr = useMemo(() => {
+//     return _.flatten(Object.values(dataList_payment)) as (typeof dataList_payment)[`${number}`];
+//   }, [dataList_payment]);
+
+//   // -------------------------------------------------------------------------
+
+//   const { tabArr: tabArr_api, defaultActiveIndex } = useMemo(() => {
+//     let defaultActiveIndex = -1;
+
+//     const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
+//       const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
+
+//       if (data.id === targetOutsourcingId) {
+//         defaultActiveIndex = index;
+//       }
+
+//       return {
+//         label: data.name,
+//         viewRef,
+//         // isActive: targetOutsourcingId === data.id,
+//         onClick: () => {
+//           onTabClick_outsourcing(data.id);
+//           setActiveIndex_outsourcing(index);
+//           setActiveIndex_id(-1);
+//         },
+//       };
+//     });
+
+//     return {
+//       tabArr: arr,
+//       defaultActiveIndex,
+//     };
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [outsourcingArr]);
+
+//   const control_tabCarousel_api: Tcontrol_tabCarousel = {
+//     activeIndex: activeIndex_outsourcing,
+//     tabArr: tabArr_api,
+//   };
+
+//   // -------------------------------------------------------------------------
+//   // -------------------------------------------------------------------------
+//   // -------------------------------------------------------------------------
+
+//   const { tabArr_date, defaultIndex_date } = useMemo(() => {
+//     let defaultIndex_date = -1;
+
+//     const dateArr = paymentArr.map((payment) => {
+//       return payment;
+//     });
+
+//     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
+//       const twDate = getTaiwanDateStr(payment.date);
+
+//       if (payment.id === targetPaymentId) {
+//         defaultIndex_date = index;
+//       }
+
+//       return {
+//         label: twDate ?? '',
+//         onClick: ({ ref_slider }) => {
+//           ref_slider.current.slickGoTo(index);
+//           onTabClick_date(payment.id);
+//         },
+//       };
+//     });
+
+//     return { tabArr_date: arr, defaultIndex_date };
+//   }, [paymentArr]);
+
+//   const control_tabCarousel: Tcontrol_tabCarousel = {
+//     activeIndex: activeIndex_id,
+//     tabArr: tabArr_date,
+//   };
+
+//   // -------------------------------------------------------------------------
+
+//   useEffect(() => {
+//     reset();
+//   }, []);
+
+//   useEffect(() => {
+//     reset_payment();
+//     onTabClick_date(undefined);
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [targetOutsourcingId]);
+
+//   useEffect(() => {
+//     if (isLoading) {
+//       return;
+//     }
+
+//     if (defaultActiveIndex === -1) {
+//       nextPage();
+//     } else {
+//       setActiveIndex_outsourcing(defaultActiveIndex);
+//       setSlideToIndex(defaultActiveIndex);
+//     }
+//   }, [isLoading, defaultActiveIndex === -1]);
+
+//   useEffect(() => {
+//     if (defaultIndex_date !== -1) {
+//       setActiveIndex_id(defaultIndex_date);
+//       setSlideToIndex_date(defaultIndex_date);
+//     } else {
+//       if (!targetPaymentId) {
+//         onTabClick_date(paymentArr[0]?.id);
+//         setActiveIndex_id(0);
+//       }
+//     }
+//     //
+//   }, [paymentArr, defaultIndex_date === -1, targetPaymentId]);
+
+//   // -------------------------------------------------------------------------
+
+//   return (
+//     <div className={classNames(className)}>
+//       <TabCarousel02
+//         className={'mb-2'}
+//         control={control_tabCarousel_api}
+//         //
+//         // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
+//         // 藉以移動到在OutsourcingList選中的廠商
+//         // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
+//         // onMount={({ ref_slider }) => {
+//         //   ref_slider.current.slickGoTo(activeIndex);
+//         // }}
+//         slideToIndex={slideToIndex}
+//       />
+//       <TabCarousel02
+//         className="min-h-[56px]"
+//         control={control_tabCarousel}
+//         theme="dashed"
+//         props={{
+//           arrows: false,
+//         }}
+//         slideToIndex={slideToIndex_date}
+//       />
+//     </div>
+//   );
+// };
+
 // ======================================================================
-
-const PaymentSelectSlideBar = ({
-  //
-  className,
-  targetOutsourcingId,
-  onTabClick_outsourcing,
-  targetPaymentId,
-  onTabClick_date,
-}: {
-  className?: string;
-  targetOutsourcingId: string;
-  onTabClick_outsourcing: (id: string) => void;
-  targetPaymentId: string | undefined;
-  onTabClick_date: (date: string | undefined) => void;
-}) => {
-  // -------------------------------------------------------------------------
-
-  const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
-  const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
-
-  const [slideToIndex, setSlideToIndex] = useState<number>();
-  const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
-
-  // -------------------------------------------------------------------------
-
-  const params: Tparams = {
-    // filter,
-    sort: 'createdAt',
-    order: 'DESC',
-  };
-
-  const {
-    dataList: outsourcingList,
-    viewRef_bottom,
-    reset,
-    nextPage,
-    isLoading,
-  } = useGetOutsourcing({ customParams: params });
-
-  const outsourcingArr = useMemo(() => {
-    return _.flatten(Object.values(outsourcingList)) as (typeof outsourcingList)[`${number}`];
-  }, [outsourcingList]);
-
-  // _______________________________________________________________
-
-  const params_payment: Tparams = {
-    filter: {
-      outsourcingId: { $eq: targetOutsourcingId },
-    },
-    pageSize: 99999,
-    sort: 'date',
-    order: 'ASC',
-  };
-
-  const {
-    //
-    dataList: dataList_payment,
-    reset: reset_payment,
-  } = useGetOutsourcingPayment({ customParams: params_payment });
-
-  const paymentArr = useMemo(() => {
-    return _.flatten(Object.values(dataList_payment)) as (typeof dataList_payment)[`${number}`];
-  }, [dataList_payment]);
-
-  // -------------------------------------------------------------------------
-
-  const { tabArr: tabArr_api, defaultActiveIndex } = useMemo(() => {
-    let defaultActiveIndex = -1;
-
-    const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
-      const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
-
-      if (data.id === targetOutsourcingId) {
-        defaultActiveIndex = index;
-      }
-
-      return {
-        label: data.name,
-        viewRef,
-        // isActive: targetOutsourcingId === data.id,
-        onClick: () => {
-          onTabClick_outsourcing(data.id);
-          setActiveIndex_outsourcing(index);
-          setActiveIndex_id(-1);
-        },
-      };
-    });
-
-    return {
-      tabArr: arr,
-      defaultActiveIndex,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outsourcingArr]);
-
-  const control_tabCarousel_api: Tcontrol_tabCarousel = {
-    activeIndex: activeIndex_outsourcing,
-    tabArr: tabArr_api,
-  };
-
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-
-  const { tabArr_date, defaultIndex_date } = useMemo(() => {
-    let defaultIndex_date = -1;
-
-    const dateArr = paymentArr.map((payment) => {
-      return payment;
-    });
-
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
-      const twDate = getTaiwanDateStr(payment.date);
-
-      if (payment.id === targetPaymentId) {
-        defaultIndex_date = index;
-      }
-
-      return {
-        label: twDate ?? '',
-        onClick: ({ ref_slider }) => {
-          ref_slider.current.slickGoTo(index);
-          onTabClick_date(payment.id);
-        },
-      };
-    });
-
-    return { tabArr_date: arr, defaultIndex_date };
-  }, [paymentArr]);
-
-  const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeIndex_id,
-    tabArr: tabArr_date,
-  };
-
-  // -------------------------------------------------------------------------
-
-  useEffect(() => {
-    reset();
-  }, []);
-
-  useEffect(() => {
-    reset_payment();
-    onTabClick_date(undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetOutsourcingId]);
-
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    if (defaultActiveIndex === -1) {
-      nextPage();
-    } else {
-      setActiveIndex_outsourcing(defaultActiveIndex);
-      setSlideToIndex(defaultActiveIndex);
-    }
-  }, [isLoading, defaultActiveIndex === -1]);
-
-  useEffect(() => {
-    if (defaultIndex_date !== -1) {
-      setActiveIndex_id(defaultIndex_date);
-      setSlideToIndex_date(defaultIndex_date);
-    } else {
-      if (!targetPaymentId) {
-        onTabClick_date(paymentArr[0]?.id);
-        setActiveIndex_id(0);
-      }
-    }
-    //
-  }, [paymentArr, defaultIndex_date === -1, targetPaymentId]);
-
-  // -------------------------------------------------------------------------
-
-  return (
-    <div className={classNames(className)}>
-      <TabCarousel02
-        className={'mb-2'}
-        control={control_tabCarousel_api}
-        //
-        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
-        // 藉以移動到在OutsourcingList選中的廠商
-        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
-        // onMount={({ ref_slider }) => {
-        //   ref_slider.current.slickGoTo(activeIndex);
-        // }}
-        slideToIndex={slideToIndex}
-      />
-      <TabCarousel02
-        className="min-h-[56px]"
-        control={control_tabCarousel}
-        theme="dashed"
-        props={{
-          arrows: false,
-        }}
-        slideToIndex={slideToIndex_date}
-      />
-    </div>
-  );
-};
-
-// ======================================================================
-const Table = ({
-  caption,
-  control,
-  className,
-  onAddClick,
-  disabled,
-}: {
-  caption: string;
-  control: Ttable;
-  className?: string;
-  onAddClick?: () => void;
-  disabled?: boolean;
-}) => {
-  return (
-    <div className={classNames(className)}>
-      <div className={scss.captionBar}>
-        <p className={scss.tableCaption}>{caption}</p>
-        <IconAddCircle onClick={onAddClick} className={classNames((!onAddClick || disabled) && 'invisible')} />
-      </div>
-      <Table01 {...control} />
-    </div>
-  );
-};
+// const Table = ({
+//   caption,
+//   control,
+//   className,
+//   onAddClick,
+//   disabled,
+// }: {
+//   caption: string;
+//   control: Ttable;
+//   className?: string;
+//   onAddClick?: () => void;
+//   disabled?: boolean;
+// }) => {
+//   return (
+//     <div className={classNames(className)}>
+//       <div className={scss.captionBar}>
+//         <p className={scss.tableCaption}>{caption}</p>
+//         <IconAddCircle onClick={onAddClick} className={classNames((!onAddClick || disabled) && 'invisible')} />
+//       </div>
+//       <Table01 {...control} />
+//     </div>
+//   );
+// };
 
 // ======================================================================
 // ======================================================================
