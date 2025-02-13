@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -64,8 +65,12 @@ type Tquery = {
 // MARK: START
 
 export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDto | undefined }) {
+  const userId = userInfo?.employee?.id;
+
   const router = useRouter();
-  const { paymentId } = router.query as Tquery;
+
+  const query = router.query as Tquery;
+  const { paymentId } = query as Tquery;
 
   // -------------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -112,16 +117,23 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     params_paymentDetail
   );
 
+  const { ReviewFlow, reqAddReview, reviewFlow, isAllReviewPass } = useReviewFlow({
+    uuid: data_payment?.id,
+    document_id: data_payment?.createdAt ? moment(data_payment.createdAt).format('YYYY-MM-DD hh:mm:ss') : '',
+  });
+
+  const isReviewing = !!reviewFlow;
+
   const {
     paymentOri,
-    reviewStatus_checker,
-    reviewStatus_accounting,
-    reviewStatus_cashier,
-    reviewStatus_supervisor,
-    reviewStatus_manager,
-    isReviewer,
-    isReviewing,
-    isReviewDone,
+    // reviewStatus_checker,
+    // reviewStatus_accounting,
+    // reviewStatus_cashier,
+    // reviewStatus_supervisor,
+    // reviewStatus_manager,
+    // isReviewer,
+    // isReviewing,
+    // isReviewDone,
   } = useMemo(() => {
     const payment = data_payment;
 
@@ -144,17 +156,16 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       reviewAccountingEmployee,
       reviewCashierEmployee,
     } = payment ?? {};
-    const userId = userInfo?.employee?.id;
 
-    type TdotColor = Tcontrol_processChain['statusArr'][number]['dotColor'];
+    // type TdotColor = Tcontrol_processChain['statusArr'][number]['dotColor'];
 
-    const reviewStatus_checker: TdotColor = !toReviewCheckerAt ? 'gray' : checkerReviewedAt ? 'green' : 'red';
-    const reviewStatus_accounting: TdotColor = !toAccountingAt ? 'gray' : accountingReviewedAt ? 'green' : 'red';
-    const reviewStatus_cashier: TdotColor = !toCashierAt ? 'gray' : cashierReviewedAt ? 'green' : 'red';
-    const reviewStatus_supervisor: TdotColor = !toReviewSupervisorAt ? 'gray' : supervisorReviewedAt ? 'green' : 'red';
-    const reviewStatus_manager: TdotColor = !toManagerAt ? 'gray' : managerReviewedAt ? 'green' : 'red';
+    // const reviewStatus_checker: TdotColor = !toReviewCheckerAt ? 'gray' : checkerReviewedAt ? 'green' : 'red';
+    // const reviewStatus_accounting: TdotColor = !toAccountingAt ? 'gray' : accountingReviewedAt ? 'green' : 'red';
+    // const reviewStatus_cashier: TdotColor = !toCashierAt ? 'gray' : cashierReviewedAt ? 'green' : 'red';
+    // const reviewStatus_supervisor: TdotColor = !toReviewSupervisorAt ? 'gray' : supervisorReviewedAt ? 'green' : 'red';
+    // const reviewStatus_manager: TdotColor = !toManagerAt ? 'gray' : managerReviewedAt ? 'green' : 'red';
 
-    const isReviewing = toReviewCheckerAt || toReviewSupervisorAt || toManagerAt || toAccountingAt || toCashierAt;
+    // const isReviewing = toReviewCheckerAt || toReviewSupervisorAt || toManagerAt || toAccountingAt || toCashierAt;
 
     // 影響到送審按鈕是否出現
     const isReviewer =
@@ -169,14 +180,14 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
     return {
       paymentOri: payment,
-      reviewStatus_checker,
-      reviewStatus_accounting,
-      reviewStatus_cashier,
-      reviewStatus_supervisor,
-      reviewStatus_manager,
-      isReviewer,
-      isReviewing,
-      isReviewDone,
+      // reviewStatus_checker,
+      // reviewStatus_accounting,
+      // reviewStatus_cashier,
+      // reviewStatus_supervisor,
+      // reviewStatus_manager,
+      // isReviewer,
+      // isReviewing,
+      // isReviewDone,
     };
   }, [data_payment]);
 
@@ -252,65 +263,65 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     }
   };
 
-  const reqPatchOutsourcingPaymentSubmit = async () => {
-    if (!paymentId || isLoading) {
-      return;
-    }
+  // const reqPatchOutsourcingPaymentSubmit = async () => {
+  //   if (!paymentId || isLoading) {
+  //     return;
+  //   }
 
-    const reviewCheckerEmployeeId = checker?.id;
-    const reviewSupervisorEmployeeId = supervisor?.id;
-    const reviewAccountingEmployeeId = accounting?.id;
-    const reviewCashierEmployeeId = cashier?.id;
+  //   const reviewCheckerEmployeeId = checker?.id;
+  //   const reviewSupervisorEmployeeId = supervisor?.id;
+  //   const reviewAccountingEmployeeId = accounting?.id;
+  //   const reviewCashierEmployeeId = cashier?.id;
 
-    if (
-      !reviewCheckerEmployeeId ||
-      !reviewSupervisorEmployeeId ||
-      !reviewAccountingEmployeeId ||
-      !reviewCashierEmployeeId
-    ) {
-      myAlert.info({
-        title: '請填寫完整審核人員',
-      });
+  //   if (
+  //     !reviewCheckerEmployeeId ||
+  //     !reviewSupervisorEmployeeId ||
+  //     !reviewAccountingEmployeeId ||
+  //     !reviewCashierEmployeeId
+  //   ) {
+  //     myAlert.info({
+  //       title: '請填寫完整審核人員',
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    try {
-      setIsLoading(true);
-      await apiPatchOutsourcingPaymentSubmit(paymentId);
-      myAlert.success({ title: '送審完成' });
-      await update_payment();
-      setDisabled(true);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   try {
+  //     setIsLoading(true);
+  //     await apiPatchOutsourcingPaymentSubmit(paymentId);
+  //     myAlert.success({ title: '送審完成' });
+  //     await update_payment();
+  //     setDisabled(true);
+  //   } catch (error) {
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // 審核
-  const reqPatchOutsourcingPaymentReview = async (reviewResult: boolean) => {
-    if (!paymentId || isLoading) {
-      return;
-    }
+  // const reqPatchOutsourcingPaymentReview = async (reviewResult: boolean) => {
+  //   if (!paymentId || isLoading) {
+  //     return;
+  //   }
 
-    const text = reviewResult ? '通過' : '不通過';
+  //   const text = reviewResult ? '通過' : '不通過';
 
-    const body = {
-      reviewResult,
-    };
+  //   const body = {
+  //     reviewResult,
+  //   };
 
-    try {
-      setIsLoading(true);
-      await apiPatchOutsourcingPaymentReview(paymentId, body);
-      myAlert.success({ title: `審核${text}` });
-      await update_payment();
-      setDisabled(true);
-      setShowReiveModal(false);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   try {
+  //     setIsLoading(true);
+  //     await apiPatchOutsourcingPaymentReview(paymentId, body);
+  //     myAlert.success({ title: `審核${text}` });
+  //     await update_payment();
+  //     setDisabled(true);
+  //     setShowReiveModal(false);
+  //   } catch (error) {
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // -------------------------------------------------------------------------
 
@@ -331,152 +342,54 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     subTotal_deduction,
   });
 
-  const control_processChain: Tcontrol_processChain = {
-    statusArr: [
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">經辦</span>
-            <span className="inline-block">{paymentOri?.agentEmployee?.chName}</span>
-          </>
-        ),
-        dotColor: 'green',
-      },
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">核對</span>
-            <span className="inline-block">{paymentOri?.reviewCheckerEmployee.chName}</span>
-          </>
-        ),
-        dotColor: reviewStatus_checker,
-      },
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">工務</span>
-            <span className="inline-block">{paymentOri?.reviewSupervisorEmployee.chName}</span>
-          </>
-        ),
-        dotColor: reviewStatus_supervisor,
-      },
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">總經理</span>
-            <span className="inline-block">{paymentOri?.reviewManagerEmployee.chName}</span>
-          </>
-        ),
-        dotColor: reviewStatus_manager,
-      },
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">會計</span>
-            <span className="inline-block">{paymentOri?.reviewAccountingEmployee.chName}</span>
-          </>
-        ),
-        dotColor: reviewStatus_accounting,
-      },
-      {
-        label: (
-          <>
-            <span className="inline-block mr-2">出納</span>
-            <span className="inline-block">{paymentOri?.reviewCashierEmployee.chName}</span>
-          </>
-        ),
-        dotColor: reviewStatus_cashier,
-      },
-    ],
-  };
-
-  const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
-    {
-      label: '出納',
-      employee: cashier,
-      onChange: (employee) => {
-        setCashier(employee);
-      },
-    },
-    {
-      label: '會計',
-      employee: accounting,
-      onChange: (employee) => {
-        setAccounting(employee);
-      },
-    },
-    {
-      label: '總經理',
-      employee: manager,
-      onChange: (employee) => {
-        // setManager(employee);
-      },
-      disabled: true,
-    },
-    {
-      label: '工務',
-      employee: supervisor,
-      onChange: (employee) => {
-        setSupervisor(employee);
-      },
-    },
-    {
-      label: '核對',
-      employee: checker,
-      onChange: (employee) => {
-        setChecker(employee);
-      },
-    },
-    {
-      label: '經辦',
-      employee: paymentOri?.agentEmployee,
-      onChange: (employee) => {
-        // setAgent(employee);
-      },
-      disabled: true,
-    },
-  ];
-
-  const control_signatureBar: Tcontrol_signatureBar = { signatureArr };
-
-  const reviewModalBtnArr: TmyBtn[] = [
-    {
-      label: '通過',
-      theme: 'danger',
-      onClick: () => reqPatchOutsourcingPaymentReview(true),
-      isLoading,
-    },
-    {
-      label: '不通過',
-      onClick: () => reqPatchOutsourcingPaymentReview(false),
-      isLoading,
-    },
-    {
-      label: '取消',
-      onClick: () => setShowReiveModal(false),
-      isLoading,
-    },
-  ];
+  // const reviewModalBtnArr: TmyBtn[] = [
+  //   {
+  //     label: '通過',
+  //     theme: 'danger',
+  //     onClick: () => reqPatchOutsourcingPaymentReview(true),
+  //     isLoading,
+  //   },
+  //   {
+  //     label: '不通過',
+  //     onClick: () => reqPatchOutsourcingPaymentReview(false),
+  //     isLoading,
+  //   },
+  //   {
+  //     label: '取消',
+  //     onClick: () => setShowReiveModal(false),
+  //     isLoading,
+  //   },
+  // ];
 
   const panelList_disabled: TpanelList = [
-    isReviewer
-      ? {
-          type: 'redButton',
-          label: '審核',
-          onClick: () => {
-            setShowReiveModal(true);
-          },
-        }
-      : null,
-    !isReviewing
+    !isAllReviewPass
       ? {
           type: 'redButton',
           label: '送審',
-          onClick: reqPatchOutsourcingPaymentSubmit,
+          onClick: () => {
+            if (!userId) {
+              return myAlert.info({ title: '沒有userId' });
+            }
+
+            const { destroy } = ReviewFlowSelector.open2({
+              userId,
+              onConfirm({ reviewFlowId, purpose }) {
+                if (reviewFlowId) {
+                  reqAddReview({
+                    review_id: reviewFlowId,
+                    document_title: purpose,
+                    document_type: '外包計價',
+                    user_id: userId,
+                    query: query,
+                  }).then(destroy);
+                }
+              },
+            });
+          },
         }
       : null,
 
-    !data_payment?.isPaymentCleared && isReviewDone
+    !data_payment?.isPaymentCleared && isAllReviewPass
       ? {
           type: 'myButton',
           label: '結清',
@@ -498,7 +411,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           },
         }
       : null,
-    !(isReviewing || data_payment?.isPaymentCleared || isReviewDone)
+    !(isReviewing || data_payment?.isPaymentCleared || isAllReviewPass)
       ? {
           type: 'myButton',
           label: '編輯',
@@ -611,7 +524,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
-        <div className={classNames(!disabled && 'hidden')}>
+        {/* <div className={classNames(!disabled && 'hidden')}>
           <ProcessChain control={control_processChain} className={classNames('w-[1250px] m-auto mt-[80px]')} />
         </div>
         <div className={classNames(disabled && 'hidden')}>
@@ -620,17 +533,21 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             disabled={disabled}
             className={classNames('w-[1100px] m-auto mt-[100px]')}
           />
-        </div>
+        </div> */}
+        {/*  */}
+
+        <ReviewFlow className="w-3/4 m-auto mt-5" />
+
         {/*  */}
         <br />
 
-        <ThreeButtonModal
+        {/* <ThreeButtonModal
           visible={showReiveModal}
           text={'是否通過審核?'}
           modalWidth={620}
           btnPropsArr={reviewModalBtnArr}
           onCancel={() => setShowReiveModal(false)}
-        />
+        /> */}
       </div>
     </SubLayer>
   );
