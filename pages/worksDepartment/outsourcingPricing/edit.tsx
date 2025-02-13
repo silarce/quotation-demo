@@ -50,7 +50,14 @@ type Tquery = {
 
 // MARK: START
 
-export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDto | undefined }) {
+export default function OutsourcingPricingEdit({
+  //
+  userInfo,
+  readOnly,
+}: {
+  userInfo: TuserDto | undefined;
+  readOnly?: boolean;
+}) {
   const userId = userInfo?.employee?.id;
 
   const router = useRouter();
@@ -300,11 +307,12 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
   }, [!!data_payment]);
 
   useEffect(() => {
-    router.push({
-      query: {
-        paymentId: targetPaymentId,
-      },
-    });
+    !readOnly &&
+      router.replace({
+        query: {
+          paymentId: targetPaymentId,
+        },
+      });
   }, [targetPaymentId]);
 
   // -------------------------------------------------------------------------
@@ -313,17 +321,19 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader02 tag="外包計價" panelList={panelList} customeRight={customerRight} />
+      <PageHeader02
+        tag="外包計價"
+        panelList={readOnly ? undefined : panelList}
+        customeRight={readOnly ? undefined : customerRight}
+      />
 
-      <div className={classNames(!data_payment && 'hidden')}>
+      <div className={classNames(!data_payment)}>
         {targetOutsourcingId && (
           <PaymentSelectSlideBar
-            //
-            className="mt-11"
+            className={classNames('mt-11', readOnly && 'pointer-events-none')}
             targetOutsourcingId={targetOutsourcingId}
             onTabClick_outsourcing={(id) => {
               setTargetOutsourcingId(id);
-              // setTargetPaymentId(undefined);
             }}
             targetPaymentId={targetPaymentId}
             onTabClick_date={setTargetPaymentId}
