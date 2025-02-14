@@ -26,7 +26,7 @@ import { Ttable, Tcell } from 'components/global/gear/table/table01';
 import Row, { Cell } from 'components/global/gear/table/row';
 
 // icon
-import { IconDetail, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDetail, IconDelete01, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './edit.module.scss';
@@ -89,7 +89,7 @@ export default function OutsourcingPricingEdit({
 
   // -------------------------------------------------------------------------
   // const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
-  const [state_deduction, setState_deduction] = useState<TdeductionDto[]>([]);
+  const [state_deductionArr, setState_deductionArr] = useState<TdeductionDto[]>([]);
 
   // -------------------------------------------------------------------------
   const params: Tparams = {
@@ -170,7 +170,7 @@ export default function OutsourcingPricingEdit({
       subTotal_detail_d = subTotal_detail_d.add(outsourcingTotal);
     });
 
-    state_deduction?.forEach((deduction) => {
+    state_deductionArr?.forEach((deduction) => {
       subTotal_deduction_d = subTotal_deduction_d.add(deduction.price);
     });
 
@@ -195,24 +195,24 @@ export default function OutsourcingPricingEdit({
       tax,
       actualAmountReceived,
     };
-  }, [paymentDetail, state_deduction, data_payment]);
+  }, [paymentDetail, state_deductionArr, data_payment]);
 
   // -------------------------------------------------------------------------
 
   const addDeduction = () => {
-    setState_deduction((prev) => {
+    setState_deductionArr((prev) => {
       return [...prev, create_emptyDeduction()];
     });
   };
 
   const deleteDeduction = (index: number) => {
-    setState_deduction((prev) => {
+    setState_deductionArr((prev) => {
       return prev.filter((_, i) => i !== index);
     });
   };
 
   const editDeduction = ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => {
-    setState_deduction((prev) => {
+    setState_deductionArr((prev) => {
       const newArr = [...prev];
 
       if (key === 'price') {
@@ -225,9 +225,9 @@ export default function OutsourcingPricingEdit({
     });
   };
 
-  const createEditDeduction = (index: number) => {
+  const createSetDeduction = (index: number) => {
     const func: React.Dispatch<React.SetStateAction<TdeductionDto>> = (setStateAction) => {
-      setState_deduction((prev) => {
+      setState_deductionArr((prev) => {
         const copy = [...prev];
         copy[index] = typeof setStateAction === 'function' ? setStateAction(copy[index]) : setStateAction;
 
@@ -250,7 +250,7 @@ export default function OutsourcingPricingEdit({
     const body = {
       date: new Date().toISOString(),
       paymentSubTotal: subTotal_detail,
-      deduction: state_deduction,
+      deduction: state_deductionArr,
       deductionTotal: subTotal_deduction,
       retainage: result.retainage,
       subTotal: result.subTotal,
@@ -283,10 +283,10 @@ export default function OutsourcingPricingEdit({
 
   const {
     control_table_deduction,
-    //  subTotal_deduction
+    // subTotal_deduction
   } = useDeduction({
     disabled,
-    state_deduction,
+    state_deduction: state_deductionArr,
     editDeduction: editDeduction,
     deleteAnmountToBeDeducted: deleteDeduction,
   });
@@ -459,7 +459,7 @@ export default function OutsourcingPricingEdit({
 
   useEffect(() => {
     // setPayment(paymentOri ?? create_emptyPayment());
-    setState_deduction(paymentOri?.deduction ?? []);
+    setState_deductionArr(paymentOri?.deduction ?? []);
   }, [paymentOri, disabled]);
 
   useEffect(() => {
@@ -521,7 +521,69 @@ export default function OutsourcingPricingEdit({
           </Row>
         </div> */}
 
-        <Table
+        <div className="w-[1100px] m-auto mt-[96px]">
+          <div className="mb-2">
+            <span className="text-main text-lg">工程列表</span>
+            <Link
+              href={{
+                pathname: './detail',
+                query: {
+                  outsourcingId,
+                  paymentId,
+                  isNew: 'true',
+                },
+              }}
+            >
+              <SquareBtn sharp="mini" className="ml-3">
+                新建明細
+              </SquareBtn>
+            </Link>
+          </div>
+          <div className="border border-b-0">
+            <Row thead={true} style={{ width: '100%' }}>
+              {keyArr_project.map((key) => {
+                const config = config_project[key];
+
+                return (
+                  <Cell key={key} style={config.style}>
+                    {config.label}
+                  </Cell>
+                );
+              })}
+            </Row>
+
+            {paymentDetail?.map((detail, index_d) => {
+              const { id, outsourcingTotal, engineeringContact } = detail;
+              const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
+
+              const href = {
+                pathname: './detail',
+                query: {
+                  paymentDetailId: id,
+                },
+              };
+
+              return (
+                <Row key={id} style={{ width: '100%' }}>
+                  <Cell style={config_project.indexNumber.style}>{index_d + 1}</Cell>
+                  <Cell style={config_project.projectNumber.style}>{projectNumber}</Cell>
+                  <Cell style={config_project.projectName.style}>{projectName}</Cell>
+                  <Cell style={config_project.outsourcingTotal.style}>{outsourcingTotal.toLocaleString()}</Cell>
+                  <Cell style={config_project.detail.style}>
+                    <IconDetail onClick={() => router.push(href)} />
+                  </Cell>
+                </Row>
+              );
+            })}
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_project.label_subTotal.style}>小計</Cell>
+              <Cell style={config_project.subTotal.style}>{subTotal_project.toLocaleString()}</Cell>
+              <Cell style={config_project.detail.style}></Cell>
+            </Row>
+          </div>
+        </div>
+
+        {/* <Table
           caption={
             <>
               工程列表{' '}
@@ -544,17 +606,123 @@ export default function OutsourcingPricingEdit({
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_project}
-        />
+        /> */}
 
-        <Table
+        <div className="w-[1100px] m-auto mt-[96px]">
+          <div className="mb-2 flex gap-2 items-center">
+            <span className="text-main text-lg">應扣明細</span>
+            <IconAddCircle className="w-[20px] h-[20px]" onClick={addDeduction} />
+          </div>
+          <div className="border border-b-0">
+            <Row thead={true} style={{ width: '100%' }}>
+              {keyArr_deduction.map((key) => {
+                const config = config_deduction[key];
+
+                return (
+                  <Cell key={key} style={config.style}>
+                    {config.label}
+                  </Cell>
+                );
+              })}
+              <Cell style={config_deduction.btn_delete.style}></Cell>
+            </Row>
+
+            {state_deductionArr.map((state_deduction, index) => {
+              return (
+                <Row key={index} style={{ width: '100%' }}>
+                  {keyArr_deduction.map((key) => {
+                    const { style, createNode } = config_deduction[key];
+                    const node = createNode({
+                      disabled,
+                      state_deduction,
+                      setDeduction: createSetDeduction(index),
+                    });
+
+                    return (
+                      <Cell key={key} style={style}>
+                        {node}
+                      </Cell>
+                    );
+                  })}
+                  <Cell style={config_deduction.btn_delete.style}>
+                    {!disabled && <IconDelete01 onClick={() => deleteDeduction(index)} />}
+                  </Cell>
+                </Row>
+              );
+            })}
+
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_deduction.label_subTotal.style}>小計</Cell>
+              <Cell style={config_deduction.subTotal.style}>{subTotal_deduction.toLocaleString()}</Cell>
+              <Cell style={config_deduction.btn_delete.style}></Cell>
+            </Row>
+          </div>
+        </div>
+
+        {/* <Table
           caption="應扣明細"
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_deduction}
           onAddClick={addDeduction}
-        />
+        /> */}
 
-        <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
+        <div className="w-[500px] m-auto mt-[96px] ml-[277.5px]">
+          <div className="mb-2 ">
+            <span className="text-main text-lg">應扣明細</span>
+          </div>
+          <div className="border border-b-0">
+            <Row thead={true} style={{ width: '100%' }}>
+              {keyArr_settlement.map((key) => {
+                const config = config_settlement[key];
+
+                return (
+                  <Cell key={key} style={config.style}>
+                    {config.label}
+                  </Cell>
+                );
+              })}
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>請款合計</Cell>
+              <Cell style={config_settlement.amounts.style}>{subTotal_detail.toLocaleString()}</Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>本期保留10%</Cell>
+              <Cell style={config_settlement.amounts.style} className="text-red-500">
+                {retainage.toLocaleString()}
+              </Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>上期保留10%</Cell>
+              <Cell style={config_settlement.amounts.style} className="text-green-500">
+                {latestPeriodKeep.toLocaleString()}
+              </Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>應扣明細</Cell>
+              <Cell style={config_settlement.amounts.style} className="text-red-500">
+                {subTotal_deduction.toLocaleString()}
+              </Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>小計</Cell>
+              <Cell style={config_settlement.amounts.style}>{subTotal_actualReceived.toLocaleString()}</Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>稅額5%</Cell>
+              <Cell style={config_settlement.amounts.style}>{tax.toLocaleString()}</Cell>
+            </Row>
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>實領金額</Cell>
+              <Cell style={config_settlement.amounts.style} className="font-bold">
+                {actualAmountReceived.toLocaleString()}
+              </Cell>
+            </Row>
+          </div>
+        </div>
+
+        {/* <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} /> */}
         {/*  */}
 
         <div className="w-fit m-auto ml-[275px] mt-[96px]">
@@ -601,6 +769,200 @@ interface TconfigItem {
   style?: React.CSSProperties;
   className?: string;
 }
+interface TconfigItem_deduction extends TconfigItem {
+  createNode: ({
+    disabled,
+    state_deduction,
+    setDeduction,
+  }: {
+    disabled: boolean;
+    state_deduction: TdeductionDto;
+    setDeduction: React.Dispatch<React.SetStateAction<TdeductionDto>>;
+  }) => React.ReactNode;
+}
+
+type Tconfig_project = Record<
+  'indexNumber' | 'projectNumber' | 'projectName' | 'outsourcingTotal' | 'detail' | 'label_subTotal' | 'subTotal',
+  TconfigItem
+>;
+
+type Tconfig_deduction = Record<
+  'type' | 'itemName' | 'price' | 'btn_delete' | 'label_subTotal' | 'subTotal',
+  TconfigItem_deduction
+>;
+
+type Tconfig_settlement = Record<'amountsName' | 'amounts', TconfigItem>;
+
+// MARK:config_project
+const keyArr_project: (keyof Tconfig_project)[] = [
+  'indexNumber',
+  'projectNumber',
+  'projectName',
+  'outsourcingTotal',
+  'detail',
+];
+const config_project: Tconfig_project = {
+  indexNumber: {
+    label: '序號',
+    style: {
+      width: '60px',
+      justifyContent: 'center',
+    },
+  },
+  projectNumber: {
+    label: '工程編號',
+    style: {
+      flex: '1 0',
+      justifyContent: 'left',
+    },
+  },
+  projectName: {
+    label: '工程名稱',
+    style: {
+      flex: '1 0',
+      justifyContent: 'left',
+    },
+  },
+  outsourcingTotal: {
+    label: '請款',
+    style: {
+      width: '200px',
+      justifyContent: 'flex-end',
+    },
+  },
+  detail: {
+    style: {
+      width: '70px',
+      justifyContent: 'center',
+    },
+  },
+  label_subTotal: {
+    style: {
+      flex: 'auto',
+      justifyContent: 'flex-end',
+    },
+  },
+  subTotal: {
+    style: {
+      width: '80px',
+      justifyContent: 'flex-end',
+    },
+  },
+};
+
+// MARK:config_deduction
+const keyArr_deduction: (keyof Tconfig_deduction)[] = ['type', 'itemName', 'price'];
+const config_deduction: Tconfig_deduction = {
+  type: {
+    label: '類別',
+    style: {
+      width: 414,
+      justifyContent: 'center',
+      paddingLeft: '20px',
+    },
+    createNode({ disabled, state_deduction, setDeduction }) {
+      return (
+        <input
+          value={state_deduction.type}
+          onChange={(e) => {
+            setDeduction((prev) => {
+              return { ...prev, type: e.target.value };
+            });
+          }}
+          className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+          readOnly={disabled}
+        />
+      );
+    },
+  },
+  itemName: {
+    label: '項目',
+    style: {
+      // width: 414,
+      flex: 'auto',
+      justifyContent: 'center',
+      paddingLeft: '20px',
+    },
+    createNode({ disabled, state_deduction, setDeduction }) {
+      return (
+        <input
+          value={state_deduction.itemName}
+          onChange={(e) => {
+            setDeduction((prev) => {
+              return { ...prev, itemName: e.target.value };
+            });
+          }}
+          className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+          readOnly={disabled}
+        />
+      );
+    },
+  },
+  price: {
+    label: '應扣額',
+    style: {
+      width: 200,
+      justifyContent: 'flex-end',
+      paddingLeft: '20px',
+    },
+    createNode({ disabled, state_deduction, setDeduction }) {
+      return (
+        <input
+          value={disabled ? state_deduction.price.toLocaleString() : state_deduction.price}
+          onChange={(e) => {
+            setDeduction((prev) => {
+              return { ...prev, price: Number(e.target.value) };
+            });
+          }}
+          type={disabled ? 'text' : 'number'}
+          className={classNames(scss.inputInTable, scss.textRight, !disabled && scss.enabled)}
+          readOnly={disabled}
+        />
+      );
+    },
+  },
+  btn_delete: {
+    label: '',
+    style: { width: '70px', justifyContent: 'center' },
+    createNode: () => null,
+  },
+
+  label_subTotal: {
+    style: {
+      flex: 'auto',
+      justifyContent: 'flex-end',
+    },
+    createNode: () => null,
+  },
+  subTotal: {
+    style: {
+      width: '80px',
+      justifyContent: 'flex-end',
+    },
+    createNode: () => null,
+  },
+};
+
+// MARK:config_settlement
+const keyArr_settlement: (keyof Tconfig_settlement)[] = ['amountsName', 'amounts'];
+const config_settlement: Tconfig_settlement = {
+  amountsName: {
+    label: '金額名稱',
+    style: {
+      flex: '1',
+      justifyContent: 'left',
+      paddingLeft: '20px',
+    },
+  },
+  amounts: {
+    label: '金額',
+    style: {
+      width: '170px',
+      justifyContent: 'right',
+      paddingRight: '20px',
+    },
+  },
+};
 
 // =============================================================================
 
@@ -690,7 +1052,7 @@ const thead_projectTable: Ttable['thead'] = {
 };
 // ---------------------
 
-const config_deduction: Tconfig_legency<
+const config_deduction_legacy: Tconfig_legency<
   'type' | 'itemName' | 'price' | 'price_enabled' | 'btn_delete' | 'label_subTotal' | 'subtotal'
 > = {
   type: {
@@ -734,15 +1096,15 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
   cellArr: [
     {
       children: '類別',
-      ...config_deduction.type,
+      ...config_deduction_legacy.type,
     },
     {
       children: '項目',
-      ...config_deduction.itemName,
+      ...config_deduction_legacy.itemName,
     },
     {
       children: '應扣額',
-      ...config_deduction.price,
+      ...config_deduction_legacy.price,
     },
   ],
 };
@@ -856,7 +1218,11 @@ const useProject = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetai
       haveBorder: true,
     };
 
-    return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
+    return {
+      //
+      control_table_project: control_table,
+      subTotal_project: decimal_subTotal.toNumber(),
+    };
   }, [paymentDetail]);
 };
 
@@ -883,9 +1249,9 @@ const useDeduction = ({
 
         decimal_subTotal = decimal_subTotal.add(price);
 
-        const inputWidth_type = config_deduction.type.inputWidth;
-        const inputWidth_item = config_deduction.itemName.inputWidth;
-        const inputWidth_price = config_deduction.price_enabled.inputWidth;
+        const inputWidth_type = config_deduction_legacy.type.inputWidth;
+        const inputWidth_item = config_deduction_legacy.itemName.inputWidth;
+        const inputWidth_price = config_deduction_legacy.price_enabled.inputWidth;
 
         const typeChildren = (
           <input
@@ -927,15 +1293,15 @@ const useDeduction = ({
         const cellArr: Tcell[] = [
           {
             children: typeChildren,
-            ...config_deduction.type,
+            ...config_deduction_legacy.type,
           },
           {
             children: itemChildren,
-            ...config_deduction.itemName,
+            ...config_deduction_legacy.itemName,
           },
           {
             children: subTotal_invoiceChildren,
-            ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
+            ...(disabled ? config_deduction_legacy.price.tbody : config_deduction_legacy.price_enabled.tbody),
           },
         ];
 
@@ -955,7 +1321,7 @@ const useDeduction = ({
                 }}
               />
             ),
-            ...config_deduction.btn_delete.tbody,
+            ...config_deduction_legacy.btn_delete.tbody,
           });
         }
 
