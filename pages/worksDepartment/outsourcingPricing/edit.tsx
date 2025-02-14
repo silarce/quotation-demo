@@ -586,7 +586,7 @@ export default function OutsourcingPricingEdit({
 
         <div className="w-[500px] m-auto mt-[96px] ml-[277.5px]">
           <div className="mb-2 ">
-            <span className="text-main text-lg">應扣明細</span>
+            <span className="text-main text-lg">結算</span>
           </div>
           <div className="border border-b-0">
             <Row thead={true} style={{ width: '100%' }}>
