@@ -321,6 +321,7 @@ export default function OutsourcingPricingDetail() {
             paymentDetailId: res.id,
           },
         });
+        setDisabled(true);
       })
       .catch();
   };
