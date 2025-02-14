@@ -252,10 +252,10 @@ export default function OutsourcingPricingEdit({
       paymentSubTotal: subTotal_detail,
       deduction: state_deductionArr,
       deductionTotal: subTotal_deduction,
-      retainage: result.retainage,
-      subTotal: result.subTotal,
-      salesTax: result.salesTax,
-      total: result.total,
+      retainage: retainage,
+      subTotal: subTotal_actualReceived,
+      salesTax: tax,
+      total: actualAmountReceived,
       reviewCheckerEmployeeId: undefined,
       reviewSupervisorEmployeeId: undefined,
       reviewAccountingEmployeeId: undefined,
@@ -279,23 +279,23 @@ export default function OutsourcingPricingEdit({
 
   // -------------------------------------------------------------------------
 
-  const { control_table_project, subTotal_project } = useProject({ paymentDetail });
+  // const { control_table_project, subTotal_project } = useProject({ paymentDetail });
 
-  const {
-    control_table_deduction,
-    // subTotal_deduction
-  } = useDeduction({
-    disabled,
-    state_deduction: state_deductionArr,
-    editDeduction: editDeduction,
-    deleteAnmountToBeDeducted: deleteDeduction,
-  });
+  // const {
+  //   control_table_deduction,
+  //   // subTotal_deduction
+  // } = useDeduction({
+  //   disabled,
+  //   state_deduction: state_deductionArr,
+  //   editDeduction: editDeduction,
+  //   deleteAnmountToBeDeducted: deleteDeduction,
+  // });
 
-  const { control_table_actualAmountReceived, result } = useTable({
-    subTotal_project,
-    data_payment,
-    subTotal_deduction,
-  });
+  // const { control_table_actualAmountReceived, result } = useTable({
+  //   subTotal_project: subTotal_detail,
+  //   data_payment,
+  //   subTotal_deduction,
+  // });
 
   // -------------------------------------------------------------------------
 
@@ -577,7 +577,7 @@ export default function OutsourcingPricingEdit({
             })}
             <Row style={{ width: '100%' }}>
               <Cell style={config_project.label_subTotal.style}>小計</Cell>
-              <Cell style={config_project.subTotal.style}>{subTotal_project.toLocaleString()}</Cell>
+              <Cell style={config_project.subTotal.style}>{subTotal_detail.toLocaleString()}</Cell>
               <Cell style={config_project.detail.style}></Cell>
             </Row>
           </div>
