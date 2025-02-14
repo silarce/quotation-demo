@@ -505,6 +505,29 @@ export const apiPatchOutsourcingPaymentDetail = async (
     });
 };
 
+// 結清外包計價單(須提醒使用者，此動作不可逆)
+export const apiClearDebt = async (
+  outsourcingPaymentId: string,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/clear-debt`;
+
+  await axi
+    .patch(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '結清外包計價單失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(error);
+    });
+};
+
 export const apiPostOutsourcingPaymentDetail = async (
   outsourcingPaymentId: string,
   body: TcreateOutsourcingPaymentDetailDto,

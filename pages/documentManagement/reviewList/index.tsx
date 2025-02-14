@@ -48,6 +48,7 @@ import PRequisitionDetail from 'pages/factoryDepartment/PRequisitionDetail';
 import TransferOrder from 'pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit';
 import CertifiedDocument from 'components/composition/certifiedDocument/edit';
 import { Pattern_readonly } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern/component';
+import OutsourcingEdit from 'pages/worksDepartment/outsourcingPricing/edit';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
@@ -553,13 +554,16 @@ export default function ReviewList() {
         );
       } else if (
         ['簽認圖', '平面圖', '設計圖', '施工圖', '色卡'].includes(reviewtype) ||
-        ['證明文件', '調貨單', '工作表'].includes(reviewtype)
+        ['證明文件', '調貨單', '工作表', '外包計價'].includes(reviewtype)
       ) {
         const parsedQuery = JSON.parse(itemQuery.query);
+        console.log(parsedQuery);
         const query = {
           ...parsedQuery,
           viewtype: 'review',
         };
+
+        console.log(query);
 
         router.replace({ query }, undefined, { shallow: true });
       }
@@ -1435,6 +1439,7 @@ export default function ReviewList() {
                       {['簽認圖', '平面圖', '設計圖', '施工圖', '色卡'].includes(reviewtype) && (
                         <Pattern_readonly key={theKey} />
                       )}
+                      {reviewtype === '外包計價' && <OutsourcingEdit userInfo={userInfo} readOnly={true} />}
                     </div>
                   ) : (
                     <p>頁面加載中...</p> // 可以顯示一個載入中的提示
