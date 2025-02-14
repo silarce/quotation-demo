@@ -11,8 +11,6 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import { Ttable, Tcell } from 'components/global/gear/table/table01';
-
 import Pdf_outsourcingPaymentMonthlyTable, {
   Tprops as Tprop_pdf,
 } from 'components/page/worksDepartment/outsourcingPricing/pdf_outsourcingPaymentMonthlyTable';
@@ -24,6 +22,8 @@ import { Upload } from 'antd';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
+import { Ttable, Tcell } from 'components/global/gear/table/table01';
+import Row, { Cell } from 'components/global/gear/table/row';
 
 // icon
 import { IconDetail, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -88,7 +88,8 @@ export default function OutsourcingPricingEdit({
   // const [targetPaymentId, setTargetPaymentId] = useState<string>();
 
   // -------------------------------------------------------------------------
-  const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
+  // const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
+  const [state_deduction, setState_deduction] = useState<TdeductionDto[]>([]);
 
   // -------------------------------------------------------------------------
   const params: Tparams = {
@@ -169,7 +170,7 @@ export default function OutsourcingPricingEdit({
       subTotal_detail_d = subTotal_detail_d.add(outsourcingTotal);
     });
 
-    payment.deduction?.forEach((deduction) => {
+    state_deduction?.forEach((deduction) => {
       subTotal_deduction_d = subTotal_deduction_d.add(deduction.price);
     });
 
@@ -194,31 +195,25 @@ export default function OutsourcingPricingEdit({
       tax,
       actualAmountReceived,
     };
-  }, [paymentDetail, payment, data_payment]);
+  }, [paymentDetail, state_deduction, data_payment]);
 
   // -------------------------------------------------------------------------
 
-  const addAnmountToBeDeducted = () => {
-    setPayment((prev) => {
-      return {
-        ...prev,
-        deduction: [...(prev.deduction ?? []), create_emptyDeduction()],
-      };
+  const addDeduction = () => {
+    setState_deduction((prev) => {
+      return [...prev, create_emptyDeduction()];
     });
   };
 
-  const deleteAnmountToBeDeducted = (index: number) => {
-    setPayment((prev) => {
-      return {
-        ...prev,
-        deduction: prev.deduction?.filter((_, i) => i !== index) ?? [],
-      };
+  const deleteDeduction = (index: number) => {
+    setState_deduction((prev) => {
+      return prev.filter((_, i) => i !== index);
     });
   };
 
   const editDeduction = ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => {
-    setPayment((prev) => {
-      const newArr = [...(prev.deduction ?? [])];
+    setState_deduction((prev) => {
+      const newArr = [...prev];
 
       if (key === 'price') {
         newArr[index][key] = Number(value);
@@ -226,11 +221,21 @@ export default function OutsourcingPricingEdit({
         newArr[index][key] = value;
       }
 
-      return {
-        ...prev,
-        deduction: newArr,
-      };
+      return newArr;
     });
+  };
+
+  const createEditDeduction = (index: number) => {
+    const func: React.Dispatch<React.SetStateAction<TdeductionDto>> = (setStateAction) => {
+      setState_deduction((prev) => {
+        const copy = [...prev];
+        copy[index] = typeof setStateAction === 'function' ? setStateAction(copy[index]) : setStateAction;
+
+        return copy;
+      });
+    };
+
+    return func;
   };
 
   // -------------------------------------------------------------------------
@@ -245,7 +250,7 @@ export default function OutsourcingPricingEdit({
     const body = {
       date: new Date().toISOString(),
       paymentSubTotal: subTotal_detail,
-      deduction: payment.deduction ?? [],
+      deduction: state_deduction,
       deductionTotal: subTotal_deduction,
       retainage: result.retainage,
       subTotal: result.subTotal,
@@ -281,9 +286,9 @@ export default function OutsourcingPricingEdit({
     //  subTotal_deduction
   } = useDeduction({
     disabled,
-    payment,
-    editDeduction,
-    deleteAnmountToBeDeducted,
+    state_deduction,
+    editDeduction: editDeduction,
+    deleteAnmountToBeDeducted: deleteDeduction,
   });
 
   const { control_table_actualAmountReceived, result } = useTable({
@@ -453,7 +458,8 @@ export default function OutsourcingPricingEdit({
   // MARK: useEffect
 
   useEffect(() => {
-    setPayment(paymentOri ?? create_emptyPayment());
+    // setPayment(paymentOri ?? create_emptyPayment());
+    setState_deduction(paymentOri?.deduction ?? []);
   }, [paymentOri, disabled]);
 
   useEffect(() => {
@@ -504,6 +510,17 @@ export default function OutsourcingPricingEdit({
             }}
           />
         )}
+
+        {/* <div>
+          <Row thead={true}>
+            <Cell>序號</Cell>
+            <Cell>工程編號</Cell>
+            <Cell>工程名稱</Cell>
+            <Cell>請款</Cell>
+            <Cell></Cell>
+          </Row>
+        </div> */}
+
         <Table
           caption={
             <>
@@ -528,13 +545,15 @@ export default function OutsourcingPricingEdit({
           className="w-fit m-auto mt-[96px]"
           control={control_table_project}
         />
+
         <Table
           caption="應扣明細"
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_deduction}
-          onAddClick={addAnmountToBeDeducted}
+          onAddClick={addDeduction}
         />
+
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
 
@@ -575,8 +594,17 @@ export default function OutsourcingPricingEdit({
 //
 //
 //
+// =============================================================================
 
-type Tconfig<keys extends string = string> = {
+interface TconfigItem {
+  label?: React.ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+// =============================================================================
+
+type Tconfig_legency<keys extends string = string> = {
   [key in keys]: {
     width?: React.CSSProperties['width'];
     flex?: React.CSSProperties['flex'];
@@ -594,7 +622,7 @@ type Tconfig<keys extends string = string> = {
   };
 };
 
-const config_public: Tconfig = {
+const config_public: Tconfig_legency = {
   left: {
     tbody: {
       flex: 'auto',
@@ -609,7 +637,7 @@ const config_public: Tconfig = {
   },
 };
 
-const config_projectTable: Tconfig = {
+const config_projectTable: Tconfig_legency = {
   indexNumber: {
     width: '60px',
     justifyContent: 'center',
@@ -662,7 +690,7 @@ const thead_projectTable: Ttable['thead'] = {
 };
 // ---------------------
 
-const config_deduction: Tconfig<
+const config_deduction: Tconfig_legency<
   'type' | 'itemName' | 'price' | 'price_enabled' | 'btn_delete' | 'label_subTotal' | 'subtotal'
 > = {
   type: {
@@ -721,7 +749,7 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
 
 // ======================================================================
 
-const config_actualAmountReceived: Tconfig = {
+const config_actualAmountReceived: Tconfig_legency = {
   caption: {
     flex: '1',
     justifyContent: 'center',
@@ -835,12 +863,12 @@ const useProject = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetai
 // MARK:useDeduction
 const useDeduction = ({
   disabled,
-  payment,
+  state_deduction,
   editDeduction,
   deleteAnmountToBeDeducted,
 }: {
   disabled: boolean;
-  payment: TupdateOutsourcingPaymentDto;
+  state_deduction: TdeductionDto[];
   editDeduction: ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => void;
   deleteAnmountToBeDeducted: (index: number) => void;
 }) => {
@@ -850,7 +878,7 @@ const useDeduction = ({
     //
     const control_tbody: Ttable['tbody'] = (() => {
       //
-      const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
+      const rowArr: Ttable['tbody']['rowArr'] = state_deduction.map((data, index) => {
         const { type, itemName, price } = data;
 
         decimal_subTotal = decimal_subTotal.add(price);
@@ -964,7 +992,7 @@ const useDeduction = ({
       control_table_deduction: control_table,
       subTotal_deduction: decimal_subTotal.toNumber(),
     };
-  }, [payment.deduction, disabled]);
+  }, [state_deduction, disabled]);
 };
 
 // MARK: useTable
