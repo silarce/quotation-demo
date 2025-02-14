@@ -73,12 +73,32 @@ export default function TrayList() {
             type: 'addButton',
             label: '新增托盤',
             onClick: () => {
+                // alert(((1000 + data.length) + 1).toString());
+                let nextrayname = ((1000 + data.length) + 1).toString();
                 router.push({
                     pathname: `/factoryDepartment/addTray`,
                     query: {
                         type: 'Tray',
                         whid: whid,
                         whname: whname,
+                        nextrayname: nextrayname,
+                    },
+                });
+            },
+        },
+        {
+            type: 'myButton',
+            label: '修改托盤',
+            onClick: () => {
+                // alert(((1000 + data.length) + 1).toString());
+                let nextrayname = ((1000 + data.length) + 1).toString();
+                router.push({
+                    pathname: `/factoryDepartment/editTray`,
+                    query: {
+                        type: 'Tray',
+                        whid: whid,
+                        whname: whname,
+                        nextrayname: nextrayname,
                     },
                 });
             },
@@ -153,7 +173,7 @@ export default function TrayList() {
 
             setData(distinctData);
             setDatafilter(data);
-            console.log(data);
+
             await new Promise(resolve => setTimeout(resolve, 50));
             if (data.length > 0 && checkfirstin > 0) {
                 const firstItem = data[0];
@@ -256,22 +276,58 @@ export default function TrayList() {
         fetchDataAndLayout();
     }, [whid, trayname]);
 
+    // async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
+    //     router.push({
+    //         pathname: `/factoryDepartment/editWHPosition`,
+    //         query: {
+    //             type: 'WHPosition',
+    //             whid: whid,
+    //             trayname: trayname,
+    //             whname: whname,
+    //             id: id,
+    //             traycalled: traycalled,
+    //             traycalledname: traycalledname,
+    //             traytransfer: traytransfer,
+    //             whnamecalled: whnamecalled
+    //         },
+    //     });
+    // }
+
     async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
+        const payload = {
+            type: 'trayDetail',
+            whid: whid,
+            trayname: trayname,
+            whname: whname,
+            id: id,
+        };
+        console.log(payload);
         router.push({
-            pathname: `/factoryDepartment/editWHPosition`,
+            pathname: `/factoryDepartment/trayDetail`,
             query: {
-                type: 'WHPosition',
-                whid: whid,
-                trayname: trayname,
-                whname: whname,
-                id: id,
-                traycalled: traycalled,
-                traycalledname: traycalledname,
-                traytransfer: traytransfer,
-                whnamecalled: whnamecalled
+                item: JSON.stringify(payload), // 確保 key 和接收端一致
             },
         });
+
+
+
+        //原本
+        // router.push({
+        //     pathname: `/factoryDepartment/editWHPosition`,
+        //     query: {
+        //         type: 'WHPosition',
+        //         whid: whid,
+        //         trayname: trayname,
+        //         whname: whname,
+        //         id: id
+        //         // traycalled: traycalled,
+        //         // traycalledname: traycalledname,
+        //         // traytransfer: traytransfer,
+        //         // whnamecalled: whnamecalled
+        //     },
+        // });
     }
+
 
     const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
         const convertToAlpha = (num: number): string => {
@@ -446,64 +502,10 @@ export default function TrayList() {
                 customeLeft={
                     [
                         <>
-
-
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <span style={{ padding: '0px 10px' }}>
-                                    {/* <button className={scss.longsquarebtn}
-                                        onClick={() => {
-                                            // SettlePayroll();
-
-                                            alert("入庫");
-                                        }}
-                                        title="">
-                                        入庫
-                                    </button> */}
-                                </span>
-                                <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
-                                {/* <button className={scss.longsquarebtn}
-                                        onClick={() => {
-                                            // SettlePayroll();
-
-                                            alert("出庫");
-                                        }}
-                                        title="">
-                                        出庫
-                                    </button> */}
-                                </span>
+                                <span style={{ padding: '0px 10px' }}></span>
+                                <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}></span>
                             </div>
-
-
-
-                            {/* <div>
-                                {!isLeftHidden && (
-                                    <div>
-                                        <button onClick={() => setLeftCount3(leftcount3 + 1)}>
-                                            <span style={{ width: '10px' }}>&nbsp;</span>
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!isRightHidden && (
-                                    <div>
-                                        <button onClick={() => setRightCount3(rightcount3 + 1)}>
-                                            <span style={{ width: '10px' }}>&nbsp;</span>
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!isFinalHidden && (
-                                    <div>
-                                        <button onClick={getDataTrans}>取得</button>
-                                        <button onClick={DataTrans}>轉換</button>
-                                        <button onClick={()=>{
-                                           setLeftCount3(0);
-                                           setRightCount3(0);
-                                        }}>關閉</button>
-                                    </div>
-                                )}
-                            </div> */}
-
                         </>
                     ]}
             />

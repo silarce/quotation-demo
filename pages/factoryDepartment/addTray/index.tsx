@@ -85,12 +85,16 @@ export default function AddTray() {
 
 
     const router = useRouter();
-    const { type, whid, whname, id } = router.query;
+    const { type, whid, whname, id, nextrayname } = router.query;
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [disabled, setDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     ;
+
+    useEffect(() => {
+        setTrayName(nextrayname as string);
+    });
 
     const AddLayOut = async () => {
         try {
@@ -322,11 +326,11 @@ export default function AddTray() {
 
 
 
-// useEffect(() => {
-//     if (traylayout.length > 0 && trayname) {
-//         AddTray();
-//     }
-// }, [traylayout]); // 當 traylayout 改變時觸發
+    // useEffect(() => {
+    //     if (traylayout.length > 0 && trayname) {
+    //         AddTray();
+    //     }
+    // }, [traylayout]); // 當 traylayout 改變時觸發
 
 
     // 點選呼叫托盤後功能紐
@@ -1102,17 +1106,18 @@ export default function AddTray() {
                             <InputSel
                                 {...inputSelProps}
                                 caption="托盤名稱"
+                                captionStyle={{ fontSize: '18px' }}                                
                                 disabled={false}
                                 inputProps={{
                                     props: {
-                                        // value: width ?? 0,
-                                        onChange: (e) => setTrayName(e.target.value)
+                                        value: trayname?.toString(),
+                                        onChange: (e) => { setTrayName(e.target.value) }
                                     },
                                 }}
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="寬"
+                                caption="寬↔"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1124,7 +1129,7 @@ export default function AddTray() {
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="長"
+                                caption="長↕"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1134,6 +1139,10 @@ export default function AddTray() {
                                     },
                                 }}
                             />
+                            <div style={{padding:'5px 0px'}}>
+                                <span style={{ color: 'red' }}>*請用方向鍵上下調整</span><br/>
+                                <span style={{ color: 'red' }}>*點擊主儲格後，可於下放調整子儲格</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1220,7 +1229,7 @@ export default function AddTray() {
 
                             <InputSel
                                 {...inputSelProps}
-                                caption="寬"
+                                caption="寬↔"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1236,7 +1245,7 @@ export default function AddTray() {
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="長"
+                                caption="長↕"
                                 disabled={false}
                                 inputProps={{
                                     props: {
