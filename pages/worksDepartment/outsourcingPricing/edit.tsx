@@ -11,8 +11,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
-import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import { Ttable, Tcell } from 'components/global/gear/table/table01';
+
 import Pdf_outsourcingPaymentMonthlyTable, {
   Tprops as Tprop_pdf,
 } from 'components/page/worksDepartment/outsourcingPricing/pdf_outsourcingPaymentMonthlyTable';
@@ -22,7 +22,6 @@ import { Upload } from 'antd';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
@@ -38,20 +37,13 @@ import {
   ToutsourcingPaymentDetailDto,
   ToutsourcingPaymentDto,
   TupdateOutsourcingPaymentDto,
-  useGetOutsourcing,
-  useGetOutsourcingPayment,
   useGetOutsourcingPayment_id_kit,
-  useGetOutsourcingPayment_id,
   useGetOutsourcingPaymentDetail,
   apiClearDebt,
 } from 'js/api/api_outsourcing';
 
 // type
-import { TuserDto, TemployeeDto, TdeductionDto } from 'js/api/dtoTypes';
-import { TmyBtn } from 'components/global/gear/button/myButton_v2';
-
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { TuserDto, TdeductionDto } from 'js/api/dtoTypes';
 
 import PaymentSelectSlideBar from 'components/page/worksDepartment/outsourcingPricing/edti/paymentSelectSlideBar';
 import Table from 'components/page/worksDepartment/outsourcingPricing/edti/table';
@@ -206,52 +198,6 @@ export default function OutsourcingPricingEdit({
 
   // -------------------------------------------------------------------------
 
-  // useEffect(() => {
-  //   if (!paymentOri) {
-  //     return;
-  //   }
-
-  //   const {
-  //     reviewCheckerEmployee, //  '核對人員'
-  //     reviewSupervisorEmployee, //  '審核主管'
-  //     reviewManagerEmployee, //  '總經理'
-  //     reviewAccountingEmployee, //  '會計'
-  //     reviewCashierEmployee, //  '出納'
-  //   } = paymentOri;
-
-  //   setManager(reviewManagerEmployee);
-  //   setSupervisor(reviewSupervisorEmployee);
-  //   setAccounting(reviewAccountingEmployee);
-  //   setChecker(reviewCheckerEmployee);
-  //   setCashier(reviewCashierEmployee);
-  // }, [paymentOri, disabled]);
-
-  // useEffect(() => {
-  //   setPayment(paymentOri ?? create_emptyPayment());
-  // }, [paymentOri, disabled]);
-
-  // useEffect(() => {
-  //   update_payment();
-  //   update_detail();
-  // }, [paymentId]);
-
-  // useEffect(() => {
-  //   if (data_payment) {
-  //     setTargetOutsourcingId(data_payment.outsourcing.id);
-  //     setTargetPaymentId(data_payment.id);
-  //   }
-  // }, [!!data_payment]);
-
-  // useEffect(() => {
-  //   router.push({
-  //     query: {
-  //       paymentId: targetPaymentId,
-  //     },
-  //   });
-  // }, [targetPaymentId]);
-
-  // -------------------------------------------------------------------------
-
   const addAnmountToBeDeducted = () => {
     setPayment((prev) => {
       return {
@@ -345,345 +291,6 @@ export default function OutsourcingPricingEdit({
     data_payment,
     subTotal_deduction,
   });
-
-  // const { control_table_project } =
-  // useMemo(() => {
-  //   const control_tbody: Ttable['tbody'] = (() => {
-  //     const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
-  //       const { outsourcingTotal, engineeringContact } = data;
-
-  //       const href = {
-  //         pathname: './detail',
-  //         query: {
-  //           paymentDetailId: data.id,
-  //           // outsourcingId,
-  //         },
-  //       };
-
-  //       const cellArr: Tcell[] = [
-  //         {
-  //           children: index + 1,
-  //           ...config_projectTable.indexNumber,
-  //         },
-  //         {
-  //           children: projectNumber,
-  //           ...config_projectTable.projectNumber,
-  //         },
-  //         {
-  //           children: projectName,
-  //           ...config_projectTable.projectName,
-  //         },
-  //         {
-  //           children: outsourcingTotal.toLocaleString(),
-  //           ...config_projectTable.subTotal_invoice.tbody,
-  //         },
-  //         {
-  //           children: (
-  //             <Link href={href}>
-  //               <IconDetail />
-  //             </Link>
-  //           ),
-  //           ...config_projectTable.btn_info.tbody,
-  //         },
-  //       ];
-
-  //       return {
-  //         cellArr,
-  //       };
-  //     });
-
-  //     rowArr.push({
-  //       cellArr: [
-  //         {
-  //           children: '小計',
-  //           ...config_projectTable.label_subTotal.tbody,
-  //         },
-  //         {
-  //           children: subTotal_detail.toLocaleString(),
-  //           ...config_projectTable.subtotal.tbody,
-  //         },
-  //       ],
-  //     });
-
-  //     return {
-  //       rowArr,
-  //     };
-  //   })();
-
-  //   const control_table: Ttable = {
-  //     thead: thead_projectTable,
-  //     tbody: control_tbody,
-  //     haveBorder: true,
-  //   };
-
-  //   return {
-  //     //
-  //     control_table_project: control_table,
-  //   };
-  // }, [paymentDetail, subTotal_detail, outsourcingId]);
-
-  // ------------------------------11-------------------------------------------
-
-  // const { control_table_deduction } =
-  // useMemo(() => {
-  //   //
-
-  //   //
-  //   const control_tbody: Ttable['tbody'] = (() => {
-  //     //
-  //     const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
-  //       const { type, itemName, price } = data;
-
-  //       const inputWidth_type = config_deduction.type.inputWidth;
-  //       const inputWidth_item = config_deduction.itemName.inputWidth;
-  //       const inputWidth_price = config_deduction.price_enabled.inputWidth;
-
-  //       const typeChildren = (
-  //         <input
-  //           value={type}
-  //           onChange={(e) => {
-  //             editDeduction({ index, key: 'type', value: e.target.value });
-  //           }}
-  //           className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-  //           style={{ width: inputWidth_type }}
-  //           readOnly={disabled}
-  //         />
-  //       );
-
-  //       const itemChildren = (
-  //         <input
-  //           value={itemName}
-  //           onChange={(e) => {
-  //             editDeduction({ index, key: 'itemName', value: e.target.value });
-  //           }}
-  //           className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-  //           style={{ width: inputWidth_item }}
-  //           readOnly={disabled}
-  //         />
-  //       );
-
-  //       const subTotal_invoiceChildren = (
-  //         <input
-  //           value={disabled ? price.toLocaleString() : price}
-  //           onChange={(e) => {
-  //             editDeduction({ index, key: 'price', value: e.target.value });
-  //           }}
-  //           type={disabled ? 'text' : 'number'}
-  //           className={classNames(scss.inputInTable, scss.textRight, !disabled && scss.enabled)}
-  //           style={{ width: inputWidth_price }}
-  //           readOnly={disabled}
-  //         />
-  //       );
-
-  //       const cellArr: Tcell[] = [
-  //         {
-  //           children: typeChildren,
-  //           ...config_deduction.type,
-  //         },
-  //         {
-  //           children: itemChildren,
-  //           ...config_deduction.itemName,
-  //         },
-  //         {
-  //           children: subTotal_invoiceChildren,
-  //           ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
-  //         },
-  //       ];
-
-  //       if (!disabled) {
-  //         cellArr.push({
-  //           children: (
-  //             <IconDelete01
-  //               onClick={() => {
-  //                 myAlert.confirm({
-  //                   title: '確定要刪除嗎?',
-  //                   props: {
-  //                     onOk: () => {
-  //                       deleteAnmountToBeDeducted(index);
-  //                     },
-  //                   },
-  //                 });
-  //               }}
-  //             />
-  //           ),
-  //           ...config_deduction.btn_delete.tbody,
-  //         });
-  //       }
-
-  //       return {
-  //         cellArr,
-  //       };
-  //     });
-
-  //     rowArr.push({
-  //       cellArr: [
-  //         {
-  //           children: '小計',
-  //           ...config_projectTable.label_subTotal.tbody,
-  //         },
-  //         {
-  //           children: subTotal_deduction.toLocaleString(),
-  //           ...config_projectTable.subtotal.tbody,
-  //         },
-  //       ],
-  //     });
-
-  //     return {
-  //       rowArr,
-  //     };
-  //   })();
-
-  //   const control_table: Ttable = {
-  //     thead: thead_amountToBeDeducted,
-  //     tbody: control_tbody,
-  //     haveBorder: true,
-  //   };
-
-  //   return {
-  //     control_table_deduction: control_table,
-  //   };
-  // }, [payment.deduction, subTotal_deduction, disabled]);
-
-  // -------------------------------------------------------------------------
-
-  // const { control_table_actualAmountReceived, result } =
-  // useMemo(() => {
-  //   //
-
-  //   const result = {
-  //     retainage: retainage, // 本期保留款項
-  //     subTotal: subTotal_actualReceived,
-  //     salesTax: tax,
-  //     total: actualAmountReceived, // 實領總計
-  //   };
-
-  //   //
-  //   const rowArr: Ttable['tbody']['rowArr'] = [
-  //     //
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '請款合計',
-  //           ...config_actualAmountReceived.caption,
-  //         },
-  //         {
-  //           children: subTotal_detail.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //         },
-  //       ],
-  //     },
-  //     //
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '本期保留10%',
-  //           ...config_actualAmountReceived.caption,
-  //         },
-  //         {
-  //           children: retainage.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //           className: scss.textRed,
-  //         },
-  //       ],
-  //     },
-  //     //
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '上期保留10%',
-  //           ...config_actualAmountReceived.caption,
-  //         },
-  //         {
-  //           children: latestPeriodKeep.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //           className: scss.textGreen,
-  //         },
-  //       ],
-  //     },
-  //     //
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '應扣明細',
-  //           ...config_actualAmountReceived.caption,
-  //         },
-  //         {
-  //           children: subTotal_deduction.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //           className: scss.textRed,
-  //         },
-  //       ],
-  //     },
-  //     //
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '小計',
-  //           ...config_actualAmountReceived.caption.tbody,
-  //         },
-  //         {
-  //           children: subTotal_actualReceived.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '稅額5%',
-  //           ...config_actualAmountReceived.caption.tbody,
-  //         },
-  //         {
-  //           children: tax.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       cellArr: [
-  //         {
-  //           children: '實領金額',
-  //           ...config_actualAmountReceived.caption.tbody,
-  //         },
-  //         {
-  //           children: actualAmountReceived.toLocaleString(),
-  //           ...config_actualAmountReceived.subTotal_invoice.tbody,
-  //           className: scss.textBold,
-  //         },
-  //       ],
-  //     },
-  //   ]; // rowArr
-
-  //   const tbody = {
-  //     rowArr,
-  //   };
-
-  //   const control_table: Ttable = {
-  //     thead: thead_actualAmountReceived,
-  //     tbody,
-  //     haveBorder: true,
-  //   };
-
-  //   return {
-  //     control_table_actualAmountReceived: control_table,
-  //     result,
-  //   };
-  //   //
-  // }, [
-  //   subTotal_detail,
-  //   subTotal_deduction,
-  //   latestPeriodKeep,
-  //   retainage,
-  //   subTotal_actualReceived,
-  //   tax,
-  //   actualAmountReceived,
-  // ]);
-
-  // -------------------------------------------------------------------------
-
-  // -------------------------------------------------------------------------
-
-  // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
 
@@ -857,18 +464,8 @@ export default function OutsourcingPricingEdit({
   useEffect(() => {
     if (data_payment) {
       setTargetOutsourcingId(data_payment.outsourcing.id);
-      // setTargetPaymentId(data_payment.id);
     }
   }, [!!data_payment]);
-
-  // useEffect(() => {
-  //   !readOnly &&
-  //     router.replace({
-  //       query: {
-  //         paymentId: targetPaymentId,
-  //       },
-  //     });
-  // }, [targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
