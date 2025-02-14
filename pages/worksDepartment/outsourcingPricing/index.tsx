@@ -6,7 +6,7 @@
 // UX改善
 // 關於tabBar，被選中者置中應該會比較好，方便使用者點擊上一個被選中者
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -19,7 +19,10 @@ import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/Pag
 import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable } from 'components/global/gear/table/table01';
 import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
-import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import TabCarousel02, {
+  Tcontrol_tabCarousel,
+  TimperativeHandle,
+} from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 
 // css
 import scss from './index.module.scss';
@@ -305,6 +308,8 @@ const VendorMonthPanel = ({
   // ----------------------------------------------------------------------
   const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
 
+  const ref_carousel = useRef<TimperativeHandle>(null!);
+
   // ----------------------------------------------------------------------
 
   const filter = {
@@ -406,18 +411,15 @@ const VendorMonthPanel = ({
 
   // ----------------------------------------------------------------------
 
+  useEffect(() => {
+    ref_carousel.current.slideToIndex(activeIndex);
+  }, []);
+
+  // ----------------------------------------------------------------------
+
   return (
     <div className={className}>
-      <TabCarousel02
-        control={control_tabCarousel}
-        //
-        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
-        // 藉以移動到在OutsourcingList選中的廠商
-        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
-        onMount={({ ref_slider }) => {
-          ref_slider.current.slickGoTo(activeIndex);
-        }}
-      />
+      <TabCarousel02 ref={ref_carousel} control={control_tabCarousel} />
       <DateCollapse className={classNames('m-auto mt-1')} control={control_dateCollapse} />
     </div>
   );
@@ -437,6 +439,8 @@ const MonthVendorPanel = ({
 
   // ----------------------------------------------------------------------
   const [activeTab_date, setActiveTab_date] = useState<number>(0);
+
+  const ref_carousel = useRef<TimperativeHandle>(null!);
 
   // ----------------------------------------------------------------------
 
@@ -560,14 +564,15 @@ const MonthVendorPanel = ({
   };
 
   // ----------------------------------------------------------------------
+
+  useEffect(() => {
+    ref_carousel.current.slideToIndex(defaultCarouselIndex);
+  }, []);
+
+  // ----------------------------------------------------------------------
   return (
     <div className={classNames(className)}>
-      <TabCarousel02
-        control={control_tabCarousel}
-        onMount={({ ref_slider }) => {
-          ref_slider.current.slickGoTo(defaultCarouselIndex);
-        }}
-      />
+      <TabCarousel02 ref={ref_carousel} control={control_tabCarousel} />
       <Wrapper_tab
         className={classNames('m-auto')}
         childrenOption={{
@@ -590,13 +595,13 @@ const MonthVendorPanel = ({
 // ====================================================================
 // ====================================================================
 
-function generateRandomDate(): string {
-  const start = moment().year(2022).startOf('year');
-  const end = moment().year(2024).endOf('year');
-  const randomDate = start.add(Math.random() * end.diff(start));
+// function generateRandomDate(): string {
+//   const start = moment().year(2022).startOf('year');
+//   const end = moment().year(2024).endOf('year');
+//   const randomDate = start.add(Math.random() * end.diff(start));
 
-  return randomDate.toISOString();
-}
+//   return randomDate.toISOString();
+// }
 
 // ====================================================================
 
