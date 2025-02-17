@@ -67,7 +67,7 @@ const style = {
 // 以下的高度值都是在直接在控制台看元素的高度而定義的
 const height_page = 867;
 const height_top = 38;
-const height_bottom = 304 + 200; // 加200是因為下方要留白
+const height_bottom = 337 + 200; // 加200是因為下方要留白
 const height_thead = 27;
 // const allowHeight_wholePage = 323;
 const allowHeight_table = height_page - height_thead;
@@ -515,7 +515,7 @@ const Bottom = ({ className }: { className?: string }) => {
 
       <div className={scss.deductionTotal}>
         <Cell className={classNames(scss.a)}>按裝物料</Cell>
-        <Cell className={classNames(scss.b, 'text-sm')}>
+        <Cell className={classNames(scss.b)}>
           {installationMaterialsArr.map((item, index) => {
             return (
               <React.Fragment key={index}>
@@ -526,7 +526,7 @@ const Bottom = ({ className }: { className?: string }) => {
           })}
         </Cell>
         <Cell className={classNames(scss.c)}>借支勞保</Cell>
-        <Cell className={classNames(scss.d, 'text-sm')}>
+        <Cell className={classNames(scss.d)}>
           {laborInsuranceLoanArr.map((item, index) => {
             return (
               <React.Fragment key={index}>
