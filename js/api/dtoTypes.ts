@@ -4916,11 +4916,19 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
   otherWorkItemTotal: number | null; // 特殊項目之合計
 };
 
+// export type TupdateOutsourcingPaymentDetailDto = {
+//   engineeringContactId: string; // 工程聯落單id
+//   installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+//   // outsourcing: number; // 外包計價明細總計
+//   outsourcingTotal: number; // 外包計價明細總計
+// };
 export type TupdateOutsourcingPaymentDetailDto = {
-  engineeringContactId: string; // 工程聯落單id
-  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+  engineeringContactId: string | null; // 工程聯落單id
+  installItems: TcreateOutsourcingPaymentDetailItemDto[] | null; // 項目
   // outsourcing: number; // 外包計價明細總計
   outsourcingTotal: number; // 外包計價明細總計
+
+  itemDetail?: TitemDetail[] | null;
 };
 
 export type ToutsourcingPaymentDetailItemDto = {

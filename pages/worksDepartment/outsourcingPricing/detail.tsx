@@ -131,7 +131,7 @@ export default function OutsourcingPricingDetail() {
   // ---------------------------------------------------------------------
   // const [disabled, setDisabled] = useState(!isNew);
   const stateDisabled = useState(false);
-  let disabled = stateDisabled[0];
+  const disabled = stateDisabled[0];
   const setDisabled = stateDisabled[1];
 
   const [isLoading, setIsLoading] = useState(false);
@@ -153,11 +153,11 @@ export default function OutsourcingPricingDetail() {
   const outsourcingId = outsourcing?.id;
   const isPaymentCleared = outsourcingPayment?.isPaymentCleared;
 
-  const isFromEngineeringContact = !!installItems;
+  // const isFromEngineeringContact = !!installItems;
   const isFromUserCreat = !!itemDetail;
 
   const isAllowEditProfile = isNew || isFromUserCreat;
-  isFromUserCreat && (disabled = true); // 現在沒有api可以更新itemDetail
+  // isFromUserCreat && (disabled = true); // 現在沒有api可以更新itemDetail
 
   // ---------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ export default function OutsourcingPricingDetail() {
   // region REQUEST
 
   const reqPatchOutsourcingPaymentDetail = async () => {
-    if (!paymentDetailId || !engineeringContact?.id) {
+    if (!paymentDetailId) {
       return;
     }
 
@@ -206,47 +206,94 @@ export default function OutsourcingPricingDetail() {
 
     const otherWorkItemGroup = groupOtherWorkItem();
 
-    const installItems: TcreateOutsourcingPaymentDetailItemDto[] = Object.values(state_installItemDict).map(
-      (state_installItem) => {
-        const { key, id, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
+    let body: TupdateOutsourcingPaymentDetailDto;
 
-        if (!id) {
-          console.error(state_installItem);
+    if (!isFromUserCreat) {
+      if (!engineeringContact?.id) {
+        myAlert.err({ title: '更新外包計價單錯誤', content: '沒有engineeringContact.id' });
 
-          throw new Error('reqPatchOutsourcingPaymentDetail: 沒有installItem.id');
-        }
+        return;
+      }
 
-        const otherWorkItems: ToutsourcingPaymentDetailItemDto[] = otherWorkItemGroup[key].map(
-          (state_otherWorkItem) => {
-            const { content, quantity, unitPrice, totalPrice } = state_otherWorkItem;
-            const otherWorkItem: ToutsourcingPaymentDetailItemDto = {
-              otherInstallation: content,
-              otherQuantity: Number(quantity || 0),
-              otherUnitPrice: Number(unitPrice || 0),
-              otherSubTotalPrice: totalPrice,
-              quotationItemStatusId: deliveryStatusId,
-            };
+      const installItems: TcreateOutsourcingPaymentDetailItemDto[] = Object.values(state_installItemDict).map(
+        (state_installItem) => {
+          const { key, id, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
 
-            return otherWorkItem;
+          if (!id) {
+            console.error(state_installItem);
+
+            throw new Error('reqPatchOutsourcingPaymentDetail: 沒有installItem.id');
           }
-        );
 
-        const installItem: TcreateOutsourcingPaymentDetailItemDto = {
-          itemId: id,
-          itemPrice: Number(unitPrice || 0),
-          otherWorkItems: otherWorkItems,
-          otherWorkItemTotal: totalPrice,
+          const otherWorkItems: ToutsourcingPaymentDetailItemDto[] = otherWorkItemGroup[key]?.map(
+            (state_otherWorkItem) => {
+              const { content, quantity, unitPrice, totalPrice } = state_otherWorkItem;
+              const otherWorkItem: ToutsourcingPaymentDetailItemDto = {
+                otherInstallation: content,
+                otherQuantity: Number(quantity || 0),
+                otherUnitPrice: Number(unitPrice || 0),
+                otherSubTotalPrice: totalPrice,
+                quotationItemStatusId: deliveryStatusId,
+              };
+
+              return otherWorkItem;
+            }
+          );
+
+          const installItem: TcreateOutsourcingPaymentDetailItemDto = {
+            itemId: id,
+            itemPrice: Number(unitPrice || 0),
+            otherWorkItems: otherWorkItems,
+            otherWorkItemTotal: totalPrice,
+          };
+
+          return installItem;
+        }
+      );
+
+      body = {
+        engineeringContactId: engineeringContact.id,
+        installItems: installItems,
+        outsourcingTotal: state_outsourcingTotal,
+      };
+    } else {
+      // const itemDetailArr: TitemDetail[] = [];
+
+      const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
+        const { key, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
+
+        const singleItemDetail: TsingleItemDetail[] = otherWorkItemGroup[key]?.map((state_otherWorkItem) => {
+          const { content, quantity, unitPrice } = state_otherWorkItem;
+
+          const singleItemDetail: TsingleItemDetail = {
+            floorNumber: state_otherWorkItem.floorNumber,
+            content,
+            quantity: Number(quantity || 0),
+            unitPrice: Number(unitPrice || 0),
+          };
+
+          return singleItemDetail;
+        });
+
+        const itemDetail: TitemDetail = {
+          floorNumber: state_installItem.floorNumber,
+          width: Number(state_installItem.width || 0),
+          height: Number(state_installItem.height || 0),
+          talent: Number(state_installItem.talent || 0),
+          quantity: Number(state_installItem.quantity || 0),
+          unitPrice: Number(unitPrice || 0),
+          singleItemDetail: singleItemDetail,
         };
 
-        return installItem;
-      }
-    );
-
-    const body: TupdateOutsourcingPaymentDetailDto = {
-      engineeringContactId: engineeringContact.id,
-      installItems: installItems,
-      outsourcingTotal: state_outsourcingTotal,
-    };
+        return itemDetail;
+      });
+      body = {
+        engineeringContactId: null,
+        installItems: null,
+        outsourcingTotal: state_outsourcingTotal,
+        itemDetail: itemDetailArr,
+      };
+    }
 
     try {
       setIsLoading(true);
@@ -257,31 +304,6 @@ export default function OutsourcingPricingDetail() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const reqPatchOutsourcingPaymentDetail_fromUserCreate = async () => {
-    if (!paymentDetailId) {
-      myAlert.err({ title: '外包計價單錯誤', content: '沒有paymentId' });
-
-      return;
-    }
-
-    if (!checkOtherWorkItemArr()) {
-      myAlert.warning({
-        title: '特殊工作項目錯誤',
-        content: '樓層編號不得為空白',
-      });
-
-      return;
-    }
-
-    myAlert.info({ title: '功能未完成' });
-
-    // 使用者新建的detail會在itemDetail裡面
-    // TitemDetail沒有id，也沒有engineeringContact
-    // TcreateOutsourcingPaymentDetailItemDto也不收itemDetail
-
-    // 剩下的等確認api後再寫
   };
 
   const reqPost = async () => {
