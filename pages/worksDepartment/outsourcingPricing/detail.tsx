@@ -129,7 +129,11 @@ export default function OutsourcingPricingDetail() {
   const paymentDetailId = isNew ? undefined : query.paymentDetailId;
 
   // ---------------------------------------------------------------------
-  const [disabled, setDisabled] = useState(!isNew);
+  // const [disabled, setDisabled] = useState(!isNew);
+  const stateDisabled = useState(false);
+  let disabled = stateDisabled[0];
+  const setDisabled = stateDisabled[1];
+
   const [isLoading, setIsLoading] = useState(false);
   // ---------------------------------------------------------------------
 
@@ -143,10 +147,17 @@ export default function OutsourcingPricingDetail() {
     isLoading_outsourcingPaymentDetail,
   } = useGetOutsourcingPaymentDetail_id(paymentDetailId);
 
-  const { engineeringContact, outsourcingPayment } = paymentDetail ?? {};
+  const { engineeringContact, outsourcingPayment, installItems, itemDetail } = paymentDetail ?? {};
 
   const outsourcing = isNew ? outsourcing_forNew : outsourcingPayment?.outsourcing;
   const outsourcingId = outsourcing?.id;
+  const isPaymentCleared = outsourcingPayment?.isPaymentCleared;
+
+  const isFromEngineeringContact = !!installItems;
+  const isFromUserCreat = !!itemDetail;
+
+  const isAllowEditProfile = isNew || isFromUserCreat;
+  isFromUserCreat && (disabled = true); // 現在沒有api可以更新itemDetail
 
   // ---------------------------------------------------------------------
 
@@ -246,6 +257,31 @@ export default function OutsourcingPricingDetail() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const reqPatchOutsourcingPaymentDetail_fromUserCreate = async () => {
+    if (!paymentDetailId) {
+      myAlert.err({ title: '外包計價單錯誤', content: '沒有paymentId' });
+
+      return;
+    }
+
+    if (!checkOtherWorkItemArr()) {
+      myAlert.warning({
+        title: '特殊工作項目錯誤',
+        content: '樓層編號不得為空白',
+      });
+
+      return;
+    }
+
+    myAlert.info({ title: '功能未完成' });
+
+    // 使用者新建的detail會在itemDetail裡面
+    // TitemDetail沒有id，也沒有engineeringContact
+    // TcreateOutsourcingPaymentDetailItemDto也不收itemDetail
+
+    // 剩下的等確認api後再寫
   };
 
   const reqPost = async () => {
@@ -351,13 +387,15 @@ export default function OutsourcingPricingDetail() {
   });
 
   const panelList_disabled: TpanelList = [
-    {
-      type: 'redButton',
-      label: '編輯',
-      onClick: () => {
-        setDisabled(false);
-      },
-    },
+    !isPaymentCleared
+      ? {
+          type: 'redButton',
+          label: '編輯',
+          onClick: () => {
+            setDisabled(false);
+          },
+        }
+      : null,
     {
       type: 'myButton',
       label: '返回',
@@ -412,7 +450,7 @@ export default function OutsourcingPricingDetail() {
           <InputSel caption={'外包廠商'} showBaseline="invisible" node={outsourcing?.name} />
           <InputSel
             caption={'工程編號'}
-            disabled={isNew ? disabled : true}
+            disabled={isAllowEditProfile ? disabled : true}
             showBaseline="auto"
             inputProps={{
               props: {
@@ -426,7 +464,7 @@ export default function OutsourcingPricingDetail() {
           />
           <InputSel
             caption={'工程日期'}
-            disabled={isNew ? disabled : true}
+            disabled={isAllowEditProfile ? disabled : true}
             showBaseline="auto"
             datePickerProps={{
               props: {
@@ -441,7 +479,7 @@ export default function OutsourcingPricingDetail() {
           <InputSel
             caption={'工程名稱'}
             className="col-span-2"
-            disabled={isNew ? disabled : true}
+            disabled={isAllowEditProfile ? disabled : true}
             showBaseline="auto"
             inputProps={{
               props: {
@@ -457,7 +495,7 @@ export default function OutsourcingPricingDetail() {
             inputSelProps={{
               caption: '工程地址',
               className: 'col-span-2',
-              disabled: isNew ? disabled : true,
+              disabled: isAllowEditProfile ? disabled : true,
               showBaseline: 'auto',
             }}
             addressProps={{
@@ -466,7 +504,7 @@ export default function OutsourcingPricingDetail() {
                 props: {
                   menuPortalTarget: undefined,
                   placeholder: '',
-                  isDisabled: isNew ? disabled : true,
+                  isDisabled: isAllowEditProfile ? disabled : true,
                   value: { value: state_profile.county, label: state_profile.county },
                   onChange: (option) => {
                     const value = option?.value ?? '';
@@ -484,7 +522,7 @@ export default function OutsourcingPricingDetail() {
                 props: {
                   menuPortalTarget: undefined,
                   placeholder: '',
-                  isDisabled: isNew ? disabled : true,
+                  isDisabled: isAllowEditProfile ? disabled : true,
                   value: { value: state_profile.district, label: state_profile.district },
                   onChange: (option) => {
                     const value = option?.value ?? '';
@@ -499,7 +537,7 @@ export default function OutsourcingPricingDetail() {
               address: {
                 props: {
                   placeholder: '',
-                  readOnly: isNew ? disabled : true,
+                  readOnly: isAllowEditProfile ? disabled : true,
                   value: state_profile.address,
                   onChange: (e) => {
                     setState_profile((prev) => ({ ...prev, address: e.target.value }));
@@ -513,7 +551,7 @@ export default function OutsourcingPricingDetail() {
 
         <div className="mt-10">
           <IconAddCircle
-            className={classNames('mb-2', (disabled || !isNew) && 'invisible')}
+            className={classNames('mb-2', (disabled || !isAllowEditProfile) && 'invisible')}
             onClick={() => {
               !disabled && addInstallItem();
             }}
